@@ -1,38 +1,148 @@
-.App {
+/* App.css */
+
+/* Gaya dasar untuk seluruh aplikasi */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f4f7f9;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+/* Kontainer utama aplikasi */
+.app-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+  color: #1a2c42;
   text-align: center;
+  margin-bottom: 2rem;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+h2 {
+  color: #34495e;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 0.5rem;
+  margin-top: 2.5rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Gaya untuk form */
+.job-form {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+}
+
+.job-form input,
+.job-form select {
+  padding: 0.8rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  flex-grow: 1;
+}
+
+.job-form input:focus,
+.job-form select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Gaya untuk semua tombol */
+button {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+button:hover {
+  transform: translateY(-2px);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Tombol utama (Tambah) */
+.btn-submit {
+  background-color: #007bff;
+}
+.btn-submit:hover {
+  background-color: #0056b3;
+}
+
+/* Tombol Selesaikan */
+.btn-finish {
+  background-color: #dc3545;
+}
+.btn-finish:hover {
+  background-color: #c82333;
+}
+
+/* Tombol Mulai Kerjakan */
+.btn-start {
+  background-color: #28a745;
+}
+.btn-start:hover {
+  background-color: #218838;
+}
+
+
+/* Gaya untuk tabel */
+.job-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.job-table th,
+.job-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.job-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #495057;
+}
+
+.job-table tbody tr:hover {
+  background-color: #f1f3f5;
+}
+
+/* Gaya untuk status di dalam tabel */
+.status {
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 0.8rem;
+  color: #fff;
+  text-align: center;
+  display: inline-block;
+  min-width: 110px;
+}
+
+.status-belum {
+  background-color: #6c757d; /* Abu-abu */
+}
+
+.status-sedang {
+  background-color: #ffc107; /* Kuning */
+  color: #333;
+}
+
+.status-selesai {
+  background-color: #17a2b8; /* Biru kehijauan */
 }
