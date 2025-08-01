@@ -20,11 +20,37 @@ function App() {
     setJobs([...jobs, newJob]);
   };
 
+  const selesaikanPekerjaan = (id) => {
+    setJobs((prevJobs) => {
+      const updatedJobs = prevJobs.map((job) =>
+        job.id === id ? { ...job, status: 'Selesai' } : job
+      );
+
+      const justFinished = prevJobs.find((job) => job.id === id);
+      if (justFinished) {
+        const nextJobIndex = updatedJobs.findIndex(
+          (job) =>
+            job.namaPekerja === justFinished.namaPekerja &&
+            job.status === 'Belum Dikerjakan'
+        );
+
+        if (nextJobIndex !== -1) {
+          updatedJobs[nextJobIndex] = {
+            ...updatedJobs[nextJobIndex],
+            status: 'Sedang Dikerjakan',
+          };
+        }
+      }
+
+      return updatedJobs;
+    });
+  };
+
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Ticketing Tracker</h1>
       <JobForm addJob={addJob} />
-      <JobList jobs={jobs} />
+      <JobList jobs={jobs} selesaikanPekerjaan={selesaikanPekerjaan} />
     </div>
   );
 }

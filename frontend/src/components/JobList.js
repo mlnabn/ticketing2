@@ -1,6 +1,6 @@
 import React from 'react';
 
-function JobList({ jobs }) {
+function JobList({ jobs, selesaikanPekerjaan }) {
   return (
     <div>
       <h2>Daftar Pekerjaan</h2>
@@ -11,6 +11,7 @@ function JobList({ jobs }) {
             <th>Nama Pekerja</th>
             <th>Nama Pekerjaan</th>
             <th>Status</th>
+            <th>Aksi</th>
           </tr>
         </thead>
         <tbody>
@@ -20,6 +21,13 @@ function JobList({ jobs }) {
               <td>{job.namaPekerja}</td>
               <td>{job.namaPekerjaan}</td>
               <td>{job.status}</td>
+              <td>
+                {job.status === 'Sedang Dikerjakan' && (
+                  <button onClick={() => selesaikanPekerjaan(job.id)}>
+                    Selesaikan
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
