@@ -1,5 +1,3 @@
-// JobForm.js
-
 import React, { useState } from 'react';
 
 // Terima props 'pekerjaList' dan 'statusList'

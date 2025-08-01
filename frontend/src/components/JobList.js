@@ -1,5 +1,4 @@
-// JobList.js
-import React from 'react';
+  import React from 'react';
 
 function JobList({ jobs, selesaikanPekerjaan, mulaiPekerjaan }) {
   const getStatusClass = (status) => {
