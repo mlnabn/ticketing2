@@ -1,6 +1,9 @@
-  import React from 'react';
+// JobList.js
 
-function JobList({ jobs, selesaikanPekerjaan, mulaiPekerjaan }) {
+import React from 'react';
+
+// Terima props `jobs` dan `updateJobStatus` dari App.js
+function JobList({ jobs, updateJobStatus }) {
   const getStatusClass = (status) => {
     if (status === 'Selesai') return 'status-selesai';
     if (status === 'Sedang Dikerjakan') return 'status-sedang';
@@ -10,7 +13,6 @@ function JobList({ jobs, selesaikanPekerjaan, mulaiPekerjaan }) {
   return (
     <div>
       <h2>Daftar Pekerjaan</h2>
-      {/* Ganti tabel dengan className */}
       <table className="job-table">
         <thead>
           <tr>
@@ -22,26 +24,28 @@ function JobList({ jobs, selesaikanPekerjaan, mulaiPekerjaan }) {
           </tr>
         </thead>
         <tbody>
-          {jobs.map((job) => (
+          {/* Pastikan `jobs` tidak kosong sebelum di-map */}
+          {jobs && jobs.map((job) => (
             <tr key={job.id}>
               <td>{job.id}</td>
-              <td>{job.namaPekerja}</td>
-              <td>{job.namaPekerjaan}</td>
+              {/* Akses nama pekerja dari relasi yang dikirim Laravel */}
+              <td>{job.worker ? job.worker.name : 'N/A'}</td>
+              <td>{job.title}</td>
               <td>
-                {/* Tambahkan span dengan className dinamis untuk status */}
                 <span className={`status ${getStatusClass(job.status)}`}>
                   {job.status}
                 </span>
               </td>
               <td>
+                {/* Tombol akan memanggil fungsi `updateJobStatus` dengan parameter yang sesuai */}
                 {job.status === 'Sedang Dikerjakan' && (
-                  <button onClick={() => selesaikanPekerjaan(job.id)} className="btn-finish">
+                  <button onClick={() => updateJobStatus(job.id, 'Selesai')} className="btn-finish">
                     Selesaikan
                   </button>
                 )}
                 
                 {job.status === 'Belum Dikerjakan' && (
-                  <button onClick={() => mulaiPekerjaan(job.id)} className="btn-start">
+                  <button onClick={() => updateJobStatus(job.id, 'Sedang Dikerjakan')} className="btn-start">
                     Mulai Kerjakan
                   </button>
                 )}

@@ -1,100 +1,61 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import JobForm from './components/JobForm';
 import JobList from './components/JobList';
-import './App.css'
+import './App.css';
 
-const DAFTAR_PEKERJA = ['Andi', 'Budi', 'Citra', 'Dewi'];
-const DAFTAR_STATUS = ['Belum Dikerjakan', 'Sedang Dikerjakan'];
+// 2. Definisikan URL base API Laravel Anda
+const API_URL = 'http://127.0.0.1:8000/api';
 
 function App() {
-  const [jobs, setJobs] = useState(() => {
-    const savedJobs = localStorage.getItem('jobs');
-    return savedJobs ? JSON.parse(savedJobs) : [];
-  });
+  const [jobs, setJobs] = useState([]);
+  const [workers, setWorkers] = useState([]);
 
+  // 3. Gunakan useEffect untuk mengambil data saat komponen dimuat pertama kali
   useEffect(() => {
-    localStorage.setItem('jobs', JSON.stringify(jobs));
-  }, [jobs]);
+    fetchData();
+  }, []);
 
-  const addJob = (namaPekerja, namaPekerjaan, status) => {
-    if (status === 'Sedang Dikerjakan') {
-      const isWorkerBusy = jobs.some(
-        (job) => job.namaPekerja === namaPekerja && job.status === 'Sedang Dikerjakan'
-      );
-      if (isWorkerBusy) {
-        alert(`${namaPekerja} sudah memiliki pekerjaan yang sedang dikerjakan! Status diubah menjadi 'Belum Dikerjakan'.`);
-        status = 'Belum Dikerjakan';
-      }
+  // Fungsi untuk mengambil semua data dari backend
+  const fetchData = async () => {
+    try {
+      const [jobsResponse, workersResponse] = await Promise.all([
+        axios.get(`${API_URL}/jobs`),
+        axios.get(`${API_URL}/workers`)
+      ]);
+      setJobs(jobsResponse.data);
+      setWorkers(workersResponse.data);
+    } catch (error) {
+      console.error("Gagal mengambil data dari server:", error);
     }
-    
-    const newJob = {
-      id: new Date().getTime(),
-      namaPekerja,
-      namaPekerjaan,
-      status,
-    };
-    setJobs([...jobs, newJob]);
   };
 
-  // PASTIKAN FUNGSI INI ADA DI SINI
-  const mulaiPekerjaan = (id) => {
-    const jobToStart = jobs.find((job) => job.id === id);
-    if (!jobToStart) return;
-
-    const isWorkerBusy = jobs.some(
-      (job) => job.namaPekerja === jobToStart.namaPekerja && job.status === 'Sedang Dikerjakan'
-    );
-
-    if (isWorkerBusy) {
-      alert(`${jobToStart.namaPekerja} tidak bisa memulai pekerjaan baru karena masih ada pekerjaan yang aktif.`);
-      return;
+  // Fungsi untuk MENAMBAH pekerjaan baru, akan dikirim ke JobForm
+  const addJob = async (formData) => {
+    try {
+      await axios.post(`${API_URL}/jobs`, formData);
+      fetchData(); // Ambil ulang data terbaru setelah berhasil menambah
+    } catch (error) {
+      console.error("Gagal menambah pekerjaan:", error);
     }
-
-    setJobs((prevJobs) =>
-      prevJobs.map((job) =>
-        job.id === id ? { ...job, status: 'Sedang Dikerjakan' } : job
-      )
-    );
   };
 
-  const selesaikanPekerjaan = (id) => {
-    setJobs((prevJobs) => {
-      let updatedJobs = prevJobs.map((job) =>
-        job.id === id ? { ...job, status: 'Selesai' } : job
-      );
-
-      const justFinished = prevJobs.find((job) => job.id === id);
-      if (justFinished) {
-        const nextJobIndex = updatedJobs.findIndex(
-          (job) =>
-            job.namaPekerja === justFinished.namaPekerja &&
-            job.status === 'Belum Dikerjakan'
-        );
-
-        if (nextJobIndex !== -1) {
-          updatedJobs[nextJobIndex] = {
-            ...updatedJobs[nextJobIndex],
-            status: 'Sedang Dikerjakan',
-          };
-        }
-      }
-      return updatedJobs;
-    });
+  // Fungsi untuk MENGUBAH status pekerjaan, akan dikirim ke JobList
+  const updateJobStatus = async (id, newStatus) => {
+    try {
+      await axios.patch(`${API_URL}/jobs/${id}/status`, { status: newStatus });
+      fetchData(); // Ambil ulang data terbaru setelah berhasil update
+    } catch (error) {
+      console.error("Gagal mengubah status pekerjaan:", error);
+    }
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <div className="app-container">
       <h1>Ticketing Tracker</h1>
-      <JobForm
-        addJob={addJob}
-        pekerjaList={DAFTAR_PEKERJA}
-        statusList={DAFTAR_STATUS}
-      />
-      <JobList
-        jobs={jobs}
-        selesaikanPekerjaan={selesaikanPekerjaan}
-        mulaiPekerjaan={mulaiPekerjaan}
-      />
+      {/* Kirim fungsi dan data yang relevan sebagai props */}
+      <JobForm workers={workers} addJob={addJob} />
+      <JobList jobs={jobs} updateJobStatus={updateJobStatus} />
     </div>
   );
 }
