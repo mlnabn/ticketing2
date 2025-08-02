@@ -23,38 +23,40 @@ function JobForm({ workers, addJob }) {
 
   const selectedWorker = workerOptions.find(option => option.value === workerId);
 
-  // Styling react-select supaya mirip input text
+  // Styling react-select
   const selectStyles = {
     control: (provided) => ({
       ...provided,
-      backgroundColor: "#f9f9f9",
+      backgroundColor: "var(--input-bg)",
       borderRadius: "10px",
-      borderColor: "#d0d0d0",
+      borderColor: "var(--border-color)",
       minHeight: "45px",
       fontWeight: 500
     }),
     placeholder: (provided) => ({
       ...provided,
-      color: "#333",
+      color: "var(--placeholder-color)",
       fontWeight: 500
     }),
     singleValue: (provided) => ({
       ...provided,
-      color: "#333",
+      color: "var(--text-color)",
       fontWeight: 500
     })
   };
 
   return (
     <form onSubmit={handleSubmit} className="job-form">
+      
       {/* Dropdown pekerja */}
       <Select
         options={workerOptions}
         onChange={(selected) => setWorkerId(selected.value)}
         value={selectedWorker}
-        placeholder="Pekerja"
+        placeholder="Pilih Pekerja"
         isSearchable
         styles={selectStyles}
+        classNamePrefix="react-select"
         required
       />
 
@@ -78,6 +80,7 @@ function JobForm({ workers, addJob }) {
         value={{ value: status, label: status }}
         placeholder="Status"
         styles={selectStyles}
+        classNamePrefix="react-select"
         required
       />
 
