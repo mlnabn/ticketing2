@@ -234,6 +234,13 @@ body.dark .job-filter select {
   background-color: #111;
 }
 
+.btn-delete {
+  background-color: red; /* Abu-abu */
+}
+.btn-delete:hover {
+  background-color: #5a6268;
+}
+
 /* Responsif */
 @media (max-width: 600px) {
   .job-form {

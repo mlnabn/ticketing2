@@ -1,9 +1,7 @@
-// JobList.js
-
 import React from 'react';
 
-// Terima props `jobs` dan `updateJobStatus` dari App.js
-function JobList({ jobs, updateJobStatus }) {
+// 1. Terima prop `deleteJob` yang sudah kita buat di App.js
+function JobList({ jobs, updateJobStatus, deleteJob }) {
   const getStatusClass = (status) => {
     if (status === 'Selesai') return 'status-selesai';
     if (status === 'Sedang Dikerjakan') return 'status-sedang';
@@ -24,11 +22,10 @@ function JobList({ jobs, updateJobStatus }) {
           </tr>
         </thead>
         <tbody>
-          {/* Pastikan `jobs` tidak kosong sebelum di-map */}
           {jobs && jobs.map((job) => (
             <tr key={job.id}>
               <td>{job.id}</td>
-              {/* Akses nama pekerja dari relasi yang dikirim Laravel */}
+              {/* 3. Tetap gunakan struktur data dari API */}
               <td>{job.worker ? job.worker.name : 'N/A'}</td>
               <td>{job.title}</td>
               <td>
@@ -37,7 +34,6 @@ function JobList({ jobs, updateJobStatus }) {
                 </span>
               </td>
               <td>
-                {/* Tombol akan memanggil fungsi `updateJobStatus` dengan parameter yang sesuai */}
                 {job.status === 'Sedang Dikerjakan' && (
                   <button onClick={() => updateJobStatus(job.id, 'Selesai')} className="btn-finish">
                     Selesaikan
@@ -47,6 +43,16 @@ function JobList({ jobs, updateJobStatus }) {
                 {job.status === 'Belum Dikerjakan' && (
                   <button onClick={() => updateJobStatus(job.id, 'Sedang Dikerjakan')} className="btn-start">
                     Mulai Kerjakan
+                  </button>
+                )}
+
+                {/* 2. Tambahkan tombol Hapus dari kode teman Anda */}
+                {job.status === 'Selesai' && (
+                  <button
+                    onClick={() => deleteJob(job.id)}
+                    className="btn-delete"
+                  >
+                    🗑️ Delete
                   </button>
                 )}
               </td>
