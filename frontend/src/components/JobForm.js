@@ -1,57 +1,86 @@
-// JobForm.js
-
 import React, { useState } from 'react';
+import Select from 'react-select';
 
-// Terima props `workers` dan `addJob` dari App.js
 function JobForm({ workers, addJob }) {
-  // State lokal hanya untuk mengelola input form
   const [title, setTitle] = useState('');
   const [workerId, setWorkerId] = useState('');
   const [status, setStatus] = useState('Belum Dikerjakan');
-  
-  // Set workerId default saat data workers pertama kali diterima
-  if (workers.length > 0 && workerId === '') {
-      setWorkerId(workers[0].id);
-  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (title && workerId && status) {
-      // Kirim data dalam bentuk object ke fungsi addJob
       addJob({ title, worker_id: workerId, status });
-      setTitle(''); // Reset input title
+      setTitle('');
+      setWorkerId('');
+      setStatus('Belum Dikerjakan');
     }
+  };
+
+  const workerOptions = workers.map(worker => ({
+    value: worker.id,
+    label: worker.name
+  }));
+
+  const selectedWorker = workerOptions.find(option => option.value === workerId);
+
+  // Styling react-select supaya mirip input text
+  const selectStyles = {
+    control: (provided) => ({
+      ...provided,
+      backgroundColor: "#f9f9f9",
+      borderRadius: "10px",
+      borderColor: "#d0d0d0",
+      minHeight: "45px",
+      fontWeight: 500
+    }),
+    placeholder: (provided) => ({
+      ...provided,
+      color: "#333",
+      fontWeight: 500
+    }),
+    singleValue: (provided) => ({
+      ...provided,
+      color: "#333",
+      fontWeight: 500
+    })
   };
 
   return (
     <form onSubmit={handleSubmit} className="job-form">
-      {/* Dropdown untuk memilih pekerja */}
-      <select value={workerId} onChange={(e) => setWorkerId(e.target.value)} required>
-        <option value="" disabled>Pilih Pekerja</option>
-        
-        {/* Tambahkan pengecekan `Array.isArray(workers)` sebelum melakukan map */}
-        {Array.isArray(workers) && workers.map((worker) => (
-          <option key={worker.id} value={worker.id}>
-            {worker.name}
-          </option>
-        ))}
-      </select>
+      {/* Dropdown pekerja */}
+      <Select
+        options={workerOptions}
+        onChange={(selected) => setWorkerId(selected.value)}
+        value={selectedWorker}
+        placeholder="Pekerja"
+        isSearchable
+        styles={selectStyles}
+        required
+      />
 
-      {/* Input untuk nama pekerjaan */}
+      {/* Input nama pekerjaan */}
       <input
         type="text"
         placeholder="Nama Pekerjaan"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
+        className="input-like-select"
       />
 
-      {/* Dropdown untuk status */}
-      <select value={status} onChange={(e) => setStatus(e.target.value)} required>
-          <option value="Belum Dikerjakan">Belum Dikerjakan</option>
-          <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
-      </select>
-      
+      {/* Dropdown status */}
+      <Select
+        options={[
+          { value: 'Belum Dikerjakan', label: 'Belum Dikerjakan' },
+          { value: 'Sedang Dikerjakan', label: 'Sedang Dikerjakan' }
+        ]}
+        onChange={(selected) => setStatus(selected.value)}
+        value={{ value: status, label: status }}
+        placeholder="Status"
+        styles={selectStyles}
+        required
+      />
+
       <button type="submit" className="btn-submit">Tambah</button>
     </form>
   );

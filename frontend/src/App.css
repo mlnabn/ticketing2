@@ -23,7 +23,6 @@ body.dark {
 }
 
 .app-container {
-  /* max-width: 960px; */
   margin: auto;
   padding: 2rem;
   background-color: #fff;
@@ -77,6 +76,29 @@ body.dark .job-form select {
   border-color: #007bff;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
   outline: none;
+}
+
+
+
+/* Khusus input Nama Pekerjaan agar mirip select */
+.input-like-select {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-height: 38px;
+  padding: 0 8px;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.input-like-select:focus {
+  border-color: #2684FF;
+  box-shadow: 0 0 0 3px rgba(38, 132, 255, 0.2);
+  outline: none;
+}
+
+.input-like-select::placeholder {
+  color: #999;
 }
 
 /* Tombol */
@@ -235,7 +257,7 @@ body.dark .job-filter select {
 }
 
 .btn-delete {
-  background-color: red; /* Abu-abu */
+  background-color: red;
 }
 .btn-delete:hover {
   background-color: #5a6268;
@@ -251,10 +273,6 @@ body.dark .job-filter select {
   .job-table td {
     font-size: 0.9rem;
     padding: 0.7rem;
-  }
-
-  .job-table td:last-child {
-    flex-direction: column;
   }
 
   button {
