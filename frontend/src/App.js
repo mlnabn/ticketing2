@@ -4,17 +4,24 @@ import JobForm from './components/JobForm';
 import JobList from './components/JobList';
 import './App.css';
 
-// 2. Definisikan URL base API Laravel Anda
+// URL base API Laravel Anda
 const API_URL = 'http://127.0.0.1:8000/api';
 
 function App() {
   const [jobs, setJobs] = useState([]);
   const [workers, setWorkers] = useState([]);
+  // Fitur dari kode teman Anda: State untuk Dark Mode
+  const [darkMode, setDarkMode] = useState(false);
 
-  // 3. Gunakan useEffect untuk mengambil data saat komponen dimuat pertama kali
+  // Mengambil data dari backend saat komponen dimuat
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Fitur dari kode teman Anda: Efek untuk mengubah tema
+  useEffect(() => {
+    document.body.classList.toggle('dark', darkMode);
+  }, [darkMode]);
 
   // Fungsi untuk mengambil semua data dari backend
   const fetchData = async () => {
@@ -30,32 +37,62 @@ function App() {
     }
   };
 
-  // Fungsi untuk MENAMBAH pekerjaan baru, akan dikirim ke JobForm
+  // Fungsi untuk MENAMBAH pekerjaan baru
   const addJob = async (formData) => {
     try {
       await axios.post(`${API_URL}/jobs`, formData);
-      fetchData(); // Ambil ulang data terbaru setelah berhasil menambah
+      fetchData();
     } catch (error) {
       console.error("Gagal menambah pekerjaan:", error);
     }
   };
 
-  // Fungsi untuk MENGUBAH status pekerjaan, akan dikirim ke JobList
+  // Fungsi untuk MENGUBAH status pekerjaan
   const updateJobStatus = async (id, newStatus) => {
     try {
       await axios.patch(`${API_URL}/jobs/${id}/status`, { status: newStatus });
-      fetchData(); // Ambil ulang data terbaru setelah berhasil update
+      fetchData();
     } catch (error) {
       console.error("Gagal mengubah status pekerjaan:", error);
+    }
+  };
+  
+  // Fitur dari kode teman Anda: Fungsi HAPUS pekerjaan (diadaptasi untuk API)
+  const deleteJob = async (id) => {
+    const jobToDelete = jobs.find(j => j.id === id);
+    if (!jobToDelete) return;
+
+    const confirmHapus = window.confirm(
+      `Yakin ingin menghapus pekerjaan "${jobToDelete.title}"?`
+    );
+
+    if (confirmHapus) {
+        try {
+            await axios.delete(`${API_URL}/jobs/${id}`);
+            fetchData(); // Ambil ulang data terbaru setelah berhasil menghapus
+        } catch (error) {
+            console.error("Gagal menghapus pekerjaan:", error);
+        }
     }
   };
 
   return (
     <div className="app-container">
+      {/* Fitur dari kode teman Anda: Tombol Dark Mode */}
+      <button className="dark-toggle" onClick={() => setDarkMode(!darkMode)}>
+        {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+      </button>
+
       <h1>Ticketing Tracker</h1>
-      {/* Kirim fungsi dan data yang relevan sebagai props */}
+      
       <JobForm workers={workers} addJob={addJob} />
-      <JobList jobs={jobs} updateJobStatus={updateJobStatus} />
+      
+      {/* Kirim fungsi deleteJob sebagai prop baru ke JobList */}
+      <JobList 
+        jobs={jobs} 
+        updateJobStatus={updateJobStatus} 
+        deleteJob={deleteJob} 
+      />
     </div>
   );
 }
