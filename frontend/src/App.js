@@ -4,94 +4,88 @@ import JobForm from './components/JobForm';
 import JobList from './components/JobList';
 import './App.css';
 
-// URL base API Laravel Anda
 const API_URL = 'http://127.0.0.1:8000/api';
 
 function App() {
-  const [jobs, setJobs] = useState([]);
+  // Pastikan nama state adalah 'tickets' dan 'setTickets'
+  const [tickets, setTickets] = useState([]); 
   const [workers, setWorkers] = useState([]);
-  // Fitur dari kode teman Anda: State untuk Dark Mode
   const [darkMode, setDarkMode] = useState(false);
 
-  // Mengambil data dari backend saat komponen dimuat
   useEffect(() => {
     fetchData();
   }, []);
 
-  // Fitur dari kode teman Anda: Efek untuk mengubah tema
   useEffect(() => {
     document.body.classList.toggle('dark', darkMode);
   }, [darkMode]);
 
-  // Fungsi untuk mengambil semua data dari backend
   const fetchData = async () => {
     try {
-      const [jobsResponse, workersResponse] = await Promise.all([
-        axios.get(`${API_URL}/jobs`),
+      const [ticketsResponse, workersResponse] = await Promise.all([
+        axios.get(`${API_URL}/tickets`),
         axios.get(`${API_URL}/workers`)
       ]);
-      setJobs(jobsResponse.data);
+      // Pastikan data dari ticketsResponse disimpan menggunakan setTickets
+      setTickets(ticketsResponse.data); 
       setWorkers(workersResponse.data);
     } catch (error) {
       console.error("Gagal mengambil data dari server:", error);
     }
-  };
+  };  
 
-  // Fungsi untuk MENAMBAH pekerjaan baru
-  const addJob = async (formData) => {
+  const addTicket = async (formData) => {
     try {
-      await axios.post(`${API_URL}/jobs`, formData);
+      await axios.post(`${API_URL}/tickets`, formData);
       fetchData();
     } catch (error) {
-      console.error("Gagal menambah pekerjaan:", error);
+      console.error("Gagal menambah tiket:", error);
     }
   };
 
-  // Fungsi untuk MENGUBAH status pekerjaan
-  const updateJobStatus = async (id, newStatus) => {
+  const updateTicketStatus = async (id, newStatus) => {
     try {
-      await axios.patch(`${API_URL}/jobs/${id}/status`, { status: newStatus });
+      await axios.patch(`${API_URL}/tickets/${id}/status`, { status: newStatus });
       fetchData();
     } catch (error) {
-      console.error("Gagal mengubah status pekerjaan:", error);
+      console.error("Gagal mengubah status tiket:", error);
     }
   };
   
-  // Fitur dari kode teman Anda: Fungsi HAPUS pekerjaan (diadaptasi untuk API)
-  const deleteJob = async (id) => {
-    const jobToDelete = jobs.find(j => j.id === id);
-    if (!jobToDelete) return;
+  const deleteTicket = async (id) => {
+    // Pastikan fungsi ini mencari dari state 'tickets'
+    const ticketToDelete = tickets.find(t => t.id === id); 
+    if (!ticketToDelete) return;
 
     const confirmHapus = window.confirm(
-      `Yakin ingin menghapus pekerjaan "${jobToDelete.title}"?`
+      `Yakin ingin menghapus pekerjaan "${ticketToDelete.title}"?`
     );
 
     if (confirmHapus) {
         try {
-            await axios.delete(`${API_URL}/jobs/${id}`);
-            fetchData(); // Ambil ulang data terbaru setelah berhasil menghapus
+            await axios.delete(`${API_URL}/tickets/${id}`);
+            fetchData();
         } catch (error) {
-            console.error("Gagal menghapus pekerjaan:", error);
+            console.error("Gagal menghapus tiket:", error);
         }
     }
   };
 
   return (
     <div className="app-container">
-      {/* Fitur dari kode teman Anda: Tombol Dark Mode */}
       <button className="dark-toggle" onClick={() => setDarkMode(!darkMode)}>
         {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
       </button>
 
       <h1>Ticketing Tracker</h1>
       
-      <JobForm workers={workers} addJob={addJob} />
+      <JobForm workers={workers} addTicket={addTicket} /> 
       
-      {/* Kirim fungsi deleteJob sebagai prop baru ke JobList */}
+      {/* Pastikan prop yang dikirim ke JobList adalah 'tickets' */}
       <JobList 
-        jobs={jobs} 
-        updateJobStatus={updateJobStatus} 
-        deleteJob={deleteJob} 
+        tickets={tickets} 
+        updateTicketStatus={updateTicketStatus} 
+        deleteTicket={deleteTicket} 
       />
     </div>
   );

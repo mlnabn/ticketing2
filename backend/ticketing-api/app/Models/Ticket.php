@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Job extends Model {
+class Ticket extends Model
+{
     use HasFactory;
-    protected $fillable = ['title', 'status', 'worker_id']; // Izinkan mass-assignment
+
+    protected $fillable = ['title', 'status', 'worker_id'];
+
     public function worker() {
-        return $this->belongsTo(Worker::class);
-    }
+    return $this->belongsTo(Worker::class);
+}
 }

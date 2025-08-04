@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 
-function JobForm({ workers, addJob }) {
+// DIUBAH: Terima prop 'addTicket', bukan 'addJob'
+function JobForm({ workers, addTicket }) { 
   const [title, setTitle] = useState('');
   const [workerId, setWorkerId] = useState('');
   const [status, setStatus] = useState('Belum Dikerjakan');
@@ -9,21 +10,23 @@ function JobForm({ workers, addJob }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (title && workerId && status) {
-      addJob({ title, worker_id: workerId, status });
+      // DIUBAH: Panggil fungsi 'addTicket'
+      addTicket({ title, worker_id: workerId, status }); 
       setTitle('');
       setWorkerId('');
       setStatus('Belum Dikerjakan');
     }
   };
 
-  const workerOptions = workers.map(worker => ({
+  // DITAMBAH: Pengaman jika 'workers' belum berupa array
+  const workerOptions = Array.isArray(workers) ? workers.map(worker => ({
     value: worker.id,
     label: worker.name
-  }));
+  })) : [];
 
   const selectedWorker = workerOptions.find(option => option.value === workerId);
 
-  // Styling react-select
+  // Styling (tidak ada perubahan)
   const selectStyles = {
     control: (provided) => ({
       ...provided,
@@ -48,10 +51,9 @@ function JobForm({ workers, addJob }) {
   return (
     <form onSubmit={handleSubmit} className="job-form">
       
-      {/* Dropdown pekerja */}
       <Select
         options={workerOptions}
-        onChange={(selected) => setWorkerId(selected.value)}
+        onChange={(selected) => setWorkerId(selected ? selected.value : '')}
         value={selectedWorker}
         placeholder="Pilih Pekerja"
         isSearchable
@@ -60,7 +62,6 @@ function JobForm({ workers, addJob }) {
         required
       />
 
-      {/* Input nama pekerjaan */}
       <input
         type="text"
         placeholder="Nama Pekerjaan"
@@ -70,7 +71,6 @@ function JobForm({ workers, addJob }) {
         className="input-like-select"
       />
 
-      {/* Dropdown status */}
       <Select
         options={[
           { value: 'Belum Dikerjakan', label: 'Belum Dikerjakan' },
