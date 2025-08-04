@@ -47,7 +47,7 @@ body.dark {
 
 body.dark .app-container {
   background-color: #2c2c3e;
-  color: #f5f5f5;
+  color: black;
 }
 
 /* Heading */
@@ -261,5 +261,77 @@ body.dark .job-table tbody tr:hover {
 
   button {
     width: 100%;
+  }
+}
+
+@media (max-width: 768px){
+  .job-table {
+    display: none;
+  }
+
+  .job-table,
+  .job-table tbody,
+  .job-table tr,
+  .job-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .job-table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0;
+  }
+
+  body.dark .job-table tr {
+    border-color: #444;
+  }
+
+  .job-table td {
+    /* Atur posisi untuk label */
+    text-align: right;
+    position: relative;
+    padding-left: 50%;
+    border-bottom: 1px solid #eee;
+  }
+
+  body.dark .job-table td {
+    border-bottom: 1px solid #4a4a66;
+  }
+
+  .job-table tr td:last-child {
+    border-bottom: none;
+  }
+
+  /* Buat label dari atribut data-label yang kita tambahkan di JSX */
+  .job-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1rem;
+    width: calc(50% - 2rem);
+    text-align: left;
+    font-weight: bold;
+    color: #333;
+  }
+
+  body.dark .job-table td::before {
+    color: #eee;
+  }
+
+  /* Atur agar status dan tombol aksi rata kanan */
+  .job-table td .status,
+  .job-table td button {
+    width: auto;
+    float: right;
+  }
+
+  /* Atur agar tombol di kolom Aksi memiliki jarak */
+  .job-table td[data-label="Aksi"] {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
   }
 }

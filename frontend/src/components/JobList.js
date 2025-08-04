@@ -24,16 +24,15 @@ function JobList({ tickets, updateTicketStatus, deleteTicket }) {
         <tbody>
           {tickets && tickets.map((tickets) => (
             <tr key={tickets.id}>
-              <td>{tickets.id}</td>
-              {/* 3. Tetap gunakan struktur data dari API */}
-              <td>{tickets.worker ? tickets.worker.name : 'N/A'}</td>
-              <td>{tickets.title}</td>
-              <td>
+              <td data-label="ID">{tickets.id}</td>
+              <td data-label="Nama Pekerja">{tickets.worker ? tickets.worker.name : 'N/A'}</td>
+              <td data-label="Nama Pekerjaan">{tickets.title}</td>
+              <td data-label="Status">
                 <span className={`status ${getStatusClass(tickets.status)}`}>
                   {tickets.status}
                 </span>
               </td>
-              <td>
+              <td data-label="Aksi">
                 {tickets.status === 'Sedang Dikerjakan' && (
                   <button onClick={() => updateTicketStatus(tickets.id, 'Selesai')} className="btn-finish">
                     Selesaikan
