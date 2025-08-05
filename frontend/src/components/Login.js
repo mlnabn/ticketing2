@@ -28,64 +28,65 @@ function Login({ onLogin, onShowRegister }) {
     }
   };
 
-//   return (
-//     <form onSubmit={handleSubmit} className="auth-form">
-//       <h2>Login</h2>
-//       <input
-//         type="email"
-//         placeholder="Email"
-//         value={email}
-//         onChange={(e) => setEmail(e.target.value)}
-//         required
-//       />
-//       <input
-//         type="password"
-//         placeholder="Password"
-//         value={password}
-//         onChange={(e) => setPassword(e.target.value)}
-//         required
-//       />
-//       <button type="submit" disabled={loading}>
-//         {loading ? 'Memproses...' : 'Login'}
-//       </button>
-//     </form>
-//   );
+  const handleForgotPassword = () => {
+    alert('Silakan hubungi admin atau reset melalui email.');
+    // Atau redirect ke halaman lupa password:
+    // window.location.href = '/forgot-password';
+  };
 
-    return (
-        <div className="login-page">
-        <form onSubmit={handleSubmit} className="login-card">
-            <h2>Login</h2>
-            <div className="input-group">
-            <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-            />
-            </div>
-            <div className="input-group">
-            <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-            />
-            </div>
-            <div className="login-options">
-            <label>
-                <input type="checkbox" /> Remember me
-            </label>
-            <a href="#">Forgot password?</a>
-            </div>
-            <button type="submit" className="login-btn">Login</button>
-            <p className="auth-toggle">
-                Don't have an account? <button type="button" onClick={onShowRegister} className="register-link">Register</button>
-            </p>
-        </form>
+  return (
+    <div className="login-page">
+      <form onSubmit={handleSubmit} className="login-card">
+        <h2>Login</h2>
+
+        <div className="input-group">
+          <span className="input-icon">📧</span>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </div>
-        );
-    }
+
+        <div className="input-group">
+          <span className="input-icon">🔒</span>
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="login-options">
+          <label>
+            <input type="checkbox" /> Remember me
+          </label>
+          <button
+            type="button"
+            className="forgot-password"
+            onClick={handleForgotPassword}
+          >
+            Forgot password?
+          </button>
+        </div>
+
+        <button type="submit" className="login-btn" disabled={loading}>
+          {loading ? 'Processing...' : 'Login'}
+        </button>
+
+        <p className="auth-toggle">
+          Don't have an account?{' '}
+          <button type="button" onClick={onShowRegister} className="register-link">
+            Register
+          </button>
+        </p>
+      </form>
+    </div>
+  );
+}
 
 export default Login;

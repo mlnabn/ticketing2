@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const API_URL = 'http://127.0.0.1:8000/api';
 
-function Register({ onRegister }) {
+function Register({ onRegister, onShowLogin }) {
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -19,7 +19,6 @@ function Register({ onRegister }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validasi password lokal (optional)
     if (form.password !== form.password_confirmation) {
       alert('Password dan konfirmasi tidak cocok!');
       return;
@@ -36,7 +35,6 @@ function Register({ onRegister }) {
         alert('Registrasi berhasil tapi token tidak ditemukan.');
       }
     } catch (err) {
-      // Jika Laravel mengirim validasi error
       if (err.response && err.response.data && err.response.data.message) {
         alert(`Registrasi gagal: ${err.response.data.message}`);
       } else {
@@ -48,16 +46,71 @@ function Register({ onRegister }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="auth-form">
-      <h2>Register</h2>
-      <input type="text" name="name" placeholder="Nama" onChange={handleChange} required />
-      <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
-      <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
-      <input type="password" name="password_confirmation" placeholder="Konfirmasi Password" onChange={handleChange} required />
-      <button type="submit" disabled={loading}>
-        {loading ? 'Memproses...' : 'Register'}
-      </button>
-    </form>
+    <div className="register-page">
+      <form onSubmit={handleSubmit} className="register-card">
+        <h2>Register</h2>
+
+        <div className="input-group">
+          <span className="input-icon">👤</span>
+          <input
+            type="text"
+            name="name"
+            placeholder="Nama"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="input-group">
+          <span className="input-icon">📧</span>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="input-group">
+          <span className="input-icon">🔒</span>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="input-group">
+          <span className="input-icon">🔒</span>
+          <input
+            type="password"
+            name="password_confirmation"
+            placeholder="Konfirmasi Password"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <button type="submit" className="register-btn" disabled={loading}>
+          {loading ? 'Memproses...' : 'Register'}
+        </button>
+
+        {/* ✅ Tombol untuk kembali ke Login */}
+        <p className="auth-toggle">
+          Have an account?{" "}
+          <button
+            type="button"
+            onClick={onShowLogin}
+            className="login-link"
+          >
+            Login
+          </button>
+        </p>
+      </form>
+    </div>
   );
 }
 

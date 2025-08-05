@@ -85,18 +85,22 @@ function App() {
   };
 
   if (!isLogin) {
-    return (
-      <div className="auth-container">
-        {showRegister ? (
-          <>
-            <Register onRegister={() => setIsLogin(true)} />
-            <p>Sudah punya akun? <button onClick={() => setShowRegister(false)}>Login</button></p>
-          </>
-        ) : (
-          <>
-            <Login onLogin={() => setIsLogin(true)} onShowRegister={() => setShowRegister(true)} />
-            <p>Belum punya akun? <button onClick={() => setShowRegister(true)}>Register</button></p>
-          </>
+  return (
+    <div className="auth-container">
+      {showRegister ? (
+        <>
+          <Register
+            onRegister={() => setIsLogin(true)}
+            onShowLogin={() => setShowRegister(false)}
+          />
+        </>
+      ) : (
+        <>
+          <Login
+            onLogin={() => setIsLogin(true)}
+            onShowRegister={() => setShowRegister(true)}
+          />
+        </>
         )}
       </div>
     );
