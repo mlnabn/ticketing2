@@ -9,9 +9,9 @@ class Ticket extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'status', 'worker_id'];
+    protected $fillable = ['title', 'status', 'user_id'];
 
-    public function worker() {
-    return $this->belongsTo(Worker::class);
+    public function user() {
+    return $this->belongsTo(User::class);
 }
 }

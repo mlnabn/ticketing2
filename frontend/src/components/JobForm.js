@@ -2,29 +2,29 @@ import React, { useState } from 'react';
 import Select from 'react-select';
 
 // DIUBAH: Terima prop 'addTicket', bukan 'addJob'
-function JobForm({ workers, addTicket }) { 
+function JobForm({ users, addTicket }) { 
   const [title, setTitle] = useState('');
-  const [workerId, setWorkerId] = useState('');
+  const [userId, setuserId] = useState('');
   const [status, setStatus] = useState('Belum Dikerjakan');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (title && workerId && status) {
+    if (title && userId && status) {
       // DIUBAH: Panggil fungsi 'addTicket'
-      addTicket({ title, worker_id: workerId, status }); 
+      addTicket({ title, user_id: userId, status }); 
       setTitle('');
-      setWorkerId('');
+      setuserId('');
       setStatus('Belum Dikerjakan');
     }
   };
 
-  // DITAMBAH: Pengaman jika 'workers' belum berupa array
-  const workerOptions = Array.isArray(workers) ? workers.map(worker => ({
-    value: worker.id,
-    label: worker.name
+  // DITAMBAH: Pengaman jika 'users' belum berupa array
+  const userOptions = Array.isArray(users) ? users.map(user => ({
+    value: user.id,
+    label: user.name
   })) : [];
 
-  const selectedWorker = workerOptions.find(option => option.value === workerId);
+  const selecteduser = userOptions.find(option => option.value === userId);
 
   // Styling (tidak ada perubahan)
   const selectStyles = {
@@ -52,9 +52,9 @@ function JobForm({ workers, addTicket }) {
     <form onSubmit={handleSubmit} className="job-form">
       
       <Select
-        options={workerOptions}
-        onChange={(selected) => setWorkerId(selected ? selected.value : '')}
-        value={selectedWorker}
+        options={userOptions}
+        onChange={(selected) => setuserId(selected ? selected.value : '')}
+        value={selecteduser}
         placeholder="Pilih Pekerja"
         isSearchable
         styles={selectStyles}

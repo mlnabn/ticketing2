@@ -12,7 +12,7 @@ const API_URL = 'http://127.0.0.1:8000/api';
 
 function App() {
   const [tickets, setTickets] = useState([]);
-  const [workers, setWorkers] = useState([]);
+  const [users, setusers] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
   const [isLogin, setIsLogin] = useState(isLoggedIn());
   const [showRegister, setShowRegister] = useState(false);
@@ -30,12 +30,15 @@ function App() {
       const config = {
         headers: { Authorization: `Bearer ${getToken()}` }
       };
-      const [ticketsRes, workersRes] = await Promise.all([
+      const [ticketsRes, usersRes] = await Promise.all([
         axios.get(`${API_URL}/tickets`, config),
-        axios.get(`${API_URL}/workers`, config)
+        axios.get(`${API_URL}/users`, config)
       ]);
+
+      console.log("Struktur Data Users dari API:", usersRes.data);
+
       setTickets(ticketsRes.data);
-      setWorkers(workersRes.data);
+      setusers(usersRes.data);
     } catch (error) {
       console.error("Gagal mengambil data:", error);
     }
@@ -120,7 +123,7 @@ function App() {
         {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
       </button>
       <h1>Ticketing Tracker</h1>
-      <JobForm workers={workers} addTicket={addTicket} />
+      <JobForm users={users} addTicket={addTicket} />
       <JobList tickets={tickets} updateTicketStatus={updateTicketStatus} deleteTicket={deleteTicket} />
 
 

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\TicketController;
-use App\Http\Controllers\Api\WorkerController;
+use App\Http\Controllers\Api\UserController;
 
 Route::get('/', function () {
     return response()->json(['message' => 'Hello world!']);
@@ -20,8 +20,8 @@ Route::middleware('jwt')->group(function () {
     Route::put('/user', [AuthController::class, 'updateUser']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Workers
-    Route::apiResource('workers', WorkerController::class)->only(['index', 'store']);
+    // Users
+    Route::apiResource('users', UserController::class)->only(['index', 'store']);
 
     // Tickets
     Route::apiResource('tickets', TicketController::class)->only(['index', 'store', 'destroy']);

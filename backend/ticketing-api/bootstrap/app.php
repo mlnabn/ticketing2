@@ -18,6 +18,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'jwt' => JwtMiddleware::class
         ]);
+
+        // $middleware->handleCors(
+        //     paths: ['api/*'], // Terapkan kebijakan CORS untuk semua rute yang berawalan 'api/'
+        //     allowedOrigins: ['http://localhost:3000'], // Izinkan request dari alamat React Anda. Sesuaikan port jika berbeda.
+        //     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+        //     allowedMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+        // );
+
     })
 
     ->withExceptions(function (Exceptions $exceptions): void {

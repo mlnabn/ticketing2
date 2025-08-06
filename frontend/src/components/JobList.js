@@ -25,7 +25,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket }) {
           {tickets && tickets.map((tickets) => (
             <tr key={tickets.id}>
               <td data-label="ID">{tickets.id}</td>
-              <td data-label="Nama Pekerja">{tickets.worker ? tickets.worker.name : 'N/A'}</td>
+              <td data-label="Nama Pekerja">{tickets.user ? tickets.user.name : 'N/A'}</td>
               <td data-label="Nama Pekerjaan">{tickets.title}</td>
               <td data-label="Status">
                 <span className={`status ${getStatusClass(tickets.status)}`}>
