@@ -116,27 +116,27 @@ button:hover {
 }
 
 .btn-start {
-  background-color: #2ecc71;
+  background-color: #2196f3;
 }
 
 .btn-start:hover {
-  background-color: #27ae60;
+  background-color: #0f4461;
 }
 
 .btn-finish {
-  background-color: #e63946;
+  background-color: #ffa726;
 }
 
 .btn-finish:hover {
-  background-color: #c82333;
+  background-color: #744d11;
 }
 
 .btn-delete {
-  background-color: red;
+  background-color: #ff4649;
 }
 
 .btn-delete:hover {
-  background-color: #5a6268;
+  background-color: #721f21;
 }
 
 /* .top-button right {
@@ -154,11 +154,16 @@ button:hover {
 } */
 
 /* Styling tombolnya */
+
+.top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
 .top-button {
-  position: absolute;
-  top: 3.5rem;
-  right: 4rem;
-  background-color: #ff4d4d;
+  background-color: #f44336;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -170,32 +175,10 @@ button:hover {
   z-index: 1000;
 }
 
-/* Tombol Logout
-.top-button:first-child {
-  background-color: #ff4d4d;
-  color: white;
-} */
-
-/* Mode gelap */
-/* body.dark .top-button {
-  background-color: #222;
-  color: white;
-} */
-
-/* body.dark .top-button:first-child {
-  background-color: #ff4d4d;
-  color: white; */
-/* } */
-
 
 /* Dark Mode Toggle */
 .dark-toggle {
-  position: absolute;
-  top: 6rem;
-  /* Menurunkan posisinya dari atas */
-  right: 4rem;
-  /* Tetap di kanan */
-  background-color: #333;
+  background-color: #003158;
   color: white;
   border-radius: 8px;
   padding: 0.5rem 1rem;

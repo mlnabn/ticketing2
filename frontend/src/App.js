@@ -116,23 +116,17 @@ function App() {
     <div className="app-container">
       <Navbar onLogout={handleLogout} />
         {/* Tombol Logout di kiri bawah */}
-      <button className="top-button" onClick={handleLogout}>
-        🚪 Logout
-      </button>
-      <button className="dark-toggle" onClick={() => setDarkMode(!darkMode)}>
-        {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
-      </button>
+      <div className='top-controls'>
+        <button className="top-button" onClick={handleLogout}>
+          🚪 Logout
+        </button>
+        <button className="dark-toggle" onClick={() => setDarkMode(!darkMode)}>
+          {darkMode ? '☀ Light Mode' : '🌙 Dark Mode'}
+        </button>
+      </div>
       <h1>Ticketing Tracker</h1>
       <JobForm users={users} addTicket={addTicket} />
       <JobList tickets={tickets} updateTicketStatus={updateTicketStatus} deleteTicket={deleteTicket} />
-
-
-
-      {/* Dark Mode Toggle di kanan bawah
-      <button className="top-button right" onClick={() => setDarkMode(!darkMode)}>
-        {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
-      </button> */}
-
     </div>
   );
 }
