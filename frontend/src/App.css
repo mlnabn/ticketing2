@@ -10,7 +10,7 @@
 
 body.dark {
   --input-bg: #222;
-  --text-color: #fff;
+  --text-color: #fdfdfd;
   --placeholder-color: #ffffff;
   --border-color: #fffcfc;
 }
@@ -27,7 +27,7 @@ body {
   background: linear-gradient(to right, #e0f7fa, #ffffff);
   color: var(--text-color);
   min-height: 100vh;
-  padding: 1.5rem;
+  padding: 2rem;
   transition: background 0.3s ease, color 0.3s ease;
 }
 
@@ -40,7 +40,7 @@ body.dark {
   margin: auto;
   padding: 2rem;
   background-color: #fff;
-  border-radius: 16px;
+  border-radius: 15px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   transition: background 0.3s ease, color 0.3s ease;
 }
@@ -54,25 +54,25 @@ body.dark .app-container {
 h1 {
   text-align: center;
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: 800;
   background: linear-gradient(to right, #007bff, #00c6ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 2rem;
+  margin-bottom: 3.5rem;
 }
 
 /* Form */
 .job-form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 2rem;
+  margin-bottom: 3rem;
 }
 
 .job-form input,
 .job-form select {
   padding: 0.75rem 1rem;
-  border: 1px solid var(--border-color);
+  border: 3px solid var(--border-color);
   border-radius: 10px;
   font-size: 1rem;
   background-color: var(--input-bg);
@@ -110,6 +110,7 @@ button:hover {
 .btn-submit {
   background: linear-gradient(to right, #007bff, #00c6ff);
 }
+
 .btn-submit:hover {
   background: linear-gradient(to right, #0056b3, #0096c7);
 }
@@ -117,6 +118,7 @@ button:hover {
 .btn-start {
   background-color: #2ecc71;
 }
+
 .btn-start:hover {
   background-color: #27ae60;
 }
@@ -124,6 +126,7 @@ button:hover {
 .btn-finish {
   background-color: #e63946;
 }
+
 .btn-finish:hover {
   background-color: #c82333;
 }
@@ -131,21 +134,86 @@ button:hover {
 .btn-delete {
   background-color: red;
 }
+
 .btn-delete:hover {
   background-color: #5a6268;
 }
 
+/* .top-button right {
+  position: fixed;
+  display: flex;
+  align-items: center;
+} */
+/* .top-buttons {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 1rem;
+  z-index: 1000;
+} */
+
+/* Styling tombolnya */
+.top-button {
+  position: absolute;
+  top: 3.5rem;
+  right: 4rem;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: background 0.3s ease;
+  z-index: 1000;
+}
+
+/* Tombol Logout
+.top-button:first-child {
+  background-color: #ff4d4d;
+  color: white;
+} */
+
+/* Mode gelap */
+/* body.dark .top-button {
+  background-color: #222;
+  color: white;
+} */
+
+/* body.dark .top-button:first-child {
+  background-color: #ff4d4d;
+  color: white; */
+/* } */
+
+
 /* Dark Mode Toggle */
 .dark-toggle {
+  position: absolute;
+  top: 6rem;
+  /* Menurunkan posisinya dari atas */
+  right: 4rem;
+  /* Tetap di kanan */
   background-color: #333;
   color: white;
   border-radius: 8px;
   padding: 0.5rem 1rem;
-  float: right;
-  margin-bottom: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  z-index: 1000;
 }
-.dark-toggle:hover {
-  background-color: #111;
+
+/* DafPeker */
+body.dark h2 {
+  color: #000000;
+}
+
+
+body.dark .job-table~h2,
+body.dark h2 {
+  color: #ffffff;
 }
 
 /* Table */
@@ -168,17 +236,23 @@ body.dark .job-table {
   padding: 1rem;
   text-align: left;
   border-bottom: 1px solid #eaeaea;
+  color: #000000;
 }
 
-body.dark .job-table th,
+body.dark .job-table th {
+  background-color: #44445a;
+  color: #ffffff
+}
+
 body.dark .job-table td {
-  border-bottom: 1px solid #555;
+  border-bottom: 1px solid #fbfbfb;
+  color: #ffffff; /* isi putih */
 }
 
 .job-table th {
-  background-color: #f3f4f6;
+  background-color:#44445a;
   font-weight: 600;
-  color: #333;
+  color: #fffcfc;
 }
 
 body.dark .job-table th {
@@ -189,8 +263,11 @@ body.dark .job-table th {
 .job-table tbody tr:hover {
   background-color: #f0fbff;
 }
+
 body.dark .job-table tbody tr:hover {
   background-color: #4a4a66;
+
+
 }
 
 /* Filter */
@@ -227,6 +304,7 @@ body.dark .job-table tbody tr:hover {
   background-color: #adb5bd;
   color: #fff;
 }
+
 .status-belum::before {
   content: '🕓';
 }
@@ -235,6 +313,7 @@ body.dark .job-table tbody tr:hover {
   background-color: #ffe066;
   color: #444;
 }
+
 .status-sedang::before {
   content: '🔧';
 }
@@ -243,6 +322,7 @@ body.dark .job-table tbody tr:hover {
   background-color: #38b6ff;
   color: white;
 }
+
 .status-selesai::before {
   content: '✅';
 }
@@ -264,7 +344,7 @@ body.dark .job-table tbody tr:hover {
   }
 }
 
-@media (max-width: 768px){
+@media (max-width: 768px) {
   .job-table {
     display: none;
   }
@@ -328,11 +408,11 @@ body.dark .job-table tbody tr:hover {
 
   /* Atur agar tombol di kolom Aksi memiliki jarak */
   .job-table td[data-label="Aksi"] {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 0.5rem;
-      flex-wrap: wrap;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
   }
 }
 
@@ -564,7 +644,8 @@ body.dark .job-table tbody tr:hover {
   font-weight: 600;
   cursor: pointer;
   transition: color 0.3s ease;
-  padding-bottom: 4px; /* untuk beri ruang garis bawah */
+  padding-bottom: 4px;
+  /* untuk beri ruang garis bawah */
 }
 
 .auth-toggle .login-link::after {
@@ -605,5 +686,3 @@ body.dark .job-table tbody tr:hover {
 .forgot-password:hover {
   color: #0d47a1;
 }
-
-

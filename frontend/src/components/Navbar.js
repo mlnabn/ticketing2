@@ -4,7 +4,7 @@ function Navbar({ onLogout }) {
   return (
     <nav className="navbar">
       {/* <h2>Ticketing App</h2> */}
-      <button onClick={onLogout}>Logout</button>
+      {/* <button onClick={onLogout}>Logout</button> */}
     </nav>
   );
 }

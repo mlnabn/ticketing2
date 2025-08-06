@@ -85,36 +85,51 @@ function App() {
   };
 
   if (!isLogin) {
-  return (
-    <div className="auth-container">
-      {showRegister ? (
-        <>
-          <Register
-            onRegister={() => setIsLogin(true)}
-            onShowLogin={() => setShowRegister(false)}
-          />
-        </>
-      ) : (
-        <>
-          <Login
-            onLogin={() => setIsLogin(true)}
-            onShowRegister={() => setShowRegister(true)}
-          />
-        </>
+    return (
+      <div className="auth-container">
+        {showRegister ? (
+          <>
+            <Register
+              onRegister={() => setIsLogin(true)}
+              onShowLogin={() => setShowRegister(false)}
+            />
+          </>
+        ) : (
+          <>
+            <Login
+              onLogin={() => setIsLogin(true)}
+              onShowRegister={() => setShowRegister(true)}
+            />
+          </>
+
         )}
+
       </div>
+
     );
   }
 
   return (
     <div className="app-container">
       <Navbar onLogout={handleLogout} />
+        {/* Tombol Logout di kiri bawah */}
+      <button className="top-button" onClick={handleLogout}>
+        🚪 Logout
+      </button>
       <button className="dark-toggle" onClick={() => setDarkMode(!darkMode)}>
         {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
       </button>
       <h1>Ticketing Tracker</h1>
       <JobForm workers={workers} addTicket={addTicket} />
       <JobList tickets={tickets} updateTicketStatus={updateTicketStatus} deleteTicket={deleteTicket} />
+
+
+
+      {/* Dark Mode Toggle di kanan bawah
+      <button className="top-button right" onClick={() => setDarkMode(!darkMode)}>
+        {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+      </button> */}
+
     </div>
   );
 }
