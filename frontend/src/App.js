@@ -165,12 +165,30 @@ function App() {
             <button className="hamburger-menu-button" onClick={toggleSidebar}>
               <i className="fas fa-bars"></i>
             </button>
+<<<<<<< Updated upstream
             <h1 className="dashboard-header-title">{isAdmin ? 'Admin Dashboard' : 'My Dashboard'}</h1>
+=======
+            <h1 className="dashboard-header-title">Dashboard</h1> 
+>>>>>>> Stashed changes
           </div>
           <div className="main-header-controls">
+<<<<<<< Updated upstream
             <span className="breadcrumb">Home / {currentPage === 'home' ? 'Dashboard' : 'Add User'}</span>
             <button className="header-icon-button"><i className="fas fa-cog"></i></button>
             <button className="dark-mode-toggle-button" onClick={() => setDarkMode(!darkMode)}>
+=======
+            <span className="breadcrumb">Home / Ticketing Tracker</span>
+            <button className="header-icon-button">
+              <i className="fas fa-cog"></i>
+            </button>
+            <button className="header-icon-button error-icon">
+              <i className="fas fa-exclamation-circle"></i>
+            </button>
+            <button
+              className="dark-mode-toggle-button"
+              onClick={() => setDarkMode(!darkMode)}
+            >
+>>>>>>> Stashed changes
               {darkMode ? '☀ Light Mode' : '🌙 Dark Mode'}
             </button>
           </div>
