@@ -1091,3 +1091,420 @@ body.dark-mode .react-select__option--is-selected {
   background-color: #0056b3 !important; /* Warna opsi terpilih di mode gelap */
   color: white !important;
 }
+
+/* Login.css */
+
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #e3f2fd, #ffffff);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.login-card h2 {
+  margin-bottom: 24px;
+  color: #1a237e;
+  font-size: 28px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 16px 12px 42px;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  background-color: #f8f9fa;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+  border-color: #42a5f5;
+  background-color: #fff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.1);
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  font-size: 16px;
+  color: #757575;
+}
+
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.login-options a {
+  color: #1976d2;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-options a:hover {
+  text-decoration: underline;
+}
+
+.login-btn {
+  background: linear-gradient(to right, #1976d2, #1565c0);
+  color: white;
+  border: none;
+  padding: 12px;
+  width: 100%;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.login-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.auth-toggle {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #333;
+}
+
+.register-link {
+  background: none;
+  border: none;
+  color: #1976d2;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-size: 14px;
+}
+
+.register-link:hover {
+  color: #0d47a1;
+}
+
+/* RegisterPage */
+
+.register-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #e3f2fd, #ffffff);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.register-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.register-card h2 {
+  margin-bottom: 24px;
+  color: #1a237e;
+  font-size: 28px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 16px 12px 42px;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  background-color: #f8f9fa;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+  border-color: #42a5f5;
+  background-color: #fff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.1);
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  font-size: 16px;
+  color: #757575;
+}
+
+.register-btn {
+  background: linear-gradient(to right, #1976d2, #1565c0);
+  color: white;
+  border: none;
+  padding: 12px;
+  width: 100%;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.register-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.login-redirect {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #1a237e;
+}
+
+.login-redirect button {
+  background: transparent;
+  border: 2px solid #1976d2;
+  color: #1976d2;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s ease;
+  margin-top: 10px;
+}
+
+.login-redirect button:hover {
+  background-color: #1976d2;
+  color: #fff;
+}
+
+.auth-toggle .login-link {
+  position: relative;
+  background: transparent;
+  border: none;
+  color: #1976d2;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  padding-bottom: 4px;
+  /* untuk beri ruang garis bawah */
+}
+
+.auth-toggle .login-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #1976d2;
+  transition: background-color 0.3s ease;
+}
+
+.auth-toggle .login-link:hover {
+  color: #0d47a1;
+}
+
+.auth-toggle .login-link:hover::after {
+  background-color: #0d47a1;
+}
+
+.forgot-password {
+  color: #1976d2;
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: color 0.3s ease;
+  text-decoration: underline;
+  padding: 0;
+
+  /* Efek timbul */
+  /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15); */
+  /* text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); */
+}
+
+.forgot-password:hover {
+  color: #0d47a1;
+}
+
+/* ADD USER PAGE */
+
+/* src/components/AddUser.css */
+
+.add-user-container {
+  padding: 24px;
+  font-family: 'Inter', sans-serif;
+}
+
+.add-user-title {
+  font-size: 1.5rem; /* 24px */
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #1f2937; /* Abu-abu sangat gelap */
+  text-align: center;
+}
+
+.add-user-form {
+  background-color: #ffffff;
+  padding: 24px 32px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: 0 auto;
+  transition: background-color 0.3s;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  color: #4a5568;
+  font-size: 0.875rem; /* 14px */
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db; /* Abu-abu lebih terang */
+  border-radius: 6px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  background-color: #f9fafb;
+  color: #1f2937;
+  transition: border-color 0.2s, background-color 0.3s, color 0.3s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #2563eb; /* Biru */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.submit-btn {
+  background-color: #3b82f6; /* Biru primer */
+  color: white;
+  font-weight: 700;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-btn:hover {
+  background-color: #2563eb; /* Biru lebih gelap */
+}
+
+/* Untuk pesan error dan sukses */
+.feedback-message {
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  border: 1px solid transparent;
+}
+
+.success-message {
+  background-color: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.error-message {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+
+.error-list {
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+/* ================================== */
+/* GAYA UNTUK DARK MODE               */
+/* ================================== */
+
+/* Cek dari App.js, jika class 'dark-mode' ditambahkan ke body */
+.dark-mode .add-user-title {
+  color: #f3f4f6; /* Abu-abu sangat terang */
+}
+
+.dark-mode .add-user-form {
+  background-color: #1f2937; /* Warna abu-abu gelap, sesuai tema */
+  border: 1px solid #374151;
+}
+
+.dark-mode .form-label {
+  color: #d1d5db; /* Abu-abu terang */
+}
+
+.dark-mode .form-input {
+  background-color: #374151; /* Warna input lebih gelap */
+  border-color: #4b5563;
+  color: #f9fafb; /* ✅ INI FIX UTAMA: Warna teks input menjadi putih */
+}
+
+.dark-mode .form-input:focus {
+  border-color: #60a5fa; /* Biru terang */
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+}
+
+/* Umpan balik untuk dark mode */
+.dark-mode .success-message {
+  background-color: #052e16;
+  color: #a7f3d0;
+  border-color: #15803d;
+}
+
+.dark-mode .error-message {
+  background-color: #450a0a;
+  color: #fecaca;
+  border-color: #b91c1c;
+}

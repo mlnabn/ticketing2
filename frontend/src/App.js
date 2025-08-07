@@ -20,7 +20,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState('home');
   // UI State
   const [darkMode, setDarkMode] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // <-- State sidebar ditambahkan kembali
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showRegister, setShowRegister] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState(null);
@@ -42,7 +42,9 @@ function App() {
 
   const fetchData = async () => {
     try {
-      const config = { headers: { Authorization: `Bearer ${getToken()}` } };
+      const config = {
+        headers: { Authorization: `Bearer ${getToken()}` }
+      };
       const [ticketsRes, usersRes] = await Promise.all([
         axios.get(`${API_URL}/tickets`, config),
         axios.get(`${API_URL}/users`, config)
@@ -94,8 +96,8 @@ function App() {
     setIsLogin(false);
     setCurrentPage('home');
   };
-  
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen); // <-- Fungsi sidebar ditambahkan kembali
+
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   // --- RENDER LOGIC ---
 
@@ -165,30 +167,12 @@ function App() {
             <button className="hamburger-menu-button" onClick={toggleSidebar}>
               <i className="fas fa-bars"></i>
             </button>
-<<<<<<< Updated upstream
             <h1 className="dashboard-header-title">{isAdmin ? 'Admin Dashboard' : 'My Dashboard'}</h1>
-=======
-            <h1 className="dashboard-header-title">Dashboard</h1> 
->>>>>>> Stashed changes
           </div>
           <div className="main-header-controls">
-<<<<<<< Updated upstream
             <span className="breadcrumb">Home / {currentPage === 'home' ? 'Dashboard' : 'Add User'}</span>
             <button className="header-icon-button"><i className="fas fa-cog"></i></button>
             <button className="dark-mode-toggle-button" onClick={() => setDarkMode(!darkMode)}>
-=======
-            <span className="breadcrumb">Home / Ticketing Tracker</span>
-            <button className="header-icon-button">
-              <i className="fas fa-cog"></i>
-            </button>
-            <button className="header-icon-button error-icon">
-              <i className="fas fa-exclamation-circle"></i>
-            </button>
-            <button
-              className="dark-mode-toggle-button"
-              onClick={() => setDarkMode(!darkMode)}
-            >
->>>>>>> Stashed changes
               {darkMode ? '☀ Light Mode' : '🌙 Dark Mode'}
             </button>
           </div>
@@ -215,7 +199,7 @@ function App() {
       </main>
 
       {showConfirmModal && ticketToDelete && (
-        <ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete}/>
+        <ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />
       )}
     </div>
   );
