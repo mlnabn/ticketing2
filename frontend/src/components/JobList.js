@@ -9,8 +9,8 @@ function JobList({ tickets, updateTicketStatus, deleteTicket }) {
   };
 
   return (
-    <div className="mt-6"> {/* Tambahkan margin atas */}
-      <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Daftar Pekerjaan</h2>
+    <div>
+      <h2>Daftar Pekerjaan</h2>
       <table className="job-table">
         <thead>
           <tr>
@@ -22,33 +22,33 @@ function JobList({ tickets, updateTicketStatus, deleteTicket }) {
           </tr>
         </thead>
         <tbody>
-          {tickets && tickets.map((ticket) => ( // Perbaikan nama variabel dari 'tickets' menjadi 'ticket'
-            <tr key={ticket.id}>
-              <td data-label="ID">{ticket.id}</td>
-              <td data-label="Nama Pekerja">{ticket.user ? ticket.user.name : 'N/A'}</td>
-              <td data-label="Nama Pekerjaan">{ticket.title}</td>
+          {tickets && tickets.map((tickets) => (
+            <tr key={tickets.id}>
+              <td data-label="ID">{tickets.id}</td>
+              <td data-label="Nama Pekerja">{tickets.user ? tickets.user.name : 'N/A'}</td>
+              <td data-label="Nama Pekerjaan">{tickets.title}</td>
               <td data-label="Status">
-                <span className={`status ${getStatusClass(ticket.status)}`}>
-                  {ticket.status}
+                <span className={`status ${getStatusClass(tickets.status)}`}>
+                  {tickets.status}
                 </span>
               </td>
               <td data-label="Aksi">
-                {ticket.status === 'Sedang Dikerjakan' && (
-                  <button onClick={() => updateTicketStatus(ticket.id, 'Selesai')} className="btn-finish">
+                {tickets.status === 'Sedang Dikerjakan' && (
+                  <button onClick={() => updateTicketStatus(tickets.id, 'Selesai')} className="btn-finish">
                     Selesaikan
                   </button>
                 )}
                 
-                {ticket.status === 'Belum Dikerjakan' && (
-                  <button onClick={() => updateTicketStatus(ticket.id, 'Sedang Dikerjakan')} className="btn-start">
+                {tickets.status === 'Belum Dikerjakan' && (
+                  <button onClick={() => updateTicketStatus(tickets.id, 'Sedang Dikerjakan')} className="btn-start">
                     Mulai Kerjakan
                   </button>
                 )}
 
                 {/* 2. Tambahkan tombol Hapus dari kode teman Anda */}
-                {ticket.status === 'Selesai' && (
+                {tickets.status === 'Selesai' && (
                   <button
-                    onClick={() => deleteTicket(ticket.id)}
+                    onClick={() => deleteTicket(tickets.id)}
                     className="btn-delete"
                   >
                     🗑️ Delete
