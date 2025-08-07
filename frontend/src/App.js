@@ -125,7 +125,7 @@ function App() {
           <ul>
             <li className="sidebar-nav-item">
               <button onClick={() => setCurrentPage('home')} className={`sidebar-button ${currentPage === 'home' ? 'active' : ''}`}>
-                <i className="fas fa-home"></i><span>Home</span>
+                <i className="fas fa-home"></i><span>My Ticket</span>
               </button>
             </li>
             {isAdmin && (
@@ -137,7 +137,7 @@ function App() {
             )}
             <li className="sidebar-nav-item">
               <button className="sidebar-button">
-                <i className="fas fa-ticket-alt"></i><span>Ticket List</span>
+                <i className="fas fa-ticket-alt"></i><span>Add Ticket</span>
               </button>
             </li>
             <li className="sidebar-nav-item">
