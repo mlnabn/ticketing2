@@ -18,6 +18,7 @@ function App() {
   const [isLogin, setIsLogin] = useState(isLoggedIn());
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState('');
+
   const [currentPage, setCurrentPage] = useState('home');
   // UI State
   const [darkMode, setDarkMode] = useState(false);
@@ -67,8 +68,8 @@ function App() {
       await axios.post(`${API_URL}/tickets`, formData, { headers: { Authorization: `Bearer ${getToken()}` } });
       fetchData();
       // Otomatis pindah ke halaman home setelah berhasil menambah tiket
-      setCurrentPage('home'); 
-    } catch (error) { 
+      setCurrentPage('home');
+    } catch (error) {
       console.error("Gagal menambah tiket:", error);
       // Anda bisa menambahkan feedback error di sini
     }
@@ -103,7 +104,7 @@ function App() {
     setIsLogin(false);
     setCurrentPage('home');
   };
-  
+
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   // --- RENDER LOGIC ---
@@ -173,9 +174,12 @@ function App() {
             <div className="user-avatar"><i className="fas fa-user"></i></div>
             <span>{userName || 'User'}</span>
           </div>
-          <button onClick={handleLogout} className="logout-button">
-            <i className="fas fa-sign-out-alt"></i><span>Logout</span>
+          <button className="dark-mode-toggle-button" onClick={() => setDarkMode(!darkMode)}>
+            {darkMode ? '☀ Light' : '🌙 Dark'}
           </button>
+          {/* <button onClick={handleLogout} className="logout-button">
+            <i className="fas fa-sign-out-alt"></i><span>Logout</span>
+          </button> */}
         </div>
       </aside>
 
@@ -190,9 +194,10 @@ function App() {
           <div className="main-header-controls">
             <span className="breadcrumb">Home / {currentPage.replace('add', 'Add ')}</span>
             <button className="header-icon-button"><i className="fas fa-cog"></i></button>
-            <button className="dark-mode-toggle-button" onClick={() => setDarkMode(!darkMode)}>
-              {darkMode ? '☀ Light Mode' : '🌙 Dark Mode'}
+            <button onClick={handleLogout} className="logout-button">
+              <i className="fas fa-sign-out-alt"></i><span>Logout</span>
             </button>
+
           </div>
         </header>
 
@@ -225,7 +230,7 @@ function App() {
             <>
               <h2>Tambah Tiket Baru</h2>
               <p>Silakan isi detail pekerjaan di bawah ini.</p>
-              <br/>
+              <br />
               <JobForm users={users} addTicket={addTicket} />
             </>
           )}

@@ -174,7 +174,9 @@ body.dark-mode {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height:100vh;
+  width: 100%;
+  
   /* Diubah menjadi warna putih solid */
   background-color: var(--auth-bg-light);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -192,8 +194,8 @@ body.dark-mode .auth-page-container {
   backdrop-filter: none; /* Hapus efek blur */
   border-radius: 20px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  padding: 40px;
-  width: 100%;
+  padding: 50px;
+  width: 400px;
   /* DIUBAH: Mengatur max-width agar lebih besar */
   max-width: 400px; /* Lebar kartu login/register, bisa diubah ke 450px atau lebih */
   text-align: center;
@@ -459,10 +461,10 @@ body.dark-mode .sidebar-footer {
 }
 
 .logout-button {
-  width: 100%; /* Lebar penuh */
+  width: 100px; /* Lebar penuh */
   text-align: left; /* Teks rata kiri */
   padding: 0.75rem; /* Padding */
-  border-radius: 0.5rem; /* Sudut membulat */
+  border-radius: 1rem; /* Sudut membulat */
   display: flex;
   align-items: center;
   gap: 0.75rem; /* Jarak antar ikon dan teks */
@@ -565,30 +567,21 @@ body.dark-mode .header-icon-button:hover {
 .header-icon-button.error-icon:hover {
   color: #b91c1c; /* Warna hover merah */
 }
-
 .dark-mode-toggle-button {
-  padding: 0.5rem 1rem; /* Padding */
-  border-radius: 0.375rem; /* Sudut membulat */
-  background-color: var(--header-button-bg-light); /* Latar belakang tombol di mode terang */
-  color: var(--header-button-text-light); /* Warna teks tombol di mode terang */
-  border: 1px solid #c0c0c0; /* Garis tegas di mode terang */
-  font-weight: 600; /* Tebal font */
-  cursor: pointer;
-  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out; /* Transisi halus */
+  width: 100px; /* Lebar penuh */
+  text-align: left; /* Teks rata kiri */
+  padding: 0.75rem; /* Padding */
+  border-radius: 1rem; /* Sudut membulat */
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Jarak antar ikon dan teks */
+  background-color: #003158; /* Warna latar belakang tombol logout (merah) */
+  color: #fff; /* Warna teks tombol logout */
+  transition: background-color 0.15s ease-in-out; /* Transisi halus */
 }
 
 .dark-mode-toggle-button:hover {
-  background-color: var(--header-button-hover-bg-light); /* Warna hover di mode terang */
-}
-
-body.dark-mode .dark-mode-toggle-button {
-  background-color: var(--header-button-bg-dark); /* Latar belakang tombol di mode gelap */
-  color: var(--header-button-text-dark); /* Warna teks tombol di mode gelap */
-  border: 1px solid #374151; /* Garis tegas di mode gelap */
-}
-
-body.dark-mode .dark-mode-toggle-button:hover {
-  background-color: var(--header-button-hover-bg-dark); /* Warna hover di mode gelap */
+  background-color: #041c2f; /* Warna hover tombol logout */
 }
 
 /* Tombol Hamburger Menu */
