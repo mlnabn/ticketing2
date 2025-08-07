@@ -1353,3 +1353,149 @@ body.dark-mode .react-select__option--is-selected {
 .forgot-password:hover {
   color: #0d47a1;
 }
+
+/* ADD USER PAGE */
+
+/* src/components/AddUser.css */
+
+.add-user-container {
+  padding: 24px;
+  font-family: 'Inter', sans-serif;
+}
+
+.add-user-title {
+  font-size: 1.5rem; /* 24px */
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #1f2937; /* Abu-abu sangat gelap */
+  text-align: center;
+}
+
+.add-user-form {
+  background-color: #ffffff;
+  padding: 24px 32px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: 0 auto;
+  transition: background-color 0.3s;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  color: #4a5568;
+  font-size: 0.875rem; /* 14px */
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db; /* Abu-abu lebih terang */
+  border-radius: 6px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  background-color: #f9fafb;
+  color: #1f2937;
+  transition: border-color 0.2s, background-color 0.3s, color 0.3s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #2563eb; /* Biru */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.submit-btn {
+  background-color: #3b82f6; /* Biru primer */
+  color: white;
+  font-weight: 700;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-btn:hover {
+  background-color: #2563eb; /* Biru lebih gelap */
+}
+
+/* Untuk pesan error dan sukses */
+.feedback-message {
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  border: 1px solid transparent;
+}
+
+.success-message {
+  background-color: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.error-message {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+
+.error-list {
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+/* ================================== */
+/* GAYA UNTUK DARK MODE               */
+/* ================================== */
+
+/* Cek dari App.js, jika class 'dark-mode' ditambahkan ke body */
+.dark-mode .add-user-title {
+  color: #f3f4f6; /* Abu-abu sangat terang */
+}
+
+.dark-mode .add-user-form {
+  background-color: #1f2937; /* Warna abu-abu gelap, sesuai tema */
+  border: 1px solid #374151;
+}
+
+.dark-mode .form-label {
+  color: #d1d5db; /* Abu-abu terang */
+}
+
+.dark-mode .form-input {
+  background-color: #374151; /* Warna input lebih gelap */
+  border-color: #4b5563;
+  color: #f9fafb; /* ✅ INI FIX UTAMA: Warna teks input menjadi putih */
+}
+
+.dark-mode .form-input:focus {
+  border-color: #60a5fa; /* Biru terang */
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+}
+
+/* Umpan balik untuk dark mode */
+.dark-mode .success-message {
+  background-color: #052e16;
+  color: #a7f3d0;
+  border-color: #15803d;
+}
+
+.dark-mode .error-message {
+  background-color: #450a0a;
+  color: #fecaca;
+  border-color: #b91c1c;
+}

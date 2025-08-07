@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { getToken } from '../auth';
+import '../App.css'; // Import file CSS yang baru dibuat
+
+const API_URL = 'http://127.0.0.1:8000/api';
 
 const AddUser = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    password_confirmation: '', // Disesuaikan untuk validasi Laravel
+    workshop: '',
   });
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,82 +24,90 @@ const AddUser = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      // Mengganti alert dengan modal UI kustom jika diperlukan di masa depan
-      alert('Konfirmasi password tidak cocok!'); 
-      return;
+    setError(null);
+    setSuccess('');
+
+    try {
+      await axios.post(`${API_URL}/users`, formData, {
+        headers: {
+          'Authorization': `Bearer ${getToken()}`
+        }
+      });
+      
+      setSuccess('User berhasil ditambahkan!');
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+        division: ''
+      });
+
+    } catch (err) {
+      if (err.response && err.response.status === 422) {
+        setError(err.response.data.errors);
+      } else {
+        setError({ general: ['Terjadi kesalahan pada server. Silakan coba lagi.'] });
+      }
+      console.error(err);
     }
-    // Logika untuk menambahkan user (Anda bisa menambahkan panggilan API di sini)
-    console.log('User baru:', formData);
-    // Mengganti alert dengan modal UI kustom jika diperlukan di masa depan
-    alert('User berhasil ditambahkan!'); 
-    setFormData({ // Reset form
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: ''
-    });
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Add User</h2>
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto dark:bg-gray-700">
-        <div className="mb-4">
-          <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2 dark:text-gray-200">Nama:</label>
+    <div className="add-user-container">
+      <h2 className="add-user-title">Tambah Pengguna Baru</h2>
+      
+      {success && <div className="feedback-message success-message">{success}</div>}
+      {error?.general && <div className="feedback-message error-message">{error.general[0]}</div>}
+
+      <form onSubmit={handleSubmit} className="add-user-form">
+        <div className="form-group">
+          <label htmlFor="name" className="form-label">Nama:</label>
           <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-600 dark:text-white dark:border-gray-500"
+            type="text" id="name" name="name"
+            value={formData.name} onChange={handleChange}
+            className="form-input"
+            required
+          />
+          {error?.name && <p className="error-list">{error.name[0]}</p>}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="email" className="form-label">Email:</label>
+          <input
+            type="email" id="email" name="email"
+            value={formData.email} onChange={handleChange}
+            className="form-input"
+            required
+          />
+          {error?.email && <p className="error-list">{error.email[0]}</p>}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="password" className="form-label">Password:</label>
+          <input
+            type="password" id="password" name="password"
+            value={formData.password} onChange={handleChange}
+            className="form-input"
+            required
+          />
+          {error?.password && <p className="error-list">{error.password[0]}</p>}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="password_confirmation" className="form-label">Konfirmasi Password:</label>
+          <input
+            type="password" id="password_confirmation" name="password_confirmation"
+            value={formData.password_confirmation} onChange={handleChange}
+            className="form-input"
             required
           />
         </div>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2 dark:text-gray-200">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-600 dark:text-white dark:border-gray-500"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2 dark:text-gray-200">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-600 dark:text-white dark:border-gray-500"
-            required
-          />
-        </div>
-        <div className="mb-6">
-          <label htmlFor="confirmPassword" className="block text-gray-700 text-sm font-bold mb-2 dark:text-gray-200">Konfirmasi Password:</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-600 dark:text-white dark:border-gray-500"
-            required
-          />
-        </div>
-        <div className="flex items-center justify-between">
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors"
-          >
+
+        <div className="form-actions">
+          <button type="submit" className="submit-btn">
             Tambah User
           </button>
         </div>

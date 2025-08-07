@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { login } from '../auth'; // ✅ 1. Import fungsi login dari auth.js
 import '../App.css';
 
 const API_URL = 'http://127.0.0.1:8000/api';
@@ -8,21 +9,30 @@ function Login({ onLogin, onShowRegister }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(''); // State untuk pesan error
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(''); // Reset error setiap kali login
+
     try {
       const response = await axios.post(`${API_URL}/login`, { email, password });
-      const token = response.data.token;
-      if (token) {
-        localStorage.setItem('token', token);
-        onLogin();
+      
+      // ✅ 2. Ambil KEDUA data: token dan user
+      const { token, user } = response.data;
+
+      if (token && user) {
+        // ✅ 3. Gunakan fungsi login untuk menyimpan KEDUANYA
+        login(token, user);
+        
+        onLogin(); // Beritahu App.js untuk refresh
       } else {
-        alert('Login gagal: Token tidak ditemukan.');
+        setError('Login gagal: Respons dari server tidak lengkap.');
       }
     } catch (err) {
-      alert('Login gagal. Periksa kembali email & password!');
+      setError('Login gagal. Periksa kembali email & password!');
+      console.error(err); // Tampilkan error di console untuk debug
     } finally {
       setLoading(false);
     }
@@ -30,14 +40,14 @@ function Login({ onLogin, onShowRegister }) {
 
   const handleForgotPassword = () => {
     alert('Silakan hubungi admin atau reset melalui email.');
-    // Atau redirect ke halaman lupa password:
-    // window.location.href = '/forgot-password';
   };
 
   return (
     <div className="login-page">
       <form onSubmit={handleSubmit} className="login-card">
         <h2>Login</h2>
+        {/* Tampilkan pesan error jika ada */}
+        {error && <p className="error-message">{error}</p>}
 
         <div className="input-group">
           <span className="input-icon">📧</span>

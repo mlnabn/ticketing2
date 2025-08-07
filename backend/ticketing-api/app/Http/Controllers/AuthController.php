@@ -53,8 +53,13 @@ class AuthController extends Controller
             return response()->json(['error' => 'Could not create token'], 500);
         }
 
+        // ✅ AMBIL DATA USER YANG BERHASIL LOGIN
+        $user = auth()->user();
+
+        // ✅ KEMBALIKAN RESPON LENGKAP DENGAN DATA USER
         return response()->json([
-            'token' => $token,
+            'token'      => $token,
+            'user'       => $user, // <-- INI BARIS KUNCINYA
             'expires_in' => auth('api')->factory()->getTTL() * 60,
         ]);
     }
