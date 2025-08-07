@@ -5,15 +5,31 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; // <-- 1. Tambahkan ini
 
 class TicketController extends Controller
 {
     /**
-     * Ambil semua tiket beserta data user (sebagai pengganti worker).
+     * Ambil tiket berdasarkan peran pengguna.
+     * - Admin: Dapat melihat semua tiket.
+     * - User: Hanya dapat melihat tiket yang ditugaskan padanya.
      */
     public function index()
     {
-        return Ticket::with('user')->latest()->get();
+        // 2. Ambil data user yang sedang login
+        $user = Auth::user();
+
+        // 3. Tambahkan logika berdasarkan peran (role)
+        if ($user->role === 'admin') {
+            // Jika admin, kembalikan semua tiket
+            return Ticket::with('user')->latest()->get();
+        } else {
+            // Jika bukan admin (yaitu 'user'), filter berdasarkan user_id
+            return Ticket::with('user')
+                        ->where('user_id', $user->id) // Ini adalah baris kuncinya
+                        ->latest()
+                        ->get();
+        }
     }
 
     /**
@@ -23,7 +39,7 @@ class TicketController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'user_id' => 'required|exists:users,id', // ganti dari workers
+            'user_id' => 'required|exists:users,id',
             'status' => 'required|string',
         ]);
 
