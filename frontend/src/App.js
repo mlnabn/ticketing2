@@ -18,7 +18,7 @@ function App() {
   const [isLogin, setIsLogin] = useState(isLoggedIn());
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState('');
-
+  const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [currentPage, setCurrentPage] = useState('home');
   // UI State
   const [darkMode, setDarkMode] = useState(false);
@@ -34,6 +34,7 @@ function App() {
       if (currentUser) {
         setUserRole(currentUser.role);
         setUserName(currentUser.name);
+        setLoggedInUserId(currentUser.id);
       }
       fetchData();
     }
@@ -220,8 +221,13 @@ function App() {
                   <JobForm users={users} addTicket={addTicket} />
                 </>
               )}
-              {/* Semua role melihat daftar pekerjaan di halaman utama */}
-              <JobList tickets={tickets} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} />
+              <JobList 
+                tickets={tickets} 
+                updateTicketStatus={updateTicketStatus} 
+                deleteTicket={handleDeleteClick}
+                loggedInUserId={loggedInUserId}
+                userRole={userRole}
+              />
             </>
           )}
 
