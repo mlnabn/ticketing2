@@ -1007,85 +1007,108 @@ body.dark-mode .job-filter select {
   ---------------------------------------------------
   Mengatur tampilan tabel agar responsif di layar kecil.
 */
-@media (max-width: 600px) {
-  .job-form {
-    grid-template-columns: 1fr;
+/* ==========================================================================
+   Tabel Responsif (Pendekatan Desktop-Down)
+   ========================================================================== */
+
+/* Aturan untuk layar lebar (di atas 768px) ada di luar media query. */
+/* ... kode CSS tabel desktop Anda di sini ... */
+
+
+/* == 1. Transformasi ke Tampilan Kartu untuk Tablet & Ponsel == */
+  @media (max-width: 768px) {
+    /* Sembunyikan header tabel asli */
+    .job-table thead {
+      display: none;
+    }
+
+    /* Ubah semua elemen tabel menjadi block agar bisa ditumpuk */
+    .job-table,
+    .job-table tbody,
+    .job-table tr,
+    .job-table td {
+      display: block;
+      width: 100%;
+    }
+
+    /* Beri jarak dan border pada setiap baris, yang sekarang berfungsi seperti kartu */
+    .job-table tr {
+      margin-bottom: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 0;
+    }
+
+    .job-table td {
+      position: relative; /* Diperlukan untuk pseudo-element ::before */
+      padding-left: 50%; /* Beri ruang di kiri untuk label */
+      text-align: right; /* Pindahkan konten data ke kanan */
+      border-bottom: 1px solid #eee;
+    }
+    
+    /* Hapus border bawah pada sel terakhir di setiap kartu */
+    .job-table tr td:last-child {
+      border-bottom: none;
+    }
+
+    /* Trik untuk membuat label dari atribut data-label */
+    .job-table td::before {
+      content: attr(data-label); /* Ambil teks dari atribut data-label di <td> */
+      position: absolute;
+      left: 1rem;
+      width: calc(50% - 2rem);
+      text-align: left;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    /* Atur agar status dan tombol tidak memenuhi lebar */
+    .job-table td .status,
+    .job-table td button {
+      width: auto;
+      float: right;
+    }
+
+    /* Style khusus untuk sel Aksi agar tombol rapi */
+    .job-table td[data-label="Aksi"] {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* --- Pengelompokan Dark Mode untuk 768px --- */
+    body.dark-mode {
+      & .job-table tr {
+        border-color: #444;
+      }
+      & .job-table td {
+        border-bottom-color: #4a4a66;
+      }
+      & .job-table td::before {
+        color: #eee;
+      }
+    }
   }
 
-  .job-table th,
-  .job-table td {
-    font-size: 0.9rem;
-    padding: 0.7rem;
-  }
-}
 
-@media (max-width: 768px) {
-  .job-table thead {
-    display: none; /* Sembunyikan header tabel */
+  /* == 2. Penyempurnaan untuk Layar Ponsel Kecil == */
+  @media (max-width: 600px) {
+    /* Aturan ini akan menimpa style dari 768px jika diperlukan */
+    
+    .job-table th,
+    .job-table td {
+      font-size: 0.9rem;
+      padding-top: 0.7rem;
+      padding-bottom: 0.7rem;
+    }
+    
+    /* Form input juga diubah menjadi satu kolom */
+    .job-form {
+      grid-template-columns: 1fr;
+    }
   }
-
-  .job-table,
-  .job-table tbody,
-  .job-table tr,
-  .job-table td {
-    display: block;
-    width: 100%;
-  }
-
-  .job-table tr {
-    margin-bottom: 1rem;
-    border: 1px solid #ddd; /* Border baris di mode terang */
-    border-radius: 8px;
-    padding: 0;
-  }
-
-  body.dark-mode .job-table tr {
-    border-color: #444; /* Warna border baris di mode gelap */
-  }
-
-  .job-table td {
-    text-align: right;
-    position: relative;
-    padding-left: 50%;
-    border-bottom: 1px solid #eee; /* Border bawah sel di mode terang */
-  }
-
-  body.dark-mode .job-table td {
-    border-bottom: 1px solid #4a4a66; /* Warna border bawah sel di mode gelap */
-  }
-
-  .job-table tr td:last-child {
-    border-bottom: none;
-  }
-
-  .job-table td::before {
-    content: attr(data-label); /* Menggunakan atribut data-label sebagai label */
-    position: absolute;
-    left: 1rem;
-    width: calc(50% - 2rem);
-    text-align: left;
-    font-weight: bold;
-    color: #333; /* Warna label di mode terang */
-  }
-
-  body.dark-mode .job-table td::before {
-    color: #eee; /* Warna label di mode gelap */
-  }
-
-  .job-table td .status,
-  .job-table td button {
-    width: auto;
-    float: right;
-  }
-
-  .job-table td[data-label="Aksi"] {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-}
 
 /*
   ---------------------------------------------------

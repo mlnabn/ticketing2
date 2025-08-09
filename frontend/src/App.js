@@ -19,7 +19,7 @@ function App() {
   const [isLogin, setIsLogin] = useState(isLoggedIn());
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState('');
-
+  const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [currentPage, setCurrentPage] = useState('home');
   // UI State
   const [darkMode, setDarkMode] = useState(false);
@@ -35,6 +35,7 @@ function App() {
       if (currentUser) {
         setUserRole(currentUser.role);
         setUserName(currentUser.name);
+        setLoggedInUserId(currentUser.id);
       }
       fetchData();
     }
@@ -214,20 +215,28 @@ function App() {
           {/* Tampilan Halaman HOME */}
           {currentPage === 'home' && (
             <>
-              {isAdmin && (
+              {(
                 <>
                   <div className="info-cards-grid">
-                    <div className="info-card red-card"><h3>{tickets.filter(t => t.status !== 'selesai').length}</h3><p>Tiket Belum Selesai</p></div>
-                    <div className="info-card green-card"><h3>{tickets.filter(t => t.status === 'selesai').length}</h3><p>Tiket Selesai</p></div>
+                    <div className="info-card red-card"><h3>{tickets.filter(t => t.status !== 'Selesai').length}</h3><p>Tiket Belum Selesai</p></div>
+                    <div className="info-card green-card"><h3>{tickets.filter(t => t.status === 'Selesai').length}</h3><p>Tiket Selesai</p></div>
                     <div className="info-card yellow-card"><h3>{tickets.length}</h3><p>Total Tiket</p></div>
-                    <div className="info-card blue-card"><h3>{users.length}</h3><p>Total Pengguna</p></div>
+                    {isAdmin && (
+                      <div className="info-card blue-card"><h3>{users.length}</h3><p>Total Pengguna</p></div>
+                    )}
+
                   </div>
                   {/* Admin tetap melihat form di halaman utama */}
                   <JobForm users={users} addTicket={addTicket} />
                 </>
               )}
-              {/* Semua role melihat daftar pekerjaan di halaman utama */}
-              <JobList tickets={tickets} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} />
+              <JobList 
+                tickets={tickets} 
+                updateTicketStatus={updateTicketStatus} 
+                deleteTicket={handleDeleteClick}
+                loggedInUserId={loggedInUserId}
+                userRole={userRole}
+              />
             </>
           )}
 

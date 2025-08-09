@@ -41,6 +41,7 @@ class TicketController extends Controller
             'title' => 'required|string|max:255',
             'user_id' => 'required|exists:users,id',
             'status' => 'required|string',
+            'workshop' => 'required|string',
         ]);
 
         $ticket = Ticket::create($validated);
