@@ -205,13 +205,16 @@ function App() {
           {/* Tampilan Halaman HOME */}
           {currentPage === 'home' && (
             <>
-              {isAdmin && (
+              {(
                 <>
                   <div className="info-cards-grid">
                     <div className="info-card red-card"><h3>{tickets.filter(t => t.status !== 'Selesai').length}</h3><p>Tiket Belum Selesai</p></div>
                     <div className="info-card green-card"><h3>{tickets.filter(t => t.status === 'Selesai').length}</h3><p>Tiket Selesai</p></div>
                     <div className="info-card yellow-card"><h3>{tickets.length}</h3><p>Total Tiket</p></div>
-                    <div className="info-card blue-card"><h3>{users.length}</h3><p>Total Pengguna</p></div>
+                    {isAdmin && (
+                      <div className="info-card blue-card"><h3>{users.length}</h3><p>Total Pengguna</p></div>
+                    )}
+
                   </div>
                   {/* Admin tetap melihat form di halaman utama */}
                   <JobForm users={users} addTicket={addTicket} />
