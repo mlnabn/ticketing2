@@ -8,6 +8,7 @@ import AddUser from './components/AddUser.js';
 import ConfirmationModal from './components/ConfirmationModal';
 import { getToken, isLoggedIn, logout, getUser } from './auth';
 import './App.css';
+import yourLogo from './Image/Logo.png';
 
 const API_URL = 'http://127.0.0.1:8000/api';
 
@@ -125,8 +126,16 @@ function App() {
 
   return (
     <div className={`dashboard-container ${!isSidebarOpen ? 'sidebar-closed' : ''}`}>
+      {/* Sidebar */}
       <aside className={`sidebar ${!isSidebarOpen ? 'closed' : ''}`}>
-        <div className="sidebar-header">Helpdesk Tiketing</div>
+        <div className="sidebar-header">
+          {/* Mengganti src dengan variabel yourLogo */}
+          <img
+            src={yourLogo} // 💡 NEW: Menggunakan variabel yang diimpor
+            alt="Helpdesk Tiketing Logo"
+            className="sidebar-logo" // Tambahkan kelas untuk styling
+          />
+        </div>
         <nav className="sidebar-nav">
           <ul>
             {/* Tampilan Menu untuk Admin */}
@@ -139,7 +148,7 @@ function App() {
                 </li>
                 <li className="sidebar-nav-item">
                   <button onClick={() => setCurrentPage('addUser')} className={`sidebar-button ${currentPage === 'addUser' ? 'active' : ''}`}>
-                    <i className="fas fa-user-plus"></i><span>Add User</span>
+                    <i className="fas fa-user-plus"></i><span>User</span>
                   </button>
                 </li>
               </>
