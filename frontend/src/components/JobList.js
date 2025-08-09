@@ -16,8 +16,8 @@ function JobList({ tickets, updateTicketStatus, deleteTicket }) {
           <tr>
             <th>ID</th>
             <th>Nama Pekerja</th>
-            <th>Workshop</th> {/* Kolom Workshop dipindahkan */}
-            <th>Deskripsi</th> {/* Kolom Deskripsi dipindahkan */}
+            <th>Deskripsi</th>
+            <th>Workshop</th> {/* Kolom Workshop */}
             <th>Status</th>
             <th>Aksi</th>
           </tr>
@@ -29,34 +29,33 @@ function JobList({ tickets, updateTicketStatus, deleteTicket }) {
               <td data-label="ID">{ticket.id}</td>
               {/* Pastikan ticket.user ada sebelum mengakses propertinya */}
               <td data-label="Nama Pekerja">{ticket.user ? ticket.user.name : 'N/A'}</td>
+              <td data-label="Deskripsi">{ticket.title}</td>
               {/* Menampilkan data workshop dari ticket */}
               <td data-label="Workshop">{ticket.workshop || 'N/A'}</td>
-              <td data-label="Deskripsi">{ticket.title}</td> {/* Data Deskripsi */}
               <td data-label="Status">
                 <span className={`status ${getStatusClass(ticket.status)}`}>
                   {ticket.status}
                 </span>
               </td>
-              <td data-label="Aksi">
+              <td data-label="Aksi"> {/* Perbaiki data-label */}
                 {ticket.status === 'Sedang Dikerjakan' && (
                   <button onClick={() => updateTicketStatus(ticket.id, 'Selesai')} className="btn-finish">
                     Selesaikan
                   </button>
                 )}
 
-                {/* Tombol "Mulai Kerjakan" untuk "Belum Dikerjakan" dihapus */}
-                {/* {ticket.status === 'Belum Dikerjakan' && (
+                {ticket.status === 'Belum Dikerjakan' && (
                   <button onClick={() => updateTicketStatus(ticket.id, 'Sedang Dikerjakan')} className="btn-start">
                     Mulai Kerjakan
                   </button>
-                )} */}
+                )}
 
                 {ticket.status === 'Selesai' && (
                   <button
                     onClick={() => deleteTicket(ticket.id)}
                     className="btn-delete"
                   >
-                    Delete
+                    Delete {/* Mengubah teks tombol */}
                   </button>
                 )}
               </td>

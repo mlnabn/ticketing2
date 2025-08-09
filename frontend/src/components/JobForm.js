@@ -5,20 +5,20 @@ import Select from 'react-select';
 function JobForm({ users, addTicket }) {
   const [title, setTitle] = useState(''); // Untuk Deskripsi
   const [userId, setUserId] = useState(''); // Untuk Nama Pekerja
-  const [workshop, setWorkshop] = useState(''); // Untuk Workshop (sekarang sebagai state untuk Select)
-  const [status, setStatus] = useState('Belum Dikerjakan'); // Default status tiket baru
+  const [workshop, setWorkshop] = useState(''); // Untuk Workshop
+  const [status, setStatus] = useState('Belum Dikerjakan'); // Default status
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Pastikan semua field terisi sebelum submit
-    if (title && userId && workshop) { // Status tidak perlu dicek karena sudah default
+    if (title && userId && workshop && status) {
       // Panggil fungsi 'addTicket' dengan data yang sesuai
       addTicket({ title, user_id: userId, status, workshop });
       // Reset form setelah submit
       setTitle('');
       setUserId('');
-      setWorkshop(''); // Reset workshop
-      setStatus('Belum Dikerjakan'); // Reset status ke default
+      setWorkshop('');
+      setStatus('Belum Dikerjakan');
     } else {
       console.log("Mohon lengkapi semua field.");
     }
@@ -40,7 +40,7 @@ function JobForm({ users, addTicket }) {
     { value: 'Muhasa', label: 'Muhasa' },
   ];
 
-  // Temukan user dan workshop yang dipilih untuk ditampilkan di Select
+  // Temukan user yang dipilih untuk ditampilkan di Select
   const selectedUser = userOptions.find(option => option.value === userId);
   const selectedWorkshop = workshopOptions.find(option => option.value === workshop);
 
@@ -84,7 +84,7 @@ function JobForm({ users, addTicket }) {
 
   return (
     <form onSubmit={handleSubmit} className="job-form">
-      {/* Select untuk Workshop */}
+      {/* Input untuk Workshop */}
       <Select
         options={workshopOptions}
         onChange={(selected) => setWorkshop(selected ? selected.value : '')}
@@ -118,18 +118,10 @@ function JobForm({ users, addTicket }) {
         className="input-like-select"
       />
 
-      {/* Status akan otomatis 'Belum Dikerjakan' di backend/state awal.
-          Select ini hanya perlu menampilkan opsi 'Sedang Dikerjakan'
-          jika ada kasus update manual dari user, atau bisa dihilangkan
-          jika status sepenuhnya dikontrol oleh backend setelah pembuatan.
-          Karena tiket baru otomatis "Belum Dikerjakan", kita tidak perlu
-          opsi "Belum Dikerjakan" di sini untuk tiket baru.
-          Tetapi, jika Anda ingin memungkinkan pengguna untuk memilih status awal lain
-          (misal: langsung ke "Sedang Dikerjakan" saat membuat), Anda bisa menambahkan opsi lain.
-          Untuk saat ini, saya menghilangkan opsi 'Belum Dikerjakan' dari UI Select.
-      */}
+      {/* Select untuk Status */}
       <Select
         options={[
+          { value: 'Belum Dikerjakan', label: 'Belum Dikerjakan' },
           { value: 'Sedang Dikerjakan', label: 'Sedang Dikerjakan' }
         ]}
         onChange={(selected) => setStatus(selected.value)}
@@ -138,8 +130,6 @@ function JobForm({ users, addTicket }) {
         styles={selectStyles}
         classNamePrefix="react-select"
         required
-        // Set status default secara terprogram agar tidak kosong
-        // useEffect(() => { if (!status) setStatus('Belum Dikerjakan'); }, [status]);
       />
 
       {/* Tombol Tambah */}
