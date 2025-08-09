@@ -1,6 +1,6 @@
 import React from 'react';
 
-// 1. Terima prop `deleteJob` yang sudah kita buat di App.js
+// Terima prop `tickets`, `updateTicketStatus`, dan `deleteTicket`
 function JobList({ tickets, updateTicketStatus, deleteTicket }) {
   const getStatusClass = (status) => {
     if (status === 'Selesai') return 'status-selesai';
@@ -16,42 +16,47 @@ function JobList({ tickets, updateTicketStatus, deleteTicket }) {
           <tr>
             <th>ID</th>
             <th>Nama Pekerja</th>
-            <th>Nama Pekerjaan</th>
+            <th>Workshop</th> {/* Kolom Workshop dipindahkan */}
+            <th>Deskripsi</th> {/* Kolom Deskripsi dipindahkan */}
             <th>Status</th>
             <th>Aksi</th>
           </tr>
         </thead>
         <tbody>
-          {tickets && tickets.map((tickets) => (
-            <tr key={tickets.id}>
-              <td data-label="ID">{tickets.id}</td>
-              <td data-label="Nama Pekerja">{tickets.user ? tickets.user.name : 'N/A'}</td>
-              <td data-label="Nama Pekerjaan">{tickets.title}</td>
+          {/* Pastikan tickets adalah array dan map di atasnya */}
+          {Array.isArray(tickets) && tickets.map((ticket) => (
+            <tr key={ticket.id}>
+              <td data-label="ID">{ticket.id}</td>
+              {/* Pastikan ticket.user ada sebelum mengakses propertinya */}
+              <td data-label="Nama Pekerja">{ticket.user ? ticket.user.name : 'N/A'}</td>
+              {/* Menampilkan data workshop dari ticket */}
+              <td data-label="Workshop">{ticket.workshop || 'N/A'}</td>
+              <td data-label="Deskripsi">{ticket.title}</td> {/* Data Deskripsi */}
               <td data-label="Status">
-                <span className={`status ${getStatusClass(tickets.status)}`}>
-                  {tickets.status}
+                <span className={`status ${getStatusClass(ticket.status)}`}>
+                  {ticket.status}
                 </span>
               </td>
               <td data-label="Aksi">
-                {tickets.status === 'Sedang Dikerjakan' && (
-                  <button onClick={() => updateTicketStatus(tickets.id, 'Selesai')} className="btn-finish">
+                {ticket.status === 'Sedang Dikerjakan' && (
+                  <button onClick={() => updateTicketStatus(ticket.id, 'Selesai')} className="btn-finish">
                     Selesaikan
                   </button>
                 )}
-                
-                {tickets.status === 'Belum Dikerjakan' && (
-                  <button onClick={() => updateTicketStatus(tickets.id, 'Sedang Dikerjakan')} className="btn-start">
+
+                {/* Tombol "Mulai Kerjakan" untuk "Belum Dikerjakan" dihapus */}
+                {/* {ticket.status === 'Belum Dikerjakan' && (
+                  <button onClick={() => updateTicketStatus(ticket.id, 'Sedang Dikerjakan')} className="btn-start">
                     Mulai Kerjakan
                   </button>
-                )}
+                )} */}
 
-                {/* 2. Tambahkan tombol Hapus dari kode teman Anda */}
-                {tickets.status === 'Selesai' && (
+                {ticket.status === 'Selesai' && (
                   <button
-                    onClick={() => deleteTicket(tickets.id)}
+                    onClick={() => deleteTicket(ticket.id)}
                     className="btn-delete"
                   >
-                    🗑️ Delete
+                    Delete
                   </button>
                 )}
               </td>
