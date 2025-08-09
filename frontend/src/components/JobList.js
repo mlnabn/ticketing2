@@ -1,5 +1,3 @@
-// file: components/JobList.js
-
 import React from 'react';
 
 // Terima prop 'loggedInUserId'
@@ -34,9 +32,8 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, loggedInUserId, us
               <td data-label="Deskripsi">{ticket.title}</td>
               <td data-label="Workshop">{ticket.workshop || 'N/A'}</td>
               <td data-label="Status">
-                <span className={`status ${getStatusClass(ticket.status)}`}>
-                  {ticket.status}
-                <span className={`status ${getStatusClass(ticket.status)}`}>
+                {/* Perbaikan: Menggunakan backticks untuk template literal */}
+                <span className={`status ${getStatusClass(ticket.status)}`}> 
                   {ticket.status}
                 </span>
               </td>

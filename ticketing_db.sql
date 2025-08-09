@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 06, 2025 at 10:42 AM
+-- Generation Time: Aug 09, 2025 at 09:28 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -123,7 +123,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (8, '2025_08_06_015130_rename_worker_id_to_user_id_in_tickets_table', 3),
 (9, '2025_08_06_024718_drop_worker_id_foreign_from_tickets_table', 4),
 (10, '2025_08_06_024030_drop_workers_table', 5),
-(11, '2025_08_06_025536_add_user_id_foreign_to_tickets_table', 6);
+(12, '2025_08_06_025536_add_user_id_foreign_to_tickets_table', 6),
+(13, '2025_08_09_025432_add_workshop_to_tickets_table', 6),
+(14, '2025_08_09_033939_remove_division_from_users_table', 7);
 
 -- --------------------------------------------------------
 
@@ -238,6 +240,7 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 CREATE TABLE `tickets` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `title` varchar(255) NOT NULL,
+  `workshop` varchar(255) DEFAULT NULL,
   `status` varchar(255) NOT NULL DEFAULT 'Belum Dikerjakan',
   `user_id` bigint(20) UNSIGNED NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -248,11 +251,24 @@ CREATE TABLE `tickets` (
 -- Dumping data for table `tickets`
 --
 
-INSERT INTO `tickets` (`id`, `title`, `status`, `user_id`, `created_at`, `updated_at`) VALUES
-(4, 'Mengerjakan Tiketing Tracker', 'Sedang Dikerjakan', 1, '2025-08-05 18:46:11', '2025-08-05 18:46:11'),
-(5, 'Makan', 'Belum Dikerjakan', 1, '2025-08-05 18:46:23', '2025-08-05 18:46:23'),
-(6, 'Minum', 'Selesai', 1, '2025-08-05 18:46:35', '2025-08-06 00:03:30'),
-(8, 'Solat', 'Selesai', 4, '2025-08-05 23:52:36', '2025-08-06 01:27:36');
+INSERT INTO `tickets` (`id`, `title`, `workshop`, `status`, `user_id`, `created_at`, `updated_at`) VALUES
+(4, 'Mengerjakan Tiketing Tracker', NULL, 'Selesai', 1, '2025-08-05 18:46:11', '2025-08-08 05:46:03'),
+(5, 'Makan', NULL, 'Belum Dikerjakan', 1, '2025-08-05 18:46:23', '2025-08-05 18:46:23'),
+(6, 'Minum', NULL, 'Selesai', 1, '2025-08-05 18:46:35', '2025-08-06 00:03:30'),
+(8, 'Solat', NULL, 'Selesai', 4, '2025-08-05 23:52:36', '2025-08-06 01:27:36'),
+(11, 'asnalksdn', NULL, 'Belum Dikerjakan', 1, '2025-08-06 02:50:33', '2025-08-06 02:50:33'),
+(12, 'lfnaf', NULL, 'Belum Dikerjakan', 4, '2025-08-06 02:52:22', '2025-08-06 02:52:22'),
+(13, 'Makan', NULL, 'Sedang Dikerjakan', 4, '2025-08-06 02:52:46', '2025-08-06 02:52:46'),
+(14, 'Pulang', NULL, 'Selesai', 6, '2025-08-06 02:55:18', '2025-08-08 21:16:53'),
+(15, 'Ngising', NULL, 'Belum Dikerjakan', 8, '2025-08-06 02:55:59', '2025-08-06 02:55:59'),
+(16, 'Ticketing', NULL, 'Sedang Dikerjakan', 1, '2025-08-06 18:24:25', '2025-08-07 03:41:33'),
+(21, 'asdasd', NULL, 'Selesai', 2, '2025-08-07 00:13:44', '2025-08-09 00:17:40'),
+(23, 'Mulih', NULL, 'Selesai', 4, '2025-08-07 01:24:08', '2025-08-07 01:45:49'),
+(31, 'Pulang', NULL, 'Selesai', 2, '2025-08-07 01:49:32', '2025-08-08 19:32:03'),
+(32, 'Melanjutkan Project Ticketing', NULL, 'Sedang Dikerjakan', 2, '2025-08-08 19:41:16', '2025-08-08 19:42:46'),
+(34, 'asf', 'Canden', 'Belum Dikerjakan', 2, '2025-08-08 20:02:43', '2025-08-08 20:02:43'),
+(35, 'Masang Router', 'Nusa Persada', 'Belum Dikerjakan', 6, '2025-08-08 21:15:40', '2025-08-08 21:15:40'),
+(36, 'Istirahat', 'Canden', 'Belum Dikerjakan', 2, '2025-08-08 23:04:56', '2025-08-08 23:04:56');
 
 -- --------------------------------------------------------
 
@@ -269,21 +285,28 @@ CREATE TABLE `users` (
   `remember_token` varchar(100) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `role` varchar(255) NOT NULL DEFAULT 'user',
-  `division` varchar(255) DEFAULT NULL
+  `role` varchar(255) NOT NULL DEFAULT 'user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `role`, `division`) VALUES
-(1, 'Akasha Bin Ali', 'akasha@gmail.com', NULL, '$2y$12$k2oFo2vho1s.aJju8LPi1O74kCqlLp9kY6C58LB5OX1sETqJuTRp6', NULL, '2025-08-04 06:24:40', '2025-08-04 06:24:40', 'user', NULL),
-(2, 'akasha', 'akasha1@gmail.com', NULL, '$2y$12$WOujVRTZZB802m4pk3GVLuDT8A1bVL3/nWGmXOD2Y/WN2eLvnn2bC', NULL, '2025-08-04 19:30:32', '2025-08-04 19:30:32', 'user', NULL),
-(4, 'Bintang', 'bintang@gmail.com', NULL, '$2y$12$0hEuAgGyu4o5k0M.xOuDLO21yQ6fDYBZB0eEPbvYODIp/mKBHZRJm', NULL, '2025-08-05 01:33:33', '2025-08-05 01:33:33', 'user', NULL),
-(5, 'yadi', 'yadi@gmail.com', NULL, '$2y$12$KY1wRoJF53KdXzhnCOAKp.m/RAPe0pCHYvGI63dDsAX2GpZLfzagK', NULL, '2025-08-05 18:45:46', '2025-08-05 18:45:46', 'user', NULL),
-(6, 'bagas', 'bagas@gmail.com', NULL, '$2y$12$37JT39ckdV69yrlvTaAn0u88KnHXdIJlSm.dFYbgaDMm3MxMi7sIi', NULL, '2025-08-05 23:35:21', '2025-08-05 23:35:21', 'user', NULL),
-(7, 'admin', 'admin@gmail.com', NULL, '$2y$12$qpy1MaEepu34.L8XRbjsour9xDSHspMeJUJpAkSNIKqvYehoVWwa.', NULL, '2025-08-06 00:06:58', '2025-08-06 00:06:58', 'admin', NULL);
+INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `role`) VALUES
+(1, 'Akasha Bin Ali', 'akasha@gmail.com', NULL, '$2y$12$k2oFo2vho1s.aJju8LPi1O74kCqlLp9kY6C58LB5OX1sETqJuTRp6', NULL, '2025-08-04 06:24:40', '2025-08-04 06:24:40', 'user'),
+(2, 'akasha', 'akasha1@gmail.com', NULL, '$2y$12$WOujVRTZZB802m4pk3GVLuDT8A1bVL3/nWGmXOD2Y/WN2eLvnn2bC', NULL, '2025-08-04 19:30:32', '2025-08-04 19:30:32', 'user'),
+(4, 'Bintang', 'bintang@gmail.com', NULL, '$2y$12$0hEuAgGyu4o5k0M.xOuDLO21yQ6fDYBZB0eEPbvYODIp/mKBHZRJm', NULL, '2025-08-05 01:33:33', '2025-08-05 01:33:33', 'user'),
+(5, 'yadi', 'yadi@gmail.com', NULL, '$2y$12$KY1wRoJF53KdXzhnCOAKp.m/RAPe0pCHYvGI63dDsAX2GpZLfzagK', NULL, '2025-08-05 18:45:46', '2025-08-05 18:45:46', 'user'),
+(6, 'bagas', 'bagas@gmail.com', NULL, '$2y$12$37JT39ckdV69yrlvTaAn0u88KnHXdIJlSm.dFYbgaDMm3MxMi7sIi', NULL, '2025-08-05 23:35:21', '2025-08-05 23:35:21', 'user'),
+(7, 'admin', 'admin@gmail.com', NULL, '$2y$12$qpy1MaEepu34.L8XRbjsour9xDSHspMeJUJpAkSNIKqvYehoVWwa.', NULL, '2025-08-06 00:06:58', '2025-08-06 00:06:58', 'admin'),
+(8, 'Naufal', 'naufal@gmail.com', NULL, '$2y$12$nFpugvVQauS1q0G8ludgiuMUWLpeaG/kMQkkRIORd.blTEN726wW2', NULL, '2025-08-06 02:55:46', '2025-08-06 02:55:46', 'user'),
+(9, 'Adi', 'adi@gmail.com', NULL, '$2y$12$YqxP2sZiz48v41L7ydtC4.NmJ6Bmpxig.abN9RkMrFIpRkbrXkXlG', NULL, '2025-08-06 18:58:54', '2025-08-06 18:58:54', 'user'),
+(10, 'Rasya', 'rasya@gmail.com', NULL, '$2y$12$Hl3BQRF/mHhaGOixbkTWHupTHjedUQC67Jw.ifqDtEud5Ek6dEwVK', NULL, '2025-08-06 19:33:16', '2025-08-06 19:33:16', 'user'),
+(11, 'Hadi', 'hadi@gmail.com', NULL, '$2y$12$KX1spLmly5YmYQD/Y9EQOeKo./hTuFRB7dj8.RjaMdHzF05Y6FA/K', NULL, '2025-08-08 18:20:12', '2025-08-08 18:20:12', 'user'),
+(12, 'Dwi', 'dwi@gmail.com', NULL, '$2y$12$TU5MvK3q7EUahTzUQiowIOWQrsAwuCmVyf/4rFtChJF06MNNPkPhe', NULL, '2025-08-08 20:18:38', '2025-08-08 20:18:38', 'user'),
+(13, 'babi', 'babi@gmail.com', NULL, '$2y$12$fapCrpc0O/rgtTM.e3Lc5erh3hxd5rQyzHZnc58KEoujW/dLZLaLq', NULL, '2025-08-08 20:41:40', '2025-08-08 20:41:40', 'user'),
+(14, 'Nopal', 'nopal@gmail.com', NULL, '$2y$12$ychVw6yazYdW6nxHnWrYCeDKXTF5aUuwcGR2mJFJdnAZoLs3ppZfG', NULL, '2025-08-08 20:49:16', '2025-08-08 20:49:16', 'user'),
+(15, 'hahaha', 'hahaha@gmail.com', NULL, '$2y$12$TJb6wc1LaajyfuiwDhF4DOopYXpRkn1SHIRX4iHe/x2JG./ltKdpq', NULL, '2025-08-08 20:49:38', '2025-08-08 20:49:38', 'user');
 
 --
 -- Indexes for dumped tables
@@ -384,7 +407,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
@@ -396,13 +419,13 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `tickets`
 --
 ALTER TABLE `tickets`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- Constraints for dumped tables

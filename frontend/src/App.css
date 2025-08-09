@@ -235,7 +235,7 @@ body.dark-mode .auth-page-container {
   padding: 50px;
   width: 400px;
   /* DIUBAH: Mengatur max-width agar lebih besar */
-  /* max-width: 400px; Lebar kartu login/register, bisa diubah ke 450px atau lebih */
+  max-width: 400px; /*Lebar kartu login/register, bisa diubah ke 450px atau lebih */
   text-align: center;
   transition: all 0.3s ease;
 }
@@ -908,10 +908,10 @@ body.dark-mode .job-table td {
 }
 
 .job-table th {
-  background-color: var(--joblist-header-bg-light); /* Latar belakang header tabel di mode terang (kuning) */
+  background-color: var(--joblist-header-bg-light); 
   font-weight: 600;
-  color: var(--joblist-header-text-light); /* Warna teks header tabel di mode terang */
-  border-bottom: 2px solid #b8860b; /* Garis bawah lebih tegas untuk header kuning */
+  color: var(--joblist-header-text-light); 
+  border-bottom: 2px solid #b8860b; 
 }
 
 body.dark-mode .job-table th {
@@ -989,7 +989,7 @@ body.dark-mode .job-filter select {
 }
 
 .status-sedang::before {
-  content: '�';
+  content: '⏳';
 }
 
 .status-selesai {
