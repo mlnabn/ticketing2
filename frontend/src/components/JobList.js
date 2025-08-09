@@ -36,6 +36,8 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, loggedInUserId, us
               <td data-label="Status">
                 <span className={`status ${getStatusClass(ticket.status)}`}>
                   {ticket.status}
+                <span className={`status ${getStatusClass(ticket.status)}`}>
+                  {ticket.status}
                 </span>
               </td>
               <td data-label="Aksi">

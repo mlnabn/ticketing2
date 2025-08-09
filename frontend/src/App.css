@@ -235,7 +235,7 @@ body.dark-mode .auth-page-container {
   padding: 50px;
   width: 400px;
   /* DIUBAH: Mengatur max-width agar lebih besar */
-  max-width: 400px; /* Lebar kartu login/register, bisa diubah ke 450px atau lebih */
+  /* max-width: 400px; Lebar kartu login/register, bisa diubah ke 450px atau lebih */
   text-align: center;
   transition: all 0.3s ease;
 }
