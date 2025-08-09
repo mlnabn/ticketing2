@@ -230,7 +230,9 @@ function App() {
 
                       </div>
                       {/* Admin tetap melihat form di halaman utama */}
-                      <JobForm users={users} addTicket={addTicket} />
+                      {isAdmin &&(
+                        <JobForm users={users} addTicket={addTicket} />
+                      )}
                     </>
                   )}
                   <JobList
