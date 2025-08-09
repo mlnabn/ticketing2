@@ -18,8 +18,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users',
-            'password' => 'required|string|min:6',
-            'division' => 'required|string',
+            'password' => 'required|string|min:6|confirmed',
         ]);
 
         $user = User::create([
@@ -27,7 +26,6 @@ class UserController extends Controller
             'email'    => $validated['email'],
             'password' => bcrypt($validated['password']),
             'role'     => 'user',
-            'division' => $validated['division'],
         ]);
 
         return response()->json($user, 201);

@@ -11,7 +11,6 @@ const AddUser = () => {
     email: '',
     password: '',
     password_confirmation: '', // Disesuaikan untuk validasi Laravel
-    workshop: '',
   });
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState('');
@@ -42,7 +41,6 @@ const AddUser = () => {
         email: '',
         password: '',
         password_confirmation: '',
-        division: ''
       });
 
     } catch (err) {
