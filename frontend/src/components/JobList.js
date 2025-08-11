@@ -17,7 +17,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, loggedInUserId, us
       <table className="job-table">
         <thead>
           <tr>
-            <th>ID</th>
+            <th>Pengirim</th>
             <th>Nama Pekerja</th>
             <th>Deskripsi</th>
             <th>Workshop</th>
@@ -29,7 +29,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, loggedInUserId, us
         <tbody>
           {Array.isArray(tickets) && tickets.map((ticket) => (
             <tr key={ticket.id}>
-              <td data-label="ID">{ticket.id}</td>
+              <td data-label="Pengirim">{ticket.creator ? ticket.creator.name : 'N/A'}</td>
               <td data-label="Nama Pekerja">{ticket.user ? ticket.user.name : 'N/A'}</td>
               <td data-label="Deskripsi">{ticket.title}</td>
               <td data-label="Workshop">{ticket.workshop || 'N/A'}</td>

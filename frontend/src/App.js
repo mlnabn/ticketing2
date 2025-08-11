@@ -337,7 +337,7 @@ function App() {
                 <table className='job-table'>
                   <thead>
                     <tr>
-                      <th>ID</th>
+                      <th>Pengirim</th>
                       <th>Ditugaskan Kepada</th>
                       <th>Deskripsi</th>
                       <th>Workshop</th>
@@ -349,7 +349,7 @@ function App() {
                     {createdTicketsOnPage.length > 0 ? (
                       createdTicketsOnPage.map(ticket => (
                         <tr key={ticket.id}>
-                          <td>{ticket.id}</td>
+                          <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
                           <td>{ticket.user.name}</td>
                           <td>{ticket.title}</td>
                           <td>{ticket.workshop}</td>

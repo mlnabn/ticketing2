@@ -23,7 +23,7 @@ class TicketController extends Controller
         $search = $request->query('search');
 
         // 2. Mulai query dasar dengan menyertakan relasi user
-        $query = Ticket::with('user');
+        $query = Ticket::with(['user', 'creator']);
 
         // 3. Terapkan filter berdasarkan peran
         if ($user->role === 'admin') {
@@ -64,7 +64,7 @@ class TicketController extends Controller
 
     public function createdTickets(Request $request)
     {
-        $tickets = Ticket::with('user') // 'user' di sini adalah orang yang DITUGASKAN
+        $tickets = Ticket::with(['user', 'creator']) // 'user' di sini adalah orang yang DITUGASKAN
             ->where('creator_id', auth()->id())
             ->latest()
             ->paginate(5); // Kita pakai paginasi 5 agar tidak terlalu panjang

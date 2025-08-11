@@ -12,6 +12,12 @@ class Ticket extends Model
     protected $fillable = ['title', 'status', 'user_id', 'workshop', 'creator_id'];
 
     public function user() {
-    return $this->belongsTo(User::class);
-}
+        return $this->belongsTo(User::class);
+    }
+
+    public function creator()
+    {
+        // Pastikan parameter kedua 'creator_id' ada
+        return $this->belongsTo(User::class, 'creator_id');
+    }
 }
