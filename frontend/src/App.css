@@ -50,10 +50,10 @@
   --auth-bg-light: #F7F9FC; /* Sama dengan latar belakang dashboard */
 
   /* Warna Kartu Informasi (Sesuai dengan screenshot dan penyesuaian sebelumnya) */
-  --info-card-red: #EF4444; /* Merah */
-  --info-card-green: #22C55E; /* Hijau */
-  --info-card-yellow: #F59E0B; /* Kuning/Oranye */
-  --info-card-blue: #3B82F6; /* Biru */
+  --info-card-red: #EF4444; 
+  --info-card-green: #22C55E; 
+  --info-card-yellow: #F59E0B; 
+  --info-card-blue: #3B82F6; 
 
   /* Warna untuk pesan (sukses/error) di mode terang */
   --success-bg-light: #D1FAE5; /* Hijau terang */
@@ -157,9 +157,9 @@ body.dark-mode {
 
   /* Warna Kartu Informasi (Darker, Desaturated) */
   --info-card-red: #AF7070; /* Darker Muted Rose */
-  --info-card-green: #7DAA80; /* Darker Muted Sage Green */
-  --info-card-yellow: #C7AF7A; /* Darker Muted Gold */
-  --info-card-blue: #7A96AF; /* Darker Muted Sky Blue */
+  --info-card-green: #7DAA80; 
+  --info-card-yellow: #C7AF7A; 
+  --info-card-blue: #7A96AF; 
 
   /* Warna untuk pesan (sukses/error) di mode gelap */
   --success-bg-dark: #052e16; /* Hijau gelap */
@@ -807,7 +807,7 @@ body.dark-mode .content-area {
 .info-card {
   position: relative; /* Diperlukan untuk penempatan ikon dan grafik */
   padding: 1.25rem; /* Meningkatkan padding internal */
-  border-radius: 0.75rem; /* Sudut lebih membulat */
+  border-radius: 2rem; /* Sudut lebih membulat */
   box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25); /* Bayangan lebih dalam */
   color: #fff; /* Warna teks default putih */
   overflow: hidden; /* Penting untuk efek gradien dan clipping */
@@ -1066,8 +1066,7 @@ button:hover {
   border-radius: 12px;
   overflow: hidden;
   margin-top: 1rem;
-  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Menambahkan shadow ke tabel */
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Menambahkan shadow ke tabel */
   transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; /* Tambahkan transisi untuk border-color */
   /* --- Penyesuaian untuk border container tabel --- */
   border: 1px solid var(--border-color-light); /* Border untuk seluruh tabel di mode terang */
