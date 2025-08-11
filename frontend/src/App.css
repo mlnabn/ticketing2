@@ -1,72 +1,88 @@
 /* App.css */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
-/*
-  ---------------------------------------------------
-  IMPOR FONT DAN TAILWIND CSS (JIKA DIGUNAKAN)
-  ---------------------------------------------------
-  Pastikan Font Awesome CDN juga dimuat di public/index.html jika menggunakan ikon.
-  Jika Anda tidak menggunakan Tailwind CSS lagi, Anda bisa menghapus baris @import 'tailwindcss/...'
-*/
+/* Import Google Fonts - Inter (hanya satu kali) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-/* @import 'tailwindcss/base'; */
-/* @import 'tailwindcss/components'; */
-/* @import 'tailwindcss/utilities'; */
 
-
-/*
-  ---------------------------------------------------
-  VARIABEL CSS (ROOT VARIABLES)
-  ---------------------------------------------------
-  Definisi variabel CSS untuk tema terang (default).
-  Ubah nilai-nilai hex di sini untuk menyesuaikan palet warna di mode terang.
-*/
+/* Root Variables untuk tema terang/gelap */
 :root {
   /* -- Variabel Umum untuk Input -- */
   --input-bg-light: #FBFBFB; /* Latar belakang input sangat terang */
-  --text-color-light: #334155; /* Warna teks umum (slate-700) */
-  --placeholder-color-light: #64748B; /* Warna placeholder (slate-500) */
-  --border-color-light: #E2E8F0; /* Warna border umum (slate-200) */
+  --text-color-light: #334155; /* Warna teks umum (dark slate) */
+  --placeholder-color-light: #64748B; /* Warna placeholder (medium slate) */
+  --border-color-light: #E2E8F0; /* Warna border umum (light gray-blue) */
 
   /* -- Warna Dashboard (Light Mode) -- */
-  --bg-color-dashboard-light: #F7F9FC; /* Latar belakang utama dashboard (sangat light blue-gray) */
-  --text-color-dashboard-light: #334155; /* Warna teks utama dashboard (slate-700) */
+  --bg-color-dashboard-light: #F7F9FC; /* Latar belakang utama dashboard (very light blue-gray) */
+  --text-color-dashboard-light: #334155; /* Warna teks utama dashboard (dark slate) */
 
   /* Sidebar */
-  --sidebar-bg-light: #f8f7f7; /* Latar belakang sidebar (putih bersih) */
+  --sidebar-bg-light: #f0e9e9; /* Latar belakang sidebar (putih bersih) */
   --sidebar-text-light: #334155; /* Warna teks sidebar */
-  --sidebar-border-light: #E2E8F0; /* Warna border di sidebar */
-  --sidebar-hover-bg-light: #F1F5F9; /* Warna hover tombol sidebar (slate-100) */
+  --sidebar-border-light: #d6cece; /* Warna border di sidebar */
+  --sidebar-hover-bg-light: #F1F5F9; /* Warna hover tombol sidebar (soft light gray) */
 
   /* Header Dashboard */
-  --header-bg-light: #f8f7f7; /* Latar belakang header dashboard (putih bersih) */
-  --header-text-light: #64748B; /* Warna teks di header (slate-500) */
-  --header-button-bg-light: #E2E8F0; /* Latar belakang tombol header (slate-200) */
+  --header-bg-light: #f0e9e9; /* Latar belakang header dashboard (putih bersih) */
+  --header-text-light: #334155; /* Warna teks di header (medium slate) */
+  --header-button-bg-light: #757171; /* Latar belakang tombol header */
   --header-button-text-light: #334155; /* Warna teks tombol header */
-  --header-button-hover-bg-light: #CBD5E1; /* Warna hover tombol header (slate-300) */
+  --header-button-hover-bg-light: #CBD5E1; /* Warna hover tombol header */
 
   /* Konten Utama */
   --content-bg-light: #FFFFFF; /* Latar belakang area konten utama dashboard (putih bersih) */
 
-  /* Header Tabel Joblist */
-  --joblist-header-bg-light: #5B85E5; /* Indigo-500 (biru-ungu yang kalem) */
-  --joblist-header-text-light: #FFFFFF; /* Teks putih di atas indigo */
+  /* Header Tabel Joblist (Muted Slate Blue, sesuai screenshot) */
+  --joblist-header-bg-light: #5A7A97; 
+  --joblist-header-text-light: #FFFFFF; /* Teks putih di atas background header */
 
   /* Border & Shadow Input/Select Form */
   --form-input-border-light: #E2E8F0; /* Border input/select yang terang */
   --form-input-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.05) inset; /* Shadow inset untuk efek terangkat */
 
   /* Ikon Hamburger */
-  --hamburger-icon-color-light: #64748B; /* Warna ikon hamburger (slate-500) */
+  --hamburger-icon-color-light: #64748B; /* Warna ikon hamburger (medium slate) */
   --hamburger-hover-color-light: #334155; /* Warna hover ikon hamburger */
 
   /* Login Page Background (Light Mode) */
   --auth-bg-light: #F7F9FC; /* Sama dengan latar belakang dashboard */
 
-  /* Warna Kartu Informasi (disesuaikan untuk App.css class) */
-  --info-card-red: #E66E75; /* Merah lembut */
-  --info-card-green: #5CC98F; /* Hijau lembut */
-  --info-card-yellow: #FBBF24; /* Kuning/Oranye lembut */
-  --info-card-blue: #60A5FA; /* Biru lembut */
+  /* Warna Kartu Informasi (Sesuai dengan screenshot dan penyesuaian sebelumnya) */
+  --info-card-red: #EF4444; /* Merah */
+  --info-card-green: #22C55E; /* Hijau */
+  --info-card-yellow: #F59E0B; /* Kuning/Oranye */
+  --info-card-blue: #3B82F6; /* Biru */
+
+  /* Warna untuk pesan (sukses/error) di mode terang */
+  --success-bg-light: #D1FAE5; /* Hijau terang */
+  --success-text-light: #065F46; /* Hijau gelap */
+  --success-border-light: #34D399; /* Hijau medium */
+
+  --error-bg-light: #FEE2E2; /* Merah terang */
+  --error-text-light: #991B1B; /* Merah gelap */
+  --error-border-light: #EF4444; /* Merah medium */
+
+  /* Warna Status Badge (Light Mode - disesuaikan dengan input user) */
+  --status-belum-bg-light: #9CA3AF; /* Gray-400 */
+  --status-belum-text-light: #fff;
+  --status-sedang-bg-light: #FBBF24; /* Yellow / Amber-400 */
+  --status-sedang-text-light: #444;
+  --status-selesai-bg-light: #5CC98F; /* Green lembut */
+  --status-selesai-text-light: #fff;
+
+  /* Tombol Utama (Biru kalem) */
+  --btn-submit: #5B86E5;
+  --btn-submit-hover: #4A7CD1;
+
+  /* Tombol Aksi Lainnya (dibuat lebih kalem) */
+  --btn-start: #3B82F6; /* Biru untuk "Mulai Kerjakan" */
+  --btn-start-hover: #2563EB; /* Biru lebih gelap saat hover */
+  --btn-finish: #F59E0B; /* Kuning/Oranye untuk "Selesaikan" */
+  --btn-finish-hover: #D97706; /* Kuning/Oranye lebih gelap saat hover */
+  --btn-delete: #EF4444; /* Merah untuk "Delete" */
+  --btn-delete-hover: #DC2626; /* Merah lebih gelap saat hover */
 }
 
 /*
@@ -74,12 +90,10 @@
   VARIABEL CSS (DARK MODE VARIABLES)
   ---------------------------------------------------
   Definisi variabel CSS untuk tema gelap.
-  Kelas 'dark-mode' ditambahkan ke body oleh JavaScript saat mode gelap aktif.
-  Ubah nilai-nilai hex di sini untuk menyesuaikan palet warna di mode gelap.
 */
 body.dark-mode {
   /* -- Variabel Umum untuk Input -- */
---input-bg-dark: #2A333C; /* Latar belakang input gelap */
+  --input-bg-dark: #2A333C; /* Latar belakang input gelap */
   --text-color-dark: #E0E0E0; /* Warna teks umum (soft off-white) */
   --placeholder-color-dark: #A0AEC0; /* Warna placeholder (medium gray) */
   --border-color-dark: #4A5568; /* Warna border umum (dark gray) */
@@ -104,8 +118,8 @@ body.dark-mode {
   /* Konten Utama */
   --content-bg-dark: #2D3748; /* Latar belakang area konten utama dashboard */
 
-  /* Header Tabel Joblist */
-  --joblist-header-bg-dark: #3E5C76; /* Darker Muted Slate Blue */
+  /* Header Tabel Joblist (Darker Muted Slate Blue) */
+  --joblist-header-bg-dark: #3E5C76; 
   --joblist-header-text-dark: #FFFFFF;
 
   /* Border & Shadow Input/Select Form */
@@ -134,22 +148,25 @@ body.dark-mode {
   --error-text-dark: #fecaca; /* Merah terang */
   --error-border-dark: #b91c1c; /* Merah medium */
 
-  /* Warna Status Badge (Darker, matching info cards) */
-  --status-belum: #8A939E;
-  --status-sedang: #C7AF7A;
-  --status-selesai: #7DAA80;
+  /* Warna Status Badge (Dark Mode - disesuaikan dengan input user dan harmonisasi) */
+  --status-belum-bg-dark: #6B7280; /* Gray-600 */
+  --status-belum-text-dark: #fff;
+  --status-sedang-bg-dark: #D97706; /* Amber-700 */
+  --status-sedang-text-dark: #fff;
+  --status-selesai-bg-dark: #16A34A; /* Green-700 */
+  --status-selesai-text-dark: #fff;
 
   /* Tombol Utama (Biru kalem) */
-  --btn-submit: #005bf9;
+  --btn-submit: #4A7CD1;
   --btn-submit-hover: #3A62B0;
 
   /* Tombol Aksi Lainnya (dibuat lebih kalem) */
-  --btn-start: #70A7C9;
-  --btn-start-hover: #588FA9;
-  --btn-finish: #C7AF7A;
-  --btn-finish-hover: #AF9B6F;
-  --btn-delete: #AF7070;
-  --btn-delete-hover: #986060;
+  --btn-start: #2563EB; /* Biru untuk "Mulai Kerjakan" */
+  --btn-start-hover: #1D4ED8; /* Biru lebih gelap saat hover */
+  --btn-finish: #D97706; /* Kuning/Oranye untuk "Selesaikan" */
+  --btn-finish-hover: #B45309; /* Kuning/Oranye lebih gelap saat hover */
+  --btn-delete: #DC2626; /* Merah untuk "Delete" */
+  --btn-delete-hover: #B91C1C; /* Merah lebih gelap saat hover */
 }
 
 /*
@@ -212,7 +229,7 @@ body.dark-mode {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height:100vh;
+  min-height: 100vh;
   width: 100%;
   
   /* Diubah menjadi warna putih solid */
@@ -405,9 +422,16 @@ body.dark-mode .dashboard-container {
   display: flex;
   flex-direction: column;
   border-top-right-radius: 0.5rem; /* Sudut membulat kanan atas */
-  border-bottom-right-radius: 0rem; /* Sudut membulat kanan bawah */
+  border-bottom-right-radius: 0rem; /* DISESUAIKAN: Sudut membulat kanan bawah diubah menjadi 0 */
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Bayangan */
   transition: all 0.3s ease; /* Transisi untuk lebar dan properti lainnya */
+  
+  /* === Penyesuaian untuk sidebar tetap (fixed) === */
+  position: fixed; /* Menjadikan sidebar tetap di viewport */
+  top: 0; /* Jaga sidebar di bagian atas viewport */
+  left: 0; /* Jaga sidebar di sisi kiri viewport */
+  height: 100vh; /* Buat sidebar mengambil seluruh tinggi viewport */
+  z-index: 1000; /* Pastikan sidebar di atas elemen lain */
 }
 
 body.dark-mode .sidebar {
@@ -538,17 +562,31 @@ body.dark-mode .sidebar-footer {
   flex: 1 1 0%; /* Memenuhi sisa ruang horizontal */
   display: flex;
   flex-direction: column;
+  
+  /* === Penyesuaian untuk ruang sidebar yang tetap === */
+  margin-left: 16rem; /* Memberikan ruang seukuran sidebar di sebelah kiri */
+  transition: margin-left 0.3s ease; /* Transisi halus saat sidebar dibuka/ditutup */
+  height: 100vh;
+  overflow: hidden;
 }
+
+
+/* Mendorong konten utama ke kiri saat sidebar ditutup */
+.dashboard-container.sidebar-closed .main-content {
+  margin-left: 0; /* Atau nilai kecil jika ada ikon hamburger yang terlihat */
+}
+
 
 .main-header {
   background-color: var(--header-bg-light); /* Latar belakang header di mode terang */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Bayangan lebih lembut */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Bayangan lebih halus dan tegas */
   border-bottom: 1px solid #e0e0e0; /* Garis bawah tegas di light mode */
   padding: 1rem; /* Padding */
   display: flex;
   align-items: center; /* Mengatur item secara vertikal di tengah */
   justify-content: space-between; /* Untuk mendorong grup kiri dan kontrol kanan */
   gap: 1rem; /* Jarak antar elemen di header */
+  flex-shrink: 0;
 }
 
 body.dark-mode .main-header {
@@ -882,28 +920,28 @@ button:hover {
   border-radius: 12px;
   overflow: hidden;
   margin-top: 1rem;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Menambahkan shadow ke tabel */
+  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; /* Tambahkan transisi untuk border-color */
+  /* --- Penyesuaian untuk border container tabel --- */
+  border: 1px solid var(--border-color-light); /* Border untuk seluruh tabel di mode terang */
 }
 
 body.dark-mode .job-table {
   background-color: #393955; /* Latar belakang tabel di mode gelap */
+  border: 1px solid var(--border-color-dark); /* Border untuk seluruh tabel di mode gelap */
 }
 
 .job-table th,
 .job-table td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid #eaeaea; /* Warna border baris di mode terang */
+  padding: 1rem; /* Mengurangi padding agar lebih compact */
+  text-align: left; /* Teks rata kiri di header dan sel */
+  border-bottom: 1px solid var(--border-color-light); /* Menggunakan variabel border */
   color: #000000; /* Warna teks sel di mode terang */
-}
-
-body.dark-mode .job-table th {
-  background-color: var(--joblist-header-bg-dark); /* Latar belakang header tabel di mode gelap (kuning) */
-  color: var(--joblist-header-text-dark); /* Warna teks header tabel di mode gelap */
+  transition: border-color 0.3s ease, color 0.3s ease;
 }
 
 body.dark-mode .job-table td {
-  border-bottom: 1px solid #fbfbfb; /* Warna border baris di mode gelap */
+  border-bottom: 1px solid var(--border-color-dark); /* Menggunakan variabel border di dark mode */
   color: #ffffff; /* Warna teks sel di mode gelap */
 }
 
@@ -911,13 +949,31 @@ body.dark-mode .job-table td {
   background-color: var(--joblist-header-bg-light); 
   font-weight: 600;
   color: var(--joblist-header-text-light); 
-  border-bottom: 2px solid #b8860b; 
+  border-bottom: 2px solid #b8860b; /* Garis bawah lebih tegas untuk header (kuning/oranye) */
+  /* Hapus border-right untuk th agar tidak ada garis vertikal di header */
+  border-right: none; 
 }
 
 body.dark-mode .job-table th {
-  background-color: var(--joblist-header-bg-dark); /* Latar belakang header tabel di mode gelap (kuning) */
-  color: var(--joblist-header-text-dark); /* Warna teks header tabel di mode gelap */
-  border-bottom: 2px solid #b8860b; /* Garis bawah lebih tegas untuk header kuning */
+  background-color: var(--joblist-header-bg-dark); 
+  color: var(--joblist-header-text-dark); 
+  border-bottom: 2px solid #b8860b; /* Garis bawah lebih tegas untuk header (kuning/oranye) */
+  /* Hapus border-right untuk th di dark mode */
+  border-right: none;
+}
+
+/* Menambahkan garis vertikal pada sel data (td) */
+.job-table td {
+  border-right: 1px solid var(--border-color-light); /* Garis vertikal di mode terang */
+}
+
+body.dark-mode .job-table td {
+  border-right: 1px solid var(--border-color-dark); /* Garis vertikal di mode gelap */
+}
+
+/* Hapus garis vertikal pada sel terakhir di setiap baris */
+.job-table td:last-child {
+  border-right: none;
 }
 
 .job-table tbody tr:hover {
@@ -972,11 +1028,20 @@ body.dark-mode .job-filter select {
   font-size: 0.9rem;
   min-width: 140px;
   justify-content: center;
+  border: 1px solid; /* Menambahkan border solid */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 .status-belum {
-  background-color: #9CA3AF; /* Gray-400 */
-  color: #fff;
+  background-color: var(--status-belum-bg-light); 
+  color: var(--status-belum-text-light);
+  border-color: var(--status-belum-bg-light); /* Border sesuai warna background */
+}
+
+body.dark-mode .status-belum {
+  background-color: var(--status-belum-bg-dark); 
+  color: var(--status-belum-text-dark);
+  border-color: var(--status-belum-bg-dark); /* Border sesuai warna background */
 }
 
 .status-belum::before {
@@ -984,17 +1049,31 @@ body.dark-mode .job-filter select {
 }
 
 .status-sedang {
-  background-color: #FBBF24;
-  color: #444;
+  background-color: var(--status-sedang-bg-light);
+  color: var(--status-sedang-text-light);
+  border-color: var(--status-sedang-bg-light); /* Border sesuai warna background */
 }
 
 .status-sedang::before {
   content: '⏳';
 }
 
+body.dark-mode .status-sedang {
+  background-color: var(--status-sedang-bg-dark);
+  color: var(--status-sedang-text-dark);
+  border-color: var(--status-sedang-bg-dark);
+}
+
 .status-selesai {
-  background-color: #5CC98F; /* Hijau lembut */
-  color: white;
+  background-color: var(--status-selesai-bg-light);
+  color: var(--status-selesai-text-light);
+  border-color: var(--status-selesai-bg-light);
+}
+
+body.dark-mode .status-selesai {
+  background-color: var(--status-selesai-bg-dark);
+  color: var(--status-selesai-text-dark);
+  border-color: var(--status-selesai-bg-dark);
 }
 
 .status-selesai::before {
@@ -1008,8 +1087,8 @@ body.dark-mode .job-filter select {
   Mengatur tampilan tabel agar responsif di layar kecil.
 */
 /* ==========================================================================
-   Tabel Responsif (Pendekatan Desktop-Down)
-   ========================================================================== */
+  Tabel Responsif (Pendekatan Desktop-Down)
+  ========================================================================== */
 
 /* Aturan untuk layar lebar (di atas 768px) ada di luar media query. */
 /* ... kode CSS tabel desktop Anda di sini ... */
@@ -1034,79 +1113,58 @@ body.dark-mode .job-filter select {
     /* Beri jarak dan border pada setiap baris, yang sekarang berfungsi seperti kartu */
     .job-table tr {
       margin-bottom: 1rem;
-      border: 1px solid #ddd;
+      border: 1px solid var(--border-color-light); /* Border baris di mode terang */
       border-radius: 8px;
       padding: 0;
+    }
+
+    body.dark-mode .job-table tr {
+      border-color: var(--border-color-dark); /* Warna border baris di mode gelap */
     }
 
     .job-table td {
       position: relative; /* Diperlukan untuk pseudo-element ::before */
       padding-left: 50%; /* Beri ruang di kiri untuk label */
       text-align: right; /* Pindahkan konten data ke kanan */
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid var(--sidebar-hover-bg-light); /* Border bawah sel di mode terang */
+      /* Nonaktifkan border-right di tampilan mobile/kartu */
+      border-right: none;
     }
-    
-    /* Hapus border bawah pada sel terakhir di setiap kartu */
+
+    body.dark-mode .job-table td {
+      border-bottom: 1px solid var(--sidebar-hover-bg-dark); /* Warna border bawah sel di mode gelap */
+    }
+
     .job-table tr td:last-child {
       border-bottom: none;
     }
 
-    /* Trik untuk membuat label dari atribut data-label */
     .job-table td::before {
-      content: attr(data-label); /* Ambil teks dari atribut data-label di <td> */
+      content: attr(data-label); /* Menggunakan atribut data-label sebagai label */
       position: absolute;
       left: 1rem;
       width: calc(50% - 2rem);
       text-align: left;
       font-weight: bold;
-      color: #333;
+      color: var(--text-color-dashboard-light); /* Warna label di mode terang */
     }
-    
-    /* Atur agar status dan tombol tidak memenuhi lebar */
+
+    body.dark-mode .job-table td::before {
+      color: var(--text-color-dashboard-dark); /* Warna label di mode gelap */
+    }
+
     .job-table td .status,
     .job-table td button {
       width: auto;
       float: right;
     }
 
-    /* Style khusus untuk sel Aksi agar tombol rapi */
     .job-table td[data-label="Aksi"] {
       display: flex;
       justify-content: flex-end;
       align-items: center;
       gap: 0.5rem;
       flex-wrap: wrap;
-    }
-
-    /* --- Pengelompokan Dark Mode untuk 768px --- */
-    body.dark-mode {
-      & .job-table tr {
-        border-color: #444;
-      }
-      & .job-table td {
-        border-bottom-color: #4a4a66;
-      }
-      & .job-table td::before {
-        color: #eee;
-      }
-    }
-  }
-
-
-  /* == 2. Penyempurnaan untuk Layar Ponsel Kecil == */
-  @media (max-width: 600px) {
-    /* Aturan ini akan menimpa style dari 768px jika diperlukan */
-    
-    .job-table th,
-    .job-table td {
-      font-size: 0.9rem;
-      padding-top: 0.7rem;
-      padding-bottom: 0.7rem;
-    }
-    
-    /* Form input juga diubah menjadi satu kolom */
-    .job-form {
-      grid-template-columns: 1fr;
     }
   }
 
@@ -1123,6 +1181,7 @@ body.dark-mode .job-filter select {
   box-shadow: var(--form-input-shadow-light) !important; /* Efek bayangan terangkat */
   min-height: 45px !important;
   font-weight: 500 !important;
+  transition: all 0.3s ease;
 }
 
 body.dark-mode .react-select__control {
@@ -1134,6 +1193,7 @@ body.dark-mode .react-select__control {
 .react-select__placeholder {
   color: var(--placeholder-color-light) !important; /* Warna placeholder di mode terang */
   font-weight: 500 !important;
+  transition: color 0.3s ease;
 }
 
 body.dark-mode .react-select__placeholder {
@@ -1143,6 +1203,7 @@ body.dark-mode .react-select__placeholder {
 .react-select__single-value {
   color: var(--text-color-light) !important; /* Warna nilai terpilih di mode terang */
   font-weight: 500 !important;
+  transition: color 0.3s ease;
 }
 
 body.dark-mode .react-select__single-value {
@@ -1153,6 +1214,7 @@ body.dark-mode .react-select__single-value {
   background-color: var(--input-bg-light) !important; /* Latar belakang menu di mode terang */
   border: 1px solid var(--border-color-light) !important; /* Border menu di mode terang */
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  transition: all 0.3s ease;
 }
 
 body.dark-mode .react-select__menu {
@@ -1162,6 +1224,7 @@ body.dark-mode .react-select__menu {
 
 .react-select__option {
   color: var(--text-color-light) !important; /* Warna teks opsi di mode terang */
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 body.dark-mode .react-select__option {
@@ -1185,6 +1248,7 @@ body.dark-mode .react-select__option--is-selected {
   background-color: #0056b3 !important; /* Warna opsi terpilih di mode gelap */
   color: white !important;
 }
+
 
 /* ADD USER PAGE */
 
