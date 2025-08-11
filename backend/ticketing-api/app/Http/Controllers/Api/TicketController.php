@@ -14,21 +14,22 @@ class TicketController extends Controller
      * - Admin: Dapat melihat semua tiket.
      * - User: Hanya dapat melihat tiket yang ditugaskan padanya.
      */
-    public function index()
+    public function index(Request $request)
     {
         // 2. Ambil data user yang sedang login
         $user = Auth::user();
+        $perPage = $request->query('per_page', 5);
 
         // 3. Tambahkan logika berdasarkan peran (role)
         if ($user->role === 'admin') {
             // Jika admin, kembalikan semua tiket
-            return Ticket::with('user')->latest()->get();
+            return Ticket::with('user')->latest()->paginate();
         } else {
             // Jika bukan admin (yaitu 'user'), filter berdasarkan user_id
             return Ticket::with('user')
                         ->where('user_id', $user->id) // Ini adalah baris kuncinya
                         ->latest()
-                        ->get();
+                        ->paginate();
         }
     }
 
