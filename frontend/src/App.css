@@ -65,7 +65,7 @@
   --error-border-light: #EF4444; /* Merah medium */
 
   /* Warna Status Badge (Light Mode - disesuaikan dengan input user) */
-  --status-belum-bg-light: #9CA3AF; /* Gray-400 */
+  --status-belum-bg-light: #EF4444; /* Gray-400 */
   --status-belum-text-light: #fff;
   --status-sedang-bg-light: #FBBF24; /* Yellow / Amber-400 */
   --status-sedang-text-light: #444;
