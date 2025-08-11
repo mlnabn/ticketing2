@@ -94,13 +94,15 @@
   --pagination-disabled-bg-light: #e5e7eb; /* Warna latar belakang tombol nonaktif pagination di light mode */
   --pagination-disabled-text-light: #9ca3af; /* Warna teks tombol nonaktif pagination di light mode */
 
-    /* Search Form Specific - Light Mode */
-  --search-input-bg-light: #ffffff;
-  --search-input-border-light: #e0e0e0;
+  /* Search Form Specific - Light Mode (Aesthetic) */
+  --search-form-bg-light: #ffffff;
+  --search-form-shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08); /* Shadow yang lebih lembut */
+  --search-input-bg-light: #fcfcfc;
+  --search-input-border-light: #dde2e8; /* Border lebih soft */
   --search-input-text-light: #333;
-  --search-input-placeholder-light: #666;
-  --search-button-bg-light: #4CAF50; /* Hijau untuk tombol cari */
-  --search-button-hover-bg-light: #45a049;
+  --search-input-placeholder-light: #888; /* Placeholder lebih terang */
+  --search-button-bg-light: #3b82f6; /* Biru yang lebih modern */
+  --search-button-hover-bg-light: #2563eb;
   --search-button-text-light: #ffffff;
 
 }
@@ -199,14 +201,15 @@ body.dark-mode {
   --pagination-disabled-text-dark: #4b5563; /* Warna teks tombol nonaktif pagination di dark mode */
 
   /* Search Form Specific - Dark Mode */
-  --search-input-bg-dark: #374151;
+  --search-form-bg-dark: #1f2937;
+  --search-form-shadow-dark: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --search-input-bg-dark: #2d3748;
   --search-input-border-dark: #4b5563;
   --search-input-text-dark: #e5e7eb;
-  --search-input-placeholder-dark: #9ca3af;
-  --search-button-bg-dark: #3CB371; /* Hijau tua untuk tombol cari */
-  --search-button-hover-bg-dark: #2E8B57;
+  --search-input-placeholder-dark: #a0aec0;
+  --search-button-bg-dark: #2563eb;
+  --search-button-hover-bg-dark: #1e40af;
   --search-button-text-dark: #ffffff;
-
   
 }
 
@@ -784,40 +787,48 @@ body.dark-mode .content-area {
 */
 .info-cards-grid {
   display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr)); /* 1 kolom di mobile */
-  gap: 1rem; /* Jarak antar kartu */
-  margin-bottom: 1.5rem; /* Margin bawah */
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.5rem; /* Meningkatkan jarak antar kartu */
+  margin-bottom: 2rem; /* Meningkatkan margin bawah grid */
 }
 
-@media (min-width: 768px) { /* Untuk tablet ke atas */
+@media (min-width: 768px) {
   .info-cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 kolom */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 1024px) { /* Untuk desktop ke atas */
+@media (min-width: 1024px) {
   .info-cards-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 kolom */
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
 .info-card {
-  padding: 1.5rem; /* Padding */
-  border-radius: 0.5rem; /* Sudut membulat */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Bayangan */
-  color: #fff; /* Warna teks di kartu */
-  
-  /* === Penyesuaian untuk kerapian dan penempatan link === */
-  display: flex; /* Mengaktifkan flexbox untuk tata letak internal */
-  flex-direction: column; /* Mengatur item-item di dalam kartu secara vertikal */
-  justify-content: space-between; /* Mendorong item terakhir (link) ke bagian bawah */
-  min-height: 100px; /* Memberikan tinggi minimum untuk konsistensi visual */
+  position: relative; /* Diperlukan untuk penempatan ikon dan grafik */
+  padding: 1.25rem; /* Meningkatkan padding internal */
+  border-radius: 0.75rem; /* Sudut lebih membulat */
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25); /* Bayangan lebih dalam */
+  color: #fff; /* Warna teks default putih */
+  overflow: hidden; /* Penting untuk efek gradien dan clipping */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 120px; /* Tinggi minimum kartu */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transisi untuk hover */
+}
+
+.info-card:hover {
+  transform: translateY(-5px); /* Sedikit terangkat saat hover */
+  box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.35); /* Bayangan lebih dalam saat hover */
 }
 
 .info-card.red-card { background-color: #ef4444; } /* Warna merah */
 .info-card.green-card { background-color: #22c55e; } /* Warna hijau */
 .info-card.yellow-card { background-color: #f59e0b; } /* Warna kuning */
 .info-card.blue-card { background-color: #3b82f6; } /* Warna biru */
+
+
 
 .info-card-title {
   font-size: 1.25rem; /* Ukuran font judul */
@@ -827,7 +838,7 @@ body.dark-mode .content-area {
 
 /* Gaya untuk paragraf deskripsi di dalam info card */
 .info-card p {
-  font-size: 0.9rem; /* Ukuran font sedikit lebih kecil untuk deskripsi */
+  font-size: 1.5rem; /* Ukuran font sedikit lebih kecil untuk deskripsi */
   margin-bottom: 0rem; /* Memberi jarak di bawah paragraf */
   flex-grow: 1; /* Memungkinkan paragraf tumbuh dan mendorong link ke bawah */
 }
@@ -858,22 +869,24 @@ body.dark-mode .content-area {
   margin: 20px 0;
   display: flex;
   gap: 10px;
-  background-color: var(--content-bg-light); /* Latar belakang sama dengan content area */
+  background-color: var(--search-form-bg-light); /* Menggunakan variabel baru */
   padding: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  align-items: center; /* Pusatkan secara vertikal */
+  border-radius: 0.75rem; /* Lebih membulat */
+  box-shadow: var(--search-form-shadow-light); /* Shadow yang lebih estetik */
+  align-items: center;
+  transition: all 0.3s ease; /* Transisi untuk perubahan mode */
 }
 
 body.dark-mode .search-form {
-  background-color: var(--content-bg-dark); /* Latar belakang sama dengan content area di dark mode */
+  background-color: var(--search-form-bg-dark);
+  box-shadow: var(--search-form-shadow-dark);
 }
 
 .search-form input[type="text"] {
   flex-grow: 1;
-  padding: 0.75rem 1rem;
+  padding: 0.8rem 1.2rem; /* Padding sedikit lebih besar */
   border: 1px solid var(--search-input-border-light);
-  border-radius: 0.375rem;
+  border-radius: 0.5rem; /* Lebih membulat */
   font-size: 1rem;
   background-color: var(--search-input-bg-light);
   color: var(--search-input-text-light);
@@ -897,23 +910,25 @@ body.dark-mode .search-form input[type="text"]::placeholder {
 .search-form input[type="text"]:focus {
   border-color: #3b82f6; /* Warna biru saat fokus */
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); /* Shadow fokus sedikit lebih kuat */
 }
 
 .search-form button[type="submit"] {
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.375rem;
+  padding: 0.8rem 1.8rem; /* Padding tombol lebih besar */
+  border-radius: 0.5rem; /* Lebih membulat */
   font-weight: 600;
   background-color: var(--search-button-bg-light);
   color: var(--search-button-text-light);
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
-  border: none; /* Pastikan tidak ada border default */
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease; /* Tambah transisi shadow */
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Tambah shadow pada tombol */
 }
 
 .search-form button[type="submit"]:hover {
   background-color: var(--search-button-hover-bg-light);
   transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow lebih besar saat hover */
 }
 
 body.dark-mode .search-form button[type="submit"] {
@@ -1051,6 +1066,7 @@ button:hover {
   border-radius: 12px;
   overflow: hidden;
   margin-top: 1rem;
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Menambahkan shadow ke tabel */
   transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; /* Tambahkan transisi untuk border-color */
   /* --- Penyesuaian untuk border container tabel --- */

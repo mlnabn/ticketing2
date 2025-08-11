@@ -322,7 +322,7 @@ function App() {
 
               <h3>Tiket yang Telah Anda Buat</h3>
               <div className="job-list" style={{ marginTop: '20px' }}>
-                <table>
+                <table className="job-table">
                   <thead>
                     <tr>
                       <th>ID</th>
@@ -330,6 +330,7 @@ function App() {
                       <th>Deskripsi</th>
                       <th>Workshop</th>
                       <th>Status</th>
+                      <th>Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
