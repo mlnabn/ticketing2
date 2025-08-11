@@ -24,6 +24,7 @@ Route::middleware('jwt')->group(function () {
     Route::apiResource('users', UserController::class)->only(['index', 'store']);
 
     // Tickets
+    Route::get('/tickets/created-by-me', [TicketController::class, 'createdTickets']);
     Route::apiResource('tickets', TicketController::class)->only(['index', 'store', 'destroy']);
     Route::patch('tickets/{ticket}/status', [TicketController::class, 'updateStatus']);
     Route::get('/tickets/stats', [TicketController::class, 'stats']);

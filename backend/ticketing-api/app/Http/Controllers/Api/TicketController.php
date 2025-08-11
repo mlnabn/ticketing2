@@ -57,8 +57,19 @@ class TicketController extends Controller
             'workshop' => 'required|string',
         ]);
 
+        $validated['creator_id'] = auth()->id();
         $ticket = Ticket::create($validated);
         return response()->json($ticket->load('user'), 201);
+    }
+
+    public function createdTickets(Request $request)
+    {
+        $tickets = Ticket::with('user') // 'user' di sini adalah orang yang DITUGASKAN
+            ->where('creator_id', auth()->id())
+            ->latest()
+            ->paginate(5); // Kita pakai paginasi 5 agar tidak terlalu panjang
+
+        return response()->json($tickets);
     }
 
     /**
