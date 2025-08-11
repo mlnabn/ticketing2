@@ -6,7 +6,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import AddUser from './components/AddUser.js';
 import ConfirmationModal from './components/ConfirmationModal';
-import Pagination from './components/Pagination.js'; // MODIFIKASI: Impor komponen Pagination
+import Pagination from './components/Pagination' // MODIFIKASI: Impor komponen Pagination
 import { getToken, isLoggedIn, logout, getUser } from './auth';
 import './App.css';
 import yourLogo from './Image/Logo.png';

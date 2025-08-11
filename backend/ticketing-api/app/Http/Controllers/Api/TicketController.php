@@ -23,13 +23,13 @@ class TicketController extends Controller
         // 3. Tambahkan logika berdasarkan peran (role)
         if ($user->role === 'admin') {
             // Jika admin, kembalikan semua tiket
-            return Ticket::with('user')->latest()->paginate();
+            return Ticket::with('user')->latest()->paginate($perPage);
         } else {
             // Jika bukan admin (yaitu 'user'), filter berdasarkan user_id
             return Ticket::with('user')
                         ->where('user_id', $user->id) // Ini adalah baris kuncinya
                         ->latest()
-                        ->paginate();
+                        ->paginate($perPage);
         }
     }
 
