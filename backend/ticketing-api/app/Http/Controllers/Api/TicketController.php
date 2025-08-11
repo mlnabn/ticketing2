@@ -16,21 +16,32 @@ class TicketController extends Controller
      */
     public function index(Request $request)
     {
-        // 2. Ambil data user yang sedang login
+        // 1. Ambil data user dan parameter dari request
         $user = Auth::user();
         $perPage = $request->query('per_page', 5);
+        $search = $request->query('search');
 
-        // 3. Tambahkan logika berdasarkan peran (role)
+        // 2. Mulai query dasar dengan menyertakan relasi user
+        $query = Ticket::with('user');
+
+        // 3. Terapkan filter berdasarkan peran
         if ($user->role === 'admin') {
-            // Jika admin, kembalikan semua tiket
-            return Ticket::with('user')->latest()->paginate($perPage);
+            // Jika admin dan ada parameter pencarian, terapkan filter 'whereHas'
+            if ($search) {
+                $query->whereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%');
+                });
+            }
         } else {
-            // Jika bukan admin (yaitu 'user'), filter berdasarkan user_id
-            return Ticket::with('user')
-                        ->where('user_id', $user->id) // Ini adalah baris kuncinya
-                        ->latest()
-                        ->paginate($perPage);
+            // Jika bukan admin, filter hanya untuk tiket miliknya sendiri
+            $query->where('user_id', $user->id);
         }
+
+        // 4. Setelah semua filter diterapkan, baru lakukan pengurutan dan paginasi
+        $tickets = $query->latest()->paginate($perPage);
+
+        // 5. Kembalikan hasil dalam format JSON
+        return response()->json($tickets);
     }
 
     /**

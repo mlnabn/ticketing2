@@ -6,7 +6,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import AddUser from './components/AddUser.js';
 import ConfirmationModal from './components/ConfirmationModal';
-import Pagination from './components/Pagination' // MODIFIKASI: Impor komponen Pagination
+import Pagination from './components/Pagination';
 import { getToken, isLoggedIn, logout, getUser } from './auth';
 import './App.css';
 import yourLogo from './Image/Logo.png';
@@ -15,7 +15,6 @@ const API_URL = 'http://127.0.0.1:8000/api';
 
 function App() {
   // --- STATE MANAGEMENT ---
-  // MODIFIKASI: 'tickets' diubah jadi 'ticketData' untuk menampung objek paginasi dari Laravel
   const [ticketData, setTicketData] = useState(null);
   const [users, setUsers] = useState([]);
   const [isLogin, setIsLogin] = useState(isLoggedIn());
@@ -23,8 +22,11 @@ function App() {
   const [userName, setUserName] = useState('');
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [currentPage, setCurrentPage] = useState('Tickets');
-  // MODIFIKASI: State baru khusus untuk melacak halaman data di tabel
   const [dataPage, setDataPage] = useState(1);
+  // FITUR PENCARIAN: State untuk menampung input dan query pencarian
+  const [searchInput, setSearchInput] = useState(''); // Untuk teks di dalam kotak input
+  const [searchQuery, setSearchQuery] = useState(''); // Untuk query yang dikirim ke API
+
   // UI State
   const [darkMode, setDarkMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -41,28 +43,31 @@ function App() {
         setUserName(currentUser.name);
         setLoggedInUserId(currentUser.id);
       }
-      // MODIFIKASI: Panggil fetchData dengan nomor halaman saat ini
-      fetchData(dataPage);
+      fetchData(dataPage, searchQuery);
     }
-  // MODIFIKASI: Tambahkan `dataPage` sebagai dependensi agar data di-fetch ulang saat halaman berubah
-  }, [isLogin, dataPage]);
+  // FITUR PENCARIAN: Tambahkan `searchQuery` sebagai dependensi
+  }, [isLogin, dataPage, searchQuery]);
 
   useEffect(() => {
     document.body.classList.toggle('dark-mode', darkMode);
   }, [darkMode]);
 
-  // MODIFIKASI: fetchData sekarang menerima parameter halaman
-  const fetchData = async (page = 1) => {
+  // FITUR PENCARIAN: `fetchData` sekarang menerima parameter `search`
+  const fetchData = async (page = 1, search = '') => {
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${getToken()}` }
-      };
-      // MODIFIKASI: Tambahkan parameter `?page=` pada URL request tiket
+      const config = { headers: { Authorization: `Bearer ${getToken()}` } };
+
+      // Bangun URL dengan parameter dinamis
+      let ticketsUrl = `${API_URL}/tickets?page=${page}`;
+      if (search) {
+        ticketsUrl += `&search=${search}`;
+      }
+      
       const [ticketsRes, usersRes] = await Promise.all([
-        axios.get(`${API_URL}/tickets?page=${page}`, config),
+        axios.get(ticketsUrl, config),
         axios.get(`${API_URL}/users`, config)
       ]);
-      // MODIFIKASI: Simpan seluruh objek paginasi ke `ticketData`
+      
       setTicketData(ticketsRes.data);
       setUsers(usersRes.data);
     } catch (error) {
@@ -74,12 +79,18 @@ function App() {
   };
 
   // --- HANDLER FUNCTIONS ---
+  // FITUR PENCARIAN: Fungsi untuk menangani submit form pencarian
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    setSearchQuery(searchInput); // Set query pencarian yang akan memicu useEffect
+    setDataPage(1); // Selalu kembali ke halaman 1 setiap kali pencarian baru dilakukan
+  };
+
   const addTicket = async (formData) => {
     try {
       await axios.post(`${API_URL}/tickets`, formData, { headers: { Authorization: `Bearer ${getToken()}` } });
-      // MODIFIKASI: Setelah menambah, kembali ke halaman pertama
       setDataPage(1); 
-      fetchData(1);
+      fetchData(1, searchQuery); // Kirim juga query pencarian saat ini
       setCurrentPage('Tickets');
     } catch (error) {
       console.error("Gagal menambah tiket:", error);
@@ -89,13 +100,11 @@ function App() {
   const updateTicketStatus = async (id, newStatus) => {
     try {
       await axios.patch(`${API_URL}/tickets/${id}/status`, { status: newStatus }, { headers: { Authorization: `Bearer ${getToken()}` } });
-      // MODIFIKASI: Tetap di halaman saat ini setelah update
-      fetchData(dataPage); 
+      fetchData(dataPage, searchQuery);
     } catch (error) { console.error("Gagal update status:", error); }
   };
 
   const handleDeleteClick = (id) => {
-    // MODIFIKASI: Cari tiket dari dalam 'ticketData.data' dan pastikan ticketData tidak null
     if (ticketData && ticketData.data) {
       const ticket = ticketData.data.find(t => t.id === id);
       if (ticket) { setTicketToDelete(ticket); setShowConfirmModal(true); }
@@ -106,8 +115,7 @@ function App() {
     if (ticketToDelete) {
       try {
         await axios.delete(`${API_URL}/tickets/${ticketToDelete.id}`, { headers: { Authorization: `Bearer ${getToken()}` } });
-        // MODIFIKASI: Tetap di halaman saat ini setelah hapus
-        fetchData(dataPage); 
+        fetchData(dataPage, searchQuery); 
       } catch (error) { console.error("Gagal hapus tiket:", error); }
       finally { setShowConfirmModal(false); setTicketToDelete(null); }
     }
@@ -119,12 +127,12 @@ function App() {
     logout();
     setIsLogin(false);
     setCurrentPage('Tickets');
-    // MODIFIKASI: Reset state saat logout
     setDataPage(1);
     setTicketData(null);
+    setSearchQuery(''); // Reset pencarian saat logout
+    setSearchInput('');
   };
 
-  // MODIFIKASI: Handler baru untuk mengubah halaman data
   const handlePageChange = (page) => {
     setDataPage(page);
   };
@@ -132,22 +140,15 @@ function App() {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   // --- RENDER LOGIC ---
-
   if (!isLogin) {
     return (
       <div className="auth-page-container">
-        {showRegister ? (
-          <Register onRegister={() => setIsLogin(true)} onShowLogin={() => setShowRegister(false)} />
-        ) : (
-          <Login onLogin={() => setIsLogin(true)} onShowRegister={() => setShowRegister(true)} />
-        )}
+        {showRegister ? <Register onRegister={() => setIsLogin(true)} onShowLogin={() => setShowRegister(false)} /> : <Login onLogin={() => setIsLogin(true)} onShowRegister={() => setShowRegister(true)} />}
       </div>
     );
   }
 
   const isAdmin = userRole && userRole.toLowerCase() === 'admin';
-
-  // MODIFIKASI: Variabel helper untuk mencegah error 'cannot read properties of undefined'
   const ticketsOnPage = ticketData ? ticketData.data : [];
   const totalTickets = ticketData ? ticketData.total : 0;
 
@@ -219,6 +220,19 @@ function App() {
                 )}
               </div>
               {isAdmin && (<JobForm users={users} addTicket={addTicket} />)}
+
+              {isAdmin && (
+                <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
+                  <input
+                    type="text"
+                    placeholder="Cari berdasarkan nama pekerja..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    style={{ flexGrow: 1, padding: '8px' }}
+                  />
+                  <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
+                </form>
+              )}
               
               <JobList
                 // MODIFIKASI: Kirim `ticketsOnPage` ke komponen JobList
