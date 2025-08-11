@@ -166,10 +166,11 @@ function App() {
     } catch (error) { console.error("Gagal update status:", error); }
   };
 
-  const handleDeleteClick = (id) => {
-    if (ticketData && ticketData.data) {
-      const ticket = ticketData.data.find(t => t.id === id);
-      if (ticket) { setTicketToDelete(ticket); setShowConfirmModal(true); }
+  const handleDeleteClick = (ticket) => {
+    // Fungsi ini sekarang menerima seluruh objek tiket
+    if (ticket) {
+      setTicketToDelete(ticket);
+      setShowConfirmModal(true);
     }
   };
 
@@ -177,9 +178,20 @@ function App() {
     if (ticketToDelete) {
       try {
         await axios.delete(`${API_URL}/tickets/${ticketToDelete.id}`, { headers: { Authorization: `Bearer ${getToken()}` } });
-        fetchData(dataPage, searchQuery);
-      } catch (error) { console.error("Gagal hapus tiket:", error); }
-      finally { setShowConfirmModal(false); setTicketToDelete(null); }
+        // Setelah berhasil hapus, refresh kedua daftar data
+        fetchData(dataPage, searchQuery); 
+        fetchCreatedTickets(createdTicketsPage); // <-- PERUBAHAN: Refresh juga daftar ini
+      } catch (error) { 
+        console.error("Gagal hapus tiket:", error);
+        // Tambahan: Beri tahu user jika tidak diizinkan
+        if(error.response && error.response.status === 403) {
+          alert(error.response.data.error);
+        }
+      }
+      finally { 
+        setShowConfirmModal(false); 
+        setTicketToDelete(null); 
+      }
     }
   };
 
@@ -322,7 +334,7 @@ function App() {
 
               <h3>Tiket yang Telah Anda Buat</h3>
               <div className="job-list" style={{ marginTop: '20px' }}>
-                <table className="job-table">
+                <table className='job-table'>
                   <thead>
                     <tr>
                       <th>ID</th>
@@ -330,7 +342,7 @@ function App() {
                       <th>Deskripsi</th>
                       <th>Workshop</th>
                       <th>Status</th>
-                      <th>Aksi</th>
+                      <th>Aksi</th> {/* Pastikan header Aksi ada */}
                     </tr>
                   </thead>
                   <tbody>
@@ -342,10 +354,19 @@ function App() {
                           <td>{ticket.title}</td>
                           <td>{ticket.workshop}</td>
                           <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
+                          {/* PERUBAHAN: Tambahkan kolom Aksi dengan tombol Delete */}
+                          <td>
+                            <button 
+                              onClick={() => handleDeleteClick(ticket)} 
+                              className="btn-delete"
+                            >
+                              Delete
+                            </button>
+                          </td>
                         </tr>
                       ))
                     ) : (
-                      <tr><td colSpan="5">Anda belum membuat tiket untuk pengguna lain.</td></tr>
+                      <tr><td colSpan="6">Anda belum membuat tiket untuk pengguna lain.</td></tr>
                     )}
                   </tbody>
                 </table>

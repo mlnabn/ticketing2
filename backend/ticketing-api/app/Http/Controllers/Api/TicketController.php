@@ -77,6 +77,11 @@ class TicketController extends Controller
      */
     public function destroy(Ticket $ticket)
     {
+        if (auth()->id() !== $ticket->creator_id && auth()->user()->role !== 'admin') {
+            // Jika bukan keduanya, tolak akses.
+            return response()->json(['error' => 'Anda tidak memiliki izin untuk menghapus tiket ini.'], 403);
+        }
+        
         $ticket->delete();
         return response()->json(null, 204);
     }
