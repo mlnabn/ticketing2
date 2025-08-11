@@ -20,7 +20,7 @@ function App() {
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState('');
   const [loggedInUserId, setLoggedInUserId] = useState(null);
-  const [currentPage, setCurrentPage] = useState('home');
+  const [currentPage, setCurrentPage] = useState('Tickets');
   // UI State
   const [darkMode, setDarkMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -70,7 +70,7 @@ function App() {
       await axios.post(`${API_URL}/tickets`, formData, { headers: { Authorization: `Bearer ${getToken()}` } });
       fetchData();
       // Otomatis pindah ke halaman home setelah berhasil menambah tiket
-      setCurrentPage('home');
+      setCurrentPage('Tickets');
     } catch (error) {
       console.error("Gagal menambah tiket:", error);
       // Anda bisa menambahkan feedback error di sini
@@ -104,7 +104,7 @@ function App() {
   const handleLogout = () => {
     logout();
     setIsLogin(false);
-    setCurrentPage('home');
+    setCurrentPage('Tickets');
   };
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -146,7 +146,7 @@ function App() {
                 {isAdmin && (
                   <>
                     <li className="sidebar-nav-item">
-                      <button onClick={() => setCurrentPage('home')} className={`sidebar-button ${currentPage === 'home' ? 'active' : ''}`}>
+                      <button onClick={() => setCurrentPage('Tickets')} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}>
                         <i className="fas fa-home"></i><span>Home</span>
                       </button>
                     </li>
@@ -162,8 +162,8 @@ function App() {
                 {!isAdmin && (
                   <>
                     <li className="sidebar-nav-item">
-                      <button onClick={() => setCurrentPage('home')} className={`sidebar-button ${currentPage === 'home' ? 'active' : ''}`}>
-                        <i className="fas fa-ticket-alt"></i><span>My Ticket</span>
+                      <button onClick={() => setCurrentPage('Tickets')} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}>
+                        <i className="fas fa-ticket-alt"></i><span>Tickets</span>
                       </button>
                     </li>
                     <li className="sidebar-nav-item">
@@ -216,7 +216,7 @@ function App() {
 
             <div className="content-area">
               {/* Tampilan Halaman HOME */}
-              {currentPage === 'home' && (
+              {currentPage === 'Tickets' && (
                 <>
                   {(
                     <>
