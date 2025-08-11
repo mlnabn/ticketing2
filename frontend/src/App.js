@@ -17,6 +17,7 @@ function App() {
   // --- STATE MANAGEMENT ---
   const [ticketData, setTicketData] = useState(null);
   const [users, setUsers] = useState([]);
+  const [stats, setStats] = useState(null);
   const [isLogin, setIsLogin] = useState(isLoggedIn());
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState('');
@@ -63,13 +64,15 @@ function App() {
         ticketsUrl += `&search=${search}`;
       }
       
-      const [ticketsRes, usersRes] = await Promise.all([
+      const [ticketsRes, usersRes, statsRes] = await Promise.all([
         axios.get(ticketsUrl, config),
-        axios.get(`${API_URL}/users`, config)
+        axios.get(`${API_URL}/users`, config),
+        axios.get(`${API_URL}/tickets/stats`, config)
       ]);
       
       setTicketData(ticketsRes.data);
       setUsers(usersRes.data);
+      setStats(statsRes.data);
     } catch (error) {
       console.error("Gagal mengambil data:", error);
       if (error.response && error.response.status === 401) {
@@ -208,64 +211,69 @@ function App() {
         </header>
 
         <div className="content-area">
-          {currentPage === 'Tickets' && (
-            <>
-              <div className="info-cards-grid">
-                
-                <div className="info-card red-card"><h3>{ticketsOnPage.filter(t => t.status !== 'Selesai').length}</h3><p>Tiket Belum Selesai</p></div>
-                <div className="info-card green-card"><h3>{ticketsOnPage.filter(t => t.status === 'Selesai').length}</h3><p>Tiket Selesai</p></div>
-                <div className="info-card yellow-card"><h3>{totalTickets}</h3><p>Total Tiket</p></div>
-                {isAdmin && (
-                  <div className="info-card blue-card"><h3>{users.length}</h3><p>Total Pengguna</p></div>
-                )}
-              </div>
-              {isAdmin && (<JobForm users={users} addTicket={addTicket} />)}
+              {currentPage === 'Tickets' && (
+                  <>
+                      {/* PERBAIKAN 2: Gunakan data dari state `stats` untuk mengisi kartu */}
+                      <div className="info-cards-grid">
+                          <div className="info-card red-card">
+                              {/* Tampilkan '...' saat data sedang loading */}
+                              <h3>{stats ? stats.pending_tickets : '...'}</h3>
+                              <p>Tiket Belum Selesai</p>
+                          </div>
+                          <div className="info-card green-card">
+                              <h3>{stats ? stats.completed_tickets : '...'}</h3>
+                              <p>Tiket Selesai</p>
+                          </div>
+                          <div className="info-card yellow-card">
+                              <h3>{stats ? stats.total_tickets : '...'}</h3>
+                              <p>Total Tiket</p>
+                          </div>
+                          {isAdmin && (
+                              <div className="info-card blue-card">
+                                  <h3>{stats ? stats.total_users : '...'}</h3>
+                                  <p>Total Pengguna</p>
+                              </div>
+                          )}
+                      </div>
 
-              {isAdmin && (
-                <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
-                  <input
-                    type="text"
-                    placeholder="Cari berdasarkan nama pekerja..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    style={{ flexGrow: 1, padding: '8px' }}
-                  />
-                  <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
-                </form>
+                      {isAdmin && (<JobForm users={users} addTicket={addTicket} />)}
+                      {isAdmin && (
+                          <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
+                              <input type="text" placeholder="Cari berdasarkan nama pekerja..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} style={{ flexGrow: 1, padding: '8px' }} />
+                              <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
+                          </form>
+                      )}
+                      
+                      <JobList
+                          tickets={ticketsOnPage}
+                          updateTicketStatus={updateTicketStatus}
+                          deleteTicket={handleDeleteClick}
+                          loggedInUserId={loggedInUserId}
+                          userRole={userRole}
+                      />
+                      
+                      <Pagination
+                          currentPage={dataPage}
+                          lastPage={ticketData ? ticketData.last_page : 1}
+                          onPageChange={handlePageChange}
+                      />
+                  </>
               )}
-              
-              <JobList
-                // MODIFIKASI: Kirim `ticketsOnPage` ke komponen JobList
-                tickets={ticketsOnPage}
-                updateTicketStatus={updateTicketStatus}
-                deleteTicket={handleDeleteClick}
-                loggedInUserId={loggedInUserId}
-                userRole={userRole}
-              />
-              
-              {/* MODIFIKASI: Tambahkan komponen Pagination di sini */}
-              <Pagination
-                currentPage={dataPage}
-                lastPage={ticketData ? ticketData.last_page : 1}
-                onPageChange={handlePageChange}
-              />
-            </>
-          )}
 
-          {/* Bagian ini tidak berubah */}
-          {currentPage === 'addUser' && isAdmin && <AddUser />}
-          {!isAdmin && currentPage === 'addTicket' && (
-            <>
-              <h2>Tambah Tiket Baru</h2>
-              <p>Silakan isi detail pekerjaan di bawah ini.</p><br />
-              <JobForm users={users} addTicket={addTicket} />
-            </>
-          )}
-        </div>
+              {/* Bagian ini tidak berubah */}
+              {currentPage === 'addUser' && isAdmin && <AddUser />}
+              {!isAdmin && currentPage === 'addTicket' && (
+                  <>
+                      <h2>Tambah Tiket Baru</h2>
+                      <p>Silakan isi detail pekerjaan di bawah ini.</p><br />
+                      <JobForm users={users} addTicket={addTicket} />
+                  </>
+              )}
+          </div>
       </main>
 
       {showConfirmModal && ticketToDelete && (
-        <ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />
+          <ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />
       )}
     </div>
   );

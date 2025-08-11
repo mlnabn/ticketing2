@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; // <-- 1. Tambahkan ini
 
@@ -77,5 +78,26 @@ class TicketController extends Controller
         $validated = $request->validate(['status' => 'required|string']);
         $ticket->update($validated);
         return response()->json($ticket->load('user'));
+    }
+
+    public function stats()
+    {
+        $user = Auth::user();
+        $stats = [];
+
+        if ($user->role === 'admin') {
+            // Statistik untuk Admin (mencakup semua tiket dan user)
+            $stats['total_tickets'] = Ticket::count();
+            $stats['completed_tickets'] = Ticket::where('status', 'Selesai')->count();
+            $stats['pending_tickets'] = $stats['total_tickets'] - $stats['completed_tickets'];
+            $stats['total_users'] = User::count();
+        } else {
+            // Statistik untuk User biasa (hanya tiket miliknya)
+            $stats['total_tickets'] = Ticket::where('user_id', $user->id)->count();
+            $stats['completed_tickets'] = Ticket::where('user_id', $user->id)->where('status', 'Selesai')->count();
+            $stats['pending_tickets'] = $stats['total_tickets'] - $stats['completed_tickets'];
+        }
+
+        return response()->json($stats);
     }
 }
