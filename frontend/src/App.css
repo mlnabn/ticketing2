@@ -1210,6 +1210,32 @@ body.dark-mode .status-sedang {
   border-color: var(--status-sedang-bg-dark);
 }
 
+.status.status-ditunda {
+  background-color: #6c757d; /* Abu-abu */
+  color: white;
+}
+
+/* Warna untuk tombol baru */
+.btn-pause {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-pause:hover {
+  background-color: #5a6268;
+}
+
+/* Container untuk menjaga tombol tetap rapi */
+.action-buttons-group {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
 .status-selesai {
   background-color: var(--status-selesai-bg-light);
   color: var(--status-selesai-text-light);
