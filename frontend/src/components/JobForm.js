@@ -119,7 +119,7 @@ function JobForm({ users, addTicket }) {
       />
 
       {/* Select untuk Status */}
-      <Select
+      {/* <Select
         options={[
           { value: 'Belum Dikerjakan', label: 'Belum Dikerjakan' },
           { value: 'Sedang Dikerjakan', label: 'Sedang Dikerjakan' }
@@ -130,7 +130,7 @@ function JobForm({ users, addTicket }) {
         styles={selectStyles}
         classNamePrefix="react-select"
         required
-      />
+      /> */}
 
       {/* Tombol Tambah */}
       <button type="submit" className="btn-submit">Tambah</button>
