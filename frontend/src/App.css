@@ -81,6 +81,8 @@
   --btn-start-hover: #2563EB; /* Biru lebih gelap saat hover */
   --btn-finish: #F59E0B; /* Kuning/Oranye untuk "Selesaikan" */
   --btn-finish-hover: #D97706; /* Kuning/Oranye lebih gelap saat hover */
+  --btn-pause: #6B7280; /* Warna abu-abu yang lebih netral untuk "Tunda" */
+  --btn-pause-hover: #4B5563; /* Abu-abu lebih gelap saat hover */
   --btn-delete: #EF4444; /* Merah untuk "Delete" */
   --btn-delete-hover: #DC2626; /* Merah lebih gelap saat hover */
 
@@ -187,6 +189,8 @@ body.dark-mode {
   --btn-start-hover: #1D4ED8; /* Biru lebih gelap saat hover */
   --btn-finish: #D97706; /* Kuning/Oranye untuk "Selesaikan" */
   --btn-finish-hover: #B45309; /* Kuning/Oranye lebih gelap saat hover */
+  --btn-pause-dark: #4B5563; /* Warna abu-abu yang lebih netral untuk "Tunda" */
+  --btn-pause-hover-dark: #374151; /* Abu-abu lebih gelap saat hover */
   --btn-delete: #DC2626; /* Merah untuk "Delete" */
   --btn-delete-hover: #B91C1C; /* Merah lebih gelap saat hover */
 
@@ -1041,6 +1045,29 @@ button:hover {
   background-color: #D68910
 }
 
+/* .btn-pause {
+  background-color: var(--btn-pause);
+}
+
+.btn-pause:hover {
+  background-color: var(--btn-pause-hover); 
+} */
+
+button.btn-pause {
+  background-color: rgb(116, 116, 116) !important; /* !important akan memaksa override */
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  color: white;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+button.btn-pause:hover {
+  background-color:  rgb(60, 59, 59) !important; /* Merah lebih gelap saat hover, dengan !important */
+}
+
 .btn-delete {
   background-color: #E74C3C;
 }
@@ -1704,3 +1731,5 @@ body.dark-mode .page-item.disabled .page-link:hover {
   background-color: var(--pagination-disabled-bg-dark);
   border-color: var(--pagination-border-dark);
 }
+
+
