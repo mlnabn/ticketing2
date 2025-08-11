@@ -211,7 +211,7 @@ function App() {
           {currentPage === 'Tickets' && (
             <>
               <div className="info-cards-grid">
-                {/* MODIFIKASI: Kartu statistik disesuaikan untuk menggunakan data baru */}
+                
                 <div className="info-card red-card"><h3>{ticketsOnPage.filter(t => t.status !== 'Selesai').length}</h3><p>Tiket Belum Selesai</p></div>
                 <div className="info-card green-card"><h3>{ticketsOnPage.filter(t => t.status === 'Selesai').length}</h3><p>Tiket Selesai</p></div>
                 <div className="info-card yellow-card"><h3>{totalTickets}</h3><p>Total Tiket</p></div>

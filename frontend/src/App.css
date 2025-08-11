@@ -93,6 +93,16 @@
   --pagination-active-text-light: #ffffff; /* Warna teks tombol aktif pagination di light mode */
   --pagination-disabled-bg-light: #e5e7eb; /* Warna latar belakang tombol nonaktif pagination di light mode */
   --pagination-disabled-text-light: #9ca3af; /* Warna teks tombol nonaktif pagination di light mode */
+
+    /* Search Form Specific - Light Mode */
+  --search-input-bg-light: #ffffff;
+  --search-input-border-light: #e0e0e0;
+  --search-input-text-light: #333;
+  --search-input-placeholder-light: #666;
+  --search-button-bg-light: #4CAF50; /* Hijau untuk tombol cari */
+  --search-button-hover-bg-light: #45a049;
+  --search-button-text-light: #ffffff;
+
 }
 
 /*
@@ -187,6 +197,17 @@ body.dark-mode {
   --pagination-active-text-dark: #ffffff; /* Warna teks tombol aktif pagination di dark mode */
   --pagination-disabled-bg-dark: #111827; /* Warna latar belakang tombol nonaktif pagination di dark mode */
   --pagination-disabled-text-dark: #4b5563; /* Warna teks tombol nonaktif pagination di dark mode */
+
+  /* Search Form Specific - Dark Mode */
+  --search-input-bg-dark: #374151;
+  --search-input-border-dark: #4b5563;
+  --search-input-text-dark: #e5e7eb;
+  --search-input-placeholder-dark: #9ca3af;
+  --search-button-bg-dark: #3CB371; /* Hijau tua untuk tombol cari */
+  --search-button-hover-bg-dark: #2E8B57;
+  --search-button-text-dark: #ffffff;
+
+  
 }
 
 /*
@@ -781,7 +802,7 @@ body.dark-mode .content-area {
 }
 
 .info-card {
-  padding: 2rem; /* Padding */
+  padding: 1.5rem; /* Padding */
   border-radius: 0.5rem; /* Sudut membulat */
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Bayangan */
   color: #fff; /* Warna teks di kartu */
@@ -790,7 +811,7 @@ body.dark-mode .content-area {
   display: flex; /* Mengaktifkan flexbox untuk tata letak internal */
   flex-direction: column; /* Mengatur item-item di dalam kartu secara vertikal */
   justify-content: space-between; /* Mendorong item terakhir (link) ke bagian bawah */
-  min-height: 120px; /* Memberikan tinggi minimum untuk konsistensi visual */
+  min-height: 100px; /* Memberikan tinggi minimum untuk konsistensi visual */
 }
 
 .info-card.red-card { background-color: #ef4444; } /* Warna merah */
@@ -807,7 +828,7 @@ body.dark-mode .content-area {
 /* Gaya untuk paragraf deskripsi di dalam info card */
 .info-card p {
   font-size: 0.9rem; /* Ukuran font sedikit lebih kecil untuk deskripsi */
-  margin-bottom: 0.5rem; /* Memberi jarak di bawah paragraf */
+  margin-bottom: 0rem; /* Memberi jarak di bawah paragraf */
   flex-grow: 1; /* Memungkinkan paragraf tumbuh dan mendorong link ke bawah */
 }
 
@@ -826,6 +847,82 @@ body.dark-mode .content-area {
 
 .info-card-link:hover {
   opacity: 0.8;
+}
+
+/*
+  ---------------------------------------------------
+  GAYA SEARCH FORM
+  ---------------------------------------------------
+*/
+.search-form {
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
+  background-color: var(--content-bg-light); /* Latar belakang sama dengan content area */
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  align-items: center; /* Pusatkan secara vertikal */
+}
+
+body.dark-mode .search-form {
+  background-color: var(--content-bg-dark); /* Latar belakang sama dengan content area di dark mode */
+}
+
+.search-form input[type="text"] {
+  flex-grow: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--search-input-border-light);
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  background-color: var(--search-input-bg-light);
+  color: var(--search-input-text-light);
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .search-form input[type="text"] {
+  border: 1px solid var(--search-input-border-dark);
+  background-color: var(--search-input-bg-dark);
+  color: var(--search-input-text-dark);
+}
+
+.search-form input[type="text"]::placeholder {
+  color: var(--search-input-placeholder-light);
+}
+
+body.dark-mode .search-form input[type="text"]::placeholder {
+  color: var(--search-input-placeholder-dark);
+}
+
+.search-form input[type="text"]:focus {
+  border-color: #3b82f6; /* Warna biru saat fokus */
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.search-form button[type="submit"] {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  background-color: var(--search-button-bg-light);
+  color: var(--search-button-text-light);
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  border: none; /* Pastikan tidak ada border default */
+}
+
+.search-form button[type="submit"]:hover {
+  background-color: var(--search-button-hover-bg-light);
+  transform: translateY(-1px);
+}
+
+body.dark-mode .search-form button[type="submit"] {
+  background-color: var(--search-button-bg-dark);
+  color: var(--search-button-text-dark);
+}
+
+body.dark-mode .search-form button[type="submit"]:hover {
+  background-color: var(--search-button-hover-bg-dark);
 }
 
 /*
