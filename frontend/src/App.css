@@ -1732,4 +1732,70 @@ body.dark-mode .page-item.disabled .page-link:hover {
   border-color: var(--pagination-border-dark);
 }
 
+/*
+  ---------------------------------------------------
+  GAYA HALAMAN "ADD TICKET" (UNTUK USER)
+  ---------------------------------------------------
+*/
+.content-area h2 {
+  font-size: 2.8rem; /* Ukuran judul h2 lebih besar untuk dampak */
+  font-weight: 900; /* Lebih tebal */
+  margin-bottom: 0.75rem; /* Margin bawah lebih besar */
+  color: var(--add-ticket-title-color-light);
+  transition: color 0.3s ease;
+  text-align: center; /* Teks di tengah */
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1); /* Bayangan teks yang lebih menonjol */
 
+  /* Efek gradien teks baru untuk h2 */
+  background: linear-gradient(45deg, #007bff, #8a2be2, #00c6ff); /* Biru, Ungu, Biru Muda */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto; /* Ukuran background agar gradien bisa bergerak */
+  animation: gradientShift 5s ease infinite alternate; /* Animasi gradien */
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+body.dark-mode .content-area h2 {
+  color: var(--add-ticket-title-color-dark); /* Fallback jika gradien tidak didukung */
+  text-shadow: 2px 2px 4px rgba(255,255,255,0.08); /* Bayangan teks di dark mode */
+  /* Untuk dark mode, kita bisa mengubah gradien atau membiarkannya sama */
+  background: linear-gradient(45deg, #6a00ff, #00c6ff, #0056b3); /* Ungu gelap, biru muda, biru tua */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.content-area p {
+  font-size: 1.15rem; /* Ukuran teks paragraf sedikit lebih besar */
+  color: var(--add-ticket-text-color-light);
+  margin-bottom: 0rem; /* Margin bawah lebih besar */
+  transition: color 0.3s ease;
+  text-align: center; /* Teks di tengah */
+  line-height: 1.6; /* Spasi baris untuk keterbacaan yang lebih baik */
+  max-width: 800px; /* Batasi lebar paragraf untuk keterbacaan di layar lebar */
+  margin-left: auto;
+  margin-right: auto;
+  font-weight: 400; /* Pastikan tidak terlalu tebal atau tipis */
+  opacity: 0.9; /* Sedikit transparan untuk efek yang lebih lembut */
+}
+
+body.dark-mode .content-area p {
+  color: var(--add-ticket-text-color-dark);
+  opacity: 0.8; /* Sedikit lebih transparan di dark mode */
+}
+.content-area h3 {
+  font-size: 1.9rem; /* Ukuran judul h3 lebih besar */
+  font-weight: 700; /* Lebih tebal */
+  margin-bottom: 1.5rem; /* Margin bawah lebih besar */
+  color: var(--add-ticket-title-color-light);
+  transition: color 0.3s ease;
+  text-align: center; /* Teks di tengah */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.05); /* Sedikit bayangan teks */
+}
+body.dark-mode .content-area h3 {
+  color: var(--add-ticket-title-color-dark);
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.05);
+}
