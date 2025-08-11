@@ -83,6 +83,16 @@
   --btn-finish-hover: #D97706; /* Kuning/Oranye lebih gelap saat hover */
   --btn-delete: #EF4444; /* Merah untuk "Delete" */
   --btn-delete-hover: #DC2626; /* Merah lebih gelap saat hover */
+
+  /* Pagination */
+  --pagination-text-light: #374151; /* Warna teks pagination di light mode */
+  --pagination-border-light: #e5e7eb; /* Warna border pagination di light mode */
+  --pagination-bg-light: #ffffff; /* Warna latar belakang tombol pagination di light mode */
+  --pagination-hover-bg-light: #f3f4f6; /* Warna hover tombol pagination di light mode */
+  --pagination-active-bg-light: #3b82f6; /* Warna latar belakang tombol aktif pagination di light mode */
+  --pagination-active-text-light: #ffffff; /* Warna teks tombol aktif pagination di light mode */
+  --pagination-disabled-bg-light: #e5e7eb; /* Warna latar belakang tombol nonaktif pagination di light mode */
+  --pagination-disabled-text-light: #9ca3af; /* Warna teks tombol nonaktif pagination di light mode */
 }
 
 /*
@@ -103,27 +113,27 @@ body.dark-mode {
   --text-color-dashboard-dark: #E0E0E0; /* Warna teks utama dashboard */
 
   /* Sidebar */
-  --sidebar-bg-dark: #5a6d8d; /* Latar belakang sidebar (slightly lighter slate) */
+  --sidebar-bg-dark: #4A5568; /* Latar belakang sidebar (slightly lighter slate) */
   --sidebar-text-dark: #E0E0E0; /* Warna teks sidebar */
-  --sidebar-border-dark: #4A5568; /* Warna border di sidebar */
+  --sidebar-border-dark: #6d7785; /* Warna border di sidebar */
   --sidebar-hover-bg-dark: #374151; /* Warna hover tombol sidebar */
 
   /* Header Dashboard */
-  --header-bg-dark: #5a6d8d; /* Latar belakang header dashboard */
+  --header-bg-dark: #4A5568; /* Latar belakang header dashboard */
   --header-text-dark: #A0AEC0; /* Warna teks di header */
   --header-button-bg-dark: #4A5568; /* Latar belakang tombol header */
   --header-button-text-dark: #E0E0E0; /* Warna teks tombol header */
   --header-button-hover-bg-dark: #5A6A80; /* Warna hover tombol header */
 
   /* Konten Utama */
-  --content-bg-dark: #3233814b; /* Latar belakang area konten utama dashboard */
+  --content-bg-dark: #2D3748; /* Latar belakang area konten utama dashboard */
 
   /* Header Tabel Joblist (Darker Muted Slate Blue) */
   --joblist-header-bg-dark: #5a6d8d; 
   --joblist-header-text-dark: #FFFFFF;
 
   /* Border & Shadow Input/Select Form */
-  --form-input-border-dark: #5a6d8d; /* Border input/select yang gelap */
+  --form-input-border-dark: #4A5568; /* Border input/select yang gelap */
   --form-input-shadow-dark: 0 1px 3px rgba(0, 0, 0, 0.2) inset; /* Shadow inset untuk efek terangkat */
 
   /* Ikon Hamburger */
@@ -167,6 +177,16 @@ body.dark-mode {
   --btn-finish-hover: #B45309; /* Kuning/Oranye lebih gelap saat hover */
   --btn-delete: #DC2626; /* Merah untuk "Delete" */
   --btn-delete-hover: #B91C1C; /* Merah lebih gelap saat hover */
+
+  /* Pagination */
+  --pagination-text-dark: #d1d5db; /* Warna teks pagination di dark mode */
+  --pagination-border-dark: #374151; /* Warna border pagination di dark mode */
+  --pagination-bg-dark: #1f2937; /* Warna latar belakang tombol pagination di dark mode */
+  --pagination-hover-bg-dark: #374151; /* Warna hover tombol pagination di dark mode */
+  --pagination-active-bg-dark: #2563eb; /* Warna latar belakang tombol aktif pagination di dark mode */
+  --pagination-active-text-dark: #ffffff; /* Warna teks tombol aktif pagination di dark mode */
+  --pagination-disabled-bg-dark: #111827; /* Warna latar belakang tombol nonaktif pagination di dark mode */
+  --pagination-disabled-text-dark: #4b5563; /* Warna teks tombol nonaktif pagination di dark mode */
 }
 
 /*
@@ -963,7 +983,7 @@ body.dark-mode .job-table td {
   background-color: var(--joblist-header-bg-light); 
   font-weight: 600;
   color: var(--joblist-header-text-light); 
-  border-bottom: 2px solid #b8860b; /* Garis bawah lebih tegas untuk header (kuning/oranye) */
+  border-bottom: 2px solid #aba8a1; /* Garis bawah lebih tegas untuk header (kuning/oranye) */
   /* Hapus border-right untuk th agar tidak ada garis vertikal di header */
   border-right: none; 
 }
@@ -971,7 +991,7 @@ body.dark-mode .job-table td {
 body.dark-mode .job-table th {
   background-color: var(--joblist-header-bg-dark); 
   color: var(--joblist-header-text-dark); 
-  border-bottom: 2px solid #b8860b; /* Garis bawah lebih tegas untuk header (kuning/oranye) */
+  border-bottom: 2px solid #aba8a1; /* Garis bawah lebih tegas untuk header (kuning/oranye) */
   /* Hapus border-right untuk th di dark mode */
   border-right: none;
 }
@@ -1447,4 +1467,102 @@ body.dark-mode .form-input {
   background-color: #450a0a;
   color: #fecaca;
   border-color: #b91c1c;
+}
+
+/*
+  ---------------------------------------------------
+  PAGINATION (PENOMORAN HALAMAN)
+  ---------------------------------------------------
+  Gaya untuk komponen paginasi.
+*/
+.pagination-nav {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  gap: 5px; /* Jarak antar tombol halaman */
+}
+
+.page-item .page-link {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem; /* Sudut membulat */
+  background-color: var(--pagination-bg-light); /* Latar belakang tombol */
+  border: 1px solid var(--pagination-border-light); /* Border tombol */
+  color: var(--pagination-text-light); /* Warna teks */
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  font-weight: 500;
+  text-decoration: none; /* Hapus underline jika ada default */
+}
+
+body.dark-mode .page-item .page-link {
+  background-color: var(--pagination-bg-dark);
+  border: 1px solid var(--pagination-border-dark);
+  color: var(--pagination-text-dark);
+}
+
+.page-item .page-link:hover {
+  background-color: var(--pagination-hover-bg-light);
+  border-color: #c0c0c0; /* Sedikit lebih gelap saat hover di light mode */
+}
+
+body.dark-mode .page-item .page-link:hover {
+  background-color: var(--pagination-hover-bg-dark);
+  border-color: #4b5563; /* Sedikit lebih terang saat hover di dark mode */
+}
+
+.page-item.active .page-link {
+  background-color: var(--pagination-active-bg-light); /* Warna latar belakang aktif (biru) */
+  border-color: var(--pagination-active-bg-light); /* Warna border aktif */
+  color: var(--pagination-active-text-light); /* Warna teks aktif */
+  cursor: default; /* Kursor default untuk halaman aktif */
+  font-weight: 600;
+}
+
+body.dark-mode .page-item.active .page-link {
+  background-color: var(--pagination-active-bg-dark);
+  border-color: var(--pagination-active-bg-dark);
+  color: var(--pagination-active-text-dark);
+}
+
+.page-item.active .page-link:hover {
+  /* Tidak ada perubahan saat hover pada halaman aktif */
+  background-color: var(--pagination-active-bg-light); 
+  border-color: var(--pagination-active-bg-light);
+  cursor: default;
+}
+
+body.dark-mode .page-item.active .page-link:hover {
+  background-color: var(--pagination-active-bg-dark);
+  border-color: var(--pagination-active-bg-dark);
+}
+
+.page-item.disabled .page-link {
+  background-color: var(--pagination-disabled-bg-light); /* Latar belakang dinonaktifkan */
+  border-color: var(--pagination-border-light); /* Border dinonaktifkan */
+  color: var(--pagination-disabled-text-light); /* Warna teks dinonaktifkan */
+  cursor: not-allowed; /* Kursor not-allowed */
+  opacity: 0.7; /* Sedikit transparan */
+}
+
+body.dark-mode .page-item.disabled .page-link {
+  background-color: var(--pagination-disabled-bg-dark);
+  border-color: var(--pagination-border-dark);
+  color: var(--pagination-disabled-text-dark);
+}
+
+.page-item.disabled .page-link:hover {
+  background-color: var(--pagination-disabled-bg-light); /* Tidak ada perubahan hover */
+  border-color: var(--pagination-border-light);
+  cursor: not-allowed;
+}
+
+body.dark-mode .page-item.disabled .page-link:hover {
+  background-color: var(--pagination-disabled-bg-dark);
+  border-color: var(--pagination-border-dark);
 }
