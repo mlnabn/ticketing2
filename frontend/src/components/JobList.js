@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 function JobList({ tickets, updateTicketStatus, deleteTicket, loggedInUserId, userRole, onSelectionChange }) {
+  // State untuk melacak tiket yang dipilih
   const [selectedTickets, setSelectedTickets] = useState([]);
 
+  // Efek untuk mereset pilihan setiap kali daftar tiket utama berubah
   useEffect(() => {
     setSelectedTickets([]);
   }, [tickets]);
 
+  // Efek untuk mengirim perubahan state ke parent (App.js)
   useEffect(() => {
     if (onSelectionChange) {
       onSelectionChange(selectedTickets);
     }
   }, [selectedTickets, onSelectionChange]);
 
+
+  // Handler untuk checkbox "Pilih Semua"
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       const allTicketIds = tickets.map(t => t.id);
@@ -22,6 +29,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, loggedInUserId, us
     }
   };
 
+  // Handler untuk checkbox per baris
   const handleSelectSingle = (e, ticketId) => {
     if (e.target.checked) {
       setSelectedTickets(prev => [...prev, ticketId]);
@@ -55,9 +63,9 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, loggedInUserId, us
             <th>Pengirim</th>
             <th>Nama Pekerja</th>
             <th>Deskripsi</th>
-            <th>Workshop</th>
+            <th>Tanggal Dibuat</th>
+            <th>Waktu Pengerjaan</th>
             <th>Status</th>
-            {/* PERUBAHAN: Sembunyikan kolom Aksi jika role adalah admin */}
             {userRole !== 'admin' && <th>Aksi</th>}
           </tr>
         </thead>
@@ -76,39 +84,35 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, loggedInUserId, us
               <td data-label="Pengirim">{ticket.creator ? ticket.creator.name : 'N/A'}</td>
               <td data-label="Nama Pekerja">{ticket.user ? ticket.user.name : 'N/A'}</td>
               <td data-label="Deskripsi">{ticket.title}</td>
-              <td data-label="Workshop">{ticket.workshop || 'N/A'}</td>
+              <td data-label="Tanggal Dibuat">
+                {format(new Date(ticket.created_at), 'dd MMM yyyy', { locale: id })}
+              </td>
+              <td data-label="Waktu Pengerjaan">
+                {ticket.started_at ? `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}` : '-'}
+                {ticket.completed_at && <><br />{`Selesai: ${format(new Date(ticket.completed_at), 'HH:mm')}`}</>}
+              </td>
               <td data-label="Status">
                 <span className={`status ${getStatusClass(ticket.status)}`}> 
                   {ticket.status}
                 </span>
               </td>
               
-              {/* PERUBAHAN: Jangan render kolom Aksi jika role adalah admin */}
               {userRole !== 'admin' && (
                 <td data-label="Aksi">
                   <div className="action-buttons-group">
-                    {/* Logika Aksi untuk User Biasa (tidak berubah) */}
                     {loggedInUserId === ticket.user_id && (
                       <>
                         {(ticket.status === 'Belum Dikerjakan' || ticket.status === 'Ditunda') && (
-                          <button onClick={() => updateTicketStatus(ticket.id, 'Sedang Dikerjakan')} className="btn-start">
-                            Mulai Kerjakan
-                          </button>
+                          <button onClick={() => updateTicketStatus(ticket.id, 'Sedang Dikerjakan')} className="btn-start">Mulai Kerjakan</button>
                         )}
                         {ticket.status === 'Sedang Dikerjakan' && (
                           <>
-                            <button onClick={() => updateTicketStatus(ticket.id, 'Ditunda')} className="btn-pause">
-                              Tunda
-                            </button>
-                            <button onClick={() => updateTicketStatus(ticket.id, 'Selesai')} className="btn-finish">
-                              Selesaikan
-                            </button>
+                            <button onClick={() => updateTicketStatus(ticket.id, 'Ditunda')} className="btn-pause">Tunda</button>
+                            <button onClick={() => updateTicketStatus(ticket.id, 'Selesai')} className="btn-finish">Selesaikan</button>
                           </>
                         )}
                         {ticket.status === 'Selesai' && (
-                          <button onClick={() => deleteTicket(ticket)} className="btn-delete">
-                            Delete
-                          </button>
+                          <button onClick={() => deleteTicket(ticket)} className="btn-delete">Delete</button>
                         )}
                       </>
                     )}

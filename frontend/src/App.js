@@ -14,6 +14,8 @@ import { getToken, isLoggedIn, logout, getUser } from './auth';
 import './App.css';
 import yourLogo from './Image/Logo.png';
 import loginBackground from './Image/my-login-background.png';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 // =================================================================
 //  KONFIGURASI GLOBAL
@@ -383,39 +385,45 @@ function App() {
 
               <h3>Tiket yang Telah Anda Buat</h3>
               <div className="job-list" style={{ marginTop: '20px' }}>
-                <table className='job-table'>
+                <table>
                   <thead>
                     <tr>
                       <th>Pengirim</th>
                       <th>Ditugaskan Kepada</th>
                       <th>Deskripsi</th>
-                      <th>Workshop</th>
+                      <th>Tanggal Dibuat</th>
+                      <th>Waktu Pengerjaan</th>
                       <th>Status</th>
-                      <th>Aksi</th> {/* Pastikan header Aksi ada */}
+                      <th>Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
                     {createdTicketsOnPage.length > 0 ? (
                       createdTicketsOnPage.map(ticket => (
                         <tr key={ticket.id}>
-                          <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
-                          <td>{ticket.user.name}</td>
-                          <td>{ticket.title}</td>
-                          <td>{ticket.workshop}</td>
-                          <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
-                          {/* PERUBAHAN: Tambahkan kolom Aksi dengan tombol Delete */}
-                          <td>
-                            <button 
-                              onClick={() => handleDeleteClick(ticket)} 
-                              className="btn-delete"
-                            >
+                          <td data-label="Pengirim">{ticket.creator ? ticket.creator.name : 'N/A'}</td>
+                          <td data-label="Ditugaskan Kepada">{ticket.user.name}</td>
+                          <td data-label="Deskripsi">{ticket.title}</td>
+                          <td data-label="Tanggal Dibuat">
+                            {format(new Date(ticket.created_at), 'dd MMM yyyy', { locale: id })}
+                          </td>
+                          <td data-label="Waktu Pengerjaan">
+                            {ticket.started_at ? `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}` : '-'}
+                            {ticket.completed_at && <><br />{`Selesai: ${format(new Date(ticket.completed_at), 'HH:mm')}`}</>}
+                          </td>
+                          <td data-label="Status">
+                            <span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span>
+                          </td>
+                          <td data-label="Aksi">
+                            <button onClick={() => handleDeleteClick(ticket)} className="btn-delete">
                               Delete
                             </button>
                           </td>
                         </tr>
                       ))
                     ) : (
-                      <tr><td colSpan="6">Anda belum membuat tiket untuk pengguna lain.</td></tr>
+                      // Update colSpan menjadi 7
+                      <tr><td colSpan="7">Anda belum membuat tiket untuk pengguna lain.</td></tr>
                     )}
                   </tbody>
                 </table>

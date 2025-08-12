@@ -118,13 +118,26 @@ class TicketController extends Controller
     /**
      * Update status tiket.
      */
+    // File: app/Http/Controllers/Api/TicketController.php
     public function updateStatus(Request $request, Ticket $ticket)
     {
         $validated = $request->validate(['status' => 'required|string']);
-        $ticket->update($validated);
-        return response()->json($ticket->load('user'));
-    }
+        $updateData = ['status' => $validated['status']];
 
+        // Logika Otomatisasi Waktu
+        if ($validated['status'] === 'Sedang Dikerjakan' && is_null($ticket->started_at)) {
+            // Catat waktu mulai saat pertama kali dikerjakan
+            $updateData['started_at'] = now();
+        } elseif ($validated['status'] === 'Selesai') {
+            // Catat waktu selesai
+            $updateData['completed_at'] = now();
+        }
+
+        $ticket->update($updateData);
+        
+        return response()->json($ticket->load(['user', 'creator']));
+    }
+    
     public function stats()
     {
         $user = Auth::user();
