@@ -159,6 +159,7 @@ function App() {
         setSearchInput('');
         setSearchQuery('');
         setDataPage(1);
+        fetchData(1, ''); 
       } else {
         // Jika user, refresh daftar tiket yang dia buat ke halaman 1
         setCreatedTicketsPage(1);
@@ -385,7 +386,7 @@ function App() {
 
               <h3>Tiket yang Telah Anda Buat</h3>
               <div className="job-list" style={{ marginTop: '20px' }}>
-                <table>
+                <table className='job-table'>
                   <thead>
                     <tr>
                       <th>Pengirim</th>
