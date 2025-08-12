@@ -25,7 +25,7 @@ const API_URL = 'http://127.0.0.1:8000/api';
 //  KOMPONEN UTAMA: App
 // =================================================================
 function App() {
-  // -----------------------------------------------------------------
+// -----------------------------------------------------------------
   // #1. STATE MANAGEMENT (Manajemen Data Aplikasi)
   // -----------------------------------------------------------------
   // --- State untuk Data dari API ---
@@ -55,11 +55,12 @@ function App() {
 
   // --- State untuk Interaksi UI (Tampilan) ---
   const [darkMode, setDarkMode] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showRegister, setShowRegister] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState([]);
+  const [statusFilter, setStatusFilter] = useState(null);
   
 
   // -----------------------------------------------------------------
@@ -170,6 +171,7 @@ function App() {
         // Jika admin, reset pencarian dan kembali ke halaman 1 daftar utama
         setSearchInput('');
         setSearchQuery('');
+        setStatusFilter(null);
         setDataPage(1);
       } else {
         // Jika user, refresh daftar tiket yang dia buat ke halaman 1
