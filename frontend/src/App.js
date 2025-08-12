@@ -14,8 +14,6 @@ import { getToken, isLoggedIn, logout, getUser } from './auth';
 import './App.css';
 import yourLogo from './Image/Logo.png';
 import loginBackground from './Image/my-login-background.png';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 
 // =================================================================
 //  KONFIGURASI GLOBAL
@@ -52,12 +50,12 @@ function App() {
 
   // --- State untuk Interaksi UI (Tampilan) ---
   const [darkMode, setDarkMode] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState([]);
-  
+
 
   // -----------------------------------------------------------------
   // #1.A. VARIABEL TURUNAN (Derived State)
@@ -70,6 +68,7 @@ function App() {
   // #2. SIDE EFFECTS (useEffect Hooks)
   // -----------------------------------------------------------------
   // Efek untuk mengambil data utama saat login, halaman, atau pencarian berubah
+
   useEffect(() => {
     if (isLogin) {
       const currentUser = getUser();
@@ -89,22 +88,20 @@ function App() {
     }
   }, [isLogin, isAdmin, currentPage, createdTicketsPage]);
 
-  // Efek untuk mengganti tema dark/light mode
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    setDarkMode(savedDarkMode);
+  }, []);
+
   useEffect(() => {
     document.body.classList.toggle('dark-mode', darkMode);
+    localStorage.setItem('darkMode', darkMode); // Simpan preferensi mode gelap
   }, [darkMode]);
 
-   // Efek untuk mengatur background gambar login menggunakan variabel CSS
+  // Efek untuk mengatur background gambar login menggunakan variabel CSS
   useEffect(() => {
     document.documentElement.style.setProperty('--auth-background-image-light', `url(${loginBackground})`);
-    // Jika Anda memiliki gambar dark mode terpisah, gunakan ini:
-    // if (loginBackgroundDark) {
-    //   document.documentElement.style.setProperty('--auth-background-image-dark', `url(${loginBackgroundDark})`);
-    // } else {
-    //   // Fallback jika tidak ada gambar dark mode, bisa diatur ke 'none' atau gambar yang sama
-    //   document.documentElement.style.setProperty('--auth-background-image-dark', `url(${loginBackground})`);
-    // }
-  }, []); // Hanya dijalankan sekali saat komponen dimuat
+  }, []);
 
 
 
@@ -118,13 +115,13 @@ function App() {
       if (search) {
         ticketsUrl += `&search=${search}`;
       }
-      
+
       const [ticketsRes, usersRes, statsRes] = await Promise.all([
         axios.get(ticketsUrl, config),
         axios.get(`${API_URL}/users`, config),
         axios.get(`${API_URL}/tickets/stats`, config)
       ]);
-      
+
       setTicketData(ticketsRes.data);
       setUsers(usersRes.data);
       setStats(statsRes.data);
@@ -153,7 +150,7 @@ function App() {
   const addTicket = async (formData) => {
     try {
       await axios.post(`${API_URL}/tickets`, formData, { headers: { Authorization: `Bearer ${getToken()}` } });
-      
+
       if (isAdmin) {
         // Jika admin, reset pencarian dan kembali ke halaman 1 daftar utama
         setSearchInput('');
@@ -177,7 +174,7 @@ function App() {
       // Refresh data di halaman saat ini
       fetchData(dataPage, searchQuery);
       // Jika user, refresh juga daftar tiket yang dia buat (jika ada perubahan status di sana)
-      if(!isAdmin) {
+      if (!isAdmin) {
         fetchCreatedTickets(createdTicketsPage);
       }
     } catch (error) { console.error("Gagal update status:", error); }
@@ -196,18 +193,18 @@ function App() {
       try {
         await axios.delete(`${API_URL}/tickets/${ticketToDelete.id}`, { headers: { Authorization: `Bearer ${getToken()}` } });
         // Setelah berhasil hapus, refresh kedua daftar data
-        fetchData(dataPage, searchQuery); 
+        fetchData(dataPage, searchQuery);
         fetchCreatedTickets(createdTicketsPage); // <-- PERUBAHAN: Refresh juga daftar ini
-      } catch (error) { 
+      } catch (error) {
         console.error("Gagal hapus tiket:", error);
         // Tambahan: Beri tahu user jika tidak diizinkan
-        if(error.response && error.response.status === 403) {
+        if (error.response && error.response.status === 403) {
           alert(error.response.data.error);
         }
       }
-      finally { 
-        setShowConfirmModal(false); 
-        setTicketToDelete(null); 
+      finally {
+        setShowConfirmModal(false);
+        setTicketToDelete(null);
       }
     }
   };
@@ -233,7 +230,7 @@ function App() {
     // Tampilkan modal konfirmasi
     if (window.confirm(`Anda yakin ingin menghapus ${selectedTicketIds.length} tiket yang dipilih?`)) {
       try {
-        await axios.post(`${API_URL}/tickets/bulk-delete`, 
+        await axios.post(`${API_URL}/tickets/bulk-delete`,
           { ids: selectedTicketIds }, // Kirim array ID di dalam body request
           { headers: { Authorization: `Bearer ${getToken()}` } }
         );
@@ -249,11 +246,11 @@ function App() {
   const handlePageChange = (page) => {
     setDataPage(page);
   };
-  
+
   const handleCreatedTicketsPageChange = (page) => {
     setCreatedTicketsPage(page);
   };
-  
+
   const handleLogout = () => {
     logout();
     setIsLogin(false);
@@ -266,8 +263,11 @@ function App() {
     setSearchQuery('');
     setSearchInput('');
   };
+  const toggleDarkMode = () => setDarkMode(!darkMode);
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
 
   // -----------------------------------------------------------------
@@ -292,11 +292,11 @@ function App() {
         {/* ... isi sidebar Anda ... */}
         {/* Kode Sidebar Anda dari sebelumnya tidak perlu diubah */}
         <div className="sidebar-header">
-            <img
-                src={yourLogo}
-                alt="Helpdesk Tiketing Logo"
-                className="sidebar-logo"
-            />
+          <img
+            src={yourLogo}
+            alt="Helpdesk Tiketing Logo"
+            className="sidebar-logo"
+          />
         </div>
         <nav className="sidebar-nav">
           <ul>
@@ -319,43 +319,61 @@ function App() {
           <div className="user-info">
             <div className="user-avatar"><i className="fas fa-user"></i></div>
             <span>{userName || 'User'}</span>
+
+            <div className={`dark-mode-toggle ${darkMode ? 'dark' : ''}`} onClick={toggleDarkMode}>
+              <div className="dark-mode-toggle-ball">
+                {/* Ikon untuk bulan dan bintang (saat dark mode aktif) */}
+                {darkMode ? (
+                  <>
+                    <i className="fas fa-moon moon-icon"></i>
+                    {/* <i className="fas fa-star star-icon star-1"></i>
+                    <i className="fas fa-star star-icon star-2"></i> */}
+                  </>
+                ) : (
+                  <i className="fas fa-sun sun-icon"></i> /* Icon matahari (saat light mode aktif) */
+                )}
+              </div>
+            </div>
           </div>
-          <button className="dark-mode-toggle-button" onClick={() => setDarkMode(!darkMode)}>
-            {darkMode ? '☀ Light' : '🌙 Dark'}
-          </button>
+
         </div>
       </aside>
 
       <main className="main-content">
         {/* Header tidak berubah */}
         <header className="main-header">
-            <div className="header-left-group">
-                <button className="hamburger-menu-button" onClick={toggleSidebar}><i className="fas fa-bars"></i></button>
-                <h1 className="dashboard-header-title">{isAdmin ? 'Admin Dashboard' : 'My Dashboard'}</h1>
-            </div>
-            <div className="main-header-controls">
-                <span className="breadcrumb">Home / {currentPage.replace('add', 'Add ')}</span>
-                <button className="header-icon-button"><i className="fas fa-cog"></i></button>
-                <button onClick={handleLogout} className="logout-button"><i className="fas fa-sign-out-alt"></i><span>Logout</span></button>
-            </div>
+          <div className="header-left-group">
+            <button className="hamburger-menu-button" onClick={toggleSidebar}><i className="fas fa-bars"></i></button>
+            <h1 className="dashboard-header-title">{isAdmin ? 'Admin Dashboard' : 'My Dashboard'}</h1>
+          </div>
+          <div className="main-header-controls">
+            <span className="breadcrumb">Home / {currentPage.replace('add', 'Add ')}</span>
+            {/* <button className="header-icon-button"><i className="fas fa-cog"></i></button> */}
+            {/* <button onClick={handleLogout} className="logout-button"><i className="fas fa-sign-out-alt"></i><span>Logout</span></button> */}
+
+
+            <button onClick={handleLogout} className="logout-button">
+              <i className="fas fa-sign-out-alt"></i>
+            </button>
+          </div>
         </header>
-        
+
         <div className="content-area">
           {/* Tampilan Halaman Utama (Tickets/Home) */}
           {currentPage === 'Tickets' && (
             <>
               <div className="info-cards-grid">
-                  <div className="info-card red-card"><h3>{stats ? stats.pending_tickets : '...'}</h3><p>Tiket Belum Selesai</p></div>
-                  <div className="info-card green-card"><h3>{stats ? stats.completed_tickets : '...'}</h3><p>Tiket Selesai</p></div>
-                  <div className="info-card yellow-card"><h3>{stats ? stats.total_tickets : '...'}</h3><p>Total Tiket</p></div>
-                  {isAdmin && (<div className="info-card blue-card"><h3>{stats ? stats.total_users : '...'}</h3><p>Total Pengguna</p></div>)}
+                <div className="info-card red-card"><h3>{stats ? stats.pending_tickets : '...'}</h3><p>Tiket Belum Selesai</p></div>
+                <div className="info-card green-card"><h3>{stats ? stats.completed_tickets : '...'}</h3><p>Tiket Selesai</p></div>
+                <div className="info-card yellow-card"><h3>{stats ? stats.total_tickets : '...'}</h3><p>Total Tiket</p></div>
+                {isAdmin && (<div className="info-card blue-card"><h3>{stats ? stats.total_users : '...'}</h3><p>Total Pengguna</p></div>)}
               </div>
               {isAdmin && (<JobForm users={users} addTicket={addTicket} />)}
               {isAdmin && (
-                  <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
-                      <input type="text" placeholder="Cari berdasarkan nama pekerja..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} style={{ flexGrow: 1, padding: '8px' }} />
-                      <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
-                  </form>
+                <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
+                  <input type="text" placeholder="Cari berdasarkan nama pekerja..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} style={{ flexGrow: 1, padding: '8px' }} />
+                  <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
+                </form>
               )}
               {/* Tombol Hapus Massal hanya untuk admin dan jika ada tiket yang dipilih */}
               {isAdmin && selectedTicketIds.length > 0 && (
@@ -365,8 +383,8 @@ function App() {
                   </button>
                 </div>
               )}
-              <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} loggedInUserId={loggedInUserId} userRole={userRole} onSelectionChange={handleSelectionChange}/>
-              <Pagination currentPage={dataPage} lastPage={ticketData ? ticketData.last_page : 1} onPageChange={handlePageChange}/>
+              <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} loggedInUserId={loggedInUserId} userRole={userRole} onSelectionChange={handleSelectionChange} />
+              <Pagination currentPage={dataPage} lastPage={ticketData ? ticketData.last_page : 1} onPageChange={handlePageChange} />
             </>
           )}
 
@@ -384,52 +402,46 @@ function App() {
               <div className="divider" style={{ margin: '40px 0', borderTop: '1px solid #444' }}></div>
 
               <h3>Tiket yang Telah Anda Buat</h3>
-              <div className="job-list" style={{ marginTop: '20px' }}>
-                <table>
+              <div style={{ marginTop: '20px' }}>
+                <table className='job-table'>
                   <thead>
                     <tr>
                       <th>Pengirim</th>
                       <th>Ditugaskan Kepada</th>
                       <th>Deskripsi</th>
-                      <th>Tanggal Dibuat</th>
-                      <th>Waktu Pengerjaan</th>
+                      <th>Workshop</th>
                       <th>Status</th>
-                      <th>Aksi</th>
+                      <th>Aksi</th> {/* Pastikan header Aksi ada */}
                     </tr>
                   </thead>
                   <tbody>
                     {createdTicketsOnPage.length > 0 ? (
                       createdTicketsOnPage.map(ticket => (
                         <tr key={ticket.id}>
-                          <td data-label="Pengirim">{ticket.creator ? ticket.creator.name : 'N/A'}</td>
-                          <td data-label="Ditugaskan Kepada">{ticket.user.name}</td>
-                          <td data-label="Deskripsi">{ticket.title}</td>
-                          <td data-label="Tanggal Dibuat">
-                            {format(new Date(ticket.created_at), 'dd MMM yyyy', { locale: id })}
-                          </td>
-                          <td data-label="Waktu Pengerjaan">
-                            {ticket.started_at ? `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}` : '-'}
-                            {ticket.completed_at && <><br />{`Selesai: ${format(new Date(ticket.completed_at), 'HH:mm')}`}</>}
-                          </td>
-                          <td data-label="Status">
-                            <span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span>
-                          </td>
-                          <td data-label="Aksi">
-                            <button onClick={() => handleDeleteClick(ticket)} className="btn-delete">
+                          <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
+                          <td>{ticket.user.name}</td>
+                          <td>{ticket.title}</td>
+                          <td>{ticket.workshop}</td>
+                          <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
+                          {/* PERUBAHAN: Tambahkan kolom Aksi dengan tombol Delete */}
+                          <td>
+                            <button
+                              onClick={() => handleDeleteClick(ticket)}
+                              className="btn-delete"
+                            >
                               Delete
                             </button>
                           </td>
                         </tr>
                       ))
                     ) : (
-                      // Update colSpan menjadi 7
-                      <tr><td colSpan="7">Anda belum membuat tiket untuk pengguna lain.</td></tr>
+                      <tr><td colSpan="6">Anda belum membuat tiket untuk pengguna lain.</td></tr>
                     )}
                   </tbody>
                 </table>
               </div>
-              
-              <Pagination currentPage={createdTicketsPage} lastPage={createdTicketsData ? createdTicketsData.last_page : 1} onPageChange={handleCreatedTicketsPageChange}/>
+
+              <Pagination currentPage={createdTicketsPage} lastPage={createdTicketsData ? createdTicketsData.last_page : 1} onPageChange={handleCreatedTicketsPageChange} />
             </>
           )}
         </div>

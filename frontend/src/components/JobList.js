@@ -53,6 +53,9 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, loggedInUserId, us
           <tr>
             {userRole === 'admin' && (
               <th>
+                {/* Nama header untuk checkbox */}
+                select
+                <br />
                 <input
                   type="checkbox"
                   onChange={handleSelectAll}

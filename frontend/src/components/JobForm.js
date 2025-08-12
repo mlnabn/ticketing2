@@ -44,40 +44,67 @@ function JobForm({ users, addTicket }) {
   const selectedUser = userOptions.find(option => option.value === userId);
   const selectedWorkshop = workshopOptions.find(option => option.value === workshop);
 
+  // Deteksi status mode gelap saat ini
+  const isDarkMode = document.body.classList.contains('dark-mode');
+
+  // Tentukan variabel CSS yang akan digunakan berdasarkan mode saat ini
+  // Mengacu pada variabel yang sudah didefinisikan di App.css
+  const inputBg = isDarkMode ? "var(--input-bg-light)" : "var(--input-bg-light)";
+  const borderColor = isDarkMode ? "var(--border-color-light)" : "var(--border-color-light)";
+  const textColor = isDarkMode ? "var(--text-color-light)" : "var(--text-color-light)";
+  const placeholderColor = isDarkMode ? "var(--placeholder-color-light)" : "var(--placeholder-color-light)";
+  const formInputShadow = isDarkMode ? "var(--form-input-shadow-light)" : "var(--form-input-shadow-light)";
+  const menuBg = isDarkMode ? "var(--content-bg-light)" : "var(--content-bg-light)";
+  const menuBorder = isDarkMode ? "var(--border-color-light)" : "var(--border-color-light)";
+  const optionHoverBg = isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 123, 255, 0.1)"; // Warna hover opsi
+  const optionActiveBg = isDarkMode ? "#007bff" : "#007bff"; // Warna saat diklik
+
   // Styling untuk komponen React-Select
   const selectStyles = {
     control: (provided) => ({
       ...provided,
-      backgroundColor: "var(--input-bg-light)", // Menggunakan variabel CSS
+      backgroundColor: inputBg,
       borderRadius: "10px",
-      borderColor: "var(--border-color-light)", // Menggunakan variabel CSS
+      borderColor: borderColor,
       minHeight: "45px",
       fontWeight: 500,
-      boxShadow: "var(--form-input-shadow-light)" // Menggunakan variabel CSS
+      boxShadow: formInputShadow,
+      color: textColor, // Warna teks saat nilai sudah dipilih di kontrol
     }),
     placeholder: (provided) => ({
       ...provided,
-      color: "var(--placeholder-color-light)", // Menggunakan variabel CSS
+      color: placeholderColor,
       fontWeight: 500
     }),
     singleValue: (provided) => ({
       ...provided,
-      color: "var(--text-color-light)", // Menggunakan variabel CSS
+      color: textColor,
       fontWeight: 500
     }),
     menu: (provided) => ({
       ...provided,
-      backgroundColor: "var(--input-bg-light)", // Latar belakang menu
-      borderColor: "var(--border-color-light)", // Border menu
-      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
+      backgroundColor: menuBg,
+      borderColor: menuBorder,
+      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
     }),
     option: (provided, state) => ({
       ...provided,
-      color: "var(--text-color-light)", // Warna teks opsi
-      backgroundColor: state.isFocused ? "rgba(0, 123, 255, 0.1)" : "transparent", // Warna hover
+      color: textColor,
+      backgroundColor: state.isFocused ? optionHoverBg : "transparent",
       "&:active": {
-        backgroundColor: "#007bff", // Warna saat diklik
+        backgroundColor: optionActiveBg,
         color: "white"
+      }
+    }),
+    indicatorSeparator: (provided) => ({
+      ...provided,
+      backgroundColor: borderColor,
+    }),
+    dropdownIndicator: (provided) => ({
+      ...provided,
+      color: placeholderColor, // Warna panah dropdown
+      '&:hover': {
+        color: textColor, // Warna panah dropdown saat hover
       }
     }),
   };
@@ -117,20 +144,6 @@ function JobForm({ users, addTicket }) {
         required
         className="input-like-select"
       />
-
-      {/* Select untuk Status */}
-      {/* <Select
-        options={[
-          { value: 'Belum Dikerjakan', label: 'Belum Dikerjakan' },
-          { value: 'Sedang Dikerjakan', label: 'Sedang Dikerjakan' }
-        ]}
-        onChange={(selected) => setStatus(selected.value)}
-        value={{ value: status, label: status }}
-        placeholder="Status"
-        styles={selectStyles}
-        classNamePrefix="react-select"
-        required
-      /> */}
 
       {/* Tombol Tambah */}
       <button type="submit" className="btn-submit">Tambah</button>
