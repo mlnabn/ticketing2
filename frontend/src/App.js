@@ -8,6 +8,7 @@ import JobList from './components/JobList';
 import Login from './components/Login';
 import Register from './components/Register';
 import UserManagement from './components/UserManagement';
+import UserFormModal from './components/UserFormModal';
 import ConfirmationModal from './components/ConfirmationModal';
 import Pagination from './components/Pagination';
 import { getToken, isLoggedIn, logout, getUser } from './auth';
@@ -40,6 +41,10 @@ function App() {
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState('');
   const [loggedInUserId, setLoggedInUserId] = useState(null);
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [showUserConfirmModal, setShowUserConfirmModal] = useState(false);
+  const [showUserFormModal, setShowUserFormModal] = useState(false);
+  const [userToEdit, setUserToEdit] = useState(null); // null untuk 'tambah', objek user untuk 'edit'
 
   // --- State untuk Navigasi & Paginasi ---
   const [currentPage, setCurrentPage] = useState('Tickets');
@@ -279,6 +284,83 @@ function App() {
     }
   };
 
+  const handleUserDeleteClick = (user) => {
+    if (user.id === loggedInUserId) {
+      alert("Anda tidak bisa menghapus akun Anda sendiri.");
+      return;
+    }
+    setUserToDelete(user);
+    setShowUserConfirmModal(true);
+  };
+
+  const confirmUserDelete = async () => {
+    if (userToDelete) {
+      try {
+        await axios.delete(`${API_URL}/users/${userToDelete.id}`, { 
+          headers: { Authorization: `Bearer ${getToken()}` } 
+        });
+        // Refresh semua data setelah berhasil hapus
+        fetchData(dataPage, searchQuery, statusFilter);
+      } catch (error) {
+        console.error("Gagal menghapus pengguna:", error);
+        alert("Gagal menghapus pengguna.");
+      } finally {
+        setShowUserConfirmModal(false);
+        setUserToDelete(null);
+      }
+    }
+  };
+
+  const cancelUserDelete = () => {
+    setShowUserConfirmModal(false);
+    setUserToDelete(null);
+  };
+
+  // Fungsi untuk membuka modal (mode 'tambah')
+  const handleAddUserClick = () => {
+    setUserToEdit(null); // Pastikan null untuk mode tambah
+    setShowUserFormModal(true);
+  };
+
+  // Fungsi untuk membuka modal (mode 'edit')
+  const handleUserEditClick = (user) => {
+    setUserToEdit(user);
+    setShowUserFormModal(true);
+  };
+
+  // Fungsi untuk menutup modal
+  const handleCloseUserForm = () => {
+    setShowUserFormModal(false);
+    setUserToEdit(null);
+  };
+
+  // Fungsi untuk menyimpan data (baik 'tambah' maupun 'edit')
+  const handleSaveUser = async (formData) => {
+    const isEditMode = Boolean(userToEdit);
+    const url = isEditMode ? `${API_URL}/users/${userToEdit.id}` : `${API_URL}/users`;
+    const method = isEditMode ? 'put' : 'post';
+
+    try {
+      await axios[method](url, formData, { 
+        headers: { Authorization: `Bearer ${getToken()}` } 
+      });
+
+      // Refresh semua data setelah berhasil
+      fetchData(dataPage, searchQuery, statusFilter);
+      handleCloseUserForm(); // Tutup modal
+
+    } catch (error) {
+      console.error("Gagal menyimpan pengguna:", error);
+      // Tampilkan pesan error spesifik jika ada
+      if (error.response && error.response.data.errors) {
+        const errorMessages = Object.values(error.response.data.errors).flat().join('\n');
+        alert(errorMessages);
+      } else {
+        alert("Gagal menyimpan pengguna.");
+      }
+    }
+  };
+
   const handlePageChange = (page) => {
     setDataPage(page);
   };
@@ -428,8 +510,14 @@ function App() {
             </>
           )}
 
-          {/* Tampilan Halaman "Add User" (Hanya Admin) */}
-          {currentPage === 'userManagement' && isAdmin && <UserManagement />}
+          {/* Tampilan Halaman "User" (Hanya Admin) */}
+          {currentPage === 'userManagement' && isAdmin && (
+            <UserManagement 
+              onDeleteClick={handleUserDeleteClick}
+              onAddClick={handleAddUserClick}
+              onEditClick={handleUserEditClick}
+            />
+          )}
 
           {/* Tampilan Halaman "Add Ticket" (Hanya User) */}
           {!isAdmin && currentPage === 'addTicket' && (
@@ -496,6 +584,20 @@ function App() {
       {/* --------------- MODAL KONFIRMASI --------------- */}
       {showConfirmModal && ticketToDelete && (
         <ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />
+      )}
+      {showUserConfirmModal && userToDelete && (
+        <ConfirmationModal 
+          message={`Anda yakin ingin menghapus pengguna "${userToDelete.name}"?`} 
+          onConfirm={confirmUserDelete} 
+          onCancel={cancelUserDelete} 
+        />
+      )}
+      {showUserFormModal && (
+        <UserFormModal
+          userToEdit={userToEdit}
+          onClose={handleCloseUserForm}
+          onSave={handleSaveUser}
+        />
       )}
     </div>
   );
