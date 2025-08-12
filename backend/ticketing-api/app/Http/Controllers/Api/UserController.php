@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -48,32 +50,34 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        // Otorisasi: Pastikan hanya admin yang bisa mengakses
         if (auth()->user()->role !== 'admin') {
             return response()->json(['error' => 'Akses ditolak.'], 403);
         }
 
+        // Validasi data yang masuk
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            // Pastikan email unik, kecuali untuk user ini sendiri
+            // Pastikan email unik, kecuali untuk user yang sedang diedit
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            // Password bersifat opsional, hanya di-update jika diisi
+            // Password bersifat opsional: hanya divalidasi jika tidak kosong
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
-        // Update data dasar
+        // Update data nama dan email
         $user->name = $validated['name'];
         $user->email = $validated['email'];
 
-        // Jika ada password baru, hash dan update
+        // Jika field password diisi oleh admin, maka hash dan update passwordnya
         if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }
 
+        // Simpan perubahan ke database
         $user->save();
 
         return response()->json($user);
     }
-
     /**
      * (BARU) Menghapus pengguna.
      */

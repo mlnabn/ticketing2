@@ -299,8 +299,8 @@ function App() {
         await axios.delete(`${API_URL}/users/${userToDelete.id}`, { 
           headers: { Authorization: `Bearer ${getToken()}` } 
         });
-        // Refresh semua data setelah berhasil hapus
-        fetchData(dataPage, searchQuery, statusFilter);
+        // PERBAIKAN: Refresh semua data ke halaman pertama setelah hapus
+        fetchData(1, '', null); 
       } catch (error) {
         console.error("Gagal menghapus pengguna:", error);
         alert("Gagal menghapus pengguna.");
@@ -338,20 +338,22 @@ function App() {
   const handleSaveUser = async (formData) => {
     const isEditMode = Boolean(userToEdit);
     const url = isEditMode ? `${API_URL}/users/${userToEdit.id}` : `${API_URL}/users`;
-    const method = isEditMode ? 'put' : 'post';
+    
+    // PERBAIKAN: Selalu gunakan 'post' untuk method. 
+    // Laravel akan membedakan antara 'buat baru' dan 'update' berdasarkan URL.
+    const method = 'post';
 
     try {
       await axios[method](url, formData, { 
         headers: { Authorization: `Bearer ${getToken()}` } 
       });
 
-      // Refresh semua data setelah berhasil
-      fetchData(dataPage, searchQuery, statusFilter);
+      // Refresh semua data ke halaman pertama setelah berhasil
+      fetchData(1, '', null);
       handleCloseUserForm(); // Tutup modal
 
     } catch (error) {
       console.error("Gagal menyimpan pengguna:", error);
-      // Tampilkan pesan error spesifik jika ada
       if (error.response && error.response.data.errors) {
         const errorMessages = Object.values(error.response.data.errors).flat().join('\n');
         alert(errorMessages);
