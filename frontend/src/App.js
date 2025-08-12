@@ -7,7 +7,7 @@ import JobForm from './components/JobForm';
 import JobList from './components/JobList';
 import Login from './components/Login';
 import Register from './components/Register';
-import AddUser from './components/AddUser.js';
+import UserManagement from './components/UserManagement';
 import ConfirmationModal from './components/ConfirmationModal';
 import Pagination from './components/Pagination';
 import { getToken, isLoggedIn, logout, getUser } from './auth';
@@ -334,7 +334,7 @@ function App() {
             {isAdmin && (
               <>
                 <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Tickets')} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-home"></i><span>Home</span></button></li>
-                <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('addUser')} className={`sidebar-button ${currentPage === 'addUser' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>Add User</span></button></li>
+                <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>User</span></button></li>
               </>
             )}
             {!isAdmin && (
@@ -431,7 +431,7 @@ function App() {
           )}
 
           {/* Tampilan Halaman "Add User" (Hanya Admin) */}
-          {currentPage === 'addUser' && isAdmin && <AddUser />}
+          {currentPage === 'userManagement' && isAdmin && <userManagement />}
 
           {/* Tampilan Halaman "Add Ticket" (Hanya User) */}
           {!isAdmin && currentPage === 'addTicket' && (

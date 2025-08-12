@@ -22,7 +22,7 @@ Route::middleware('jwt')->group(function () {
     Route::post('/tickets/bulk-delete', [TicketController::class, 'bulkDelete']);
 
     // Users
-    Route::apiResource('users', UserController::class)->only(['index', 'store']);
+    Route::apiResource('users', UserController::class)->except(['create', 'edit']);
 
     // Tickets
     Route::get('/tickets/created-by-me', [TicketController::class, 'createdTickets']);
