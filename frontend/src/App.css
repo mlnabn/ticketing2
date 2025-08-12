@@ -48,6 +48,7 @@
 
   /* Login Page Background (Light Mode) */
   --auth-bg-light: #F7F9FC; /* Sama dengan latar belakang dashboard */
+  --auth-background-image-light: none; /* Default, akan diisi dari JS */
 
   /* Warna Kartu Informasi (Sesuai dengan screenshot dan penyesuaian sebelumnya) */
   --info-card-red: #EF4444; 
@@ -275,13 +276,20 @@ body.dark-mode {
 */
 .auth-page-container {
   display: flex;
+  justify-content: right;
   align-items: center;
-  justify-content: center;
+  padding-right: 270px;
+  /* justify-content: ; */
   min-height: 100vh;
   width: 100%;
   
   /* Diubah menjadi warna putih solid */
-  background-color: var(--auth-bg-light);
+  background-image: var(--auth-background-image-light); /* Gunakan variabel CSS dari JS */
+  background-size: cover; /* Memastikan gambar menutupi seluruh area */
+  background-position: center; /* Memposisikan gambar di tengah */
+  background-repeat: no-repeat; /* Mencegah gambar berulang */
+  position: relative; /* Diperlukan untuk overlay */
+  overflow: hidden; /* Memastikan tidak ada scrollbar yang tidak diinginkan */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   transition: background-color 0.3s ease; /* Transisi untuk warna solid */
 }
@@ -293,22 +301,23 @@ body.dark-mode .auth-page-container {
 /* Gaya untuk kartu Login/Register (kotak putih di tengah) */
 .login-card,
 .register-card {
-  background: #ffffff; /* Kartu putih solid */
+  background: #c2c0c0; /* Kartu putih solid */
   backdrop-filter: none; /* Hapus efek blur */
   border-radius: 20px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   padding: 50px;
-  width: 400px;
+  width: 500px;
   /* DIUBAH: Mengatur max-width agar lebih besar */
-  max-width: 400px; /*Lebar kartu login/register, bisa diubah ke 450px atau lebih */
+  max-width: 450px; /*Lebar kartu login/register, bisa diubah ke 450px atau lebih */
   text-align: center;
   transition: all 0.3s ease;
+  opacity: 80%;
 }
 
 .login-card h2,
 .register-card h2 {
   margin-bottom: 24px;
-  color: #1a237e; /* Warna judul di kartu login/register */
+  color: #000111; /* Warna judul di kartu login/register */
   font-size: 28px;
 }
 
