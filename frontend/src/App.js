@@ -58,10 +58,6 @@ function App() {
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState([]);
   const [statusFilter, setStatusFilter] = useState(null);
-
-  // Variabel helper untuk mempermudah render dan mencegah error
-  const ticketsOnPage = useMemo(() => (ticketData ? ticketData.data : []), [ticketData]);
-  const createdTicketsOnPage = useMemo(() => (createdTicketsData ? createdTicketsData.data : []), [createdTicketsData]);
   
 
   // -----------------------------------------------------------------
@@ -69,7 +65,12 @@ function App() {
   // -----------------------------------------------------------------
   // Variabel yang nilainya diturunkan dari state, dideklarasikan sebelum digunakan.
   const isAdmin = userRole && userRole.toLowerCase() === 'admin';
+  const ticketsOnPage = useMemo(() => (ticketData ? ticketData.data : []), [ticketData]);
+  const createdTicketsOnPage = useMemo(() => (createdTicketsData ? createdTicketsData.data : []), [createdTicketsData]);
 
+  const handleSelectionChange = useCallback((selectedIds) => {
+    setSelectedTicketIds(selectedIds);
+  }, []); // Dependency array kosong berarti fungsi ini hanya dibuat sekali
 
   // -----------------------------------------------------------------
   // #2. SIDE EFFECTS (useEffect Hooks)
@@ -255,9 +256,6 @@ function App() {
     setDataPage(1);
   };
 
-  const handleSelectionChange = useCallback((selectedIds) => {
-    setSelectedTicketIds(selectedIds);
-  }, []); // Dependency array kosong berarti fungsi ini hanya dibuat sekali
 
   const handleBulkDelete = async () => {
     if (selectedTicketIds.length === 0) {
@@ -431,7 +429,7 @@ function App() {
           )}
 
           {/* Tampilan Halaman "Add User" (Hanya Admin) */}
-          {currentPage === 'userManagement' && isAdmin && <userManagement />}
+          {currentPage === 'userManagement' && isAdmin && <UserManagement />}
 
           {/* Tampilan Halaman "Add Ticket" (Hanya User) */}
           {!isAdmin && currentPage === 'addTicket' && (
