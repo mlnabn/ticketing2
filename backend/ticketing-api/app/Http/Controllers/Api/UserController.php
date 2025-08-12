@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -29,5 +31,69 @@ class UserController extends Controller
         ]);
 
         return response()->json($user, 201);
+    }
+
+    /**
+     * (BARU) Menampilkan data satu pengguna.
+     */
+    public function show(User $user)
+    {
+        // Pastikan hanya admin yang bisa mengakses
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'Akses ditolak.'], 403);
+        }
+        return response()->json($user);
+    }
+
+    /**
+     * (BARU) Memperbarui data pengguna.
+     */
+    public function update(Request $request, User $user)
+    {
+        // Otorisasi: Pastikan hanya admin yang bisa mengakses
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'Akses ditolak.'], 403);
+        }
+
+        // Validasi data yang masuk
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            // Pastikan email unik, kecuali untuk user yang sedang diedit
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            // Password bersifat opsional: hanya divalidasi jika tidak kosong
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+
+        // Update data nama dan email
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+
+        // Jika field password diisi oleh admin, maka hash dan update passwordnya
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        // Simpan perubahan ke database
+        $user->save();
+
+        return response()->json($user);
+    }
+    /**
+     * (BARU) Menghapus pengguna.
+     */
+    public function destroy(User $user)
+    {
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'Akses ditolak.'], 403);
+        }
+        
+        // Tambahan: Jangan biarkan admin menghapus dirinya sendiri
+        if ($user->id === auth()->id()) {
+            return response()->json(['error' => 'Anda tidak bisa menghapus akun Anda sendiri.'], 403);
+        }
+
+        $user->delete();
+
+        return response()->json(null, 204);
     }
 }
