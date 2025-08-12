@@ -13,6 +13,7 @@ import Pagination from './components/Pagination';
 import { getToken, isLoggedIn, logout, getUser } from './auth';
 import './App.css';
 import yourLogo from './Image/Logo.png';
+import loginBackground from './Image/my-login-background.png';
 
 // =================================================================
 //  KONFIGURASI GLOBAL
@@ -89,6 +90,19 @@ function App() {
   useEffect(() => {
     document.body.classList.toggle('dark-mode', darkMode);
   }, [darkMode]);
+
+   // Efek untuk mengatur background gambar login menggunakan variabel CSS
+  useEffect(() => {
+    document.documentElement.style.setProperty('--auth-background-image-light', `url(${loginBackground})`);
+    // Jika Anda memiliki gambar dark mode terpisah, gunakan ini:
+    // if (loginBackgroundDark) {
+    //   document.documentElement.style.setProperty('--auth-background-image-dark', `url(${loginBackgroundDark})`);
+    // } else {
+    //   // Fallback jika tidak ada gambar dark mode, bisa diatur ke 'none' atau gambar yang sama
+    //   document.documentElement.style.setProperty('--auth-background-image-dark', `url(${loginBackground})`);
+    // }
+  }, []); // Hanya dijalankan sekali saat komponen dimuat
+
 
 
   // -----------------------------------------------------------------
