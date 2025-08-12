@@ -18,16 +18,17 @@ class TicketController extends Controller
     public function index(Request $request)
     {
         // 1. Ambil data user dan parameter dari request
-        $user = Auth::user();
+        $user = auth()->user();
         $perPage = $request->query('per_page', 5);
         $search = $request->query('search');
+        $statusFilter = $request->query('status');
 
-        // 2. Mulai query dasar dengan menyertakan relasi user
+        // 2. Mulai query dasar dengan menyertakan relasi yang dibutuhkan
         $query = Ticket::with(['user', 'creator']);
 
-        // 3. Terapkan filter berdasarkan peran
+        // 3. Terapkan filter berdasarkan peran (user atau admin)
         if ($user->role === 'admin') {
-            // Jika admin dan ada parameter pencarian, terapkan filter 'whereHas'
+            // Jika admin, terapkan filter pencarian jika ada
             if ($search) {
                 $query->whereHas('user', function ($q) use ($search) {
                     $q->where('name', 'like', '%' . $search . '%');
@@ -38,11 +39,20 @@ class TicketController extends Controller
             $query->where('user_id', $user->id);
         }
 
-        // 4. Setelah semua filter diterapkan, baru lakukan pengurutan dan paginasi
-        $tickets = $query->latest()->paginate($perPage);
+        // 4. Terapkan filter status jika ada
+        if ($statusFilter) {
+            if ($statusFilter === 'Belum Selesai') {
+                $query->whereIn('status', ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan']);
+            } else {
+                $query->where('status', $statusFilter);
+            }
+        }
 
-        // 5. Kembalikan hasil dalam format JSON
-        return response()->json($tickets);
+        // 5. Eksekusi query dengan urutan dan paginasi (ini adalah satu-satunya tempat $tickets didefinisikan)
+        $ticketsData = $query->latest()->paginate($perPage);
+
+        // 6. Kembalikan hasil dalam format JSON (ini adalah satu-satunya return)
+        return response()->json($ticketsData);
     }
 
     /**

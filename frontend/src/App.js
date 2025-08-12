@@ -1,7 +1,7 @@
 // =================================================================
 //  IMPOR LIBRARY & KOMPONEN
 // =================================================================
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback} from 'react';
 import axios from 'axios';
 import JobForm from './components/JobForm';
 import JobList from './components/JobList';
@@ -57,6 +57,11 @@ function App() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState([]);
+  const [statusFilter, setStatusFilter] = useState(null);
+
+  // Variabel helper untuk mempermudah render dan mencegah error
+  const ticketsOnPage = useMemo(() => (ticketData ? ticketData.data : []), [ticketData]);
+  const createdTicketsOnPage = useMemo(() => (createdTicketsData ? createdTicketsData.data : []), [createdTicketsData]);
   
 
   // -----------------------------------------------------------------
@@ -78,9 +83,9 @@ function App() {
         setUserName(currentUser.name);
         setLoggedInUserId(currentUser.id);
       }
-      fetchData(dataPage, searchQuery);
+      fetchData(dataPage, searchQuery, statusFilter);
     }
-  }, [isLogin, dataPage, searchQuery]);
+  }, [isLogin, dataPage, searchQuery, statusFilter]);
 
   // Efek untuk mengambil daftar tiket yang dibuat saat user di halaman "Add Ticket"
   useEffect(() => {
@@ -111,14 +116,23 @@ function App() {
   // -----------------------------------------------------------------
   // #3. DATA FETCHING FUNCTIONS (Fungsi Pengambilan Data)
   // -----------------------------------------------------------------
-  const fetchData = async (page = 1, search = '') => {
+  // 1. Tambahkan parameter 'status' dengan nilai default null
+  const fetchData = async (page = 1, search = '', status = null) => {
     try {
       const config = { headers: { Authorization: `Bearer ${getToken()}` } };
       let ticketsUrl = `${API_URL}/tickets?page=${page}`;
+
+      // Logika untuk search tidak berubah
       if (search) {
         ticketsUrl += `&search=${search}`;
       }
       
+      // 2. Tambahkan filter status ke URL jika ada
+      if (status) {
+        ticketsUrl += `&status=${status}`;
+      }
+      
+      // Sisa fungsi tidak berubah, ia akan menggunakan ticketsUrl yang sudah dimodifikasi
       const [ticketsRes, usersRes, statsRes] = await Promise.all([
         axios.get(ticketsUrl, config),
         axios.get(`${API_URL}/users`, config),
@@ -150,23 +164,38 @@ function App() {
   // -----------------------------------------------------------------
   // #4. HANDLER FUNCTIONS (Fungsi untuk Menangani Aksi Pengguna)
   // -----------------------------------------------------------------
+  // Di dalam file App.js
+
   const addTicket = async (formData) => {
     try {
       await axios.post(`${API_URL}/tickets`, formData, { headers: { Authorization: `Bearer ${getToken()}` } });
       
-      if (isAdmin) {
-        // Jika admin, reset pencarian dan kembali ke halaman 1 daftar utama
-        setSearchInput('');
-        setSearchQuery('');
-        setDataPage(1);
-        fetchData(1, ''); 
-      } else {
-        // Jika user, refresh daftar tiket yang dia buat ke halaman 1
+      // Setelah tiket berhasil ditambahkan, kita perlu data yang paling baru.
+      // Cara paling sederhana dan pasti adalah memuat ulang semua data ke halaman pertama.
+      
+      // Reset semua filter dan paginasi
+      setSearchInput('');
+      setSearchQuery('');
+      setStatusFilter(null); // Reset juga filter status jika ada
+      setDataPage(1);
+      
+      // Jika user biasa, reset juga paginasi daftar tiket yang dibuat
+      if (!isAdmin) {
         setCreatedTicketsPage(1);
+        // Panggil fetchCreatedTickets secara eksplisit untuk memastikan daftarnya ter-update
+        // bahkan sebelum navigasi (jika user tetap di halaman Add Ticket)
         fetchCreatedTickets(1);
-        // Refresh juga statistik karena ada penambahan tiket baru
-        fetchData(dataPage, searchQuery);
       }
+      
+      // Panggil ulang fetchData untuk memuat ulang daftar tiket utama dan statistik
+      // Ini akan secara otomatis membawa admin ke halaman utama yang sudah di-refresh
+      fetchData(1, '', null);
+
+      // Untuk admin, otomatis pindah ke halaman utama setelah menambah tiket
+      if (isAdmin) {
+        setCurrentPage('Tickets');
+      }
+
     } catch (error) {
       console.error("Gagal menambah tiket:", error);
     }
@@ -182,6 +211,11 @@ function App() {
         fetchCreatedTickets(createdTicketsPage);
       }
     } catch (error) { console.error("Gagal update status:", error); }
+  };
+
+  const handleStatusFilterClick = (status) => {
+    setStatusFilter(status); // Set filter status yang baru
+    setDataPage(1); // Selalu kembali ke halaman 1 saat filter baru diterapkan
   };
 
   const handleDeleteClick = (ticket) => {
@@ -221,9 +255,9 @@ function App() {
     setDataPage(1);
   };
 
-  const handleSelectionChange = (selectedIds) => {
+  const handleSelectionChange = useCallback((selectedIds) => {
     setSelectedTicketIds(selectedIds);
-  };
+  }, []); // Dependency array kosong berarti fungsi ini hanya dibuat sekali
 
   const handleBulkDelete = async () => {
     if (selectedTicketIds.length === 0) {
@@ -281,10 +315,6 @@ function App() {
       </div>
     );
   }
-
-  // Variabel helper untuk mempermudah render dan mencegah error
-  const ticketsOnPage = ticketData ? ticketData.data : [];
-  const createdTicketsOnPage = createdTicketsData ? createdTicketsData.data : [];
 
   return (
     <div className={`dashboard-container ${!isSidebarOpen ? 'sidebar-closed' : ''}`}>
@@ -346,10 +376,39 @@ function App() {
           {currentPage === 'Tickets' && (
             <>
               <div className="info-cards-grid">
-                  <div className="info-card red-card"><h3>{stats ? stats.pending_tickets : '...'}</h3><p>Tiket Belum Selesai</p></div>
-                  <div className="info-card green-card"><h3>{stats ? stats.completed_tickets : '...'}</h3><p>Tiket Selesai</p></div>
-                  <div className="info-card yellow-card"><h3>{stats ? stats.total_tickets : '...'}</h3><p>Total Tiket</p></div>
-                  {isAdmin && (<div className="info-card blue-card"><h3>{stats ? stats.total_users : '...'}</h3><p>Total Pengguna</p></div>)}
+                {/* Kartu "Belum Selesai" */}
+                <div 
+                  className={`info-card red-card ${statusFilter === 'Belum Selesai' ? 'active' : ''}`}
+                  onClick={() => handleStatusFilterClick('Belum Selesai')}
+                >
+                  <h3>{stats ? stats.pending_tickets : '...'}</h3>
+                  <p>Tiket Belum Selesai</p>
+                </div>
+
+                {/* Kartu "Selesai" */}
+                <div 
+                  className={`info-card green-card ${statusFilter === 'Selesai' ? 'active' : ''}`}
+                  onClick={() => handleStatusFilterClick('Selesai')}
+                >
+                  <h3>{stats ? stats.completed_tickets : '...'}</h3>
+                  <p>Tiket Selesai</p>
+                </div>
+
+                {/* Kartu "Total Tiket" - klik ini untuk mereset filter */}
+                <div 
+                  className={`info-card yellow-card ${!statusFilter ? 'active' : ''}`}
+                  onClick={() => handleStatusFilterClick(null)}
+                >
+                  <h3>{stats ? stats.total_tickets : '...'}</h3>
+                  <p>Total Tiket</p>
+                </div>
+                
+                {isAdmin && (
+                  <div className="info-card blue-card">
+                    <h3>{stats ? stats.total_users : '...'}</h3>
+                    <p>Total Pengguna</p>
+                  </div>
+                )}
               </div>
               {isAdmin && (<JobForm users={users} addTicket={addTicket} />)}
               {isAdmin && (
