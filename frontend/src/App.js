@@ -53,6 +53,7 @@ function App() {
   const [showRegister, setShowRegister] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState(null);
+  const [selectedTicketIds, setSelectedTicketIds] = useState([]);
   
 
   // -----------------------------------------------------------------
@@ -168,7 +169,7 @@ function App() {
 
   const handleDeleteClick = (ticket) => {
     // Fungsi ini sekarang menerima seluruh objek tiket
-    if (ticket) {
+    if (ticket && ticket.id) {
       setTicketToDelete(ticket);
       setShowConfirmModal(true);
     }
@@ -201,6 +202,32 @@ function App() {
     e.preventDefault();
     setSearchQuery(searchInput);
     setDataPage(1);
+  };
+
+  const handleSelectionChange = (selectedIds) => {
+    setSelectedTicketIds(selectedIds);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedTicketIds.length === 0) {
+      alert("Pilih setidaknya satu tiket untuk dihapus.");
+      return;
+    }
+
+    // Tampilkan modal konfirmasi
+    if (window.confirm(`Anda yakin ingin menghapus ${selectedTicketIds.length} tiket yang dipilih?`)) {
+      try {
+        await axios.post(`${API_URL}/tickets/bulk-delete`, 
+          { ids: selectedTicketIds }, // Kirim array ID di dalam body request
+          { headers: { Authorization: `Bearer ${getToken()}` } }
+        );
+        // Refresh data setelah berhasil
+        fetchData(1, ''); // Kembali ke halaman 1
+      } catch (error) {
+        console.error("Gagal menghapus tiket secara massal:", error);
+        alert("Terjadi kesalahan saat mencoba menghapus tiket.");
+      }
+    }
   };
 
   const handlePageChange = (page) => {
@@ -314,7 +341,15 @@ function App() {
                       <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
                   </form>
               )}
-              <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} loggedInUserId={loggedInUserId} userRole={userRole}/>
+              {/* Tombol Hapus Massal hanya untuk admin dan jika ada tiket yang dipilih */}
+              {isAdmin && selectedTicketIds.length > 0 && (
+                <div className="bulk-action-bar" style={{ margin: '20px 0' }}>
+                  <button onClick={handleBulkDelete} className="btn-delete">
+                    Hapus {selectedTicketIds.length} Tiket yang Dipilih
+                  </button>
+                </div>
+              )}
+              <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} loggedInUserId={loggedInUserId} userRole={userRole} onSelectionChange={handleSelectionChange}/>
               <Pagination currentPage={dataPage} lastPage={ticketData ? ticketData.last_page : 1} onPageChange={handlePageChange}/>
             </>
           )}

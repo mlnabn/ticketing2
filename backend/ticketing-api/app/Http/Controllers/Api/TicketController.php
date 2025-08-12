@@ -72,18 +72,47 @@ class TicketController extends Controller
         return response()->json($tickets);
     }
 
+    public function bulkDelete(Request $request)
+    {
+        // Pastikan hanya admin yang bisa mengakses
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'Akses ditolak.'], 403);
+        }
+
+        // Validasi input: harus berupa array dan tidak boleh kosong
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'exists:tickets,id', // Pastikan setiap ID ada di tabel tiket
+        ]);
+
+        // Hapus semua tiket yang ID-nya ada di dalam array
+        Ticket::whereIn('id', $validated['ids'])->delete();
+
+        // Kembalikan respons berhasil
+        return response()->json(['message' => 'Tiket yang dipilih telah dihapus.']);
+    }
+
     /**
      * Hapus tiket.
      */
     public function destroy(Ticket $ticket)
     {
-        if (auth()->id() !== $ticket->creator_id && auth()->user()->role !== 'admin') {
-            // Jika bukan keduanya, tolak akses.
-            return response()->json(['error' => 'Anda tidak memiliki izin untuk menghapus tiket ini.'], 403);
+        // Ambil data pengguna yang sedang login
+        $user = auth()->user();
+
+        // Definisikan kondisi siapa saja yang boleh menghapus
+        $isAdmin = $user->role === 'admin';
+        $isCreator = $user->id === $ticket->creator_id;
+        $isAssigneeOfCompletedTicket = ($user->id === $ticket->user_id && $ticket->status === 'Selesai');
+
+        // Jika pengguna memenuhi SALAH SATU dari kondisi di atas, izinkan penghapusan
+        if ($isAdmin || $isCreator || $isAssigneeOfCompletedTicket) {
+            $ticket->delete();
+            return response()->json(null, 204); // 204 No Content, artinya berhasil
         }
-        
-        $ticket->delete();
-        return response()->json(null, 204);
+
+        // Jika tidak ada kondisi yang terpenuhi, tolak akses
+        return response()->json(['error' => 'Anda tidak memiliki izin untuk menghapus tiket ini.'], 403); // 403 Forbidden
     }
 
     /**

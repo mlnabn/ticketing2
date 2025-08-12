@@ -19,6 +19,7 @@ Route::middleware('jwt')->group(function () {
     Route::get('/user', [AuthController::class, 'getUser']);
     Route::put('/user', [AuthController::class, 'updateUser']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/tickets/bulk-delete', [TicketController::class, 'bulkDelete']);
 
     // Users
     Route::apiResource('users', UserController::class)->only(['index', 'store']);
