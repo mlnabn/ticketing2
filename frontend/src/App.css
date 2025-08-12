@@ -1000,6 +1000,10 @@ body.dark-mode .job-form input::placeholder {
   outline: none;
 }
 
+.job-table tbody tr.selected-row {
+  background-color: #3a537e; /* Warna biru gelap lembut */
+}
+
 /*
   ---------------------------------------------------
   Tombol Umum
