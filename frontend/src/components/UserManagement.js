@@ -1,40 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Pagination from './Pagination';
 
-// const API_URL = 'http://127.0.0.1:8000/api';
+// Terima semua data dan fungsi sebagai props
+const UserManagement = ({ userData, onAddClick, onEditClick, onDeleteClick, onPageChange, onSearch }) => {
+  const [searchInput, setSearchInput] = useState('');
 
-// 1. Terima semua props yang dibutuhkan: onAddClick, onEditClick, dan onDeleteClick
-const UserManagement = ({ users, onAddClick, onEditClick, onDeleteClick }) => {
-  // const [users, setUsers] = useState([]);
-  
-  // // Fungsi fetchUsers ini akan dipanggil ulang dari App.js,
-  // // jadi kita bisa sederhanakan di sini.
-  // useEffect(() => {
-  //   fetchUsers();
-  // }, []);
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    onSearch(searchInput);
+  };
 
-  // const fetchUsers = async () => {
-  //   try {
-  //     const response = await axios.get(`${API_URL}/users`, {
-  //       headers: { Authorization: `Bearer ${getToken()}` }
-  //     });
-  //     setUsers(response.data);
-  //   } catch (error) {
-  //     console.error("Gagal mengambil data pengguna:", error);
-  //   }
-  // };
+  // Ambil array user dari objek paginasi
+  const users = userData ? userData.data : [];
 
   return (
     <div className="user-management-container">
       <div className="flex justify-between items-center mb-4">
         <h1>Manajemen Pengguna</h1>
-        <button onClick={onAddClick} className="btn-primary">Tambah Pengguna Baru</button>
+        <button onClick={onAddClick} className="btn-primary">
+          Tambah Pengguna Baru
+        </button>
       </div>
+
+      <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
+        <input
+          type="text"
+          placeholder="Cari berdasarkan nama..."
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          style={{ flexGrow: 1, padding: '8px' }}
+        />
+        <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
+      </form>
 
       <div className="user-list-table">
         <table className='job-table'>
           <thead>
             <tr>
-              <th>ID</th>
+              <th>No.</th>
               <th>Nama</th>
               <th>Email</th>
               <th>Peran</th>
@@ -42,10 +45,9 @@ const UserManagement = ({ users, onAddClick, onEditClick, onDeleteClick }) => {
             </tr>
           </thead>
           <tbody>
-            {/* Langsung gunakan prop 'users' untuk me-render tabel */}
-            {users.map(user => (
+            {users.map((user, index) => (
               <tr key={user.id}>
-                <td>{user.id}</td>
+                <td>{userData.from + index}</td>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>{user.role}</td>
@@ -60,6 +62,14 @@ const UserManagement = ({ users, onAddClick, onEditClick, onDeleteClick }) => {
           </tbody>
         </table>
       </div>
+      
+      {userData && (
+        <Pagination
+          currentPage={userData.current_page}
+          lastPage={userData.last_page}
+          onPageChange={onPageChange}
+        />
+      )}
     </div>
   );
 };

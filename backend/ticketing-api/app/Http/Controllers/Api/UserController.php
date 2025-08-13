@@ -10,9 +10,24 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return User::where('role', 'user')->orderBy('name')->get();
+        // Ambil parameter dari request
+        $search = $request->query('search');
+        $perPage = $request->query('per_page', 10); // Default 10 user per halaman
+
+        // Mulai query untuk user dengan peran 'user'
+        $query = User::where('role', 'user');
+
+        // Jika ada parameter pencarian, tambahkan filter nama
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        }
+
+        // Urutkan berdasarkan nama dan lakukan paginasi
+        $users = $query->orderBy('name')->paginate($perPage);
+
+        return response()->json($users);
     }
 
     public function store(Request $request)

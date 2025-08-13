@@ -48,6 +48,9 @@ function App() {
   const [currentPage, setCurrentPage] = useState('Tickets');
   const [dataPage, setDataPage] = useState(1);
   const [createdTicketsPage, setCreatedTicketsPage] = useState(1);
+  const [userData, setUserData] = useState(null);
+  const [userPage, setUserPage] = useState(1);
+  const [userSearchQuery, setUserSearchQuery] = useState('');
 
   // --- State untuk Fitur Pencarian ---
   const [searchInput, setSearchInput] = useState('');
@@ -119,6 +122,21 @@ function App() {
       console.error("Gagal mengambil tiket yang dibuat:", error);
     }
   };
+
+  const fetchUsers = useCallback(async (page = 1, search = '') => {
+    try {
+      let url = `${API_URL}/users?page=${page}`;
+      if (search) {
+        url += `&search=${search}`;
+      }
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${getToken()}` }
+      });
+      setUserData(response.data);
+    } catch (error) {
+      console.error("Gagal mengambil data pengguna:", error);
+    }
+  }, []);
 
 
   // -----------------------------------------------------------------
@@ -252,7 +270,7 @@ function App() {
         });
         alert(`User "${userToDelete.name}" berhasil dihapus.`);
         // PERBAIKAN: Refresh semua data ke halaman pertama setelah hapus
-        fetchData(1, '', null); 
+        fetchUsers(1, '', null); 
       } catch (error) {
         console.error("Gagal menghapus pengguna:", error);
         alert("Gagal menghapus pengguna.");
@@ -307,8 +325,8 @@ function App() {
       }
 
       // Refresh semua data ke halaman pertama setelah berhasil (kode ini sudah ada)
-      fetchData(1, '', null);
-      handleCloseUserForm(); // Tutup modal
+      fetchUsers(1, '', null); 
+      handleCloseUserForm();
 
     } catch (error) {
       console.error("Gagal menyimpan pengguna:", error);
@@ -323,6 +341,15 @@ function App() {
 
   const handlePageChange = (page) => {
     setDataPage(page);
+  };
+
+  const handleUserPageChange = (page) => {
+    setUserPage(page);
+  };
+
+  const handleUserSearch = (query) => {
+    setUserPage(1);
+    setUserSearchQuery(query);
   };
 
   const handleCreatedTicketsPageChange = (page) => {
@@ -362,6 +389,12 @@ function App() {
       fetchData(dataPage, searchQuery, statusFilter);
     }
   }, [isLogin, dataPage, searchQuery, statusFilter, fetchData]);
+
+  useEffect(() => {
+    if (isLogin && currentPage === 'userManagement') {
+      fetchUsers(userPage, userSearchQuery);
+    }
+  }, [isLogin, currentPage, userPage, userSearchQuery, fetchUsers]);
 
   // Efek untuk mengambil daftar tiket yang dibuat saat user di halaman "Add Ticket"
   useEffect(() => {
@@ -532,10 +565,12 @@ function App() {
           {/* Tampilan Halaman "User" (Hanya Admin) */}
           {currentPage === 'userManagement' && isAdmin && (
             <UserManagement 
-              users={users}
+              userData={userData} // Kirim seluruh objek data user
               onDeleteClick={handleUserDeleteClick}
               onAddClick={handleAddUserClick}
               onEditClick={handleUserEditClick}
+              onPageChange={handleUserPageChange} // Kirim handler paginasi
+              onSearch={handleUserSearch} // Kirim handler search
             />
           )}
 
