@@ -41,7 +41,7 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
     } else {
       setFormData({ name: '', email: '', password: '', password_confirmation: '' });
     }
-  }, [userToEdit]);
+  }, [userToEdit, isEditMode]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
