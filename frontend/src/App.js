@@ -88,6 +88,10 @@ function App() {
       if (search) {
         ticketsUrl += `&search=${search}`;
       }
+
+      if (status) {
+        ticketsUrl += `&status=${status}`;
+      }
       
       const [ticketsRes, usersRes, statsRes] = await Promise.all([
         axios.get(ticketsUrl, config),
@@ -547,7 +551,7 @@ function App() {
 
               <h3>Tiket yang Telah Anda Buat</h3>
               <div className="job-list" style={{ marginTop: '20px' }}>
-                <table>
+                <table className='job-table'>
                   <thead>
                     <tr>
                       <th>Pengirim</th>
