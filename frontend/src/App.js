@@ -76,51 +76,10 @@ function App() {
   }, []); // Dependency array kosong berarti fungsi ini hanya dibuat sekali
 
   // -----------------------------------------------------------------
-  // #2. SIDE EFFECTS (useEffect Hooks)
-  // -----------------------------------------------------------------
-  // Efek untuk mengambil data utama saat login, halaman, atau pencarian berubah
-
-  useEffect(() => {
-    if (isLogin) {
-      const currentUser = getUser();
-      if (currentUser) {
-        setUserRole(currentUser.role);
-        setUserName(currentUser.name);
-        setLoggedInUserId(currentUser.id);
-      }
-      fetchData(dataPage, searchQuery, statusFilter);
-    }
-  }, [isLogin, dataPage, searchQuery, statusFilter]);
-
-  // Efek untuk mengambil daftar tiket yang dibuat saat user di halaman "Add Ticket"
-  useEffect(() => {
-    if (isLogin && !isAdmin && currentPage === 'addTicket') {
-      fetchCreatedTickets(createdTicketsPage);
-    }
-  }, [isLogin, isAdmin, currentPage, createdTicketsPage]);
-
-  useEffect(() => {
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-    setDarkMode(savedDarkMode);
-  }, []);
-
-  useEffect(() => {
-    document.body.classList.toggle('dark-mode', darkMode);
-    localStorage.setItem('darkMode', darkMode); // Simpan preferensi mode gelap
-  }, [darkMode]);
-
-  // Efek untuk mengatur background gambar login menggunakan variabel CSS
-  useEffect(() => {
-    document.documentElement.style.setProperty('--auth-background-image-light', `url(${loginBackground})`);
-  }, []);
-
-
-
-  // -----------------------------------------------------------------
   // #3. DATA FETCHING FUNCTIONS (Fungsi Pengambilan Data)
   // -----------------------------------------------------------------
   // 1. Tambahkan parameter 'status' dengan nilai default null
-  const fetchData = async (page = 1, search = '', status = null) => {
+  const fetchData = useCallback(async (page = 1, search = '', status = null) => {
     try {
       const config = { headers: { Authorization: `Bearer ${getToken()}` } };
       let ticketsUrl = `${API_URL}/tickets?page=${page}`;
@@ -145,7 +104,7 @@ function App() {
         handleLogout();
       }
     }
-  };
+  },[]);
 
   const fetchCreatedTickets = async (page = 1) => {
     try {
@@ -287,6 +246,7 @@ function App() {
         await axios.delete(`${API_URL}/users/${userToDelete.id}`, { 
           headers: { Authorization: `Bearer ${getToken()}` } 
         });
+        alert(`User "${userToDelete.name}" berhasil dihapus.`);
         // PERBAIKAN: Refresh semua data ke halaman pertama setelah hapus
         fetchData(1, '', null); 
       } catch (error) {
@@ -326,17 +286,23 @@ function App() {
   const handleSaveUser = async (formData) => {
     const isEditMode = Boolean(userToEdit);
     const url = isEditMode ? `${API_URL}/users/${userToEdit.id}` : `${API_URL}/users`;
-    
-    // PERBAIKAN: Selalu gunakan 'post' untuk method. 
-    // Laravel akan membedakan antara 'buat baru' dan 'update' berdasarkan URL.
     const method = 'post';
 
     try {
-      await axios[method](url, formData, { 
+      // 1. Tangkap respons dari server untuk mendapatkan data user yang baru
+      const response = await axios[method](url, formData, { 
         headers: { Authorization: `Bearer ${getToken()}` } 
       });
 
-      // Refresh semua data ke halaman pertama setelah berhasil
+      // 2. Tampilkan notifikasi berdasarkan mode (edit atau tambah)
+      if (isEditMode) {
+        const updatedUserName = response.data.name;
+        alert(`User "${updatedUserName}" berhasil di-edit.`);
+      } else {
+        alert("User baru berhasil dibuat.");
+      }
+
+      // Refresh semua data ke halaman pertama setelah berhasil (kode ini sudah ada)
       fetchData(1, '', null);
       handleCloseUserForm(); // Tutup modal
 
@@ -376,7 +342,44 @@ function App() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  // -----------------------------------------------------------------
+  // #2. SIDE EFFECTS (useEffect Hooks)
+  // -----------------------------------------------------------------
+  // Efek untuk mengambil data utama saat login, halaman, atau pencarian berubah
 
+  useEffect(() => {
+    if (isLogin) {
+      const currentUser = getUser();
+      if (currentUser) {
+        setUserRole(currentUser.role);
+        setUserName(currentUser.name);
+        setLoggedInUserId(currentUser.id);
+      }
+      fetchData(dataPage, searchQuery, statusFilter);
+    }
+  }, [isLogin, dataPage, searchQuery, statusFilter, fetchData]);
+
+  // Efek untuk mengambil daftar tiket yang dibuat saat user di halaman "Add Ticket"
+  useEffect(() => {
+    if (isLogin && !isAdmin && currentPage === 'addTicket') {
+      fetchCreatedTickets(createdTicketsPage);
+    }
+  }, [isLogin, isAdmin, currentPage, createdTicketsPage]);
+
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    setDarkMode(savedDarkMode);
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle('dark-mode', darkMode);
+    localStorage.setItem('darkMode', darkMode); // Simpan preferensi mode gelap
+  }, [darkMode]);
+
+  // Efek untuk mengatur background gambar login menggunakan variabel CSS
+  useEffect(() => {
+    document.documentElement.style.setProperty('--auth-background-image-light', `url(${loginBackground})`);
+  }, []);
 
   // -----------------------------------------------------------------
   // #5. RENDER LOGIC (Logika untuk Menampilkan Komponen)
@@ -467,10 +470,40 @@ function App() {
           {currentPage === 'Tickets' && (
             <>
               <div className="info-cards-grid">
-                  <div className="info-card red-card"><h3>{stats ? stats.pending_tickets : '...'}</h3><p>Tiket Belum Selesai</p></div>
-                  <div className="info-card green-card"><h3>{stats ? stats.completed_tickets : '...'}</h3><p>Tiket Selesai</p></div>
-                  <div className="info-card yellow-card"><h3>{stats ? stats.total_tickets : '...'}</h3><p>Total Tiket</p></div>
-                  {isAdmin && (<div className="info-card blue-card"><h3>{stats ? stats.total_users : '...'}</h3><p>Total Pengguna</p></div>)}
+                {/* Kartu "Belum Selesai" */}
+                <div 
+                  className={`info-card red-card ${statusFilter === 'Belum Selesai' ? 'active' : ''}`}
+                  onClick={() => handleStatusFilterClick('Belum Selesai')}
+                >
+                  <h3>{stats ? stats.pending_tickets : '...'}</h3>
+                  <p>Tiket Belum Selesai</p>
+                </div>
+
+                {/* Kartu "Selesai" */}
+                <div 
+                  className={`info-card green-card ${statusFilter === 'Selesai' ? 'active' : ''}`}
+                  onClick={() => handleStatusFilterClick('Selesai')}
+                >
+                  <h3>{stats ? stats.completed_tickets : '...'}</h3>
+                  <p>Tiket Selesai</p>
+                </div>
+
+                {/* Kartu "Total Tiket" - klik ini untuk mereset filter */}
+                <div 
+                  className={`info-card yellow-card ${!statusFilter ? 'active' : ''}`}
+                  onClick={() => handleStatusFilterClick(null)}
+                >
+                  <h3>{stats ? stats.total_tickets : '...'}</h3>
+                  <p>Total Tiket</p>
+                </div>
+                
+                {/* Kartu "Total Pengguna" (tidak bisa diklik) */}
+                {isAdmin && (
+                  <div className="info-card blue-card">
+                    <h3>{stats ? stats.total_users : '...'}</h3>
+                    <p>Total Pengguna</p>
+                  </div>
+                )}
               </div>
               {isAdmin && (<JobForm users={users} addTicket={addTicket} />)}
               {isAdmin && (
@@ -495,6 +528,7 @@ function App() {
           {/* Tampilan Halaman "User" (Hanya Admin) */}
           {currentPage === 'userManagement' && isAdmin && (
             <UserManagement 
+              users={users}
               onDeleteClick={handleUserDeleteClick}
               onAddClick={handleAddUserClick}
               onEditClick={handleUserEditClick}
