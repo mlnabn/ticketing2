@@ -356,7 +356,6 @@ function App() {
     }
   }, [isLogin, currentPage, userPage, userSearchQuery, fetchUsers]); 
 
-  // PERBAIKAN: Efek ini sekarang akan mengambil data riwayat SETIAP KALI tab 'history' aktif
   useEffect(() => {
     if (isLogin && !isAdmin && userViewTab === 'history') {
       fetchCreatedTickets(createdTicketsPage);
@@ -400,6 +399,7 @@ function App() {
             <ul>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Tickets')} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-home"></i><span>Home</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>User</span></button></li>
+              <li className="sidebar-nav-item"><button className="sidebar-button"><i className="fas fa-chart-bar"></i><span>Laporan</span></button></li>
             </ul>
           </nav>
           <div className="sidebar-footer">
@@ -451,6 +451,9 @@ function App() {
             )}
           </div>
         </main>
+        {showConfirmModal && ticketToDelete && (<ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
+        {showUserConfirmModal && userToDelete && (<ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete.name}"?`} onConfirm={confirmUserDelete} onCancel={cancelUserDelete} />)}
+        {showUserFormModal && (<UserFormModal userToEdit={userToEdit} onClose={handleCloseUserForm} onSave={handleSaveUser}/>)}
       </div>
     );
   }
@@ -463,14 +466,8 @@ function App() {
           <div className="header-left-group">
             <img src={yourLogo} alt="Logo" className="header-logo"></img>
           </div>
-          {/* <div className="user-view-tabs">
-            <button className={`tab-button ${userViewTab === 'request' ? 'active' : ''}`} onClick={() => setUserViewTab('request')}>Request</button>
-            <button className={`tab-button ${userViewTab === 'history' ? 'active' : ''}`} onClick={() => setUserViewTab('history')}>History</button>
-          </div> */}
           <div className="main-header-controls">
             <span className="breadcrumb">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
-            
-            {/* PERUBAHAN: Tombol Dark Mode ditambahkan di sini */}
             <div className={`theme-switch ${darkMode ? 'dark' : ''}`} onClick={toggleDarkMode}>
                 <div className="theme-switch-ball">
                     {darkMode ? <i className="fas fa-moon moon-icon"></i> : <i className="fas fa-sun sun-icon"></i>}
