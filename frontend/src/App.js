@@ -30,8 +30,8 @@ function App() {
   // -----------------------------------------------------------------
   // --- State untuk Data dari API ---
   const [ticketData, setTicketData] = useState(null);
-  const [users, setUsers] = useState([]); // State ini sekarang KHUSUS untuk dropdown form
-  const [userData, setUserData] = useState(null); // State ini untuk tabel User Management (dengan paginasi)
+  const [users, setUsers] = useState([]); 
+  const [userData, setUserData] = useState(null); 
   const [stats, setStats] = useState(null);
   const [createdTicketsData, setCreatedTicketsData] = useState(null);
 
@@ -47,6 +47,7 @@ function App() {
 
   // --- State untuk Navigasi & Paginasi ---
   const [currentPage, setCurrentPage] = useState('Tickets');
+  const [userViewTab, setUserViewTab] = useState('request');
   const [dataPage, setDataPage] = useState(1);
   const [createdTicketsPage, setCreatedTicketsPage] = useState(1);
   const [userPage, setUserPage] = useState(1);
@@ -58,7 +59,7 @@ function App() {
 
   // --- State untuk Interaksi UI (Tampilan) ---
   const [darkMode, setDarkMode] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Default sidebar terbuka untuk admin
   const [showRegister, setShowRegister] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState(null);
@@ -81,7 +82,6 @@ function App() {
   // #3. DATA FETCHING FUNCTIONS (Fungsi Pengambilan Data)
   // -----------------------------------------------------------------
   
-  // Fungsi ini HANYA mengambil data tiket dan statistik
   const fetchData = useCallback(async (page = 1, search = '', status = null) => {
     try {
       const config = { headers: { Authorization: `Bearer ${getToken()}` } };
@@ -102,32 +102,30 @@ function App() {
     }
   },[]);
 
-  // FUNGSI BARU: Mengambil SEMUA pengguna untuk dropdown
   const fetchAllUsers = useCallback(async () => {
     try {
       const config = { headers: { Authorization: `Bearer ${getToken()}` } };
-      const response = await axios.get(`${API_URL}/users/all`, config); // Panggil endpoint baru
+      const response = await axios.get(`${API_URL}/users/all`, config); 
       if (Array.isArray(response.data)) {
-        setUsers(response.data); // Simpan array ke state 'users'
+        setUsers(response.data);
       }
     } catch (error) {
       console.error("Gagal mengambil daftar semua pengguna:", error);
     }
   }, []);
 
-  // Fungsi ini HANYA mengambil pengguna dengan paginasi untuk tabel User Management
   const fetchUsers = useCallback(async (page = 1, search = '') => {
     try {
       let url = `${API_URL}/users?page=${page}`;
       if (search) url += `&search=${search}`;
       const response = await axios.get(url, { headers: { Authorization: `Bearer ${getToken()}` } });
-      setUserData(response.data); // Simpan ke state 'userData'
+      setUserData(response.data);
     } catch (error) {
       console.error("Gagal mengambil data pengguna:", error);
     }
   }, []);
 
-  const fetchCreatedTickets = async (page = 1) => {
+  const fetchCreatedTickets = useCallback(async (page = 1) => {
     try {
       const config = { headers: { Authorization: `Bearer ${getToken()}` } };
       const response = await axios.get(`${API_URL}/tickets/created-by-me?page=${page}`, config);
@@ -135,43 +133,28 @@ function App() {
     } catch (error) {
       console.error("Gagal mengambil tiket yang dibuat:", error);
     }
-  };
+  }, []);
 
-  // ... (SEMUA FUNGSI HANDLER ANDA DARI #4 TETAP SAMA, TIDAK PERLU DIUBAH) ...
-  // Contoh: addTicket, updateTicketStatus, handleDeleteClick, dll.
-  // Sisipkan semua fungsi handler Anda di sini
-  
   // -----------------------------------------------------------------
   // #4. HANDLER FUNCTIONS (Fungsi untuk Menangani Aksi Pengguna)
   // -----------------------------------------------------------------
-  // Di dalam file App.js
-
   const addTicket = async (formData) => {
     try {
       await axios.post(`${API_URL}/tickets`, formData, { headers: { Authorization: `Bearer ${getToken()}` } });
       
       if (isAdmin) {
-        // Jika admin, reset pencarian dan kembali ke halaman 1 daftar utama
         setSearchInput('');
         setSearchQuery('');
         setStatusFilter(null);
         setDataPage(1);
+        setCurrentPage('Tickets');
       } else {
-        // Jika user, refresh daftar tiket yang dia buat ke halaman 1
         setCreatedTicketsPage(1);
-        // Panggil fetchCreatedTickets secara eksplisit untuk memastikan daftarnya ter-update
-        // bahkan sebelum navigasi (jika user tetap di halaman Add Ticket)
         fetchCreatedTickets(1);
+        setUserViewTab('history'); 
       }
       
-      // Panggil ulang fetchData untuk memuat ulang daftar tiket utama dan statistik
-      // Ini akan secara otomatis membawa admin ke halaman utama yang sudah di-refresh
       fetchData(1, '', null);
-
-      // Untuk admin, otomatis pindah ke halaman utama setelah menambah tiket
-      if (isAdmin) {
-        setCurrentPage('Tickets');
-      }
 
     } catch (error) {
       console.error("Gagal menambah tiket:", error);
@@ -181,9 +164,7 @@ function App() {
   const updateTicketStatus = async (id, newStatus) => {
     try {
       await axios.patch(`${API_URL}/tickets/${id}/status`, { status: newStatus }, { headers: { Authorization: `Bearer ${getToken()}` } });
-      // Refresh data di halaman saat ini
       fetchData(dataPage, searchQuery);
-      // Jika user, refresh juga daftar tiket yang dia buat (jika ada perubahan status di sana)
       if (!isAdmin) {
         fetchCreatedTickets(createdTicketsPage);
       }
@@ -191,12 +172,11 @@ function App() {
   };
 
   const handleStatusFilterClick = (status) => {
-    setStatusFilter(status); // Set filter status yang baru
-    setDataPage(1); // Selalu kembali ke halaman 1 saat filter baru diterapkan
+    setStatusFilter(status);
+    setDataPage(1);
   };
 
   const handleDeleteClick = (ticket) => {
-    // Fungsi ini sekarang menerima seluruh objek tiket
     if (ticket && ticket.id) {
       setTicketToDelete(ticket);
       setShowConfirmModal(true);
@@ -207,12 +187,10 @@ function App() {
     if (ticketToDelete) {
       try {
         await axios.delete(`${API_URL}/tickets/${ticketToDelete.id}`, { headers: { Authorization: `Bearer ${getToken()}` } });
-        // Setelah berhasil hapus, refresh kedua daftar data
         fetchData(dataPage, searchQuery);
-        fetchCreatedTickets(createdTicketsPage); // <-- PERUBAHAN: Refresh juga daftar ini
+        fetchCreatedTickets(createdTicketsPage);
       } catch (error) {
         console.error("Gagal hapus tiket:", error);
-        // Tambahan: Beri tahu user jika tidak diizinkan
         if (error.response && error.response.status === 403) {
           alert(error.response.data.error);
         }
@@ -232,22 +210,18 @@ function App() {
     setDataPage(1);
   };
 
-
   const handleBulkDelete = async () => {
     if (selectedTicketIds.length === 0) {
       alert("Pilih setidaknya satu tiket untuk dihapus.");
       return;
     }
-
-    // Tampilkan modal konfirmasi
     if (window.confirm(`Anda yakin ingin menghapus ${selectedTicketIds.length} tiket yang dipilih?`)) {
       try {
         await axios.post(`${API_URL}/tickets/bulk-delete`,
-          { ids: selectedTicketIds }, // Kirim array ID di dalam body request
+          { ids: selectedTicketIds },
           { headers: { Authorization: `Bearer ${getToken()}` } }
         );
-        // Refresh data setelah berhasil
-        fetchData(1, ''); // Kembali ke halaman 1
+        fetchData(1, '');
       } catch (error) {
         console.error("Gagal menghapus tiket secara massal:", error);
         alert("Terjadi kesalahan saat mencoba menghapus tiket.");
@@ -271,8 +245,7 @@ function App() {
           headers: { Authorization: `Bearer ${getToken()}` } 
         });
         alert(`User "${userToDelete.name}" berhasil dihapus.`);
-        // PERBAIKAN: Refresh semua data ke halaman pertama setelah hapus
-        fetchUsers(1, '', null); 
+        fetchUsers(1, ''); 
       } catch (error) {
         console.error("Gagal menghapus pengguna:", error);
         alert("Gagal menghapus pengguna.");
@@ -288,48 +261,36 @@ function App() {
     setUserToDelete(null);
   };
 
-  // Fungsi untuk membuka modal (mode 'tambah')
   const handleAddUserClick = () => {
-    setUserToEdit(null); // Pastikan null untuk mode tambah
+    setUserToEdit(null);
     setShowUserFormModal(true);
   };
 
-  // Fungsi untuk membuka modal (mode 'edit')
   const handleUserEditClick = (user) => {
     setUserToEdit(user);
     setShowUserFormModal(true);
   };
 
-  // Fungsi untuk menutup modal
   const handleCloseUserForm = () => {
     setShowUserFormModal(false);
     setUserToEdit(null);
   };
 
-  // Fungsi untuk menyimpan data (baik 'tambah' maupun 'edit')
   const handleSaveUser = async (formData) => {
     const isEditMode = Boolean(userToEdit);
     const url = isEditMode ? `${API_URL}/users/${userToEdit.id}` : `${API_URL}/users`;
     const method = 'post';
-
     try {
-      // 1. Tangkap respons dari server untuk mendapatkan data user yang baru
       const response = await axios[method](url, formData, { 
         headers: { Authorization: `Bearer ${getToken()}` } 
       });
-
-      // 2. Tampilkan notifikasi berdasarkan mode (edit atau tambah)
       if (isEditMode) {
-        const updatedUserName = response.data.name;
-        alert(`User "${updatedUserName}" berhasil di-edit.`);
+        alert(`User "${response.data.name}" berhasil di-edit.`);
       } else {
         alert("User baru berhasil dibuat.");
       }
-
-      // Refresh semua data ke halaman pertama setelah berhasil (kode ini sudah ada)
-      fetchUsers(1, '', null); 
+      fetchUsers(1, ''); 
       handleCloseUserForm();
-
     } catch (error) {
       console.error("Gagal menyimpan pengguna:", error);
       if (error.response && error.response.data.errors) {
@@ -341,27 +302,17 @@ function App() {
     }
   };
 
-  const handlePageChange = (page) => {
-    setDataPage(page);
-  };
-
-  const handleUserPageChange = (page) => {
-    setUserPage(page);
-  };
-
+  const handlePageChange = (page) => setDataPage(page);
+  const handleUserPageChange = (page) => setUserPage(page);
   const handleUserSearch = (query) => {
     setUserPage(1);
     setUserSearchQuery(query);
   };
-
-  const handleCreatedTicketsPageChange = (page) => {
-    setCreatedTicketsPage(page);
-  };
+  const handleCreatedTicketsPageChange = (page) => setCreatedTicketsPage(page);
 
   const handleLogout = () => {
     logout();
     setIsLogin(false);
-    // Reset semua state ke nilai awal
     setCurrentPage('Tickets');
     setDataPage(1);
     setTicketData(null);
@@ -371,15 +322,12 @@ function App() {
     setSearchInput('');
   };
   const toggleDarkMode = () => setDarkMode(!darkMode);
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   // -----------------------------------------------------------------
-  // #2. SIDE EFFECTS (useEffect Hooks) - BAGIAN INI TELAH DIPERBAIKI
+  // #2. SIDE EFFECTS (useEffect Hooks)
   // -----------------------------------------------------------------
   
-  // Efek untuk mengambil data tiket dan info user
   useEffect(() => {
     if (isLogin) {
       const currentUser = getUser();
@@ -388,33 +336,32 @@ function App() {
         setUserName(currentUser.name);
         setLoggedInUserId(currentUser.id);
       }
-      fetchData(dataPage, searchQuery, statusFilter);
+      if(isAdmin) {
+        fetchData(dataPage, searchQuery, statusFilter);
+      }
     }
-  }, [isLogin, dataPage, searchQuery, statusFilter, fetchData]);
+  }, [isLogin, dataPage, searchQuery, statusFilter, fetchData, isAdmin]);
 
-  // EFEK BARU: Mengambil SEMUA pengguna untuk form dropdown
   useEffect(() => {
-    const needsUserListForForm = (isAdmin && currentPage === 'Tickets') || currentPage === 'addTicket';
+    const needsUserListForForm = (isAdmin && currentPage === 'Tickets') || (!isAdmin && userViewTab === 'request');
     if (isLogin && needsUserListForForm) {
       fetchAllUsers();
     }
-  }, [isLogin, isAdmin, currentPage, fetchAllUsers]);
+  }, [isLogin, isAdmin, currentPage, userViewTab, fetchAllUsers]);
 
-  // EFEK BARU: Mengambil pengguna dengan paginasi untuk tabel User Management
   useEffect(() => {
     if (isLogin && currentPage === 'userManagement') {
       fetchUsers(userPage, userSearchQuery);
     }
   }, [isLogin, currentPage, userPage, userSearchQuery, fetchUsers]); 
 
-  // Efek untuk mengambil daftar tiket yang dibuat oleh user
+  // PERBAIKAN: Efek ini sekarang akan mengambil data riwayat SETIAP KALI tab 'history' aktif
   useEffect(() => {
-    if (isLogin && !isAdmin && currentPage === 'addTicket') {
+    if (isLogin && !isAdmin && userViewTab === 'history') {
       fetchCreatedTickets(createdTicketsPage);
     }
-  }, [isLogin, isAdmin, currentPage, createdTicketsPage, fetchCreatedTickets]); // Tambahkan fetchCreatedTickets ke dependensi
+  }, [isLogin, isAdmin, userViewTab, createdTicketsPage, fetchCreatedTickets]);
 
-  // Efek untuk mode gelap dan background
   useEffect(() => {
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
     setDarkMode(savedDarkMode);
@@ -440,202 +387,156 @@ function App() {
     );
   }
 
-  // ... (BAGIAN JSX ANDA DARI return (...) TETAP SAMA, TIDAK PERLU DIUBAH) ...
-  // Cukup salin dan tempel bagian JSX Anda yang sudah ada di sini.
-  return (
-    <div className={`dashboard-container ${!isSidebarOpen ? 'sidebar-closed' : ''}`}>
-      <aside className={`sidebar ${!isSidebarOpen ? 'closed' : ''}`}>
-        <div className="sidebar-header">
-          <img
-            src={yourLogo}
-            alt="Helpdesk Tiketing Logo"
-            className="sidebar-logo"
-          />
-        </div>
-        <nav className="sidebar-nav">
-          <ul>
-            {isAdmin && (
-              <>
-                <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Tickets')} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-home"></i><span>Home</span></button></li>
-                <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>User</span></button></li>
-              </>
-            )}
-            {!isAdmin && (
-              <>
-                <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Tickets')} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-ticket-alt"></i><span>Tickets</span></button></li>
-                <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('addTicket')} className={`sidebar-button ${currentPage === 'addTicket' ? 'active' : ''}`}><i className="fas fa-plus-circle"></i><span>Add Ticket</span></button></li>
-              </>
-            )}
-            <li className="sidebar-nav-item"><button className="sidebar-button"><i className="fas fa-chart-bar"></i><span>Laporan</span></button></li>
-          </ul>
-        </nav>
-        <div className="sidebar-footer">
-          <div className="user-info">
-            <div className="user-avatar"><i className="fas fa-user"></i></div>
-            <span>{userName || 'User'}</span>
-
-            <div className={`dark-mode-toggle ${darkMode ? 'dark' : ''}`} onClick={toggleDarkMode}>
-              <div className="dark-mode-toggle-ball">
-                {darkMode ? (
-                  <>
-                    <i className="fas fa-moon moon-icon"></i>
-                  </>
-                ) : (
-                  <i className="fas fa-sun sun-icon"></i>
-                )}
+  // Tampilan untuk ADMIN
+  if (isAdmin) {
+    return (
+      <div className={`dashboard-container ${isSidebarOpen ? '' : 'sidebar-closed'}`}>
+        <aside className={`sidebar ${!isSidebarOpen ? 'closed' : ''}`}>
+          <div className="sidebar-header">
+            <img src={yourLogo} alt="Logo" className="sidebar-logo" />
+          </div>
+          <nav className="sidebar-nav">
+            <ul>
+              <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Tickets')} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-home"></i><span>Home</span></button></li>
+              <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>User</span></button></li>
+              <li className="sidebar-nav-item"><button className="sidebar-button"><i className="fas fa-chart-bar"></i><span>Laporan</span></button></li>
+            </ul>
+          </nav>
+          <div className="sidebar-footer">
+            <div className="user-info">
+              <div className="user-avatar"><i className="fas fa-user"></i></div>
+              <span>{userName || 'User'}</span>
+              <div className={`dark-mode-toggle ${darkMode ? 'dark' : ''}`} onClick={toggleDarkMode}>
+                <div className="dark-mode-toggle-ball">
+                  {darkMode ? <i className="fas fa-moon moon-icon"></i> : <i className="fas fa-sun sun-icon"></i>}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </aside>
+        </aside>
 
-      <main className="main-content">
-        <header className="main-header">
-          <div className="header-left-group">
-            <button className="hamburger-menu-button" onClick={toggleSidebar}><i className="fas fa-bars"></i></button>
-            <h1 className="dashboard-header-title">{isAdmin ? 'Admin Dashboard' : 'My Dashboard'}</h1>
-          </div>
-          <div className="main-header-controls">
-            <span className="breadcrumb">Home / {currentPage.replace('add', 'Add ')}</span>
-            <button onClick={handleLogout} className="logout-button">
-              <i className="fas fa-sign-out-alt"></i>
-            </button>
-          </div>
-        </header>
+        <main className="main-content">
+          <header className="main-header">
+            <div className="header-left-group">
+              <button className="hamburger-menu-button" onClick={toggleSidebar}><i className="fas fa-bars"></i></button>
+              <h1 className="dashboard-header-title">Admin Dashboard</h1>
+            </div>
+            <div className="main-header-controls">
+              <span className="breadcrumb">Home / {currentPage}</span>
+              <button onClick={handleLogout} className="logout-button"><i className="fas fa-sign-out-alt"></i></button>
+            </div>
+          </header>
 
-        <div className="content-area">
-          {currentPage === 'Tickets' && (
-            <>
-              <div className="info-cards-grid">
-                <div 
-                  className={`info-card red-card ${statusFilter === 'Belum Selesai' ? 'active' : ''}`}
-                  onClick={() => handleStatusFilterClick('Belum Selesai')}
-                >
-                  <h3>{stats ? stats.pending_tickets : '...'}</h3>
-                  <p>Tiket Belum Selesai</p>
+          <div className="content-area">
+            {currentPage === 'Tickets' && (
+              <>
+                <div className="info-cards-grid">
+                  <div className={`info-card red-card ${statusFilter === 'Belum Selesai' ? 'active' : ''}`} onClick={() => handleStatusFilterClick('Belum Selesai')}><h3>{stats ? stats.pending_tickets : '...'}</h3><p>Tiket Belum Selesai</p></div>
+                  <div className={`info-card green-card ${statusFilter === 'Selesai' ? 'active' : ''}`} onClick={() => handleStatusFilterClick('Selesai')}><h3>{stats ? stats.completed_tickets : '...'}</h3><p>Tiket Selesai</p></div>
+                  <div className={`info-card yellow-card ${!statusFilter ? 'active' : ''}`} onClick={() => handleStatusFilterClick(null)}><h3>{stats ? stats.total_tickets : '...'}</h3><p>Total Tiket</p></div>
+                  <div className="info-card blue-card"><h3>{stats ? stats.total_users : '...'}</h3><p>Total Pengguna</p></div>
                 </div>
-                <div 
-                  className={`info-card green-card ${statusFilter === 'Selesai' ? 'active' : ''}`}
-                  onClick={() => handleStatusFilterClick('Selesai')}
-                >
-                  <h3>{stats ? stats.completed_tickets : '...'}</h3>
-                  <p>Tiket Selesai</p>
-                </div>
-                <div 
-                  className={`info-card yellow-card ${!statusFilter ? 'active' : ''}`}
-                  onClick={() => handleStatusFilterClick(null)}
-                >
-                  <h3>{stats ? stats.total_tickets : '...'}</h3>
-                  <p>Total Tiket</p>
-                </div>
-                {isAdmin && (
-                  <div className="info-card blue-card">
-                    <h3>{stats ? stats.total_users : '...'}</h3>
-                    <p>Total Pengguna</p>
-                  </div>
-                )}
-              </div>
-              {isAdmin && (<JobForm users={users} addTicket={addTicket} />)}
-              {isAdmin && (
+                <JobForm users={users} addTicket={addTicket} />
                 <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
                   <input type="text" placeholder="Cari berdasarkan nama pekerja..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} style={{ flexGrow: 1, padding: '8px' }} />
                   <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
                 </form>
-              )}
-              {isAdmin && selectedTicketIds.length > 0 && (
-                <div className="bulk-action-bar" style={{ margin: '20px 0' }}>
-                  <button onClick={handleBulkDelete} className="btn-delete">
-                    Hapus {selectedTicketIds.length} Tiket yang Dipilih
-                  </button>
+                {selectedTicketIds.length > 0 && (<div className="bulk-action-bar" style={{ margin: '20px 0' }}><button onClick={handleBulkDelete} className="btn-delete">Hapus {selectedTicketIds.length} Tiket yang Dipilih</button></div>)}
+                <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} loggedInUserId={loggedInUserId} userRole={userRole} onSelectionChange={handleSelectionChange} />
+                <Pagination currentPage={dataPage} lastPage={ticketData ? ticketData.last_page : 1} onPageChange={handlePageChange} />
+              </>
+            )}
+            {currentPage === 'userManagement' && (
+              <UserManagement userData={userData} onDeleteClick={handleUserDeleteClick} onAddClick={handleAddUserClick} onEditClick={handleUserEditClick} onPageChange={handleUserPageChange} onSearch={handleUserSearch} />
+            )}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Tampilan untuk USER BIASA (tanpa sidebar)
+  return (
+    <div className="dashboard-container no-sidebar">
+      <main className="main-content">
+        <header className="main-header">
+          <div className="header-left-group">
+            <img src={yourLogo} alt="Logo" className="header-logo"></img>
+          </div>
+          <div className="user-view-tabs">
+            <button className={`tab-button ${userViewTab === 'request' ? 'active' : ''}`} onClick={() => setUserViewTab('request')}>Request</button>
+            <button className={`tab-button ${userViewTab === 'history' ? 'active' : ''}`} onClick={() => setUserViewTab('history')}>History</button>
+          </div>
+          <div className="main-header-controls">
+            <span className="breadcrumb">Home / {userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
+            <button onClick={handleLogout} className="logout-button"><i className="fas fa-sign-out-alt"></i></button>
+          </div>
+        </header>
+
+        {/* <div className="user-view-tabs">
+          <button className={`tab-button ${userViewTab === 'request' ? 'active' : ''}`} onClick={() => setUserViewTab('request')}>Request</button>
+          <button className={`tab-button ${userViewTab === 'history' ? 'active' : ''}`} onClick={() => setUserViewTab('history')}>History</button>
+        </div> */}
+
+        <div className="content-area">
+          <div className="user-view-container">
+            <div className="user-view-content">
+              {userViewTab === 'request' && (
+                <div className="request-tab">
+                  <h2>Tambah Tiket Baru</h2>
+                  <p>Silakan isi detail pekerjaan di bawah ini.</p>
+                  <br />
+                  <JobForm users={users} addTicket={addTicket} />
                 </div>
               )}
-              <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} loggedInUserId={loggedInUserId} userRole={userRole} onSelectionChange={handleSelectionChange} />
-              <Pagination currentPage={dataPage} lastPage={ticketData ? ticketData.last_page : 1} onPageChange={handlePageChange} />
-            </>
-          )}
 
-          {currentPage === 'userManagement' && isAdmin && (
-            <UserManagement 
-              userData={userData}
-              onDeleteClick={handleUserDeleteClick}
-              onAddClick={handleAddUserClick}
-              onEditClick={handleUserEditClick}
-              onPageChange={handleUserPageChange}
-              onSearch={handleUserSearch}
-            />
-          )}
-
-          {!isAdmin && currentPage === 'addTicket' && (
-            <>
-              <h2>Tambah Tiket Baru</h2>
-              <p>Silakan isi detail pekerjaan di bawah ini.</p>
-              <br />
-              <JobForm users={users} addTicket={addTicket} />
-
-              <div className="divider" style={{ margin: '40px 0', borderTop: '1px solid #444' }}></div>
-
-              <h3>Tiket yang Telah Anda Buat</h3>
-              <div className="job-list" style={{ marginTop: '20px' }}>
-                <table className='job-table'>
-                  <thead>
-                    <tr>
-                      <th>Pengirim</th>
-                      <th>Ditugaskan Kepada</th>
-                      <th>Deskripsi</th>
-                      <th>Workshop</th>
-                      <th>Status</th>
-                      <th>Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {createdTicketsOnPage.length > 0 ? (
-                      createdTicketsOnPage.map(ticket => (
-                        <tr key={ticket.id}>
-                          <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
-                          <td>{ticket.user.name}</td>
-                          <td>{ticket.title}</td>
-                          <td>{ticket.workshop}</td>
-                          <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
-                          <td>
-                            <button
-                              onClick={() => handleDeleteClick(ticket)}
-                              className="btn-delete"
-                            >
-                              Delete
-                            </button>
-                          </td>
+              {userViewTab === 'history' && (
+                <div className="history-tab">
+                  <h2>Tiket yang Telah Anda Buat</h2>
+                  <div className="job-list" style={{ marginTop: '20px' }}>
+                    <table className='job-table'>
+                      <thead>
+                        <tr>
+                          <th>Pengirim</th>
+                          <th>Ditugaskan Kepada</th>
+                          <th>Deskripsi</th>
+                          <th>Workshop</th>
+                          <th>Status</th>
+                          <th>Aksi</th>
                         </tr>
-                      ))
-                    ) : (
-                      <tr><td colSpan="6">Anda belum membuat tiket untuk pengguna lain.</td></tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
-              <Pagination currentPage={createdTicketsPage} lastPage={createdTicketsData ? createdTicketsData.last_page : 1} onPageChange={handleCreatedTicketsPageChange} />
-            </>
-          )}
+                      </thead>
+                      <tbody>
+                        {!createdTicketsData ? (
+                          <tr><td colSpan="6">Memuat riwayat tiket...</td></tr>
+                        ) : createdTicketsOnPage.length > 0 ? (
+                          createdTicketsOnPage.map(ticket => (
+                            <tr key={ticket.id}>
+                              <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
+                              <td>{ticket.user.name}</td>
+                              <td>{ticket.title}</td>
+                              <td>{ticket.workshop}</td>
+                              <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
+                              <td><button onClick={() => handleDeleteClick(ticket)} className="btn-delete">Delete</button></td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr><td colSpan="6">Anda belum membuat tiket.</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                  <Pagination currentPage={createdTicketsPage} lastPage={createdTicketsData ? createdTicketsData.last_page : 1} onPageChange={handleCreatedTicketsPageChange} />
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </main>
 
-      {showConfirmModal && ticketToDelete && (
-        <ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />
-      )}
-      {showUserConfirmModal && userToDelete && (
-        <ConfirmationModal 
-          message={`Anda yakin ingin menghapus pengguna "${userToDelete.name}"?`} 
-          onConfirm={confirmUserDelete} 
-          onCancel={cancelUserDelete} 
-        />
-      )}
-      {showUserFormModal && (
-        <UserFormModal
-          userToEdit={userToEdit}
-          onClose={handleCloseUserForm}
-          onSave={handleSaveUser}
-        />
-      )}
+      {/* Modal tidak berubah, tetap ada untuk kedua peran */}
+      {showConfirmModal && ticketToDelete && (<ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
+      {showUserConfirmModal && userToDelete && (<ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete.name}"?`} onConfirm={confirmUserDelete} onCancel={cancelUserDelete} />)}
+      {showUserFormModal && (<UserFormModal userToEdit={userToEdit} onClose={handleCloseUserForm} onSave={handleSaveUser}/>)}
     </div>
   );
 }

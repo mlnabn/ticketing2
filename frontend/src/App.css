@@ -2595,3 +2595,118 @@ body.dark-mode .btn-delete:hover {
   }
 }
 
+/* =================================================================
+   PERUBAHAN UTAMA: TATA LETAK UNTUK USER (TANPA SIDEBAR)
+   Tambahkan ini untuk mengatur layout utama saat user login.
+================================================================= */
+
+/* Layout untuk user (tanpa sidebar) */
+.dashboard-container.no-sidebar {
+  display: block; /* Mengubah dari grid ke block agar tidak ada kolom sidebar */
+}
+
+/* Di layout no-sidebar, main-content tidak perlu margin-left */
+.dashboard-container.no-sidebar .main-content {
+  margin-left: 0;
+}
+
+/* Logo di header untuk user agar header tidak kosong */
+.header-logo {
+  height: 40px; 
+}
+
+
+/* =================================================================
+   USER VIEW: NAVIGASI TAB BARU ("Request" & "History")
+   Gaya untuk tombol navigasi utama di halaman user.
+================================================================= */
+.user-view-tabs {
+  display: flex;
+  justify-content: center;
+  /* gap: 2rem;
+  padding: 1.5rem 0; */
+  /* border-bottom: 1px solid var(--border-color-light); */
+}
+
+body.dark-mode .user-view-tabs {
+  background-color: var(--content-bg-dark);
+  border-bottom-color: var(--border-color-dark);
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #888;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.3s;
+}
+
+.tab-button:hover {
+  color: var(--primary-color, #3b82f6); /* Menggunakan variabel primary color Anda */
+}
+
+.tab-button.active {
+  color: var(--primary-color, #3b82f6);
+}
+
+/* Garis bawah untuk tab yang aktif */
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; /* Disesuaikan agar pas dengan padding */
+  left: 1rem;
+  right: 1rem;
+  height: 3px;
+  background-color: var(--primary-color, #3b82f6);
+  border-radius: 2px;
+}
+
+/* =================================================================
+   USER VIEW: PENATAAN KONTEN
+   Gaya untuk membungkus konten di dalam tab Request & History.
+================================================================= */
+.user-view-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  width: 100%;
+}
+
+.request-tab, .history-tab {
+  background-color: var(--content-bg-light);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+body.dark-mode .request-tab, 
+body.dark-mode .history-tab {
+  background-color: var(--content-bg-dark);
+}
+
+.request-tab h2, .history-tab h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-color-light);
+}
+
+body.dark-mode .request-tab h2, 
+body.dark-mode .history-tab h2 {
+  color: var(--text-color-dark);
+}
+
+.request-tab p {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--placeholder-color-light);
+}
+
+body.dark-mode .request-tab p {
+  color: var(--placeholder-color-dark);
+}
