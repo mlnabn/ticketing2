@@ -406,8 +406,8 @@ function App() {
             <div className="user-info">
               <div className="user-avatar"><i className="fas fa-user"></i></div>
               <span>{userName || 'User'}</span>
-              <div className={`dark-mode-toggle ${darkMode ? 'dark' : ''}`} onClick={toggleDarkMode}>
-                <div className="dark-mode-toggle-ball">
+              <div className={`theme-switch ${darkMode ? 'dark' : ''}`} onClick={toggleDarkMode}>
+                <div className="theme-switch-ball">
                   {darkMode ? <i className="fas fa-moon moon-icon"></i> : <i className="fas fa-sun sun-icon"></i>}
                 </div>
               </div>
