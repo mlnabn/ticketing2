@@ -30,6 +30,16 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    public function all()
+    {
+        // DIUBAH: Tambahkan ->where('role', 'user') untuk hanya mengambil user biasa.
+        $users = User::where('role', 'user')
+                    ->orderBy('name')
+                    ->get();
+
+        return response()->json($users);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

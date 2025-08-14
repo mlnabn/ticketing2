@@ -30,7 +30,8 @@ function App() {
   // -----------------------------------------------------------------
   // --- State untuk Data dari API ---
   const [ticketData, setTicketData] = useState(null);
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]); // State ini sekarang KHUSUS untuk dropdown form
+  const [userData, setUserData] = useState(null); // State ini untuk tabel User Management (dengan paginasi)
   const [stats, setStats] = useState(null);
   const [createdTicketsData, setCreatedTicketsData] = useState(null);
 
@@ -42,13 +43,12 @@ function App() {
   const [userToDelete, setUserToDelete] = useState(null);
   const [showUserConfirmModal, setShowUserConfirmModal] = useState(false);
   const [showUserFormModal, setShowUserFormModal] = useState(false);
-  const [userToEdit, setUserToEdit] = useState(null); // null untuk 'tambah', objek user untuk 'edit'
+  const [userToEdit, setUserToEdit] = useState(null);
 
   // --- State untuk Navigasi & Paginasi ---
   const [currentPage, setCurrentPage] = useState('Tickets');
   const [dataPage, setDataPage] = useState(1);
   const [createdTicketsPage, setCreatedTicketsPage] = useState(1);
-  const [userData, setUserData] = useState(null);
   const [userPage, setUserPage] = useState(1);
   const [userSearchQuery, setUserSearchQuery] = useState('');
 
@@ -69,49 +69,63 @@ function App() {
   // -----------------------------------------------------------------
   // #1.A. VARIABEL TURUNAN (Derived State)
   // -----------------------------------------------------------------
-  // Variabel yang nilainya diturunkan dari state, dideklarasikan sebelum digunakan.
   const isAdmin = userRole && userRole.toLowerCase() === 'admin';
   const ticketsOnPage = useMemo(() => (ticketData ? ticketData.data : []), [ticketData]);
   const createdTicketsOnPage = useMemo(() => (createdTicketsData ? createdTicketsData.data : []), [createdTicketsData]);
 
   const handleSelectionChange = useCallback((selectedIds) => {
     setSelectedTicketIds(selectedIds);
-  }, []); // Dependency array kosong berarti fungsi ini hanya dibuat sekali
+  }, []);
 
   // -----------------------------------------------------------------
   // #3. DATA FETCHING FUNCTIONS (Fungsi Pengambilan Data)
   // -----------------------------------------------------------------
-  // 1. Tambahkan parameter 'status' dengan nilai default null
+  
+  // Fungsi ini HANYA mengambil data tiket dan statistik
   const fetchData = useCallback(async (page = 1, search = '', status = null) => {
     try {
       const config = { headers: { Authorization: `Bearer ${getToken()}` } };
       let ticketsUrl = `${API_URL}/tickets?page=${page}`;
-
-      // Logika untuk search tidak berubah
-      if (search) {
-        ticketsUrl += `&search=${search}`;
-      }
-
-      if (status) {
-        ticketsUrl += `&status=${status}`;
-      }
+      if (search) ticketsUrl += `&search=${search}`;
+      if (status) ticketsUrl += `&status=${status}`;
       
-      const [ticketsRes, usersRes, statsRes] = await Promise.all([
+      const [ticketsRes, statsRes] = await Promise.all([
         axios.get(ticketsUrl, config),
-        axios.get(`${API_URL}/users`, config),
         axios.get(`${API_URL}/tickets/stats`, config)
       ]);
 
       setTicketData(ticketsRes.data);
-      setUsers(usersRes.data);
       setStats(statsRes.data);
     } catch (error) {
       console.error("Gagal mengambil data utama:", error);
-      if (error.response && error.response.status === 401) {
-        handleLogout();
-      }
+      if (error.response && error.response.status === 401) handleLogout();
     }
   },[]);
+
+  // FUNGSI BARU: Mengambil SEMUA pengguna untuk dropdown
+  const fetchAllUsers = useCallback(async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${getToken()}` } };
+      const response = await axios.get(`${API_URL}/users/all`, config); // Panggil endpoint baru
+      if (Array.isArray(response.data)) {
+        setUsers(response.data); // Simpan array ke state 'users'
+      }
+    } catch (error) {
+      console.error("Gagal mengambil daftar semua pengguna:", error);
+    }
+  }, []);
+
+  // Fungsi ini HANYA mengambil pengguna dengan paginasi untuk tabel User Management
+  const fetchUsers = useCallback(async (page = 1, search = '') => {
+    try {
+      let url = `${API_URL}/users?page=${page}`;
+      if (search) url += `&search=${search}`;
+      const response = await axios.get(url, { headers: { Authorization: `Bearer ${getToken()}` } });
+      setUserData(response.data); // Simpan ke state 'userData'
+    } catch (error) {
+      console.error("Gagal mengambil data pengguna:", error);
+    }
+  }, []);
 
   const fetchCreatedTickets = async (page = 1) => {
     try {
@@ -123,22 +137,10 @@ function App() {
     }
   };
 
-  const fetchUsers = useCallback(async (page = 1, search = '') => {
-    try {
-      let url = `${API_URL}/users?page=${page}`;
-      if (search) {
-        url += `&search=${search}`;
-      }
-      const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${getToken()}` }
-      });
-      setUserData(response.data);
-    } catch (error) {
-      console.error("Gagal mengambil data pengguna:", error);
-    }
-  }, []);
-
-
+  // ... (SEMUA FUNGSI HANDLER ANDA DARI #4 TETAP SAMA, TIDAK PERLU DIUBAH) ...
+  // Contoh: addTicket, updateTicketStatus, handleDeleteClick, dll.
+  // Sisipkan semua fungsi handler Anda di sini
+  
   // -----------------------------------------------------------------
   // #4. HANDLER FUNCTIONS (Fungsi untuk Menangani Aksi Pengguna)
   // -----------------------------------------------------------------
@@ -374,10 +376,10 @@ function App() {
   };
 
   // -----------------------------------------------------------------
-  // #2. SIDE EFFECTS (useEffect Hooks)
+  // #2. SIDE EFFECTS (useEffect Hooks) - BAGIAN INI TELAH DIPERBAIKI
   // -----------------------------------------------------------------
-  // Efek untuk mengambil data utama saat login, halaman, atau pencarian berubah
-
+  
+  // Efek untuk mengambil data tiket dan info user
   useEffect(() => {
     if (isLogin) {
       const currentUser = getUser();
@@ -390,19 +392,29 @@ function App() {
     }
   }, [isLogin, dataPage, searchQuery, statusFilter, fetchData]);
 
+  // EFEK BARU: Mengambil SEMUA pengguna untuk form dropdown
+  useEffect(() => {
+    const needsUserListForForm = (isAdmin && currentPage === 'Tickets') || currentPage === 'addTicket';
+    if (isLogin && needsUserListForForm) {
+      fetchAllUsers();
+    }
+  }, [isLogin, isAdmin, currentPage, fetchAllUsers]);
+
+  // EFEK BARU: Mengambil pengguna dengan paginasi untuk tabel User Management
   useEffect(() => {
     if (isLogin && currentPage === 'userManagement') {
       fetchUsers(userPage, userSearchQuery);
     }
-  }, [isLogin, currentPage, userPage, userSearchQuery, fetchUsers]);
+  }, [isLogin, currentPage, userPage, userSearchQuery, fetchUsers]); 
 
-  // Efek untuk mengambil daftar tiket yang dibuat saat user di halaman "Add Ticket"
+  // Efek untuk mengambil daftar tiket yang dibuat oleh user
   useEffect(() => {
     if (isLogin && !isAdmin && currentPage === 'addTicket') {
       fetchCreatedTickets(createdTicketsPage);
     }
-  }, [isLogin, isAdmin, currentPage, createdTicketsPage]);
+  }, [isLogin, isAdmin, currentPage, createdTicketsPage, fetchCreatedTickets]); // Tambahkan fetchCreatedTickets ke dependensi
 
+  // Efek untuk mode gelap dan background
   useEffect(() => {
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
     setDarkMode(savedDarkMode);
@@ -410,10 +422,9 @@ function App() {
 
   useEffect(() => {
     document.body.classList.toggle('dark-mode', darkMode);
-    localStorage.setItem('darkMode', darkMode); // Simpan preferensi mode gelap
+    localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);
 
-  // Efek untuk mengatur background gambar login menggunakan variabel CSS
   useEffect(() => {
     document.documentElement.style.setProperty('--auth-background-image-light', `url(${loginBackground})`);
   }, []);
@@ -429,12 +440,11 @@ function App() {
     );
   }
 
+  // ... (BAGIAN JSX ANDA DARI return (...) TETAP SAMA, TIDAK PERLU DIUBAH) ...
+  // Cukup salin dan tempel bagian JSX Anda yang sudah ada di sini.
   return (
     <div className={`dashboard-container ${!isSidebarOpen ? 'sidebar-closed' : ''}`}>
-      {/* Sidebar tidak berubah */}
       <aside className={`sidebar ${!isSidebarOpen ? 'closed' : ''}`}>
-        {/* ... isi sidebar Anda ... */}
-        {/* Kode Sidebar Anda dari sebelumnya tidak perlu diubah */}
         <div className="sidebar-header">
           <img
             src={yourLogo}
@@ -466,25 +476,20 @@ function App() {
 
             <div className={`dark-mode-toggle ${darkMode ? 'dark' : ''}`} onClick={toggleDarkMode}>
               <div className="dark-mode-toggle-ball">
-                {/* Ikon untuk bulan dan bintang (saat dark mode aktif) */}
                 {darkMode ? (
                   <>
                     <i className="fas fa-moon moon-icon"></i>
-                    {/* <i className="fas fa-star star-icon star-1"></i>
-                    <i className="fas fa-star star-icon star-2"></i> */}
                   </>
                 ) : (
-                  <i className="fas fa-sun sun-icon"></i> /* Icon matahari (saat light mode aktif) */
+                  <i className="fas fa-sun sun-icon"></i>
                 )}
               </div>
             </div>
           </div>
-
         </div>
       </aside>
 
       <main className="main-content">
-        {/* Header tidak berubah */}
         <header className="main-header">
           <div className="header-left-group">
             <button className="hamburger-menu-button" onClick={toggleSidebar}><i className="fas fa-bars"></i></button>
@@ -492,10 +497,6 @@ function App() {
           </div>
           <div className="main-header-controls">
             <span className="breadcrumb">Home / {currentPage.replace('add', 'Add ')}</span>
-            {/* <button className="header-icon-button"><i className="fas fa-cog"></i></button> */}
-            {/* <button onClick={handleLogout} className="logout-button"><i className="fas fa-sign-out-alt"></i><span>Logout</span></button> */}
-
-
             <button onClick={handleLogout} className="logout-button">
               <i className="fas fa-sign-out-alt"></i>
             </button>
@@ -503,11 +504,9 @@ function App() {
         </header>
 
         <div className="content-area">
-          {/* Tampilan Halaman Utama (Tickets/Home) */}
           {currentPage === 'Tickets' && (
             <>
               <div className="info-cards-grid">
-                {/* Kartu "Belum Selesai" */}
                 <div 
                   className={`info-card red-card ${statusFilter === 'Belum Selesai' ? 'active' : ''}`}
                   onClick={() => handleStatusFilterClick('Belum Selesai')}
@@ -515,8 +514,6 @@ function App() {
                   <h3>{stats ? stats.pending_tickets : '...'}</h3>
                   <p>Tiket Belum Selesai</p>
                 </div>
-
-                {/* Kartu "Selesai" */}
                 <div 
                   className={`info-card green-card ${statusFilter === 'Selesai' ? 'active' : ''}`}
                   onClick={() => handleStatusFilterClick('Selesai')}
@@ -524,8 +521,6 @@ function App() {
                   <h3>{stats ? stats.completed_tickets : '...'}</h3>
                   <p>Tiket Selesai</p>
                 </div>
-
-                {/* Kartu "Total Tiket" - klik ini untuk mereset filter */}
                 <div 
                   className={`info-card yellow-card ${!statusFilter ? 'active' : ''}`}
                   onClick={() => handleStatusFilterClick(null)}
@@ -533,8 +528,6 @@ function App() {
                   <h3>{stats ? stats.total_tickets : '...'}</h3>
                   <p>Total Tiket</p>
                 </div>
-                
-                {/* Kartu "Total Pengguna" (tidak bisa diklik) */}
                 {isAdmin && (
                   <div className="info-card blue-card">
                     <h3>{stats ? stats.total_users : '...'}</h3>
@@ -549,7 +542,6 @@ function App() {
                   <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
                 </form>
               )}
-              {/* Tombol Hapus Massal hanya untuk admin dan jika ada tiket yang dipilih */}
               {isAdmin && selectedTicketIds.length > 0 && (
                 <div className="bulk-action-bar" style={{ margin: '20px 0' }}>
                   <button onClick={handleBulkDelete} className="btn-delete">
@@ -562,19 +554,17 @@ function App() {
             </>
           )}
 
-          {/* Tampilan Halaman "User" (Hanya Admin) */}
           {currentPage === 'userManagement' && isAdmin && (
             <UserManagement 
-              userData={userData} // Kirim seluruh objek data user
+              userData={userData}
               onDeleteClick={handleUserDeleteClick}
               onAddClick={handleAddUserClick}
               onEditClick={handleUserEditClick}
-              onPageChange={handleUserPageChange} // Kirim handler paginasi
-              onSearch={handleUserSearch} // Kirim handler search
+              onPageChange={handleUserPageChange}
+              onSearch={handleUserSearch}
             />
           )}
 
-          {/* Tampilan Halaman "Add Ticket" (Hanya User) */}
           {!isAdmin && currentPage === 'addTicket' && (
             <>
               <h2>Tambah Tiket Baru</h2>
@@ -594,7 +584,7 @@ function App() {
                       <th>Deskripsi</th>
                       <th>Workshop</th>
                       <th>Status</th>
-                      <th>Aksi</th> {/* Pastikan header Aksi ada */}
+                      <th>Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -606,7 +596,6 @@ function App() {
                           <td>{ticket.title}</td>
                           <td>{ticket.workshop}</td>
                           <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
-                          {/* PERUBAHAN: Tambahkan kolom Aksi dengan tombol Delete */}
                           <td>
                             <button
                               onClick={() => handleDeleteClick(ticket)}
@@ -630,7 +619,6 @@ function App() {
         </div>
       </main>
 
-      {/* --------------- MODAL KONFIRMASI --------------- */}
       {showConfirmModal && ticketToDelete && (
         <ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />
       )}

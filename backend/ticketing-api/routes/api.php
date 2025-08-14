@@ -31,6 +31,8 @@ Route::middleware('jwt')->group(function () {
     Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus']);
     Route::apiResource('tickets', TicketController::class)->only(['index', 'store', 'destroy']);
     
+    Route::get('/users/all', [UserController::class, 'all']);
+
     // --- Rute untuk Manajemen Pengguna oleh Admin ---
     // Route manual untuk update menggunakan POST agar sesuai dengan frontend
     Route::post('/users/{user}', [UserController::class, 'update']);
