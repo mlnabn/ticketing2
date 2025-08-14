@@ -785,26 +785,40 @@ body.dark-mode .sidebar-footer {
    Gaya untuk Tombol Logout (Mode Terang)
    ================================================================= */
 .logout-button {
-  width: 50px; /* Lebar tombol */
-  height: 50px; /* Tinggi tombol */
-  font-size: 28px; /* Ukuran ikon, sedikit lebih kecil agar pas */
-  padding: 0; /* Menghilangkan padding agar ikon terpusat */
-  border-radius: 50%; /* Membuat tombol bulat */
-  border: none; /* Menghilangkan border */
-  background-color: transparent; /* Latar belakang transparan di mode terang */
-  color: #333333; /* Warna ikon default (abu-abu gelap) */
+  width: 50px;
+  /* Lebar tombol */
+  height: 50px;
+  /* Tinggi tombol */
+  font-size: 28px;
+  /* Ukuran ikon, sedikit lebih kecil agar pas */
+  padding: 0;
+  /* Menghilangkan padding agar ikon terpusat */
+  border-radius: 50%;
+  /* Membuat tombol bulat */
+  border: none;
+  /* Menghilangkan border */
+  background-color: transparent;
+  /* Latar belakang transparan di mode terang */
+  color: #333333;
+  /* Warna ikon default (abu-abu gelap) */
   display: flex;
-  justify-content: center; /* Memposisikan ikon di tengah secara horizontal */
-  align-items: center; /* Memposisikan ikon di tengah secara vertikal */
-  cursor: pointer; /* Menunjukkan bahwa ini adalah elemen yang dapat diklik */
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out; /* Transisi halus untuk hover */
+  justify-content: center;
+  /* Memposisikan ikon di tengah secara horizontal */
+  align-items: center;
+  /* Memposisikan ikon di tengah secara vertikal */
+  cursor: pointer;
+  /* Menunjukkan bahwa ini adalah elemen yang dapat diklik */
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  /* Transisi halus untuk hover */
   /* text-align: left; dan gap: 0.75rem; dihilangkan karena hanya ikon */
 }
 
 /* Efek hover untuk tombol logout di mode terang */
 .logout-button:hover {
-  background-color: rgba(0, 0, 0, 0.05); /* Latar belakang abu-abu transparan saat hover */
-  color: #000000; /* Warna ikon menjadi hitam saat hover */
+  background-color: rgba(0, 0, 0, 0.05);
+  /* Latar belakang abu-abu transparan saat hover */
+  color: #000000;
+  /* Warna ikon menjadi hitam saat hover */
 }
 
 /* =================================================================
@@ -812,19 +826,23 @@ body.dark-mode .sidebar-footer {
    ================================================================= */
 /* Saat elemen body memiliki kelas 'dark-mode' */
 body.dark-mode .logout-button {
-  background-color: transparent; /* Latar belakang transparan di mode gelap */
-  color: #CCCCCC; /* Warna ikon (abu-abu terang) yang terlihat jelas di latar belakang gelap */
+  background-color: transparent;
+  /* Latar belakang transparan di mode gelap */
+  color: #CCCCCC;
+  /* Warna ikon (abu-abu terang) yang terlihat jelas di latar belakang gelap */
 }
 
 /* Efek hover untuk tombol logout di mode gelap */
 body.dark-mode .logout-button:hover {
-  background-color: rgba(255, 255, 255, 0.1); /* Latar belakang putih transparan saat hover */
-  color: #FFFFFF; /* Warna ikon menjadi putih saat hover */
+  background-color: rgba(255, 255, 255, 0.1);
+  /* Latar belakang putih transparan saat hover */
+  color: #FFFFFF;
+  /* Warna ikon menjadi putih saat hover */
 }
 
 /* Pastikan elemen ikon (misalnya, dari Font Awesome) mewarisi warna dari tombol induk */
 .logout-button i {
-    color: inherit;
+  color: inherit;
 }
 
 
@@ -973,7 +991,7 @@ body.dark-mode .logout-button:hover {
 
 /* .dark-mode-toggle.dark .star-background-icon {
   opacity: 0; */
-  /* Sembunyikan bintang background saat dark mode */
+/* Sembunyikan bintang background saat dark mode */
 /* } */
 
 /* .logout-button:hover {
@@ -1439,7 +1457,7 @@ body.dark-mode .job-form {
   background-color: #2D3748;
   /* Latar belakang form di mode gelap */
   color: #E2E8F0;
-  
+
 }
 
 /* Deskripsi */
@@ -2475,11 +2493,13 @@ body.dark-mode .content-area h3 {
  ---------------------------------------------------
 */
 .btn-primary {
-  background-color: #007bff; /* Biru cerah */
+  background-color: #007bff;
+  /* Biru cerah */
   color: white;
   padding: 10px 20px;
   border: none;
-  border-radius: 25px; /* Lebih bulat */
+  border-radius: 25px;
+  /* Lebih bulat */
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -2488,7 +2508,8 @@ body.dark-mode .content-area h3 {
 }
 
 .btn-primary:hover {
-  background-color: #0056b3; /* Biru lebih gelap saat hover */
+  background-color: #0056b3;
+  /* Biru lebih gelap saat hover */
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3);
 }
@@ -2501,12 +2522,14 @@ body.dark-mode .content-area h3 {
 
 /* Mode Gelap untuk Tombol Utama */
 body.dark-mode .btn-primary {
-  background-color: #5b8ff9; /* Biru yang lebih terang untuk dark mode */
+  background-color: #5b8ff9;
+  /* Biru yang lebih terang untuk dark mode */
   box-shadow: 0 4px 8px rgba(91, 143, 249, 0.3);
 }
 
 body.dark-mode .btn-primary:hover {
-  background-color: #4074d9; /* Biru gelap saat hover di dark mode */
+  background-color: #4074d9;
+  /* Biru gelap saat hover di dark mode */
   box-shadow: 0 6px 12px rgba(91, 143, 249, 0.4);
 }
 
@@ -2517,8 +2540,10 @@ body.dark-mode .btn-primary:hover {
 */
 .action-buttons-group {
   display: flex;
-  gap: 8px; /* Jarak antar tombol */
-  justify-content: center; /* Pusatkan tombol dalam sel */
+  gap: 8px;
+  /* Jarak antar tombol */
+  justify-content: center;
+  /* Pusatkan tombol dalam sel */
 }
 
 .btn-edit,
@@ -2533,7 +2558,8 @@ body.dark-mode .btn-primary:hover {
 }
 
 .btn-edit {
-  background-color: #28a745; /* Hijau untuk Edit */
+  background-color: #28a745;
+  /* Hijau untuk Edit */
   color: white;
   box-shadow: 0 3px 6px rgba(40, 167, 69, 0.2);
 }
@@ -2546,7 +2572,8 @@ body.dark-mode .btn-primary:hover {
 
 /* Mode Gelap untuk Tombol Edit */
 body.dark-mode .btn-edit {
-  background-color: #4CAF50; /* Hijau yang lebih terang untuk dark mode */
+  background-color: #4CAF50;
+  /* Hijau yang lebih terang untuk dark mode */
   box-shadow: 0 3px 6px rgba(76, 175, 80, 0.3);
 }
 
@@ -2556,7 +2583,8 @@ body.dark-mode .btn-edit:hover {
 }
 
 .btn-delete {
-  background-color: #dc3545; /* Merah untuk Hapus */
+  background-color: #dc3545;
+  /* Merah untuk Hapus */
   color: white;
   box-shadow: 0 3px 6px rgba(220, 53, 69, 0.2);
 }
@@ -2569,7 +2597,8 @@ body.dark-mode .btn-edit:hover {
 
 /* Mode Gelap untuk Tombol Hapus */
 body.dark-mode .btn-delete {
-  background-color: #ef5350; /* Merah yang lebih terang untuk dark mode */
+  background-color: #ef5350;
+  /* Merah yang lebih terang untuk dark mode */
   box-shadow: 0 3px 6px rgba(239, 83, 80, 0.3);
 }
 
@@ -2581,13 +2610,17 @@ body.dark-mode .btn-delete:hover {
 /* Anda mungkin masih memerlukan beberapa gaya dasar untuk responsivitas */
 @media (max-width: 768px) {
   .flex.justify-between.items-center.mb-4 {
-    flex-direction: column; /* Mengubah tata letak menjadi kolom */
+    flex-direction: column;
+    /* Mengubah tata letak menjadi kolom */
     align-items: center;
   }
+
   .btn-primary {
-    width: 100%; /* Tombol "Tambah" menjadi lebar penuh */
+    width: 100%;
+    /* Tombol "Tambah" menjadi lebar penuh */
     margin-bottom: 15px;
   }
+
   .btn-edit,
   .btn-delete {
     padding: 6px 12px;
@@ -2602,7 +2635,8 @@ body.dark-mode .btn-delete:hover {
 
 /* Layout untuk user (tanpa sidebar) */
 .dashboard-container.no-sidebar {
-  display: block; /* Mengubah dari grid ke block agar tidak ada kolom sidebar */
+  display: block;
+  /* Mengubah dari grid ke block agar tidak ada kolom sidebar */
 }
 
 /* Di layout no-sidebar, main-content tidak perlu margin-left */
@@ -2612,7 +2646,7 @@ body.dark-mode .btn-delete:hover {
 
 /* Logo di header untuk user agar header tidak kosong */
 .header-logo {
-  height: 40px; 
+  height: 40px;
 }
 
 
@@ -2646,7 +2680,8 @@ body.dark-mode .btn-delete:hover {
 }
 
 .tab-button:hover {
-  color: var(--primary-color, #3b82f6); /* Menggunakan variabel primary color Anda */
+  color: var(--primary-color, #3b82f6);
+  /* Menggunakan variabel primary color Anda */
 }
 
 .tab-button.active {
@@ -2657,7 +2692,8 @@ body.dark-mode .btn-delete:hover {
 .tab-button.active::after {
   content: '';
   position: absolute;
-  bottom: -4px; /* Disesuaikan agar pas dengan padding */
+  bottom: -4px;
+  /* Disesuaikan agar pas dengan padding */
   left: 1rem;
   right: 1rem;
   height: 3px;
@@ -2675,19 +2711,21 @@ body.dark-mode .btn-delete:hover {
   width: 100%;
 }
 
-.request-tab, .history-tab {
+.request-tab,
+.history-tab {
   background-color: var(--content-bg-light);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-body.dark-mode .request-tab, 
+body.dark-mode .request-tab,
 body.dark-mode .history-tab {
   background-color: var(--content-bg-dark);
 }
 
-.request-tab h2, .history-tab h2 {
+.request-tab h2,
+.history-tab h2 {
   text-align: center;
   margin-top: 0;
   margin-bottom: 0.5rem;
@@ -2696,7 +2734,7 @@ body.dark-mode .history-tab {
   color: var(--text-color-light);
 }
 
-body.dark-mode .request-tab h2, 
+body.dark-mode .request-tab h2,
 body.dark-mode .history-tab h2 {
   color: var(--text-color-dark);
 }
@@ -2717,7 +2755,8 @@ body.dark-mode .request-tab p {
   align-items: center;
   width: 52px;
   height: 28px;
-  background-color: #E2E8F0; /* Warna latar (light gray) */
+  background-color: #E2E8F0;
+  /* Warna latar (light gray) */
   border-radius: 28px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -2725,7 +2764,8 @@ body.dark-mode .request-tab p {
 
 /* Latar belakang saat dark mode aktif */
 .theme-switch.dark {
-  background-color: var(--primary-color, #3b82f6); /* Menggunakan variabel primary color Anda */
+  background-color: var(--primary-color, #3b82f6);
+  /* Menggunakan variabel primary color Anda */
 }
 
 /* Bola slider */
@@ -2740,7 +2780,7 @@ body.dark-mode .request-tab p {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 /* Pergerakan bola saat dark mode aktif */
@@ -2751,13 +2791,15 @@ body.dark-mode .request-tab p {
 /* Ikon di dalam bola (Matahari dan Bulan) */
 .theme-switch-ball .fas {
   font-size: 14px;
-  position: absolute; /* Memungkinkan ikon tumpang tindih */
+  position: absolute;
+  /* Memungkinkan ikon tumpang tindih */
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 /* Ikon Matahari (terlihat saat light mode) */
 .theme-switch-ball .fa-sun {
-  color: #f59e0b; /* Warna kuning dari variabel Anda */
+  color: #f59e0b;
+  /* Warna kuning dari variabel Anda */
   opacity: 1;
   transform: scale(1);
 }
@@ -2770,7 +2812,8 @@ body.dark-mode .request-tab p {
 
 /* Ikon Bulan (terlihat saat dark mode) */
 .theme-switch-ball .fa-moon {
-  color: var(--primary-color, #3b82f6); /* Warna ikon bulan */
+  color: var(--primary-color, #3b82f6);
+  /* Warna ikon bulan */
   opacity: 0;
   transform: scale(0);
 }
@@ -2779,4 +2822,87 @@ body.dark-mode .request-tab p {
 .theme-switch.dark .fa-moon {
   opacity: 1;
   transform: scale(1);
+}
+
+/*JOBFORM USER*/
+
+.job-form-user {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ====== Input & Select Sama Rata ====== */
+.job-form-user .react-select__control,
+.input-like-select {
+  border-radius: 8px;
+  padding: 10px 12px;
+  border: none;
+  background-color: white;
+  box-shadow: none;
+  font-size: 14px;
+  color: #333;
+}
+
+.job-form-user .react-select__control--is-focused,
+.input-like-select:focus {
+  box-shadow: none;
+  outline: none;
+  border: none;
+}
+
+.input-like-select::placeholder {
+  color: #999;
+  font-size: 14px;
+}
+
+/* Hilangkan merah muda di input required */
+.input-like-select:invalid {
+  box-shadow: none;
+  background-color: #f5f0f07c;
+  border: 1px solid #eaeaf0;
+  border-radius: 8px;
+}
+
+/* ====== Button ====== */
+.btn-submit {
+  background-color: #1a73e8;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-submit:hover {
+  background-color: #1558b0;
+}
+
+/* ====== DARK MODE ====== */
+body.dark-mode .job-form-user {
+  background: rgba(30, 30, 30, 0.85);
+}
+
+body.dark-mode .react-select__control,
+body.dark-mode .input-like-select {
+  background-color: #2a2a2a;
+  color: #f0f0f0;
+}
+
+body.dark-mode .input-like-select::placeholder {
+  color: #bbb;
+}
+
+body.dark-mode .btn-submit {
+  background-color: #4285f4;
+}
+
+body.dark-mode .btn-submit:hover {
+  background-color: #3367d6;
 }

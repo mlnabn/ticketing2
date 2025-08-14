@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Select from 'react-select';
 
 // Terima prop 'addTicket'
-function JobForm({ users, addTicket, userRole }) {
+function JobFormUser({ users, addTicket, userRole }) {
   const isAdmin = userRole && userRole.toLowerCase() === 'admin';
   const [title, setTitle] = useState(''); // Untuk Deskripsi
   const [userId, setUserId] = useState(''); // Untuk Nama Pekerja
@@ -110,9 +110,8 @@ function JobForm({ users, addTicket, userRole }) {
     }),
   };
 
-  if (isAdmin) {
   return (
-    <form onSubmit={handleSubmit} className="job-form">
+    <form onSubmit={handleSubmit} className="job-form-user">
       {/* Input untuk Workshop */}
       <Select
         options={workshopOptions}
@@ -151,48 +150,7 @@ function JobForm({ users, addTicket, userRole }) {
       <button type="submit" className="btn-submit">Tambah</button>
     </form>
   );
+
 }
 
-  return (
-    <form onSubmit={handleSubmit} className="job-form">
-      {/* Input untuk Workshop */}
-      <Select
-        options={workshopOptions}
-        onChange={(selected) => setWorkshop(selected ? selected.value : '')}
-        value={selectedWorkshop}
-        placeholder="Workshop"
-        isSearchable
-        styles={selectStyles}
-        classNamePrefix="react-select"
-        required
-      />
-
-      {/* Select untuk Nama Pekerja */}
-      <Select
-        options={userOptions}
-        onChange={(selected) => setUserId(selected ? selected.value : '')}
-        value={selectedUser}
-        placeholder="Nama Pekerja"
-        isSearchable
-        styles={selectStyles}
-        classNamePrefix="react-select"
-        required
-      />
-
-      {/* Input untuk Deskripsi */}
-      <input
-        type="text"
-        placeholder="Deskripsi"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        required
-        className="input-like-select"
-      />
-
-      {/* Tombol Tambah */}
-      <button type="submit" className="btn-submit">Tambah</button>
-    </form>
-  );
-}
-
-export default JobForm;
+export default JobFormUser;

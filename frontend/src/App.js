@@ -4,6 +4,7 @@
 import React, { useState, useEffect, useMemo, useCallback} from 'react';
 import axios from 'axios';
 import JobForm from './components/JobForm';
+import JobFormUser from './components/JobFormUser';
 import JobList from './components/JobList';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -491,10 +492,10 @@ function App() {
             <div className="user-view-content">
               {userViewTab === 'request' && (
                 <div className="request-tab">
-                  <h2>Tambah Tiket Baru</h2>
-                  <p>Silakan isi detail pekerjaan di bawah ini.</p>
+                  <h2>Submit a Request</h2>
+                  <p>Please fill in the job details below.</p>
                   <br />
-                  <JobForm users={users} addTicket={addTicket} />
+                  <JobFormUser users={users} addTicket={addTicket} />
                 </div>
               )}
 
