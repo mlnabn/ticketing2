@@ -468,8 +468,17 @@ function App() {
             <button className={`tab-button ${userViewTab === 'history' ? 'active' : ''}`} onClick={() => setUserViewTab('history')}>History</button>
           </div>
           <div className="main-header-controls">
-            <span className="breadcrumb">Home / {userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
-            <button onClick={handleLogout} className="logout-button"><i className="fas fa-sign-out-alt"></i></button>
+            <span className="breadcrumb">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
+            
+            {/* PERUBAHAN: Tombol Dark Mode ditambahkan di sini */}
+            <div className={`theme-switch ${darkMode ? 'dark' : ''}`} onClick={toggleDarkMode}>
+                <div className="theme-switch-ball">
+                    {darkMode ? <i className="fas fa-moon moon-icon"></i> : <i className="fas fa-sun sun-icon"></i>}
+                </div>
+            </div>
+            <div>
+              <button onClick={handleLogout} className="logout-button"><i className="fas fa-sign-out-alt"></i></button>
+            </div>
           </div>
         </header>
 
