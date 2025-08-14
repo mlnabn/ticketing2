@@ -2623,9 +2623,9 @@ body.dark-mode .btn-delete:hover {
 .user-view-tabs {
   display: flex;
   justify-content: center;
-  /* gap: 2rem;
-  padding: 1.5rem 0; */
-  /* border-bottom: 1px solid var(--border-color-light); */
+  gap: 2rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--border-color-light);
 }
 
 /* body.dark-mode .user-view-tabs {

@@ -399,7 +399,6 @@ function App() {
             <ul>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Tickets')} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-home"></i><span>Home</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>User</span></button></li>
-              <li className="sidebar-nav-item"><button className="sidebar-button"><i className="fas fa-chart-bar"></i><span>Laporan</span></button></li>
             </ul>
           </nav>
           <div className="sidebar-footer">
@@ -463,10 +462,10 @@ function App() {
           <div className="header-left-group">
             <img src={yourLogo} alt="Logo" className="header-logo"></img>
           </div>
-          <div className="user-view-tabs">
+          {/* <div className="user-view-tabs">
             <button className={`tab-button ${userViewTab === 'request' ? 'active' : ''}`} onClick={() => setUserViewTab('request')}>Request</button>
             <button className={`tab-button ${userViewTab === 'history' ? 'active' : ''}`} onClick={() => setUserViewTab('history')}>History</button>
-          </div>
+          </div> */}
           <div className="main-header-controls">
             <span className="breadcrumb">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
             
@@ -482,10 +481,10 @@ function App() {
           </div>
         </header>
 
-        {/* <div className="user-view-tabs">
+        <div className="user-view-tabs">
           <button className={`tab-button ${userViewTab === 'request' ? 'active' : ''}`} onClick={() => setUserViewTab('request')}>Request</button>
           <button className={`tab-button ${userViewTab === 'history' ? 'active' : ''}`} onClick={() => setUserViewTab('history')}>History</button>
-        </div> */}
+        </div>
 
         <div className="content-area">
           <div className="user-view-container">
