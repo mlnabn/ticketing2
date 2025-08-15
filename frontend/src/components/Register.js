@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '../App.css';
-import bgImage2 from '../Image/Login.svg'; // Ganti sesuai gambar background yang dipakai
+import bgImage2 from '../Image/Login.png'; // Ganti sesuai gambar background yang dipakai
 
 const API_URL = 'http://127.0.0.1:8000/api';
 
