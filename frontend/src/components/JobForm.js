@@ -61,60 +61,65 @@ function JobForm({ users, addTicket, userRole }) {
   const optionActiveBg = isDarkMode ? "#007bff" : "#007bff"; // Warna saat diklik
 
   // Styling untuk komponen React-Select
-  const selectStyles = {
-    control: (provided) => ({
-      ...provided,
-      backgroundColor: inputBg,
-      borderRadius: "10px",
-      borderColor: borderColor,
-      minHeight: "45px",
-      fontWeight: 500,
-      boxShadow: formInputShadow,
-      color: textColor, // Warna teks saat nilai sudah dipilih di kontrol
-    }),
-    input: (provided) => ({
-      ...provided,
-      color: isDarkMode ? "white" : "black", // Warna teks saat mengetik
-
-    }),
-    placeholder: (provided) => ({
-      ...provided,
-      color: placeholderColor,
-      fontWeight: 500
-    }),
-    singleValue: (provided) => ({
-      ...provided,
+const selectStyles = {
+  control: (provided) => ({
+    ...provided,
+    backgroundColor: inputBg,
+    borderRadius: "10px",
+    borderColor: borderColor,
+    minHeight: "45px",
+    fontWeight: 500,
+    boxShadow: formInputShadow,
+    color: textColor, // Warna teks saat nilai sudah dipilih di kontrol
+  }),
+  input: (provided) => ({
+    ...provided,
+    color: isDarkMode ? "white" : "black", // Warna teks saat mengetik
+  }),
+  placeholder: (provided) => ({
+    ...provided,
+    color: placeholderColor,
+    fontWeight: 500,
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: textColor,
+    fontWeight: 500,
+  }),
+  menu: (provided) => ({
+    ...provided,
+    backgroundColor: menuBg,
+    borderColor: menuBorder,
+    boxShadow:
+      "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    color: textColor,
+    backgroundColor: state.isFocused ? optionHoverBg : "transparent",
+    cursor: "pointer",
+    "&:hover": {
+      backgroundColor: optionHoverBg,
       color: textColor,
-      fontWeight: 500
+    },
+    "&:active": {
+      backgroundColor: optionActiveBg,
+      color: "white",
+    },
+  }),
+  indicatorSeparator: (provided) => ({
+    ...provided,
+    backgroundColor: borderColor,
+  }),
+  dropdownIndicator: (provided) => ({
+    ...provided,
+    color: placeholderColor, // Warna panah dropdown
+    "&:hover": {
+      color: textColor, // Warna panah dropdown saat hover
+    },
+  }),
+};
 
-    }),
-    menu: (provided) => ({
-      ...provided,
-      backgroundColor: menuBg,
-      borderColor: menuBorder,
-      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      color: textColor,
-      backgroundColor: state.isFocused ? optionHoverBg : "transparent",
-      "&:active": {
-        backgroundColor: optionActiveBg,
-        color: "white"
-      }
-    }),
-    indicatorSeparator: (provided) => ({
-      ...provided,
-      backgroundColor: borderColor,
-    }),
-    dropdownIndicator: (provided) => ({
-      ...provided,
-      color: placeholderColor, // Warna panah dropdown
-      '&:hover': {
-        color: textColor, // Warna panah dropdown saat hover
-      }
-    }),
-  };
 
   if (isAdmin) {
     return (

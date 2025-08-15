@@ -1539,6 +1539,7 @@ body.dark-mode .job-form {
   color: var(--text-color-light);
 }
 
+
 /* MODE GELAP */
 body.dark-mode .job-form .react-select__control {
   background-color: var(--input-bg-dark);
@@ -1579,11 +1580,11 @@ body.dark-mode .job-form .react-select__dropdown-indicator:hover {
   color: var(--text-color-dark);
 }
 
+
 /* Input Deskripsi */
 .job-form .input-like-select {
   background-color: var(--input-bg-light);
   border: 1px solid rgba(138, 136, 136, 0.119);
-  ;
   border-radius: 10px;
   min-height: 45px;
   padding: 0 12px;
@@ -1598,7 +1599,7 @@ body.dark-mode .job-form .react-select__dropdown-indicator:hover {
 }
 
 .job-form .input-like-select:hover {
-  border-color: rgba(144, 144, 144, 0.35);
+  border-color: rgb(0, 0, 0);
   /* sedikit lebih terang */
 }
 
@@ -1629,7 +1630,7 @@ body.dark-mode .job-form .input-like-select::placeholder {
 
 /* Saat hover */
 body.dark-mode .job-form .input-like-select:hover {
-  border-color: rgba(255, 255, 255, 0.35);
+  border-color: rgb(255, 255, 255);
   /* sedikit lebih terang */
 }
 
@@ -3014,12 +3015,14 @@ body.dark-mode .history-tab {
 
 /* ====== Input Deskripsi User ====== */
 .input-like-selectuser {
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 12px;
   border-color: #949494ff;
   background-color: #565659;
   box-shadow: none;
   font-size: 14px;
+  font-weight: 500;
+  min-height: 45px;
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
