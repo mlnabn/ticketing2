@@ -519,8 +519,8 @@ function App() {
                     <table className='job-table user-history-table'>
                       <thead>
                         <tr>
-                          <th>Pengirim</th>
-                          <th>Ditugaskan Kepada</th>
+                          {/* <th>Pengirim</th>
+                          <th>Ditugaskan Kepada</th> */}
                           <th>Deskripsi</th>
                           <th>Workshop</th>
                           <th>Tanggal Dibuat</th>
@@ -535,8 +535,9 @@ function App() {
                         ) : createdTicketsOnPage.length > 0 ? (
                           createdTicketsOnPage.map(ticket => (
                             <tr key={ticket.id}>
-                              <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
-                              <td>{ticket.user.name}</td>
+                              {/* <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
+                              <td>{ticket.user ? ticket.user.name : 'Belum Ditugaskan'}</td> */}
+                              {/* <td>{ticket.user.name}</td> */}
                               <td>{ticket.title}</td>
                               <td>{ticket.workshop}</td>
                               <td data-label="Tanggal Dibuat">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>

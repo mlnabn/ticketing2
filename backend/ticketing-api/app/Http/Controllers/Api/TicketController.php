@@ -6,40 +6,34 @@ use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // <-- 1. Tambahkan ini
+use Illuminate\Support\Facades\Auth;
 
 class TicketController extends Controller
 {
     /**
      * Ambil tiket berdasarkan peran pengguna.
-     * - Admin: Dapat melihat semua tiket.
-     * - User: Hanya dapat melihat tiket yang ditugaskan padanya.
      */
     public function index(Request $request)
     {
-        // 1. Ambil data user dan parameter dari request
         $user = auth()->user();
         $perPage = $request->query('per_page', 5);
         $search = $request->query('search');
         $statusFilter = $request->query('status');
 
-        // 2. Mulai query dasar dengan menyertakan relasi yang dibutuhkan
         $query = Ticket::with(['user', 'creator']);
 
-        // 3. Terapkan filter berdasarkan peran (user atau admin)
         if ($user->role === 'admin') {
-            // Jika admin, terapkan filter pencarian jika ada
+            // Admin bisa mencari berdasarkan nama pekerja yang ditugaskan
             if ($search) {
                 $query->whereHas('user', function ($q) use ($search) {
                     $q->where('name', 'like', '%' . $search . '%');
                 });
             }
         } else {
-            // Jika bukan admin, filter hanya untuk tiket miliknya sendiri
+            // User biasa hanya melihat tiket yang ditugaskan padanya
             $query->where('user_id', $user->id);
         }
 
-        // 4. Terapkan filter status jika ada
         if ($statusFilter) {
             if ($statusFilter === 'Belum Selesai') {
                 $query->whereIn('status', ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan']);
@@ -48,119 +42,124 @@ class TicketController extends Controller
             }
         }
 
-        // 5. Eksekusi query dengan urutan dan paginasi (ini adalah satu-satunya tempat $tickets didefinisikan)
         $ticketsData = $query->latest()->paginate($perPage);
-
-        // 6. Kembalikan hasil dalam format JSON (ini adalah satu-satunya return)
         return response()->json($ticketsData);
     }
 
     /**
-     * Simpan tiket baru dengan validasi user_id.
+     * PERUBAHAN UTAMA: Simpan tiket baru dari user.
+     * Tiket akan otomatis memiliki user_id = null.
      */
     public function store(Request $request)
     {
+        // 1. Validasi field yang dikirim oleh form user
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'user_id' => 'required|exists:users,id',
-            'status' => 'required|string',
             'workshop' => 'required|string',
         ]);
 
-        $validated['creator_id'] = auth()->id();
-        $ticket = Ticket::create($validated);
-        return response()->json($ticket->load('user'), 201);
+        // 2. Cari user pertama yang memiliki peran 'admin'
+        $admin = User::where('role', 'admin')->first();
+
+        // 3. Jika tidak ada admin, kembalikan error (ini adalah kasus darurat)
+        if (!$admin) {
+            return response()->json(['error' => 'Tidak ada admin yang bisa ditugaskan.'], 500);
+        }
+
+        // 4. Buat tiket baru dan tugaskan ke admin yang ditemukan
+        $ticket = Ticket::create([
+            'title' => $validated['title'],
+            'workshop' => $validated['workshop'],
+            'creator_id' => auth()->id(),
+            'user_id' => $admin->id, // Langsung ditugaskan ke admin
+            'status' => 'Belum Dikerjakan',
+        ]);
+
+        return response()->json($ticket, 201);
     }
 
+    /**
+     * Ambil tiket yang dibuat oleh pengguna yang sedang login.
+     */
     public function createdTickets(Request $request)
     {
-        $tickets = Ticket::with(['user', 'creator']) // 'user' di sini adalah orang yang DITUGASKAN
+        $tickets = Ticket::with(['user', 'creator'])
             ->where('creator_id', auth()->id())
             ->latest()
-            ->paginate(5); // Kita pakai paginasi 5 agar tidak terlalu panjang
+            ->paginate(5);
 
         return response()->json($tickets);
     }
 
+    /**
+     * Hapus beberapa tiket sekaligus (hanya admin).
+     */
     public function bulkDelete(Request $request)
     {
-        // Pastikan hanya admin yang bisa mengakses
         if (auth()->user()->role !== 'admin') {
             return response()->json(['error' => 'Akses ditolak.'], 403);
         }
 
-        // Validasi input: harus berupa array dan tidak boleh kosong
         $validated = $request->validate([
             'ids' => 'required|array|min:1',
-            'ids.*' => 'exists:tickets,id', // Pastikan setiap ID ada di tabel tiket
+            'ids.*' => 'exists:tickets,id',
         ]);
 
-        // Hapus semua tiket yang ID-nya ada di dalam array
         Ticket::whereIn('id', $validated['ids'])->delete();
-
-        // Kembalikan respons berhasil
         return response()->json(['message' => 'Tiket yang dipilih telah dihapus.']);
     }
 
     /**
-     * Hapus tiket.
+     * Hapus satu tiket.
      */
     public function destroy(Ticket $ticket)
     {
-        // Ambil data pengguna yang sedang login
         $user = auth()->user();
-
-        // Definisikan kondisi siapa saja yang boleh menghapus
         $isAdmin = $user->role === 'admin';
         $isCreator = $user->id === $ticket->creator_id;
         $isAssigneeOfCompletedTicket = ($user->id === $ticket->user_id && $ticket->status === 'Selesai');
 
-        // Jika pengguna memenuhi SALAH SATU dari kondisi di atas, izinkan penghapusan
         if ($isAdmin || $isCreator || $isAssigneeOfCompletedTicket) {
             $ticket->delete();
-            return response()->json(null, 204); // 204 No Content, artinya berhasil
+            return response()->json(null, 204);
         }
 
-        // Jika tidak ada kondisi yang terpenuhi, tolak akses
-        return response()->json(['error' => 'Anda tidak memiliki izin untuk menghapus tiket ini.'], 403); // 403 Forbidden
+        return response()->json(['error' => 'Anda tidak memiliki izin untuk menghapus tiket ini.'], 403);
     }
 
     /**
      * Update status tiket.
      */
-    // File: app/Http/Controllers/Api/TicketController.php
     public function updateStatus(Request $request, Ticket $ticket)
     {
         $validated = $request->validate(['status' => 'required|string']);
         $updateData = ['status' => $validated['status']];
 
-        // Logika Otomatisasi Waktu
         if ($validated['status'] === 'Sedang Dikerjakan' && is_null($ticket->started_at)) {
-            // Catat waktu mulai saat pertama kali dikerjakan
             $updateData['started_at'] = now();
         } elseif ($validated['status'] === 'Selesai') {
-            // Catat waktu selesai
             $updateData['completed_at'] = now();
         }
 
         $ticket->update($updateData);
-        
         return response()->json($ticket->load(['user', 'creator']));
     }
     
+    /**
+     * Ambil statistik tiket.
+     */
     public function stats()
     {
         $user = Auth::user();
         $stats = [];
 
         if ($user->role === 'admin') {
-            // Statistik untuk Admin (mencakup semua tiket dan user)
             $stats['total_tickets'] = Ticket::count();
             $stats['completed_tickets'] = Ticket::where('status', 'Selesai')->count();
             $stats['pending_tickets'] = $stats['total_tickets'] - $stats['completed_tickets'];
             $stats['total_users'] = User::count();
         } else {
-            // Statistik untuk User biasa (hanya tiket miliknya)
+            // Statistik untuk User biasa (hanya tiket yang ditugaskan padanya)
             $stats['total_tickets'] = Ticket::where('user_id', $user->id)->count();
             $stats['completed_tickets'] = Ticket::where('user_id', $user->id)->where('status', 'Selesai')->count();
             $stats['pending_tickets'] = $stats['total_tickets'] - $stats['completed_tickets'];

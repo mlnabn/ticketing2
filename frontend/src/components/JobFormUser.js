@@ -3,33 +3,26 @@ import Select from 'react-select';
 
 // Terima prop 'addTicket'
 function JobFormUser({ users, addTicket, userRole }) {
-  const isAdmin = userRole && userRole.toLowerCase() === 'admin';
   const [title, setTitle] = useState(''); // Untuk Deskripsi
-  const [userId, setUserId] = useState(''); // Untuk Nama Pekerja
+  // const [userId, setUserId] = useState(''); // Untuk Nama Pekerja
   const [workshop, setWorkshop] = useState(''); // Untuk Workshop
-  const [status, setStatus] = useState('Belum Dikerjakan'); // Default status
+  // const [status, setStatus] = useState('Belum Dikerjakan'); // Default status
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Pastikan semua field terisi sebelum submit
-    if (title && userId && workshop && status) {
+    if (title && workshop) {
       // Panggil fungsi 'addTicket' dengan data yang sesuai
-      addTicket({ title, user_id: userId, status, workshop });
+      addTicket({ title, workshop });
       // Reset form setelah submit
       setTitle('');
-      setUserId('');
+      //setUserId('');
       setWorkshop('');
-      setStatus('Belum Dikerjakan');
+      // setStatus('Belum Dikerjakan');
     } else {
       console.log("Mohon lengkapi semua field.");
     }
   };
-
-  // Opsi untuk dropdown Nama Pekerja dari data users
-  const userOptions = Array.isArray(users) ? users.map(user => ({
-    value: user.id,
-    label: user.name
-  })) : [];
 
   // Opsi untuk dropdown Workshop
   const workshopOptions = [
@@ -42,23 +35,9 @@ function JobFormUser({ users, addTicket, userRole }) {
   ];
 
   // Temukan user yang dipilih untuk ditampilkan di Select
-  const selectedUser = userOptions.find(option => option.value === userId);
+  // const selectedUser = userOptions.find(option => option.value === userId);
   const selectedWorkshop = workshopOptions.find(option => option.value === workshop);
 
-  // Deteksi status mode gelap saat ini
-  const isDarkMode = document.body.classList.contains('dark-mode');
-
-  // Tentukan variabel CSS yang akan digunakan berdasarkan mode saat ini
-  // Mengacu pada variabel yang sudah didefinisikan di App.css
-  const inputBg = isDarkMode ? "var(--input-bg-light)" : "var(--input-bg-light)";
-  const borderColor = isDarkMode ? "var(--border-color-light)" : "var(--border-color-light)";
-  const textColor = isDarkMode ? "var(--text-color-light)" : "var(--text-color-light)";
-  const placeholderColor = isDarkMode ? "var(--placeholder-color-light)" : "var(--placeholder-color-light)";
-  const formInputShadow = isDarkMode ? "var(--form-input-shadow-light)" : "var(--form-input-shadow-light)";
-  const menuBg = isDarkMode ? "var(--content-bg-light)" : "var(--content-bg-light)";
-  const menuBorder = isDarkMode ? "var(--border-color-light)" : "var(--border-color-light)";
-  const optionHoverBg = isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 123, 255, 0.1)"; // Warna hover opsi
-  const optionActiveBg = isDarkMode ? "#007bff" : "#007bff"; // Warna saat diklik
 
   // Styling untuk komponen React-Select
 const selectStyles = {
@@ -132,7 +111,7 @@ const selectStyles = {
       />
 
       {/* Select untuk Nama Pekerja */}
-      <Select
+      {/* <Select
         options={userOptions}
         onChange={(selected) => setUserId(selected ? selected.value : '')}
         value={selectedUser}
@@ -141,7 +120,7 @@ const selectStyles = {
         styles={selectStyles}
         classNamePrefix="react-selectuser"
         required
-      />
+      /> */}
 
       {/* Input untuk Deskripsi */}
       <input

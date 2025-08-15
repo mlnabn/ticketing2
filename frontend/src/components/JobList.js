@@ -82,6 +82,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
             )}
             <th>Pengirim</th>
             <th>Nama Pekerja</th>
+            <th>Workshop</th>
             <th>Deskripsi</th>
             <th>Tanggal Dibuat</th>
             <th>Waktu Pengerjaan</th>
@@ -103,7 +104,8 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                   </td>
                 )}
                 <td data-label="Pengirim">{ticket.creator ? ticket.creator.name : 'N/A'}</td>
-                <td data-label="Nama Pekerja">{ticket.user.name}</td>
+                <td data-label="Nama Pekerja">{ticket.user ? ticket.user.name : 'Belum Ditugaskan'}</td>
+                <td data-label="Workshop">{ticket.workshop}</td>
                 <td data-label="Deskripsi">{ticket.title}</td>
                 <td data-label="Tanggal Dibuat">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
                 <td data-label="Waktu Pengerjaan">
