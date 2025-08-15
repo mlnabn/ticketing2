@@ -104,6 +104,8 @@
   --status-selesai-bg-light: #5CC98F;
   /* Green lembut */
   --status-selesai-text-light: #fff;
+  --status-ditunda-bg-light: #6B7280;
+  --status-ditunda-text-light: #fff;
 
   /* Tombol Utama (Biru kalem) */
   --btn-submit: #5B86E5;
@@ -254,7 +256,7 @@ body.dark-mode {
   /* Merah medium */
 
   /* Warna Status Badge (Dark Mode - disesuaikan dengan input user dan harmonisasi) */
-  --status-belum-bg-dark: #6B7280;
+  --status-belum-bg-dark: #e13333;
   /* Gray-600 */
   --status-belum-text-dark: #fff;
   --status-sedang-bg-dark: #D97706;
@@ -262,7 +264,10 @@ body.dark-mode {
   --status-sedang-text-dark: #fff;
   --status-selesai-bg-dark: #16A34A;
   /* Green-700 */
-  --status-selesai-text-dark: #fff;
+
+
+  --status-ditunda-bg-dark: #6B7280;
+  --status-ditunda-text-dark: #fff;
 
   /* Tombol Utama (Biru kalem) */
   --btn-submit: #4A7CD1;
@@ -1534,6 +1539,7 @@ body.dark-mode .job-form {
   color: var(--text-color-light);
 }
 
+
 /* MODE GELAP */
 body.dark-mode .job-form .react-select__control {
   background-color: var(--input-bg-dark);
@@ -1574,11 +1580,11 @@ body.dark-mode .job-form .react-select__dropdown-indicator:hover {
   color: var(--text-color-dark);
 }
 
+
 /* Input Deskripsi */
 .job-form .input-like-select {
   background-color: var(--input-bg-light);
   border: 1px solid rgba(138, 136, 136, 0.119);
-  ;
   border-radius: 10px;
   min-height: 45px;
   padding: 0 12px;
@@ -1593,7 +1599,7 @@ body.dark-mode .job-form .react-select__dropdown-indicator:hover {
 }
 
 .job-form .input-like-select:hover {
-  border-color: rgba(144, 144, 144, 0.35);
+  border-color: rgb(0, 0, 0);
   /* sedikit lebih terang */
 }
 
@@ -1624,7 +1630,7 @@ body.dark-mode .job-form .input-like-select::placeholder {
 
 /* Saat hover */
 body.dark-mode .job-form .input-like-select:hover {
-  border-color: rgba(255, 255, 255, 0.35);
+  border-color: rgb(255, 255, 255);
   /* sedikit lebih terang */
 }
 
@@ -1937,7 +1943,8 @@ body.dark-mode .job-filter select {
   ---------------------------------------------------
   Gaya untuk badge status tiket (Belum Dikerjakan, Sedang Dikerjakan, Selesai).
 */
-.status {
+/* Gaya umum untuk semua status */
+.status-badge {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1948,73 +1955,77 @@ body.dark-mode .job-filter select {
   min-width: 140px;
   justify-content: center;
   border: 1px solid;
-  /* Menambahkan border solid */
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
-.status-belum {
+/* ====== Status Badge Base ====== */
+.status-badge {
+  display: flex;
+  /* ubah dari flex jadi block agar justify text bisa jalan */
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  min-width: 140px;
+  border: 1px solid;
+  text-align: justify;
+  /* rata kanan kiri */
+  justify-content: center;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* === Belum Dikerjakan === */
+.status-belum-dikerjakan {
   background-color: var(--status-belum-bg-light);
   color: var(--status-belum-text-light);
   border-color: var(--status-belum-bg-light);
-  /* Border sesuai warna background */
 }
 
-body.dark-mode .status-belum {
+body.dark-mode .status-belum-dikerjakan {
   background-color: var(--status-belum-bg-dark);
   color: var(--status-belum-text-dark);
   border-color: var(--status-belum-bg-dark);
-  /* Border sesuai warna background */
 }
 
-.status-belum::before {
-  content: '🕓';
-  /* Ikon emoji */
+.status-belum-dikerjakan::before {
+  content: '';
 }
 
-.status-sedang {
+/* === Sedang Dikerjakan === */
+.status-sedang-dikerjakan {
   background-color: var(--status-sedang-bg-light);
   color: var(--status-sedang-text-light);
   border-color: var(--status-sedang-bg-light);
-  /* Border sesuai warna background */
 }
 
-.status-sedang::before {
-  content: '⏳';
-}
-
-body.dark-mode .status-sedang {
+body.dark-mode .status-sedang-dikerjakan {
   background-color: var(--status-sedang-bg-dark);
   color: var(--status-sedang-text-dark);
   border-color: var(--status-sedang-bg-dark);
 }
 
-.status.status-ditunda {
-  background-color: #6c757d;
-  /* Abu-abu */
-  color: white;
+.status-sedang-dikerjakan::before {
+  content: '';
 }
 
-/* Warna untuk tombol baru */
-.btn-pause {
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
+/* === Ditunda === */
+.status-ditunda {
+  background-color: var(--status-ditunda-bg-light);
+  color: var(--status-ditunda-text-light);
+  border-color: var(--status-ditunda-bg-light);
 }
 
-.btn-pause:hover {
-  background-color: #5a6268;
+body.dark-mode .status-ditunda {
+  background-color: var(--status-ditunda-bg-dark);
+  color: var(--status-ditunda-text-dark);
+  border-color: var(--status-ditunda-bg-dark);
 }
 
-/* Container untuk menjaga tombol tetap rapi */
-.action-buttons-group {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-start;
+.status-ditunda::before {
+  content: '';
 }
 
+/* === Selesai === */
 .status-selesai {
   background-color: var(--status-selesai-bg-light);
   color: var(--status-selesai-text-light);
@@ -2028,8 +2039,30 @@ body.dark-mode .status-selesai {
 }
 
 .status-selesai::before {
-  content: '✅';
+  content: '';
 }
+
+/* ====== Tombol Pause ====== */
+.btn-pause {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-pause:hover {
+  background-color: #5a6268;
+}
+
+/* ====== Container Tombol ====== */
+.action-buttons-group {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
 
 
 
@@ -2982,12 +3015,14 @@ body.dark-mode .history-tab {
 
 /* ====== Input Deskripsi User ====== */
 .input-like-selectuser {
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 12px;
   border-color: #949494ff;
   background-color: #565659;
   box-shadow: none;
   font-size: 14px;
+  font-weight: 500;
+  min-height: 45px;
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
@@ -3002,7 +3037,7 @@ body.dark-mode .history-tab {
 .input-like-selectuser:focus {
   box-shadow: none;
   outline: none;
-  border: 1px solid rgba(255, 255, 255, 0.35); 
+  border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 .input-like-selectuser::placeholder {
