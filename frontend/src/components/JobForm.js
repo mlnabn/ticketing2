@@ -72,6 +72,11 @@ function JobForm({ users, addTicket, userRole }) {
       boxShadow: formInputShadow,
       color: textColor, // Warna teks saat nilai sudah dipilih di kontrol
     }),
+    input: (provided) => ({
+      ...provided,
+      color: isDarkMode ? "white" : "black", // Warna teks saat mengetik
+
+    }),
     placeholder: (provided) => ({
       ...provided,
       color: placeholderColor,
@@ -81,6 +86,7 @@ function JobForm({ users, addTicket, userRole }) {
       ...provided,
       color: textColor,
       fontWeight: 500
+
     }),
     menu: (provided) => ({
       ...provided,
@@ -111,47 +117,47 @@ function JobForm({ users, addTicket, userRole }) {
   };
 
   if (isAdmin) {
-  return (
-    <form onSubmit={handleSubmit} className="job-form">
-      {/* Input untuk Workshop */}
-      <Select
-        options={workshopOptions}
-        onChange={(selected) => setWorkshop(selected ? selected.value : '')}
-        value={selectedWorkshop}
-        placeholder="Workshop"
-        isSearchable
-        styles={selectStyles}
-        classNamePrefix="react-select"
-        required
-      />
+    return (
+      <form onSubmit={handleSubmit} className="job-form">
+        {/* Input untuk Workshop */}
+        <Select
+          options={workshopOptions}
+          onChange={(selected) => setWorkshop(selected ? selected.value : '')}
+          value={selectedWorkshop}
+          placeholder="Workshop"
+          isSearchable
+          styles={selectStyles}
+          classNamePrefix="react-select"
+          required
+        />
 
-      {/* Select untuk Nama Pekerja */}
-      <Select
-        options={userOptions}
-        onChange={(selected) => setUserId(selected ? selected.value : '')}
-        value={selectedUser}
-        placeholder="Nama Pekerja"
-        isSearchable
-        styles={selectStyles}
-        classNamePrefix="react-select"
-        required
-      />
+        {/* Select untuk Nama Pekerja */}
+        <Select
+          options={userOptions}
+          onChange={(selected) => setUserId(selected ? selected.value : '')}
+          value={selectedUser}
+          placeholder="Nama Pekerja"
+          isSearchable
+          styles={selectStyles}
+          classNamePrefix="react-select"
+          required
+        />
 
-      {/* Input untuk Deskripsi */}
-      <input
-        type="text"
-        placeholder="Deskripsi"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        required
-        className="input-like-select"
-      />
+        {/* Input untuk Deskripsi */}
+        <input
+          type="text"
+          placeholder="Deskripsi"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+          className="input-like-select"
+        />
 
-      {/* Tombol Tambah */}
-      <button type="submit" className="btn-submit">Tambah</button>
-    </form>
-  );
-}
+        {/* Tombol Tambah */}
+        <button type="submit" className="btn-submit">Tambah</button>
+      </form>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="job-form">

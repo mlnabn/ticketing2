@@ -799,7 +799,7 @@ body.dark-mode .sidebar-footer {
   /* Menghilangkan border */
   background-color: transparent;
   /* Latar belakang transparan di mode terang */
-  color: #333333;
+  color: #000000;
   /* Warna ikon default (abu-abu gelap) */
   display: flex;
   justify-content: center;
@@ -1029,7 +1029,7 @@ body.dark-mode .logout-button:hover {
 
 
 .main-header {
-  background-color: var(--header-bg-light);
+  /* background-color: var(--header-bg-light); */
   /* Latar belakang header di mode terang */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   /* Bayangan lebih halus dan tegas */
@@ -1091,7 +1091,9 @@ body.dark-mode .dashboard-header-title {
   /* Jarak antar elemen kontrol */
 }
 
-
+.breadcrump {
+  color: #fff !important;
+}
 
 .breadcrumb {
   color: var(--header-text-light);
@@ -1437,81 +1439,222 @@ body.dark-mode .search-form button[type="submit"]:hover {
 
 /*
   ---------------------------------------------------
-  GAYA JOB FORM
+  GAYA JOB FORM Admin
   ---------------------------------------------------
   Gaya untuk formulir penambahan tiket.
 */
 .job-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 2rem;
+  display: flex;
+  flex-direction: row;
+  /* sejajar horizontal */
+  gap: 10px;
+  align-items: center;
   margin-bottom: 3rem;
   background-color: #fff;
-  /* Latar belakang form di mode terang */
+  /* Latar belakang mode terang */
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.06);
   padding: 1.5rem;
 }
 
 body.dark-mode .job-form {
   background-color: #2D3748;
-  /* Latar belakang form di mode gelap */
+  /* Latar belakang mode gelap */
   color: #E2E8F0;
-
 }
 
-/* Deskripsi */
+/* Semua input, select, dan tombol sama lebar */
+.job-form .react-select__control,
+.job-form .input-like-select,
+.job-form .btn-submit {
+  flex: 1;
+  /* lebar sama rata */
+}
 
-.job-form input,
-.job-form select {
-  padding: 0rem 1rem;
-  border: 1px solid var(--form-input-border-light);
-  /* Warna border di mode terang */
-  border-radius: 10px;
-  font-size: 1rem;
+.job-form>* {
+  flex: 1;
+  min-width: 0;
+  /* biar nggak overflow */
+}
+
+
+/* React-Select styling */
+.job-form .react-select__control {
   background-color: var(--input-bg-light);
-  /* Latar belakang input di mode terang */
-  color: var(--text-color-light);
-  /* Warna teks input di mode terang */
+  border: 1px solid var(--border-color-light);
+  border-radius: 10px;
+  min-height: 45px;
+  font-weight: 500;
   box-shadow: var(--form-input-shadow-light);
-  /* Efek bayangan terangkat */
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
-
-body.dark-mode .job-form input,
-body.dark-mode .job-form select {
-  border-color: var(--form-input-border-dark);
-  /* Warna border di mode gelap */
-  background-color: var(--input-bg-dark);
-  /* Latar belakang input di mode gelap */
-  color: var(--text-color-dark);
-  /* Warna teks input di mode gelap */
-  box-shadow: var(--form-input-shadow-dark);
-  /* Efek bayangan terangkat di dark mode */
+.job-form .react-select__control:hover {
+  border-color: #64748B;
 }
 
-.job-form input::placeholder {
+.job-form .react-select__placeholder {
   color: var(--placeholder-color-light);
-  /* Warna placeholder di mode terang */
+  font-weight: 500;
 }
 
-body.dark-mode .job-form input::placeholder {
+.job-form .react-select__single-value {
+  color: var(--text-color-light);
+  font-weight: 500;
+}
+
+.job-form .react-select__menu {
+  background-color: var(--content-bg-light);
+  border: 1px solid var(--border-color-light);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.job-form .react-select__option {
+  color: var(--text-color-light);
+}
+
+.job-form .react-select__option--is-focused {
+  background-color: rgba(100, 116, 139, 0.1);
+}
+
+.job-form .react-select__option--is-selected {
+  background-color: #64748B;
+  color: white;
+}
+
+.job-form .react-select__indicator-separator {
+  background-color: var(--border-color-light);
+}
+
+.job-form .react-select__dropdown-indicator {
+  color: var(--placeholder-color-light);
+}
+
+.job-form .react-select__dropdown-indicator:hover {
+  color: var(--text-color-light);
+}
+
+/* MODE GELAP */
+body.dark-mode .job-form .react-select__control {
+  background-color: var(--input-bg-dark);
+  border: 1px solid var(--border-color-dark);
+  box-shadow: var(--form-input-shadow-dark);
+}
+
+body.dark-mode .job-form .react-select__placeholder {
   color: var(--placeholder-color-dark);
-  /* Warna placeholder di mode gelap */
 }
 
-.job-form input:focus,
-.job-form select:focus {
-  border-color: #5B86E5;
-  box-shadow: 0 0 0 3px rgba(91, 134, 229, 0.15);
+body.dark-mode .job-form .react-select__single-value {
+  color: var(--text-color-dark);
+}
+
+body.dark-mode .job-form .react-select__menu {
+  background-color: var(--content-bg-dark);
+  border: 1px solid var(--border-color-dark);
+}
+
+body.dark-mode .job-form .react-select__option {
+  color: var(--text-color-dark);
+}
+
+body.dark-mode .job-form .react-select__option--is-focused {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .job-form .react-select__indicator-separator {
+  background-color: var(--border-color-dark);
+}
+
+body.dark-mode .job-form .react-select__dropdown-indicator {
+  color: var(--placeholder-color-dark);
+}
+
+body.dark-mode .job-form .react-select__dropdown-indicator:hover {
+  color: var(--text-color-dark);
+}
+
+/* Input Deskripsi */
+.job-form .input-like-select {
+  background-color: var(--input-bg-light);
+  border: 1px solid rgba(138, 136, 136, 0.119);
+  ;
+  border-radius: 10px;
+  min-height: 45px;
+  padding: 0 12px;
+  font-weight: 500;
+  box-shadow: var(--form-input-shadow-light);
+  transition: border-color 0.2s ease;
+}
+
+.job-form .input-like-select::placeholder {
+  color: var(--placeholder-color-light);
+  font-weight: 500;
+}
+
+.job-form .input-like-select:hover {
+  border-color: rgba(144, 144, 144, 0.35);
+  /* sedikit lebih terang */
+}
+
+.job-form .input-like-select:focus {
+  border-color: rgba(100, 116, 139, 0.45);
+  /* lebih terang sedikit dari hover */
   outline: none;
+  /* hilangkan outline biru bawaan */
 }
 
+/* Dark mode */
+body.dark-mode .job-form .input-like-select {
+  background-color: var(--input-bg-dark);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-color-dark);
+  /* warna teks ketikan */
+  border-radius: 10px;
+  min-height: 45px;
+  padding: 0 12px;
+  font-weight: 500;
+  box-shadow: var(--form-input-shadow-dark);
+  transition: border-color 0.2s ease;
+}
+
+body.dark-mode .job-form .input-like-select::placeholder {
+  color: var(--placeholder-color-dark);
+}
+
+/* Saat hover */
+body.dark-mode .job-form .input-like-select:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  /* sedikit lebih terang */
+}
+
+body.dark-mode .job-form .input-like-select:focus {
+  border-color: rgba(255, 255, 255, 0.45);
+  /* lebih terang sedikit dari hover */
+  outline: none;
+  /* hilangkan outline biru bawaan */
+}
+
+/* Tombol submit */
+.job-form .btn-submit {
+  background-color: #287bef;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.job-form .btn-submit:hover {
+  background-color: #285a96;
+}
+
+/* Row table selected */
 .job-table tbody tr.selected-row {
   background-color: #73767a;
-  /* Warna biru gelap lembut */
 }
+
 
 /*
   ---------------------------------------------------
@@ -1631,6 +1774,7 @@ body.dark-mode .job-table {
   /* Border untuk seluruh tabel di mode gelap */
 }
 
+
 .job-table th,
 .job-table td {
   padding: 1rem;
@@ -1694,6 +1838,63 @@ body.dark-mode .job-table td {
 body.dark-mode .job-table tbody tr:hover {
   background-color: #4a4a66;
   /* Warna hover baris di mode gelap */
+}
+
+/* =================================================================
+   STYLING KHUSUS UNTUK TABEL RIWAYAT USER
+   Membuat tabel lebih menyatu dengan tema gelap permanen.
+================================================================= */
+
+.user-history-table {
+  background-color: transparent;
+  /* Hapus background putih */
+  border: 1px solid #5a6d8d;
+  /* PERUBAHAN: Border lebih tegas di sekeliling tabel */
+  box-shadow: none;
+  /* Hapus shadow agar lebih flat */
+  border-radius: 12px;
+  /* Menjaga sudut membulat */
+  overflow: hidden;
+  /* Penting agar radius terlihat */
+  border-collapse: separate;
+  /* Memastikan border luar terlihat */
+  border-spacing: 0;
+}
+
+/* Header tabel yang lebih gelap dan menyatu */
+.user-history-table th {
+  /* PERUBAHAN: Menggunakan gradien untuk header yang lebih estetik */
+  background: linear-gradient(90deg, rgba(46, 39, 112, 0.6) 0%, rgba(30, 67, 137, 0.6) 100%);
+  color: #FFFFFF;
+  /* Teks header putih */
+  border-bottom: 1px solid #5a6d8d;
+  /* Border bawah yang lebih tegas */
+}
+
+/* Sel data dengan warna teks yang sesuai */
+.user-history-table td {
+  color: #E0E0E0;
+  /* Teks putih/terang secara langsung */
+  border-bottom: 1px solid #4A5568;
+  /* Border gelap antar baris */
+  border-right: 1px solid #4A5568;
+  /* Border gelap antar kolom */
+}
+
+/* Menghilangkan border bawah pada baris terakhir */
+.user-history-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Hapus border kanan di sel terakhir */
+.user-history-table td:last-child {
+  border-right: none;
+}
+
+/* Efek hover yang lebih gelap */
+.user-history-table tbody tr:hover {
+  background-color: rgba(74, 74, 102, 0.7);
+  /* Warna hover gelap dengan transparansi */
 }
 
 /*
@@ -1932,106 +2133,7 @@ body.dark-mode .status-selesai {
 }
 
 
-/*
-  ---------------------------------------------------
-  REACT SELECT OVERRIDES
-  ---------------------------------------------------
-  Menyesuaikan gaya komponen React-Select agar konsisten dengan tema aplikasi
-  dan mendukung mode gelap.
-*/
-.react-select__control {
-  background-color: var(--input-bg-light) !important;
-  /* Latar belakang kontrol di mode terang */
-  border-color: var(--form-input-border-light) !important;
-  /* Warna border kontrol di mode terang */
-  box-shadow: var(--form-input-shadow-light) !important;
-  /* Efek bayangan terangkat */
-  min-height: 45px !important;
-  font-weight: 500 !important;
-  transition: all 0.3s ease;
-}
 
-body.dark-mode .react-select__control {
-  background-color: var(--input-bg-dark) !important;
-  /* Latar belakang kontrol di mode gelap */
-  border-color: var(--form-input-border-dark) !important;
-  /* Warna border kontrol di mode gelap */
-  box-shadow: var(--form-input-shadow-dark) !important;
-  /* Efek bayangan terangkat di dark mode */
-}
-
-.react-select__placeholder {
-  color: var(--placeholder-color-light) !important;
-  /* Warna placeholder di mode terang */
-  font-weight: 500 !important;
-  transition: color 0.3s ease;
-}
-
-body.dark-mode .react-select__placeholder {
-  color: var(--placeholder-color-dark) !important;
-  /* Warna placeholder di mode gelap */
-}
-
-.react-select__single-value {
-  color: var(--text-color-light) !important;
-  /* Warna nilai terpilih di mode terang */
-  font-weight: 500 !important;
-  transition: color 0.3s ease;
-}
-
-body.dark-mode .react-select__single-value {
-  color: var(--text-color-dark) !important;
-  /* Warna nilai terpilih di mode gelap */
-}
-
-.react-select__menu {
-  background-color: var(--input-bg-light) !important;
-  /* Latar belakang menu di mode terang */
-  border: 1px solid var(--border-color-light) !important;
-  /* Border menu di mode terang */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
-  transition: all 0.3s ease;
-}
-
-body.dark-mode .react-select__menu {
-  background-color: var(--input-bg-dark) !important;
-  /* Latar belakang menu di mode gelap */
-  border-color: var(--border-color-dark) !important;
-  /* Border menu di mode gelap */
-}
-
-.react-select__option {
-  color: var(--text-color-light) !important;
-  /* Warna teks opsi di mode terang */
-  transition: color 0.3s ease, background-color 0.3s ease;
-}
-
-body.dark-mode .react-select__option {
-  color: var(--text-color-dark) !important;
-  /* Warna teks opsi di mode gelap */
-}
-
-.react-select__option--is-focused {
-  background-color: rgba(0, 123, 255, 0.1) !important;
-  /* Warna hover opsi di mode terang */
-}
-
-body.dark-mode .react-select__option--is-focused {
-  background-color: rgba(0, 123, 255, 0.3) !important;
-  /* Warna hover opsi di mode gelap */
-}
-
-.react-select__option--is-selected {
-  background-color: #007bff !important;
-  /* Warna opsi terpilih di mode terang */
-  color: white !important;
-}
-
-body.dark-mode .react-select__option--is-selected {
-  background-color: #0056b3 !important;
-  /* Warna opsi terpilih di mode gelap */
-  color: white !important;
-}
 
 
 /* ADD USER PAGE */
@@ -2639,6 +2741,37 @@ body.dark-mode .btn-delete:hover {
   /* Mengubah dari grid ke block agar tidak ada kolom sidebar */
 }
 
+.dashboard-container.no-sidebar {
+  background-color: transparent;
+  /* Sembunyikan sidebar untuk user */
+}
+
+.dashboard-container.no-sidebar {
+  min-height: 100vh;
+}
+
+.main-content {
+  background: transparent;
+}
+
+.content-area {
+  background: transparent;
+}
+
+/* .job-form-user {
+  border-color:#000000;
+  backdrop-filter: blur(10px); 
+  border: 1px solid rgba(255, 252, 252, 0.3); 
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark .job-form-user {
+  background-color: transparent; 
+  border: 1px solid rgba(255, 255, 255, 0.2);
+} */
+
 /* Di layout no-sidebar, main-content tidak perlu margin-left */
 .dashboard-container.no-sidebar .main-content {
   margin-left: 0;
@@ -2659,7 +2792,8 @@ body.dark-mode .btn-delete:hover {
   justify-content: center;
   gap: 2rem;
   padding: 1.5rem 0;
-  border-bottom: 1px solid var(--border-color-light);
+  padding-right: 150px;
+  /* border-bottom: 1px solid var(--border-color-light); */
 }
 
 /* body.dark-mode .user-view-tabs {
@@ -2706,48 +2840,52 @@ body.dark-mode .btn-delete:hover {
    Gaya untuk membungkus konten di dalam tab Request & History.
 ================================================================= */
 .user-view-container {
-  max-width: 900px;
+  /* padding-top: 50px; */
+  max-width: 1000px;
   margin: 2rem auto;
   width: 100%;
 }
 
 .request-tab,
 .history-tab {
-  background-color: var(--content-bg-light);
+  background-color: rgba(255, 255, 255, 0.2);
+  /* putih transparan */
+  backdrop-filter: blur(10px);
+  /* efek blur kaca */
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0px 0px 100px 0px rgba(83, 83, 83, 1);
+  -webkit-box-shadow: 0px 0px 100px 0px rgba(83, 83, 83, 1);
+  -moz-box-shadow: 0px 0px 100px 0px rgba(83, 83, 83, 1);
 }
 
 body.dark-mode .request-tab,
 body.dark-mode .history-tab {
-  background-color: var(--content-bg-dark);
+  background-color: rgba(0, 0, 0, 0.4);
+  /* hitam transparan */
 }
 
+/* Judul */
 .request-tab h2,
 .history-tab h2 {
   text-align: center;
   margin-top: 0;
   margin-bottom: 0.5rem;
-  font-size: 1.8rem;
+  font-size: 3rem;
   font-weight: 700;
-  color: var(--text-color-light);
+  color: white;
+  /* ganti jadi putih */
 }
 
-body.dark-mode .request-tab h2,
-body.dark-mode .history-tab h2 {
-  color: var(--text-color-dark);
-}
-
-.request-tab p {
+/* Subjudul */
+.request-tab p,
+.history-tab p {
   text-align: center;
   margin-bottom: 2rem;
-  color: var(--placeholder-color-light);
+  color: white;
+  /* ganti jadi putih */
 }
 
-body.dark-mode .request-tab p {
-  color: var(--placeholder-color-dark);
-}
 
 .theme-switch {
   position: relative;
@@ -2824,68 +2962,92 @@ body.dark-mode .request-tab p {
   transform: scale(1);
 }
 
-/*JOBFORM USER*/
-
+/* ====== JOB FORM USER ====== */
 .job-form-user {
   display: flex;
   flex-direction: column;
   gap: 15px;
   padding: 20px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #1f29372a;
+  box-shadow: 0px 2px 148px 35px rgba(0, 0, 0, 0.6);
+  -webkit-box-shadow: 0px 2px 148px 35px rgba(0, 0, 0, 0.6);
+  -moz-box-shadow: 0px 2px 148px 35px rgba(0, 0, 0, 0.6);
 }
 
-/* ====== Input & Select Sama Rata ====== */
-.job-form-user .react-select__control,
-.input-like-select {
+/* =========================
+   REACT-SELECT USER STYLING
+   ========================= */
+
+
+/* ====== Input Deskripsi User ====== */
+.input-like-selectuser {
   border-radius: 8px;
   padding: 10px 12px;
-  border: none;
-  background-color: white;
+  border-color: #949494ff;
+  background-color: #565659;
   box-shadow: none;
   font-size: 14px;
-  color: #333;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.job-form-user .react-select__control--is-focused,
-.input-like-select:focus {
+.input-like-selectuser:hover {
+  background-color: #6b6b6e;
+  /* warna saat hover */
+  border-color: #b0b0b0;
+  /* warna border saat hover */
+}
+
+.input-like-selectuser:focus {
   box-shadow: none;
   outline: none;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.35); 
 }
 
-.input-like-select::placeholder {
-  color: #999;
+.input-like-selectuser::placeholder {
+  color: #c6c7c8ff;
   font-size: 14px;
 }
 
 /* Hilangkan merah muda di input required */
-.input-like-select:invalid {
-  box-shadow: none;
-  background-color: #f5f0f07c;
+/* .input-like-selectuser:invalid {
+  background-color: #565659;
   border: 1px solid #eaeaf0;
   border-radius: 8px;
+} */
+
+/* ====== Dark Mode ====== */
+/* body.dark-mode .input-like-selectuser {
+  background-color: #2a2a2a;
+  color: #f0f0f0;
 }
 
+body.dark-mode .input-like-selectuser::placeholder {
+  color: #bbb;
+} */
+
 /* ====== Button ====== */
-.btn-submit {
-  background-color: #1a73e8;
+.btn-submituser {
+  display: block;
+  margin: 0 auto;
+  background-color: #17355b;
   color: white;
   padding: 10px 18px;
   border-radius: 8px;
-  border: none;
+  width: 30%;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease;
+
 }
 
-.btn-submit:hover {
+.btn-submituser:hover {
   background-color: #1558b0;
 }
 
 /* ====== DARK MODE ====== */
-body.dark-mode .job-form-user {
+/* body.dark-mode .job-form-user {
   background: rgba(30, 30, 30, 0.85);
 }
 
@@ -2905,4 +3067,36 @@ body.dark-mode .btn-submit {
 
 body.dark-mode .btn-submit:hover {
   background-color: #3367d6;
+} */
+
+/* =================================================================
+   Gaya untuk Tombol Logout (Mode Terang)
+   ================================================================= */
+.logout-buttonuser {
+  width: 50px;
+  /* Lebar tombol */
+  height: 50px;
+  /* Tinggi tombol */
+  font-size: 28px;
+  /* Ukuran ikon, sedikit lebih kecil agar pas */
+  padding: 0;
+  /* Menghilangkan padding agar ikon terpusat */
+  border-radius: 50%;
+  /* Membuat tombol bulat */
+  border: none;
+  /* Menghilangkan border */
+  background-color: transparent;
+  /* Latar belakang transparan di mode terang */
+  color: #ffffff;
+  /* Warna ikon default (abu-abu gelap) */
+  display: flex;
+  justify-content: center;
+  /* Memposisikan ikon di tengah secara horizontal */
+  align-items: center;
+  /* Memposisikan ikon di tengah secara vertikal */
+  cursor: pointer;
+  /* Menunjukkan bahwa ini adalah elemen yang dapat diklik */
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  /* Transisi halus untuk hover */
+  /* text-align: left; dan gap: 0.75rem; dihilangkan karena hanya ikon */
 }

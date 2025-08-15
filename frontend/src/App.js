@@ -1,7 +1,8 @@
 // =================================================================
 //  IMPOR LIBRARY & KOMPONEN
 // =================================================================
-import React, { useState, useEffect, useMemo, useCallback} from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { format } from 'date-fns';
 import axios from 'axios';
 import JobForm from './components/JobForm';
 import JobFormUser from './components/JobFormUser';
@@ -16,7 +17,8 @@ import { getToken, isLoggedIn, logout, getUser } from './auth';
 import './App.css';
 import yourLogo from './Image/Logo.png';
 import loginBackground from './Image/my-login-background.png';
-
+import bgImage from './Image/homeBg.jpg';
+import yourLogok from './Image/DTECH-Logo.png';
 // =================================================================
 //  KONFIGURASI GLOBAL
 // =================================================================
@@ -26,13 +28,13 @@ const API_URL = 'http://127.0.0.1:8000/api';
 //  KOMPONEN UTAMA: App
 // =================================================================
 function App() {
-// -----------------------------------------------------------------
+  // -----------------------------------------------------------------
   // #1. STATE MANAGEMENT (Manajemen Data Aplikasi)
   // -----------------------------------------------------------------
   // --- State untuk Data dari API ---
   const [ticketData, setTicketData] = useState(null);
-  const [users, setUsers] = useState([]); 
-  const [userData, setUserData] = useState(null); 
+  const [users, setUsers] = useState([]);
+  const [userData, setUserData] = useState(null);
   const [stats, setStats] = useState(null);
   const [createdTicketsData, setCreatedTicketsData] = useState(null);
 
@@ -66,7 +68,7 @@ function App() {
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState([]);
   const [statusFilter, setStatusFilter] = useState(null);
-  
+
 
   // -----------------------------------------------------------------
   // #1.A. VARIABEL TURUNAN (Derived State)
@@ -82,14 +84,14 @@ function App() {
   // -----------------------------------------------------------------
   // #3. DATA FETCHING FUNCTIONS (Fungsi Pengambilan Data)
   // -----------------------------------------------------------------
-  
+
   const fetchData = useCallback(async (page = 1, search = '', status = null) => {
     try {
       const config = { headers: { Authorization: `Bearer ${getToken()}` } };
       let ticketsUrl = `${API_URL}/tickets?page=${page}`;
       if (search) ticketsUrl += `&search=${search}`;
       if (status) ticketsUrl += `&status=${status}`;
-      
+
       const [ticketsRes, statsRes] = await Promise.all([
         axios.get(ticketsUrl, config),
         axios.get(`${API_URL}/tickets/stats`, config)
@@ -101,12 +103,12 @@ function App() {
       console.error("Gagal mengambil data utama:", error);
       if (error.response && error.response.status === 401) handleLogout();
     }
-  },[]);
+  }, []);
 
   const fetchAllUsers = useCallback(async () => {
     try {
       const config = { headers: { Authorization: `Bearer ${getToken()}` } };
-      const response = await axios.get(`${API_URL}/users/all`, config); 
+      const response = await axios.get(`${API_URL}/users/all`, config);
       if (Array.isArray(response.data)) {
         setUsers(response.data);
       }
@@ -142,7 +144,7 @@ function App() {
   const addTicket = async (formData) => {
     try {
       await axios.post(`${API_URL}/tickets`, formData, { headers: { Authorization: `Bearer ${getToken()}` } });
-      
+
       if (isAdmin) {
         setSearchInput('');
         setSearchQuery('');
@@ -152,9 +154,9 @@ function App() {
       } else {
         setCreatedTicketsPage(1);
         fetchCreatedTickets(1);
-        setUserViewTab('history'); 
+        setUserViewTab('history');
       }
-      
+
       fetchData(1, '', null);
 
     } catch (error) {
@@ -242,11 +244,11 @@ function App() {
   const confirmUserDelete = async () => {
     if (userToDelete) {
       try {
-        await axios.delete(`${API_URL}/users/${userToDelete.id}`, { 
-          headers: { Authorization: `Bearer ${getToken()}` } 
+        await axios.delete(`${API_URL}/users/${userToDelete.id}`, {
+          headers: { Authorization: `Bearer ${getToken()}` }
         });
         alert(`User "${userToDelete.name}" berhasil dihapus.`);
-        fetchUsers(1, ''); 
+        fetchUsers(1, '');
       } catch (error) {
         console.error("Gagal menghapus pengguna:", error);
         alert("Gagal menghapus pengguna.");
@@ -282,15 +284,15 @@ function App() {
     const url = isEditMode ? `${API_URL}/users/${userToEdit.id}` : `${API_URL}/users`;
     const method = 'post';
     try {
-      const response = await axios[method](url, formData, { 
-        headers: { Authorization: `Bearer ${getToken()}` } 
+      const response = await axios[method](url, formData, {
+        headers: { Authorization: `Bearer ${getToken()}` }
       });
       if (isEditMode) {
         alert(`User "${response.data.name}" berhasil di-edit.`);
       } else {
         alert("User baru berhasil dibuat.");
       }
-      fetchUsers(1, ''); 
+      fetchUsers(1, '');
       handleCloseUserForm();
     } catch (error) {
       console.error("Gagal menyimpan pengguna:", error);
@@ -328,7 +330,7 @@ function App() {
   // -----------------------------------------------------------------
   // #2. SIDE EFFECTS (useEffect Hooks)
   // -----------------------------------------------------------------
-  
+
   useEffect(() => {
     if (isLogin) {
       const currentUser = getUser();
@@ -337,7 +339,7 @@ function App() {
         setUserName(currentUser.name);
         setLoggedInUserId(currentUser.id);
       }
-      if(isAdmin) {
+      if (isAdmin) {
         fetchData(dataPage, searchQuery, statusFilter);
       }
     }
@@ -354,7 +356,7 @@ function App() {
     if (isLogin && currentPage === 'userManagement') {
       fetchUsers(userPage, userSearchQuery);
     }
-  }, [isLogin, currentPage, userPage, userSearchQuery, fetchUsers]); 
+  }, [isLogin, currentPage, userPage, userSearchQuery, fetchUsers]);
 
   // PERBAIKAN: Efek ini sekarang akan mengambil data riwayat SETIAP KALI tab 'history' aktif
   useEffect(() => {
@@ -457,35 +459,43 @@ function App() {
 
   // Tampilan untuk USER BIASA (tanpa sidebar)
   return (
-    <div className="dashboard-container no-sidebar">
+    <div
+      className="dashboard-container no-sidebar"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+        minHeight: '100vh'
+      }}
+    >
       <main className="main-content">
         <header className="main-header">
           <div className="header-left-group">
-            <img src={yourLogo} alt="Logo" className="header-logo"></img>
+            <img src={yourLogok} alt="Logo" className="header-logo"></img>
           </div>
-          {/* <div className="user-view-tabs">
+          <div className="user-view-tabs">
             <button className={`tab-button ${userViewTab === 'request' ? 'active' : ''}`} onClick={() => setUserViewTab('request')}>Request</button>
             <button className={`tab-button ${userViewTab === 'history' ? 'active' : ''}`} onClick={() => setUserViewTab('history')}>History</button>
-          </div> */}
+          </div>
           <div className="main-header-controls">
-            <span className="breadcrumb">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
-            
+            <span className="breadcrump">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
+
             {/* PERUBAHAN: Tombol Dark Mode ditambahkan di sini */}
-            <div className={`theme-switch ${darkMode ? 'dark' : ''}`} onClick={toggleDarkMode}>
-                <div className="theme-switch-ball">
-                    {darkMode ? <i className="fas fa-moon moon-icon"></i> : <i className="fas fa-sun sun-icon"></i>}
-                </div>
-            </div>
+            {/* <div className={`theme-switch ${darkMode ? 'dark' : ''}`} onClick={toggleDarkMode}>
+              <div className="theme-switch-ball">
+                {darkMode ? <i className="fas fa-moon moon-icon"></i> : <i className="fas fa-sun sun-icon"></i>}
+              </div>
+            </div> */}
             <div>
-              <button onClick={handleLogout} className="logout-button"><i className="fas fa-sign-out-alt"></i></button>
+              <button onClick={handleLogout} className="logout-buttonuser"><i className="fas fa-sign-out-alt"></i></button>
             </div>
           </div>
         </header>
-
-        <div className="user-view-tabs">
+        {/* <div className="user-view-tabs">
           <button className={`tab-button ${userViewTab === 'request' ? 'active' : ''}`} onClick={() => setUserViewTab('request')}>Request</button>
           <button className={`tab-button ${userViewTab === 'history' ? 'active' : ''}`} onClick={() => setUserViewTab('history')}>History</button>
-        </div>
+        </div> */}
 
         <div className="content-area">
           <div className="user-view-container">
@@ -503,13 +513,15 @@ function App() {
                 <div className="history-tab">
                   <h2>Tiket yang Telah Anda Buat</h2>
                   <div className="job-list" style={{ marginTop: '20px' }}>
-                    <table className='job-table'>
+                    <table className='job-table user-history-table'>
                       <thead>
                         <tr>
                           <th>Pengirim</th>
                           <th>Ditugaskan Kepada</th>
                           <th>Deskripsi</th>
                           <th>Workshop</th>
+                          <th>Tanggal Dibuat</th>
+                          <th>Waktu Pengerjaan</th>
                           <th>Status</th>
                           <th>Aksi</th>
                         </tr>
@@ -524,6 +536,12 @@ function App() {
                               <td>{ticket.user.name}</td>
                               <td>{ticket.title}</td>
                               <td>{ticket.workshop}</td>
+                              <td data-label="Tanggal Dibuat">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
+                              <td data-label="Waktu Pengerjaan">
+                                {ticket.started_at && ticket.completed_at
+                                  ? `${format(new Date(ticket.started_at), 'HH:mm')} - ${format(new Date(ticket.completed_at), 'HH:mm')}`
+                                  : ticket.started_at ? `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}` : '-'}
+                              </td>
                               <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
                               <td><button onClick={() => handleDeleteClick(ticket)} className="btn-delete">Delete</button></td>
                             </tr>
@@ -545,7 +563,7 @@ function App() {
       {/* Modal tidak berubah, tetap ada untuk kedua peran */}
       {showConfirmModal && ticketToDelete && (<ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
       {showUserConfirmModal && userToDelete && (<ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete.name}"?`} onConfirm={confirmUserDelete} onCancel={cancelUserDelete} />)}
-      {showUserFormModal && (<UserFormModal userToEdit={userToEdit} onClose={handleCloseUserForm} onSave={handleSaveUser}/>)}
+      {showUserFormModal && (<UserFormModal userToEdit={userToEdit} onClose={handleCloseUserForm} onSave={handleSaveUser} />)}
     </div>
   );
 }

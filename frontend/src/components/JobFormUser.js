@@ -61,54 +61,61 @@ function JobFormUser({ users, addTicket, userRole }) {
   const optionActiveBg = isDarkMode ? "#007bff" : "#007bff"; // Warna saat diklik
 
   // Styling untuk komponen React-Select
-  const selectStyles = {
-    control: (provided) => ({
-      ...provided,
-      backgroundColor: inputBg,
-      borderRadius: "10px",
-      borderColor: borderColor,
-      minHeight: "45px",
-      fontWeight: 500,
-      boxShadow: formInputShadow,
-      color: textColor, // Warna teks saat nilai sudah dipilih di kontrol
-    }),
-    placeholder: (provided) => ({
-      ...provided,
-      color: placeholderColor,
-      fontWeight: 500
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: textColor,
-      fontWeight: 500
-    }),
-    menu: (provided) => ({
-      ...provided,
-      backgroundColor: menuBg,
-      borderColor: menuBorder,
-      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      color: textColor,
-      backgroundColor: state.isFocused ? optionHoverBg : "transparent",
-      "&:active": {
-        backgroundColor: optionActiveBg,
-        color: "white"
-      }
-    }),
-    indicatorSeparator: (provided) => ({
-      ...provided,
-      backgroundColor: borderColor,
-    }),
-    dropdownIndicator: (provided) => ({
-      ...provided,
-      color: placeholderColor, // Warna panah dropdown
-      '&:hover': {
-        color: textColor, // Warna panah dropdown saat hover
-      }
-    }),
-  };
+const selectStyles = {
+  control: (provided) => ({
+    ...provided,
+    backgroundColor: "#565659", // biru gelap sesuai tema utama
+    borderRadius: "10px",
+    borderColor: "#949494ff",
+    minHeight: "45px",
+    fontWeight: 500,
+    boxShadow: "none",
+    color: "white", // warna teks saat nilai sudah dipilih
+    "&:hover": {
+      borderColor: "#f2f7f7ff" 
+    }
+  }),
+  placeholder: (provided) => ({
+    ...provided,
+    color: "#c6c7c8ff", // biru muda untuk placeholder
+    fontWeight: 500
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: "#c6c7c8ff",
+    fontWeight: 500
+  }),
+  input: (provided) => ({
+    ...provided,
+    color: "#c6c7c8ff" // warna teks saat mengetik
+  }),
+  menu: (provided) => ({
+    ...provided,
+    backgroundColor: "#696b6cff",
+    border: "1px solid #cadaf0ff",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.2)"
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    color: "white",
+    backgroundColor: state.isFocused ? "#626f81ff" : "transparent",
+    "&:active": {
+      backgroundColor: "#7592c3ff",
+      color: "white"
+    }
+  }),
+  indicatorSeparator: (provided) => ({
+    ...provided,
+    backgroundColor: "#adadaeff"
+  }),
+  dropdownIndicator: (provided) => ({
+    ...provided,
+    color: "#aeafb0ff",
+    '&:hover': {
+      color: "white"
+    }
+  }),
+};
 
   return (
     <form onSubmit={handleSubmit} className="job-form-user">
@@ -120,7 +127,7 @@ function JobFormUser({ users, addTicket, userRole }) {
         placeholder="Workshop"
         isSearchable
         styles={selectStyles}
-        classNamePrefix="react-select"
+        classNamePrefix="react-selectuser"
         required
       />
 
@@ -132,7 +139,7 @@ function JobFormUser({ users, addTicket, userRole }) {
         placeholder="Nama Pekerja"
         isSearchable
         styles={selectStyles}
-        classNamePrefix="react-select"
+        classNamePrefix="react-selectuser"
         required
       />
 
@@ -143,11 +150,11 @@ function JobFormUser({ users, addTicket, userRole }) {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
-        className="input-like-select"
+        className="input-like-selectuser"
       />
 
       {/* Tombol Tambah */}
-      <button type="submit" className="btn-submit">Tambah</button>
+      <button type="submit" className="btn-submituser">Tambah</button>
     </form>
   );
 
