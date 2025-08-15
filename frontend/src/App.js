@@ -514,7 +514,7 @@ function App() {
 
               {userViewTab === 'history' && (
                 <div className="history-tab">
-                  <h2>Tiket yang Telah Anda Buat</h2>
+                  <h2>Your Tickets</h2>
                   <div className="job-list" style={{ marginTop: '20px' }}>
                     <table className='job-table user-history-table'>
                       <thead>
@@ -541,10 +541,13 @@ function App() {
                               <td>{ticket.title}</td>
                               <td>{ticket.workshop}</td>
                               <td data-label="Tanggal Dibuat">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
-                              <td data-label="Waktu Pengerjaan">
-                                {ticket.started_at && ticket.completed_at
-                                  ? `${format(new Date(ticket.started_at), 'HH:mm')} - ${format(new Date(ticket.completed_at), 'HH:mm')}`
-                                  : ticket.started_at ? `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}` : '-'}
+                              <td>
+                                {ticket.started_at
+                                  ? (ticket.completed_at
+                                    ? `${format(new Date(ticket.started_at), 'HH:mm')} - ${format(new Date(ticket.completed_at), 'HH:mm')}`
+                                    : `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}`)
+                                  : (ticket.requested_time ? `Request: ${ticket.requested_time}` : '-')
+                                }
                               </td>
                               <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
                               <td><button onClick={() => handleDeleteClick(ticket)} className="btn-delete">Delete</button></td>

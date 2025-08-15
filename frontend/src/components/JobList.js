@@ -32,7 +32,6 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
   };
 
   const renderActionButtons = (ticket) => {
-    // Fungsi ini sekarang menangani semua tombol aksi untuk Admin
     if (!isAdmin) {
       return null;
     }
@@ -61,8 +60,14 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
             Lanjutkan
           </button>
         );
+      case 'Selesai':
+        return (
+          <button onClick={() => deleteTicket(ticket)} className="btn-delete">
+            Hapus
+          </button>
+        );
       default:
-        return null; // Tidak ada tombol untuk status lain
+        return null;
     }
   };
 
@@ -104,14 +109,23 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                   </td>
                 )}
                 <td data-label="Pengirim">{ticket.creator ? ticket.creator.name : 'N/A'}</td>
-                <td data-label="Nama Pekerja">{ticket.user ? ticket.user.name : 'Belum Ditugaskan'}</td>
+                <td data-label="Nama Pekerja">{ticket.user ? ticket.user.name : 'N/A'}</td>
                 <td data-label="Workshop">{ticket.workshop}</td>
                 <td data-label="Deskripsi">{ticket.title}</td>
                 <td data-label="Tanggal Dibuat">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
                 <td data-label="Waktu Pengerjaan">
-                  {ticket.started_at && ticket.completed_at
-                    ? `${format(new Date(ticket.started_at), 'HH:mm')} - ${format(new Date(ticket.completed_at), 'HH:mm')}`
-                    : ticket.started_at ? `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}` : '-'}
+                  {(() => {
+                    if (ticket.started_at && ticket.completed_at) {
+                      return `${format(new Date(ticket.started_at), 'HH:mm')} - ${format(new Date(ticket.completed_at), 'HH:mm')}`;
+                    }
+                    if (ticket.started_at) {
+                      return `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}`;
+                    }
+                    if (ticket.requested_time) {
+                      return `Waktu yang diminta: ${ticket.requested_time}`;
+                    }
+                    return '-';
+                  })()}
                 </td>
                 <td data-label="Status">
                   <span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>
@@ -120,7 +134,6 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                 </td>
                 <td data-label="Aksi">
                   <div className="action-buttons-group">
-                    {/* Memanggil fungsi render yang sudah diperbaiki */}
                     {renderActionButtons(ticket)}
                   </div>
                 </td>
@@ -128,7 +141,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
             ))
           ) : (
             <tr>
-              <td colSpan={isAdmin ? 8 : 7}>Tidak ada pekerjaan yang ditemukan.</td>
+              <td colSpan={isAdmin ? 9 : 8}>Tidak ada pekerjaan yang ditemukan.</td>
             </tr>
           )}
         </tbody>

@@ -8,13 +8,14 @@ function JobForm({ users, addTicket, userRole }) {
   const [userId, setUserId] = useState(''); // Untuk Nama Pekerja
   const [workshop, setWorkshop] = useState(''); // Untuk Workshop
   const [status, setStatus] = useState('Belum Dikerjakan'); // Default status
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Pastikan semua field terisi sebelum submit
     if (title && userId && workshop && status) {
       // Panggil fungsi 'addTicket' dengan data yang sesuai
-      addTicket({ title, user_id: userId, status, workshop });
+      addTicket({ title, user_id: userId, status, workshop});
       // Reset form setelah submit
       setTitle('');
       setUserId('');

@@ -56,6 +56,7 @@ class TicketController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'workshop' => 'required|string',
+            'requested_time' => 'required|date_format:H:i',
         ]);
 
         // 2. Cari user pertama yang memiliki peran 'admin'
@@ -70,6 +71,7 @@ class TicketController extends Controller
         $ticket = Ticket::create([
             'title' => $validated['title'],
             'workshop' => $validated['workshop'],
+            'requested_time' => $validated['requested_time'],
             'creator_id' => auth()->id(),
             'user_id' => $admin->id, // Langsung ditugaskan ke admin
             'status' => 'Belum Dikerjakan',
