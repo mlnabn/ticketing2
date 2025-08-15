@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { login } from '../auth';
 import '../App.css';
-import bgImage2 from '../Image/Login.jpg';
+import bgImage2 from '../Image/Login.png';
 
 const API_URL = 'http://127.0.0.1:8000/api';
 

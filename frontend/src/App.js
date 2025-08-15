@@ -16,7 +16,7 @@ import Pagination from './components/Pagination';
 import { getToken, isLoggedIn, logout, getUser } from './auth';
 import './App.css';
 import yourLogo from './Image/Logo.png';
-import loginBackground from './Image/my-login-background.jpg';
+import loginBackground from './Image/LoginBg.jpg';
 import bgImage from './Image/homeBg.jpg';
 import yourLogok from './Image/DTECH-Logo.png';
 // =================================================================

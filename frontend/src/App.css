@@ -2,6 +2,7 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 
 /* Import Google Fonts - Inter (hanya satu kali) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -397,10 +398,7 @@ body.dark-mode {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   transition: background-color 0.3s ease;
   background-image: var(--auth-background-image-light);
-}
 
-body.dark-mode .auth-page-container {
-  background-color: var(--auth-bg-dark);
 }
 
 /* Card 2 kolom */
@@ -408,28 +406,37 @@ body.dark-mode .auth-page-container {
   display: flex;
   flex-direction: row;
   border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0px 0px 54px 4px rgba(150,150,150,0.89);
+-webkit-box-shadow: 0px 0px 54px 4px rgba(150,150,150,0.89);
+-moz-box-shadow: 0px 0px 54px 4px rgba(150,150,150,0.89);
   overflow: hidden;
   width: 900px;
   max-width: 100%;
-  background: #fff;
+  /* transparansi sama */
+  /* backdrop-filter: blur(6px); efek blur */
 }
 
-/* Bagian form */
+/* Bagian form kiri & kanan */
 .login-card,
-.register-card {
+.register-card,
+.login-background-side {
   flex: 1;
   padding: 50px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(6px);
+  background: rgba(255, 255, 255, 0.432);
+  /* sama persis */
+  /* backdrop-filter: blur(6px); */
   text-align: center;
+
 }
+
 
 .login-card h2,
 .register-card h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 545;
   margin-bottom: 24px;
   color: #000111;
-  font-size: 28px;
+  font-size: 40px;
 }
 
 /* Bagian background kanan */
