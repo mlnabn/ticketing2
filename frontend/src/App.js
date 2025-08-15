@@ -392,7 +392,7 @@ function App() {
   // Tampilan untuk ADMIN
   if (isAdmin) {
     return (
-      <div className={`dashboard-container${isSidebarOpen ? '' : 'sidebar-closed'}`}>
+      <div className={`dashboard-container ${isSidebarOpen ? '' : 'sidebar-closed'}`}>
         <aside className={`sidebar ${!isSidebarOpen ? 'closed' : ''}`}>
           <div className="sidebar-header">
             <img src={yourLogo} alt="Logo" className="sidebar-logo" />

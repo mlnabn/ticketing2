@@ -583,6 +583,7 @@ body.dark-mode .dashboard-container {
 
 /* Kelas untuk saat sidebar tertutup */
 .dashboard-container.sidebar-closed .sidebar {
+  grid-template-columns: 0 1fr;
   width: 0;
   /* Sembunyikan sidebar dengan lebar 0 */
   overflow: hidden;
@@ -1022,6 +1023,12 @@ body.dark-mode .logout-button:hover {
 .dashboard-container.sidebar-closed .main-content {
   margin-left: 0;
   /* Atau nilai kecil jika ada ikon hamburger yang terlihat */
+}
+
+.sidebar.closed {
+  width: 0;
+  padding: 0;
+  overflow: hidden; /* Sembunyikan semua isinya */
 }
 
 
@@ -2776,6 +2783,7 @@ body.dark-mode .btn-delete:hover {
 }
 
 .main-content {
+  transition: margin-left 0.3s ease;
   background: transparent;
 }
 
