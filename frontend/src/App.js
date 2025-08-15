@@ -358,7 +358,6 @@ function App() {
     }
   }, [isLogin, currentPage, userPage, userSearchQuery, fetchUsers]);
 
-  // PERBAIKAN: Efek ini sekarang akan mengambil data riwayat SETIAP KALI tab 'history' aktif
   useEffect(() => {
     if (isLogin && !isAdmin && userViewTab === 'history') {
       fetchCreatedTickets(createdTicketsPage);
@@ -402,6 +401,7 @@ function App() {
             <ul>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Tickets')} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-home"></i><span>Home</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>User</span></button></li>
+              <li className="sidebar-nav-item"><button className="sidebar-button"><i className="fas fa-chart-bar"></i><span>Laporan</span></button></li>
             </ul>
           </nav>
           <div className="sidebar-footer">
@@ -453,6 +453,9 @@ function App() {
             )}
           </div>
         </main>
+        {showConfirmModal && ticketToDelete && (<ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
+        {showUserConfirmModal && userToDelete && (<ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete.name}"?`} onConfirm={confirmUserDelete} onCancel={cancelUserDelete} />)}
+        {showUserFormModal && (<UserFormModal userToEdit={userToEdit} onClose={handleCloseUserForm} onSave={handleSaveUser}/>)}
       </div>
     );
   }
