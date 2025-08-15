@@ -378,73 +378,72 @@ body.dark-mode {
   margin-bottom: 3.5rem;
 }
 
-/*
-  ---------------------------------------------------
-  GAYA HALAMAN LOGIN/REGISTER
-  ---------------------------------------------------
-  Gaya untuk container utama halaman login dan register.
-  DIUBAH: Menggunakan warna solid untuk latar belakang dan menyesuaikan ukuran kartu.
-*/
+/* =========================================
+   GAYA HALAMAN LOGIN & REGISTER
+   ========================================= */
+
+/* Container utama */
 .auth-page-container {
   display: flex;
-  justify-content: right;
+  justify-content: center;
   align-items: center;
-  padding-right: 270px;
-  /* justify-content: ; */
   min-height: 100vh;
   width: 100%;
-
-  /* Diubah menjadi warna putih solid */
-  background-image: var(--auth-background-image-light);
-  /* Gunakan variabel CSS dari JS */
   background-size: cover;
-  /* Memastikan gambar menutupi seluruh area */
   background-position: center;
-  /* Memposisikan gambar di tengah */
   background-repeat: no-repeat;
-  /* Mencegah gambar berulang */
   position: relative;
-  /* Diperlukan untuk overlay */
   overflow: hidden;
-  /* Memastikan tidak ada scrollbar yang tidak diinginkan */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   transition: background-color 0.3s ease;
-  /* Transisi untuk warna solid */
+  background-image: var(--auth-background-image-light);
 }
 
 body.dark-mode .auth-page-container {
   background-color: var(--auth-bg-dark);
-  /* Latar belakang gelap solid di dark mode */
 }
 
-/* Gaya untuk kartu Login/Register (kotak putih di tengah) */
+/* Card 2 kolom */
+.split-card {
+  display: flex;
+  flex-direction: row;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  width: 900px;
+  max-width: 100%;
+  background: #fff;
+}
+
+/* Bagian form */
 .login-card,
 .register-card {
-  background: #c2c0c0;
-  /* Kartu putih solid */
-  backdrop-filter: none;
-  /* Hapus efek blur */
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  flex: 1;
   padding: 50px;
-  width: 500px;
-  /* DIUBAH: Mengatur max-width agar lebih besar */
-  max-width: 450px;
-  /*Lebar kartu login/register, bisa diubah ke 450px atau lebih */
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(6px);
   text-align: center;
-  transition: all 0.3s ease;
-  opacity: 80%;
 }
 
 .login-card h2,
 .register-card h2 {
   margin-bottom: 24px;
   color: #000111;
-  /* Warna judul di kartu login/register */
   font-size: 28px;
 }
 
-/* Grup input dengan ikon */
+/* Bagian background kanan */
+.login-background-side {
+  flex: 1;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Input group */
 .input-group {
   position: relative;
   margin-bottom: 20px;
@@ -455,15 +454,12 @@ body.dark-mode .auth-page-container {
 .input-group input {
   width: 100%;
   padding: 12px 16px 12px 42px;
-  /* Padding disesuaikan untuk ikon */
   border: 1px solid #ccc;
   border-radius: 30px;
-  /* Lebih bulat */
   background-color: #f8f9fa;
   font-size: 16px;
   transition: all 0.3s ease;
 }
-
 
 .input-group input:focus {
   border-color: #42a5f5;
@@ -477,11 +473,9 @@ body.dark-mode .auth-page-container {
   left: 15px;
   font-size: 16px;
   color: #757575;
-  z-index: 1;
-  /* Pastikan ikon di atas input */
 }
 
-/* Opsi login (Remember me, Forgot password) */
+/* Opsi login/register */
 .login-options {
   display: flex;
   justify-content: space-between;
@@ -491,17 +485,22 @@ body.dark-mode .auth-page-container {
   color: #555;
 }
 
-.login-options a {
+.forgot-password {
   color: #1976d2;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.login-options a:hover {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 600;
   text-decoration: underline;
+  padding: 0;
 }
 
-/* Tombol Login/Register utama */
+.forgot-password:hover {
+  color: #0d47a1;
+}
+
+/* Tombol */
 .login-btn,
 .register-btn {
   background: linear-gradient(to right, #1976d2, #1565c0);
@@ -522,7 +521,7 @@ body.dark-mode .auth-page-container {
   transform: scale(1.02);
 }
 
-/* Teks dan link toggle autentikasi (Don't have an account? / Already have an account?) */
+/* Toggle link */
 .auth-toggle {
   margin-top: 20px;
   font-size: 14px;
@@ -546,21 +545,7 @@ body.dark-mode .auth-page-container {
   color: #0d47a1;
 }
 
-.forgot-password {
-  color: #1976d2;
-  background: none;
-  border: none;
-  font-size: 14px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: color 0.3s ease;
-  text-decoration: underline;
-  padding: 0;
-}
 
-.forgot-password:hover {
-  color: #0d47a1;
-}
 
 
 /*
@@ -3025,6 +3010,7 @@ body.dark-mode .history-tab {
   min-height: 45px;
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.15);
+  width: 50%;
 }
 
 .input-like-selectuser:hover {

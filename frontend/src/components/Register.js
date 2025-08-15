@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import '../App.css';
+import bgImage2 from '../Image/Login.jpg'; // Ganti sesuai gambar background yang dipakai
 
 const API_URL = 'http://127.0.0.1:8000/api';
 
@@ -46,70 +48,84 @@ function Register({ onRegister, onShowLogin }) {
   };
 
   return (
-    <div className="register-page">
-      <form onSubmit={handleSubmit} className="register-card">
-        <h2>Register</h2>
+    <div className="auth-page-container">
+      {/* Card dengan 2 kolom */}
+      <div className="split-card">
 
-        <div className="input-group">
-          <span className="input-icon">👤</span>
-          <input
-            type="text"
-            name="name"
-            placeholder="Nama"
-            onChange={handleChange}
-            required
-          />
+        {/* Kiri - Form Register */}
+        <div className="register-card">
+          <form onSubmit={handleSubmit}>
+            <h2>Register</h2>
+
+            <div className="input-group">
+              <span className="input-icon">👤</span>
+              <input
+                type="text"
+                name="name"
+                placeholder="Nama"
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="input-group">
+              <span className="input-icon">📧</span>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="input-group">
+              <span className="input-icon">🔒</span>
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="input-group">
+              <span className="input-icon">🔒</span>
+              <input
+                type="password"
+                name="password_confirmation"
+                placeholder="Konfirmasi Password"
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <button type="submit" className="register-btn" disabled={loading}>
+              {loading ? 'Memproses...' : 'Register'}
+            </button>
+
+            <p className="auth-toggle">
+              Have an account?{" "}
+              <button
+                type="button"
+                onClick={onShowLogin}
+                className="login-link"
+              >
+                Login
+              </button>
+            </p>
+          </form>
         </div>
 
-        <div className="input-group">
-          <span className="input-icon">📧</span>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="input-group">
-          <span className="input-icon">🔒</span>
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="input-group">
-          <span className="input-icon">🔒</span>
-          <input
-            type="password"
-            name="password_confirmation"
-            placeholder="Konfirmasi Password"
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <button type="submit" className="register-btn" disabled={loading}>
-          {loading ? 'Memproses...' : 'Register'}
-        </button>
-
-        {/* ✅ Tombol untuk kembali ke Login */}
-        <p className="auth-toggle">
-          Have an account?{" "}
-          <button
-            type="button"
-            onClick={onShowLogin}
-            className="login-link"
-          >
-            Login
-          </button>
-        </p>
-      </form>
+        {/* Kanan - Gambar */}
+        <div
+          className="login-background-side"
+          style={{
+            backgroundImage: `url(${bgImage2})`
+          }}
+        />
+      </div>
     </div>
   );
 }

@@ -16,7 +16,7 @@ import Pagination from './components/Pagination';
 import { getToken, isLoggedIn, logout, getUser } from './auth';
 import './App.css';
 import yourLogo from './Image/Logo.png';
-import loginBackground from './Image/my-login-background.png';
+import loginBackground from './Image/my-login-background.jpg';
 import bgImage from './Image/homeBg.jpg';
 import yourLogok from './Image/DTECH-Logo.png';
 // =================================================================
@@ -392,7 +392,7 @@ function App() {
   // Tampilan untuk ADMIN
   if (isAdmin) {
     return (
-      <div className={`dashboard-container ${isSidebarOpen ? '' : 'sidebar-closed'}`}>
+      <div className={`dashboard-container${isSidebarOpen ? '' : 'sidebar-closed'}`}>
         <aside className={`sidebar ${!isSidebarOpen ? 'closed' : ''}`}>
           <div className="sidebar-header">
             <img src={yourLogo} alt="Logo" className="sidebar-logo" />
@@ -455,7 +455,7 @@ function App() {
         </main>
         {showConfirmModal && ticketToDelete && (<ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
         {showUserConfirmModal && userToDelete && (<ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete.name}"?`} onConfirm={confirmUserDelete} onCancel={cancelUserDelete} />)}
-        {showUserFormModal && (<UserFormModal userToEdit={userToEdit} onClose={handleCloseUserForm} onSave={handleSaveUser}/>)}
+        {showUserFormModal && (<UserFormModal userToEdit={userToEdit} onClose={handleCloseUserForm} onSave={handleSaveUser} />)}
       </div>
     );
   }

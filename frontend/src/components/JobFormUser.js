@@ -40,61 +40,63 @@ function JobFormUser({ users, addTicket, userRole }) {
 
 
   // Styling untuk komponen React-Select
-const selectStyles = {
-  control: (provided) => ({
-    ...provided,
-    backgroundColor: "#565659", // biru gelap sesuai tema utama
-    borderRadius: "10px",
-    borderColor: "#949494ff",
-    minHeight: "45px",
-    fontWeight: 500,
-    boxShadow: "none",
-    color: "white", // warna teks saat nilai sudah dipilih
-    "&:hover": {
-      borderColor: "#f2f7f7ff" 
-    }
-  }),
-  placeholder: (provided) => ({
-    ...provided,
-    color: "#c6c7c8ff", // biru muda untuk placeholder
-    fontWeight: 500
-  }),
-  singleValue: (provided) => ({
-    ...provided,
-    color: "#c6c7c8ff",
-    fontWeight: 500
-  }),
-  input: (provided) => ({
-    ...provided,
-    color: "#c6c7c8ff" // warna teks saat mengetik
-  }),
-  menu: (provided) => ({
-    ...provided,
-    backgroundColor: "#696b6cff",
-    border: "1px solid #cadaf0ff",
-    boxShadow: "0 4px 8px rgba(0,0,0,0.2)"
-  }),
-  option: (provided, state) => ({
-    ...provided,
-    color: "white",
-    backgroundColor: state.isFocused ? "#626f81ff" : "transparent",
-    "&:active": {
-      backgroundColor: "#7592c3ff",
-      color: "white"
-    }
-  }),
-  indicatorSeparator: (provided) => ({
-    ...provided,
-    backgroundColor: "#adadaeff"
-  }),
-  dropdownIndicator: (provided) => ({
-    ...provided,
-    color: "#aeafb0ff",
-    '&:hover': {
-      color: "white"
-    }
-  }),
-};
+  const selectStyles = {
+    control: (provided) => ({
+      ...provided,
+      backgroundColor: "#565659", // biru gelap sesuai tema utama
+      borderRadius: "10px",
+      borderColor: "#949494ff",
+      minHeight: "45px",
+      fontWeight: 500,
+      boxShadow: "none",
+
+      color: "white",
+      width: "50%", // warna teks saat nilai sudah dipilih
+      "&:hover": {
+        borderColor: "#f2f7f7ff"
+      }
+    }),
+    placeholder: (provided) => ({
+      ...provided,
+      color: "#c6c7c8ff", // biru muda untuk placeholder
+      fontWeight: 500
+    }),
+    singleValue: (provided) => ({
+      ...provided,
+      color: "#c6c7c8ff",
+      fontWeight: 500
+    }),
+    input: (provided) => ({
+      ...provided,
+      color: "#c6c7c8ff" // warna teks saat mengetik
+    }),
+    menu: (provided) => ({
+      ...provided,
+      backgroundColor: "#696b6cff",
+      border: "1px solid #cadaf0ff",
+      boxShadow: "0 4px 8px rgba(0,0,0,0.2)"
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      color: "white",
+      backgroundColor: state.isFocused ? "#626f81ff" : "transparent",
+      "&:active": {
+        backgroundColor: "#7592c3ff",
+        color: "white"
+      }
+    }),
+    indicatorSeparator: (provided) => ({
+      ...provided,
+      backgroundColor: "#adadaeff"
+    }),
+    dropdownIndicator: (provided) => ({
+      ...provided,
+      color: "#aeafb0ff",
+      '&:hover': {
+        color: "white"
+      }
+    }),
+  };
 
   return (
     <form onSubmit={handleSubmit} className="job-form-user">
