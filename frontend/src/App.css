@@ -489,11 +489,11 @@ body.dark-mode {
   align-items: center;
   font-size: 14px;
   margin-bottom: 20px;
-  color: #555;
+  color: #ffffff;
 }
 
 .forgot-password {
-  color: #1976d2;
+  color: #4da6ff;
   background: none;
   border: none;
   font-size: 14px;
@@ -504,7 +504,7 @@ body.dark-mode {
 }
 
 .forgot-password:hover {
-  color: #0d47a1;
+  color: #7bb0ff;
 }
 
 /* Tombol */
@@ -532,14 +532,14 @@ body.dark-mode {
 .auth-toggle {
   margin-top: 20px;
   font-size: 14px;
-  color: #333;
+  color: #ffffff;
 }
 
 .register-link,
 .login-link {
   background: none;
   border: none;
-  color: #1976d2;
+  color: #4da6ff;
   font-weight: bold;
   cursor: pointer;
   text-decoration: underline;
@@ -549,10 +549,65 @@ body.dark-mode {
 
 .register-link:hover,
 .login-link:hover {
-  color: #0d47a1;
+  color: #7bb0ff;
 }
 
+/* =========================================
+   📱 RESPONSIVE UNTUK HP
+   ========================================= */
+@media (max-width: 768px) {
+  .split-card {
+    flex-direction: column;
+    width: 95%;
+    box-shadow: none;
+    border-radius: 10px;
+  }
 
+  .login-card,
+  .register-card {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.85);
+  }
+
+  .login-background-side {
+    display: none;
+  }
+
+  .login-card h2,
+  .register-card h2 {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+
+  .input-group input {
+    font-size: 14px;
+    padding: 10px 14px 10px 38px;
+  }
+
+  .login-btn,
+  .register-btn {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .login-options {
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .auth-toggle {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card h2,
+  .register-card h2 {
+    font-size: 24px;
+  }
+}
 
 
 /*
@@ -1159,6 +1214,7 @@ body.dark-mode .header-icon-button:hover {
 
 
 
+
 /* Tombol Hamburger Menu */
 .hamburger-menu-button {
   background: none;
@@ -1178,6 +1234,7 @@ body.dark-mode .header-icon-button:hover {
   /* Tengahkan ikon secara vertikal */
   justify-content: center;
   /* Tengahkan ikon secara horizontal */
+  
 }
 
 .hamburger-menu-button:hover {
