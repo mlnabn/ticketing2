@@ -52,7 +52,7 @@ function JobFormUser({ users, addTicket, userRole }) {
       boxShadow: "none",
 
       color: "white",
-      width: "50%", // warna teks saat nilai sudah dipilih
+
       "&:hover": {
         borderColor: "#f2f7f7ff"
       }
@@ -102,16 +102,31 @@ function JobFormUser({ users, addTicket, userRole }) {
   return (
     <form onSubmit={handleSubmit} className="job-form-user">
       {/* Input untuk Workshop */}
-      <Select
-        options={workshopOptions}
-        onChange={(selected) => setWorkshop(selected ? selected.value : '')}
-        value={selectedWorkshop}
-        placeholder="Workshop"
-        isSearchable
-        styles={selectStyles}
-        classNamePrefix="react-selectuser"
-        required
-      />
+
+      <div className="row-input">
+        <Select
+          options={workshopOptions}
+          onChange={(selected) => setWorkshop(selected ? selected.value : '')}
+          value={selectedWorkshop}
+          placeholder="Workshop"
+          isSearchable
+          styles={selectStyles}
+          classNamePrefix="react-selectuser"
+          required
+        />
+        <div className="time-wrapper">
+          <label className="time-label">Select Time</label>
+          <input
+            type="time"
+            value={requestedTime}
+            onChange={(e) => setRequestedTime(e.target.value)}
+            required
+            className="input-selectuser"
+          />
+        </div>
+
+      </div>
+
 
       {/* Select untuk Nama Pekerja */}
       {/* <Select
@@ -125,14 +140,6 @@ function JobFormUser({ users, addTicket, userRole }) {
         required
       /> */}
 
-      <input
-        type="time"
-        value={requestedTime}
-        onChange={(e) => setRequestedTime(e.target.value)}
-        required
-        className="input-like-selectuser"
-      />
-
       {/* Input untuk Deskripsi */}
       <input
         type="text"
@@ -145,7 +152,7 @@ function JobFormUser({ users, addTicket, userRole }) {
 
       {/* Tombol Tambah */}
       <button type="submit" className="btn-submituser">Tambah</button>
-    </form>
+    </form >
   );
 
 }
