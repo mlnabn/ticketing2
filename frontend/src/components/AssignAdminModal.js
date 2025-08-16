@@ -93,8 +93,8 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose }) {
   return (
     <div className="confirmation-modal-backdrop">
       <div className="confirmation-modal-content">
-        <h3>Tugaskan Pekerjaan "{ticket.title}"</h3>
-        <p>Pilih admin yang akan mengerjakan tiket ini:</p>
+        <h3>Ticket "{ticket.title}"</h3>
+        <p>Dikerjakan Oleh :</p>
         <Select
           options={adminOptions}
           onChange={(option) => setSelectedAdminId(option.value)}
