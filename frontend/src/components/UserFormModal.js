@@ -19,7 +19,7 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
         email: userToEdit.email,
         password: '',
         password_confirmation: '',
-        role: userToEdit,
+        role: userToEdit.role,
       });
     } else {
       setFormData({ name: '', email: '', password: '', password_confirmation: '', role: 'user' });
@@ -52,7 +52,7 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
             </div>
             <div>
               <label htmlFor="role">Peran:</label>
-              <select id="role" name="role" value={formData.role} onChange={handleChange} required>
+              <select id="role" name="role" value={formData.role} onChange={handleChange} required className="form-input">
                 <option value="user">User</option>
                 <option value="admin">Admin</option>
               </select>
@@ -66,7 +66,7 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
               <input type="password" id="password_confirmation" name="password_confirmation" value={formData.password_confirmation} onChange={handleChange} />
             </div>
             <div className="form-actions">
-              <button type="button" onClick={onClose} className="btn-secondary">Batal</button>
+              <button type="button" onClick={onClose} className="btn-delete">Batal</button>
               <button type="submit" className="btn-primary">Simpan</button>
             </div>
           </form>
