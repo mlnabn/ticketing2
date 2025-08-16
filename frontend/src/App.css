@@ -406,9 +406,9 @@ body.dark-mode {
   display: flex;
   flex-direction: row;
   border-radius: 20px;
-  box-shadow: 0px 0px 54px 4px rgba(150,150,150,0.89);
--webkit-box-shadow: 0px 0px 54px 4px rgba(150,150,150,0.89);
--moz-box-shadow: 0px 0px 54px 4px rgba(150,150,150,0.89);
+  box-shadow: 0px 0px 54px 4px rgba(150, 150, 150, 0.89);
+  -webkit-box-shadow: 0px 0px 54px 4px rgba(150, 150, 150, 0.89);
+  -moz-box-shadow: 0px 0px 54px 4px rgba(150, 150, 150, 0.89);
   overflow: hidden;
   width: 900px;
   max-width: 100%;
@@ -603,6 +603,7 @@ body.dark-mode {
 }
 
 @media (max-width: 480px) {
+
   .login-card h2,
   .register-card h2 {
     font-size: 24px;
@@ -1083,7 +1084,8 @@ body.dark-mode .logout-button:hover {
 .sidebar.closed {
   width: 0;
   padding: 0;
-  overflow: hidden; /* Sembunyikan semua isinya */
+  overflow: hidden;
+  /* Sembunyikan semua isinya */
 }
 
 
@@ -1241,7 +1243,7 @@ body.dark-mode .header-icon-button:hover {
   /* Tengahkan ikon secara vertikal */
   justify-content: center;
   /* Tengahkan ikon secara horizontal */
-  
+
 }
 
 .hamburger-menu-button:hover {
@@ -2972,7 +2974,7 @@ body.dark-mode .history-tab {
 .history-tab p {
   text-align: center;
   margin-bottom: 2rem;
-  color: white;
+  color: rgba(249, 246, 246, 0.652);
   /* ganti jadi putih */
 }
 
@@ -3056,7 +3058,8 @@ body.dark-mode .history-tab {
 .job-form-user {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  flex-wrap: wrap;
+  gap: 12px;
   padding: 20px;
   border-radius: 12px;
   background: #1f29372a;
@@ -3065,79 +3068,115 @@ body.dark-mode .history-tab {
   -moz-box-shadow: 0px 2px 148px 35px rgba(0, 0, 0, 0.6);
 }
 
+
 /* =========================
    REACT-SELECT USER STYLING
    ========================= */
 
+/* ====== Row Input (Workshop + Time) ====== */
+.row-input {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.row-input > * {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Khusus kalau mau beda lebar */
+.react-selectuser {
+  flex: 2;
+}
+
+/* ====== Time Input Wrapper ====== */
+.time-wrapper {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Label untuk time */
+.time-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #c6c7c8;
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+/* ====== Input Time User ====== */
+.input-selectuser {
+  flex: 1;
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background-color: #565659;
+  transition: 0.2s ease;
+}
+
+.input-selectuser:hover,
+.input-selectuser:focus {
+  background-color: #6b6b6e;
+  border-color: #b0b0b0;
+  outline: none;
+}
 
 /* ====== Input Deskripsi User ====== */
 .input-like-selectuser {
-  border-radius: 10px;
+  width: 100%;
+  min-height: 45px;
   padding: 10px 12px;
-  border-color: #949494ff;
-  background-color: #565659;
-  box-shadow: none;
   font-size: 14px;
   font-weight: 500;
-  min-height: 45px;
-  color: white;
+  color: #fff;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  width: 50%;
+  background-color: #565659;
+  margin-bottom: 20px;
+  transition: 0.2s ease;
 }
 
-.input-like-selectuser:hover {
-  background-color: #6b6b6e;
-  /* warna saat hover */
-  border-color: #b0b0b0;
-  /* warna border saat hover */
-}
-
+.input-like-selectuser:hover,
 .input-like-selectuser:focus {
-  box-shadow: none;
+  background-color: #6b6b6e;
+  border-color: rgba(255, 255, 255, 0.35);
   outline: none;
-  border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 .input-like-selectuser::placeholder {
-  color: #c6c7c8ff;
+  color: #c6c7c8;
   font-size: 14px;
 }
 
-/* Hilangkan merah muda di input required */
-/* .input-like-selectuser:invalid {
-  background-color: #565659;
-  border: 1px solid #eaeaf0;
-  border-radius: 8px;
-} */
-
-/* ====== Dark Mode ====== */
-/* body.dark-mode .input-like-selectuser {
-  background-color: #2a2a2a;
-  color: #f0f0f0;
-}
-
-body.dark-mode .input-like-selectuser::placeholder {
-  color: #bbb;
-} */
-
-/* ====== Button ====== */
+/* ====== Button Tambah ====== */
 .btn-submituser {
   display: block;
   margin: 0 auto;
-  background-color: #17355b;
-  color: white;
-  padding: 10px 18px;
-  border-radius: 8px;
   width: 30%;
+  padding: 10px 18px;
   font-weight: bold;
+  color: #fff;
+  background-color: #17355b;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-
+  transition: 0.2s ease;
 }
 
 .btn-submituser:hover {
   background-color: #1558b0;
 }
+
+
 
 /* ====== DARK MODE ====== */
 /* body.dark-mode .job-form-user {
