@@ -73,11 +73,36 @@ class TicketController extends Controller
             'workshop' => $validated['workshop'],
             'requested_time' => $validated['requested_time'],
             'creator_id' => auth()->id(),
-            'user_id' => $admin->id, // Langsung ditugaskan ke admin
+            'user_id' => null, 
             'status' => 'Belum Dikerjakan',
         ]);
 
         return response()->json($ticket, 201);
+    }
+
+    public function assign(Request $request, Ticket $ticket)
+    {
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'Hanya admin yang bisa menugaskan tiket.'], 403);
+        }
+
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+        
+        // Pastikan user yang ditugaskan adalah admin
+        $assignee = User::find($validated['user_id']);
+        if (!$assignee || $assignee->role !== 'admin') {
+            return response()->json(['error' => 'Hanya bisa menugaskan ke sesama admin.'], 422);
+        }
+
+        $ticket->update([
+            'user_id' => $validated['user_id'],
+            'status' => 'Sedang Dikerjakan',
+            'started_at' => now(),
+        ]);
+
+        return response()->json($ticket->load(['user', 'creator']));
     }
 
     /**

@@ -12,6 +12,7 @@ import Register from './components/Register';
 import UserManagement from './components/UserManagement';
 import UserFormModal from './components/UserFormModal';
 import ConfirmationModal from './components/ConfirmationModal';
+import AssignAdminModal from './components/AssignAdminModal';
 import Pagination from './components/Pagination';
 import { getToken, isLoggedIn, logout, getUser } from './auth';
 import './App.css';
@@ -34,6 +35,7 @@ function App() {
   // --- State untuk Data dari API ---
   const [ticketData, setTicketData] = useState(null);
   const [users, setUsers] = useState([]);
+  const [adminList, setAdminList] = useState([]);
   const [userData, setUserData] = useState(null);
   const [stats, setStats] = useState(null);
   const [createdTicketsData, setCreatedTicketsData] = useState(null);
@@ -68,6 +70,8 @@ function App() {
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState([]);
   const [statusFilter, setStatusFilter] = useState(null);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [ticketToAssign, setTicketToAssign] = useState(null);
 
 
   // -----------------------------------------------------------------
@@ -102,6 +106,16 @@ function App() {
     } catch (error) {
       console.error("Gagal mengambil data utama:", error);
       if (error.response && error.response.status === 401) handleLogout();
+    }
+  }, []);
+
+  const fetchAdmins = useCallback(async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${getToken()}` } };
+      const response = await axios.get(`${API_URL}/admins`, config);
+      setAdminList(response.data);
+    } catch (error) {
+      console.error("Gagal mengambil daftar admin:", error);
     }
   }, []);
 
@@ -172,6 +186,30 @@ function App() {
         fetchCreatedTickets(createdTicketsPage);
       }
     } catch (error) { console.error("Gagal update status:", error); }
+  };
+
+  // Fungsi BARU untuk membuka modal penugasan
+  const handleAssignClick = (ticket) => {
+    setTicketToAssign(ticket);
+    setShowAssignModal(true);
+  };
+
+  // Fungsi BARU untuk menutup modal penugasan
+  const handleCloseAssignModal = () => {
+    setTicketToAssign(null);
+    setShowAssignModal(false);
+  };
+
+  // Fungsi BARU untuk konfirmasi penugasan
+  const handleConfirmAssign = async (ticketId, adminId) => {
+    try {
+      await axios.patch(`${API_URL}/tickets/${ticketId}/assign`, { user_id: adminId }, { headers: { Authorization: `Bearer ${getToken()}` } });
+      handleCloseAssignModal();
+      fetchData(dataPage, searchQuery); // Refresh data tiket
+    } catch (error) {
+      console.error("Gagal menugaskan tiket:", error);
+      alert("Gagal menugaskan tiket.");
+    }
   };
 
   const handleStatusFilterClick = (status) => {
@@ -341,9 +379,10 @@ function App() {
       }
       if (isAdmin) {
         fetchData(dataPage, searchQuery, statusFilter);
+        fetchAdmins();
       }
     }
-  }, [isLogin, dataPage, searchQuery, statusFilter, fetchData, isAdmin]);
+  }, [isLogin, dataPage, searchQuery, statusFilter, fetchData, isAdmin, fetchAdmins]);
 
   useEffect(() => {
     const needsUserListForForm = (isAdmin && currentPage === 'Tickets') || (!isAdmin && userViewTab === 'request');
@@ -438,13 +477,13 @@ function App() {
                   <div className={`info-card yellow-card ${!statusFilter ? 'active' : ''}`} onClick={() => handleStatusFilterClick(null)}><h3>{stats ? stats.total_tickets : '...'}</h3><p>Total Tiket</p></div>
                   <div className="info-card blue-card"><h3>{stats ? stats.total_users : '...'}</h3><p>Total Pengguna</p></div>
                 </div>
-                <JobForm users={users} addTicket={addTicket} />
+                {/* <JobForm users={users} addTicket={addTicket} /> */}
                 <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
                   <input type="text" placeholder="Cari berdasarkan nama pekerja..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} style={{ flexGrow: 1, padding: '8px' }} />
                   <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
                 </form>
                 {selectedTicketIds.length > 0 && (<div className="bulk-action-bar" style={{ margin: '20px 0' }}><button onClick={handleBulkDelete} className="btn-delete">Hapus {selectedTicketIds.length} Tiket yang Dipilih</button></div>)}
-                <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} loggedInUserId={loggedInUserId} userRole={userRole} onSelectionChange={handleSelectionChange} />
+                <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} userRole={userRole} onSelectionChange={handleSelectionChange} onAssignClick={handleAssignClick} />
                 <Pagination currentPage={dataPage} lastPage={ticketData ? ticketData.last_page : 1} onPageChange={handlePageChange} />
               </>
             )}
@@ -453,6 +492,9 @@ function App() {
             )}
           </div>
         </main>
+        {showAssignModal && ticketToAssign && (
+          <AssignAdminModal ticket={ticketToAssign} admins={adminList} onAssign={handleConfirmAssign} onClose={handleCloseAssignModal} />
+        )}
         {showConfirmModal && ticketToDelete && (<ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
         {showUserConfirmModal && userToDelete && (<ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete.name}"?`} onConfirm={confirmUserDelete} onCancel={cancelUserDelete} />)}
         {showUserFormModal && (<UserFormModal userToEdit={userToEdit} onClose={handleCloseUserForm} onSave={handleSaveUser} />)}

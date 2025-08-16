@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 
-function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelectionChange }) {
+function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelectionChange, onAssignClick }) {
   const [selectedIds, setSelectedIds] = useState([]);
   const isAdmin = userRole && userRole.toLowerCase() === 'admin';
 
@@ -38,6 +38,15 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
 
     switch (ticket.status) {
       case 'Belum Dikerjakan':
+        if (!ticket.user) {
+          // Jika belum ditugaskan, tombol ini akan membuka modal
+          return (
+            <button onClick={() => onAssignClick(ticket)} className="btn-start">
+              Mulai Kerjakan
+            </button>
+          );
+        }
+        // Jika sudah ditugaskan, tombol ini mengubah status
         return (
           <button onClick={() => updateTicketStatus(ticket.id, 'Sedang Dikerjakan')} className="btn-start">
             Mulai Kerjakan
@@ -109,7 +118,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                   </td>
                 )}
                 <td data-label="Pengirim">{ticket.creator ? ticket.creator.name : 'N/A'}</td>
-                <td data-label="Nama Pekerja">{ticket.user ? ticket.user.name : 'N/A'}</td>
+                <td data-label="Nama Pekerja">{ticket.user ? ticket.user.name : '-'}</td>
                 <td data-label="Workshop">{ticket.workshop}</td>
                 <td data-label="Deskripsi">{ticket.title}</td>
                 <td data-label="Tanggal Dibuat">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>

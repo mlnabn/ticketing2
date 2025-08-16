@@ -30,6 +30,12 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    public function getAdmins()
+    {
+        $admins = User::where('role', 'admin')->get();
+        return response()->json($admins);
+    }
+
     public function all()
     {
         // DIUBAH: Tambahkan ->where('role', 'user') untuk hanya mengambil user biasa.
