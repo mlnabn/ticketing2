@@ -95,7 +95,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
               </th>
             )}
             <th>Pengirim</th>
-            <th>Nama Pekerja</th>
+            <th>Dikerjakan Oleh</th>
             <th>Workshop</th>
             <th>Deskripsi</th>
             <th>Tanggal Dibuat</th>
