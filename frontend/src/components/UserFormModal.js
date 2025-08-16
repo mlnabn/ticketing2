@@ -7,6 +7,7 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
     email: '',
     password: '',
     password_confirmation: '',
+    role: 'user',
   });
   
   const isEditMode = Boolean(userToEdit);
@@ -18,9 +19,10 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
         email: userToEdit.email,
         password: '',
         password_confirmation: '',
+        role: userToEdit,
       });
     } else {
-      setFormData({ name: '', email: '', password: '', password_confirmation: '' });
+      setFormData({ name: '', email: '', password: '', password_confirmation: '', role: 'user' });
     }
   }, [userToEdit, isEditMode]);
 
@@ -47,6 +49,13 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
             <div>
               <label htmlFor="email">Email:</label>
               <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
+            </div>
+            <div>
+              <label htmlFor="role">Peran:</label>
+              <select id="role" name="role" value={formData.role} onChange={handleChange} required>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
             </div>
             <div>
               <label htmlFor="password">Password:</label>

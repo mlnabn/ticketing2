@@ -23,12 +23,14 @@ Route::middleware('jwt')->group(function () {
     Route::get('/user', [AuthController::class, 'getUser']);
     Route::put('/user', [AuthController::class, 'updateUser']); // Untuk user update profil sendiri
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/admins', [UserController::class, 'getAdmins']);
 
     // --- Rute untuk Tiket ---
     Route::get('/tickets/stats', [TicketController::class, 'stats']);
     Route::get('/tickets/created-by-me', [TicketController::class, 'createdTickets']);
     Route::post('/tickets/bulk-delete', [TicketController::class, 'bulkDelete']);
     Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus']);
+    Route::patch('/tickets/{ticket}/assign', [TicketController::class, 'assign']);
     Route::apiResource('tickets', TicketController::class)->only(['index', 'store', 'destroy']);
     
     Route::get('/users/all', [UserController::class, 'all']);
