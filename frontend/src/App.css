@@ -163,7 +163,33 @@
   --search-button-hover-bg-light: #2563eb;
   --search-button-text-light: #ffffff;
   
+    --modal-bg-light: #fff;
+  --text-color-light: #1a1a1a;
+  --secondary-text-color-light: #666;
+  --input-bg-light: #fff;
+  --border-color-light: #ccc;
+  --placeholder-color-light: #999;
+  --form-input-shadow-light: 0 2px 5px rgba(0,0,0,0.1);
+  --content-bg-light: #fff;
   
+  --button-confirm-bg-light: #007bff;
+  --button-confirm-hover-light: #0056b3;
+  --button-cancel-bg-light: #dc3545;
+  --button-cancel-hover-light: #c82333;
+
+  --modal-bg-dark: #2d2d2d;
+  --text-color-dark: #f0f0f0;
+  --secondary-text-color-dark: #b0b0b0;
+  --input-bg-dark: #444;
+  --border-color-dark: #555;
+  --placeholder-color-dark: #888;
+  --form-input-shadow-dark: 0 2px 5px rgba(0,0,0,0.4);
+  --content-bg-dark: #2d2d2d;
+
+  --button-confirm-bg-dark: #4a90e2;
+  --button-confirm-hover-dark: #3a7ed9;
+  --button-cancel-bg-dark: #e25c5c;
+  --button-cancel-hover-dark: #c84d4d;
 
 }
 
@@ -3240,101 +3266,110 @@ body.dark-mode .btn-submit:hover {
 
 
 
-/* AssignAdminModal.css */
-
-/* Backdrop overlay yang menutupi layar */
+/* --- Styling Backdrop Modal (Latar Belakang) --- */
 .confirmation-modal-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparan untuk efek buram */
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000; /* Memastikan modal berada di atas konten lain */
+  justify-content: center;
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
 }
 
-/* Konten utama modal */
+/* --- Styling Konten Modal --- */
 .confirmation-modal-content {
-  background-color: #fff;
+  background: var(--modal-bg-light);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
   padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  width: 90%;
-  max-width: 400px; /* Ukuran maksimal agar tidak terlalu lebar */
+  width: 420px;
+  max-width: 90%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.4s ease;
   text-align: center;
-  font-family: Arial, sans-serif;
-  animation: modal-fade-in 0.3s ease-out; /* Animasi muncul */
+  transition: all 0.3s ease;
 }
 
-/* Animasi untuk modal */
-@keyframes modal-fade-in {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+/* Efek khusus untuk Dark Mode */
+.dark-mode .confirmation-modal-content {
+  background: var(--modal-bg-dark);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
-/* Judul modal */
+/* --- Styling Teks di dalam Modal --- */
 .confirmation-modal-content h3 {
   margin-top: 0;
-  color: #333;
+  margin-bottom: 12px;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--text-color-light);
 }
 
-/* Paragraf deskriptif */
+.dark-mode .confirmation-modal-content h3 {
+  color: var(--text-color-dark);
+}
+
 .confirmation-modal-content p {
-  color: #666;
   font-size: 1rem;
-  margin-bottom: 25px;
+  color: var(--secondary-text-color-light);
+  margin-top: 0;
+  margin-bottom: 24px;
 }
 
-/* Container untuk tombol aksi */
+.dark-mode .confirmation-modal-content p {
+  color: var(--secondary-text-color-dark);
+}
+
+/* --- Styling Tombol Aksi --- */
 .confirmation-modal-actions {
   display: flex;
-  justify-content: space-between;
-  gap: 15px; /* Jarak antara tombol */
-  margin-top: 20px;
+  gap: 12px;
+  margin-top: 24px;
 }
 
-/* Styling dasar untuk semua tombol */
-.btn-cancel,
-.btn-confirm {
+.btn-confirm, .btn-cancel {
+  flex: 1;
   padding: 12px 24px;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
-  flex-grow: 1; /* Agar tombol mengisi ruang yang tersedia */
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white; /* Warna teks tombol */
 }
 
-/* Tombol 'Batal' */
-.btn-cancel {
-  background-color: #f44336; /* Merah */
-  color: #fff;
-}
-
-.btn-cancel:hover {
-  background-color: #d32f2f;
-  transform: translateY(-2px);
-}
-
-/* Tombol 'Tugaskan' */
 .btn-confirm {
-  background-color: #4caf50; /* Hijau */
-  color: #fff;
+  background-color: var(--button-confirm-bg-light);
 }
 
 .btn-confirm:hover {
-  background-color: #388e3c;
+  background-color: var(--button-confirm-hover-light);
   transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-cancel {
+  background-color: var(--button-cancel-bg-light);
+}
+
+.btn-cancel:hover {
+  background-color: var(--button-cancel-hover-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Animasi --- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
