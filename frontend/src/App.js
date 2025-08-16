@@ -62,7 +62,7 @@ function App() {
 
   // --- State untuk Interaksi UI (Tampilan) ---
   const [darkMode, setDarkMode] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Default sidebar terbuka untuk admin
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default sidebar terbuka untuk admin
   const [showRegister, setShowRegister] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState(null);
