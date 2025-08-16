@@ -17,7 +17,7 @@ class UserController extends Controller
         $perPage = $request->query('per_page', 10); // Default 10 user per halaman
 
         // Mulai query untuk user dengan peran 'user'
-        $query = User::where('role', 'user');
+        $query = User::query();
 
         // Jika ada parameter pencarian, tambahkan filter nama
         if ($search) {
@@ -25,7 +25,7 @@ class UserController extends Controller
         }
 
         // Urutkan berdasarkan nama dan lakukan paginasi
-        $users = $query->orderBy('name')->paginate($perPage);
+        $users = $query->orderBy('role', 'asc')->orderBy('name', 'asc')->paginate($perPage);
 
         return response()->json($users);
     }
