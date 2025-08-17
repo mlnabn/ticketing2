@@ -16,21 +16,19 @@ class TicketController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $perPage = $request->query('per_page', 5);
+        $perPage = $request->query('per_page', 10);
         $search = $request->query('search');
         $statusFilter = $request->query('status');
 
         $query = Ticket::with(['user', 'creator']);
 
         if ($user->role === 'admin') {
-            // Admin bisa mencari berdasarkan nama pekerja yang ditugaskan
             if ($search) {
                 $query->whereHas('user', function ($q) use ($search) {
                     $q->where('name', 'like', '%' . $search . '%');
                 });
             }
         } else {
-            // User biasa hanya melihat tiket yang ditugaskan padanya
             $query->where('user_id', $user->id);
         }
 
@@ -47,39 +45,33 @@ class TicketController extends Controller
     }
 
     /**
-     * PERUBAHAN UTAMA: Simpan tiket baru dari user.
-     * Tiket akan otomatis memiliki user_id = null.
+     * PERUBAHAN: Simpan tiket baru dengan user_id null.
      */
     public function store(Request $request)
     {
-        // 1. Validasi field yang dikirim oleh form user
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'workshop' => 'required|string',
             'requested_time' => 'required|date_format:H:i',
+            'requested_date' => 'nullable|date',
         ]);
 
-        // 2. Cari user pertama yang memiliki peran 'admin'
-        $admin = User::where('role', 'admin')->first();
-
-        // 3. Jika tidak ada admin, kembalikan error (ini adalah kasus darurat)
-        if (!$admin) {
-            return response()->json(['error' => 'Tidak ada admin yang bisa ditugaskan.'], 500);
-        }
-
-        // 4. Buat tiket baru dan tugaskan ke admin yang ditemukan
         $ticket = Ticket::create([
             'title' => $validated['title'],
             'workshop' => $validated['workshop'],
             'requested_time' => $validated['requested_time'],
+            'requested_date' => $validated['requested_date'] ?? null,
             'creator_id' => auth()->id(),
-            'user_id' => null, 
+            'user_id' => null, // Tiket baru belum ditugaskan
             'status' => 'Belum Dikerjakan',
         ]);
 
         return response()->json($ticket, 201);
     }
 
+    /**
+     * FUNGSI BARU: Menugaskan tiket ke admin dan memulai pekerjaan.
+     */
     public function assign(Request $request, Ticket $ticket)
     {
         if (auth()->user()->role !== 'admin') {
@@ -90,7 +82,6 @@ class TicketController extends Controller
             'user_id' => 'required|exists:users,id',
         ]);
         
-        // Pastikan user yang ditugaskan adalah admin
         $assignee = User::find($validated['user_id']);
         if (!$assignee || $assignee->role !== 'admin') {
             return response()->json(['error' => 'Hanya bisa menugaskan ke sesama admin.'], 422);
@@ -186,7 +177,6 @@ class TicketController extends Controller
             $stats['pending_tickets'] = $stats['total_tickets'] - $stats['completed_tickets'];
             $stats['total_users'] = User::count();
         } else {
-            // Statistik untuk User biasa (hanya tiket yang ditugaskan padanya)
             $stats['total_tickets'] = Ticket::where('user_id', $user->id)->count();
             $stats['completed_tickets'] = Ticket::where('user_id', $user->id)->where('status', 'Selesai')->count();
             $stats['pending_tickets'] = $stats['total_tickets'] - $stats['completed_tickets'];

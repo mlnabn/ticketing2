@@ -130,8 +130,8 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                     if (ticket.started_at) {
                       return `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}`;
                     }
-                    if (ticket.requested_time) {
-                      return `Waktu yang diminta: ${ticket.requested_time}`;
+                    if (ticket.requested_date && ticket.requested_time) {
+                      return `Diminta: ${format(new Date(ticket.requested_date), 'dd MMM yyyy')}, ${ticket.requested_time}`;
                     }
                     return '-';
                   })()}

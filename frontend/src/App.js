@@ -582,7 +582,7 @@ function App() {
                               {/* <td>{ticket.user.name}</td> */}
                               <td>{ticket.title}</td>
                               <td>{ticket.workshop}</td>
-                              <td data-label="Tanggal Dibuat">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
+                              <td data-label="Tanggal Dibuat">{format(new Date(ticket.requested_date || ticket.created_at), 'dd MMM yyyy')}</td>
                               <td>
                                 {ticket.started_at
                                   ? (ticket.completed_at

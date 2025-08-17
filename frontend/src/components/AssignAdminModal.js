@@ -98,13 +98,13 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose }) {
         <Select
           options={adminOptions}
           onChange={(option) => setSelectedAdminId(option.value)}
-          placeholder="Pilih Admin..."
+          placeholder="Pilih ..."
           styles={selectStyles} // Menerapkan gaya di sini
           className="admin-select"
         />
         <div className="confirmation-modal-actions">
           <button onClick={onClose} className="btn-cancel">Batal</button>
-          <button onClick={handleSubmit} className="btn-confirm">Tugaskan</button>
+          <button onClick={handleSubmit} className="btn-confirm">Kerjakan</button>
         </div>
       </div>
     </div>

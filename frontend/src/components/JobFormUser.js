@@ -8,13 +8,14 @@ function JobFormUser({ users, addTicket, userRole }) {
   const [workshop, setWorkshop] = useState(''); // Untuk Workshop
   // const [status, setStatus] = useState('Belum Dikerjakan'); // Default status
   const [requestedTime, setRequestedTime] = useState('');
+  const [requestedDate, setRequestedDate] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Pastikan semua field terisi sebelum submit
     if (title && workshop && requestedTime) {
       // Panggil fungsi 'addTicket' dengan data yang sesuai
-      addTicket({ title, workshop, requested_time: requestedTime });
+      addTicket({ title, workshop, requested_time: requestedTime, requested_date: requestedDate });
       // Reset form setelah submit
       setTitle('');
       //setUserId('');
@@ -122,6 +123,12 @@ function JobFormUser({ users, addTicket, userRole }) {
             onChange={(e) => setRequestedTime(e.target.value)}
             required
             className="input-selectuser"
+          />
+          <input
+            type="date"
+            value={requestedDate}
+            onChange={(e) => setRequestedDate(e.target.value)}
+            className="input-like-selectuser"
           />
         </div>
 
