@@ -96,6 +96,23 @@ class TicketController extends Controller
         return response()->json($ticket->load(['user', 'creator']));
     }
 
+    public function reject(Request $request, Ticket $ticket)
+    {
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'Hanya admin yang bisa menolak tiket.'], 403);
+        }
+
+        $validated = $request->validate([
+            'reason' => 'required|string|max:1000',
+        ]);
+
+        // PERBAIKAN: Menyimpan data secara manual untuk menghindari masalah
+        $ticket->status = 'Ditolak';
+        $ticket->rejection_reason = $validated['reason'];
+        $ticket->save(); // Simpan perubahan
+
+        return response()->json($ticket->load(['user', 'creator']));
+    }
     /**
      * Ambil tiket yang dibuat oleh pengguna yang sedang login.
      */

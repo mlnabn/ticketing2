@@ -27,6 +27,7 @@ Route::middleware('jwt')->group(function () {
 
     // --- Rute untuk Tiket ---
     Route::get('/tickets/stats', [TicketController::class, 'stats']);
+    Route::patch('/tickets/{ticket}/reject', [TicketController::class, 'reject']);
     Route::get('/tickets/created-by-me', [TicketController::class, 'createdTickets']);
     Route::post('/tickets/bulk-delete', [TicketController::class, 'bulkDelete']);
     Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus']);

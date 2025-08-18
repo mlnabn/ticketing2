@@ -13,6 +13,8 @@ import UserManagement from './components/UserManagement';
 import UserFormModal from './components/UserFormModal';
 import ConfirmationModal from './components/ConfirmationModal';
 import AssignAdminModal from './components/AssignAdminModal';
+import RejectTicketModal from './components/RejectTicketModal';
+import RejectionInfoModal from './components/RejectionInfoModal';
 import Pagination from './components/Pagination';
 import { getToken, isLoggedIn, logout, getUser } from './auth';
 import './App.css';
@@ -72,6 +74,10 @@ function App() {
   const [statusFilter, setStatusFilter] = useState(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [ticketToAssign, setTicketToAssign] = useState(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [ticketToReject, setTicketToReject] = useState(null);
+   const [showRejectionInfoModal, setShowRejectionInfoModal] = useState(false); 
+  const [ticketToShowReason, setTicketToShowReason] = useState(null);
 
 
   // -----------------------------------------------------------------
@@ -216,6 +222,42 @@ function App() {
       console.error("Gagal menugaskan tiket:", error);
       alert("Gagal menugaskan tiket.");
     }
+  };
+
+  const handleRejectClick = (ticket) => {
+    setTicketToReject(ticket);
+    setShowRejectModal(true);
+  };
+
+  const handleCloseRejectModal = () => {
+    setTicketToReject(null);
+    setShowRejectModal(false);
+  };
+
+  const handleConfirmReject = async (ticketId, reason) => {
+    try {
+      await axios.patch(`${API_URL}/tickets/${ticketId}/reject`, { reason }, { headers: { Authorization: `Bearer ${getToken()}` } });
+      handleCloseRejectModal();
+      fetchData(dataPage, searchQuery);
+    } catch (error) {
+      console.error("Gagal menolak tiket:", error);
+      alert("Gagal menolak tiket.");
+    }
+  };
+
+  const handleShowReasonClick = (ticket) => {
+    setTicketToShowReason(ticket);
+    setShowRejectionInfoModal(true);
+  };
+
+  const handleCloseReasonModal = () => {
+    setTicketToShowReason(null);
+    setShowRejectionInfoModal(false);
+  };
+
+  const handleDeleteFromReasonModal = (ticket) => {
+    handleCloseReasonModal();
+    handleDeleteClick(ticket);
   };
 
   const handleStatusFilterClick = (status) => {
@@ -488,7 +530,7 @@ function App() {
                   <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
                 </form>
                 {selectedTicketIds.length > 0 && (<div className="bulk-action-bar" style={{ margin: '20px 0' }}><button onClick={handleBulkDelete} className="btn-delete">Hapus {selectedTicketIds.length} Tiket yang Dipilih</button></div>)}
-                <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} userRole={userRole} onSelectionChange={handleSelectionChange} onAssignClick={handleAssignClick} />
+                <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} userRole={userRole} onSelectionChange={handleSelectionChange} onAssignClick={handleAssignClick} onRejectClick={handleRejectClick} />
                 <Pagination currentPage={dataPage} lastPage={ticketData ? ticketData.last_page : 1} onPageChange={handlePageChange} />
               </>
             )}
@@ -500,6 +542,7 @@ function App() {
         {showAssignModal && ticketToAssign && (
           <AssignAdminModal ticket={ticketToAssign} admins={adminList} onAssign={handleConfirmAssign} onClose={handleCloseAssignModal} />
         )}
+        {showRejectModal && ticketToReject && ( <RejectTicketModal ticket={ticketToReject} onReject={handleConfirmReject} onClose={handleCloseRejectModal} /> )}
         {showConfirmModal && ticketToDelete && (<ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
         {showUserConfirmModal && userToDelete && (<ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete.name}"?`} onConfirm={confirmUserDelete} onCancel={cancelUserDelete} />)}
         {showUserFormModal && (<UserFormModal userToEdit={userToEdit} onClose={handleCloseUserForm} onSave={handleSaveUser} />)}
@@ -595,7 +638,13 @@ function App() {
                                 })()}
                               </td>
                               <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
-                              <td><button onClick={() => handleDeleteClick(ticket)} className="btn-delete">Delete</button></td>
+                              <td>
+                                {ticket.status === 'Ditolak' ? (
+                                  <button onClick={() => handleShowReasonClick(ticket)} className="btn-reason">Alasan</button>
+                                ) : (
+                                  <button onClick={() => handleDeleteClick(ticket)} className="btn-delete">Delete</button>
+                                )}
+                              </td>
                             </tr>
                           ))
                         ) : (
@@ -613,6 +662,9 @@ function App() {
       </main>
 
       {/* Modal tidak berubah, tetap ada untuk kedua peran */}
+      {showRejectionInfoModal && ticketToShowReason && (
+        <RejectionInfoModal ticket={ticketToShowReason} onClose={handleCloseReasonModal} onDelete={handleDeleteFromReasonModal} />
+      )}
       {showConfirmModal && ticketToDelete && (<ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
       {showUserConfirmModal && userToDelete && (<ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete.name}"?`} onConfirm={confirmUserDelete} onCancel={cancelUserDelete} />)}
       {showUserFormModal && (<UserFormModal userToEdit={userToEdit} onClose={handleCloseUserForm} onSave={handleSaveUser} />)}

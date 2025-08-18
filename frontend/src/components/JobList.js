@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 
-function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelectionChange, onAssignClick }) {
+function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelectionChange, onAssignClick, onRejectClick }) {
   const [selectedIds, setSelectedIds] = useState([]);
   const isAdmin = userRole && userRole.toLowerCase() === 'admin';
 
@@ -39,14 +39,18 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
     switch (ticket.status) {
       case 'Belum Dikerjakan':
         if (!ticket.user) {
-          // Jika belum ditugaskan, tombol ini akan membuka modal
           return (
-            <button onClick={() => onAssignClick(ticket)} className="btn-start">
-              Mulai Kerjakan
-            </button>
+            <>
+              <button onClick={() => onAssignClick(ticket)} className="btn-start">
+                Mulai Kerjakan
+              </button>
+              <button onClick={() => onRejectClick(ticket)} className="btn-delete">
+                Tolak
+              </button>
+            </>
           );
         }
-        // Jika sudah ditugaskan, tombol ini mengubah status
+        // Jika sudah ditugaskan, tombol ini tetap mengubah status
         return (
           <button onClick={() => updateTicketStatus(ticket.id, 'Sedang Dikerjakan')} className="btn-start">
             Mulai Kerjakan
@@ -75,6 +79,12 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
             Hapus
           </button>
         );
+      case 'Ditolak':
+        return (
+          <button onClick={() => deleteTicket(ticket)} className="btn-delete">
+            Hapus
+          </button>
+        );  
       default:
         return null;
     }
