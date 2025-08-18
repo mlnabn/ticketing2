@@ -591,7 +591,7 @@ function App() {
                                   if (ticket.requested_time) {
                                     return `Request: ${ticket.requested_time}`;
                                   }
-                                  return 'Jadwal pengerjaan fleksibel';
+                                  return 'Jadwal Pengerjaan Fleksibel';
                                 })()}
                               </td>
                               <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
