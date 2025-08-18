@@ -1886,6 +1886,7 @@ body.dark-mode .job-table td {
 .job-table th {
   background-color: var(--joblist-header-bg-light);
   font-weight: 600;
+  text-align: center;
   color: var(--joblist-header-text-light);
   border-bottom: 2px solid #aba8a1;
   /* Garis bawah lebih tegas untuk header (kuning/oranye) */
