@@ -3527,6 +3527,20 @@ body.dark-mode .rejection-reason-textarea {
   border-color: var(--border-color-dark);
 }
 
+.rejection-reason-textarea-user {
+  background-color: var(--input-bg-dark);
+  color: var(--text-color-dark);
+  border: 1px solid var(--border-color-dark);
+  width: 100%;
+  min-height: 100px;
+  padding: 10px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  margin-top: 1rem;
+  resize: vertical;
+}
+
 /* Styling untuk tombol konfirmasi penolakan */
 .btn-confirm-reject {
   padding: 12px 24px;
@@ -3595,6 +3609,19 @@ body.dark-mode .rejection-reason-display p {
   animation: fadeBackdrop 0.35s ease;
 }
 
+.modal-backdrop-user {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeBackdrop 0.35s ease;
+}
+
+
 /* === KONTEN MODAL === */
 .modal-content {
   background: rgba(255, 255, 255, 0.92);
@@ -3615,6 +3642,32 @@ body.dark-mode .rejection-reason-display p {
   background: rgba(31, 41, 55, 0.95);
   border: 1px solid rgba(148, 163, 184, 0.25);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+}
+
+.modal-content-user {
+  background: rgba(31, 41, 55, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
+  padding: 28px 32px;
+  width: 460px;
+  max-width: 90%;
+  animation: scaleIn 0.35s ease-out;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.modal-content-user h3 {
+  margin: 0 0 14px;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.3px;
+}
+
+.modal-content-user p {
+  color: #cbd5e1;
 }
 
 /* === JUDUL MODAL === */
@@ -3640,33 +3693,6 @@ body.dark-mode .rejection-reason-display p {
 
 .dark-mode .modal-content p {
   color: #cbd5e1;
-}
-
-/* === TEXTAREA UNTUK PENOLAKAN === */
-.rejection-reason-textarea {
-  width: 100%;
-  min-height: 110px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid #cbd5e1;
-  background-color: #f9fafb;
-  color: #1e293b;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
-  margin-bottom: 1.2rem;
-  resize: vertical;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
-}
-.rejection-reason-textarea:focus {
-  border-color: #dc2626;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25);
-}
-
-.dark-mode .rejection-reason-textarea {
-  background-color: #334155;
-  color: #f8fafc;
-  border-color: #475569;
 }
 
 /* === BOX ALASAN YANG DITAMPILKAN === */
