@@ -149,7 +149,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                     if (ticket.requested_time) {
                       return `Waktu yang Diminta: ${ticket.requested_time}`;
                     }
-                    return 'Tanggal dan Waktu Tidak Diisi';
+                    return 'Jadwal Pengerjaan Fleksibel';
                   })()}
                 </td>
                 <td data-label="Status">
