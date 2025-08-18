@@ -52,14 +52,14 @@ class TicketController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'workshop' => 'required|string',
-            'requested_time' => 'required|date_format:H:i',
+            'requested_time' => 'nullable|date_format:H:i',
             'requested_date' => 'nullable|date',
         ]);
 
         $ticket = Ticket::create([
             'title' => $validated['title'],
             'workshop' => $validated['workshop'],
-            'requested_time' => $validated['requested_time'],
+            'requested_time' => $validated['requested_time'] ?? null,
             'requested_date' => $validated['requested_date'] ?? null,
             'creator_id' => auth()->id(),
             'user_id' => null, // Tiket baru belum ditugaskan

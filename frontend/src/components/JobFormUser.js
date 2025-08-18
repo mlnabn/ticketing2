@@ -13,7 +13,7 @@ function JobFormUser({ users, addTicket, userRole }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Pastikan semua field terisi sebelum submit
-    if (title && workshop && requestedTime) {
+    if (title && workshop) {
       // Panggil fungsi 'addTicket' dengan data yang sesuai
       addTicket({ title, workshop, requested_time: requestedTime, requested_date: requestedDate });
       // Reset form setelah submit
@@ -130,7 +130,7 @@ function JobFormUser({ users, addTicket, userRole }) {
             type="time"
             value={requestedTime}
             onChange={(e) => setRequestedTime(e.target.value)}
-            required
+            // required
             className="input-selectuser"
           />
           <input
