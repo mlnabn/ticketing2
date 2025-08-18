@@ -188,19 +188,25 @@ function App() {
     } catch (error) { console.error("Gagal update status:", error); }
   };
 
-  // Fungsi BARU untuk membuka modal penugasan
+  const handleHomeClick = () => {
+    setCurrentPage('Tickets');
+    setDataPage(1);
+    setSearchQuery('');
+    setSearchInput('');
+    setStatusFilter(null);
+    fetchData(1, '', null); // Panggil fetchData secara eksplisit
+  };
+
   const handleAssignClick = (ticket) => {
     setTicketToAssign(ticket);
     setShowAssignModal(true);
   };
 
-  // Fungsi BARU untuk menutup modal penugasan
   const handleCloseAssignModal = () => {
     setTicketToAssign(null);
     setShowAssignModal(false);
   };
 
-  // Fungsi BARU untuk konfirmasi penugasan
   const handleConfirmAssign = async (ticketId, adminId) => {
     try {
       await axios.patch(`${API_URL}/tickets/${ticketId}/assign`, { user_id: adminId }, { headers: { Authorization: `Bearer ${getToken()}` } });
@@ -438,9 +444,8 @@ function App() {
           </div>
           <nav className="sidebar-nav">
             <ul>
-              <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Tickets')} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-home"></i><span>Home</span></button></li>
+              <li className="sidebar-nav-item"><button onClick={handleHomeClick} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-home"></i><span>Home</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>User</span></button></li>
-              {/* <li className="sidebar-nav-item"><button className="sidebar-button"><i className="fas fa-chart-bar"></i><span>Laporan</span></button></li> */}
             </ul>
           </nav>
           <div className="sidebar-footer">
@@ -525,22 +530,11 @@ function App() {
           </div>
           <div className="main-header-controls">
             <span className="breadcrump">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
-
-            {/* PERUBAHAN: Tombol Dark Mode ditambahkan di sini */}
-            {/* <div className={`theme-switch ${darkMode ? 'dark' : ''}`} onClick={toggleDarkMode}>
-              <div className="theme-switch-ball">
-                {darkMode ? <i className="fas fa-moon moon-icon"></i> : <i className="fas fa-sun sun-icon"></i>}
-              </div>
-            </div> */}
             <div>
               <button onClick={handleLogout} className="logout-buttonuser"><i className="fas fa-sign-out-alt"></i></button>
             </div>
           </div>
         </header>
-        {/* <div className="user-view-tabs">
-          <button className={`tab-button ${userViewTab === 'request' ? 'active' : ''}`} onClick={() => setUserViewTab('request')}>Request</button>
-          <button className={`tab-button ${userViewTab === 'history' ? 'active' : ''}`} onClick={() => setUserViewTab('history')}>History</button>
-        </div> */}
 
         <div className="content-area">
           <div className="user-view-container">
