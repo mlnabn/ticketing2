@@ -642,7 +642,7 @@ function App() {
                                 {ticket.status === 'Ditolak' ? (
                                   <button onClick={() => handleShowReasonClick(ticket)} className="btn-reason">Alasan</button>
                                 ) : (
-                                  <button onClick={() => handleDeleteClick(ticket)} className="btn-delete">Delete</button>
+                                  <button onClick={() => handleDeleteClick(ticket)} classname="btn-cancel=aksi">Delete</button>
                                 )}
                               </td>
                             </tr>
