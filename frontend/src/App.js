@@ -571,19 +571,28 @@ function App() {
                         ) : createdTicketsOnPage.length > 0 ? (
                           createdTicketsOnPage.map(ticket => (
                             <tr key={ticket.id}>
-                              {/* <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
-                              <td>{ticket.user ? ticket.user.name : 'Belum Ditugaskan'}</td> */}
-                              {/* <td>{ticket.user.name}</td> */}
                               <td>{ticket.title}</td>
                               <td>{ticket.workshop}</td>
-                              <td data-label="Tanggal Dibuat">{format(new Date(ticket.requested_date || ticket.created_at), 'dd MMM yyyy')}</td>
+                              <td>{format(new Date(ticket.requested_date || ticket.created_at), 'dd-MM-yy')}</td>
                               <td>
-                                {ticket.started_at
-                                  ? (ticket.completed_at
-                                    ? `${format(new Date(ticket.started_at), 'HH:mm')} - ${format(new Date(ticket.completed_at), 'HH:mm')}`
-                                    : `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}`)
-                                  : (ticket.requested_time ? `Request: ${format(new Date(ticket.requested_date || ticket.created_at), 'dd-MM-yy')}, ${ticket.requested_time}` : '-')
-                                }
+                                {(() => {
+                                  if (ticket.started_at) {
+                                    return ticket.completed_at
+                                      ? `${format(new Date(ticket.started_at), 'HH:mm')} - ${format(new Date(ticket.completed_at), 'HH:mm')}`
+                                      : `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}`;
+                                  }
+                                  if (ticket.requested_date && ticket.requested_time) {
+                                    return `Request: ${format(new Date(ticket.requested_date), 'dd-MM-yy')} ${ticket.requested_time}`;
+                                  }
+                                  // PERBAIKAN: Menambahkan kondisi ini
+                                  if (ticket.requested_date) {
+                                    return `Request: ${format(new Date(ticket.requested_date), 'dd-MM-yy')}`;
+                                  }
+                                  if (ticket.requested_time) {
+                                    return `Request: ${ticket.requested_time}`;
+                                  }
+                                  return '-';
+                                })()}
                               </td>
                               <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
                               <td><button onClick={() => handleDeleteClick(ticket)} className="btn-delete">Delete</button></td>

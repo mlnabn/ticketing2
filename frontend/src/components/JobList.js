@@ -133,8 +133,11 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                     if (ticket.requested_date && ticket.requested_time) {
                       return `Diminta: ${format(new Date(ticket.requested_date), 'dd MMM yyyy')}, ${ticket.requested_time}`;
                     }
+                    if (ticket.requested_date) {
+                      return `Tanggal yang Diminta: ${format(new Date(ticket.requested_date), 'dd MMM yyyy')}`;
+                    }
                     if (ticket.requested_time) {
-                      return `Waktu yang diminta: ${ticket.requested_time}`;
+                      return `Waktu yang Diminta: ${ticket.requested_time}`;
                     }
                     return 'Tanggal dan Waktu Tidak Diisi';
                   })()}
