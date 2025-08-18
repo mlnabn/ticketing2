@@ -3712,20 +3712,6 @@ body.dark-mode .rejection-reason-display p {
   transition: all 0.25s ease;
 }
 
-/* Batal */
-.btn-cancel {
-  background: #e5e7eb;
-  color: #111827;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-}
-.btn-cancel:hover {
-  background: #d1d5db;
-  transform: translateY(-2px);
-}
-.btn-cancel:active {
-  transform: scale(0.97);
-}
-
 /* Tolak Tiket (Submit Reject) */
 .btn-confirm-reject {
   background: #dc2626;

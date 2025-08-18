@@ -8,13 +8,13 @@ const ConfirmationModal = ({ message, onConfirm, onCancel }) => {
         <div className="flex justify-end space-x-3">
           <button
             onClick={onCancel}
-            className="btn-confirm"
+            className="btn-cancel"
           >
             Batal
           </button>
           <button
             onClick={onConfirm}
-            className="btn-cancel"
+            className="btn-confirm"
           >
             Hapus
           </button>
