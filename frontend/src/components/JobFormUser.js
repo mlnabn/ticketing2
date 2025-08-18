@@ -61,17 +61,26 @@ function JobFormUser({ users, addTicket, userRole }) {
     placeholder: (provided) => ({
       ...provided,
       color: "#c6c7c8ff", // biru muda untuk placeholder
+      textAlign: 'center',
       fontWeight: 500
+      
     }),
     singleValue: (provided) => ({
       ...provided,
       color: "#c6c7c8ff",
+      textAlign: 'center',
       fontWeight: 500
     }),
     input: (provided) => ({
       ...provided,
+      textAlign: 'center', 
       color: "#c6c7c8ff" // warna teks saat mengetik
+      
     }),
+    valueContainer: (provided) => ({
+    ...provided,
+    justifyContent: 'center', // supaya teks tetap di tengah
+  }),
     menu: (provided) => ({
       ...provided,
       backgroundColor: "#696b6cff",
@@ -128,7 +137,7 @@ function JobFormUser({ users, addTicket, userRole }) {
             type="date"
             value={requestedDate}
             onChange={(e) => setRequestedDate(e.target.value)}
-            className="input-like-selectuser"
+            className="input-dateuser"
           />
         </div>
 
