@@ -582,7 +582,7 @@ function App() {
                                   ? (ticket.completed_at
                                     ? `${format(new Date(ticket.started_at), 'HH:mm')} - ${format(new Date(ticket.completed_at), 'HH:mm')}`
                                     : `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}`)
-                                  : (ticket.requested_time ? `Request: ${format(new Date(ticket.requested_date || ticket.created_at), 'dd-MM-yy')}, ${ticket.requested_time}` : '-')
+                                  : (ticket.requested_time ? `Request: ${format(new Date(ticket.requested_date || ticket.created_at), 'dd-MM-yy')}, ${ticket.requested_time}` : 'Tidak menambahkan waktu')
                                 }
                               </td>
                               <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
