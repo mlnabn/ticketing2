@@ -3442,6 +3442,28 @@ body.dark-mode .btn-submit:hover {
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 
+.btn-cancel-aksi {
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+  /* Warna teks tombol */
+}
+
+.btn-cancel-aksi {
+  background-color: var(--button-cancel-bg-light);
+}
+
+.btn-cancel-aksi:hover {
+  background-color: var(--button-cancel-hover-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
 /* --- Animasi --- */
 @keyframes fadeIn {
   from {

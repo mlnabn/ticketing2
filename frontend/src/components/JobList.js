@@ -44,7 +44,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
               <button onClick={() => onAssignClick(ticket)} className="btn-start">
                 Mulai Kerjakan
               </button>
-              <button onClick={() => onRejectClick(ticket)} className="btn-delete">
+              <button onClick={() => onRejectClick(ticket)} className="btn-cancel-aksi">
                 Tolak
               </button>
             </>
@@ -75,13 +75,13 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
         );
       case 'Selesai':
         return (
-          <button onClick={() => deleteTicket(ticket)} className="btn-delete">
+          <button onClick={() => deleteTicket(ticket)} className="btn-cancel-aksi">
             Hapus
           </button>
         );
       case 'Ditolak':
         return (
-          <button onClick={() => deleteTicket(ticket)} className="btn-delete">
+          <button onClick={() => deleteTicket(ticket)} className="btn-cancel-aksi">
             Hapus
           </button>
         );  

@@ -24,7 +24,7 @@ function RejectTicketModal({ ticket, onReject, onClose }) {
         />
         <div className="confirmation-modal-actions">
           <button onClick={onClose} className="btn-cancel">Batal</button>
-          <button onClick={handleSubmit} className="btn-confirm-reject">Tolak Tiket</button>
+          <button onClick={handleSubmit} className="btn-confirm">Tolak Tiket</button>
         </div>
       </div>
     </div>
