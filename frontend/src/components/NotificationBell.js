@@ -19,8 +19,6 @@ function NotificationBell() {
                 headers: { Authorization: `Bearer ${getToken()}` },
             });
             setNotifications(response.data);
-            // Untuk sementara, anggap semua yang baru adalah unread
-            // Implementasi `is_read` yang proper butuh backend lebih kompleks
         } catch (error) {
             console.error("Gagal mengambil notifikasi:", error);
         }
@@ -32,7 +30,6 @@ function NotificationBell() {
         return () => clearInterval(interval);
     }, []);
 
-    // Cek unread count berdasarkan notifikasi yang lebih baru dari login terakhir (simplifikasi)
     useEffect(() => {
          const lastCleared = localStorage.getItem('notifications_last_cleared');
          if (lastCleared) {
@@ -43,20 +40,17 @@ function NotificationBell() {
          }
     }, [notifications]);
 
-
     const handleToggle = () => {
         setIsOpen(!isOpen);
         if (!isOpen) { // Saat membuka panel
             setUnreadCount(0);
             localStorage.setItem('notifications_last_cleared', new Date().toISOString());
-            // Idealnya panggil API untuk mark as read
             axios.post(`${API_URL}/notifications/mark-all-read`, {}, {
                 headers: { Authorization: `Bearer ${getToken()}` }
             });
         }
     };
 
-    // Menutup panel jika klik di luar
     useEffect(() => {
         function handleClickOutside(event) {
             if (notificationRef.current && !notificationRef.current.contains(event.target)) {
@@ -68,6 +62,27 @@ function NotificationBell() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [notificationRef]);
+
+    // FUNGSI UNTUK MENGHAPUS NOTIFIKASI
+    const handleDelete = async (notificationId) => {
+        const notifToDelete = notifications.find(n => n.id === notificationId);
+        // Hentikan jika notifikasi tidak ditemukan atau merupakan notifikasi global (user_id null)
+        if (!notifToDelete || notifToDelete.user_id === null) return;
+        
+        try {
+            await axios.delete(`${API_URL}/notifications/${notificationId}`, {
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+
+            // Update state agar notifikasi langsung hilang dari tampilan
+            setNotifications(currentNotifications =>
+                currentNotifications.filter(notif => notif.id !== notificationId)
+            );
+        } catch (error) {
+            console.error("Gagal menghapus notifikasi:", error);
+            alert("Gagal menghapus notifikasi.");
+        }
+    };
 
     return (
         <div className="notification-bell-container" ref={notificationRef}>
@@ -83,12 +98,21 @@ function NotificationBell() {
                     <div className="notification-list">
                         {notifications.length > 0 ? (
                             notifications.map(notif => (
+                                // PERUBAHAN DI SINI: Struktur item notifikasi diubah
                                 <div key={notif.id} className="notification-item">
-                                    <strong>{notif.title}</strong>
-                                    <p>{notif.message}</p>
-                                    <small>
-                                        {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true, locale: id })}
-                                    </small>
+                                    <div className="notification-content">
+                                        <strong>{notif.title}</strong>
+                                        <p>{notif.message}</p>
+                                        <small>
+                                            {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true, locale: id })}
+                                        </small>
+                                    </div>
+                                    {/* TAMBAHAN: Tombol hapus hanya muncul jika notif punya user_id */}
+                                    {notif.user_id && (
+                                        <button onClick={() => handleDelete(notif.id)} className="notification-delete-btn" title="Hapus Notifikasi">
+                                            <i className="fas fa-trash-alt"></i>
+                                        </button>
+                                    )}
                                 </div>
                             ))
                         ) : (

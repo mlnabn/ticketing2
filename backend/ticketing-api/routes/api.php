@@ -47,6 +47,8 @@ Route::middleware('jwt')->group(function () {
     Route::apiResource('users', UserController::class)->except(['create', 'edit', 'update']);
 
     Route::get('/notifications', [NotificationController::class, 'index']); // Untuk user mengambil notif
+    Route::get('/notifications/global', [NotificationController::class, 'getGlobalNotifications']);
     Route::post('/notifications', [NotificationController::class, 'store']); // Untuk admin mengirim notif
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']); // Untuk user menandai sudah baca
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
 });

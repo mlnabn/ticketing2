@@ -4297,3 +4297,98 @@ body.dark-mode .feedback-message {
 .btn-view-proof:hover {
   background-color: #229954;
 }
+
+.notification-item {
+    /* Gunakan flexbox untuk mensejajarkan konten dan tombol */
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Konten rata atas */
+    gap: 10px; /* Jarak antara konten dan tombol */
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.notification-content {
+    flex-grow: 1; /* Konten akan memakai sisa ruang */
+}
+
+.notification-delete-btn {
+    background: none;
+    border: none;
+    color: #a0a0a0; /* Warna abu-abu netral */
+    cursor: pointer;
+    font-size: 14px;
+    padding: 5px;
+    margin-top: 5px;
+    transition: color 0.2s ease;
+}
+
+.notification-delete-btn:hover {
+    color: #e74c3c; /* Warna merah saat hover */
+}
+
+/* App.css */
+
+/* ... (CSS lainnya) ... */
+
+.global-notification-history {
+    background-color: var(--background-color-light);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-top: 30px; /* Jarak dari form di atasnya */
+}
+
+.global-notification-history h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-color-light);
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-item-content p {
+    margin: 5px 0;
+    color: #6c757d;
+}
+
+.history-item-content small {
+    color: #a0a0a0;
+    font-size: 12px;
+}
+
+.btn-delete-small {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 14px;
+}
+
+.btn-delete-small:hover {
+    background-color: #f1b0b7;
+}
+
+.btn-delete-small i {
+    margin-right: 5px;
+}

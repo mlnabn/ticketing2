@@ -51,9 +51,31 @@ class NotificationController extends Controller
     // Fungsi untuk User: Menandai semua notifikasi sebagai sudah dibaca
     public function markAllAsRead()
     {
-        // Untuk saat ini, kita hanya memberikan konfirmasi ke frontend
-        // bahwa aksi "baca" telah diterima. Logika `is_read` yang lebih
-        // kompleks bisa ditambahkan nanti.
         return response()->json(['message' => 'Notifikasi ditandai sebagai dibaca']);
+    }
+
+    public function getGlobalNotifications()
+    {
+        if (Auth::user()->role !== 'admin') {
+            return response()->json(['error' => 'Aksi tidak diizinkan.'], 403);
+        }
+
+        $globalNotifications = Notification::whereNull('user_id')
+                                           ->orderBy('created_at', 'desc')
+                                           ->get();
+        
+        return response()->json($globalNotifications);
+    }
+
+    public function destroy(Notification $notification)
+    {
+        $user = Auth::user();
+
+        if ($user->role === 'admin' || $notification->user_id === $user->id) {
+            $notification->delete();
+            return response()->json(['message' => 'Notifikasi berhasil dihapus.']);
+        }
+
+        return response()->json(['error' => 'Aksi tidak diizinkan.'], 403);
     }
 }
