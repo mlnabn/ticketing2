@@ -148,7 +148,7 @@ function JobFormUser({ users, addTicket, userRole }) {
           required
         />
         <div className="time-wrapper">
-          <label htmlFor="flexible-schedule">Fleksibel</label>
+          <label htmlFor="flexible-schedule">Fleksible</label>
           <input
             type="checkbox"
             id="flexible-schedule"
@@ -196,7 +196,7 @@ function JobFormUser({ users, addTicket, userRole }) {
       {/* Input untuk Deskripsi */}
       <input
         type="text"
-        placeholder="Deskripsi"
+        placeholder="Description"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
@@ -204,7 +204,7 @@ function JobFormUser({ users, addTicket, userRole }) {
       />
 
       {/* Tombol Tambah */}
-      <button type="submit" className="btn-submituser">Tambah</button>
+      <button type="submit" className="btn-submituser">Add</button>
     </form >
   );
 

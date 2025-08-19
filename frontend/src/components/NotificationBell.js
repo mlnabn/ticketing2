@@ -78,7 +78,7 @@ function NotificationBell() {
             {isOpen && (
                 <div className="notification-panel">
                     <div className="notification-panel-header">
-                        <h4>Notifikasi</h4>
+                        <h4>Notifications</h4>
                     </div>
                     <div className="notification-list">
                         {notifications.length > 0 ? (
@@ -93,7 +93,7 @@ function NotificationBell() {
                             ))
                         ) : (
                             <div className="notification-item empty">
-                                <p>Belum ada notifikasi.</p>
+                                <p>There are no notifications yet.</p>
                             </div>
                         )}
                     </div>

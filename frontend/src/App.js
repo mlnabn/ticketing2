@@ -14,6 +14,7 @@ import NotificationForm from './components/NotificationForm';
 import NotificationBell from './components/NotificationBell';
 import UserFormModal from './components/UserFormModal';
 import ConfirmationModal from './components/ConfirmationModal';
+import ConfirmationModalUser from './components/ConfirmationModalUser';
 import AssignAdminModal from './components/AssignAdminModal';
 import RejectTicketModal from './components/RejectTicketModal';
 import RejectionInfoModal from './components/RejectionInfoModal';
@@ -640,13 +641,13 @@ function App() {
                                   if (ticket.requested_time) {
                                     return `Request: ${ticket.requested_time}`;
                                   }
-                                  return 'Jadwal Pengerjaan Fleksibel';
+                                  return 'Flexible Work Schedule';
                                 })()}
                               </td>
                               <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
                               <td>
-                                {ticket.status === 'Ditolak' ? (
-                                  <button onClick={() => handleShowReasonClick(ticket)} className="btn-reason">Alasan</button>
+                                {ticket.status === 'Rejected' ? (
+                                  <button onClick={() => handleShowReasonClick(ticket)} className="btn-reason">Reason</button>
                                 ) : (
                                   <button onClick={() => handleDeleteClick(ticket)} className="btn-cancel-aksi">Delete</button>
                                 )}
@@ -654,7 +655,7 @@ function App() {
                             </tr>
                           ))
                         ) : (
-                          <tr><td colSpan="6">Anda belum membuat tiket.</td></tr>
+                          <tr><td colSpan="6">You haven't created a ticket yet.</td></tr>
                         )}
                       </tbody>
                     </table>
@@ -670,7 +671,7 @@ function App() {
       {showRejectionInfoModal && ticketToShowReason && (
         <RejectionInfoModal ticket={ticketToShowReason} onClose={handleCloseReasonModal} onDelete={handleDeleteFromReasonModal} />
       )}
-      {showConfirmModal && ticketToDelete && (<ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
+      {showConfirmModal && ticketToDelete && (<ConfirmationModalUser message={`Delete job "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
     </div>
   );
 }

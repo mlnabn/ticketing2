@@ -3413,6 +3413,64 @@ body.dark-mode .btn-submit:hover {
   margin-top: 24px;
 }
 
+/* --- Styling Backdrop Modal USER (Latar Belakang) --- */
+.confirmation-modal-backdrop-user {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease;
+}
+
+/* --- Styling Konten Modal --- */
+.confirmation-modal-content-user {
+  background: var(--modal-bg-dark);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  width: 420px;
+  max-width: 90%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.4s ease;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+/* Efek khusus untuk Dark Mode */
+.dark-mode .confirmation-modal-content-user {
+  background: var(--modal-bg-dark);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Styling Teks di dalam Modal --- */
+.confirmation-modal-content-user h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color-dark);
+}
+
+.dark-mode .confirmation-modal-content-user h3 {
+  color: var(--text-color-dark);
+}
+
+.confirmation-modal-content-user p {
+  font-size: 1rem;
+  color: var(--secondary-text-color-dark);
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+
+.dark-mode .confirmation-modal-content-user p {
+  color: var(--secondary-text-color-dark);
+}
+
+
 .btn-confirm,
 .btn-cancel {
   flex: 1;
@@ -3492,6 +3550,8 @@ body.dark-mode .btn-submit:hover {
     opacity: 1;
   }
 }
+
+
 
 .btn-confirmuser,
 .btn-canceluser {
