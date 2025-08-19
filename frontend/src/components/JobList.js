@@ -77,7 +77,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
         return (
           <>
             {!ticket.proof_description && (
-              <button onClick={() => onProofClick(ticket)} className="btn-proof">Bukti</button>
+              <button onClick={() => onProofClick(ticket)} className="btn-start">Bukti</button>
             )}
             <button onClick={() => deleteTicket(ticket)} className="btn-cancel-aksi">
               Hapus
