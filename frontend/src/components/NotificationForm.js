@@ -7,8 +7,8 @@ import { format } from 'date-fns';
 const API_URL = 'http://127.0.0.1:8000/api';
 
 const notificationTemplates = [
-    { title: 'Pemberitahuan Maintenance', message: 'Akan diadakan maintenance sistem pada pukul XX:XX. Mohon untuk menyimpan pekerjaan Anda.' },
-    { title: 'Update Aplikasi', message: 'Aplikasi telah diupdate ke versi terbaru. Silakan refresh browser Anda.' },
+    { title: 'Pemberitahuan Maintenance', message: 'Workshop Candi sedang ada Maintenance. Semua ticket akan dikerjakan setelah Maintanence selesai. Terima Kasih.' },
+    { title: 'Update', message: 'Ticket telah dikerjakan. Silahkan refresh website anda.' },
     { title: 'Pengumuman Penting', message: '' },
 ];
 
