@@ -3719,6 +3719,8 @@ body.dark-mode .rejection-reason-display p {
   animation: scaleIn 0.35s ease-out;
   text-align: center;
   transition: all 0.3s ease;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 /* === DARK MODE === */
@@ -4222,4 +4224,42 @@ body.dark-mode .feedback-message {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* Button Proof */
+
+.btn-proof {
+  background-color: #3498db; /* Biru */
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.btn-proof:hover {
+  background-color: #2980b9;
+}
+
+.image-preview img {
+    border: 1px solid #ddd;
+    padding: 5px;
+}
+
+.btn-view-proof {
+  background-color: #27ae60; /* Hijau */
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.btn-view-proof:hover {
+  background-color: #229954;
 }
