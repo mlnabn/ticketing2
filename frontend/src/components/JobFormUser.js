@@ -9,21 +9,44 @@ function JobFormUser({ users, addTicket, userRole }) {
   // const [status, setStatus] = useState('Belum Dikerjakan'); // Default status
   const [requestedTime, setRequestedTime] = useState('');
   const [requestedDate, setRequestedDate] = useState('');
+  const [isFlexible, setIsFlexible] = useState(false);
+
+
+  const handleFlexibleChange = (e) => {
+    const checked = e.target.checked;
+    setIsFlexible(checked);
+    if (checked) {
+      setRequestedDate('');
+      setRequestedTime('');
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Pastikan semua field terisi sebelum submit
-    if (title && workshop) {
-      // Panggil fungsi 'addTicket' dengan data yang sesuai
-      addTicket({ title, workshop, requested_time: requestedTime, requested_date: requestedDate });
-      // Reset form setelah submit
-      setTitle('');
-      //setUserId('');
-      setWorkshop('');
-      // setStatus('Belum Dikerjakan');
-    } else {
-      console.log("Mohon lengkapi semua field.");
+    // Validasi: title dan workshop selalu wajib
+    if (!title || !workshop) {
+      alert("Mohon lengkapi Workshop dan Deskripsi.");
+      return;
     }
+    // Validasi: jika tidak fleksibel, tanggal & waktu wajib diisi
+    if (!isFlexible && (!requestedDate || !requestedTime)) {
+      alert("Mohon lengkapi Tanggal dan Waktu, atau centang 'Jadwal Fleksibel'.");
+      return;
+    }
+    
+    addTicket({ 
+      title, 
+      workshop, 
+      requested_time: isFlexible ? null : requestedTime,
+      requested_date: isFlexible ? null : requestedDate
+    });
+    
+    // Reset form
+    setTitle('');
+    setWorkshop('');
+    setRequestedTime('');
+    setRequestedDate('');
+    setIsFlexible(false);
   };
 
   // Opsi untuk dropdown Workshop
@@ -130,15 +153,26 @@ function JobFormUser({ users, addTicket, userRole }) {
             type="time"
             value={requestedTime}
             onChange={(e) => setRequestedTime(e.target.value)}
-            // required
+            required={!isFlexible}
+            disabled={isFlexible}
             className="input-selectuser"
           />
           <input
             type="date"
             value={requestedDate}
             onChange={(e) => setRequestedDate(e.target.value)}
+            required={!isFlexible} 
+            disabled={isFlexible}
             className="input-dateuser"
           />
+          <input
+            type="checkbox"
+            id="flexible-schedule"
+            checked={isFlexible}
+            onChange={handleFlexibleChange}
+            className="flexible-schedule-wrapper"
+          />
+          <label htmlFor="flexible-schedule">Jadwal Pengerjaan Fleksibel</label>
         </div>
 
       </div>

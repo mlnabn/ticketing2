@@ -1,5 +1,5 @@
 // =================================================================
-//  IMPOR LIBRARY & KOMPONEN
+//  IMPOR LIBRARY & KOMPONЕН
 // =================================================================
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { format } from 'date-fns';
@@ -74,9 +74,9 @@ function App() {
   const [statusFilter, setStatusFilter] = useState(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [ticketToAssign, setTicketToAssign] = useState(null);
-  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false); 
   const [ticketToReject, setTicketToReject] = useState(null);
-   const [showRejectionInfoModal, setShowRejectionInfoModal] = useState(false); 
+  const [showRejectionInfoModal, setShowRejectionInfoModal] = useState(false); 
   const [ticketToShowReason, setTicketToShowReason] = useState(null);
 
 
@@ -244,7 +244,7 @@ function App() {
       alert("Gagal menolak tiket.");
     }
   };
-
+  
   const handleShowReasonClick = (ticket) => {
     setTicketToShowReason(ticket);
     setShowRejectionInfoModal(true);
@@ -479,7 +479,7 @@ function App() {
   // Tampilan untuk ADMIN
   if (isAdmin) {
     return (
-      <div className={`dashboard-container ${isSidebarOpen ? '' : 'sidebar-closed'}`}>
+      <div className={`dashboard-container ${isSidebarOpen ? '' : ' sidebar-closed'}`}>
         <aside className={`sidebar ${!isSidebarOpen ? 'closed' : ''}`}>
           <div className="sidebar-header">
             <img src={yourLogo} alt="Logo" className="sidebar-logo" />
@@ -522,7 +522,7 @@ function App() {
                   <div className={`info-card red-card ${statusFilter === 'Belum Selesai' ? 'active' : ''}`} onClick={() => handleStatusFilterClick('Belum Selesai')}><h3>{stats ? stats.pending_tickets : '...'}</h3><p>Tiket Belum Selesai</p></div>
                   <div className={`info-card green-card ${statusFilter === 'Selesai' ? 'active' : ''}`} onClick={() => handleStatusFilterClick('Selesai')}><h3>{stats ? stats.completed_tickets : '...'}</h3><p>Tiket Selesai</p></div>
                   <div className={`info-card yellow-card ${!statusFilter ? 'active' : ''}`} onClick={() => handleStatusFilterClick(null)}><h3>{stats ? stats.total_tickets : '...'}</h3><p>Total Tiket</p></div>
-                  <div className="info-card blue-card"><h3>{stats ? stats.total_users : '...'}</h3><p>Total Pengguna</p></div>
+                  <div className="info-card blue-card" onClick={() => setCurrentPage('userManagement')}><h3>{stats ? stats.total_users : '...'}</h3><p>Total Pengguna</p></div>
                 </div>
                 {/* <JobForm users={users} addTicket={addTicket} /> */}
                 <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
@@ -598,8 +598,6 @@ function App() {
                     <table className='job-table user-history-table'>
                       <thead>
                         <tr>
-                          {/* <th>Pengirim</th>
-                          <th>Ditugaskan Kepada</th> */}
                           <th>Deskripsi</th>
                           <th>Workshop</th>
                           <th>Tanggal Dibuat</th>
@@ -616,7 +614,7 @@ function App() {
                             <tr key={ticket.id}>
                               <td>{ticket.title}</td>
                               <td>{ticket.workshop}</td>
-                              <td>{format(new Date(ticket.requested_date || ticket.created_at), 'dd-MM-yy')}</td>
+                              <td>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
                               <td>
                                 {(() => {
                                   if (ticket.started_at) {
@@ -627,7 +625,6 @@ function App() {
                                   if (ticket.requested_date && ticket.requested_time) {
                                     return `Request: ${format(new Date(ticket.requested_date), 'dd-MM-yy')} ${ticket.requested_time}`;
                                   }
-                                  // PERBAIKAN: Menambahkan kondisi ini
                                   if (ticket.requested_date) {
                                     return `Request: ${format(new Date(ticket.requested_date), 'dd-MM-yy')}`;
                                   }
@@ -661,13 +658,10 @@ function App() {
         </div>
       </main>
 
-      {/* Modal tidak berubah, tetap ada untuk kedua peran */}
       {showRejectionInfoModal && ticketToShowReason && (
         <RejectionInfoModal ticket={ticketToShowReason} onClose={handleCloseReasonModal} onDelete={handleDeleteFromReasonModal} />
       )}
       {showConfirmModal && ticketToDelete && (<ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
-      {showUserConfirmModal && userToDelete && (<ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete.name}"?`} onConfirm={confirmUserDelete} onCancel={cancelUserDelete} />)}
-      {showUserFormModal && (<UserFormModal userToEdit={userToEdit} onClose={handleCloseUserForm} onSave={handleSaveUser} />)}
     </div>
   );
 }
