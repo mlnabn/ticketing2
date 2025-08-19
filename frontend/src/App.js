@@ -10,6 +10,8 @@ import JobList from './components/JobList';
 import Login from './components/Login';
 import Register from './components/Register';
 import UserManagement from './components/UserManagement';
+import NotificationForm from './components/NotificationForm';
+import NotificationBell from './components/NotificationBell';
 import UserFormModal from './components/UserFormModal';
 import ConfirmationModal from './components/ConfirmationModal';
 import AssignAdminModal from './components/AssignAdminModal';
@@ -488,6 +490,7 @@ function App() {
             <ul>
               <li className="sidebar-nav-item"><button onClick={handleHomeClick} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-home"></i><span>Home</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>User</span></button></li>
+              <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Notifications')} className={`sidebar-button ${currentPage === 'Notifications' ? 'active' : ''}`}><i className="fas fa-bell"></i><span>Notifikasi</span></button></li>
             </ul>
           </nav>
           <div className="sidebar-footer">
@@ -537,6 +540,9 @@ function App() {
             {currentPage === 'userManagement' && (
               <UserManagement userData={userData} onDeleteClick={handleUserDeleteClick} onAddClick={handleAddUserClick} onEditClick={handleUserEditClick} onPageChange={handleUserPageChange} onSearch={handleUserSearch} />
             )}
+            {currentPage === 'Notifications' && (
+              <NotificationForm users={users} />
+            )}
           </div>
         </main>
         {showAssignModal && ticketToAssign && (
@@ -573,9 +579,12 @@ function App() {
           </div>
           <div className="main-header-controls">
             <span className="breadcrump">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
-            <div>
-              <button onClick={handleLogout} className="logout-buttonuser"><i className="fas fa-sign-out-alt"></i></button>
-            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <NotificationBell />
+              <button onClick={handleLogout} className="logout-buttonuser">
+                  <i className="fas fa-sign-out-alt"></i>
+              </button>
+          </div>
           </div>
         </header>
 
