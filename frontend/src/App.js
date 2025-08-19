@@ -699,7 +699,7 @@ function App() {
                               <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
                               <td>
                                 {ticket.status === 'Selesai' && ticket.proof_description ? (
-                                  <button onClick={() => handleViewProofClick(ticket)} className="btn-view-proof">Lihat Bukti</button>
+                                  <button onClick={() => handleViewProofClick(ticket)} className="btn-start">Lihat Bukti</button>
                                 ) : ticket.status === 'Ditolak' ? (
                                   <button onClick={() => handleShowReasonClick(ticket)} className="btn-reason">Alasan</button>
                                 ) : (
