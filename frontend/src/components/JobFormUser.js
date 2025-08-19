@@ -33,14 +33,14 @@ function JobFormUser({ users, addTicket, userRole }) {
       alert("Mohon lengkapi Tanggal dan Waktu, atau centang 'Jadwal Fleksibel'.");
       return;
     }
-    
-    addTicket({ 
-      title, 
-      workshop, 
+
+    addTicket({
+      title,
+      workshop,
       requested_time: isFlexible ? null : requestedTime,
       requested_date: isFlexible ? null : requestedDate
     });
-    
+
     // Reset form
     setTitle('');
     setWorkshop('');
@@ -86,7 +86,7 @@ function JobFormUser({ users, addTicket, userRole }) {
       color: "#c6c7c8ff", // biru muda untuk placeholder
       textAlign: 'center',
       fontWeight: 500
-      
+
     }),
     singleValue: (provided) => ({
       ...provided,
@@ -96,14 +96,14 @@ function JobFormUser({ users, addTicket, userRole }) {
     }),
     input: (provided) => ({
       ...provided,
-      textAlign: 'center', 
+      textAlign: 'center',
       color: "#c6c7c8ff" // warna teks saat mengetik
-      
+
     }),
     valueContainer: (provided) => ({
-    ...provided,
-    justifyContent: 'center', // supaya teks tetap di tengah
-  }),
+      ...provided,
+      justifyContent: 'center', // supaya teks tetap di tengah
+    }),
     menu: (provided) => ({
       ...provided,
       backgroundColor: "#696b6cff",
@@ -148,7 +148,17 @@ function JobFormUser({ users, addTicket, userRole }) {
           required
         />
         <div className="time-wrapper">
+          <label htmlFor="flexible-schedule">Fleksibel</label>
           <input
+            type="checkbox"
+            id="flexible-schedule"
+            checked={isFlexible}
+            onChange={handleFlexibleChange}
+
+          />
+          
+          <input
+
             type="time"
             value={requestedTime}
             onChange={(e) => setRequestedTime(e.target.value)}
@@ -160,18 +170,12 @@ function JobFormUser({ users, addTicket, userRole }) {
             type="date"
             value={requestedDate}
             onChange={(e) => setRequestedDate(e.target.value)}
-            required={!isFlexible} 
+            required={!isFlexible}
             disabled={isFlexible}
             className="input-dateuser"
           />
-          <input
-            type="checkbox"
-            id="flexible-schedule"
-            checked={isFlexible}
-            onChange={handleFlexibleChange}
-            className="flexible-schedule-wrapper"
-          />
-          <label htmlFor="flexible-schedule">Jadwal Pengerjaan Fleksibel</label>
+
+
         </div>
 
       </div>
