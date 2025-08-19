@@ -4,8 +4,8 @@ function ViewProofModal({ ticket, onClose, onDelete }) {
   if (!ticket) return null;
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal-content">
+    <div className="modal-backdrop-user">
+      <div className="modal-content-user">
         <h2>Bukti Pengerjaan</h2>
         <p><strong>Workshop:</strong> {ticket.workshop}</p>
         <p><strong>Deskripsi Pekerjaan:</strong> {ticket.title}</p>
