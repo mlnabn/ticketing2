@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,4 +44,8 @@ Route::middleware('jwt')->group(function () {
     // apiResource untuk sisa method (index, store, show, destroy).
     // 'update' dikecualikan untuk menghindari konflik dengan route POST di atas.
     Route::apiResource('users', UserController::class)->except(['create', 'edit', 'update']);
+
+    Route::get('/notifications', [NotificationController::class, 'index']); // Untuk user mengambil notif
+    Route::post('/notifications', [NotificationController::class, 'store']); // Untuk admin mengirim notif
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']); // Untuk user menandai sudah baca
 });
