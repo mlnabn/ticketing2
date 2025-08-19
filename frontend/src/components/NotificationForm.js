@@ -55,7 +55,7 @@ function NotificationForm({ users }) {
             <h2>Kirim Notifikasi Baru</h2>
 
             <div className="templates-section">
-                <h4>Gunakan Template</h4>
+                <h4>Gunakan Template :</h4>
                 {notificationTemplates.map((template, index) => (
                     <button key={index} onClick={() => handleTemplateClick(template)} className="btn-template">
                         {template.title}

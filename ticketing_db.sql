@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 16, 2025 at 05:46 AM
+-- Generation Time: Aug 19, 2025 at 06:30 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -129,7 +129,37 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (15, '2025_08_11_043258_add_creator_id_to_tickets_table', 8),
 (16, '2025_08_12_025251_add_timestamps_to_tickets_table', 9),
 (17, '2025_08_15_105944_allow_null_user_id_in_tickets_table', 10),
-(18, '2025_08_15_131953_add_requested_time_to_tickets_table', 11);
+(18, '2025_08_15_131953_add_requested_time_to_tickets_table', 11),
+(19, '2025_08_17_213505_add_requested_date_to_tickets_table', 12),
+(20, '2025_08_18_104052_add_rejection_reason_to_tickets_table', 13),
+(21, '2025_08_19_105750_create_notifications_table', 14);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`id`, `user_id`, `title`, `message`, `is_read`, `created_at`, `updated_at`) VALUES
+(1, NULL, 'Pemberitahuan Maintenance', 'Akan diadakan maintenance sistem pada pukul XX:XX. Mohon untuk menyimpan pekerjaan Anda.', 0, '2025-08-19 04:23:18', '2025-08-19 04:23:18'),
+(2, NULL, 'Update Aplikasi', 'Aplikasi telah diupdate ke versi terbaru. Silakan refresh browser Anda.', 0, '2025-08-19 04:23:44', '2025-08-19 04:23:44'),
+(3, NULL, 'Pengumuman Penting', 'Canden sedang down dan perlu penanganan segera. Semua ticket akan kami kerjakan setelah masalah ini selesai.', 0, '2025-08-19 04:25:03', '2025-08-19 04:25:03'),
+(4, 2, 'Pemberitahuan Maintenance', 'Akan diadakan maintenance sistem pada pukul XX:XX. Mohon untuk menyimpan pekerjaan Anda.', 0, '2025-08-19 04:25:09', '2025-08-19 04:25:09'),
+(5, NULL, 'Pemberitahuan Maintenance', 'Akan diadakan maintenance sistem pada pukul XX:XX. Mohon untuk menyimpan pekerjaan Anda.', 0, '2025-08-19 04:28:21', '2025-08-19 04:28:21');
 
 -- --------------------------------------------------------
 
@@ -246,7 +276,9 @@ CREATE TABLE `tickets` (
   `title` varchar(255) NOT NULL,
   `workshop` varchar(255) DEFAULT NULL,
   `requested_time` varchar(255) DEFAULT NULL,
+  `requested_date` date DEFAULT NULL,
   `status` varchar(255) NOT NULL DEFAULT 'Belum Dikerjakan',
+  `rejection_reason` text DEFAULT NULL,
   `started_at` timestamp NULL DEFAULT NULL,
   `completed_at` timestamp NULL DEFAULT NULL,
   `user_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -259,30 +291,28 @@ CREATE TABLE `tickets` (
 -- Dumping data for table `tickets`
 --
 
-INSERT INTO `tickets` (`id`, `title`, `workshop`, `requested_time`, `status`, `started_at`, `completed_at`, `user_id`, `creator_id`, `created_at`, `updated_at`) VALUES
-(64, 'Hp nan', 'Canden', NULL, 'Belum Dikerjakan', NULL, NULL, 6, 7, '2025-08-11 00:00:00', '2025-08-11 00:00:00'),
-(65, 'Masang 1000 Mesin CNC', 'Bener', NULL, 'Sedang Dikerjakan', NULL, NULL, 4, 4, '2025-08-11 00:37:33', '2025-08-11 01:21:42'),
-(66, 'Pulang', 'Canden', NULL, 'Sedang Dikerjakan', '2025-08-11 20:03:58', NULL, 4, 2, '2025-08-11 01:07:58', '2025-08-11 20:03:58'),
-(68, 'Makan', 'Canden', NULL, 'Selesai', '2025-08-12 03:05:57', '2025-08-12 03:46:38', 4, 2, '2025-08-11 01:11:20', '2025-08-12 03:46:38'),
-(75, 'Ticketing', 'Canden', NULL, 'Belum Dikerjakan', NULL, NULL, 4, 7, '2025-08-12 03:47:18', '2025-08-12 03:47:18'),
-(76, 'Rakit CNC', 'Nobo', NULL, 'Belum Dikerjakan', NULL, NULL, 4, 7, '2025-08-12 03:53:52', '2025-08-12 03:53:52'),
-(77, 'Melanjtukan Ticketing App', 'Canden', NULL, 'Sedang Dikerjakan', '2025-08-13 02:45:08', NULL, 2, 7, '2025-08-13 02:15:28', '2025-08-13 02:45:33'),
-(78, 'Membenarkan Wiring', 'Nusa Persada', NULL, 'Belum Dikerjakan', NULL, NULL, 18, 2, '2025-08-13 04:09:51', '2025-08-13 04:09:51'),
-(83, 'Kerjakan Ticketing', 'Nusa Persada', NULL, 'Selesai', '2025-08-14 03:26:56', '2025-08-14 03:28:32', 2, 2, '2025-08-14 02:41:47', '2025-08-14 03:28:32'),
-(84, 'asdd', 'Canden', NULL, 'Belum Dikerjakan', NULL, NULL, 4, 18, '2025-08-14 06:10:52', '2025-08-14 06:10:52'),
-(85, 'lkancsdlkasndlckasncklas cnklas clkas nclkasnc lknas ckansclkan slcknaslcnalksf claksnf  HWOIFH Wo fhwoi hfow HFOIHEWOe oioiohoiewhfoi hseog fahgoa goweh foiedhgfoadgh das;ohgdoa;sdhghdgkajwfh ewaoigh fsdoiaf hoaiwgh aoi;dg hawoig hawoigf', 'Canden', NULL, 'Selesai', '2025-08-15 06:47:52', '2025-08-15 06:48:02', 4, 2, '2025-08-14 06:28:23', '2025-08-15 06:48:02'),
-(87, 'Benerin Laptop', 'Bener', NULL, 'Sedang Dikerjakan', '2025-08-15 04:18:56', NULL, 7, 2, '2025-08-15 04:14:52', '2025-08-15 04:18:56'),
-(88, 'Benerin Router', 'Nusa Persada', NULL, 'Belum Dikerjakan', NULL, NULL, 7, 2, '2025-08-15 04:17:31', '2025-08-15 04:17:31'),
-(89, 'Ngopi', 'Canden', NULL, 'Selesai', '2025-08-15 06:52:22', '2025-08-15 06:52:26', 7, 2, '2025-08-15 06:36:49', '2025-08-15 06:52:26'),
-(90, 'Istirahat', 'Canden', NULL, 'Belum Dikerjakan', NULL, NULL, 7, 2, '2025-08-15 06:53:00', '2025-08-15 06:53:00'),
-(91, 'Ngevape', 'Canden', NULL, 'Belum Dikerjakan', NULL, NULL, 7, 2, '2025-08-15 06:58:34', '2025-08-15 06:58:34'),
-(92, 'Rokok', 'Canden', NULL, 'Sedang Dikerjakan', '2025-08-15 07:00:56', NULL, 7, 4, '2025-08-15 07:00:34', '2025-08-15 07:00:56'),
-(93, 'asda', 'Canden', NULL, 'Belum Dikerjakan', NULL, NULL, 7, 4, '2025-08-15 07:02:20', '2025-08-15 07:02:20'),
-(94, 'lknlkn', 'Canden', '09:00', 'Selesai', '2025-08-15 07:07:01', '2025-08-15 07:07:09', 7, 4, '2025-08-15 07:06:46', '2025-08-15 07:07:09'),
-(95, 'alkdcn', 'Bener', '08:00', 'Sedang Dikerjakan', '2025-08-16 02:48:12', NULL, 7, 4, '2025-08-15 07:07:44', '2025-08-16 02:48:12'),
-(96, 'Istirahat', 'Canden', '12:12', 'Sedang Dikerjakan', '2025-08-16 01:47:45', NULL, 7, 2, '2025-08-16 01:20:41', '2025-08-16 01:47:45'),
-(98, 'Nambah Absen Buat Tim Produksi', 'Bener', '10:00', 'Sedang Dikerjakan', '2025-08-16 03:05:24', NULL, 8, 4, '2025-08-16 02:51:05', '2025-08-16 03:05:24'),
-(100, 'Pulang', 'Pelita', '05:05', 'Belum Dikerjakan', NULL, NULL, NULL, 4, '2025-08-16 03:41:53', '2025-08-16 03:41:53');
+INSERT INTO `tickets` (`id`, `title`, `workshop`, `requested_time`, `requested_date`, `status`, `rejection_reason`, `started_at`, `completed_at`, `user_id`, `creator_id`, `created_at`, `updated_at`) VALUES
+(87, 'Benerin Laptop', 'Bener', NULL, NULL, 'Sedang Dikerjakan', NULL, '2025-08-15 04:18:56', NULL, 7, 2, '2025-08-15 04:14:52', '2025-08-15 04:18:56'),
+(88, 'Benerin Router', 'Nusa Persada', NULL, NULL, 'Belum Dikerjakan', NULL, NULL, NULL, 7, 2, '2025-08-15 04:17:31', '2025-08-15 04:17:31'),
+(89, 'Ngopi', 'Canden', NULL, NULL, 'Selesai', NULL, '2025-08-15 06:52:22', '2025-08-15 06:52:26', 7, 2, '2025-08-15 06:36:49', '2025-08-15 06:52:26'),
+(92, 'Rokok', 'Canden', NULL, NULL, 'Sedang Dikerjakan', NULL, '2025-08-15 07:00:56', NULL, 7, 4, '2025-08-15 07:00:34', '2025-08-15 07:00:56'),
+(93, 'asda', 'Canden', NULL, NULL, 'Belum Dikerjakan', NULL, NULL, NULL, 7, 4, '2025-08-15 07:02:20', '2025-08-15 07:02:20'),
+(94, 'lknlkn', 'Canden', '09:00', NULL, 'Selesai', NULL, '2025-08-15 07:07:01', '2025-08-15 07:07:09', 7, 4, '2025-08-15 07:06:46', '2025-08-15 07:07:09'),
+(95, 'alkdcn', 'Bener', '08:00', NULL, 'Sedang Dikerjakan', NULL, '2025-08-16 02:48:12', NULL, 7, 4, '2025-08-15 07:07:44', '2025-08-16 02:48:12'),
+(98, 'Nambah Absen Buat Tim Produksi', 'Bener', '10:00', NULL, 'Sedang Dikerjakan', NULL, '2025-08-16 03:05:24', NULL, 8, 4, '2025-08-16 02:51:05', '2025-08-16 03:05:24'),
+(100, 'Pulang', 'Pelita', '05:05', NULL, 'Belum Dikerjakan', NULL, NULL, NULL, NULL, 4, '2025-08-16 03:41:53', '2025-08-16 03:41:53'),
+(109, 'asd', 'Canden', '23:06', '2025-08-18', 'Ditunda', NULL, '2025-08-18 02:18:41', NULL, 8, 4, '2025-08-17 15:06:19', '2025-08-18 08:11:03'),
+(111, 'Lanjutkan Ticketing App', 'Canden', '09:00', NULL, 'Ditunda', NULL, '2025-08-18 02:59:43', NULL, 21, 2, '2025-08-18 01:38:45', '2025-08-18 03:00:39'),
+(112, 'Ticketing', 'Canden', '10:00', NULL, 'Sedang Dikerjakan', NULL, '2025-08-18 03:00:26', NULL, 8, 2, '2025-08-18 02:05:32', '2025-08-18 08:11:05'),
+(113, 'asd', 'Canden', NULL, NULL, 'Ditolak', 'a;osfh oaS HDOIAF HOAHFO HDSFO;I HSAODF HSODIF HFOA SDHFOIASHFDOIASFHOASHDFOIASHDFOHASDF H FAOSIDFHOIAS DFHOAS HDFOIA SHDFOI ASHDFOI FOI SADFOI SIDFH FAISO FHDO HO IASFHDOA SHDFOIFOISA FDOI;', NULL, NULL, NULL, 2, '2025-08-18 02:51:34', '2025-08-18 07:56:26'),
+(114, 'Laptopku rusak keyboarnya mas', 'Canden', '10:00', '2025-08-18', 'Selesai', NULL, '2025-08-18 02:59:24', '2025-08-18 06:03:06', 7, 2, '2025-08-18 02:58:58', '2025-08-18 06:03:06'),
+(116, 'asd', 'Nobo', '11:06', '2025-08-19', 'Ditolak', 'apa ini?', NULL, NULL, NULL, 2, '2025-08-18 03:04:53', '2025-08-18 04:58:38'),
+(120, 'Benerke Laptopku mas', 'Bener', '14:40', NULL, 'Ditolak', 'Maaf Sedang Sibuk', NULL, NULL, NULL, 27, '2025-08-18 06:35:30', '2025-08-18 06:35:47'),
+(121, 'Maka', 'Nobo', NULL, NULL, 'Selesai', NULL, '2025-08-18 06:46:09', '2025-08-18 06:46:40', 6, 27, '2025-08-18 06:45:57', '2025-08-18 06:46:40'),
+(123, 'Pulang', 'Nobo', '16:30', NULL, 'Selesai', NULL, '2025-08-18 08:29:41', '2025-08-19 01:45:57', 7, 2, '2025-08-18 08:29:18', '2025-08-19 01:45:57'),
+(124, 'sds', 'Canden', '09:01', '2025-08-19', 'Belum Dikerjakan', NULL, NULL, NULL, NULL, 2, '2025-08-19 01:10:59', '2025-08-19 01:10:59'),
+(125, 'asd', 'Canden', NULL, NULL, 'Belum Dikerjakan', NULL, NULL, NULL, NULL, 2, '2025-08-19 01:38:39', '2025-08-19 01:38:39'),
+(126, 'asd', 'Canden', '09:41', '2025-08-20', 'Belum Dikerjakan', NULL, NULL, NULL, NULL, 2, '2025-08-19 01:39:12', '2025-08-19 01:39:12');
 
 -- --------------------------------------------------------
 
@@ -312,14 +342,14 @@ INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `re
 (6, 'Bagas', 'bagas@gmail.com', NULL, '$2y$12$37JT39ckdV69yrlvTaAn0u88KnHXdIJlSm.dFYbgaDMm3MxMi7sIi', NULL, '2025-08-05 23:35:21', '2025-08-16 03:01:01', 'admin'),
 (7, 'Dwi', 'admin@gmail.com', NULL, '$2y$12$qpy1MaEepu34.L8XRbjsour9xDSHspMeJUJpAkSNIKqvYehoVWwa.', NULL, '2025-08-06 00:06:58', '2025-08-06 00:06:58', 'admin'),
 (8, 'David', 'david@gmail.com', NULL, '$2y$12$nFpugvVQauS1q0G8ludgiuMUWLpeaG/kMQkkRIORd.blTEN726wW2', NULL, '2025-08-06 02:55:46', '2025-08-16 03:03:21', 'admin'),
-(18, 'Aris', 'aris@gmail.com', NULL, '$2y$12$.pSP/V7eaYwwdGjTBTkxcOCf5tDlTjA1kPQ2xLU0FvZ9C0Zvtczzq', NULL, '2025-08-13 01:28:37', '2025-08-16 03:03:50', 'admin'),
+(18, 'Aris', 'aris@gmail.com', NULL, '$2y$12$.pSP/V7eaYwwdGjTBTkxcOCf5tDlTjA1kPQ2xLU0FvZ9C0Zvtczzq', NULL, '2025-08-13 01:28:37', '2025-08-16 05:02:50', 'admin'),
 (20, 'Maulana', 'maulana@gmail.com', NULL, '$2y$12$9T13hNQjvzdN3toyEEmy9eyOscJa5kEbRiddgyc1sR0xTK2K0sWVe', NULL, '2025-08-13 01:46:18', '2025-08-13 04:51:45', 'user'),
 (21, 'Rasya', 'rasya@gmail.com', NULL, '$2y$12$l1wFoGOkzCv3eAryK96aiuwejMkfqiqs3D1F6wfbMLWqZUAC6H9Lq', NULL, '2025-08-13 02:12:20', '2025-08-16 03:01:22', 'admin'),
 (22, 'Karyanti', 'karyanti@gmail.com', NULL, '$2y$12$xQmwH6z6FuufFVAB4LyTAuu7YDPzTVzZTGPE3IJSUcmCgU7cp8E3S', NULL, '2025-08-13 04:25:27', '2025-08-13 04:29:30', 'user'),
-(23, 'Samsung', 'samsung@gmail.com', NULL, '$2y$12$ISwjrY52M.selaBhcALdKuGsH4tq/MZCvncpaMEZfUAjhzaAvFN9u', NULL, '2025-08-13 04:51:27', '2025-08-13 04:51:27', 'user'),
 (25, 'Taufiq Hidayat', 'taufiq@gmail.com', NULL, '$2y$12$3qkDI9IWGassZ3rNuBtBhuYkZ9IblczukkesEf403Vb4CjTKYH/E.', NULL, '2025-08-14 06:58:27', '2025-08-14 06:58:27', 'user'),
 (26, 'Vampir', 'vampir@gmail.com', NULL, '$2y$12$LB05EXe7hc6shfj6j0TjbeG5junbCQgw2908jUP2M0PDGCqhncTue', NULL, '2025-08-16 03:39:57', '2025-08-16 03:39:57', 'user'),
-(27, 'Lala', 'lala@gmail.com', NULL, '$2y$12$IrQtlyKtj4zPtQaU3aBle.QqC4yOJPI4cRZdFrFsfhcxuS19YMGyG', NULL, '2025-08-16 03:43:29', '2025-08-16 03:43:29', 'user');
+(27, 'Lala', 'lala@gmail.com', NULL, '$2y$12$IrQtlyKtj4zPtQaU3aBle.QqC4yOJPI4cRZdFrFsfhcxuS19YMGyG', NULL, '2025-08-16 03:43:29', '2025-08-16 03:43:29', 'user'),
+(28, 'Yoga', 'yoga@gmail.com', NULL, '$2y$12$FEWzOBTUUcFKjipf8NfU3.4BcCMlqeN914BY3x8UtxaB6Lom0vDdO', NULL, '2025-08-18 01:42:59', '2025-08-18 01:42:59', 'user');
 
 --
 -- Indexes for dumped tables
@@ -362,6 +392,13 @@ ALTER TABLE `job_batches`
 --
 ALTER TABLE `migrations`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `notifications_user_id_foreign` (`user_id`);
 
 --
 -- Indexes for table `password_reset_tokens`
@@ -421,7 +458,13 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
@@ -433,17 +476,23 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `tickets`
 --
 ALTER TABLE `tickets`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=128;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `notifications_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `tickets`
