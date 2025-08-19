@@ -3506,6 +3506,43 @@ body.dark-mode .btn-submit:hover {
   }
 }
 
+.btn-confirmuser,
+.btn-canceluser {
+  flex: 1;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+  /* Warna teks tombol */
+}
+
+.btn-confirmuser {
+  background-color: var(--button-confirm-bg-light);
+}
+
+.btn-confirmuser:hover {
+  background-color: var(--button-confirm-hover-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-canceluser {
+  background-color: var(--button-cancel-bg-light);
+}
+
+.btn-canceluser:hover {
+  background-color: var(--button-cancel-hover-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+
+
 /* Styling untuk Text Area di Modal Penolakan */
 .rejection-reason-textarea {
   width: 100%;
