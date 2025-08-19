@@ -4,12 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Ticket extends Model
 {
     use HasFactory;
+    protected $appends = ['proof_image_url'];
 
-    protected $fillable = ['title', 'status', 'user_id', 'workshop', 'creator_id', 'started_at', 'completed_at', 'requested_time', 'requested_date', 'rejection_reason'];
+    protected $fillable = [
+        'title', 
+        'status', 
+        'user_id', 
+        'workshop', 
+        'creator_id', 
+        'started_at', 
+        'completed_at', 
+        'requested_time', 
+        'requested_date', 
+        'rejection_reason', 
+        'proof_description', 
+        'proof_image_path',
+    ];
 
     public function user() {
         return $this->belongsTo(User::class);
@@ -19,5 +34,13 @@ class Ticket extends Model
     {
         // Pastikan parameter kedua 'creator_id' ada
         return $this->belongsTo(User::class, 'creator_id');
+    }
+
+    public function getProofImageUrlAttribute()
+    {
+        if ($this->proof_image_path) {
+            return Storage::disk('public')->url($this->proof_image_path);
+        }
+        return null;
     }
 }

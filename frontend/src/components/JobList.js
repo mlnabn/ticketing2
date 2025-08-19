@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 
-function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelectionChange, onAssignClick, onRejectClick }) {
+function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelectionChange, onAssignClick, onRejectClick, onProofClick }) {
   const [selectedIds, setSelectedIds] = useState([]);
   const isAdmin = userRole && userRole.toLowerCase() === 'admin';
 
@@ -75,9 +75,14 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
         );
       case 'Selesai':
         return (
-          <button onClick={() => deleteTicket(ticket)} className="btn-cancel-aksi">
-            Hapus
-          </button>
+          <>
+            {!ticket.proof_description && (
+              <button onClick={() => onProofClick(ticket)} className="btn-proof">Bukti</button>
+            )}
+            <button onClick={() => deleteTicket(ticket)} className="btn-cancel-aksi">
+              Hapus
+            </button>
+          </>
         );
       case 'Ditolak':
         return (

@@ -7,6 +7,7 @@ use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class TicketController extends Controller
 {
@@ -200,5 +201,36 @@ class TicketController extends Controller
         }
 
         return response()->json($stats);
+    }
+
+    public function submitProof(Request $request, $id)
+    {
+        $request->validate([
+            'proof_description' => 'required|string',
+            'proof_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi file gambar
+        ]);
+
+        $ticket = Ticket::findOrFail($id);
+
+        // Hanya admin yang mengerjakan yang bisa submit bukti
+        if (auth()->user()->id !== $ticket->user_id) {
+            return response()->json(['error' => 'Anda tidak berwenang untuk aksi ini.'], 403);
+        }
+
+        $ticket->proof_description = $request->proof_description;
+
+        if ($request->hasFile('proof_image')) {
+            // Hapus gambar lama jika ada untuk menghemat space
+            if ($ticket->proof_image_path) {
+                Storage::disk('public')->delete($ticket->proof_image_path);
+            }
+            // Simpan gambar baru dan dapatkan path-nya
+            $path = $request->file('proof_image')->store('proofs', 'public');
+            $ticket->proof_image_path = $path;
+        }
+
+        $ticket->save();
+
+        return response()->json($ticket);
     }
 }

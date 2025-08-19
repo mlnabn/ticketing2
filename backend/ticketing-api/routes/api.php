@@ -33,6 +33,7 @@ Route::middleware('jwt')->group(function () {
     Route::post('/tickets/bulk-delete', [TicketController::class, 'bulkDelete']);
     Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus']);
     Route::patch('/tickets/{ticket}/assign', [TicketController::class, 'assign']);
+    Route::post('/tickets/{ticket}/submit-proof', [TicketController::class, 'submitProof']);
     Route::apiResource('tickets', TicketController::class)->only(['index', 'store', 'destroy']);
     
     Route::get('/users/all', [UserController::class, 'all']);

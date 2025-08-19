@@ -17,6 +17,8 @@ import ConfirmationModal from './components/ConfirmationModal';
 import AssignAdminModal from './components/AssignAdminModal';
 import RejectTicketModal from './components/RejectTicketModal';
 import RejectionInfoModal from './components/RejectionInfoModal';
+import ProofModal from './components/ProofModal';
+import ViewProofModal from './components/ViewProofModal';
 import Pagination from './components/Pagination';
 import { getToken, isLoggedIn, logout, getUser } from './auth';
 import './App.css';
@@ -80,6 +82,10 @@ function App() {
   const [ticketToReject, setTicketToReject] = useState(null);
   const [showRejectionInfoModal, setShowRejectionInfoModal] = useState(false); 
   const [ticketToShowReason, setTicketToShowReason] = useState(null);
+  const [showProofModal, setShowProofModal] = useState(false);
+  const [ticketForProof, setTicketForProof] = useState(null);
+  const [showViewProofModal, setShowViewProofModal] = useState(false);
+  const [ticketToShowProof, setTicketToShowProof] = useState(null);
 
 
   // -----------------------------------------------------------------
@@ -320,6 +326,49 @@ function App() {
     }
   };
 
+  const handleProofClick = (ticket) => {
+    setTicketForProof(ticket);
+    setShowProofModal(true);
+  };
+
+  const handleCloseProofModal = () => {
+    setTicketForProof(null);
+    setShowProofModal(false);
+  };
+
+  const handleSaveProof = async (ticketId, formData) => {
+    try {
+      await axios.post(`${API_URL}/tickets/${ticketId}/submit-proof`, formData, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          'Content-Type': 'multipart/form-data', // Penting untuk file upload
+        },
+      });
+      alert('Bukti pengerjaan berhasil disimpan.');
+      handleCloseProofModal();
+      fetchData(dataPage, searchQuery); // Refresh data
+    } catch (error) {
+      console.error("Gagal menyimpan bukti:", error);
+      const errorMessage = error.response?.data?.error || "Gagal menyimpan bukti. Pastikan deskripsi diisi.";
+      alert(errorMessage);
+    }
+  };
+
+  const handleViewProofClick = (ticket) => {
+    setTicketToShowProof(ticket);
+    setShowViewProofModal(true);
+  };
+
+  const handleCloseViewProofModal = () => {
+    setTicketToShowProof(null);
+    setShowViewProofModal(false);
+  };
+
+  const handleDeleteFromViewProofModal = (ticket) => {
+    handleCloseViewProofModal();
+    handleDeleteClick(ticket);  
+  };
+
   const handleUserDeleteClick = (user) => {
     if (user.id === loggedInUserId) {
       alert("Anda tidak bisa menghapus akun Anda sendiri.");
@@ -533,7 +582,7 @@ function App() {
                   <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
                 </form>
                 {selectedTicketIds.length > 0 && (<div className="bulk-action-bar" style={{ margin: '20px 0' }}><button onClick={handleBulkDelete} className="btn-delete">Hapus {selectedTicketIds.length} Tiket yang Dipilih</button></div>)}
-                <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} userRole={userRole} onSelectionChange={handleSelectionChange} onAssignClick={handleAssignClick} onRejectClick={handleRejectClick} />
+                <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} userRole={userRole} onSelectionChange={handleSelectionChange} onAssignClick={handleAssignClick} onRejectClick={handleRejectClick} onProofClick={handleProofClick} />
                 <Pagination currentPage={dataPage} lastPage={ticketData ? ticketData.last_page : 1} onPageChange={handlePageChange} />
               </>
             )}
@@ -545,6 +594,9 @@ function App() {
             )}
           </div>
         </main>
+        {showProofModal && ticketForProof && (
+          <ProofModal ticket={ticketForProof} onSave={handleSaveProof} onClose={handleCloseProofModal}/>
+        )}
         {showAssignModal && ticketToAssign && (
           <AssignAdminModal ticket={ticketToAssign} admins={adminList} onAssign={handleConfirmAssign} onClose={handleCloseAssignModal} />
         )}
@@ -645,7 +697,9 @@ function App() {
                               </td>
                               <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
                               <td>
-                                {ticket.status === 'Ditolak' ? (
+                                {ticket.status === 'Selesai' && ticket.proof_description ? (
+                                  <button onClick={() => handleViewProofClick(ticket)} className="btn-view-proof">Lihat Bukti</button>
+                                ) : ticket.status === 'Ditolak' ? (
                                   <button onClick={() => handleShowReasonClick(ticket)} className="btn-reason">Alasan</button>
                                 ) : (
                                   <button onClick={() => handleDeleteClick(ticket)} className="btn-cancel-aksi">Delete</button>
@@ -666,7 +720,10 @@ function App() {
           </div>
         </div>
       </main>
-
+      
+      {showViewProofModal && ticketToShowProof && (
+        <ViewProofModal ticket={ticketToShowProof} onClose={handleCloseViewProofModal} onDelete={handleDeleteFromViewProofModal}/>
+      )}
       {showRejectionInfoModal && ticketToShowReason && (
         <RejectionInfoModal ticket={ticketToShowReason} onClose={handleCloseReasonModal} onDelete={handleDeleteFromReasonModal} />
       )}
