@@ -3152,7 +3152,7 @@ body.dark-mode .history-tab {
 }
 
 /* Label untuk time */
-.time-label {
+/* .time-label {
   font-size: 14px;
   font-weight: 600;
   color: #ffffff;
@@ -3160,7 +3160,7 @@ body.dark-mode .history-tab {
   white-space: nowrap;
   margin: 0;
   align-self: center;
-}
+} */
 
 /* ====== Input Time User ====== */
 .input-selectuser {
@@ -3371,7 +3371,7 @@ body.dark-mode .btn-submit:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
+  z-index: 2000;
   animation: fadeIn 0.3s ease;
 }
 
@@ -3841,7 +3841,7 @@ body.dark-mode .rejection-reason-display p {
 
 /* Styling untuk label checklist */
 .flexible-schedule-wrapper label {
-  color: #c6c7c8; /* Warna teks terang */
+  color: #ffffff; /* Warna teks terang */
   font-weight: 500;
   cursor: pointer;
 }

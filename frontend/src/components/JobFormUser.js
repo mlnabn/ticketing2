@@ -148,7 +148,6 @@ function JobFormUser({ users, addTicket, userRole }) {
           required
         />
         <div className="time-wrapper">
-          <label className="time-label">Select Time</label>
           <input
             type="time"
             value={requestedTime}
