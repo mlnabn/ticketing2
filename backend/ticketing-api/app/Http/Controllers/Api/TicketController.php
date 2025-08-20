@@ -36,7 +36,10 @@ class TicketController extends Controller
         if ($statusFilter) {
             if ($statusFilter === 'Belum Selesai') {
                 $query->whereIn('status', ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan']);
-            } else {
+            } elseif ($statusFilter === 'Selesai'){
+                    $query->whereIn('status', ['Selesai', 'Ditolak']);
+                }
+            else {
                 $query->where('status', $statusFilter);
             }
         }
@@ -191,12 +194,12 @@ class TicketController extends Controller
 
         if ($user->role === 'admin') {
             $stats['total_tickets'] = Ticket::count();
-            $stats['completed_tickets'] = Ticket::where('status', 'Selesai')->count();
-            $stats['pending_tickets'] = $stats['total_tickets'] - $stats['completed_tickets'];
+            $stats['completed_tickets'] = Ticket::whereIn('status', ['Selesai', 'Ditolak'])->count();
+            $stats['pending_tickets'] = Ticket::whereIn('status', ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'])->count();
             $stats['total_users'] = User::count();
         } else {
             $stats['total_tickets'] = Ticket::where('user_id', $user->id)->count();
-            $stats['completed_tickets'] = Ticket::where('user_id', $user->id)->where('status', 'Selesai')->count();
+            $stats['completed_tickets'] = Ticket::where('user_id', $user->id)->where('status', ['Selesai', 'Ditolak'])->count();
             $stats['pending_tickets'] = $stats['total_tickets'] - $stats['completed_tickets'];
         }
 
