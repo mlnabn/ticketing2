@@ -4138,6 +4138,18 @@ body {
   background: #d1d5db;
 }
 
+.modal-content .form-group textarea,
+.modal-content .form-group input
+{
+  width: 395px;
+  background: #ffffff;
+  border-color: #d1d5db;
+  color: #111827;
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
 .form-group input,
 .form-group select,
 .form-group textarea,

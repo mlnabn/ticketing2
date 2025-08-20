@@ -62,8 +62,8 @@ function ProofModal({ ticket, onSave, onClose }) {
             </div>
           )}
           <div className="modal-actions">
-            <button type="button" onClick={onClose} className="btn-start">Batal</button>
-            <button type="submit" className="btn-delete">Simpan Bukti</button>
+            <button type="button" onClick={onClose} className="btn-cancel">Batal</button>
+            <button type="submit" className="btn-confirm">Simpan Bukti</button>
           </div>
         </form>
       </div>
