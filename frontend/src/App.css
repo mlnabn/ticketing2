@@ -3776,6 +3776,8 @@ body.dark-mode .rejection-reason-display p {
   animation: scaleIn 0.35s ease-out;
   text-align: center;
   transition: all 0.3s ease;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .modal-content-user h3 {
