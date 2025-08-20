@@ -623,33 +623,34 @@ function App() {
               </>
             )}
             {currentPage === 'MyTickets' && (
-              <>
-                <h2 style={{ marginBottom: '20px' }}>Tiket yang Saya Kerjakan</h2>
-
-                {/* Tampilkan daftar tiket jika ada data */}
-                {myTicketsData && myTicketsData.data && myTicketsData.data.length > 0 ? (
-                  <>
-                    <JobList
-                      tickets={myTicketsData.data}
-                      updateTicketStatus={updateTicketStatus}
-                      deleteTicket={handleDeleteClick}
-                      userRole={userRole}
-                      onAssignClick={handleAssignClick}
-                      onRejectClick={handleRejectClick}
-                    />
-                    <Pagination
-                      currentPage={myTicketsPage}
-                      lastPage={myTicketsData.last_page}
-                      onPageChange={(page) => setMyTicketsPage(page)}
-                    />
-                  </>
-                ) : (
-                  // Tampilkan pesan jika tidak ada tiket yang dikerjakan
-                  <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
-                    <p>Anda belum bertugas untuk mengerjakan tiket apa pun.</p>
-                  </div>
-                )}
-              </>
+                <>
+                    <h2 style={{ marginBottom: '20px' }}>Tiket yang Saya Kerjakan</h2>
+                    
+                    {/* Tampilkan daftar tiket jika ada data */}
+                    {myTicketsData && myTicketsData.data && myTicketsData.data.length > 0 ? (
+                        <>
+                            <JobList
+                                tickets={myTicketsData.data}
+                                updateTicketStatus={updateTicketStatus}
+                                deleteTicket={handleDeleteClick}
+                                userRole={userRole}
+                                onAssignClick={handleAssignClick}
+                                onRejectClick={handleRejectClick}
+                                onProofClick={handleProofClick}
+                            />
+                            <Pagination
+                                currentPage={myTicketsPage}
+                                lastPage={myTicketsData.last_page}
+                                onPageChange={(page) => setMyTicketsPage(page)}
+                            />
+                        </>
+                    ) : (
+                        // Tampilkan pesan jika tidak ada tiket yang dikerjakan
+                        <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
+                            <p>Anda belum bertugas untuk mengerjakan tiket apa pun.</p>
+                        </div>
+                    )}
+                </>
             )}
             {currentPage === 'userManagement' && (
               <UserManagement userData={userData} onDeleteClick={handleUserDeleteClick} onAddClick={handleAddUserClick} onEditClick={handleUserEditClick} onPageChange={handleUserPageChange} onSearch={handleUserSearch} />

@@ -3457,7 +3457,8 @@ body.dark-mode .btn-submit:hover {
   border-radius: 20px;
   padding: 30px;
   width: 400;
-  max-width: 90%;
+  min-width: 30%;
+  max-width: 30%;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   animation: slideUp 0.4s ease;
   text-align: center;
@@ -4249,8 +4250,9 @@ body {
 }
 
 .modal-content .form-group textarea,
-.modal-content .form-group input {
-  width: 395px;
+.modal-content .form-group input
+{
+  width: 435px;
   background: #ffffff;
   border-color: #d1d5db;
   color: #111827;
