@@ -494,6 +494,19 @@ function App() {
       if (isAdmin) {
         fetchData(dataPage, searchQuery, statusFilter);
         fetchAdmins();
+
+        if (currentPage === 'Tickets') {
+                const intervalId = setInterval(() => {
+                    console.log('Memuat ulang daftar tiket...'); // Pesan untuk debugging
+                    fetchData(dataPage, searchQuery, statusFilter);
+                }, 60000); // 60000 milidetik = 1 menit
+
+                // Fungsi cleanup: Hentikan interval jika komponen di-unmount 
+                // atau jika user pindah halaman/mengubah filter.
+                return () => {
+                    clearInterval(intervalId);
+                };
+            }
       }
     }
   }, [isLogin, dataPage, searchQuery, statusFilter, fetchData, isAdmin, fetchAdmins]);
