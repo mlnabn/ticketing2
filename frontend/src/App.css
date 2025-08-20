@@ -26,7 +26,7 @@
   /* Warna teks utama dashboard (dark slate) */
 
   /* Sidebar */
-  --sidebar-bg-light: whitesmoke;
+  --sidebar-bg-light: #E2E8F0;
   /* Latar belakang sidebar (putih bersih) */
   --sidebar-text-light: #334155;
   /* Warna teks sidebar */
@@ -52,8 +52,8 @@
   /* Latar belakang area konten utama dashboard (putih bersih) */
 
   /* Header Tabel Joblist (Muted Slate Blue, sesuai screenshot) */
-  --joblist-header-bg-light: #5A7A97;
-  --joblist-header-text-light: #FFFFFF;
+  --joblist-header-bg-light: #BFDBFE;
+  --joblist-header-text-light: #111827;
   /* Teks putih di atas background header */
 
   /* Border & Shadow Input/Select Form */
@@ -149,7 +149,7 @@
   /* abu gelap */
 
   /* Search Form Specific - Light Mode (Aesthetic) */
-  --search-form-bg-light: #ffffff;
+  --search-form-bg-light: #E5E7EB;
   --search-form-shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08);
   /* Shadow yang lebih lembut */
   --search-input-bg-light: #fcfcfc;
@@ -1121,8 +1121,25 @@ body.dark-mode .logout-button:hover {
 
 
 .main-header {
-  /* background-color: var(--header-bg-light); */
+  background-color: #CBD5E1;
   /* Latar belakang header di mode terang */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* Bayangan lebih halus dan tegas */
+  border-bottom: 1px solid #e0e0e0;
+  /* Garis bawah tegas di light mode */
+  padding: 1rem;
+  /* Padding */
+  display: flex;
+  align-items: center;
+  /* Mengatur item secara vertikal di tengah */
+  justify-content: space-between;
+  /* Untuk mendorong grup kiri dan kontrol kanan */
+  gap: 1rem;
+  /* Jarak antar elemen di header */
+  flex-shrink: 0;
+}
+
+.main-header-user {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   /* Bayangan lebih halus dan tegas */
   border-bottom: 1px solid #e0e0e0;
@@ -1935,7 +1952,7 @@ body.dark-mode .job-table td {
 }
 
 .job-table tbody tr:hover {
-  background-color: #f0fbff;
+  background-color: #F1F5F9;
   /* Warna hover baris di mode terang */
 }
 
@@ -3014,7 +3031,7 @@ body.dark-mode .btn-delete:hover {
   justify-content: center;
   gap: 2rem;
   padding: 1.5rem 0;
-  padding-right: 150px;
+  padding-right: 90px;
   /* border-bottom: 1px solid var(--border-color-light); */
 }
 
@@ -4071,7 +4088,7 @@ body.dark-mode .rejection-reason-display p {
   padding: 24px;
   border-radius: 14px;
   margin-top: 24px;
-  background: whitesmoke;
+  background: #E5E7EB;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 
 }
@@ -4118,15 +4135,15 @@ body.dark-mode .rejection-reason-display p {
 }
 
 /* 🌞 Light mode */
-.light-mode .btn-template {
+/* .light-mode .btn-template {
   background: #f3f4f6;
   color: #111827;
-}
+} */
 
-.light-mode .btn-template:hover {
+/* .light-mode .btn-template:hover {
   background: #e5e7eb;
   transform: translateY(-2px);
-}
+} */
 
 /* 🌙 Dark mode */
 .dark-mode .btn-template {
@@ -4241,12 +4258,12 @@ body {
 }
 
 .btn-template {
-  background: #e5e7eb;
+  background: #d1d5db;
   color: #111827;
 }
 
 .btn-template:hover {
-  background: #d1d5db;
+  background: #9b9ea2;
 }
 
 .modal-content .form-group textarea,
@@ -4529,7 +4546,7 @@ body.dark-mode .feedback-message {
    GLOBAL NOTIFICATION HISTORY
    =============================== */
 .global-notification-history {
-  background-color: whitesmoke;
+  background-color: #E5E7EB;
   padding: 25px;
   border-radius: 8px;
   margin-top: 30px;
