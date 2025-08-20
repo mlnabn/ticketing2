@@ -66,8 +66,8 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
               <input type="password" id="password_confirmation" name="password_confirmation" value={formData.password_confirmation} onChange={handleChange} />
             </div>
             <div className="form-actions">
-              <button type="button" onClick={onClose} className="btn-delete">Batal</button>
-              <button type="submit" className="btn-primary">Simpan</button>
+              <button type="button" onClick={onClose} className="btn-cancel">Batal</button>
+              <button type="submit" className="btn-confirm">Simpan</button>
             </div>
           </form>
         </div>
