@@ -635,6 +635,7 @@ function App() {
                                 userRole={userRole}
                                 onAssignClick={handleAssignClick}
                                 onRejectClick={handleRejectClick}
+                                onProofClick={handleProofClick}
                             />
                             <Pagination
                                 currentPage={myTicketsPage}
