@@ -131,22 +131,22 @@
   /* Merah lebih gelap saat hover */
 
   /* Pagination */
-  --pagination-text-light: #374151;
-  /* Warna teks pagination di light mode */
-  --pagination-border-light: #e5e7eb;
-  /* Warna border pagination di light mode */
-  --pagination-bg-light: #ffffff;
-  /* Warna latar belakang tombol pagination di light mode */
-  --pagination-hover-bg-light: #f3f4f6;
-  /* Warna hover tombol pagination di light mode */
-  --pagination-active-bg-light: #3b82f6;
-  /* Warna latar belakang tombol aktif pagination di light mode */
+  --pagination-bg-light: #e0f2fe;
+  /* biru muda */
+  --pagination-border-light: #93c5fd;
+  /* biru lembut */
+  --pagination-text-light: #1e3a8a;
+  /* biru tua */
+  --pagination-hover-bg-light: #bfdbfe;
+  /* biru lebih gelap saat hover */
+  --pagination-active-bg-light: #2563eb;
+  /* biru solid */
   --pagination-active-text-light: #ffffff;
-  /* Warna teks tombol aktif pagination di light mode */
+  /* putih */
   --pagination-disabled-bg-light: #e5e7eb;
-  /* Warna latar belakang tombol nonaktif pagination di light mode */
+  /* abu terang */
   --pagination-disabled-text-light: #9ca3af;
-  /* Warna teks tombol nonaktif pagination di light mode */
+  /* abu gelap */
 
   /* Search Form Specific - Light Mode (Aesthetic) */
   --search-form-bg-light: #ffffff;
@@ -322,23 +322,23 @@ body.dark-mode {
   /* Merah lebih gelap saat hover */
 
   /* Pagination */
-  --pagination-text-dark: #d1d5db;
-  /* Warna teks pagination di dark mode */
-  --pagination-border-dark: #374151;
-  /* Warna border pagination di dark mode */
-  --pagination-bg-dark: #1f2937;
-  /* Warna latar belakang tombol pagination di dark mode */
-  --pagination-hover-bg-dark: #374151;
-  /* Warna hover tombol pagination di dark mode */
-  --pagination-active-bg-dark: #2563eb;
-  /* Warna latar belakang tombol aktif pagination di dark mode */
+  --pagination-text-dark: #e0f2fe;
+  /* teks putih kebiruan */
+  --pagination-border-dark: #334155;
+  /* abu gelap seperti horizon malam */
+  --pagination-bg-dark: #0a0f2c;
+  /* biru navy gelap */
+  --pagination-hover-bg-dark: #1e293b;
+  /* sedikit lebih terang saat hover */
+  --pagination-active-bg-dark: #6d28d9;
+  /* ungu galaxy */
   --pagination-active-text-dark: #ffffff;
-  /* Warna teks tombol aktif pagination di dark mode */
+  /* teks putih terang */
   --pagination-disabled-bg-dark: #111827;
-  /* Warna latar belakang tombol nonaktif pagination di dark mode */
-  --pagination-disabled-text-dark: #4b5563;
-  /* Warna teks tombol nonaktif pagination di dark mode */
-
+  /* hitam pekat */
+  --pagination-disabled-text-dark: #475569;
+  /* abu biru redup */
+ 
   /* Search Form Specific - Dark Mode */
   --search-form-bg-dark: #1f2937;
   --search-form-shadow-dark: 0 4px 12px rgba(0, 0, 0, 0.4);
@@ -2620,6 +2620,97 @@ body.dark-mode .page-item.disabled .page-link:hover {
   border-color: var(--pagination-border-dark);
 }
 
+
+/* Container navigasi pagination */
+.my-pagination-nav {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+/* Daftar halaman */
+.my-pagination-list {
+  display: flex;
+  list-style: none;
+  padding: 10px 20px;
+  gap: 8px;
+  background: linear-gradient(to right, #0d1b2a, #1b263b);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 153, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Bintang layer dekorasi */
+.my-pagination-list::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(white 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.25;
+  animation: starsMove 80s linear infinite;
+  pointer-events: none;
+  /* supaya layer bintang tidak menghalangi klik */
+}
+
+/* Animasi gerak bintang */
+@keyframes starsMove {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-40px);
+  }
+}
+
+/* Item halaman */
+.my-page-item {
+  display: inline-block;
+}
+
+/* Tombol pagination */
+.my-page-link {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #0f3460;
+  color: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1;
+  position: relative;
+}
+
+/* Hover tombol */
+.my-page-link:hover:not(:disabled) {
+  background: #1a508b;
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px rgba(0, 153, 255, 0.6);
+}
+
+/* Halaman aktif */
+.my-active .my-page-link {
+  background: #1a508b;
+  color: white;
+  box-shadow: 0 0 10px rgba(0, 153, 255, 0.6);
+}
+
+/* Disabled */
+.my-disabled .my-page-link {
+  background: #3a3a52;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+
 /*
   ---------------------------------------------------
   GAYA HALAMAN "ADD TICKET" (UNTUK USER)
@@ -3748,19 +3839,19 @@ body.dark-mode .rejection-reason-display p {
   backdrop-filter: blur(10px);
   border-radius: 18px;
   padding: 28px 32px;
-  
-  
+
+
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.5);
   animation: scaleIn 0.35s ease-out;
   text-align: center;
   transition: all 0.3s ease;
-  
- 
+
+
   width: 500px;
 
-  max-height: 80vh;    
-  overflow-y: auto;  
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 /* === DARK MODE === */
@@ -3947,11 +4038,14 @@ body.dark-mode .rejection-reason-display p {
 @keyframes fadeSlideIn {
   from {
     opacity: 0;
-    transform: translateY(20px); /* mulai agak turun */
+    transform: translateY(20px);
+    /* mulai agak turun */
   }
+
   to {
     opacity: 1;
-    transform: translateY(0); /* normal */
+    transform: translateY(0);
+    /* normal */
   }
 }
 
@@ -3960,6 +4054,7 @@ body.dark-mode .rejection-reason-display p {
     opacity: 0;
     transform: translateY(-5px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -4079,16 +4174,17 @@ body.dark-mode .rejection-reason-display p {
 }
 
 /* ===== Inputs ===== */
-.form-group textarea{
+.form-group textarea {
   padding: 10px 12px;
   width: 400px;
   border-radius: 8px;
   font-size: 0.95rem;
   border: 1px solid;
   transition: border-color 0.2s ease,
-              box-shadow 0.2s ease,
-              background-color 0.2s ease;
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
+
 .form-group input,
 .form-group select,
 .form-group2 input,
@@ -4099,8 +4195,8 @@ body.dark-mode .rejection-reason-display p {
   font-size: 0.95rem;
   border: 1px solid;
   transition: border-color 0.2s ease,
-              box-shadow 0.2s ease,
-              background-color 0.2s ease;
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
 /* ===== Submit Button ===== */
@@ -4131,7 +4227,8 @@ body.dark-mode .rejection-reason-display p {
   margin-top: 12px;
   font-size: 0.95rem;
   font-weight: 500;
-  color: #10b981; /* hijau sukses */
+  color: #10b981;
+  /* hijau sukses */
 }
 
 /* =========================
@@ -4152,8 +4249,7 @@ body {
 }
 
 .modal-content .form-group textarea,
-.modal-content .form-group input
-{
+.modal-content .form-group input {
   width: 395px;
   background: #ffffff;
   border-color: #d1d5db;

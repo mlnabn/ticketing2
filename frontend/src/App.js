@@ -21,6 +21,7 @@ import RejectionInfoModal from './components/RejectionInfoModal';
 import ProofModal from './components/ProofModal';
 import ViewProofModal from './components/ViewProofModal';
 import Pagination from './components/Pagination';
+import PaginationUser from './components/PaginationUser';
 import { getToken, isLoggedIn, logout, getUser } from './auth';
 import './App.css';
 import yourLogo from './Image/Logo.png';
@@ -81,9 +82,9 @@ function App() {
   const [statusFilter, setStatusFilter] = useState(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [ticketToAssign, setTicketToAssign] = useState(null);
-  const [showRejectModal, setShowRejectModal] = useState(false); 
+  const [showRejectModal, setShowRejectModal] = useState(false);
   const [ticketToReject, setTicketToReject] = useState(null);
-  const [showRejectionInfoModal, setShowRejectionInfoModal] = useState(false); 
+  const [showRejectionInfoModal, setShowRejectionInfoModal] = useState(false);
   const [ticketToShowReason, setTicketToShowReason] = useState(null);
   const [showProofModal, setShowProofModal] = useState(false);
   const [ticketForProof, setTicketForProof] = useState(null);
@@ -170,15 +171,15 @@ function App() {
   }, []);
 
   const fetchMyTickets = useCallback(async (page = 1) => {
-      try {
-          const config = { headers: { Authorization: `Bearer ${getToken()}` } };
-          const response = await axios.get(`${API_URL}/tickets/my-tickets?page=${page}`, config);
-          setMyTicketsData(response.data);
-      } catch (error) {
-          console.error("Gagal mengambil 'My Tickets':", error);
-          // Tambahkan penanganan jika token expired
-          if (error.response && error.response.status === 401) handleLogout();
-      }
+    try {
+      const config = { headers: { Authorization: `Bearer ${getToken()}` } };
+      const response = await axios.get(`${API_URL}/tickets/my-tickets?page=${page}`, config);
+      setMyTicketsData(response.data);
+    } catch (error) {
+      console.error("Gagal mengambil 'My Tickets':", error);
+      // Tambahkan penanganan jika token expired
+      if (error.response && error.response.status === 401) handleLogout();
+    }
   }, []);
 
   // -----------------------------------------------------------------
@@ -267,7 +268,7 @@ function App() {
       alert("Gagal menolak tiket.");
     }
   };
-  
+
   const handleShowReasonClick = (ticket) => {
     setTicketToShowReason(ticket);
     setShowRejectionInfoModal(true);
@@ -381,7 +382,7 @@ function App() {
 
   const handleDeleteFromViewProofModal = (ticket) => {
     handleCloseViewProofModal();
-    handleDeleteClick(ticket);  
+    handleDeleteClick(ticket);
   };
 
   const handleUserDeleteClick = (user) => {
@@ -496,17 +497,17 @@ function App() {
         fetchAdmins();
 
         if (currentPage === 'Tickets') {
-                const intervalId = setInterval(() => {
-                    console.log('Memuat ulang daftar tiket...'); // Pesan untuk debugging
-                    fetchData(dataPage, searchQuery, statusFilter);
-                }, 60000); // 60000 milidetik = 1 menit
+          const intervalId = setInterval(() => {
+            console.log('Memuat ulang daftar tiket...'); // Pesan untuk debugging
+            fetchData(dataPage, searchQuery, statusFilter);
+          }, 60000); // 60000 milidetik = 1 menit
 
-                // Fungsi cleanup: Hentikan interval jika komponen di-unmount 
-                // atau jika user pindah halaman/mengubah filter.
-                return () => {
-                    clearInterval(intervalId);
-                };
-            }
+          // Fungsi cleanup: Hentikan interval jika komponen di-unmount 
+          // atau jika user pindah halaman/mengubah filter.
+          return () => {
+            clearInterval(intervalId);
+          };
+        }
       }
     }
   }, [isLogin, dataPage, searchQuery, statusFilter, fetchData, isAdmin, fetchAdmins]);
@@ -545,9 +546,9 @@ function App() {
   }, []);
 
   useEffect(() => {
-      if (isLogin && isAdmin && currentPage === 'MyTickets') {
-          fetchMyTickets(myTicketsPage);
-      }
+    if (isLogin && isAdmin && currentPage === 'MyTickets') {
+      fetchMyTickets(myTicketsPage);
+    }
   }, [isLogin, isAdmin, currentPage, myTicketsPage, fetchMyTickets]);
 
   // -----------------------------------------------------------------
@@ -622,33 +623,33 @@ function App() {
               </>
             )}
             {currentPage === 'MyTickets' && (
-                <>
-                    <h2 style={{ marginBottom: '20px' }}>Tiket yang Saya Kerjakan</h2>
-                    
-                    {/* Tampilkan daftar tiket jika ada data */}
-                    {myTicketsData && myTicketsData.data && myTicketsData.data.length > 0 ? (
-                        <>
-                            <JobList
-                                tickets={myTicketsData.data}
-                                updateTicketStatus={updateTicketStatus}
-                                deleteTicket={handleDeleteClick}
-                                userRole={userRole}
-                                onAssignClick={handleAssignClick}
-                                onRejectClick={handleRejectClick}
-                            />
-                            <Pagination
-                                currentPage={myTicketsPage}
-                                lastPage={myTicketsData.last_page}
-                                onPageChange={(page) => setMyTicketsPage(page)}
-                            />
-                        </>
-                    ) : (
-                        // Tampilkan pesan jika tidak ada tiket yang dikerjakan
-                        <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
-                            <p>Anda belum bertugas untuk mengerjakan tiket apa pun.</p>
-                        </div>
-                    )}
-                </>
+              <>
+                <h2 style={{ marginBottom: '20px' }}>Tiket yang Saya Kerjakan</h2>
+
+                {/* Tampilkan daftar tiket jika ada data */}
+                {myTicketsData && myTicketsData.data && myTicketsData.data.length > 0 ? (
+                  <>
+                    <JobList
+                      tickets={myTicketsData.data}
+                      updateTicketStatus={updateTicketStatus}
+                      deleteTicket={handleDeleteClick}
+                      userRole={userRole}
+                      onAssignClick={handleAssignClick}
+                      onRejectClick={handleRejectClick}
+                    />
+                    <Pagination
+                      currentPage={myTicketsPage}
+                      lastPage={myTicketsData.last_page}
+                      onPageChange={(page) => setMyTicketsPage(page)}
+                    />
+                  </>
+                ) : (
+                  // Tampilkan pesan jika tidak ada tiket yang dikerjakan
+                  <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
+                    <p>Anda belum bertugas untuk mengerjakan tiket apa pun.</p>
+                  </div>
+                )}
+              </>
             )}
             {currentPage === 'userManagement' && (
               <UserManagement userData={userData} onDeleteClick={handleUserDeleteClick} onAddClick={handleAddUserClick} onEditClick={handleUserEditClick} onPageChange={handleUserPageChange} onSearch={handleUserSearch} />
@@ -659,12 +660,12 @@ function App() {
           </div>
         </main>
         {showProofModal && ticketForProof && (
-          <ProofModal ticket={ticketForProof} onSave={handleSaveProof} onClose={handleCloseProofModal}/>
+          <ProofModal ticket={ticketForProof} onSave={handleSaveProof} onClose={handleCloseProofModal} />
         )}
         {showAssignModal && ticketToAssign && (
           <AssignAdminModal ticket={ticketToAssign} admins={adminList} onAssign={handleConfirmAssign} onClose={handleCloseAssignModal} />
         )}
-        {showRejectModal && ticketToReject && ( <RejectTicketModal ticket={ticketToReject} onReject={handleConfirmReject} onClose={handleCloseRejectModal} /> )}
+        {showRejectModal && ticketToReject && (<RejectTicketModal ticket={ticketToReject} onReject={handleConfirmReject} onClose={handleCloseRejectModal} />)}
         {showConfirmModal && ticketToDelete && (<ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
         {showUserConfirmModal && userToDelete && (<ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete.name}"?`} onConfirm={confirmUserDelete} onCancel={cancelUserDelete} />)}
         {showUserFormModal && (<UserFormModal userToEdit={userToEdit} onClose={handleCloseUserForm} onSave={handleSaveUser} />)}
@@ -698,9 +699,9 @@ function App() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
               <NotificationBell />
               <button onClick={handleLogout} className="logout-buttonuser">
-                  <i className="fas fa-sign-out-alt"></i>
+                <i className="fas fa-sign-out-alt"></i>
               </button>
-          </div>
+            </div>
           </div>
         </header>
 
@@ -777,16 +778,21 @@ function App() {
                       </tbody>
                     </table>
                   </div>
-                  <Pagination currentPage={createdTicketsPage} lastPage={createdTicketsData ? createdTicketsData.last_page : 1} onPageChange={handleCreatedTicketsPageChange} />
+                  <PaginationUser
+                    currentPage={createdTicketsPage}
+                    lastPage={createdTicketsData ? createdTicketsData.last_page : 1}
+                    onPageChange={handleCreatedTicketsPageChange}
+                  />
+
                 </div>
               )}
             </div>
           </div>
         </div>
       </main>
-      
+
       {showViewProofModal && ticketToShowProof && (
-        <ViewProofModal ticket={ticketToShowProof} onClose={handleCloseViewProofModal} onDelete={handleDeleteFromViewProofModal}/>
+        <ViewProofModal ticket={ticketToShowProof} onClose={handleCloseViewProofModal} onDelete={handleDeleteFromViewProofModal} />
       )}
       {showRejectionInfoModal && ticketToShowReason && (
         <RejectionInfoModal ticket={ticketToShowReason} onClose={handleCloseReasonModal} onDelete={handleDeleteFromReasonModal} />
