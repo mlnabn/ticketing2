@@ -15,12 +15,13 @@ const UserManagement = ({ userData, onAddClick, onEditClick, onDeleteClick, onPa
 
   return (
     <div className="user-management-container">
-      <div className="flex justify-between items-center mb-4">
+
         <h1>Manajemen Pengguna</h1>
+
         <button onClick={onAddClick} className="btn-primary">
           Tambah Pengguna Baru
         </button>
-      </div>
+
 
       <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
         <input

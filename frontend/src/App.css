@@ -26,7 +26,7 @@
   /* Warna teks utama dashboard (dark slate) */
 
   /* Sidebar */
-  --sidebar-bg-light: #f0e9e9;
+  --sidebar-bg-light: whitesmoke;
   /* Latar belakang sidebar (putih bersih) */
   --sidebar-text-light: #334155;
   /* Warna teks sidebar */
@@ -36,7 +36,7 @@
   /* Warna hover tombol sidebar (soft light gray) */
 
   /* Header Dashboard */
-  --header-bg-light: #f0e9e9;
+  --header-bg-light: whitesmoke;
   /* Latar belakang header dashboard (putih bersih) */
   --header-text-light: #334155;
   /* Warna teks di header (medium slate) */
@@ -1766,12 +1766,13 @@ button {
   border: none;
   color: white;
   transition: background 0.2s ease, transform 0.1s ease;
-  
+
 }
 
 .btn-reason {
   background-color: #2885ff;
 }
+
 .btn-reason:hover {
   background-color: #1a6ed4;
 }
@@ -2720,14 +2721,6 @@ body.dark-mode .content-area h3 {
 
 /*
  ---------------------------------------------------
- PEWARNAAN TOMBOL SAJA
- ---------------------------------------------------
- Gaya ini hanya berfokus pada pewarnaan tombol di dalam komponen
- Manajemen Pengguna, tanpa memengaruhi gaya tabel yang lain.
-*/
-
-/*
- ---------------------------------------------------
  TOMBOL UTAMA (Tambah Pengguna Baru)
  ---------------------------------------------------
 */
@@ -3128,7 +3121,7 @@ body.dark-mode .history-tab {
   width: 100%;
 }
 
-.row-input > * {
+.row-input>* {
   flex: 1;
   min-width: 0;
 }
@@ -3160,7 +3153,8 @@ body.dark-mode .history-tab {
 .time-wrapper input[type="checkbox"] {
   width: 18px;
   height: 18px;
-  accent-color: #5e5e5e;    /* hijau modern */
+  accent-color: #5e5e5e;
+  /* hijau modern */
   border-radius: 4px;
   cursor: pointer;
   transition: transform 0.2s ease;
@@ -3172,7 +3166,8 @@ body.dark-mode .history-tab {
 
 /* Label Fleksibel */
 .time-wrapper label {
-  color: rgba(249, 246, 246, 0.81);              /* putih biar kontras */
+  color: rgba(249, 246, 246, 0.81);
+  /* putih biar kontras */
   font-weight: 500;
   font-size: 0.95rem;
   cursor: pointer;
@@ -3181,10 +3176,11 @@ body.dark-mode .history-tab {
 }
 
 /* Kalau checkbox disable, label jadi abu-abu */
-.time-wrapper input[type="checkbox"]:disabled + label {
+.time-wrapper input[type="checkbox"]:disabled+label {
   color: #9ca3af;
   cursor: not-allowed;
 }
+
 /* ====== Input Time & Date ====== */
 .input-selectuser,
 .input-dateuser {
@@ -3459,8 +3455,10 @@ body.dark-mode .btn-submit:hover {
   font-size: 1rem;
   margin: 12px 0 6px;
   font-weight: 500;
-  color: #d1d5db; /* abu terang */
+  color: #d1d5db;
+  /* abu terang */
 }
+
 .confirmation-modal-content-user h3 {
   margin-top: 0;
   margin-bottom: 12px;
@@ -3486,7 +3484,7 @@ body.dark-mode .btn-submit:hover {
 
 /* ===== Proof Description Box ===== */
 .modal-content-user p[style] {
-  background: #374151 !important; 
+  background: #374151 !important;
   color: #f3f4f6 !important;
   border: 1px solid #4b5563;
   font-size: 0.95rem;
@@ -3669,7 +3667,8 @@ body.dark-mode .rejection-reason-textarea {
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease;
   flex-grow: 1;
-  background-color: var(--btn-delete); /* Menggunakan warna merah dari variabel Anda */
+  background-color: var(--btn-delete);
+  /* Menggunakan warna merah dari variabel Anda */
   color: #fff;
 }
 
@@ -3680,7 +3679,8 @@ body.dark-mode .rejection-reason-textarea {
 
 /* Styling untuk area teks alasan penolakan */
 .rejection-reason-display {
-  background-color: #f1f5f9; /* Warna latar abu-abu terang */
+  background-color: #f1f5f9;
+  /* Warna latar abu-abu terang */
   border: 1px solid var(--border-color-light);
   border-radius: 8px;
   padding: 15px;
@@ -3705,7 +3705,8 @@ body.dark-mode .rejection-reason-display p {
 
 /* Styling untuk tombol sekunder (Tutup) */
 .btn-secondary {
-  background-color: #6c757d; /* Warna abu-abu */
+  background-color: #6c757d;
+  /* Warna abu-abu */
   color: white;
 }
 
@@ -3826,9 +3827,10 @@ body.dark-mode .rejection-reason-display p {
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.6;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease;
 }
+
 .reason-display:hover {
   transform: scale(1.02);
 }
@@ -3862,13 +3864,15 @@ body.dark-mode .rejection-reason-display p {
 .btn-confirm-reject {
   background: #dc2626;
   color: #fff;
-  box-shadow: 0 4px 10px rgba(220,38,38,0.25);
+  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.25);
 }
+
 .btn-confirm-reject:hover {
   background: #b91c1c;
   transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(220,38,38,0.35);
+  box-shadow: 0 6px 14px rgba(220, 38, 38, 0.35);
 }
+
 .btn-confirm-reject:active {
   transform: scale(0.97);
 }
@@ -3877,12 +3881,14 @@ body.dark-mode .rejection-reason-display p {
 .btn-delete {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(239,68,68,0.35);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
 }
+
 .btn-delete:hover {
   background: linear-gradient(135deg, #dc2626, #b91c1c);
   transform: translateY(-2px) scale(1.05);
 }
+
 .btn-delete:active {
   transform: scale(0.97);
 }
@@ -3891,12 +3897,14 @@ body.dark-mode .rejection-reason-display p {
 .btn-secondary {
   background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
   color: #1e293b;
-  box-shadow: 0 3px 10px rgba(148,163,184,0.35);
+  box-shadow: 0 3px 10px rgba(148, 163, 184, 0.35);
 }
+
 .btn-secondary:hover {
   background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
   transform: translateY(-2px) scale(1.05);
 }
+
 .btn-secondary:active {
   background: #94a3b8;
   color: #fff;
@@ -3905,15 +3913,51 @@ body.dark-mode .rejection-reason-display p {
 
 /* === ANIMASI === */
 @keyframes fadeBackdrop {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
+
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.85) translateY(20px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
+/* =========================
+   GLOBAL ANIMATIONS
+   ========================= */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px); /* mulai agak turun */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0); /* normal */
+  }
+}
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 /* =========================
    NOTIFICATION FORM STYLING
@@ -3921,19 +3965,20 @@ body.dark-mode .rejection-reason-display p {
 
 /* ===== Base Container ===== */
 .notification-form-container {
-  max-width: 600px;
-  margin: 20px auto;
   padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 14px;
+  margin-top: 24px;
+  background: whitesmoke;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  animation: fadeSlideIn 0.6s ease-out;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* ===== Headings ===== */
 .notification-form-container h2 {
-  font-size: 1.5rem;
-  margin-bottom: 16px;
-  font-weight: 600;
+  margin: 0 0 20px 0;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
 }
 
 .notification-form-container h4 {
@@ -3942,48 +3987,84 @@ body.dark-mode .rejection-reason-display p {
   font-weight: 500;
 }
 
-/* ===== Templates Section ===== */
 .templates-section {
   margin-bottom: 20px;
+}
+
+.templates-section h4 {
+  margin-bottom: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* ===== Template Buttons ===== */
+.template-buttons {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* rata otomatis */
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
 }
 
-/* ===== Template Buttons ===== */
-/* ===== Templates Section ===== */
-.templates-section {
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;  /* tombol di bawah judul */
-  gap: 10px;
-}
-
-/* ===== Template Buttons ===== */
 .btn-template {
-  width: 100%;             /* biar full lebar container */
-  text-align: left;        /* teks rata kiri */
-  padding: 12px 16px;
+  padding: 10px 16px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 500;
-  background: #374151;   /* dark mode default */
+  margin: 0 8px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+/* 🌞 Light mode */
+.light-mode .btn-template {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.light-mode .btn-template:hover {
+  background: #e5e7eb;
+  transform: translateY(-2px);
+}
+
+/* 🌙 Dark mode */
+.dark-mode .btn-template {
+  background: #374151;
   color: #f9fafb;
-  transition: transform 0.2s ease, background-color 0.3s ease;
 }
 
-.btn-template:hover {
+.dark-mode .btn-template:hover {
   background: #4b5563;
-  transform: translateX(4px); /* geser sedikit ke kanan saat hover */
+  transform: translateY(-2px);
 }
 
-/* ===== Form Inputs ===== */
-.form-group {
-  margin-bottom: 16px;
+/* ===== Form Layout ===== */
+.form-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.form-row .form-group {
+  flex: 1;
   display: flex;
   flex-direction: column;
+}
+
+/* ===== Form Groups ===== */
+.form-group,
+.form-group2 {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.form-group {
+  width: 50%;
+}
+
+.form-group2 {
+  width: 100%;
+  gap: 12px;
 }
 
 .form-group label {
@@ -3991,14 +4072,20 @@ body.dark-mode .rejection-reason-display p {
   font-weight: 500;
 }
 
+/* ===== Inputs ===== */
 .form-group input,
 .form-group select,
-.form-group textarea {
+.form-group textarea,
+.form-group2 input,
+.form-group2 select,
+.form-group2 textarea {
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 0.95rem;
   border: 1px solid;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  transition: border-color 0.2s ease,
+              box-shadow 0.2s ease,
+              background-color 0.2s ease;
 }
 
 /* ===== Submit Button ===== */
@@ -4009,7 +4096,14 @@ body.dark-mode .rejection-reason-display p {
   border: none;
   font-weight: 600;
   cursor: pointer;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  color: #ffffff;
   transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(90deg, #2563eb, #1d4ed8);
+  transform: scale(1.05);
 }
 
 .btn-primary:disabled {
@@ -4022,18 +4116,14 @@ body.dark-mode .rejection-reason-display p {
   margin-top: 12px;
   font-size: 0.95rem;
   font-weight: 500;
+  color: #10b981; /* hijau sukses */
 }
 
 /* =========================
    LIGHT THEME (default)
    ========================= */
 body {
-  background: #f9fafb;
-  color: #111827;
-}
-
-.notification-form-container {
-  background: #ffffff;
+  background: white;
   color: #111827;
 }
 
@@ -4048,7 +4138,10 @@ body {
 
 .form-group input,
 .form-group select,
-.form-group textarea {
+.form-group textarea,
+.form-group2 input,
+.form-group2 select,
+.form-group2 textarea {
   background: #ffffff;
   border-color: #d1d5db;
   color: #111827;
@@ -4056,29 +4149,35 @@ body {
 
 .form-group input:focus,
 .form-group select:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-group2 input:focus,
+.form-group2 select:focus,
+.form-group2 textarea:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.3);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
 }
 
-.btn-primary {
-  background: linear-gradient(90deg, #3b82f6, #2563eb);
-  color: #ffffff;
+/* =========================
+   USER MANAGEMENT STYLING
+   ========================= */
+.user-management-container {
+  animation: fadeSlideIn 0.6s ease-out;
 }
 
-.btn-primary:hover {
-  background: linear-gradient(90deg, #2563eb, #1d4ed8);
-  transform: scale(1.05);
-}
-
-.feedback-message {
-  color: #10b981; /* hijau untuk sukses */
+.user-management-container h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  text-align: center;
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* =========================
    DARK THEME
-   aktif bila body.dark-mode
    ========================= */
 body.dark-mode {
   background: #111827;
@@ -4088,21 +4187,15 @@ body.dark-mode {
 body.dark-mode .notification-form-container {
   background: #1f2937;
   color: #f9fafb;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-}
-
-body.dark-mode .btn-template {
-  background: #374151;
-  color: #f9fafb;
-}
-
-body.dark-mode .btn-template:hover {
-  background: #4b5563;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 body.dark-mode .form-group input,
 body.dark-mode .form-group select,
-body.dark-mode .form-group textarea {
+body.dark-mode .form-group textarea,
+body.dark-mode .form-group2 input,
+body.dark-mode .form-group2 select,
+body.dark-mode .form-group2 textarea {
   background: #374151;
   border-color: #4b5563;
   color: #f9fafb;
@@ -4110,9 +4203,12 @@ body.dark-mode .form-group textarea {
 
 body.dark-mode .form-group input:focus,
 body.dark-mode .form-group select:focus,
-body.dark-mode .form-group textarea:focus {
+body.dark-mode .form-group textarea:focus,
+body.dark-mode .form-group2 input:focus,
+body.dark-mode .form-group2 select:focus,
+body.dark-mode .form-group2 textarea:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(139,92,246,0.4);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.4);
 }
 
 body.dark-mode .btn-primary {
@@ -4128,39 +4224,34 @@ body.dark-mode .feedback-message {
   color: #34d399;
 }
 
-
 /* ===============================
-   NOTIFICATION BELL - NIGHT SKY THEME
+   NOTIFICATION BELL - NIGHT SKY
    =============================== */
-
-/* Container */
 .notification-bell-container {
   position: relative;
   display: inline-block;
 }
 
-/* Bell Button */
 .notification-button {
   position: relative;
   background: transparent;
   border: none;
   cursor: pointer;
   font-size: 1.5rem;
-  color: #f9fafb; /* putih */
+  color: #f9fafb;
   transition: transform 0.2s ease, color 0.3s ease;
 }
 
 .notification-button:hover {
   transform: scale(1.1);
-  color: #38bdf8; /* biru bintang */
+  color: #38bdf8;
 }
 
-/* Badge */
 .notification-badge {
   position: absolute;
   top: -5px;
   right: -5px;
-  background: #ef4444; /* merah terang */
+  background: #ef4444;
   color: white;
   font-size: 0.75rem;
   font-weight: bold;
@@ -4169,7 +4260,6 @@ body.dark-mode .feedback-message {
   box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
 }
 
-/* Panel */
 .notification-panel {
   position: absolute;
   right: 0;
@@ -4177,7 +4267,7 @@ body.dark-mode .feedback-message {
   width: 320px;
   max-height: 400px;
   overflow-y: auto;
-  background: #1e293b; /* panel biru navy */
+  background: #1e293b;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
   padding: 12px 0;
@@ -4185,7 +4275,6 @@ body.dark-mode .feedback-message {
   animation: fadeIn 0.2s ease;
 }
 
-/* Panel Header */
 .notification-panel-header {
   padding: 10px 16px;
   border-bottom: 1px solid #334155;
@@ -4198,42 +4287,44 @@ body.dark-mode .feedback-message {
   color: #f9fafb;
 }
 
-/* List & Items */
 .notification-list {
   display: flex;
   flex-direction: column;
 }
 
 .notification-item {
-  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 15px;
   border-bottom: 1px solid #334155;
   transition: background 0.2s ease;
 }
 
 .notification-item:hover {
-  background: #475569; /* highlight saat hover */
+  background: #475569;
 }
 
 .notification-item strong {
   display: block;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #38bdf8; /* biru bintang */
+  color: #38bdf8;
   margin-bottom: 4px;
 }
 
 .notification-item p {
   margin: 0;
   font-size: 0.85rem;
-  color: #e2e8f0; /* abu terang */
+  color: #e2e8f0;
 }
 
 .notification-item small {
   font-size: 0.75rem;
-  color: #94a3b8; /* abu lembut */
+  color: #94a3b8;
 }
 
-/* Empty State */
 .notification-item.empty {
   text-align: center;
   color: #94a3b8;
@@ -4242,29 +4333,43 @@ body.dark-mode .feedback-message {
   border-bottom: none;
 }
 
-/* Scrollbar styling */
 .notification-panel::-webkit-scrollbar {
   width: 6px;
 }
+
 .notification-panel::-webkit-scrollbar-thumb {
   background: #475569;
   border-radius: 3px;
 }
+
 .notification-panel::-webkit-scrollbar-track {
   background: transparent;
 }
 
-/* Animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+.notification-content {
+  flex-grow: 1;
 }
 
+.notification-delete-btn {
+  background: none;
+  border: none;
+  color: #a0a0a0;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 5px;
+  margin-top: 5px;
+  transition: color 0.2s ease;
+}
 
-/* Button Proof */
+.notification-delete-btn:hover {
+  color: #e74c3c;
+}
 
+/* ===============================
+   PROOF BUTTONS
+   =============================== */
 .btn-proof {
-  background-color: #3498db; /* Biru */
+  background-color: #3498db;
   color: white;
   border: none;
   padding: 6px 12px;
@@ -4279,12 +4384,12 @@ body.dark-mode .feedback-message {
 }
 
 .image-preview img {
-    border: 1px solid #ddd;
-    padding: 5px;
+  border: 1px solid #ddd;
+  padding: 5px;
 }
 
 .btn-view-proof {
-  background-color: #27ae60; /* Hijau */
+  background-color: #27ae60;
   color: white;
   border: none;
   padding: 6px 12px;
@@ -4298,97 +4403,106 @@ body.dark-mode .feedback-message {
   background-color: #229954;
 }
 
-.notification-item {
-    /* Gunakan flexbox untuk mensejajarkan konten dan tombol */
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start; /* Konten rata atas */
-    gap: 10px; /* Jarak antara konten dan tombol */
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-}
-
-.notification-content {
-    flex-grow: 1; /* Konten akan memakai sisa ruang */
-}
-
-.notification-delete-btn {
-    background: none;
-    border: none;
-    color: #a0a0a0; /* Warna abu-abu netral */
-    cursor: pointer;
-    font-size: 14px;
-    padding: 5px;
-    margin-top: 5px;
-    transition: color 0.2s ease;
-}
-
-.notification-delete-btn:hover {
-    color: #e74c3c; /* Warna merah saat hover */
-}
-
-/* App.css */
-
-/* ... (CSS lainnya) ... */
-
+/* ===============================
+   GLOBAL NOTIFICATION HISTORY
+   =============================== */
 .global-notification-history {
-    background-color: var(--background-color-light);
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    margin-top: 30px; /* Jarak dari form di atasnya */
+  background-color: whitesmoke;
+  padding: 25px;
+  border-radius: 8px;
+  margin-top: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  animation: fadeSlideIn 0.6s ease-out;
 }
 
 .global-notification-history h2 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
+  margin: 0 0 20px 0;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
 }
 
 .history-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .history-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px solid var(--border-color-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--border-color-light);
 }
 
 .history-item:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .history-item-content p {
-    margin: 5px 0;
-    color: #6c757d;
+  margin: 5px 0;
+  color: #6c757d;
 }
 
 .history-item-content small {
-    color: #a0a0a0;
-    font-size: 12px;
+  color: #a0a0a0;
+  font-size: 12px;
 }
 
 .btn-delete-small {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-    padding: 8px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    font-size: 14px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
 }
 
 .btn-delete-small:hover {
-    background-color: #f1b0b7;
+  background-color: #f1b0b7;
 }
 
 .btn-delete-small i {
-    margin-right: 5px;
+  margin-right: 5px;
+}
+
+/* 🌙 Dark Mode */
+body.dark-mode .global-notification-history {
+  background-color: #1f2937;
+  color: #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  border: 1px solid #333;
+}
+
+body.dark-mode .global-notification-history h2 {
+  border-bottom: 1px solid #444;
+  color: #f5f5f5;
+}
+
+body.dark-mode .history-item {
+  border-bottom: 1px solid #333;
+}
+
+body.dark-mode .history-item-content p {
+  color: #b0b0b0;
+}
+
+body.dark-mode .history-item-content small {
+  color: #888;
+}
+
+body.dark-mode .btn-delete-small {
+  background-color: #3a1c1c;
+  color: #ffb3b3;
+  border: 1px solid #662222;
+}
+
+body.dark-mode .btn-delete-small:hover {
+  background-color: #662222;
+}
+
+body.dark-mode .btn-delete-small i {
+  color: #ff7b7b;
 }
