@@ -100,6 +100,26 @@ class TicketController extends Controller
         return response()->json($ticket->load(['user', 'creator']));
     }
 
+    public function myTickets(Request $request)
+    {
+        $user = Auth::user();
+
+        // Pastikan hanya admin yang bisa mengakses halaman ini
+        if ($user->role !== 'admin') {
+            return response()->json(['error' => 'Akses ditolak.'], 403);
+        }
+
+        $perPage = $request->query('per_page', 10);
+
+        // Query tiket di mana 'user_id' (yang mengerjakan) adalah ID admin yang login
+        $ticketsData = Ticket::with(['user', 'creator'])
+                            ->where('user_id', $user->id)
+                            ->latest()
+                            ->paginate($perPage);
+
+        return response()->json($ticketsData);
+    }
+
     public function reject(Request $request, Ticket $ticket)
     {
         if (auth()->user()->role !== 'admin') {

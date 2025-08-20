@@ -46,6 +46,7 @@ function App() {
   const [userData, setUserData] = useState(null);
   const [stats, setStats] = useState(null);
   const [createdTicketsData, setCreatedTicketsData] = useState(null);
+  const [myTicketsData, setMyTicketsData] = useState(null);
 
   // --- State untuk Autentikasi & Info Pengguna ---
   const [isLogin, setIsLogin] = useState(isLoggedIn());
@@ -64,6 +65,7 @@ function App() {
   const [createdTicketsPage, setCreatedTicketsPage] = useState(1);
   const [userPage, setUserPage] = useState(1);
   const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [myTicketsPage, setMyTicketsPage] = useState(1);
 
   // --- State untuk Fitur Pencarian ---
   const [searchInput, setSearchInput] = useState('');
@@ -165,6 +167,18 @@ function App() {
     } catch (error) {
       console.error("Gagal mengambil tiket yang dibuat:", error);
     }
+  }, []);
+
+  const fetchMyTickets = useCallback(async (page = 1) => {
+      try {
+          const config = { headers: { Authorization: `Bearer ${getToken()}` } };
+          const response = await axios.get(`${API_URL}/tickets/my-tickets?page=${page}`, config);
+          setMyTicketsData(response.data);
+      } catch (error) {
+          console.error("Gagal mengambil 'My Tickets':", error);
+          // Tambahkan penanganan jika token expired
+          if (error.response && error.response.status === 401) handleLogout();
+      }
   }, []);
 
   // -----------------------------------------------------------------
@@ -517,6 +531,12 @@ function App() {
     document.documentElement.style.setProperty('--auth-background-image-light', `url(${loginBackground})`);
   }, []);
 
+  useEffect(() => {
+      if (isLogin && isAdmin && currentPage === 'MyTickets') {
+          fetchMyTickets(myTicketsPage);
+      }
+  }, [isLogin, isAdmin, currentPage, myTicketsPage, fetchMyTickets]);
+
   // -----------------------------------------------------------------
   // #5. RENDER LOGIC (Logika untuk Menampilkan Komponen)
   // -----------------------------------------------------------------
@@ -539,6 +559,7 @@ function App() {
           <nav className="sidebar-nav">
             <ul>
               <li className="sidebar-nav-item"><button onClick={handleHomeClick} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-home"></i><span>Home</span></button></li>
+              <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('MyTickets')} className={`sidebar-button ${currentPage === 'MyTickets' ? 'active' : ''}`}><i className="fas fa-user-tag"></i><span>My Tickets</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>User</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Notifications')} className={`sidebar-button ${currentPage === 'Notifications' ? 'active' : ''}`}><i className="fas fa-bell"></i><span>Notifikasi</span></button></li>
             </ul>
@@ -586,6 +607,35 @@ function App() {
                 <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} userRole={userRole} onSelectionChange={handleSelectionChange} onAssignClick={handleAssignClick} onRejectClick={handleRejectClick} onProofClick={handleProofClick} />
                 <Pagination currentPage={dataPage} lastPage={ticketData ? ticketData.last_page : 1} onPageChange={handlePageChange} />
               </>
+            )}
+            {currentPage === 'MyTickets' && (
+                <>
+                    <h2 style={{ marginBottom: '20px' }}>Tiket yang Saya Kerjakan</h2>
+                    
+                    {/* Tampilkan daftar tiket jika ada data */}
+                    {myTicketsData && myTicketsData.data && myTicketsData.data.length > 0 ? (
+                        <>
+                            <JobList
+                                tickets={myTicketsData.data}
+                                updateTicketStatus={updateTicketStatus}
+                                deleteTicket={handleDeleteClick}
+                                userRole={userRole}
+                                onAssignClick={handleAssignClick}
+                                onRejectClick={handleRejectClick}
+                            />
+                            <Pagination
+                                currentPage={myTicketsPage}
+                                lastPage={myTicketsData.last_page}
+                                onPageChange={(page) => setMyTicketsPage(page)}
+                            />
+                        </>
+                    ) : (
+                        // Tampilkan pesan jika tidak ada tiket yang dikerjakan
+                        <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
+                            <p>Anda belum bertugas untuk mengerjakan tiket apa pun.</p>
+                        </div>
+                    )}
+                </>
             )}
             {currentPage === 'userManagement' && (
               <UserManagement userData={userData} onDeleteClick={handleUserDeleteClick} onAddClick={handleAddUserClick} onEditClick={handleUserEditClick} onPageChange={handleUserPageChange} onSearch={handleUserSearch} />
