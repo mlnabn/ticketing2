@@ -1264,6 +1264,7 @@ body.dark-mode .logout-button:hover {
   gap: 1rem;
   /* Jarak antar elemen di header */
   flex-shrink: 0;
+
 }
 
 body.dark-mode .main-header {
@@ -4600,3 +4601,200 @@ body.dark-mode .btn-delete-small:hover {
 body.dark-mode .btn-delete-small i {
   color: #ffb3b3;
 }
+
+@media (max-width: 768px) {
+  /* Notification Bell */
+.notification-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;     /* biar transparan */
+  border: none;
+  cursor: pointer;
+  color: #fff;          /* warna icon */
+  font-size: 1.3rem;    /* ukuran icon (ubah sesuai selera) */
+  width: 32px;          /* area klik lebih luas */
+  height: 32px;
+  position: relative;   /* penting untuk badge */
+}
+
+/* Badge posisi relatif terhadap icon */
+.notification-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: red;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  padding: 2px 5px;
+}
+
+
+  .notification-panel {
+    position: fixed;
+    top: 60px;
+    right: 10px;
+    width: 85vw;
+    max-height: 60vh;
+    overflow-y: auto;
+    border-radius: 12px;
+    padding: 10px;
+    z-index: 2000;
+  }
+
+  /* Header lebih ramping */
+  .main-header-user {
+    padding: 0.3rem 0.5rem;
+  }
+
+  .main-header-user nav a {
+    font-size: 0.75rem;
+    margin: 0 0.2rem;
+  }
+
+  .main-header-user .notification-button,
+  .main-header-user .logout-buttonuser {
+    font-size: 0.9rem;
+    width: 26px;
+    height: 26px;
+  }
+}
+
+/* Extra small devices (HP <480px) */
+@media (max-width: 480px) {
+  .notification-panel {
+    top: 55px;
+    right: 8px;
+    width: 90vw;
+    max-height: 55vh;
+  }
+
+  .main-header-user {
+    padding: 0.3rem 0.5rem;    /* lebih tipis */
+  }
+
+  .main-header-user nav a {
+    font-size: 0.75rem;        /* tulisan menu lebih kecil */
+    margin: 0 0.2rem;          /* jarak antar menu lebih rapat */
+  }
+
+  .main-header-user .notification-button,
+  .main-header-user .logout-buttonuser {
+    font-size: 0.9rem;         /* ikon lebih kecil */
+    width: 26px;
+    height: 26px;
+  }
+}
+
+
+/* =============================
+   MOBILE RESPONSIVE UNTUK USER VIEW
+============================= */
+
+/* Tablet & HP (≤ 768px) */
+@media (max-width: 768px) {
+  .user-view-container {
+    padding: 0;
+    max-width: 100%;
+    display: flex;
+  }
+
+  .user-view-content {
+    width: 100%;
+    max-width: 500px;           /* batas lebar konten */
+  }
+
+  .request-tab,
+  .history-tab {
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0px 0px 40px 0px rgba(83, 83, 83, 0.6);
+  }
+
+  .request-tab h2,
+  .history-tab h2 {
+    font-size: 3rem;
+  }
+
+  .request-tab p,
+  .history-tab p {
+    font-size: 1rem;
+  }
+
+  /* Header: sembunyikan breadcrumb, besarkan logo */
+  .main-header-controls .breadcrump {
+    display: none;
+  }
+
+  .header-logo {
+    height: 36px;   /* Tablet & HP menengah */
+    width: auto;    /* jaga proporsi logo */
+  }
+
+  .main-header-user {
+    padding: 0.5rem; /* beri ruang agar logo tidak ketekan */
+  }
+}
+
+/* HP kecil (≤ 480px) */
+@media (max-width: 480px) {
+  .user-view-container {
+    margin: 3rem auto;
+    max-width: 100%;
+  }
+
+  .request-tab,
+  .history-tab {
+    padding: 0.8rem;
+    text-align: center;
+  }
+
+  /* Header lebih besar lagi di iPhone */
+  .header-logo {
+    height: 50px;   /* besar supaya jelas di layar kecil */
+    width: auto;
+  }
+
+  .main-header-controls .breadcrump {
+    display: none;
+  }
+
+  .main-header-user {
+    padding: 0.6rem; /* tambahan ruang */
+  }
+}
+
+
+    
+    
+    /* ====== Responsive (Mobile) ====== */
+@media (max-width: 768px) {
+  .row-input {
+    flex-direction: column;   /* Biar jadi vertikal */
+    gap: 15px;
+  }
+
+  .react-selectuser,
+  .time-wrapper {
+    flex: 1 1 100%;          /* Ambil full width */
+    min-width: 100%;
+    justify-content: flex-start; /* Posisi rapat kiri biar rapi */
+  }
+
+  .time-wrapper {
+    flex-wrap: wrap;         /* Supaya checkbox + input bisa turun kalau sempit */
+    justify-content: space-between;
+  }
+
+  .input-selectuser,
+  .input-dateuser {
+    width: 100%;             /* Full width di mobile */
+  }
+
+  .btn-submituser {
+    width: 100%;             /* Tombol submit juga full biar lebih nyaman di HP */
+  }
+}
+
+
