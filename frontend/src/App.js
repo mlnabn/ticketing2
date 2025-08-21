@@ -74,7 +74,8 @@ function App() {
 
   // --- State untuk Interaksi UI (Tampilan) ---
   const [darkMode, setDarkMode] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Default sidebar terbuka untuk admin
+  // const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Default sidebar terbuka untuk admin
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth > 768);
   const [showRegister, setShowRegister] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState(null);
@@ -590,6 +591,8 @@ function App() {
             </div>
           </div>
         </aside>
+
+        {isSidebarOpen && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
 
         <main className="main-content">
           <header className="main-header">

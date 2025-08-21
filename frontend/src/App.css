@@ -583,62 +583,216 @@ body.dark-mode {
   color: #7bb0ff;
 }
 
-/* =========================================
-   📱 RESPONSIVE UNTUK HP
-   ========================================= */
+@media (max-width: 1024px) {
+   /* --- Layout & Sidebar --- */
+    .dashboard-container.sidebar-closed .main-content { margin-left: 0; }
+    .main-content { padding: 10px; margin-left: 0 !important; transition: none; }
+    .sidebar { position: fixed; top: 0; left: 0; height: 100%; z-index: 1000; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
+    .sidebar:not(.closed) { transform: translateX(0); }
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999; }
+    
+    /* --- Header --- */
+    .dashboard-header-title { font-size: 20px; }
+    .main-header { padding: 10px 15px; }
+
+  .info-cards-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    /* --- #5. Tabel Tiket (Transformasi menjadi Kartu) --- */
+    .job-table { border: none; }
+    .job-table thead { display: none; }
+    .job-table tr { display: block; margin-bottom: 15px; border-radius: 8px; padding: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background-color: var(--background-color-light); border: 1px solid var(--border-color); overflow: hidden; }
+    .job-table td { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid var(--border-color-light); text-align: right; }
+    .job-table tr td:last-child { border-bottom: none; }
+    .job-table td::before { content: attr(data-label); font-weight: bold; text-align: left; color: var(--text-color-primary); margin-right: 10px; }
+}
+
 @media (max-width: 768px) {
-  .split-card {
-    flex-direction: column;
-    width: 95%;
-    box-shadow: none;
-    border-radius: 10px;
-  }
 
-  .login-card,
-  .register-card {
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.85);
-  }
+    /* =========================================== */
+    /* ===      STYLE UNTUK HALAMAN LOGIN        === */
+    /* =========================================== */
+    /* ... (kode untuk login tetap sama) ... */
+    .split-card { flex-direction: column; width: 95%; /* etc... */ }
+    /* ... (dan seterusnya untuk login) ... */
+    .auth-toggle { font-size: 13px; }
 
-  .login-background-side {
-    display: none;
-  }
 
-  .login-card h2,
-  .register-card h2 {
-    font-size: 28px;
-    margin-bottom: 16px;
-  }
+    /* =========================================== */
+    /* ===     STYLE UNTUK DASHBOARD ADMIN       === */
+    /* =========================================== */
 
-  .input-group input {
-    font-size: 14px;
-    padding: 10px 14px 10px 38px;
-  }
+    /* --- Layout & Sidebar --- */
+    .dashboard-container.sidebar-closed .main-content { margin-left: 0; }
+    .main-content { padding: 10px; margin-left: 0 !important; transition: none; }
+    .sidebar { position: fixed; top: 0; left: 0; height: 100%; z-index: 1000; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
+    .sidebar:not(.closed) { transform: translateX(0); }
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999; }
+    
+    /* --- Header --- */
+    .dashboard-header-title { font-size: 20px; }
+    .main-header { padding: 10px 15px; }
 
-  .login-btn,
-  .register-btn {
-    padding: 10px;
-    font-size: 14px;
-  }
+    /* --- Info Cards --- */
+    .info-cards-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+    .info-card h3 { font-size: 28px; }
+    .info-card p { font-size: 14px; }
 
-  .login-options {
-    flex-direction: column;
-    gap: 8px;
-    font-size: 13px;
-    text-align: center;
-  }
+    /* --- Form & Tombol Umum --- */
+    .search-form { flex-direction: column; gap: 10px; }
+    .search-form input, .search-form button { width: 100%; }
+    .flex.justify-between.items-center.mb-4 { flex-direction: column; align-items: center; }
+    .btn-primary { width: 100%; margin-bottom: 15px; }
+    .btn-edit, .btn-delete { padding: 6px 12px; font-size: 0.8rem; }
 
-  .auth-toggle {
-    font-size: 13px;
-  }
+    /* --- #5. Tabel Tiket (Transformasi menjadi Kartu) --- */
+    .job-table { border: none; }
+    .job-table thead { display: none; }
+    .job-table tr { display: block; margin-bottom: 15px; border-radius: 8px; padding: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background-color: var(--background-color-light); border: 1px solid var(--border-color); overflow: hidden; }
+    .job-table td { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid var(--border-color-light); text-align: right; }
+    .job-table tr td:last-child { border-bottom: none; }
+    .job-table td::before { content: attr(data-label); font-weight: bold; text-align: left; color: var(--text-color-primary); margin-right: 10px; }
+
+    .user-history-table {border: none}
+    .user-history-table thead { display: none; }
+    .user-history-table tr { display: block; margin-bottom: 15px; border-radius: 8px; padding: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background-color: var(--background-color-light); border: 1px solid var(--border-color); overflow: hidden; }
+    .user-history-table td { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid var(--border-color-light); text-align: right; }
+    .user-history-table tr td:last-child  { border-bottom: none; }
+    .user-history-table td::before { content: attr(data-label); font-weight: bold; text-align: left; color: var(--text-color-primary); margin-right: 10px; }
+
+    /* Dark mode compatibility */
+    body.dark-mode .job-table tr { border-color: var(--border-color-dark); }
+    body.dark-mode .job-table td { border-bottom-color: var(--border-color-dark); }
+    body.dark-mode .job-table td::before { color: var(--text-color-dashboard-dark); }
+
+    .notification-form-container h2 {
+        text-align: center;
+        font-size: 24px; /* Ukuran font khusus mobile */
+        margin-bottom: 25px;
+        background: linear-gradient(45deg, #6a11cb, #2575fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* --- Bagian Template --- */
+    .templates-section {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color-light);
+    }
+
+    .templates-section h4 {
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+
+    .templates-section .btn-template {
+        margin-right: 8px;
+        margin-bottom: 8px;
+        transform: translateY(0px);
+        filter: brightness(90%);
+    }
+
+    /* --- Struktur Form --- */
+    .notification-form-container form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px; /* Jarak antar elemen form */
+    }
+
+    .notification-form-container .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* Grup individual (label + input) */
+    .form-group, .form-group2 {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        width: 100%;
+    }
+
+    /* Pastikan semua input dan select memiliki style yang sama */
+    .form-group input, .form-group select, .form-group2 textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+
+    .notification-form-container form select,
+    .notification-form-container form input,
+    .notification-form-container form textarea {
+        width: 100%;
+        box-sizing: border-box; /* Pastikan padding tidak membuat elemen lebih lebar dari 100% */
+    }
 }
 
 @media (max-width: 480px) {
 
-  .login-card h2,
-  .register-card h2 {
-    font-size: 24px;
-  }
+    /* --- Aturan untuk Halaman Login --- */
+    .login-card h2,
+    .register-card h2 {
+        font-size: 24px;
+    }
+
+    /* --- Perbaikan Header di Layar Sangat Kecil --- */
+    .main-header .breadcrumb {
+        display: none;
+    }
+    .main-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .header-left-group {
+        flex-shrink: 1;
+        min-width: 0; 
+        overflow: hidden;
+    }
+    .dashboard-header-title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* === PERBAIKAN UTAMA UNTUK INFO CARD === */
+    .info-cards-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    /* Perkecil ukuran konten di dalam kartu */
+    .info-card {
+        padding: 12px; 
+    }
+    .info-card h3 {
+        font-size: 24px; /* Perkecil angka statistik */
+        margin-bottom: 4px;
+    }
+    .info-card p {
+        font-size: 12px; /* Perkecil teks deskripsi */
+    }
+
+    .confirmation-modal-content {
+      max-width: 80%;
+    }
+
+    .modal-content {
+      max-width: 80%;
+    }
+
+    
 }
 
 
@@ -1285,12 +1439,6 @@ body.dark-mode .content-area {
   /* Meningkatkan jarak antar kartu */
   margin-bottom: 2rem;
   /* Meningkatkan margin bawah grid */
-}
-
-@media (min-width: 768px) {
-  .info-cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (min-width: 1024px) {
@@ -2121,112 +2269,6 @@ body.dark-mode .status-selesai {
   justify-content: flex-start;
 }
 
-
-
-
-/*
-  ---------------------------------------------------
-  RESPONSIF TABEL
-  ---------------------------------------------------
-  Mengatur tampilan tabel agar responsif di layar kecil.
-*/
-/* ==========================================================================
-  Tabel Responsif (Pendekatan Desktop-Down)
-  ========================================================================== */
-
-/* Aturan untuk layar lebar (di atas 768px) ada di luar media query. */
-/* ... kode CSS tabel desktop Anda di sini ... */
-
-
-/* == 1. Transformasi ke Tampilan Kartu untuk Tablet & Ponsel == */
-@media (max-width: 768px) {
-
-  /* Sembunyikan header tabel asli */
-  .job-table thead {
-    display: none;
-  }
-
-  /* Ubah semua elemen tabel menjadi block agar bisa ditumpuk */
-  .job-table,
-  .job-table tbody,
-  .job-table tr,
-  .job-table td {
-    display: block;
-    width: 100%;
-  }
-
-  /* Beri jarak dan border pada setiap baris, yang sekarang berfungsi seperti kartu */
-  .job-table tr {
-    margin-bottom: 1rem;
-    border: 1px solid var(--border-color-light);
-    /* Border baris di mode terang */
-    border-radius: 8px;
-    padding: 0;
-  }
-
-  body.dark-mode .job-table tr {
-    border-color: var(--border-color-dark);
-    /* Warna border baris di mode gelap */
-  }
-
-  .job-table td {
-    position: relative;
-    /* Diperlukan untuk pseudo-element ::before */
-    padding-left: 50%;
-    /* Beri ruang di kiri untuk label */
-    text-align: right;
-    /* Pindahkan konten data ke kanan */
-    border-bottom: 1px solid var(--sidebar-hover-bg-light);
-    /* Border bawah sel di mode terang */
-    /* Nonaktifkan border-right di tampilan mobile/kartu */
-    border-right: none;
-  }
-
-  body.dark-mode .job-table td {
-    border-bottom: 1px solid var(--sidebar-hover-bg-dark);
-    /* Warna border bawah sel di mode gelap */
-  }
-
-  .job-table tr td:last-child {
-    border-bottom: none;
-  }
-
-  .job-table td::before {
-    content: attr(data-label);
-    /* Menggunakan atribut data-label sebagai label */
-    position: absolute;
-    left: 1rem;
-    width: calc(50% - 2rem);
-    text-align: left;
-    font-weight: bold;
-    color: var(--text-color-dashboard-light);
-    /* Warna label di mode terang */
-  }
-
-  body.dark-mode .job-table td::before {
-    color: var(--text-color-dashboard-dark);
-    /* Warna label di mode gelap */
-  }
-
-  .job-table td .status,
-  .job-table td button {
-    width: auto;
-    float: right;
-  }
-
-  .job-table td[data-label="Aksi"] {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-}
-
-
-
-
-
 /* ADD USER PAGE */
 
 /* src/components/AddUser.css */
@@ -2882,27 +2924,6 @@ body.dark-mode .btn-delete:hover {
   box-shadow: 0 4px 8px rgba(239, 83, 80, 0.4);
 }
 
-/* Anda mungkin masih memerlukan beberapa gaya dasar untuk responsivitas */
-@media (max-width: 768px) {
-  .flex.justify-between.items-center.mb-4 {
-    flex-direction: column;
-    /* Mengubah tata letak menjadi kolom */
-    align-items: center;
-  }
-
-  .btn-primary {
-    width: 100%;
-    /* Tombol "Tambah" menjadi lebar penuh */
-    margin-bottom: 15px;
-  }
-
-  .btn-edit,
-  .btn-delete {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-  }
-}
-
 /* =================================================================
    PERUBAHAN UTAMA: TATA LETAK UNTUK USER (TANPA SIDEBAR)
    Tambahkan ini untuk mengatur layout utama saat user login.
@@ -3382,9 +3403,9 @@ body.dark-mode .btn-submit:hover {
   backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 30px;
-  width: 400;
-  min-width: 30%;
-  max-width: 30%;
+  width: 800;
+  /* min-width: 30%;
+  max-width: 30%; */
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   animation: slideUp 0.4s ease;
   text-align: center;
@@ -4028,6 +4049,8 @@ body.dark-mode .rejection-reason-display p {
 }
 
 .btn-template {
+  background: #d1d5db;
+  color: #111827;
   padding: 10px 16px;
   border-radius: 8px;
   border: none;
@@ -4038,16 +4061,9 @@ body.dark-mode .rejection-reason-display p {
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
-/* 🌞 Light mode */
-/* .light-mode .btn-template {
-  background: #f3f4f6;
-  color: #111827;
-} */
-
-/* .light-mode .btn-template:hover {
-  background: #e5e7eb;
-  transform: translateY(-2px);
-} */
+.btn-template:hover {
+  background: #9b9ea2;
+}
 
 /* 🌙 Dark mode */
 .dark-mode .btn-template {
@@ -4079,10 +4095,6 @@ body.dark-mode .rejection-reason-display p {
   display: flex;
   flex-direction: column;
   margin-bottom: 16px;
-}
-
-.form-group {
-  width: 50%;
 }
 
 .form-group2 {
@@ -4159,15 +4171,6 @@ body.dark-mode .rejection-reason-display p {
 body {
   background: white;
   color: #111827;
-}
-
-.btn-template {
-  background: #d1d5db;
-  color: #111827;
-}
-
-.btn-template:hover {
-  background: #9b9ea2;
 }
 
 
