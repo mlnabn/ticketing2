@@ -626,34 +626,34 @@ function App() {
               </>
             )}
             {currentPage === 'MyTickets' && (
-                <>
-                    <h2 style={{ marginBottom: '20px' }}>Tiket yang Saya Kerjakan</h2>
-                    
-                    {/* Tampilkan daftar tiket jika ada data */}
-                    {myTicketsData && myTicketsData.data && myTicketsData.data.length > 0 ? (
-                        <>
-                            <JobList
-                                tickets={myTicketsData.data}
-                                updateTicketStatus={updateTicketStatus}
-                                deleteTicket={handleDeleteClick}
-                                userRole={userRole}
-                                onAssignClick={handleAssignClick}
-                                onRejectClick={handleRejectClick}
-                                onProofClick={handleProofClick}
-                            />
-                            <Pagination
-                                currentPage={myTicketsPage}
-                                lastPage={myTicketsData.last_page}
-                                onPageChange={(page) => setMyTicketsPage(page)}
-                            />
-                        </>
-                    ) : (
-                        // Tampilkan pesan jika tidak ada tiket yang dikerjakan
-                        <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
-                            <p>Anda belum bertugas untuk mengerjakan tiket apa pun.</p>
-                        </div>
-                    )}
-                </>
+              <>
+                <h2 style={{ marginBottom: '20px' }}>Tiket yang Saya Kerjakan</h2>
+
+                {/* Tampilkan daftar tiket jika ada data */}
+                {myTicketsData && myTicketsData.data && myTicketsData.data.length > 0 ? (
+                  <>
+                    <JobList
+                      tickets={myTicketsData.data}
+                      updateTicketStatus={updateTicketStatus}
+                      deleteTicket={handleDeleteClick}
+                      userRole={userRole}
+                      onAssignClick={handleAssignClick}
+                      onRejectClick={handleRejectClick}
+                      onProofClick={handleProofClick}
+                    />
+                    <Pagination
+                      currentPage={myTicketsPage}
+                      lastPage={myTicketsData.last_page}
+                      onPageChange={(page) => setMyTicketsPage(page)}
+                    />
+                  </>
+                ) : (
+                  // Tampilkan pesan jika tidak ada tiket yang dikerjakan
+                  <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
+                    <p>Anda belum bertugas untuk mengerjakan tiket apa pun.</p>
+                  </div>
+                )}
+              </>
             )}
             {currentPage === 'userManagement' && (
               <UserManagement userData={userData} onDeleteClick={handleUserDeleteClick} onAddClick={handleAddUserClick} onEditClick={handleUserEditClick} onPageChange={handleUserPageChange} onSearch={handleUserSearch} />
@@ -725,7 +725,7 @@ function App() {
                 <div className="history-tab">
                   <h2>Your Tickets</h2>
                   <div className="job-list" style={{ marginTop: '20px' }}>
-                    <table className='job-table user-history-table'>
+                    <table className="job-table user-history-table">
                       <thead>
                         <tr>
                           <th>Deskripsi</th>
@@ -738,22 +738,30 @@ function App() {
                       </thead>
                       <tbody>
                         {!createdTicketsData ? (
-                          <tr><td colSpan="6">Memuat riwayat tiket...</td></tr>
+                          <tr>
+                            <td colSpan="6">Memuat riwayat tiket...</td>
+                          </tr>
                         ) : createdTicketsOnPage.length > 0 ? (
                           createdTicketsOnPage.map(ticket => (
                             <tr key={ticket.id}>
-                              <td>{ticket.title}</td>
-                              <td>{ticket.workshop}</td>
-                              <td>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
-                              <td>
+                              <td data-label="Deskripsi">{ticket.title}</td>
+                              <td data-label="Workshop">{ticket.workshop}</td>
+                              <td data-label="Tanggal Dibuat">
+                                {format(new Date(ticket.created_at), 'dd MMM yyyy')}
+                              </td>
+                              <td data-label="Waktu Pengerjaan">
                                 {(() => {
                                   if (ticket.started_at) {
                                     return ticket.completed_at
-                                      ? `${format(new Date(ticket.started_at), 'HH:mm')} - ${format(new Date(ticket.completed_at), 'HH:mm')}`
+                                      ? `${format(new Date(ticket.started_at), 'HH:mm')} - ${format(
+                                        new Date(ticket.completed_at),
+                                        'HH:mm'
+                                      )}`
                                       : `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}`;
                                   }
                                   if (ticket.requested_date && ticket.requested_time) {
-                                    return `Request: ${format(new Date(ticket.requested_date), 'dd-MM-yy')} ${ticket.requested_time}`;
+                                    return `Request: ${format(new Date(ticket.requested_date), 'dd-MM-yy')} ${ticket.requested_time
+                                      }`;
                                   }
                                   if (ticket.requested_date) {
                                     return `Request: ${format(new Date(ticket.requested_date), 'dd-MM-yy')}`;
@@ -764,32 +772,58 @@ function App() {
                                   return 'Flexible Work Schedule';
                                 })()}
                               </td>
-                              <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>{ticket.status}</span></td>
-                              <td>
+                              <td data-label="Status">
+                                <span
+                                  className={`status-badge status-${ticket.status
+                                    .toLowerCase()
+                                    .replace(' ', '-')}`}
+                                >
+                                  {ticket.status}
+                                </span>
+                              </td>
+                              <td data-label="Aksi">
                                 {ticket.status === 'Selesai' && ticket.proof_description ? (
-                                  <button onClick={() => handleViewProofClick(ticket)} className="btn-start">Lihat Bukti</button>
+                                  <button
+                                    onClick={() => handleViewProofClick(ticket)}
+                                    className="btn-start"
+                                  >
+                                    Lihat Bukti
+                                  </button>
                                 ) : ticket.status === 'Ditolak' ? (
-                                  <button onClick={() => handleShowReasonClick(ticket)} className="btn-reason">Alasan</button>
+                                  <button
+                                    onClick={() => handleShowReasonClick(ticket)}
+                                    className="btn-reason"
+                                  >
+                                    Alasan
+                                  </button>
                                 ) : (
-                                  <button onClick={() => handleDeleteClick(ticket)} className="btn-cancel-aksi">Delete</button>
+                                  <button
+                                    onClick={() => handleDeleteClick(ticket)}
+                                    className="btn-cancel-aksi"
+                                  >
+                                    Delete
+                                  </button>
                                 )}
                               </td>
                             </tr>
                           ))
                         ) : (
-                          <tr><td colSpan="6">You haven't created a ticket yet.</td></tr>
+                          <tr>
+                            <td colSpan="6">You haven't created a ticket yet.</td>
+                          </tr>
                         )}
                       </tbody>
                     </table>
                   </div>
+
                   <PaginationUser
                     currentPage={createdTicketsPage}
                     lastPage={createdTicketsData ? createdTicketsData.last_page : 1}
                     onPageChange={handleCreatedTicketsPageChange}
                   />
-
                 </div>
               )}
+
             </div>
           </div>
         </div>
