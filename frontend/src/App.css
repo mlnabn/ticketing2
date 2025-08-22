@@ -5192,14 +5192,15 @@ body.dark-mode .btn-delete-small i {
   /* Control button (notif + logout) */
   .main-header-controls-user {
     position: absolute;
-    top: 97px;
+    top: 95px;
     right: 12px;
-    width: 100%;
+    width: auto;
     display: flex;
     justify-content: flex-end;
     /* tetap kanan */
     align-items: center;
     gap: 10px;
+    z-index: 20;
   }
 
   .main-header-controls-user .breadcrump {
@@ -5224,6 +5225,7 @@ body.dark-mode .btn-delete-small i {
     position: relative;
     /* wajib kalau mau z-index */
     z-index: 10;
+
   }
 
   /* Tab button khusus mobile */
@@ -5349,6 +5351,7 @@ body.dark-mode .btn-delete-small i {
     right: 0.6rem;
     height: 2px;
   }
+
 
   /* Controls kanan */
   .main-header-controls-user {
