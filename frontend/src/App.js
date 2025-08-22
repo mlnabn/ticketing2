@@ -698,7 +698,7 @@ function App() {
             <button className={`tab-button ${userViewTab === 'request' ? 'active' : ''}`} onClick={() => setUserViewTab('request')}>Request</button>
             <button className={`tab-button ${userViewTab === 'history' ? 'active' : ''}`} onClick={() => setUserViewTab('history')}>History</button>
           </div>
-          <div className="main-header-controls">
+          <div className="main-header-controls-user">
             <span className="breadcrump">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
               <NotificationBell />

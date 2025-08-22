@@ -5123,7 +5123,7 @@ body.dark-mode .btn-delete-small i {
   }
 
   /* Control button (notif + logout) */
-  .main-header-controls {
+  .main-header-controls-user {
     position: absolute;
     top: 97px;
     right: 12px;
@@ -5135,7 +5135,7 @@ body.dark-mode .btn-delete-small i {
     gap: 10px;
   }
 
-  .main-header-controls .breadcrump {
+  .main-header-controls-user .breadcrump {
     display: none;
   }
 
@@ -5281,7 +5281,7 @@ body.dark-mode .btn-delete-small i {
   }
 
   /* Controls kanan */
-  .main-header-controls {
+  .main-header-controls-user {
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -5290,7 +5290,7 @@ body.dark-mode .btn-delete-small i {
     /* hilangkan absolute dari mobile */
   }
 
-  .main-header-controls .breadcrump {
+  .main-header-controls-user .breadcrump {
     display: inline-block;
     font-size: 0.95rem;
   }
