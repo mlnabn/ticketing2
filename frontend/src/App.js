@@ -48,6 +48,8 @@ function App() {
   const [stats, setStats] = useState(null);
   const [createdTicketsData, setCreatedTicketsData] = useState(null);
   const [myTicketsData, setMyTicketsData] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // --- State untuk Autentikasi & Info Pengguna ---
   const [isLogin, setIsLogin] = useState(isLoggedIn());
@@ -183,6 +185,28 @@ function App() {
     }
   }, []);
 
+  const fetchNotifications = useCallback(async () => {
+    // Hanya fetch jika user sudah login
+    if (!isLoggedIn()) return; 
+
+    try {
+        const response = await axios.get(`${API_URL}/notifications`, {
+            headers: { Authorization: `Bearer ${getToken()}` },
+        });
+        setNotifications(response.data);
+
+        // Hitung notifikasi yang belum dibaca (sesuai logika Anda sebelumnya)
+        const lastCleared = localStorage.getItem('notifications_last_cleared');
+        const newNotifications = lastCleared
+            ? response.data.filter(n => new Date(n.created_at) > new Date(lastCleared))
+            : response.data;
+        setUnreadCount(newNotifications.length);
+
+    } catch (error) {
+        console.error("Gagal mengambil notifikasi:", error);
+    }
+  }, []);
+
   // -----------------------------------------------------------------
   // #4. HANDLER FUNCTIONS (Fungsi untuk Menangani Aksi Pengguna)
   // -----------------------------------------------------------------
@@ -217,6 +241,29 @@ function App() {
         fetchCreatedTickets(createdTicketsPage);
       }
     } catch (error) { console.error("Gagal update status:", error); }
+  };
+
+  const handleNotificationToggle = () => {
+    setUnreadCount(0);
+    localStorage.setItem('notifications_last_cleared', new Date().toISOString());
+    axios.post(`${API_URL}/notifications/mark-all-read`, {}, {
+        headers: { Authorization: `Bearer ${getToken()}` }
+    });
+  };
+
+  const handleDeleteNotification = async (notificationId) => {
+    try {
+        // Panggil API untuk menghapus notifikasi
+        await axios.delete(`${API_URL}/notifications/${notificationId}`, {
+            headers: { Authorization: `Bearer ${getToken()}` },
+        });
+
+        // Setelah berhasil, panggil ulang fetchNotifications untuk memperbarui daftar
+        fetchNotifications();
+    } catch (error) {
+        console.error("Gagal menghapus notifikasi:", error);
+        alert("Gagal menghapus notifikasi.");
+    }
   };
 
   const handleHomeClick = () => {
@@ -488,6 +535,7 @@ function App() {
   useEffect(() => {
     if (isLogin) {
       const currentUser = getUser();
+      fetchNotifications();
       if (currentUser) {
         setUserRole(currentUser.role);
         setUserName(currentUser.name);
@@ -511,7 +559,7 @@ function App() {
         }
       }
     }
-  }, [isLogin, dataPage, searchQuery, statusFilter, fetchData, isAdmin, fetchAdmins]);
+  }, [isLogin, dataPage, searchQuery, statusFilter, fetchData, isAdmin, fetchAdmins, fetchNotifications]);
 
   useEffect(() => {
     const needsUserListForForm = (isAdmin && currentPage === 'Tickets') || (!isAdmin && userViewTab === 'request');
@@ -659,7 +707,11 @@ function App() {
               <UserManagement userData={userData} onDeleteClick={handleUserDeleteClick} onAddClick={handleAddUserClick} onEditClick={handleUserEditClick} onPageChange={handleUserPageChange} onSearch={handleUserSearch} />
             )}
             {currentPage === 'Notifications' && (
-              <NotificationForm users={users} />
+              <NotificationForm 
+                  users={users} 
+                  globalNotifications={notifications.filter(n => n.user_id === null)}
+                  refreshNotifications={fetchNotifications} 
+              />
             )}
           </div>
         </main>
@@ -701,7 +753,12 @@ function App() {
           <div className="main-header-controls-user">
             <span className="breadcrump">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <NotificationBell />
+              <NotificationBell 
+                  notifications={notifications}
+                  unreadCount={unreadCount}
+                  onToggle={handleNotificationToggle}
+                  onDelete={handleDeleteNotification}
+              />
               <button onClick={handleLogout} className="logout-buttonuser">
                 <i className="fas fa-sign-out-alt"></i>
               </button>

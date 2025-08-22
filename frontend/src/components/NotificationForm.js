@@ -1,97 +1,72 @@
-// src/components/NotificationForm.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { getToken } from '../auth';
 import { format } from 'date-fns';
 
 const API_URL = 'http://127.0.0.1:8000/api';
-
 const notificationTemplates = [
     { title: 'Pemberitahuan Maintenance', message: 'Workshop Candi sedang mengalami kendala. Semua ticket akan dilanjutkan setelah maintenance workshop Candi selesai. Terima Kasih.' },
     { title: 'Update', message: 'Ticket Anda sudah selesai, silahkan refresh halaman Anda.' },
     { title: 'Pengumuman Penting', message: '' },
 ];
 
-function NotificationForm({ users }) {
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [target, setTarget] = useState('all'); // 'all' atau user id
-  const [isLoading, setIsLoading] = useState(false);
-  const [feedback, setFeedback] = useState('');
-  const [globalNotifications, setGlobalNotifications] = useState([]);
+// Terima props dari App.js
+function NotificationForm({ users, globalNotifications, refreshNotifications }) {
+    const [title, setTitle] = useState('');
+    const [message, setMessage] = useState('');
+    const [target, setTarget] = useState('all');
+    const [isLoading, setIsLoading] = useState(false);
+    const [feedback, setFeedback] = useState('');
 
-  // Ambil daftar global notifikasi
-  const fetchGlobalNotifications = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/notifications/global`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      setGlobalNotifications(response.data);
-    } catch (error) {
-      console.error('Gagal mengambil riwayat notifikasi:', error);
-    }
-  };
+    // Fungsi fetch dan useEffect telah dihapus dari sini
 
-  useEffect(() => {
-    fetchGlobalNotifications();
-  }, []);
+    const handleDelete = async (id) => {
+        if (!window.confirm('Anda yakin ingin menghapus pengumuman ini secara permanen?')) {
+            return;
+        }
+        try {
+            await axios.delete(`${API_URL}/notifications/${id}`, {
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+            // Panggil fungsi refresh dari App.js
+            refreshNotifications();
+        } catch (error) {
+            console.error('Gagal menghapus notifikasi:', error);
+            alert('Gagal menghapus notifikasi.');
+        }
+    };
 
-  // Hapus notifikasi global
-  const handleDelete = async (id) => {
-    if (!window.confirm('Anda yakin ingin menghapus pengumuman ini secara permanen?')) {
-      return;
-    }
-    try {
-      await axios.delete(`${API_URL}/notifications/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      fetchGlobalNotifications(); // Refresh daftar setelah berhasil hapus
-    } catch (error) {
-      console.error('Gagal menghapus notifikasi:', error);
-      alert('Gagal menghapus notifikasi.');
-    }
-  };
+    const handleTemplateClick = (template) => {
+        setTitle(template.title);
+        setMessage(template.message);
+    };
 
-  // Isi form pakai template
-  const handleTemplateClick = (template) => {
-    setTitle(template.title);
-    setMessage(template.message);
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setFeedback('');
+        try {
+            const payload = { title, message, target_user_id: target === 'all' ? null : target };
+            await axios.post(`${API_URL}/notifications`, payload, {
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+            setFeedback('Notifikasi berhasil dikirim!');
+            setTitle('');
+            setMessage('');
+            setTarget('all');
 
-  // Kirim notifikasi
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setFeedback('');
-
-    try {
-      const payload = {
-        title,
-        message,
-        target_user_id: target === 'all' ? null : target,
-      };
-
-      await axios.post(`${API_URL}/notifications`, payload, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-
-      setFeedback('Notifikasi berhasil dikirim!');
-      setTitle('');
-      setMessage('');
-      setTarget('all');
-
-      // Jika notifikasi global, refresh daftar
-      if (payload.target_user_id === null) {
-        fetchGlobalNotifications();
-      }
-    } catch (error) {
-      console.error('Gagal mengirim notifikasi:', error);
-      setFeedback('Gagal mengirim notifikasi. Coba lagi.');
-    } finally {
-      setIsLoading(false);
-      setTimeout(() => setFeedback(''), 3000);
-    }
-  };
+            if (payload.target_user_id === null) {
+                // Panggil fungsi refresh dari App.js
+                refreshNotifications();
+            }
+        } catch (error) {
+            console.error('Gagal mengirim notifikasi:', error);
+            setFeedback('Gagal mengirim notifikasi. Coba lagi.');
+        } finally {
+            setIsLoading(false);
+            setTimeout(() => setFeedback(''), 3000);
+        }
+    };
 
   return (
     <>
@@ -172,32 +147,33 @@ function NotificationForm({ users }) {
 
       {/* Riwayat Notifikasi Global */}
       <div className="global-notification-history card">
-        <h2>Riwayat Pengumuman Global</h2>
-        {globalNotifications.length > 0 ? (
-          <ul className="history-list">
-            {globalNotifications.map((notif) => (
-              <li key={notif.id} className="history-item">
-                <div className="history-item-content">
-                  <strong>{notif.title}</strong>
-                  <p>{notif.message}</p>
-                  <small>
-                    Dikirim pada:{' '}
-                    {format(new Date(notif.created_at), 'dd MMMM yyyy, HH:mm')}
-                  </small>
-                </div>
-                <button
-                  onClick={() => handleDelete(notif.id)}
-                  className="btn-delete-small"
-                >
-                  <i className="fas fa-trash-alt"></i> Hapus
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>Belum ada pengumuman global yang dikirim.</p>
-        )}
-      </div>
+                <h2>Riwayat Pengumuman Global</h2>
+                {/* Gunakan globalNotifications dari props */}
+                {globalNotifications && globalNotifications.length > 0 ? (
+                    <ul className="history-list">
+                        {globalNotifications.map((notif) => (
+                            <li key={notif.id} className="history-item">
+                                <div className="history-item-content">
+                                    <strong>{notif.title}</strong>
+                                    <p>{notif.message}</p>
+                                    <small>
+                                        Dikirim pada:{' '}
+                                        {format(new Date(notif.created_at), 'dd MMMM yyyy, HH:mm')}
+                                    </small>
+                                </div>
+                                <button
+                                    onClick={() => handleDelete(notif.id)}
+                                    className="btn-delete-small"
+                                >
+                                    <i className="fas fa-trash-alt"></i> Hapus
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>Belum ada pengumuman global yang dikirim.</p>
+                )}
+            </div>
     </>
   );
 }
