@@ -36,7 +36,7 @@ function ProofModal({ ticket, onSave, onClose }) {
       <div className="modal-content">
         <h2>Bukti Pengerjaan: {ticket.title}</h2>
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
+          <div className="proof-modal__group">
             <label htmlFor="proof_description">Deskripsi Pengerjaan</label>
             <textarea
               id="proof_description"
@@ -46,7 +46,7 @@ function ProofModal({ ticket, onSave, onClose }) {
               required
             ></textarea>
           </div>
-          <div className="form-group">
+          <div className="proof-modal__group">
             <label htmlFor="proof_image">Upload Foto Bukti (Opsional)</label>
             <input
               id="proof_image"
