@@ -670,93 +670,123 @@ body.dark-mode {
     font-size: 14px;
   }
 
-    /* --- Form & Tombol Umum --- */
-    .search-form { flex-direction: column; gap: 10px; }
-    .search-form input, .search-form button { width: 100%; }
-    .flex.justify-between.items-center.mb-4 { flex-direction: column; align-items: center; }
-    .btn-primary { width: 100%; margin-bottom: 15px; }
-    .btn-edit, .btn-delete { padding: 6px 12px; font-size: 0.8rem; }
-    /* Sembunyikan tabel desktop di mobile */
-    .job-table {
-        display: none;
-    }
+  /* --- Form & Tombol Umum --- */
+  .search-form {
+    flex-direction: column;
+    gap: 10px;
+  }
 
-    /* Tampilkan daftar kartu mobile (secara default disembunyikan) */
-    .job-list-mobile {
-        display: block;
-    }
+  .search-form input,
+  .search-form button {
+    width: 100%;
+  }
 
-    /* Styling untuk setiap kartu */
-    .ticket-card-mobile {
-        background: #E5E7EB;
-        box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25);
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-        padding: 15px;
-        margin-bottom: 15px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px; /* Jarak antar baris di dalam kartu */
-    }
+  .flex.justify-between.items-center.mb-4 {
+    flex-direction: column;
+    align-items: center;
+  }
 
-    /* Styling untuk setiap baris di dalam kartu */
-    .card-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        border-bottom: 1px solid var(--border-color-light);
-        padding-bottom: 10px;
-    }
-    .ticket-card-mobile .card-row:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
-    }
+  .btn-primary {
+    width: 100%;
+    margin-bottom: 15px;
+  }
 
-    /* Grup data (label + value) */
-    .data-group {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-    }
-    .data-group.single {
-        width: 100%;
-    }
-    .data-group .label {
-        font-size: 11px;
-        color: #888;
-        text-transform: uppercase;
-    }
-    .data-group .value {
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--text-color-primary);
-    }
-    .data-group .value.description {
-        white-space: pre-wrap; /* Agar deskripsi panjang bisa wrap */
-        word-break: break-word;
-    }
+  .btn-edit,
+  .btn-delete {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
 
-    /* Penataan khusus untuk baris status dan aksi */
-    .status-row {
-        justify-content: center;
-    }
-    .action-row {
-        justify-content: center;
-        padding-top: 5px;
-    }
+  /* Sembunyikan tabel desktop di mobile */
+  .job-table {
+    display: none;
+  }
 
-    /* Pastikan style dark mode juga berlaku */
-    body.dark-mode .ticket-card-mobile {
-        box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-        -webkit-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-        -moz-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-        background-color: #393955;
-        /* Latar belakang tabel di mode gelap */
-        border: 1px solid var(--border-color-dark);
-    }
-    body.dark-mode .card-row {
-        border-bottom-color: var(--border-color-dark);
-    }
+  /* Tampilkan daftar kartu mobile (secara default disembunyikan) */
+  .job-list-mobile {
+    display: block;
+  }
+
+  /* Styling untuk setiap kartu */
+  .ticket-card-mobile {
+    background: #E5E7EB;
+    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* Jarak antar baris di dalam kartu */
+  }
+
+  /* Styling untuk setiap baris di dalam kartu */
+  .card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--border-color-light);
+    padding-bottom: 10px;
+  }
+
+  .ticket-card-mobile .card-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  /* Grup data (label + value) */
+  .data-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .data-group.single {
+    width: 100%;
+  }
+
+  .data-group .label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+  }
+
+  .data-group .value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color-primary);
+  }
+
+  .data-group .value.description {
+    white-space: pre-wrap;
+    /* Agar deskripsi panjang bisa wrap */
+    word-break: break-word;
+  }
+
+  /* Penataan khusus untuk baris status dan aksi */
+  .status-row {
+    justify-content: center;
+  }
+
+  .action-row {
+    justify-content: center;
+    padding-top: 5px;
+  }
+
+  /* Pastikan style dark mode juga berlaku */
+  body.dark-mode .ticket-card-mobile {
+    box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
+    -webkit-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
+    background-color: #393955;
+    /* Latar belakang tabel di mode gelap */
+    border: 1px solid var(--border-color-dark);
+  }
+
+  body.dark-mode .card-row {
+    border-bottom-color: var(--border-color-dark);
+  }
 
   .user-history-table {
     border: none
@@ -798,10 +828,18 @@ body.dark-mode {
     margin-right: 10px;
   }
 
-    /* Dark mode compatibility */
-    body.dark-mode .job-table tr { border-color: var(--border-color-dark); }
-    body.dark-mode .job-table td { border-bottom-color: var(--border-color-dark); }
-    body.dark-mode .job-table td::before { color: var(--text-color-dashboard-dark); }
+  /* Dark mode compatibility */
+  body.dark-mode .job-table tr {
+    border-color: var(--border-color-dark);
+  }
+
+  body.dark-mode .job-table td {
+    border-bottom-color: var(--border-color-dark);
+  }
+
+  body.dark-mode .job-table td::before {
+    color: var(--text-color-dashboard-dark);
+  }
 
   /* --- Bagian Template --- */
   .templates-section {
@@ -815,124 +853,135 @@ body.dark-mode {
     font-weight: 500;
   }
 
-    .templates-section .btn-template {
-        margin-right: 8px;
-        margin-bottom: 8px;
-        transform: translateY(0px);
-        filter: brightness(90%);
-    }
+  .templates-section .btn-template {
+    margin-right: 8px;
+    margin-bottom: 8px;
+    transform: translateY(0px);
+    filter: brightness(90%);
+  }
 
-    /* Grup individual (label + input) */
-    .notification-form__group {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        width: 100%;
-    }
+  /* Grup individual (label + input) */
+  .notification-form__group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+  }
 
-    .notification-form__group input, 
-    .notification-form__group select, 
-    .notification-form__group textarea {
-        width: 100%;
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        font-size: 14px;
-    }
+  .notification-form__group input,
+  .notification-form__group select,
+  .notification-form__group textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+  }
 
-    /* Style KHUSUS untuk modal bukti (bisa Anda sesuaikan) */
-    .proof-modal__group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px; /* Contoh: beri jarak berbeda */
-        width: 100%;
-        margin-bottom: 15px; /* Contoh: beri margin bawah */
-    }
+  /* Style KHUSUS untuk modal bukti (bisa Anda sesuaikan) */
+  .proof-modal__group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* Contoh: beri jarak berbeda */
+    width: 100%;
+    margin-bottom: 15px;
+    /* Contoh: beri margin bawah */
+  }
 
-    .notification-form-container h2 {
-      font-size: 30px !important;
-    }
+  .notification-form-container h2 {
+    font-size: 30px !important;
+  }
 
-    .global-notification-history h2 {
-      font-size: 30px !important;
-    }
+  .global-notification-history h2 {
+    font-size: 30px !important;
+  }
 
-    .history-item {
-        /* Susun konten di atas, tombol di bawah jika perlu */
-        flex-direction: column;
-        align-items: flex-start; /* Rata kiri semua */
-        gap: 10px;
-    }
+  .history-item {
+    /* Susun konten di atas, tombol di bawah jika perlu */
+    flex-direction: column;
+    align-items: flex-start;
+    /* Rata kiri semua */
+    gap: 10px;
+  }
 
-    .btn-delete-small {
-        align-self: flex-end; /* Posisikan tombol tetap di kanan bawah */
-    }
+  .btn-delete-small {
+    align-self: flex-end;
+    /* Posisikan tombol tetap di kanan bawah */
+  }
 
-    /* =========================================== */
-    /* ===     STYLE UNTUK USER MANAGEMENT ADMIN       === */
-    /* =========================================== */
+  /* =========================================== */
+  /* ===     STYLE UNTUK USER MANAGEMENT ADMIN       === */
+  /* =========================================== */
 
-    /* Sembunyikan tabel versi desktop di mobile */
-    .user-list-table {
-        display: none;
-    }
+  /* Sembunyikan tabel versi desktop di mobile */
+  .user-list-table {
+    display: none;
+  }
 
-    /* Tampilkan daftar kartu versi mobile */
-    .user-list-mobile {
-        display: block;
-    }
+  /* Tampilkan daftar kartu versi mobile */
+  .user-list-mobile {
+    display: block;
+  }
 
-    /* Gaya untuk setiap kartu */
-    .user-card-mobile {
-        background: #E5E7EB;
-        box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25);
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-        padding: 15px;
-        margin-bottom: 15px;
-        display: flex;
-        flex-direction: column;
-        gap: 15px; /* Jarak antara baris atas dan bawah */
-    }
+  /* Gaya untuk setiap kartu */
+  .user-card-mobile {
+    background: #E5E7EB;
+    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    /* Jarak antara baris atas dan bawah */
+  }
 
-    /* Gaya untuk setiap baris di dalam kartu */
-    .user-card-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center; /* Sejajarkan item di tengah secara vertikal */
-    }
+  /* Gaya untuk setiap baris di dalam kartu */
+  .user-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* Sejajarkan item di tengah secara vertikal */
+  }
 
-    /* Grup data (label + value) */
-    .user-data-group {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-    }
-    .user-data-group .label {
-        font-size: 11px;
-        color: #888;
-        text-transform: uppercase;
-    }
-    .user-data-group .value {
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--text-color-primary);
-        word-break: break-all; /* Agar email panjang tidak overflow */
-    }
-    .user-data-group .value.role {
-        text-transform: capitalize; /* Membuat 'admin' atau 'user' menjadi 'Admin'/'User' */
-    }
+  /* Grup data (label + value) */
+  .user-data-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .user-data-group .label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+  }
+
+  .user-data-group .value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color-primary);
+    word-break: break-all;
+    /* Agar email panjang tidak overflow */
+  }
+
+  .user-data-group .value.role {
+    text-transform: capitalize;
+    /* Membuat 'admin' atau 'user' menjadi 'Admin'/'User' */
+  }
 
 
-    /* Dark mode compatibility */
-    body.dark-mode .user-card-mobile {
-        box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-        -webkit-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-        -moz-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-        background-color: #393955;
-        /* Latar belakang tabel di mode gelap */
-        border: 1px solid var(--border-color-dark);
-    }
+  /* Dark mode compatibility */
+  body.dark-mode .user-card-mobile {
+    box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
+    -webkit-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
+    background-color: #393955;
+    /* Latar belakang tabel di mode gelap */
+    border: 1px solid var(--border-color-dark);
+  }
 }
 
 @media (min-width: 665px) {
@@ -941,8 +990,8 @@ body.dark-mode {
   }
 
   .user-list-table {
-        display: block;
-    }
+    display: block;
+  }
 }
 
 @media (max-width: 480px) {
@@ -953,32 +1002,35 @@ body.dark-mode {
     font-size: 24px;
   }
 
-    /* --- Perbaikan Header di Layar Sangat Kecil --- */
-    .main-header .breadcrumb {
-        display: none;
-    }
-    .main-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .header-left-group {
-        flex-shrink: 1;
-        min-width: 0; 
-        overflow: hidden;
-    }
-    .dashboard-header-title {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    
-    /* === PERBAIKAN UTAMA UNTUK INFO CARD === */
-    .info-cards-grid {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px !important;
-    }
+  /* --- Perbaikan Header di Layar Sangat Kecil --- */
+  .main-header .breadcrumb {
+    display: none;
+  }
+
+  .main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header-left-group {
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .dashboard-header-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* === PERBAIKAN UTAMA UNTUK INFO CARD === */
+  .info-cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px !important;
+  }
 
   /* Perkecil ukuran konten di dalam kartu */
   .info-card {
@@ -1004,14 +1056,14 @@ body.dark-mode {
     max-width: 80%;
   }
 
-    .notification-form-container .form-row {
-        flex-direction: column;
-        gap: 15px;
-    }
+  .notification-form-container .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
 
-    .notification-form-container .form-row .form-group {
-        width: 100%;
-    }
+  .notification-form-container .form-row .form-group {
+    width: 100%;
+  }
 }
 
 /* =========================================== */
@@ -1020,80 +1072,89 @@ body.dark-mode {
 
 /* Konten utama modal */
 .modal-content {
-    padding: 24px;
+  padding: 24px;
 }
 
 /* Judul modal */
 .modal-content h3 {
-    text-align: center;
-    font-size: 20px;
-    font-weight: 600;
-    margin-top: 0;
-    margin-bottom: 20px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 20px;
 }
 
 /* Grup form di dalam modal bukti */
 .proof-modal__group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 16px;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  width: 100%;
 }
 
 .proof-modal__group label {
-    margin-bottom: 8px;
-    font-weight: 500;
-    font-size: 14px;
-    text-align: left; /* Label rata kiri */
-    color: var(--text-color-primary);
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  text-align: left;
+  /* Label rata kiri */
+  color: var(--text-color-primary);
 }
 
 /* Textarea dan input di dalam modal bukti */
 .proof-modal__group textarea,
 .proof-modal__group input {
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    border: 1px solid #d1d5db; /* Warna border light mode */
-    background-color: #ffffff; /* Warna background light mode */
-    color: #111827; /* Warna teks light mode */
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    box-sizing: border-box; /* Penting agar padding tidak merusak layout */
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  /* Warna border light mode */
+  background-color: #ffffff;
+  /* Warna background light mode */
+  color: #111827;
+  /* Warna teks light mode */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+  /* Penting agar padding tidak merusak layout */
 }
 
 /* Fokus input */
 .proof-modal__group textarea:focus,
 .proof-modal__group input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 /* Styling khusus untuk input file agar lebih modern */
 .proof-modal__group input[type="file"] {
-    padding: 0; /* Hapus padding default */
+  padding: 0;
+  /* Hapus padding default */
 }
+
 .proof-modal__group input[type="file"]::file-selector-button {
-    background-color: #f3f4f6;
-    color: #374151;
-    border: none;
-    border-right: 1px solid #d1d5db;
-    padding: 10px 12px;
-    margin-right: 12px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-right: 1px solid #d1d5db;
+  padding: 10px 12px;
+  margin-right: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
+
 .proof-modal__group input[type="file"]::file-selector-button:hover {
-    background-color: #e5e7eb;
+  background-color: #e5e7eb;
 }
 
 /* Kontainer untuk tombol aksi di modal */
 .modal-actions {
-    display: flex;
-    justify-content: flex-end; /* Tombol rata kanan */
-    gap: 10px;
-    margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+  /* Tombol rata kanan */
+  gap: 10px;
+  margin-top: 24px;
 }
 
 
@@ -1102,23 +1163,24 @@ body.dark-mode {
 /* =========================================== */
 
 body.dark-mode .proof-modal__group label {
-    color: #d1d5db;
+  color: #d1d5db;
 }
 
 body.dark-mode .proof-modal__group textarea,
 body.dark-mode .proof-modal__group input {
-    border-color: #4b5563;
-    background-color: #374151;
-    color: #f9fafb;
+  border-color: #4b5563;
+  background-color: #374151;
+  color: #f9fafb;
 }
 
 body.dark-mode .proof-modal__group input[type="file"]::file-selector-button {
-    background-color: #4b5563;
-    color: #f9fafb;
-    border-right: 1px solid #6b7280;
+  background-color: #4b5563;
+  color: #f9fafb;
+  border-right: 1px solid #6b7280;
 }
+
 body.dark-mode .proof-modal__group input[type="file"]::file-selector-button:hover {
-    background-color: #6b7280;
+  background-color: #6b7280;
 }
 
 /*
@@ -4409,72 +4471,77 @@ body.dark-mode .rejection-reason-display p {
 
 /* --- Kontainer Utama --- */
 .notification-form-container {
-    padding: 24px;
-    border-radius: 14px;
-    margin-top: 24px;
-    background: #E5E7EB; /* Warna latar light mode */
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  border-radius: 14px;
+  margin-top: 24px;
+  background: #E5E7EB;
+  /* Warna latar light mode */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 /* --- Judul --- */
 .notification-form-container h2 {
-    margin: 0 0 20px 0;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
+  margin: 0 0 20px 0;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
 }
 
 /* --- Struktur Form (Berlaku untuk semua ukuran) --- */
 .notification-form-container form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .notification-form-container .form-group,
 .notification-form-container .form-group2 {
-    display: flex;
-    flex-direction: column;
-    gap: 8px; /* Jarak antara label dan input */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* Jarak antara label dan input */
 }
 
 .notification-form-container label {
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--text-color-primary);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-color-primary);
 }
 
 /* --- Input, Select, Textarea --- */
 .notification-form-container input,
 .notification-form-container select,
 .notification-form-container textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
-    font-size: 14px;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  box-sizing: border-box;
 }
 
 /* --- Tata Letak DESKTOP (> 768px) --- */
 /* Membuat "Kirim Ke" dan "Judul" bersebelahan */
 .notification-form-container .form-row {
-    display: flex;
-    gap: 20px;
+  display: flex;
+  gap: 20px;
 }
+
 .notification-form-container .form-row .form-group {
-    flex: 1; /* Setiap grup akan mengambil ruang yang sama */
+  flex: 1;
+  /* Setiap grup akan mengambil ruang yang sama */
 }
 
 /* =========================================== */
 /* ===       DARK MODE (FORM NOTIFIKASI)     === */
 /* =========================================== */
 body.dark-mode .notification-form-container {
-    background: #1f2937;
-    color: #f9fafb;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  background: #1f2937;
+  color: #f9fafb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
+
 body.dark-mode .notification-form-container label {
-    color: #d1d5db;
+  color: #d1d5db;
 }
 
 .templates-section {
@@ -5052,7 +5119,7 @@ body.dark-mode .btn-delete-small i {
 /* =========================
    MEDIA QUERY MOBILE (≤ 768px)
 ========================= */
-@media (max-width: 768px) {
+@media (max-width: 907px) {
 
   /* Notification Bell */
   .notification-button {
@@ -5154,6 +5221,9 @@ body.dark-mode .btn-delete-small i {
     gap: 1rem;
     margin-top: 0.3rem;
     transform: translateX(40px);
+    position: relative;
+    /* wajib kalau mau z-index */
+    z-index: 10;
   }
 
   /* Tab button khusus mobile */
@@ -5238,7 +5308,7 @@ body.dark-mode .btn-delete-small i {
   }
 }
 
-@media (min-width: 770px) and (max-width: 2002px) {
+@media (min-width: 907px) and (max-width: 2002px) {
 
   /* Header */
   .main-header-user {
@@ -5307,13 +5377,16 @@ body.dark-mode .btn-delete-small i {
     /* cukup lebar untuk tablet/desktop sedang */
     margin: 0 auto;
   }
+
   .row-input {
     display: flex !important;
-    flex-wrap: wrap;         /* biar bisa turun ke bawah */
+    flex-wrap: wrap;
+    /* biar bisa turun ke bawah */
     gap: 15px !important;
     width: 100% !important;
     align-items: flex-start;
-    position: relative;      /* buat posisi fleksibel */
+    position: relative;
+    /* buat posisi fleksibel */
   }
 
   /* Input biasa (workshop, time, date) */
@@ -5321,7 +5394,8 @@ body.dark-mode .btn-delete-small i {
   .input-selectuser,
   .time-wrapper,
   .input-dateuser {
-    flex: 1 1 30%;           /* 3 kolom seimbang */
+    flex: 1 1 30%;
+    /* 3 kolom seimbang */
     min-width: 160px;
   }
 
@@ -5355,12 +5429,14 @@ body.dark-mode .btn-delete-small i {
     align-self: center;
   }
 }
+
 @media (min-width: 1371px) and (max-width: 2002px) {
   .user-view-container {
     padding: 2rem 1rem;
     max-width: 100%;
     margin-top: 2rem;
-    padding-bottom: 5rem; /* tambahin ruang kosong di bawah */
+    padding-bottom: 5rem;
+    /* tambahin ruang kosong di bawah */
   }
 
   .user-view-content {
@@ -5387,7 +5463,8 @@ body.dark-mode .btn-delete-small i {
   }
 
   .header-logo {
-    max-height: 50px; /* logo lebih besar agar jelas */
+    max-height: 50px;
+    /* logo lebih besar agar jelas */
   }
 
   .user-view-container {
@@ -5413,6 +5490,7 @@ body.dark-mode .btn-delete-small i {
    Table → Card Style
 ========================= */
 @media (max-width: 1290px) {
+
   .user-history-table,
   .user-history-table thead,
   .user-history-table tbody,
@@ -5431,7 +5509,7 @@ body.dark-mode .btn-delete-small i {
   /* Card style tiap row */
   .user-history-table tr {
     margin-bottom: 15px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     padding: 10px;
   }
@@ -5508,7 +5586,7 @@ body.dark-mode .btn-delete-small i {
     padding: 8px 14px;
     border-radius: 20px;
     font-weight: 600;
-    margin: 6px auto ;
+    margin: 6px auto;
   }
-  
+
 }
