@@ -5412,7 +5412,7 @@ body.dark-mode .btn-delete-small i {
    SMALL - MEDIUM DEVICES (≤ 768px)
    Table → Card Style
 ========================= */
-@media (max-width: 1130px) {
+@media (max-width: 1290px) {
   .user-history-table,
   .user-history-table thead,
   .user-history-table tbody,
