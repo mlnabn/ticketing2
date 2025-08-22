@@ -30,10 +30,10 @@ function ViewProofModal({ ticket, onClose, onDelete }) {
         )}
 
         <div className="modal-actions">
-            <button type="button" onClick={onClose} className="btn-delete">
+            <button type="button" onClick={onClose} className="btn-cancel">
                 Tutup
             </button>
-            <button type="button" onClick={() => onDelete(ticket)} className="btn-primary">
+            <button type="button" onClick={() => onDelete(ticket)} className="btn-confirm">
                 Hapus Tiket
             </button>
         </div>

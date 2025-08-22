@@ -5543,13 +5543,13 @@ body.dark-mode .btn-delete-small i {
 
   /* === Tombol di mobile === */
   .user-history-table td button {
-    display: block;
-    width: 50%;
+    display: inline-block block;
+    width: auto;
     margin: 6px auto;
     margin-top: 6px;
     margin-bottom: 6px;
     text-align: center;
-    border-radius: 6px;
+    border-radius: 12px;
     padding: 8px 14px;
     font-weight: 600;
     border: 1px solid #007bff;
@@ -5558,7 +5558,9 @@ body.dark-mode .btn-delete-small i {
   /* Kolom Aksi → tombol vertikal */
   .user-history-table td[data-label="Aksi"] {
     flex-direction: column;
-    align-items: stretch;
+    justify-content: flex-end;
+    /* rata kanan */
+    align-items: center;
   }
 
   .user-history-table td[data-label="Aksi"]::before {
@@ -5580,8 +5582,8 @@ body.dark-mode .btn-delete-small i {
   }
 
   .user-history-table td[data-label="Status"] .status-badge {
-    display: block;
-    width: 50%;
+    display: inline-block;
+    width: auto;
     text-align: center;
     padding: 8px 14px;
     border-radius: 20px;
