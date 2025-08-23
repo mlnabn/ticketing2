@@ -9,7 +9,6 @@
 
 /* Root Variables untuk tema terang/gelap */
 :root {
-  color-scheme: dark light;
   /* -- Variabel Umum untuk Input -- */
   --input-bg-light: #FBFBFB;
   /* Latar belakang input sangat terang */
