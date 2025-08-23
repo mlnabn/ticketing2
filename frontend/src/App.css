@@ -9,6 +9,7 @@
 
 /* Root Variables untuk tema terang/gelap */
 :root {
+  color-scheme: dark light;
   /* -- Variabel Umum untuk Input -- */
   --input-bg-light: #FBFBFB;
   /* Latar belakang input sangat terang */
@@ -4864,7 +4865,6 @@ body.dark-mode .feedback-message {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
   padding: 12px 0;
   z-index: 1000;
-
 }
 
 .notification-panel-header {
@@ -5163,8 +5163,21 @@ body.dark-mode .btn-delete-small i {
     overflow-y: auto;
     border-radius: 12px;
     padding: 10px;
+    
     z-index: 2000;
   }
+  .notification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.4); /* semi transparan */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px); /* Safari */
+  z-index: 999; /* lebih rendah dari panel */
+}
+
 
   /* Header */
   .main-header-user {
@@ -5308,6 +5321,8 @@ body.dark-mode .btn-delete-small i {
     width: 100% !important;
     margin-top: 10px;
   }
+
+
 }
 
 @media (min-width: 907px) and (max-width: 2002px) {

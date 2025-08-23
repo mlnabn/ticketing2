@@ -28,7 +28,7 @@ function NotificationBell({ notifications, unreadCount, onToggle, onDelete }) {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [notificationRef]);
-    
+
     return (
         <div className="notification-bell-container" ref={notificationRef}>
             <button onClick={handleToggle} className="notification-button">
@@ -37,38 +37,50 @@ function NotificationBell({ notifications, unreadCount, onToggle, onDelete }) {
                 {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
             </button>
             {isOpen && (
-                <div className="notification-panel">
-                    <div className="notification-panel-header">
-                        <h4>Notifications</h4>
-                    </div>
-                    <div className="notification-list">
-                        {/* Gunakan notifications dari props */}
-                        {notifications && notifications.length > 0 ? (
-                            notifications.map(notif => (
-                                <div key={notif.id} className="notification-item">
-                                    <div className="notification-content">
-                                        <strong>{notif.title}</strong>
-                                        <p>{notif.message}</p>
-                                        <small>
-                                            {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true, locale: id })}
-                                        </small>
+                <>
+                    {/* Overlay blur */}
+                    <div
+                        className="notification-overlay"
+                        onClick={handleToggle} // biar klik luar nutup panel
+                    ></div>
+
+                    {/* Panel notifikasi */}
+                    <div className="notification-panel">
+                        <div className="notification-panel-header">
+                            <h4>Notifications</h4>
+                        </div>
+                        <div className="notification-list">
+                            {notifications && notifications.length > 0 ? (
+                                notifications.map(notif => (
+                                    <div key={notif.id} className="notification-item">
+                                        <div className="notification-content">
+                                            <strong>{notif.title}</strong>
+                                            <p>{notif.message}</p>
+                                            <small>
+                                                {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true, locale: id })}
+                                            </small>
+                                        </div>
+                                        {notif.user_id && (
+                                            <button
+                                                onClick={() => onDelete(notif.id)}
+                                                className="notification-delete-btn"
+                                                title="Hapus Notifikasi"
+                                            >
+                                                <i className="fas fa-trash-alt"></i>
+                                            </button>
+                                        )}
                                     </div>
-                                    {/* Tombol hapus kini memanggil fungsi onDelete dari props */}
-                                    {notif.user_id && (
-                                        <button onClick={() => onDelete(notif.id)} className="notification-delete-btn" title="Hapus Notifikasi">
-                                            <i className="fas fa-trash-alt"></i>
-                                        </button>
-                                    )}
+                                ))
+                            ) : (
+                                <div className="notification-item empty">
+                                    <p>There are no notifications yet.</p>
                                 </div>
-                            ))
-                        ) : (
-                            <div className="notification-item empty">
-                                <p>There are no notifications yet.</p>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
-                </div>
+                </>
             )}
+
         </div>
     );
 }
