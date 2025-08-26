@@ -93,7 +93,39 @@ function App() {
   const [ticketForProof, setTicketForProof] = useState(null);
   const [showViewProofModal, setShowViewProofModal] = useState(false);
   const [ticketToShowProof, setTicketToShowProof] = useState(null);
+  const [userAvatar, setUserAvatar] = useState(null);
 
+  // modal state
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+
+  // state sementara (untuk edit)
+  const [tempName, setTempName] = useState("");
+  const [tempAvatar, setTempAvatar] = useState(null);
+
+  // state tambahan
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  const openPreview = () => setIsPreviewOpen(true);
+  const closePreview = () => setIsPreviewOpen(false);
+
+
+  const openEditProfile = () => {
+    setTempName(userName);
+    setTempAvatar(userAvatar);
+    setIsEditProfileOpen(true);
+  };
+
+  const closeEditProfile = () => setIsEditProfileOpen(false);
+
+  const saveProfile = () => {
+    setUserName(tempName);
+    setUserAvatar(tempAvatar);
+
+    localStorage.setItem("userName", tempName);
+    localStorage.setItem("userAvatar", tempAvatar);
+
+    setIsEditProfileOpen(false);
+  };
 
   // -----------------------------------------------------------------
   // #1.A. VARIABEL TURUNAN (Derived State)
@@ -101,7 +133,6 @@ function App() {
   const isAdmin = userRole && userRole.toLowerCase() === 'admin';
   const ticketsOnPage = useMemo(() => (ticketData ? ticketData.data : []), [ticketData]);
   const createdTicketsOnPage = useMemo(() => (createdTicketsData ? createdTicketsData.data : []), [createdTicketsData]);
-
   const handleSelectionChange = useCallback((selectedIds) => {
     setSelectedTicketIds(selectedIds);
   }, []);
@@ -187,23 +218,23 @@ function App() {
 
   const fetchNotifications = useCallback(async () => {
     // Hanya fetch jika user sudah login
-    if (!isLoggedIn()) return; 
+    if (!isLoggedIn()) return;
 
     try {
-        const response = await axios.get(`${API_URL}/notifications`, {
-            headers: { Authorization: `Bearer ${getToken()}` },
-        });
-        setNotifications(response.data);
+      const response = await axios.get(`${API_URL}/notifications`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      setNotifications(response.data);
 
-        // Hitung notifikasi yang belum dibaca (sesuai logika Anda sebelumnya)
-        const lastCleared = localStorage.getItem('notifications_last_cleared');
-        const newNotifications = lastCleared
-            ? response.data.filter(n => new Date(n.created_at) > new Date(lastCleared))
-            : response.data;
-        setUnreadCount(newNotifications.length);
+      // Hitung notifikasi yang belum dibaca (sesuai logika Anda sebelumnya)
+      const lastCleared = localStorage.getItem('notifications_last_cleared');
+      const newNotifications = lastCleared
+        ? response.data.filter(n => new Date(n.created_at) > new Date(lastCleared))
+        : response.data;
+      setUnreadCount(newNotifications.length);
 
     } catch (error) {
-        console.error("Gagal mengambil notifikasi:", error);
+      console.error("Gagal mengambil notifikasi:", error);
     }
   }, []);
 
@@ -247,22 +278,22 @@ function App() {
     setUnreadCount(0);
     localStorage.setItem('notifications_last_cleared', new Date().toISOString());
     axios.post(`${API_URL}/notifications/mark-all-read`, {}, {
-        headers: { Authorization: `Bearer ${getToken()}` }
+      headers: { Authorization: `Bearer ${getToken()}` }
     });
   };
 
   const handleDeleteNotification = async (notificationId) => {
     try {
-        // Panggil API untuk menghapus notifikasi
-        await axios.delete(`${API_URL}/notifications/${notificationId}`, {
-            headers: { Authorization: `Bearer ${getToken()}` },
-        });
+      // Panggil API untuk menghapus notifikasi
+      await axios.delete(`${API_URL}/notifications/${notificationId}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
 
-        // Setelah berhasil, panggil ulang fetchNotifications untuk memperbarui daftar
-        fetchNotifications();
+      // Setelah berhasil, panggil ulang fetchNotifications untuk memperbarui daftar
+      fetchNotifications();
     } catch (error) {
-        console.error("Gagal menghapus notifikasi:", error);
-        alert("Gagal menghapus notifikasi.");
+      console.error("Gagal menghapus notifikasi:", error);
+      alert("Gagal menghapus notifikasi.");
     }
   };
 
@@ -600,6 +631,15 @@ function App() {
     }
   }, [isLogin, isAdmin, currentPage, myTicketsPage, fetchMyTickets]);
 
+  useEffect(() => {
+    const savedName = localStorage.getItem("userName");
+    const savedAvatar = localStorage.getItem("userAvatar");
+
+    if (savedName) setUserName(savedName);
+    if (savedAvatar) setUserAvatar(savedAvatar);
+  }, []);
+
+
   // -----------------------------------------------------------------
   // #5. RENDER LOGIC (Logika untuk Menampilkan Komponen)
   // -----------------------------------------------------------------
@@ -628,16 +668,114 @@ function App() {
             </ul>
           </nav>
           <div className="sidebar-footer">
+            {/* === Sidebar User Info === */}
             <div className="user-info">
-              <div className="user-avatar"><i className="fas fa-user"></i></div>
-              <span>{userName || 'User'}</span>
-              <div className={`theme-switch ${darkMode ? 'dark' : ''}`} onClick={toggleDarkMode}>
+              <div className="user-avatar">
+                {userAvatar ? (
+                  <img
+                    src={userAvatar}
+                    alt="User Avatar"
+                    onClick={(e) => {
+                      e.stopPropagation(); // cegah tabrakan dengan openEditProfile
+                      openPreview();
+                    }}
+                    style={{ cursor: "pointer" }}
+                  />
+                ) : (
+                  <i className="fas fa-user"></i>
+                )}
+
+                {/* Tombol edit kecil */}
+                <button
+                  className="edit-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openEditProfile();
+                  }}
+                >
+                  <i className="fas fa-pen"></i>
+                </button>
+              </div>
+
+              <span>{userName || "User"}</span>
+
+              <div
+                className={`theme-switch ${darkMode ? "dark" : ""}`}
+                onClick={toggleDarkMode}
+              >
                 <div className="theme-switch-ball">
-                  {darkMode ? <i className="fas fa-moon moon-icon"></i> : <i className="fas fa-sun sun-icon"></i>}
+                  {darkMode ? (
+                    <i className="fas fa-moon moon-icon"></i>
+                  ) : (
+                    <i className="fas fa-sun sun-icon"></i>
+                  )}
                 </div>
               </div>
             </div>
+
+            {/* === Modal Edit Profil === */}
+            {isEditProfileOpen && (
+              <div className="modal-overlayyy" onClick={closeEditProfile}>
+                <div
+                  className="modal-contenttt"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <h2>Edit Profil</h2>
+
+                  {/* Preview Avatar */}
+                  <div className="preview-avatar">
+                    {tempAvatar ? (
+                      <img src={tempAvatar} alt="Preview Avatar" />
+                    ) : (
+                      <i className="fas fa-user"></i>
+                    )}
+                  </div>
+
+                  {/* Input Nama */}
+                  {/* <input
+                    type="text"
+                    value={tempName}
+                    onChange={(e) => setTempName(e.target.value)}
+                    placeholder="Masukkan nama"
+                  /> */}
+
+                  {/* Input Avatar */}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setTempAvatar(reader.result); // simpan Base64
+                        };
+                        reader.readAsDataURL(file); // ubah ke Base64
+                      }
+                    }}
+                  />
+
+                  <div className="modal-actionsss">
+                    <button onClick={saveProfile}>Simpan</button>
+                    <button onClick={closeEditProfile}>Batal</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* === Modal Preview Avatar === */}
+            {isPreviewOpen && (
+              <div className="modal-overlayyy" onClick={closePreview}>
+                <div
+                  className="preview-modal"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <img src={userAvatar} alt="Preview Avatar" />
+                </div>
+              </div>
+            )}
           </div>
+
         </aside>
 
         {isSidebarOpen && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
@@ -707,10 +845,10 @@ function App() {
               <UserManagement userData={userData} onDeleteClick={handleUserDeleteClick} onAddClick={handleAddUserClick} onEditClick={handleUserEditClick} onPageChange={handleUserPageChange} onSearch={handleUserSearch} />
             )}
             {currentPage === 'Notifications' && (
-              <NotificationForm 
-                  users={users} 
-                  globalNotifications={notifications.filter(n => n.user_id === null)}
-                  refreshNotifications={fetchNotifications} 
+              <NotificationForm
+                users={users}
+                globalNotifications={notifications.filter(n => n.user_id === null)}
+                refreshNotifications={fetchNotifications}
               />
             )}
           </div>
@@ -753,11 +891,11 @@ function App() {
           <div className="main-header-controls-user">
             <span className="breadcrump">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <NotificationBell 
-                  notifications={notifications}
-                  unreadCount={unreadCount}
-                  onToggle={handleNotificationToggle}
-                  onDelete={handleDeleteNotification}
+              <NotificationBell
+                notifications={notifications}
+                unreadCount={unreadCount}
+                onToggle={handleNotificationToggle}
+                onDelete={handleDeleteNotification}
               />
               <button onClick={handleLogout} className="logout-buttonuser">
                 <i className="fas fa-sign-out-alt"></i>
