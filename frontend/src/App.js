@@ -28,6 +28,18 @@ import yourLogo from './Image/Logo.png';
 import loginBackground from './Image/LoginBg.jpg';
 import bgImage from './Image/homeBg.jpg';
 import yourLogok from './Image/DTECH-Logo.png';
+import WelcomeHome from './components/WelcomeHome';
+import WelcomeHomeUser from './components/WelcomeHomeUser';
+import AboutUsPage from './components/AboutUsPage';
+import LineChartComponent from './components/LineChartComponent';
+import PieChartComponent from './components/PieChartComponent';
+import BarChartComponent from './components/BarChartComponent';
+import 'leaflet/dist/leaflet.css';
+import MapComponent from './components/MapComponent';
+
+
+
+
 // =================================================================
 //  KONFIGURASI GLOBAL
 // =================================================================
@@ -62,8 +74,8 @@ function App() {
   const [userToEdit, setUserToEdit] = useState(null);
 
   // --- State untuk Navigasi & Paginasi ---
-  const [currentPage, setCurrentPage] = useState('Tickets');
-  const [userViewTab, setUserViewTab] = useState('request');
+  const [currentPage, setCurrentPage] = useState('Welcome'); // Default ke halaman Welcome
+  const [userViewTab, setUserViewTab] = useState('home');
   const [dataPage, setDataPage] = useState(1);
   const [createdTicketsPage, setCreatedTicketsPage] = useState(1);
   const [userPage, setUserPage] = useState(1);
@@ -76,8 +88,8 @@ function App() {
 
   // --- State untuk Interaksi UI (Tampilan) ---
   const [darkMode, setDarkMode] = useState(false);
-  // const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Default sidebar terbuka untuk admin
-  const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth > 768);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default sidebar terbuka untuk admin
+  // const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth > 768);
   const [showRegister, setShowRegister] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState(null);
@@ -93,6 +105,10 @@ function App() {
   const [ticketForProof, setTicketForProof] = useState(null);
   const [showViewProofModal, setShowViewProofModal] = useState(false);
   const [ticketToShowProof, setTicketToShowProof] = useState(null);
+  const [analyticsData, setAnalyticsData] = useState([]);
+  const [locationsData, setLocationsData] = useState([]);
+  const [adminPerformanceData, setAdminPerformanceData] = useState([]);
+  // === State ===
   const [userAvatar, setUserAvatar] = useState(null);
 
   // modal state
@@ -104,27 +120,33 @@ function App() {
 
   // state tambahan
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isEditingAvatar, setIsEditingAvatar] = useState(false);
 
+  // === Functions ===
   const openPreview = () => setIsPreviewOpen(true);
   const closePreview = () => setIsPreviewOpen(false);
 
-
   const openEditProfile = () => {
-    setTempName(userName);
+    // setTempName(userName); // kalau nanti mau pakai nama
     setTempAvatar(userAvatar);
     setIsEditProfileOpen(true);
+    setIsEditingAvatar(false); // selalu mulai dari preview mode
   };
 
-  const closeEditProfile = () => setIsEditProfileOpen(false);
+  const closeEditProfile = () => {
+    setTempAvatar(userAvatar); // reset kembali ke avatar asli
+    setIsEditingAvatar(false); // kembali ke preview mode
+    setIsEditProfileOpen(false);
+  };
 
   const saveProfile = () => {
-    setUserName(tempName);
-    setUserAvatar(tempAvatar);
+    setUserAvatar(tempAvatar); // update avatar asli sesuai temp
 
     localStorage.setItem("userName", tempName);
     localStorage.setItem("userAvatar", tempAvatar);
 
     setIsEditProfileOpen(false);
+    setIsEditingAvatar(false); // pastikan reset ke preview mode
   };
 
   // -----------------------------------------------------------------
@@ -237,6 +259,36 @@ function App() {
       console.error("Gagal mengambil notifikasi:", error);
     }
   }, []);
+
+  const fetchAnalyticsData = useCallback(async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${getToken()}` } };
+      const response = await axios.get(`${API_URL}/tickets/analytics`, config);
+      setAnalyticsData(response.data);
+    } catch (error) {
+      console.error("Gagal mengambil data analitik:", error);
+    }
+  }, []);
+
+  const fetchLocationsData = useCallback(async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${getToken()}` } };
+      const response = await axios.get(`${API_URL}/locations`, config);
+      setLocationsData(response.data);
+    } catch (error) {
+      console.error("Gagal mengambil data lokasi:", error);
+    }
+  }, []);
+
+  const fetchAdminPerformance = useCallback(async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${getToken()}` } };
+      const response = await axios.get(`${API_URL}/tickets/admin-performance`, config);
+      setAdminPerformanceData(response.data);
+    } catch (error) {
+      console.error("Gagal mengambil data performa admin:", error);
+    }
+  }, [getToken]);
 
   // -----------------------------------------------------------------
   // #4. HANDLER FUNCTIONS (Fungsi untuk Menangani Aksi Pengguna)
@@ -575,6 +627,9 @@ function App() {
       if (isAdmin) {
         fetchData(dataPage, searchQuery, statusFilter);
         fetchAdmins();
+        fetchAnalyticsData();
+        fetchLocationsData();
+        fetchAdminPerformance();
 
         if (currentPage === 'Tickets') {
           const intervalId = setInterval(() => {
@@ -661,7 +716,14 @@ function App() {
           </div>
           <nav className="sidebar-nav">
             <ul>
-              <li className="sidebar-nav-item"><button onClick={handleHomeClick} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-home"></i><span>Home</span></button></li>
+              <li className="sidebar-nav-item">
+                <button
+                  onClick={() => setCurrentPage('Welcome')}
+                  className={`sidebar-button ${currentPage === 'Welcome' ? 'active' : ''}`}>
+                  <i className="fas fa-hand-sparkles"></i><span>Home</span>
+                </button>
+              </li>
+              <li className="sidebar-nav-item"><button onClick={handleHomeClick} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-home"></i><span>Daftar Tiket</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('MyTickets')} className={`sidebar-button ${currentPage === 'MyTickets' ? 'active' : ''}`}><i className="fas fa-user-tag"></i><span>Tiket Saya</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>Pengguna</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Notifications')} className={`sidebar-button ${currentPage === 'Notifications' ? 'active' : ''}`}><i className="fas fa-bell"></i><span>Notifikasi</span></button></li>
@@ -670,31 +732,21 @@ function App() {
           <div className="sidebar-footer">
             {/* === Sidebar User Info === */}
             <div className="user-info">
-              <div className="user-avatar">
-                {userAvatar ? (
+              <div
+                className="user-avatar cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openEditProfile();
+                }}
+              >
+                {userAvatar && userAvatar.trim() !== "" ? (
                   <img
                     src={userAvatar}
                     alt="User Avatar"
-                    onClick={(e) => {
-                      e.stopPropagation(); // cegah tabrakan dengan openEditProfile
-                      openPreview();
-                    }}
-                    style={{ cursor: "pointer" }}
                   />
                 ) : (
-                  <i className="fas fa-user"></i>
+                  <i className="fas fa-user text-gray-500 text-xl"></i>
                 )}
-
-                {/* Tombol edit kecil */}
-                <button
-                  className="edit-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openEditProfile();
-                  }}
-                >
-                  <i className="fas fa-pen"></i>
-                </button>
               </div>
 
               <span>{userName || "User"}</span>
@@ -713,57 +765,110 @@ function App() {
               </div>
             </div>
 
-            {/* === Modal Edit Profil === */}
+
             {isEditProfileOpen && (
               <div className="modal-overlayyy" onClick={closeEditProfile}>
                 <div
                   className="modal-contenttt"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <h2>Edit Profil</h2>
+                  {/* Judul Dinamis */}
+                  <h2>{isEditingAvatar ? "Edit Profil" : "Profil"}</h2>
 
-                  {/* Preview Avatar */}
-                  <div className="preview-avatar">
-                    {tempAvatar ? (
-                      <img src={tempAvatar} alt="Preview Avatar" />
-                    ) : (
-                      <i className="fas fa-user"></i>
-                    )}
-                  </div>
+                  {/* === PREVIEW CONTAINER === */}
+                  {!isEditingAvatar && (
+                    <div className="preview-container">
+                      <div className="preview-avatar">
+                        {userAvatar ? (
+                          <img src={userAvatar} alt="Preview Avatar" />
+                        ) : (
+                          <i className="fas fa-user"></i>
+                        )}
+                      </div>
 
-                  {/* Input Nama */}
-                  {/* <input
-                    type="text"
-                    value={tempName}
-                    onChange={(e) => setTempName(e.target.value)}
-                    placeholder="Masukkan nama"
-                  /> */}
+                      <div className="modal-actionsss">
+                        <button
+                          className="btn-confirm"
+                          onClick={() => {
+                            setTempAvatar(userAvatar); // copy avatar lama
+                            setIsEditingAvatar(true);  // masuk ke edit mode
+                          }}
+                        >
+                          Edit Avatar
+                        </button>
 
-                  {/* Input Avatar */}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          setTempAvatar(reader.result); // simpan Base64
-                        };
-                        reader.readAsDataURL(file); // ubah ke Base64
-                      }
-                    }}
-                  />
+                        <button className="btn-cancel" onClick={closeEditProfile}>
+                          Tutup
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="modal-actionsss">
-                    <button onClick={saveProfile}>Simpan</button>
-                    <button onClick={closeEditProfile}>Batal</button>
-                  </div>
+                  {/* === EDIT CONTAINER === */}
+                  {isEditingAvatar && (
+                    <div className="edit-container">
+                      <div className="preview-avatar">
+                        {tempAvatar ? (
+                          <img src={tempAvatar} alt="Preview Avatar" />
+                        ) : (
+                          <i className="fas fa-user"></i>
+                        )}
+                      </div>
+
+                      {/* Input Upload Avatar */}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setTempAvatar(reader.result);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+
+                      <div className="modal-actionsss">
+                        <button
+                          className="btn-confirm"
+                          onClick={() => {
+                            setUserAvatar(tempAvatar);
+                            setIsEditingAvatar(false);
+                            setIsEditProfileOpen(false);
+                          }}
+                        >
+                          Simpan
+                        </button>
+
+                        {userAvatar && (
+                          <button
+                            className="btn-cancel"
+                            onClick={() => setTempAvatar(null)}
+                          >
+                            Hapus Foto
+                          </button>
+                        )}
+
+                        <button
+                          className="btn-cancel"
+                          onClick={() => {
+                            setTempAvatar(userAvatar);
+                            setIsEditingAvatar(false);
+                          }}
+                        >
+                          Batal
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
-            {/* === Modal Preview Avatar === */}
+            {/* === Modal Preview Avatar Fullscreen === */}
             {isPreviewOpen && (
               <div className="modal-overlayyy" onClick={closePreview}>
                 <div
@@ -774,6 +879,7 @@ function App() {
                 </div>
               </div>
             )}
+
           </div>
 
         </aside>
@@ -793,14 +899,159 @@ function App() {
           </header>
 
           <div className="content-area">
+            {currentPage === 'Welcome' && (
+              <>
+                <WelcomeHome
+                  userRole={userRole}
+                  userName={userName}
+                  onExploreClick={() => setCurrentPage('Tickets')}
+                />
+
+                <div className="info-cards-grid">
+                  {/* Kartu Tiket Belum Selesai */}
+                  <div
+                    className={`info-card red-card ${statusFilter === 'Belum Selesai' ? 'active' : ''}`}
+                    onClick={() => {
+                      handleHomeClick(); // pindah ke Daftar Tiket
+                      handleStatusFilterClick('Belum Selesai'); // filter otomatis
+                    }}
+                  >
+                    <div className="card-header">
+                      <p className="card-label">Tiket Belum Selesai</p>
+                      <div className="card-icon red-icon"><i className="fas fa-exclamation-triangle"></i></div>
+                    </div>
+                    <h3 className="card-value">{stats ? stats.pending_tickets : '...'}</h3>
+                  </div>
+
+                  {/* Kartu Tiket Selesai */}
+                  <div
+                    className={`info-card green-card ${statusFilter === 'Selesai' ? 'active' : ''}`}
+                    onClick={() => {
+                      handleHomeClick(); // pindah ke Daftar Tiket
+                      handleStatusFilterClick('Selesai'); // filter otomatis
+                    }}
+                  >
+                    <div className="card-header">
+                      <p className="card-label">Tiket Selesai</p>
+                      <div className="card-icon green-icon"><i className="fas fa-check-circle"></i></div>
+                    </div>
+                    <h3 className="card-value">{stats ? stats.completed_tickets : '...'}</h3>
+                  </div>
+
+                  {/* Kartu Total Tiket */}
+                  <div
+                    className={`info-card yellow-card ${!statusFilter ? 'active' : ''}`}
+                    onClick={() => {
+                      handleHomeClick();             // masuk ke Daftar Tiket
+                      handleStatusFilterClick(null); // tampilkan semua tiket
+                    }}
+                  >
+                    <div className="card-header">
+                      <p className="card-label">Total Tiket</p>
+                      <div className="card-icon yellow-icon"><i className="fas fa-tasks"></i></div>
+                    </div>
+                    <h3 className="card-value">{stats ? stats.total_tickets : '...'}</h3>
+                  </div>
+
+                  {/* Kartu Total Pengguna */}
+                  <div
+                    className="info-card blue-card"
+                    onClick={() => setCurrentPage('userManagement')}
+                  >
+                    <div className="card-header">
+                      <p className="card-label">Total Pengguna</p>
+                      <div className="card-icon blue-icon"><i className="fas fa-users"></i></div>
+                    </div>
+                    <h3 className="card-value">{stats ? stats.total_users : '...'}</h3>
+                  </div>
+                </div>
+
+                <div className="dashboard-container2">
+
+                  {/* Baris 1: Line Chart + Pie Chart */}
+                  <div className="dashboard-row">
+                    <div className="dashboard-card line-chart-card">
+                      <h4>Tren Tiket (30 Hari Terakhir)</h4>
+                      <LineChartComponent data={analyticsData} />
+                    </div>
+                    <div className="dashboard-card pie-chart-card">
+                      <h4>Status Tiket</h4>
+                      <PieChartComponent stats={stats} />
+                    </div>
+                  </div>
+
+                  {/* Baris 2: Bar Chart + Map */}
+                  <div className="dashboard-row">
+                    <div className="dashboard-card bar-chart-card">
+                      <h4>Performa Admin</h4>
+                      <BarChartComponent data={adminPerformanceData} />
+                    </div>
+                    <div className="dashboard-card map-chart-card">
+                      <h4>Geografi Traffic</h4>
+                      <MapComponent data={locationsData} />
+                    </div>
+                  </div>
+
+                </div>
+              </>
+
+            )}
+
             {currentPage === 'Tickets' && (
               <>
-                <div className="info-cards-grid">
-                  <div className={`info-card red-card ${statusFilter === 'Belum Selesai' ? 'active' : ''}`} onClick={() => handleStatusFilterClick('Belum Selesai')}><h3>{stats ? stats.pending_tickets : '...'}</h3><p>Tiket Belum Selesai</p></div>
-                  <div className={`info-card green-card ${statusFilter === 'Selesai' ? 'active' : ''}`} onClick={() => handleStatusFilterClick('Selesai')}><h3>{stats ? stats.completed_tickets : '...'}</h3><p>Tiket Selesai</p></div>
-                  <div className={`info-card yellow-card ${!statusFilter ? 'active' : ''}`} onClick={() => handleStatusFilterClick(null)}><h3>{stats ? stats.total_tickets : '...'}</h3><p>Total Tiket</p></div>
-                  <div className="info-card blue-card" onClick={() => setCurrentPage('userManagement')}><h3>{stats ? stats.total_users : '...'}</h3><p>Total Pengguna</p></div>
-                </div>
+                {/* <div className="info-cards-grid">
+               
+                  <div className={`info-card red-card ${statusFilter === 'Belum Selesai' ? 'active' : ''}`} onClick={() => handleStatusFilterClick('Belum Selesai')}>
+                    <div className="card-header">
+                      <p className="card-label">Tiket Belum Selesai</p>
+                      <div className="card-icon red-icon"><i className="fas fa-exclamation-triangle"></i></div>
+                    </div>
+                    <h3 className="card-value">{stats ? stats.pending_tickets : '...'}</h3>
+                    <div className="card-footer">
+                      <span className="card-change up"><i className="fas fa-arrow-up"></i> 3.43%</span>
+                      <span className="card-period">Since last month</span>
+                    </div>
+                  </div>
+
+                  
+                  <div className={`info-card green-card ${statusFilter === 'Selesai' ? 'active' : ''}`} onClick={() => handleStatusFilterClick('Selesai')}>
+                    <div className="card-header">
+                      <p className="card-label">Tiket Selesai</p>
+                      <div className="card-icon green-icon"><i className="fas fa-check-circle"></i></div>
+                    </div>
+                    <h3 className="card-value">{stats ? stats.completed_tickets : '...'}</h3>
+                    <div className="card-footer">
+                      <span className="card-change down"><i className="fas fa-arrow-down"></i> 1.10%</span>
+                      <span className="card-period">Since yesterday</span>
+                    </div>
+                  </div>
+
+                  
+                  <div className={`info-card yellow-card ${!statusFilter ? 'active' : ''}`} onClick={() => handleStatusFilterClick(null)}>
+                    <div className="card-header">
+                      <p className="card-label">Total Tiket</p>
+                      <div className="card-icon yellow-icon"><i className="fas fa-tasks"></i></div>
+                    </div>
+                    <h3 className="card-value">{stats ? stats.total_tickets : '...'}</h3>
+                    <div className="card-footer">
+                      <span className="card-change up"><i className="fas fa-arrow-up"></i> 1.2%</span>
+                      <span className="card-period">Since last month</span>
+                    </div>
+                  </div>
+
+                  
+                  <div className="info-card blue-card" onClick={() => setCurrentPage('userManagement')}>
+                    <div className="card-header">
+                      <p className="card-label">Total Pengguna</p>
+                      <div className="card-icon blue-icon"><i className="fas fa-users"></i></div>
+                    </div>
+                    <h3 className="card-value">{stats ? stats.total_users : '...'}</h3>
+                    <div className="card-footer">
+                      <span className="card-change down"><i className="fas fa-arrow-down"></i> 3.48%</span>
+                      <span className="card-period">Since last week</span>
+                    </div>
+                  </div>
+                </div> */}
                 {/* <JobForm users={users} addTicket={addTicket} /> */}
                 <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
                   <input type="text" placeholder="Cari berdasarkan nama pekerja..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} style={{ flexGrow: 1, padding: '8px' }} />
@@ -885,8 +1136,10 @@ function App() {
             <img src={yourLogok} alt="Logo" className="header-logo"></img>
           </div>
           <div className="user-view-tabs">
+            <button className={`tab-button ${userViewTab === 'home' ? 'active' : ''}`} onClick={() => setUserViewTab('home')}>Home</button>
             <button className={`tab-button ${userViewTab === 'request' ? 'active' : ''}`} onClick={() => setUserViewTab('request')}>Request</button>
             <button className={`tab-button ${userViewTab === 'history' ? 'active' : ''}`} onClick={() => setUserViewTab('history')}>History</button>
+            <button className={`tab-button ${userViewTab === 'aboutus' ? 'active' : ''}`} onClick={() => setUserViewTab('aboutus')}>About Us</button>
           </div>
           <div className="main-header-controls-user">
             <span className="breadcrump">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
@@ -907,6 +1160,7 @@ function App() {
         <div className="content-area">
           <div className="user-view-container">
             <div className="user-view-content">
+              {userViewTab === 'home' && <WelcomeHomeUser user={userName} onExploreClick={() => setUserViewTab('request')} />}
               {userViewTab === 'request' && (
                 <div className="request-tab">
                   <h2>Submit a Request</h2>
@@ -982,14 +1236,14 @@ function App() {
                                     onClick={() => handleViewProofClick(ticket)}
                                     className="btn-start"
                                   >
-                                    Lihat Bukti
+                                    See Evidence
                                   </button>
                                 ) : ticket.status === 'Ditolak' ? (
                                   <button
                                     onClick={() => handleShowReasonClick(ticket)}
                                     className="btn-reason"
                                   >
-                                    Alasan
+                                    Reason
                                   </button>
                                 ) : (
                                   <button
@@ -1009,6 +1263,7 @@ function App() {
                         )}
                       </tbody>
                     </table>
+
                   </div>
 
                   <PaginationUser
@@ -1018,7 +1273,7 @@ function App() {
                   />
                 </div>
               )}
-
+              {userViewTab === 'aboutus' && <AboutUsPage adminList={adminList} />}
             </div>
           </div>
         </div>

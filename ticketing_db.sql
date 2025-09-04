@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 19, 2025 at 06:30 AM
+-- Generation Time: Aug 19, 2025 at 09:46 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -132,7 +132,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (18, '2025_08_15_131953_add_requested_time_to_tickets_table', 11),
 (19, '2025_08_17_213505_add_requested_date_to_tickets_table', 12),
 (20, '2025_08_18_104052_add_rejection_reason_to_tickets_table', 13),
-(21, '2025_08_19_105750_create_notifications_table', 14);
+(21, '2025_08_19_105750_create_notifications_table', 14),
+(22, '2025_08_19_131209_add_proof_fields_to_tickets_table', 15);
 
 -- --------------------------------------------------------
 
@@ -279,6 +280,8 @@ CREATE TABLE `tickets` (
   `requested_date` date DEFAULT NULL,
   `status` varchar(255) NOT NULL DEFAULT 'Belum Dikerjakan',
   `rejection_reason` text DEFAULT NULL,
+  `proof_description` text DEFAULT NULL,
+  `proof_image_path` varchar(255) DEFAULT NULL,
   `started_at` timestamp NULL DEFAULT NULL,
   `completed_at` timestamp NULL DEFAULT NULL,
   `user_id` bigint(20) UNSIGNED DEFAULT NULL,
@@ -291,28 +294,20 @@ CREATE TABLE `tickets` (
 -- Dumping data for table `tickets`
 --
 
-INSERT INTO `tickets` (`id`, `title`, `workshop`, `requested_time`, `requested_date`, `status`, `rejection_reason`, `started_at`, `completed_at`, `user_id`, `creator_id`, `created_at`, `updated_at`) VALUES
-(87, 'Benerin Laptop', 'Bener', NULL, NULL, 'Sedang Dikerjakan', NULL, '2025-08-15 04:18:56', NULL, 7, 2, '2025-08-15 04:14:52', '2025-08-15 04:18:56'),
-(88, 'Benerin Router', 'Nusa Persada', NULL, NULL, 'Belum Dikerjakan', NULL, NULL, NULL, 7, 2, '2025-08-15 04:17:31', '2025-08-15 04:17:31'),
-(89, 'Ngopi', 'Canden', NULL, NULL, 'Selesai', NULL, '2025-08-15 06:52:22', '2025-08-15 06:52:26', 7, 2, '2025-08-15 06:36:49', '2025-08-15 06:52:26'),
-(92, 'Rokok', 'Canden', NULL, NULL, 'Sedang Dikerjakan', NULL, '2025-08-15 07:00:56', NULL, 7, 4, '2025-08-15 07:00:34', '2025-08-15 07:00:56'),
-(93, 'asda', 'Canden', NULL, NULL, 'Belum Dikerjakan', NULL, NULL, NULL, 7, 4, '2025-08-15 07:02:20', '2025-08-15 07:02:20'),
-(94, 'lknlkn', 'Canden', '09:00', NULL, 'Selesai', NULL, '2025-08-15 07:07:01', '2025-08-15 07:07:09', 7, 4, '2025-08-15 07:06:46', '2025-08-15 07:07:09'),
-(95, 'alkdcn', 'Bener', '08:00', NULL, 'Sedang Dikerjakan', NULL, '2025-08-16 02:48:12', NULL, 7, 4, '2025-08-15 07:07:44', '2025-08-16 02:48:12'),
-(98, 'Nambah Absen Buat Tim Produksi', 'Bener', '10:00', NULL, 'Sedang Dikerjakan', NULL, '2025-08-16 03:05:24', NULL, 8, 4, '2025-08-16 02:51:05', '2025-08-16 03:05:24'),
-(100, 'Pulang', 'Pelita', '05:05', NULL, 'Belum Dikerjakan', NULL, NULL, NULL, NULL, 4, '2025-08-16 03:41:53', '2025-08-16 03:41:53'),
-(109, 'asd', 'Canden', '23:06', '2025-08-18', 'Ditunda', NULL, '2025-08-18 02:18:41', NULL, 8, 4, '2025-08-17 15:06:19', '2025-08-18 08:11:03'),
-(111, 'Lanjutkan Ticketing App', 'Canden', '09:00', NULL, 'Ditunda', NULL, '2025-08-18 02:59:43', NULL, 21, 2, '2025-08-18 01:38:45', '2025-08-18 03:00:39'),
-(112, 'Ticketing', 'Canden', '10:00', NULL, 'Sedang Dikerjakan', NULL, '2025-08-18 03:00:26', NULL, 8, 2, '2025-08-18 02:05:32', '2025-08-18 08:11:05'),
-(113, 'asd', 'Canden', NULL, NULL, 'Ditolak', 'a;osfh oaS HDOIAF HOAHFO HDSFO;I HSAODF HSODIF HFOA SDHFOIASHFDOIASFHOASHDFOIASHDFOHASDF H FAOSIDFHOIAS DFHOAS HDFOIA SHDFOI ASHDFOI FOI SADFOI SIDFH FAISO FHDO HO IASFHDOA SHDFOIFOISA FDOI;', NULL, NULL, NULL, 2, '2025-08-18 02:51:34', '2025-08-18 07:56:26'),
-(114, 'Laptopku rusak keyboarnya mas', 'Canden', '10:00', '2025-08-18', 'Selesai', NULL, '2025-08-18 02:59:24', '2025-08-18 06:03:06', 7, 2, '2025-08-18 02:58:58', '2025-08-18 06:03:06'),
-(116, 'asd', 'Nobo', '11:06', '2025-08-19', 'Ditolak', 'apa ini?', NULL, NULL, NULL, 2, '2025-08-18 03:04:53', '2025-08-18 04:58:38'),
-(120, 'Benerke Laptopku mas', 'Bener', '14:40', NULL, 'Ditolak', 'Maaf Sedang Sibuk', NULL, NULL, NULL, 27, '2025-08-18 06:35:30', '2025-08-18 06:35:47'),
-(121, 'Maka', 'Nobo', NULL, NULL, 'Selesai', NULL, '2025-08-18 06:46:09', '2025-08-18 06:46:40', 6, 27, '2025-08-18 06:45:57', '2025-08-18 06:46:40'),
-(123, 'Pulang', 'Nobo', '16:30', NULL, 'Selesai', NULL, '2025-08-18 08:29:41', '2025-08-19 01:45:57', 7, 2, '2025-08-18 08:29:18', '2025-08-19 01:45:57'),
-(124, 'sds', 'Canden', '09:01', '2025-08-19', 'Belum Dikerjakan', NULL, NULL, NULL, NULL, 2, '2025-08-19 01:10:59', '2025-08-19 01:10:59'),
-(125, 'asd', 'Canden', NULL, NULL, 'Belum Dikerjakan', NULL, NULL, NULL, NULL, 2, '2025-08-19 01:38:39', '2025-08-19 01:38:39'),
-(126, 'asd', 'Canden', '09:41', '2025-08-20', 'Belum Dikerjakan', NULL, NULL, NULL, NULL, 2, '2025-08-19 01:39:12', '2025-08-19 01:39:12');
+INSERT INTO `tickets` (`id`, `title`, `workshop`, `requested_time`, `requested_date`, `status`, `rejection_reason`, `proof_description`, `proof_image_path`, `started_at`, `completed_at`, `user_id`, `creator_id`, `created_at`, `updated_at`) VALUES
+(87, 'Benerin Laptop', 'Bener', NULL, NULL, 'Sedang Dikerjakan', NULL, NULL, NULL, '2025-08-15 04:18:56', NULL, 7, 2, '2025-08-15 04:14:52', '2025-08-15 04:18:56'),
+(88, 'Benerin Router', 'Nusa Persada', NULL, NULL, 'Belum Dikerjakan', NULL, NULL, NULL, NULL, NULL, 7, 2, '2025-08-15 04:17:31', '2025-08-15 04:17:31'),
+(89, 'Ngopi', 'Canden', NULL, NULL, 'Selesai', NULL, NULL, NULL, '2025-08-15 06:52:22', '2025-08-15 06:52:26', 7, 2, '2025-08-15 06:36:49', '2025-08-15 06:52:26'),
+(92, 'Rokok', 'Canden', NULL, NULL, 'Sedang Dikerjakan', NULL, NULL, NULL, '2025-08-15 07:00:56', NULL, 7, 4, '2025-08-15 07:00:34', '2025-08-15 07:00:56'),
+(93, 'asda', 'Canden', NULL, NULL, 'Belum Dikerjakan', NULL, NULL, NULL, NULL, NULL, 7, 4, '2025-08-15 07:02:20', '2025-08-15 07:02:20'),
+(94, 'lknlkn', 'Canden', '09:00', NULL, 'Selesai', NULL, NULL, NULL, '2025-08-15 07:07:01', '2025-08-15 07:07:09', 7, 4, '2025-08-15 07:06:46', '2025-08-15 07:07:09'),
+(112, 'Ticketing', 'Canden', '10:00', NULL, 'Selesai', NULL, 'Meh rampung lek', 'proofs/4OhhH3ShrtI7ET9FJ9qFfWyWUFH7ne39wIENKP1i.png', '2025-08-18 03:00:26', '2025-08-19 07:22:50', 8, 2, '2025-08-18 02:05:32', '2025-08-19 07:24:22'),
+(113, 'asd', 'Canden', NULL, NULL, 'Ditolak', 'a;osfh oaS HDOIAF HOAHFO HDSFO;I HSAODF HSODIF HFOA SDHFOIASHFDOIASFHOASHDFOIASHDFOHASDF H FAOSIDFHOIAS DFHOAS HDFOIA SHDFOI ASHDFOI FOI SADFOI SIDFH FAISO FHDO HO IASFHDOA SHDFOIFOISA FDOI;', NULL, NULL, NULL, NULL, NULL, 2, '2025-08-18 02:51:34', '2025-08-18 07:56:26'),
+(114, 'Laptopku rusak keyboarnya mas', 'Canden', '10:00', '2025-08-18', 'Selesai', NULL, 'mass mass sing genah ae', 'proofs/P2NnfyJNg73zEucRbfTKqtqgfm8pz9cpUPGHsvNG.jpg', '2025-08-18 02:59:24', '2025-08-18 06:03:06', 7, 2, '2025-08-18 02:58:58', '2025-08-19 07:05:56'),
+(116, 'asd', 'Nobo', '11:06', '2025-08-19', 'Ditolak', 'apa ini?', NULL, NULL, NULL, NULL, NULL, 2, '2025-08-18 03:04:53', '2025-08-18 04:58:38'),
+(120, 'Benerke Laptopku mas', 'Bener', '14:40', NULL, 'Ditolak', 'Maaf Sedang Sibuk', NULL, NULL, NULL, NULL, NULL, 27, '2025-08-18 06:35:30', '2025-08-18 06:35:47'),
+(121, 'Maka', 'Nobo', NULL, NULL, 'Selesai', NULL, 'Udah Makan Sayang', NULL, '2025-08-18 06:46:09', '2025-08-18 06:46:40', 6, 27, '2025-08-18 06:45:57', '2025-08-19 06:40:23'),
+(123, 'Pulang', 'Nobo', '16:30', NULL, 'Selesai', NULL, 'wes dolan kang', 'proofs/VUeDFd7MUTcTCGeC6qZXN2dFXoYHibI8KDDHRZwP.jpg', '2025-08-18 08:29:41', '2025-08-19 01:45:57', 7, 2, '2025-08-18 08:29:18', '2025-08-19 07:13:32');
 
 -- --------------------------------------------------------
 
@@ -458,7 +453,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `notifications`
@@ -476,7 +471,7 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `tickets`
 --
 ALTER TABLE `tickets`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=128;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=129;
 
 --
 -- AUTO_INCREMENT for table `users`

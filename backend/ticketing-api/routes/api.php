@@ -6,6 +6,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\LocationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,4 +54,10 @@ Route::middleware('jwt')->group(function () {
     Route::post('/notifications', [NotificationController::class, 'store']); // Untuk admin mengirim notif
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']); // Untuk user menandai sudah baca
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
+
+    // Tambahkan rute untuk Analytics di dalam group ini
+    Route::get('/tickets/analytics', [AnalyticsController::class, 'getTicketAnalytics']);
+    Route::get('/tickets/admin-performance', [AnalyticsController::class, 'getAdminPerformance']);
+
+    Route::get('/locations', [LocationController::class, 'index']);
 });
