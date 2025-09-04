@@ -6851,7 +6851,98 @@ body.dark-mode .dashboard-card h4 {
   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
 }
 
+/* ================================
+   Animations
+================================ */
 
+/* Fade + Slide In */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Glow Pulse (tim / card) */
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 5px rgba(168, 85, 247, 0.4),
+      0 0 10px rgba(236, 72, 153, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.6),
+      0 0 25px rgba(236, 72, 153, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(168, 85, 247, 0.4),
+      0 0 10px rgba(236, 72, 153, 0.2);
+  }
+}
+
+/* Floating Effect */
+@keyframes floatY {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Gradient shimmer (text) */
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+/* ================================
+   Apply Animations
+================================ */
+
+/* Section masuk smooth */
+.about-us-section,
+.team-section,
+.values-and-image-section,
+.aboutus-section.office-life,
+.aboutus-section.work-fun,
+.contact-section {
+  animation: fadeSlideIn 0.8s ease-out;
+}
+
+/* Avatar tim glow */
+.member-avatar {
+  animation: glowPulse 3s infinite ease-in-out;
+}
+
+/* Card hover + pulse */
+.team-member-card:hover {
+  animation: glowPulse 2.5s infinite ease-in-out;
+}
+
+/* Image floating */
+.aboutus-section .mission-image img,
+.values-and-image-section img {
+  animation: floatY 6s ease-in-out infinite;
+}
+
+/* Gradient text bergerak */
+.about-us-header h1,
+.about-us-section h2,
+.value-card h3 {
+  background-size: 200% auto;
+  animation: gradientMove 5s linear infinite alternate;
+}
 
 /* 📱 Responsive untuk layar kecil (max-width: 400px) */
 @media (max-width: 1009px) {

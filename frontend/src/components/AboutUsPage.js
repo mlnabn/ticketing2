@@ -242,11 +242,10 @@ const AboutUsPage = ({ adminList }) => {
 
         </div>
       </section>
-      <footer className="w-full text-center py-6 border-t border-gray-700 text-gray-400 text-sm">
-        © 2025 DTech Engineering. All rights reserved.
+            <footer className="w-full text-center py-6 border-t border-gray-800 text-gray-500 text-sm mt-10 relative z-10">
+        © 2025 Politeknik Negeri Semarang. All rights reserved.
       </footer>
     </div>
-    
   );
 };
 
