@@ -27,6 +27,7 @@ const MapComponent = ({ data }) => {
   };
 
   return (
+    <div style={{ borderRadius: "12px", overflow: "hidden", height: "100%", width: "100%", minHeight: "300px" }}>
     <MapContainer 
       center={defaultPosition} 
       zoom={10} 
@@ -58,6 +59,7 @@ const MapComponent = ({ data }) => {
         </Marker>
       ))}
     </MapContainer>
+    </div>
   );
 };
 

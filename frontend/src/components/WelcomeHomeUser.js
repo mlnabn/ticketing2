@@ -6,6 +6,9 @@ const WelcomeHomeUser = ({ user, onExploreClick }) => {
         <div className="welcome-card-container">
 
             <h2>Welcome to Your Ticket {user}!</h2>
+                        <p className="welcome-intro">
+                Simplify your daily tasks and manage work efficiently with our Ticketing System.
+            </p>
             <div className="welcome-card">
                 <p>
                     Need Help? This platform is designed to simplify your daily tasks
@@ -24,10 +27,13 @@ const WelcomeHomeUser = ({ user, onExploreClick }) => {
                     If you have any further questions or need additional support, don’t hesitate
                     to contact our support team. We are here to help you get the most out of our service.
                 </p>
-                <button onClick={onExploreClick} className="explore-button">
-                    Explore
-                </button>
+                {/* <button onClick={onExploreClick} className="explore-button">
+                    About Us
+                </button> */}
             </div>
+            <footer className="w-full text-center py-6 border-t border-gray-700 text-gray-400 text-sm">
+        © 2025 DTech Engineering. All rights reserved.
+      </footer>
         </div>
     );
 };

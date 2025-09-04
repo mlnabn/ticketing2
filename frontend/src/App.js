@@ -63,35 +63,42 @@ function App() {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // --- State untuk Autentikasi & Info Pengguna ---
+  // --- State Autentikasi ---
   const [isLogin, setIsLogin] = useState(isLoggedIn());
-  const [userRole, setUserRole] = useState(null);
-  const [userName, setUserName] = useState('');
+  const [userRole, setUserRole] = useState(null); // "admin" | "user"
+  const [userName, setUserName] = useState("");
   const [loggedInUserId, setLoggedInUserId] = useState(null);
+
+  // --- State User Management ---
   const [userToDelete, setUserToDelete] = useState(null);
   const [showUserConfirmModal, setShowUserConfirmModal] = useState(false);
   const [showUserFormModal, setShowUserFormModal] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
 
-  // --- State untuk Navigasi & Paginasi ---
-  const [currentPage, setCurrentPage] = useState('Welcome'); // Default ke halaman Welcome
-  const [userViewTab, setUserViewTab] = useState('home');
+  // --- State Navigasi ---
+  const [appPage, setAppPage] = useState("landing"); // "landing" | "login" | "register" | "dashboard"
+  const [publicPage, setPublicPage] = useState("home"); // khusus landing
+  const [currentPage, setCurrentPage] = useState("Welcome"); // admin dashboard
+  const [userViewTab, setUserViewTab] = useState("request"); // user dashboard
+
+  // --- State Paginasi ---
   const [dataPage, setDataPage] = useState(1);
   const [createdTicketsPage, setCreatedTicketsPage] = useState(1);
   const [userPage, setUserPage] = useState(1);
-  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [userSearchQuery, setUserSearchQuery] = useState("");
   const [myTicketsPage, setMyTicketsPage] = useState(1);
 
-  // --- State untuk Fitur Pencarian ---
-  const [searchInput, setSearchInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  // --- State Pencarian ---
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // --- State untuk Interaksi UI (Tampilan) ---
+  // --- State UI ---
   const [darkMode, setDarkMode] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default sidebar terbuka untuk admin
-  // const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth > 768);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  // --- State Ticket Interactions ---
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState([]);
   const [statusFilter, setStatusFilter] = useState(null);
@@ -105,9 +112,12 @@ function App() {
   const [ticketForProof, setTicketForProof] = useState(null);
   const [showViewProofModal, setShowViewProofModal] = useState(false);
   const [ticketToShowProof, setTicketToShowProof] = useState(null);
+
+  // --- State Analytics ---
   const [analyticsData, setAnalyticsData] = useState([]);
   const [locationsData, setLocationsData] = useState([]);
   const [adminPerformanceData, setAdminPerformanceData] = useState([]);
+
   // === State ===
   const [userAvatar, setUserAvatar] = useState(null);
 
@@ -699,12 +709,75 @@ function App() {
   // #5. RENDER LOGIC (Logika untuk Menampilkan Komponen)
   // -----------------------------------------------------------------
   if (!isLogin) {
+    if (appPage === "landing") {
+      return (
+        <div
+          className="dashboard-container no-sidebar landing-page"
+          style={{
+            backgroundImage: `url(${bgImage})`,
+          }}
+        >
+          <main className="main-content">
+            {/* Header */}
+            <header className="main-header-user landing-header">
+              <div className="header-left-group">
+                <img src={yourLogok} alt="Logo" className="header-logo" />
+              </div>
+
+              <nav className="header-nav">
+                <button
+                  className={publicPage === "home" ? "active" : ""}
+                  onClick={() => setPublicPage("home")}
+                >
+                  Home
+                </button>
+                <button
+                  className={publicPage === "aboutus" ? "active" : ""}
+                  onClick={() => setPublicPage("aboutus")}
+                >
+                  About Us
+                </button>
+              </nav>
+
+              <div className="header-right-group">
+                <button onClick={() => setAppPage("login")} className="login-btn2">
+                  <i className="fas fa-user-circle"></i>
+                  <span>Login</span>
+                </button>
+              </div>
+
+            </header>
+
+            {/* Konten Dinamis */}
+            <div className="public-content">
+              {publicPage === "home" && <WelcomeHomeUser />}
+              {publicPage === "aboutus" && <AboutUsPage adminList={adminList} />}
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    // ✅ Login & Register
     return (
       <div className="auth-page-container">
-        {showRegister ? <Register onRegister={() => setIsLogin(true)} onShowLogin={() => setShowRegister(false)} /> : <Login onLogin={() => setIsLogin(true)} onShowRegister={() => setShowRegister(true)} />}
+        {showRegister ? (
+          <Register
+            onRegister={() => setIsLogin(true)}
+            onShowLogin={() => setShowRegister(false)}
+            onBackToLanding={() => setAppPage("landing")}  // 👈 tambahin ini
+          />
+        ) : (
+          <Login
+            onLogin={() => setIsLogin(true)}
+            onShowRegister={() => setShowRegister(true)}
+            onBackToLanding={() => setAppPage("landing")}  // 👈 tambahin ini
+          />
+        )}
       </div>
     );
   }
+
 
   // Tampilan untuk ADMIN
   if (isAdmin) {
@@ -1136,10 +1209,10 @@ function App() {
             <img src={yourLogok} alt="Logo" className="header-logo"></img>
           </div>
           <div className="user-view-tabs">
-            <button className={`tab-button ${userViewTab === 'home' ? 'active' : ''}`} onClick={() => setUserViewTab('home')}>Home</button>
+            {/* <button className={`tab-button ${userViewTab === 'home' ? 'active' : ''}`} onClick={() => setUserViewTab('home')}>Home</button> */}
             <button className={`tab-button ${userViewTab === 'request' ? 'active' : ''}`} onClick={() => setUserViewTab('request')}>Request</button>
             <button className={`tab-button ${userViewTab === 'history' ? 'active' : ''}`} onClick={() => setUserViewTab('history')}>History</button>
-            <button className={`tab-button ${userViewTab === 'aboutus' ? 'active' : ''}`} onClick={() => setUserViewTab('aboutus')}>About Us</button>
+            {/* <button className={`tab-button ${userViewTab === 'aboutus' ? 'active' : ''}`} onClick={() => setUserViewTab('aboutus')}>About Us</button> */}
           </div>
           <div className="main-header-controls-user">
             <span className="breadcrump">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
@@ -1160,7 +1233,7 @@ function App() {
         <div className="content-area">
           <div className="user-view-container">
             <div className="user-view-content">
-              {userViewTab === 'home' && <WelcomeHomeUser user={userName} onExploreClick={() => setUserViewTab('request')} />}
+              {/* {userViewTab === 'home' && <WelcomeHomeUser user={userName} onExploreClick={() => setUserViewTab('request')} />} */}
               {userViewTab === 'request' && (
                 <div className="request-tab">
                   <h2>Submit a Request</h2>
@@ -1273,7 +1346,7 @@ function App() {
                   />
                 </div>
               )}
-              {userViewTab === 'aboutus' && <AboutUsPage adminList={adminList} />}
+              {/* {userViewTab === 'aboutus' && <AboutUsPage adminList={adminList} />} */}
             </div>
           </div>
         </div>

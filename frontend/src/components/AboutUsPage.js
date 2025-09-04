@@ -242,7 +242,11 @@ const AboutUsPage = ({ adminList }) => {
 
         </div>
       </section>
+      <footer className="w-full text-center py-6 border-t border-gray-700 text-gray-400 text-sm">
+        © 2025 DTech Engineering. All rights reserved.
+      </footer>
     </div>
+    
   );
 };
 

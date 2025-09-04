@@ -6,7 +6,7 @@ import bgImage2 from '../Image/Login.png';
 
 const API_URL = 'http://127.0.0.1:8000/api';
 
-function Login({ onLogin, onShowRegister }) {
+function Login({ onLogin, onShowRegister, onBackToLanding }) {   // 👈 tambah prop baru
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -98,6 +98,15 @@ function Login({ onLogin, onShowRegister }) {
                 Register
               </button>
             </p>
+
+            {/* ✅ Tambahin tombol Back to Landing */}
+            <button
+              type="button"
+              onClick={onBackToLanding}
+              className="back-to-landing"
+            >
+              ← Back to Landing
+            </button>
           </form>
         </div>
 

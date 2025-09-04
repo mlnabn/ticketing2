@@ -2649,7 +2649,7 @@ button {
 
 .btn-reason {
   background-color: #d6eaf8;
-  color: #154360;  
+  color: #154360;
 }
 
 .btn-reason:hover {
@@ -2672,8 +2672,10 @@ button:hover {
 }
 
 .btn-start {
-  background-color: #d6eaf8; /* biru muda (background lembut) */
-  color: #154360;   
+  background-color: #d1ecf1;
+  /* biru muda (background lembut) */
+  color: #0c5460;
+  border-color: #bee5eb;
 }
 
 .btn-start:hover {
@@ -2682,13 +2684,15 @@ button:hover {
 }
 
 .btn-finish {
-  background-color: #fdebd0; /* oranye muda */
-  color: #7d6608;   
+  background-color: #fff3cd;
+  /* oranye muda */
+  color: #856404;
+  border-color: #ffeeba;
 }
 
 
 .btn-finish:hover {
-  background-color:  #fad7a0;
+  background-color: #fad7a0;
 }
 
 
@@ -2703,9 +2707,9 @@ button:hover {
 } */
 
 button.btn-pause {
-  background-color: #e5e7e9; /* abu muda */
-  color: #424949;            /* abu tua teks */
-  border: 1px solid #d5d8dc;
+  background-color: #e5e2e2; /* soft gray */
+  color: #383d41;
+  border-color: #d6d8db;
   padding: 8px 12px;
   border-radius: 5px;
   cursor: pointer;
@@ -3097,7 +3101,8 @@ body.dark-mode .status-selesai {
 }
 
 .btn-pause:hover {
-  background-color: #5a6268;
+  background-color: #d3d5d6;
+  color: #383d41;
 }
 
 /* ====== Container Tombol ====== */
@@ -3640,32 +3645,6 @@ body.dark-mode .content-area h3 {
  TOMBOL UTAMA (Tambah Pengguna Baru)
  ---------------------------------------------------
 */
-.btn-primary {
-  background-color: #007bff;
-  /* Biru cerah */
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 20px;
-  /* Lebih bulat */
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-  /* Biru lebih gelap saat hover */
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3);
-}
-
-.btn-primary:active {
-  background-color: #004085;
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
-}
 
 /* Mode Gelap untuk Tombol Utama */
 body.dark-mode .btn-primary {
@@ -3705,8 +3684,9 @@ body.dark-mode .btn-primary:hover {
 }
 
 .btn-edit {
-  background-color: #d4edda; /* hijau muda (lembut) */
-  color: #155724;   
+  background-color: #d4edda;
+  /* hijau muda (lembut) */
+  color: #155724;
   box-shadow: 0 3px 6px rgba(40, 167, 69, 0.2);
 }
 
@@ -3729,8 +3709,9 @@ body.dark-mode .btn-edit:hover {
 }
 
 .btn-delete {
-  background-color: #f8d7da; /* merah muda (background lembut) */
-  color: #721c24; 
+  background-color: #f8d7da;
+  /* merah muda (background lembut) */
+  color: #721c24;
   box-shadow: 0 3px 6px rgba(220, 53, 69, 0.2);
 }
 
@@ -4406,9 +4387,10 @@ body.dark-mode .btn-submit:hover {
 
 /* CANCEL (Merah / Danger) */
 .btn-cancel-aksi {
-  background-color: #f8d7da; /* merah muda (background lembut) */
-  color: #721c24;            /* merah tua (teks) */
-  border: 1px solid #f5c6cb;
+  background-color: #f8d7da;
+  /* soft red */
+  color: #721c24;
+  border-color: #f5c6cb;
   padding: 8px 12px;
   border-radius: 5px;
   cursor: pointer;
@@ -4746,8 +4728,9 @@ body.dark-mode .rejection-reason-display p {
 
 /* Delete (Hapus Tiket) */
 .btn-delete {
-  background-color: #f8d7da; /* merah muda (background lembut) */
-  color: #721c24;   
+  background-color: #f8d7da;
+  /* merah muda (background lembut) */
+  color: #721c24;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
 }
 
@@ -5023,7 +5006,7 @@ body.dark-mode .notification-form-container label {
   font-weight: 600;
   cursor: pointer;
   background: #d6eaf8;
-  color: #154360; 
+  color: #154360;
   transition: transform 0.2s ease, background 0.3s ease;
 }
 
@@ -5180,7 +5163,7 @@ body.dark-mode .form-group2 textarea:focus {
 
 body.dark-mode .btn-primary {
   background: #d6eaf8;
-  color: #154360; 
+  color: #154360;
 }
 
 body.dark-mode .btn-primary:hover {
@@ -6250,731 +6233,6 @@ body.dark-mode .welcome-title {
 
 }
 
-
-/* AboutUsPage.css */
-
-/* ================================
-   AboutUsPage.css
-   ================================ */
-
-/* General container */
-.about-us-container {
-  padding: 2rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  /* putih transparan */
-  backdrop-filter: blur(10px);
-  box-shadow: 0px 0px 100px 0px rgba(83, 83, 83, 1);
-  -webkit-box-shadow: 0px 0px 100px 0px rgba(83, 83, 83, 1);
-  -moz-box-shadow: 0px 0px 100px 0px rgba(83, 83, 83, 1);
-  animation: fadeSlideIn 0.6s ease-out;
-  border-radius: 12px;
-}
-
-/* ================================
-   Header
-   ================================ */
-.about-us-header {
-  text-align: center;
-  margin-bottom: 3rem;
-  padding-top: 2rem;
-}
-
-.about-us-header h1 {
-  font-size: 3rem;
-  font-weight: 700;
-  line-height: 1.2;
-  background: linear-gradient(135deg, #a855f7, #6b46c1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.about-us-header p {
-  max-width: 800px;
-  margin: 0 auto;
-  color: #ccc;
-  line-height: 1.6;
-}
-
-/* ================================
-   Section General
-   ================================ */
-.about-us-section {
-  max-width: 900px;
-  margin: 0 auto 4rem;
-  text-align: center;
-}
-
-.about-us-section h2 {
-  font-size: 2rem;
-  font-weight: 600;
-  margin-bottom: 0rem;
-  background: linear-gradient(135deg, #a855f7, #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.about-us-section h3 {
-  font-size: 1.3rem;
-  font-weight: 500;
-  margin-bottom: 0rem;
-  background: rgba(255, 255, 255, 0.4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0rem;
-  /* jarak otomatis antar elemen */
-}
-
-
-.underline {
-  width: 150px;
-  height: 3px;
-  margin: 0.5rem auto 2rem;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, #a855f7, #ec4899);
-}
-
-
-
-/* ================================
-   Mission Section
-   ================================ */
-.mission-section {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  padding: 2rem;
-  text-align: left;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-}
-
-.mission-section .text-content {
-  flex: 2;
-}
-
-.mission-section .text-content p {
-  color: #ccc;
-  line-height: 1.6;
-}
-
-.mission-section .image-container {
-  flex: 1;
-}
-
-.mission-section .image-container img {
-  width: 100%;
-  height: auto;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-/* ================================
-   Team Section
-   ================================ */
-.team-section {
-  padding: 2rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  text-align: center;
-}
-
-.team-section h2 {
-  font-size: 2rem;
-  color: #fff;
-  margin-bottom: 0.5rem;
-}
-
-.underline {
-  width: 60px;
-  height: 4px;
-  background: #6b46c1;
-  margin: 0 auto 2rem auto;
-  border-radius: 2px;
-}
-
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  justify-items: center;
-}
-
-.team-row-2 {
-  grid-column: 1 / span 3;
-  /* ambil 3 kolom */
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-}
-
-.team-member-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 160px;
-  text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 20px;
-}
-
-.team-member-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.member-avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #6b46c1;
-  transition: border-color 0.3s ease;
-}
-
-.team-member-card:hover .member-avatar {
-  border-color: #a855f7;
-}
-
-.team-member-card h3 {
-  margin-top: 1rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #fff;
-}
-
-.team-member-card p {
-  font-size: 0.9rem;
-  color: #aaa;
-}
-
-
-/* ================================
-   Values Section
-   ================================ */
-.values-and-image-section {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  padding: 2rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-}
-
-.values-and-image-section .image-container {
-  flex: 1;
-}
-
-.values-and-image-section .image-container img {
-  width: 100%;
-  height: auto;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.values-and-image-section .values-grid {
-  flex: 2;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.value-card {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1rem;
-  text-align: left;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  transition: background 0.3s ease;
-}
-
-.value-card:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.value-card .icon-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #a855f7, #6b46c1);
-}
-
-.value-card .icon-container svg {
-  width: 24px;
-  height: 24px;
-  color: #fff;
-}
-
-.value-card h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #a855f7, #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.value-card p {
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #ccc;
-}
-
-/* ================================
-   Our Office Life & Work & Fun
-   ================================ */
-/* ==== Office Life ==== */
-.aboutus-section.office-life {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  max-width: 1100px;
-  margin: 0 auto 4rem;
-  padding: 2rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-}
-
-.aboutus-section.office-life .mission-image {
-  flex: 1;
-}
-
-.aboutus-section.office-life .mission-image img {
-  width: 100%;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.aboutus-section.office-life .mission-text {
-  flex: 1.2;
-  text-align: left;
-}
-
-.aboutus-section.office-life .mission-text h2 {
-  font-size: 2rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #a855f7, #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.aboutus-section.office-life .underline-line {
-  width: 120px;
-  height: 3px;
-  margin: 0.5rem 0 1.5rem;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, #a855f7, #ec4899);
-}
-
-.aboutus-section.office-life .mission-text p {
-  margin-bottom: 1rem;
-  line-height: 1.6;
-  color: #ccc;
-}
-
-/* ==== Work & Fun ==== */
-.aboutus-section.work-fun {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  max-width: 1100px;
-  margin: 0 auto 4rem;
-  padding: 2rem;
-  border-radius: 1rem;
-  background: rgba(255, 200, 255, 0.05);
-  border: 1px dashed rgba(168, 85, 247, 0.4);
-  backdrop-filter: blur(10px);
-  flex-direction: row-reverse;
-  /* biar image kanan */
-}
-
-.aboutus-section.work-fun .mission-image {
-  flex: 1;
-}
-
-.aboutus-section.work-fun .mission-image img {
-  width: 100%;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-}
-
-.aboutus-section.work-fun .mission-text {
-  flex: 1.2;
-  text-align: left;
-}
-
-.aboutus-section.work-fun .mission-text h2 {
-  font-size: 2rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #a855f7, #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.aboutus-section.work-fun .underline-line {
-  width: 140px;
-  height: 4px;
-  margin: 0.5rem 0 1.5rem;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, #a855f7, #ec4899);
-}
-
-.aboutus-section.work-fun .mission-text p {
-  margin-bottom: 1rem;
-  line-height: 1.6;
-  color: #f3f4f6;
-}
-
-
-/* ================================
-   Contact Section
-   ================================ */
-
-.contact-section h2 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  background: linear-gradient(135deg, #a855f7, #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.contact-section p {
-  font-size: 1rem;
-  color: #d1d5db;
-  margin-bottom: 2rem;
-}
-
-/* Social Links */
-.social-links {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-.social-links a {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #e5e7eb;
-  font-size: 1rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  padding: 0.6rem 1.2rem;
-  border-radius: 9999px;
-  background: rgba(55, 65, 81, 0.4);
-}
-
-.social-links a i {
-  font-size: 1.2rem;
-}
-
-/* Hover efek gradasi */
-.social-links a:hover {
-  background: linear-gradient(135deg, #a855f7, #ec4899);
-  color: #fff;
-  transform: translateY(-4px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-}
-
-/* ================================
-   Responsive
-   ================================ */
-
-/* Mobile */
-@media (max-width: 1008px) {
-
-  /* ================================
-   Header
-   ================================ */
-
-  .about-us-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: 1.2;
-    background: linear-gradient(135deg, #a855f7, #6b46c1);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  /* ================================
-   Section General
-   ================================ */
-  .about-us-section {
-    max-width: 900px;
-    margin: 0 auto 4rem;
-    text-align: center;
-  }
-
-  .about-us-section h2 {
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin-bottom: 0rem;
-    background: linear-gradient(135deg, #a855f7, #ec4899);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .about-us-section h3 {
-    font-size: 0.8rem;
-    font-weight: 500;
-    margin-bottom: 0rem;
-    background: rgba(255, 255, 255, 0.4);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-
-  .underline {
-    width: 100px;
-    height: 2px;
-    margin: 0.5rem auto 2rem;
-  }
-
-  .mission-section p {
-    font-size: 0.9rem;
-  }
-
-  /* ================================
-   Team Section
-   ================================ */
-
-  .team-section h2 {
-    font-size: 1.3rem;
-    color: #fff;
-    margin-bottom: 0.5rem;
-  }
-
-  .underline {
-    width: 100px;
-    height: 2px;
-    margin: 0.5rem auto 2rem;
-  }
-
-  .team-grid {
-    grid-template-columns: repeat(2, 1fr);
-    /* 2 kolom sejajar */
-    gap: 1.5rem;
-  }
-
-  .team-row-2 {
-    grid-column: unset;
-    /* lepas aturan span 3 */
-    display: contents;
-    /* ikut grid parent */
-  }
-
-  .team-member-card {
-    width: 100%;
-    max-width: 150px;
-    /* biar ga terlalu lebar */
-    padding: 16px;
-    margin: 0 auto;
-  }
-
-  .member-avatar {
-    width: 80px;
-    height: 80px;
-  }
-
-
-  /* ================================
-   Values Section
-   ================================ */
-
-  .value-card {
-    padding: 0.8rem;
-    gap: 0.4rem;
-  }
-
-  .value-card .icon-container {
-    width: 40px;
-    height: 40px;
-  }
-
-  .value-card .icon-container svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .value-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0.3rem;
-  }
-
-  .value-card p {
-    font-size: 0.85rem;
-    line-height: 1.4;
-  }
-
-  /* ================================
-   Office Life (mobile style)
-   ================================ */
-  .aboutus-section.office-life {
-    flex-direction: column;
-    /* gambar atas, teks bawah */
-    gap: 1.2rem;
-    padding: 1rem;
-    margin: 0 auto 2rem;
-  }
-
-  .aboutus-section.office-life .mission-image,
-  .aboutus-section.office-life .mission-text {
-    flex: unset;
-    width: 100%;
-  }
-
-  .aboutus-section.office-life .mission-image img {
-    width: 100%;
-    height: auto;
-    border-radius: 0.5rem;
-  }
-
-  .aboutus-section.office-life .mission-text {
-    text-align: center;
-  }
-
-  .aboutus-section.office-life .mission-text h2 {
-    font-size: 1.3rem;
-  }
-
-  .aboutus-section.office-life .mission-text p {
-    font-size: 0.9rem;
-    line-height: 1.4;
-  }
-
-  .aboutus-section.office-life .underline-line {
-    margin: 0.5rem auto 1rem;
-    width: 80px;
-    height: 2px;
-  }
-
-
-  /* ================================
-   Work & Fun (mobile style)
-   ================================ */
-  .aboutus-section.work-fun {
-    flex-direction: column;
-    /* meski di desktop dia reverse, di mobile tetap stack */
-    gap: 1.2rem;
-    padding: 1rem;
-    margin: 0 auto 2rem;
-  }
-
-  .aboutus-section.work-fun .mission-image,
-  .aboutus-section.work-fun .mission-text {
-    flex: unset;
-    width: 100%;
-  }
-
-  .aboutus-section.work-fun .mission-image img {
-    width: 100%;
-    height: auto;
-    border-radius: 0.5rem;
-  }
-
-  .aboutus-section.work-fun .mission-text {
-    text-align: center;
-  }
-
-  .aboutus-section.work-fun .mission-text h2 {
-    font-size: 1.3rem;
-  }
-
-  .aboutus-section.work-fun .mission-text p {
-    font-size: 0.9rem;
-    line-height: 1.4;
-  }
-
-  .aboutus-section.work-fun .underline-line {
-    margin: 0.5rem auto 1rem;
-    width: 80px;
-    height: 2px;
-  }
-
-
-  /* ================================
-   Contact Section
-   ================================ */
-
-  .contact-section h2 {
-    font-size: 1.5rem;
-    text-align: center;
-  }
-
-  .contact-section p {
-    font-size: 0.9rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .social-links {
-    gap: 1rem;
-  }
-
-  .social-links a {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-  }
-
-  .social-links a i {
-    font-size: 1rem;
-  }
-}
-
-
-@media (max-width: 1008px) {
-
-  /* Judul gradient */
-  .welcome-card-container h2 {
-    font-size: 1.5rem;
-    font-weight: 800;
-  }
-
-  /* Teks isi */
-  .welcome-card p {
-    font-size: 0.9rem;
-    line-height: 1.7;
-    color: #f1f1f1;
-    margin-bottom: 2rem;
-    text-align: left;
-  }
-
-  /* Tombol Explore */
-  .explore-button {
-    font-size: 0.9rem;
-    font-weight: bold;
-    transition: 0.2s ease;
-  }
-}
-
-
-
 /* Container utama */
 .dashboard-container2 {
   display: flex;
@@ -7066,4 +6324,908 @@ body.dark-mode .dashboard-card h4 {
 .dashboard-card,
 .dashboard-card h4 {
   transition: background-color 0.3s, color 0.3s;
+}
+
+
+
+
+/* ===== LANDING PAGE ===== */
+.landing-page {
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.landing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: rgba(10, 15, 30, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.landing-header .header-logo {
+  height: 40px;
+}
+
+/* Nav */
+.header-nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.header-nav button {
+  background: none;
+  border: none;
+  color: #ddd;
+  font-size: 1rem;
+  cursor: pointer;
+  padding-bottom: 0.25rem;
+  transition: color 0.3s, border-color 0.3s;
+  border-bottom: 2px solid transparent;
+}
+
+.header-nav button.active,
+.header-nav button:hover {
+  color: #60a5fa;
+  border-color: #60a5fa;
+}
+
+/* Login Button */
+.login-icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: white;
+}
+
+/* Content */
+.public-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+
+/* ====== LANDING - ABOUT US ====== */
+.public-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 2rem;
+  gap: 2rem;
+}
+
+/* Judul utama (About Company, Team Collaboration, dll.) */
+.public-content h2,
+.public-content h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  color: #8b5cf6;
+  /* ungu neon */
+  margin-bottom: 1rem;
+}
+
+.public-content h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  color: #8b5cf6;
+  /* ungu neon */
+  margin-bottom: 1rem;
+}
+
+
+/* Logo kiri */
+.header-left-group img {
+  height: 40px;
+  object-fit: contain;
+}
+
+/* NAV di tengah */
+.header-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2rem;
+}
+
+/* Style tombol nav */
+.header-nav button {
+  background: transparent;
+  border: none;
+  color: #e2e8f0;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  transition: color 0.3s, border-bottom 0.3s;
+}
+
+.header-nav button:hover {
+  color: #60a5fa;
+}
+
+.header-nav button.active {
+  color: #60a5fa;
+  border-bottom: 2px solid #60a5fa;
+}
+
+/* Login icon kanan */
+.header-right-group button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+}
+
+/* Tombol login */
+.login-btn2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.login-btn2 i {
+  font-size: 1.2rem;
+}
+
+.login-btn2:hover {
+  color: #60a5fa;
+  /* efek hover */
+}
+
+.back-to-landing {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 8px 16px;
+  /* ungu ke biru */
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-to-landing:hover {
+  transform: translateY(-2px);
+}
+
+
+/* ================================
+   AboutUsPage.css - Compact Version
+   ================================ */
+
+/* ------------------------
+   General Container
+------------------------ */
+.about-us-container {
+  padding: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 80px rgba(83, 83, 83, 1);
+  border-radius: 12px;
+  animation: fadeSlideIn 0.6s ease-out;
+}
+
+/* ------------------------
+   Header
+------------------------ */
+.about-us-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-top: 1.5rem;
+}
+
+.about-us-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  background: linear-gradient(135deg, #a855f7, #6b46c1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.about-us-header p {
+  max-width: 700px;
+  margin: 0 auto;
+  color: #ccc;
+  line-height: 1.5;
+}
+
+/* ------------------------
+   General Section
+------------------------ */
+.about-us-section {
+  max-width: 800px;
+  /* lebih kecil */
+  margin: 0 auto 3rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.about-us-section h2,
+.aboutus-section .mission-text h2,
+.contact-section h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.about-us-section .text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0rem;
+  /* lebih rapat */
+}
+
+.about-us-section .text-content h2 {
+  margin-bottom: 0.2rem;
+}
+
+.about-us-section .text-content h3 {
+  margin-bottom: 0.2rem;
+}
+
+
+.about-us-section h3 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.underline,
+.underline-line {
+  width: 100px;
+  height: 3px;
+  margin: 0.4rem auto 1rem;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+  align-items: center;
+}
+
+/* ------------------------
+   Mission Section (Office Life & Work & Fun)
+------------------------ */
+.aboutus-section.office-life,
+.aboutus-section.work-fun,
+.mission-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.aboutus-section.work-fun {
+  flex-direction: row-reverse;
+  border: 1px dashed rgba(168, 85, 247, 0.4);
+  background: rgba(255, 200, 255, 0.05);
+}
+
+.mission-section .text-content,
+.aboutus-section.office-life .mission-text,
+.aboutus-section.work-fun .mission-text {
+  flex: 1.2;
+  text-align: left;
+  color: #ccc;
+}
+
+.mission-section .image-container,
+.aboutus-section.office-life .mission-image,
+.aboutus-section.work-fun .mission-image {
+  flex: 1;
+}
+
+.mission-section .image-container img,
+.aboutus-section.office-life .mission-image img,
+.aboutus-section.work-fun .mission-image img {
+  width: 100%;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.mission-section p,
+.aboutus-section.office-life .mission-text p,
+.aboutus-section.work-fun .mission-text p {
+  line-height: 1.5;
+  margin-bottom: 0.8rem;
+}
+
+.aboutus-section.work-fun .mission-text p {
+  color: #f3f4f6;
+}
+
+/* ------------------------
+   Team Section
+------------------------ */
+.team-section {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  text-align: center;
+}
+
+.team-section h2 {
+  color: #fff;
+  margin-bottom: 0.4rem;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  justify-items: center;
+}
+
+.team-row-2 {
+  grid-column: 1 / span 3;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.team-member-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 140px;
+  text-align: center;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.team-member-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.member-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #6b46c1;
+  transition: border-color 0.3s ease;
+}
+
+.team-member-card:hover .member-avatar {
+  border-color: #a855f7;
+}
+
+.team-member-card h3 {
+  margin-top: 0.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.team-member-card p {
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+/* ------------------------
+   Values Section
+------------------------ */
+.values-and-image-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.values-and-image-section .image-container,
+.values-and-image-section .values-grid {
+  flex: 1;
+}
+
+.values-and-image-section img {
+  width: 100%;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.value-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem;
+  text-align: left;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  transition: background 0.3s ease;
+}
+
+.value-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.value-card .icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a855f7, #6b46c1);
+}
+
+.value-card .icon-container svg {
+  width: 20px;
+  height: 20px;
+  color: #fff;
+}
+
+.value-card h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.value-card p {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #ccc;
+}
+
+/* ------------------------
+   Contact Section
+------------------------ */
+.contact-section p {
+  font-size: 0.95rem;
+  color: #d1d5db;
+  margin-bottom: 1.5rem;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.social-links a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e5e7eb;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  background: rgba(55, 65, 81, 0.4);
+}
+
+.social-links a i {
+  font-size: 1rem;
+}
+
+.social-links a:hover {
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
+}
+
+
+
+/* 📱 Responsive untuk layar kecil (max-width: 400px) */
+@media (max-width: 1009px) {
+
+  /* Header */
+  .landing-header {
+    flex-direction: column;
+    padding: 0.5rem 1rem;
+    gap: 0.5rem;
+  }
+
+  .header-left-group img {
+    height: 30px;
+  }
+
+  /* Nav */
+  .header-nav {
+    position: static;
+    /* biar nggak absolute */
+    transform: none;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .header-nav button {
+    font-size: 0.9rem;
+  }
+
+  /* Login btn */
+  .login-btn2 {
+    font-size: 0.9rem;
+  }
+
+  .login-btn2 i {
+    font-size: 1rem;
+  }
+
+  /* Content */
+  .public-content {
+    padding: 1.5rem 1rem;
+    gap: 1.5rem;
+  }
+
+  /* Judul utama */
+  .public-content h1,
+  .public-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .public-content h3 {
+    font-size: 1.1rem;
+  }
+
+  /* Back to landing */
+  .back-to-landing {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
+
+  .welcome-intro {
+    font-size: 1rem;
+    /* font lebih kecil di mobile */
+    max-width: 90%;
+    /* lebar teks menyesuaikan layar */
+  }
+
+  /* ================================
+   Responsive
+   ================================ */
+
+  /* Mobile */
+  @media (max-width: 1008px) {
+
+    /* ================================
+   Header
+   ================================ */
+
+    .about-us-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #a855f7, #6b46c1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ================================
+   Section General
+   ================================ */
+    .about-us-section {
+      max-width: 900px;
+      margin: 0 auto 4rem;
+      text-align: center;
+    }
+
+    .about-us-section h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0rem;
+      background: linear-gradient(135deg, #a855f7, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .about-us-section h3 {
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 0rem;
+      background: rgba(255, 255, 255, 0.4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+
+    .underline {
+      width: 100px;
+      height: 2px;
+      margin: 0.5rem auto 2rem;
+    }
+
+    .mission-section p {
+      font-size: 0.9rem;
+    }
+
+    /* ================================
+   Team Section
+   ================================ */
+
+    .team-section h2 {
+      font-size: 1.3rem;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .underline {
+      width: 100px;
+      height: 2px;
+      margin: 0.5rem auto 2rem;
+    }
+
+    .team-grid {
+      grid-template-columns: repeat(2, 1fr);
+      /* 2 kolom sejajar */
+      gap: 1.5rem;
+    }
+
+    .team-row-2 {
+      grid-column: unset;
+      /* lepas aturan span 3 */
+      display: contents;
+      /* ikut grid parent */
+    }
+
+    .team-member-card {
+      width: 100%;
+      max-width: 150px;
+      /* biar ga terlalu lebar */
+      padding: 16px;
+      margin: 0 auto;
+    }
+
+    .member-avatar {
+      width: 80px;
+      height: 80px;
+    }
+
+
+    /* ================================
+   Values Section
+   ================================ */
+
+    .value-card {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      /* sedikit lebih longgar dari 0.4rem untuk readability */
+      padding: 0.7rem;
+      /* lebih pas di layar kecil */
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      transition: background 0.3s ease;
+    }
+
+    .value-card:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .value-card .icon-container {
+      width: 38px;
+      /* sedikit lebih kecil agar proporsional */
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #a855f7, #6b46c1);
+    }
+
+    .value-card .icon-container svg {
+      width: 18px;
+      /* lebih pas untuk icon container 38px */
+      height: 18px;
+      color: #fff;
+    }
+
+    .value-card h3 {
+      font-size: 1rem;
+      /* lebih kecil agar muat di mobile */
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      line-height: 1.2;
+    }
+
+    .value-card p {
+      font-size: 0.85rem;
+      /* masih nyaman dibaca */
+      line-height: 1.3;
+      color: #ccc;
+      margin: 0;
+      /* hilangkan margin default */
+    }
+
+
+    /* ================================
+   Office Life (mobile style)
+   ================================ */
+    .aboutus-section.office-life {
+      flex-direction: column;
+      /* gambar atas, teks bawah */
+      gap: 1.2rem;
+      padding: 1rem;
+      margin: 0 auto 2rem;
+    }
+
+    .aboutus-section.office-life .mission-image,
+    .aboutus-section.office-life .mission-text {
+      flex: unset;
+      width: 100%;
+    }
+
+    .aboutus-section.office-life .mission-image img {
+      width: 100%;
+      height: auto;
+      border-radius: 0.5rem;
+    }
+
+    .aboutus-section.office-life .mission-text {
+      text-align: center;
+    }
+
+    .aboutus-section.office-life .mission-text h2 {
+      font-size: 1.3rem;
+    }
+
+    .aboutus-section.office-life .mission-text p {
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .aboutus-section.office-life .underline-line {
+      margin: 0.5rem auto 1rem;
+      width: 80px;
+      height: 2px;
+    }
+
+
+    /* ================================
+   Work & Fun (mobile style)
+   ================================ */
+    .aboutus-section.work-fun {
+      flex-direction: column;
+      /* meski di desktop dia reverse, di mobile tetap stack */
+      gap: 1.2rem;
+      padding: 1rem;
+      margin: 0 auto 2rem;
+    }
+
+    .aboutus-section.work-fun .mission-image,
+    .aboutus-section.work-fun .mission-text {
+      flex: unset;
+      width: 100%;
+    }
+
+    .aboutus-section.work-fun .mission-image img {
+      width: 100%;
+      height: auto;
+      border-radius: 0.5rem;
+    }
+
+    .aboutus-section.work-fun .mission-text {
+      text-align: center;
+    }
+
+    .aboutus-section.work-fun .mission-text h2 {
+      font-size: 1.3rem;
+    }
+
+    .aboutus-section.work-fun .mission-text p {
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .aboutus-section.work-fun .underline-line {
+      margin: 0.5rem auto 1rem;
+      width: 80px;
+      height: 2px;
+    }
+
+
+    /* ================================
+   Contact Section
+   ================================ */
+
+    .contact-section h2 {
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .contact-section p {
+      font-size: 0.9rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .social-links {
+      gap: 1rem;
+    }
+
+    .social-links a {
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+    }
+
+    .social-links a i {
+      font-size: 1rem;
+    }
+  }
+
+
+  @media (max-width: 1008px) {
+
+    /* Judul gradient */
+    .welcome-card-container h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    /* Teks isi */
+    .welcome-card p {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: #f1f1f1;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    /* Tombol Explore */
+    .explore-button {
+      font-size: 0.9rem;
+      font-weight: bold;
+      transition: 0.2s ease;
+    }
+  }
+}
+
+
+.welcome-intro {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }

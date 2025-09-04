@@ -1,6 +1,5 @@
 // src/components/WelcomeHome.js
 import React from 'react';
-import backgroundImage from '../Image/Welcome.svg';
 
 const WelcomeHome = ({ userRole, userName, onExploreClick }) => {
   const isAdmin = userRole && userRole.toLowerCase() === 'admin';
