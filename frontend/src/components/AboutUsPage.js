@@ -3,14 +3,6 @@ import teamworkImage from "../Image/teamwork.jpg";
 import teamworkImage2 from "../Image/teamwork2.jpg";
 import profil from "../Image/Profil.jpg";
 
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Autoplay } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/pagination";
-
-// Icons
-import { FaWhatsapp, FaInstagram, FaFacebook } from "react-icons/fa";
-
 
 
 const AboutUsPage = ({ adminList }) => {
@@ -46,41 +38,40 @@ const AboutUsPage = ({ adminList }) => {
         </div>
       </section>
 
-      {/* Team Slider */}
-      <section className="about-us-section team-section py-16 px-6 md:px-20 bg-gradient-to-b from-gray-900 to-black">
-        <h2 className="text-3xl font-semibold text-center text-purple-400">
-          Team Collaboration
-        </h2>
-        <div className="w-20 h-1 bg-purple-500 mx-auto my-4 rounded"></div>
+      {/* Team */}
+      <section className="about-us-section team-section">
+        <h2>Team Collaboration</h2>
+        <div className="underline"></div>
 
-        <Swiper
-          modules={[Pagination, Autoplay]}
-          spaceBetween={30}
-          slidesPerView={1}
-          pagination={{ clickable: true }}
-          autoplay={{ delay: 2500, disableOnInteraction: false }}
-          breakpoints={{
-            640: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
-          }}
-          className="mt-10"
-        >
-          {adminsToDisplay.map((admin, index) => (
-            <SwiperSlide key={index}>
-              <div className="team-member-card bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg text-center hover:scale-105 transition-transform duration-300">
+        <div className="team-grid">
+          {/* Baris pertama: 3 orang */}
+          {adminsToDisplay.slice(0, 3).map((admin, index) => (
+            <div key={index} className="team-member-card">
+              <img
+                src={admin.avatar}
+                alt={`Profile of ${admin.name}`}
+                className="member-avatar"
+              />
+              <h3>{admin.name}</h3>
+              <p>{admin.role}</p>
+            </div>
+          ))}
+
+          {/* Baris kedua: 2 orang */}
+          <div className="team-row-2">
+            {adminsToDisplay.slice(3, 5).map((admin, index) => (
+              <div key={index} className="team-member-card">
                 <img
                   src={admin.avatar}
                   alt={`Profile of ${admin.name}`}
-                  className="w-24 h-24 mx-auto rounded-full border-4 border-purple-500 shadow-md mb-4"
+                  className="member-avatar"
                 />
-                <h3 className="text-lg font-semibold text-white">
-                  {admin.name}
-                </h3>
-                <p className="text-sm text-gray-400">{admin.role}</p>
+                <h3>{admin.name}</h3>
+                <p>{admin.role}</p>
               </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+            ))}
+          </div>
+        </div>
       </section>
 
 

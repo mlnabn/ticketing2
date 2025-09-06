@@ -7283,30 +7283,58 @@ body.dark-mode .dashboard-card h4 {
   }
 
 
-  @media (max-width: 1008px) {
+  /* ================================
+   Responsive WelcomeHomeUser
+   ================================ */
 
-    /* Judul gradient */
-    .welcome-card-container h2 {
-      font-size: 1.5rem;
-      font-weight: 800;
-    }
-
-    /* Teks isi */
-    .welcome-card p {
-      font-size: 0.9rem;
-      line-height: 1.7;
-      color: #f1f1f1;
-      margin-bottom: 2rem;
-      text-align: left;
-    }
-
-    /* Tombol Explore */
-    .explore-button {
-      font-size: 0.9rem;
-      font-weight: bold;
-      transition: 0.2s ease;
-    }
+/* Tablet & HP Medium (<= 1008px) */
+@media (max-width: 1008px) {
+  /* Judul */
+  .welcome-card-container h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
   }
+
+  /* Sub Judul / teks isi */
+  .welcome-card-container p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #f1f1f1;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  /* Tombol */
+  .welcome-card-container button {
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+  }
+}
+
+/* HP Kecil (<= 400px) */
+@media (max-width: 400px) {
+  /* Judul lebih kecil */
+  .welcome-card-container h2 {
+    font-size: 1.2rem;
+  }
+
+  /* Sub Judul / teks isi */
+  .welcome-card-container p {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  /* List item */
+  .welcome-card-container li span {
+    font-size: 0.8rem;
+  }
+
+  /* Tombol lebih kecil */
+  .welcome-card-container button {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+  }
+}
 }
 
 
