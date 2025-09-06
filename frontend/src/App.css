@@ -6535,7 +6535,8 @@ body.dark-mode .dashboard-card h4 {
   font-size: 2.5rem;
   font-weight: 700;
   line-height: 1.2;
-  background: linear-gradient(135deg, #a855f7, #6b46c1);
+  font-weight: bold;
+  background: linear-gradient(to right, #1e40af, #3b82f6, #60a5fa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -6564,7 +6565,7 @@ body.dark-mode .dashboard-card h4 {
   font-size: 1.8rem;
   font-weight: 700;
   margin-bottom: 0.4rem;
-  background: linear-gradient(135deg, #a855f7, #ec4899);
+  background: linear-gradient(to right, #1e3a8a, #2563eb, #38bdf8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -6603,7 +6604,7 @@ body.dark-mode .dashboard-card h4 {
   height: 3px;
   margin: 0.4rem auto 1rem;
   border-radius: 9999px;
-  background: linear-gradient(90deg, #a855f7, #ec4899);
+  background: linear-gradient(90deg, #6366f1, #3b82f6);
   align-items: center;
 }
 
@@ -6799,7 +6800,7 @@ body.dark-mode .dashboard-card h4 {
   font-size: 1.3rem;
   font-weight: 600;
   margin-bottom: 0.4rem;
-  background: linear-gradient(135deg, #a855f7, #ec4899);
+  background: linear-gradient(to right, #312e81, #3b82f6, #93c5fd);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
