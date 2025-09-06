@@ -6710,8 +6710,8 @@ body.dark-mode .dashboard-card h4 {
 
 .team-member-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(59, 130, 246, 0.1); /* biru transparan */
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4); /* glow biru */
 }
 
 .member-avatar {
@@ -6846,11 +6846,12 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .social-links a:hover {
-  background: linear-gradient(135deg, #a855f7, #ec4899);
+  background: linear-gradient(135deg, #2563eb, #3b82f6, #38bdf8); /* biru tua → biru → biru muda */
   color: #fff;
   transform: translateY(-3px);
   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
 }
+
 
 /* ================================
    Animations
