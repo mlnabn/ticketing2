@@ -230,7 +230,7 @@ const AboutUsPage = ({ adminList }) => {
         <div className="underline"></div>
         <p>If you need assistance or want to connect with us, you can find us on:</p>
         <div className="social-links">
-          <a href="https://wa.me/62882005944805" target="_blank" rel="noopener noreferrer">
+          <a href="https://wa.me/628996271122" target="_blank" rel="noopener noreferrer">
             <i className="fab fa-whatsapp"></i> WhatsApp
           </a>
           <a href="https://www.instagram.com/dtech.engineering?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer">

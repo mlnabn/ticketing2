@@ -1,7 +1,25 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
 
-const LineChartComponent = ({ data }) => {
+const LineChartComponent = ({ data, onPointClick }) => {
+  if (!data || data.length === 0) return null;
+
+  // Custom click handler untuk titik
+  const handlePointClick = (dataPoint, status) => {
+    if (onPointClick) {
+      onPointClick(status, dataPoint.date); // kirim status + tanggal ke parent
+    }
+  };
+
   return (
     <ResponsiveContainer width="100%" height={300}>
       <LineChart
@@ -13,9 +31,37 @@ const LineChartComponent = ({ data }) => {
         <YAxis />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="created" stroke="#8884d8" name="Dibuat" />
-        <Line type="monotone" dataKey="completed" stroke="#82ca9d" name="Selesai" />
-        <Line type="monotone" dataKey="rejected" stroke="#ffc658" name="Ditolak" />
+
+        <Line
+          type="monotone"
+          dataKey="created"
+          stroke="#8884d8"
+          name="Dibuat"
+          activeDot={{
+            onClick: (e, payload) => handlePointClick(payload.payload, 'Dibuat'),
+            cursor: 'pointer'
+          }}
+        />
+        <Line
+          type="monotone"
+          dataKey="completed"
+          stroke="#82ca9d"
+          name="Selesai"
+          activeDot={{
+            onClick: (e, payload) => handlePointClick(payload.payload, 'Selesai'),
+            cursor: 'pointer'
+          }}
+        />
+        <Line
+          type="monotone"
+          dataKey="rejected"
+          stroke="#ffc658"
+          name="Ditolak"
+          activeDot={{
+            onClick: (e, payload) => handlePointClick(payload.payload, 'Ditolak'),
+            cursor: 'pointer'
+          }}
+        />
       </LineChart>
     </ResponsiveContainer>
   );

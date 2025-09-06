@@ -36,6 +36,7 @@ import PieChartComponent from './components/PieChartComponent';
 import BarChartComponent from './components/BarChartComponent';
 import 'leaflet/dist/leaflet.css';
 import MapComponent from './components/MapComponent';
+import { FaUser } from "react-icons/fa";
 
 
 
@@ -121,43 +122,43 @@ function App() {
   // === State ===
   const [userAvatar, setUserAvatar] = useState(null);
 
-  // modal state
-  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  // // modal state
+  // const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
-  // state sementara (untuk edit)
-  const [tempName, setTempName] = useState("");
-  const [tempAvatar, setTempAvatar] = useState(null);
+  // // state sementara (untuk edit)
+  // const [tempName, setTempName] = useState("");
+  // const [tempAvatar, setTempAvatar] = useState(null);
 
-  // state tambahan
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [isEditingAvatar, setIsEditingAvatar] = useState(false);
+  // // state tambahan
+  // const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  // const [isEditingAvatar, setIsEditingAvatar] = useState(false);
 
-  // === Functions ===
-  const openPreview = () => setIsPreviewOpen(true);
-  const closePreview = () => setIsPreviewOpen(false);
+  // // === Functions ===
+  // const openPreview = () => setIsPreviewOpen(true);
+  // const closePreview = () => setIsPreviewOpen(false);
 
-  const openEditProfile = () => {
-    // setTempName(userName); // kalau nanti mau pakai nama
-    setTempAvatar(userAvatar);
-    setIsEditProfileOpen(true);
-    setIsEditingAvatar(false); // selalu mulai dari preview mode
-  };
+  // const openEditProfile = () => {
+  //   // setTempName(userName); // kalau nanti mau pakai nama
+  //   setTempAvatar(userAvatar);
+  //   setIsEditProfileOpen(true);
+  //   setIsEditingAvatar(false); // selalu mulai dari preview mode
+  // };
 
-  const closeEditProfile = () => {
-    setTempAvatar(userAvatar); // reset kembali ke avatar asli
-    setIsEditingAvatar(false); // kembali ke preview mode
-    setIsEditProfileOpen(false);
-  };
+  // const closeEditProfile = () => {
+  //   setTempAvatar(userAvatar); // reset kembali ke avatar asli
+  //   setIsEditingAvatar(false); // kembali ke preview mode
+  //   setIsEditProfileOpen(false);
+  // };
 
-  const saveProfile = () => {
-    setUserAvatar(tempAvatar); // update avatar asli sesuai temp
+  // const saveProfile = () => {
+  //   setUserAvatar(tempAvatar); // update avatar asli sesuai temp
 
-    localStorage.setItem("userName", tempName);
-    localStorage.setItem("userAvatar", tempAvatar);
+  //   localStorage.setItem("userName", tempName);
+  //   localStorage.setItem("userAvatar", tempAvatar);
 
-    setIsEditProfileOpen(false);
-    setIsEditingAvatar(false); // pastikan reset ke preview mode
-  };
+  //   setIsEditProfileOpen(false);
+  //   setIsEditingAvatar(false); // pastikan reset ke preview mode
+  // };
 
   // -----------------------------------------------------------------
   // #1.A. VARIABEL TURUNAN (Derived State)
@@ -808,25 +809,18 @@ function App() {
           <div className="sidebar-footer">
             {/* === Sidebar User Info === */}
             <div className="user-info">
+              {/* Avatar */}
               <div
-                className="user-avatar cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openEditProfile();
-                }}
+                className="user-avatar cursor-pointer w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
               >
-                {userAvatar && userAvatar.trim() !== "" ? (
-                  <img
-                    src={userAvatar}
-                    alt="User Avatar"
-                  />
-                ) : (
-                  <i className="fas fa-user text-gray-500 text-xl"></i>
-                )}
+                <FaUser className="text-gray-500 text-xl" />
               </div>
 
+              {/* User Name */}
               <span>{userName || "User"}</span>
 
+              {/* Theme Switch */}
               <div
                 className={`theme-switch ${darkMode ? "dark" : ""}`}
                 onClick={toggleDarkMode}
@@ -840,124 +834,7 @@ function App() {
                 </div>
               </div>
             </div>
-
-
-            {isEditProfileOpen && (
-              <div className="modal-overlayyy" onClick={closeEditProfile}>
-                <div
-                  className="modal-contenttt"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {/* Judul Dinamis */}
-                  <h2>{isEditingAvatar ? "Edit Profil" : "Profil"}</h2>
-
-                  {/* === PREVIEW CONTAINER === */}
-                  {!isEditingAvatar && (
-                    <div className="preview-container">
-                      <div className="preview-avatar">
-                        {userAvatar ? (
-                          <img src={userAvatar} alt="Preview Avatar" />
-                        ) : (
-                          <i className="fas fa-user"></i>
-                        )}
-                      </div>
-
-                      <div className="modal-actionsss">
-                        <button
-                          className="btn-confirm"
-                          onClick={() => {
-                            setTempAvatar(userAvatar); // copy avatar lama
-                            setIsEditingAvatar(true);  // masuk ke edit mode
-                          }}
-                        >
-                          Edit Avatar
-                        </button>
-
-                        <button className="btn-cancel" onClick={closeEditProfile}>
-                          Tutup
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* === EDIT CONTAINER === */}
-                  {isEditingAvatar && (
-                    <div className="edit-container">
-                      <div className="preview-avatar">
-                        {tempAvatar ? (
-                          <img src={tempAvatar} alt="Preview Avatar" />
-                        ) : (
-                          <i className="fas fa-user"></i>
-                        )}
-                      </div>
-
-                      {/* Input Upload Avatar */}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              setTempAvatar(reader.result);
-                            };
-                            reader.readAsDataURL(file);
-                          }
-                        }}
-                      />
-
-                      <div className="modal-actionsss">
-                        <button
-                          className="btn-confirm"
-                          onClick={() => {
-                            setUserAvatar(tempAvatar);
-                            setIsEditingAvatar(false);
-                            setIsEditProfileOpen(false);
-                          }}
-                        >
-                          Simpan
-                        </button>
-
-                        {userAvatar && (
-                          <button
-                            className="btn-cancel"
-                            onClick={() => setTempAvatar(null)}
-                          >
-                            Hapus Foto
-                          </button>
-                        )}
-
-                        <button
-                          className="btn-cancel"
-                          onClick={() => {
-                            setTempAvatar(userAvatar);
-                            setIsEditingAvatar(false);
-                          }}
-                        >
-                          Batal
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* === Modal Preview Avatar Fullscreen === */}
-            {isPreviewOpen && (
-              <div className="modal-overlayyy" onClick={closePreview}>
-                <div
-                  className="preview-modal"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <img src={userAvatar} alt="Preview Avatar" />
-                </div>
-              </div>
-            )}
-
           </div>
-
         </aside>
 
         {isSidebarOpen && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
@@ -1048,19 +925,42 @@ function App() {
                   <div className="dashboard-row">
                     <div className="dashboard-card line-chart-card">
                       <h4>Tren Tiket (30 Hari Terakhir)</h4>
-                      <LineChartComponent data={analyticsData} />
+                      <LineChartComponent
+                        data={analyticsData}
+                        onPointClick={(status, date) => {
+                          handleHomeClick();           // pindah ke halaman tiket
+                          handleStatusFilterClick(status); // filter sesuai status
+                          console.log('Filter status:', status, 'Tanggal:', date);
+                        }}
+                      />
+
                     </div>
+
                     <div className="dashboard-card pie-chart-card">
                       <h4>Status Tiket</h4>
-                      <PieChartComponent stats={stats} />
+                      <PieChartComponent
+                        stats={stats}
+                        handleHomeClick={handleHomeClick}
+                        handleStatusFilterClick={handleStatusFilterClick}
+                        statusFilter={statusFilter}
+                      />
                     </div>
-                  </div>
 
+                  </div>
                   {/* Baris 2: Bar Chart + Map */}
                   <div className="dashboard-row">
                     <div className="dashboard-card bar-chart-card">
                       <h4>Performa Admin</h4>
-                      <BarChartComponent data={adminPerformanceData} />
+                      <BarChartComponent
+  data={adminPerformanceData}
+  onBarClick={(admin) => {
+    // Misal admin = { id, name, ticketsCompleted }
+    setCurrentPage('Tickets');          // pindah ke daftar tiket
+    setStatusFilter('Selesai');         // filter tiket selesai
+    fetchData(1, '', 'Selesai', admin.id); // fetch tiket sesuai admin
+  }}
+/>
+
                     </div>
                     <div className="dashboard-card map-chart-card">
                       <h4>Geografi Traffic</h4>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const BarChartComponent = ({ data }) => {
+const BarChartComponent = ({ data, onBarClick }) => {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart
@@ -13,7 +13,13 @@ const BarChartComponent = ({ data }) => {
         <YAxis />
         <Tooltip />
         <Legend />
-        <Bar dataKey="ticketsCompleted" fill="#8884d8" name="Tiket Selesai" />
+        <Bar 
+          dataKey="ticketsCompleted" 
+          fill="#8884d8" 
+          name="Tiket Selesai" 
+          cursor="pointer"
+          onClick={(entry) => onBarClick(entry)} // <-- panggil handler
+        />
       </BarChart>
     </ResponsiveContainer>
   );
