@@ -750,9 +750,12 @@ function App() {
 
             {/* Konten Dinamis */}
             <div className="public-content">
-              {publicPage === "home" && <WelcomeHomeUser />}
+              {publicPage === "home" && (
+                <WelcomeHomeUser onGetStarted={() => setAppPage("login")} />
+              )}
               {publicPage === "aboutus" && <AboutUsPage adminList={adminList} />}
             </div>
+
           </main>
         </div>
       );

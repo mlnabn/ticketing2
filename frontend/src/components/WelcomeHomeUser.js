@@ -3,7 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { HelpCircle, Clock, FileText } from "lucide-react";
 
-const WelcomeHomeUser = ({ user }) => {
+const WelcomeHomeUser = ({ user, onGetStarted }) => {
   return (
     <div className="welcome-card-container min-h-screen flex flex-col items-center justify-center text-white px-6 relative overflow-hidden">
       {/* Background stars effect */}
@@ -80,17 +80,16 @@ const WelcomeHomeUser = ({ user }) => {
             most out of our service.
           </p>
 
-          {/* CTA Button */}
-          {/* <motion.button
+          <motion.button
             whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.97 }}
-            
-            className="mt-6 px-8 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 
-                       hover:from-indigo-500 hover:to-blue-500 rounded-xl 
-                       shadow-lg shadow-indigo-600/30 text-white font-medium transition-all"
+            whileTap={{ scale: 0.95 }}
+            onClick={onGetStarted}  // ✅ sudah fix
+            className="mt-6 px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 
+                 hover:from-purple-500 hover:to-indigo-500 rounded-xl 
+                 shadow-lg shadow-purple-600/40 text-white font-semibold transition-all"
           >
-            ✨ Contact Support
-          </motion.button> */}
+            🚀 Get Started
+          </motion.button>
         </div>
       </motion.div>
 
