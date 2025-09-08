@@ -14,18 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
         $middleware->alias([
-            'jwt' => JwtMiddleware::class
+            'jwt' => \App\Http\Middleware\JwtMiddleware::class, 
+            'apikey.auth' => \App\Http\Middleware\ApiKeyMiddleware::class,
         ]);
-
-        // $middleware->handleCors(
-        //     paths: ['api/*'], // Terapkan kebijakan CORS untuk semua rute yang berawalan 'api/'
-        //     allowedOrigins: ['http://localhost:3000'], // Izinkan request dari alamat React Anda. Sesuaikan port jika berbeda.
-        //     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-        //     allowedMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
-        // );
-
     })
 
     ->withExceptions(function (Exceptions $exceptions): void {

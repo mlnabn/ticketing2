@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    
+    'n8n_api_key' => env('N8N_API_KEY'),
 ];

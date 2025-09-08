@@ -24,6 +24,7 @@ class Ticket extends Model
         'rejection_reason', 
         'proof_description', 
         'proof_image_path',
+        'kode_tiket',
     ];
 
     public function user() {
