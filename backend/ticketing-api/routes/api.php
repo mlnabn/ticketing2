@@ -18,6 +18,9 @@ use App\Http\Controllers\LocationController;
 // Route Publik (Tanpa Autentikasi)
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/tickets/by-code/{kode_tiket}', [TicketController::class, 'showByCode']);
+
+Route::post('/tickets/whatsapp', [TicketController::class, 'storeFromWhatsapp'])->middleware('apikey.auth');
 
 // Route Terproteksi (Memerlukan Token JWT)
 Route::middleware('jwt')->group(function () {

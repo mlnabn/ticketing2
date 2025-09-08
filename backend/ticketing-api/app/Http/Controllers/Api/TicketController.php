@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Carbon\Carbon; 
 
 class TicketController extends Controller
 {
@@ -48,6 +50,28 @@ class TicketController extends Controller
         return response()->json($ticketsData);
     }
 
+    private function generateKodeTiket($workshopName)
+    {
+        $workshopMap = [
+            'Canden' => 'CN',
+            'Nobo' => 'NB',
+            'Bener' => 'BN',
+            'Nusa Persada' => 'NP',
+            'Pelita' => 'PL',
+            'Muhasa' => 'MH'
+        ];
+        $workshopCode = $workshopMap[$workshopName] ?? 'XX';
+
+        $now = now();
+        $day = $now->format('d');
+        $month = $now->format('n');
+        
+        // Menggunakan 4 digit acak untuk memastikan keunikan
+        $sequence = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+
+        return strtoupper($workshopCode . $day . $month . $sequence);
+    }
+
     /**
      * PERUBAHAN: Simpan tiket baru dengan user_id null.
      */
@@ -60,6 +84,8 @@ class TicketController extends Controller
             'requested_date' => 'nullable|date',
         ]);
 
+        $kodeTiket = $this->generateKodeTiket($validated['workshop']);
+
         $ticket = Ticket::create([
             'title' => $validated['title'],
             'workshop' => $validated['workshop'],
@@ -71,6 +97,53 @@ class TicketController extends Controller
         ]);
 
         return response()->json($ticket, 201);
+    }
+
+    public function storeFromWhatsapp(Request $request)
+    {
+        // 1. Validasi input dari n8n
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'workshop' => 'required|string',
+            'sender_phone' => 'required|string',
+            'sender_name' => 'required|string',
+        ]);
+
+        // 2. Bersihkan nomor telepon
+        $cleanPhoneNumber = preg_replace('/[^0-9]/', '', $validated['sender_phone']);
+
+        // 3. Logika "Cari atau Buat Pengguna"
+        $user = User::firstOrCreate(
+            ['phone' => $cleanPhoneNumber],
+            [
+                'name' => $validated['sender_name'],
+                'email' => $cleanPhoneNumber . '@whatsapp.user',
+                'password' => bcrypt(Str::random(16)),
+                'role' => 'user'
+            ]
+        );
+
+        // 4. Panggil helper untuk membuat kode tiket
+        $kodeTiket = $this->generateKodeTiket($validated['workshop']);
+
+        // 5. Buat tiket baru dan hubungkan dengan user yang ditemukan/dibuat
+        $ticket = Ticket::create([
+            'kode_tiket' => $kodeTiket,
+            'title' => $validated['title'],
+            'workshop' => $validated['workshop'],
+            'requester_name' => $validated['sender_name'],
+            'creator_id' => $user->id, // <-- Gunakan ID dari user WhatsApp
+            'status' => 'Belum Dikerjakan',
+        ]);
+
+        // 6. Kembalikan data tiket yang baru dibuat agar bisa dibaca n8n
+        return response()->json($ticket, 201);
+    }
+
+    public function showByCode($kode_tiket)
+    {
+        $ticket = Ticket::where('kode_tiket', $kode_tiket)->firstOrFail();
+        return response()->json($ticket);
     }
 
     /**
