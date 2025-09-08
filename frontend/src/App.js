@@ -37,8 +37,7 @@ import BarChartComponent from './components/BarChartComponent';
 import 'leaflet/dist/leaflet.css';
 import MapComponent from './components/MapComponent';
 import { FaUser } from "react-icons/fa";
-
-
+import UserHeader from './components/UserHeader';
 
 
 // =================================================================
@@ -121,44 +120,6 @@ function App() {
 
   // === State ===
   const [userAvatar, setUserAvatar] = useState(null);
-
-  // // modal state
-  // const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
-
-  // // state sementara (untuk edit)
-  // const [tempName, setTempName] = useState("");
-  // const [tempAvatar, setTempAvatar] = useState(null);
-
-  // // state tambahan
-  // const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  // const [isEditingAvatar, setIsEditingAvatar] = useState(false);
-
-  // // === Functions ===
-  // const openPreview = () => setIsPreviewOpen(true);
-  // const closePreview = () => setIsPreviewOpen(false);
-
-  // const openEditProfile = () => {
-  //   // setTempName(userName); // kalau nanti mau pakai nama
-  //   setTempAvatar(userAvatar);
-  //   setIsEditProfileOpen(true);
-  //   setIsEditingAvatar(false); // selalu mulai dari preview mode
-  // };
-
-  // const closeEditProfile = () => {
-  //   setTempAvatar(userAvatar); // reset kembali ke avatar asli
-  //   setIsEditingAvatar(false); // kembali ke preview mode
-  //   setIsEditProfileOpen(false);
-  // };
-
-  // const saveProfile = () => {
-  //   setUserAvatar(tempAvatar); // update avatar asli sesuai temp
-
-  //   localStorage.setItem("userName", tempName);
-  //   localStorage.setItem("userAvatar", tempAvatar);
-
-  //   setIsEditProfileOpen(false);
-  //   setIsEditingAvatar(false); // pastikan reset ke preview mode
-  // };
 
   // -----------------------------------------------------------------
   // #1.A. VARIABEL TURUNAN (Derived State)
@@ -304,6 +265,7 @@ function App() {
   // -----------------------------------------------------------------
   // #4. HANDLER FUNCTIONS (Fungsi untuk Menangani Aksi Pengguna)
   // -----------------------------------------------------------------
+  
   const addTicket = async (formData) => {
     try {
       await axios.post(`${API_URL}/tickets`, formData, { headers: { Authorization: `Bearer ${getToken()}` } });
@@ -952,14 +914,14 @@ function App() {
                     <div className="dashboard-card bar-chart-card">
                       <h4>Performa Admin</h4>
                       <BarChartComponent
-  data={adminPerformanceData}
-  onBarClick={(admin) => {
-    // Misal admin = { id, name, ticketsCompleted }
-    setCurrentPage('Tickets');          // pindah ke daftar tiket
-    setStatusFilter('Selesai');         // filter tiket selesai
-    fetchData(1, '', 'Selesai', admin.id); // fetch tiket sesuai admin
-  }}
-/>
+                        data={adminPerformanceData}
+                        onBarClick={(admin) => {
+                          // Misal admin = { id, name, ticketsCompleted }
+                          setCurrentPage('Tickets');          // pindah ke daftar tiket
+                          setStatusFilter('Selesai');         // filter tiket selesai
+                          fetchData(1, '', 'Selesai', admin.id); // fetch tiket sesuai admin
+                        }}
+                      />
 
                     </div>
                     <div className="dashboard-card map-chart-card">
@@ -1119,17 +1081,16 @@ function App() {
           </div>
           <div className="main-header-controls-user">
             <span className="breadcrump">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <NotificationBell
-                notifications={notifications}
-                unreadCount={unreadCount}
-                onToggle={handleNotificationToggle}
-                onDelete={handleDeleteNotification}
-              />
-              <button onClick={handleLogout} className="logout-buttonuser">
-                <i className="fas fa-sign-out-alt"></i>
-              </button>
-            </div>
+            <UserHeader
+              userName={userName}
+              userAvatar={userAvatar}
+              handleLogout={handleLogout}
+              notifications={notifications}
+              unreadCount={unreadCount}
+              handleNotificationToggle={handleNotificationToggle}
+              handleDeleteNotification={handleDeleteNotification}
+            />
+
           </div>
         </header>
 
