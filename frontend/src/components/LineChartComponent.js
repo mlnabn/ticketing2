@@ -21,13 +21,13 @@ const LineChartComponent = ({ data, onPointClick }) => {
   };
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={280}>
       <LineChart
         data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        margin={{ top: 15, right: 30, left: -10, bottom: 15 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="date" />
+        <XAxis dataKey="date" tick={{ fontSize: 10 }} />
         <YAxis />
         <Tooltip />
         <Legend />
@@ -35,7 +35,7 @@ const LineChartComponent = ({ data, onPointClick }) => {
         <Line
           type="monotone"
           dataKey="created"
-          stroke="#8884d8"
+          stroke="#8ebfe8c1"
           name="Dibuat"
           activeDot={{
             onClick: (e, payload) => handlePointClick(payload.payload, 'Dibuat'),
@@ -45,7 +45,7 @@ const LineChartComponent = ({ data, onPointClick }) => {
         <Line
           type="monotone"
           dataKey="completed"
-          stroke="#82ca9d"
+          stroke="#45e0b4f7"
           name="Selesai"
           activeDot={{
             onClick: (e, payload) => handlePointClick(payload.payload, 'Selesai'),
@@ -55,7 +55,7 @@ const LineChartComponent = ({ data, onPointClick }) => {
         <Line
           type="monotone"
           dataKey="rejected"
-          stroke="#ffc658"
+          stroke="#f5dd06ae"
           name="Ditolak"
           activeDot={{
             onClick: (e, payload) => handlePointClick(payload.payload, 'Ditolak'),
@@ -67,4 +67,4 @@ const LineChartComponent = ({ data, onPointClick }) => {
   );
 };
 
-export default LineChartComponent;
+export default React.memo(LineChartComponent);;

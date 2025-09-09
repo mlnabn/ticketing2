@@ -9,7 +9,7 @@ const PieChartComponent = ({ stats, handleHomeClick, handleStatusFilterClick, st
     { name: 'Selesai', value: stats.completed_tickets },
   ];
 
-  const COLORS = ['#FF8042', '#00C49F', '#FFBB28'];
+  const COLORS = ['#f5dd06ae', '#45e0b4f7', '#FFBB28'];
 
   // Klik slice pie chart
   const onPieClick = (entry) => {
@@ -50,4 +50,4 @@ const PieChartComponent = ({ stats, handleHomeClick, handleStatusFilterClick, st
   );
 };
 
-export default PieChartComponent;
+export default React.memo(PieChartComponent);

@@ -37,8 +37,9 @@ import BarChartComponent from './components/BarChartComponent';
 import 'leaflet/dist/leaflet.css';
 import MapComponent from './components/MapComponent';
 import { FaUser } from "react-icons/fa";
-
-
+import UserHeader from './components/UserHeader';
+import FeaturesPage from './components/FeaturesPage';
+import FAQPage from './components/FAQPage';
 
 
 // =================================================================
@@ -95,7 +96,7 @@ function App() {
 
   // --- State UI ---
   const [darkMode, setDarkMode] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showRegister, setShowRegister] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -122,44 +123,6 @@ function App() {
   // === State ===
   const [userAvatar, setUserAvatar] = useState(null);
 
-  // // modal state
-  // const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
-
-  // // state sementara (untuk edit)
-  // const [tempName, setTempName] = useState("");
-  // const [tempAvatar, setTempAvatar] = useState(null);
-
-  // // state tambahan
-  // const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  // const [isEditingAvatar, setIsEditingAvatar] = useState(false);
-
-  // // === Functions ===
-  // const openPreview = () => setIsPreviewOpen(true);
-  // const closePreview = () => setIsPreviewOpen(false);
-
-  // const openEditProfile = () => {
-  //   // setTempName(userName); // kalau nanti mau pakai nama
-  //   setTempAvatar(userAvatar);
-  //   setIsEditProfileOpen(true);
-  //   setIsEditingAvatar(false); // selalu mulai dari preview mode
-  // };
-
-  // const closeEditProfile = () => {
-  //   setTempAvatar(userAvatar); // reset kembali ke avatar asli
-  //   setIsEditingAvatar(false); // kembali ke preview mode
-  //   setIsEditProfileOpen(false);
-  // };
-
-  // const saveProfile = () => {
-  //   setUserAvatar(tempAvatar); // update avatar asli sesuai temp
-
-  //   localStorage.setItem("userName", tempName);
-  //   localStorage.setItem("userAvatar", tempAvatar);
-
-  //   setIsEditProfileOpen(false);
-  //   setIsEditingAvatar(false); // pastikan reset ke preview mode
-  // };
-
   // -----------------------------------------------------------------
   // #1.A. VARIABEL TURUNAN (Derived State)
   // -----------------------------------------------------------------
@@ -167,7 +130,7 @@ function App() {
   const ticketsOnPage = useMemo(() => (ticketData ? ticketData.data : []), [ticketData]);
   const createdTicketsOnPage = useMemo(() => (createdTicketsData ? createdTicketsData.data : []), [createdTicketsData]);
   const [publicTicketCode, setPublicTicketCode] = useState(null);
-  
+
   const handleSelectionChange = useCallback((selectedIds) => {
     setSelectedTicketIds(selectedIds);
   }, []);
@@ -328,6 +291,7 @@ function App() {
   // -----------------------------------------------------------------
   // #4. HANDLER FUNCTIONS (Fungsi untuk Menangani Aksi Pengguna)
   // -----------------------------------------------------------------
+
   const addTicket = async (formData) => {
     try {
       await axios.post(`${API_URL}/tickets`, formData, { headers: { Authorization: `Bearer ${getToken()}` } });
@@ -737,15 +701,15 @@ function App() {
 
     // Tambahan: event listener untuk menangani tombol back/forward di browser
     const handlePopState = () => {
-        if (isLogin && !isAdmin && userViewTab === 'history') {
-            handleHistoryLoad();
-        }
+      if (isLogin && !isAdmin && userViewTab === 'history') {
+        handleHistoryLoad();
+      }
     };
 
     window.addEventListener('popstate', handlePopState);
 
     return () => {
-        window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('popstate', handlePopState);
     };
 
   }, [isLogin, isAdmin, userViewTab, createdTicketsPage, fetchCreatedTickets]);
@@ -786,144 +750,144 @@ function App() {
   if (publicTicketCode) {
     // Jika ada kode tiket di URL dan user belum login, tampilkan halaman history publik
     return (
-        <div
-            className="dashboard-container no-sidebar"
-            style={{
-              backgroundImage: `url(${bgImage})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundAttachment: 'fixed',
-              minHeight: '100vh'
-            }}
-        >
-            <main className="main-content">
-                <header className="main-header-user">
-                  <div className="header-left-group">
-                    <img src={yourLogok} alt="Logo" className="header-logo"></img>
+      <div
+        className="dashboard-container no-sidebar"
+        style={{
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+          minHeight: '100vh'
+        }}
+      >
+        <main className="main-content">
+          <header className="main-header-user">
+            <div className="header-left-group">
+              <img src={yourLogok} alt="Logo" className="header-logo"></img>
+            </div>
+            {/* Kosongkan bagian tengah header untuk tampilan publik */}
+            <div className="user-view-tabs"></div>
+            <div className="main-header-controls-user">
+              <span className="breadcrump">Status Tiket</span>
+            </div>
+          </header>
+          <div className="content-area">
+            <div className="user-view-container">
+              <div className="user-view-content">
+                {/* Di sini kita langsung render konten tab history */}
+                <div className="history-tab">
+                  <h2>Status untuk Tiket: {publicTicketCode}</h2>
+                  <div className="job-list" style={{ marginTop: '20px' }}>
+                    <table className="job-table user-history-table">
+                      <thead>
+                        <tr>
+                          <th>Deskripsi</th>
+                          <th>Workshop</th>
+                          <th>Tanggal Dibuat</th>
+                          <th>Waktu Pengerjaan</th>
+                          <th>Status</th>
+                          <th>Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {/* 1. Tampilkan pesan "Memuat..." jika data belum ada */}
+                        {!createdTicketsData ? (
+                          <tr>
+                            <td colSpan="6">Memuat riwayat tiket...</td>
+                          </tr>
+                        )
+                          /* 2. Tampilkan pesan error spesifik jika tiket tidak ditemukan */
+                          : createdTicketsData.message ? (
+                            <tr>
+                              <td colSpan="6">{createdTicketsData.message}</td>
+                            </tr>
+                          )
+                            /* 3. Tampilkan tiket jika data ada */
+                            : createdTicketsOnPage.length > 0 ? (
+                              createdTicketsOnPage.map(ticket => (
+                                <tr key={ticket.id}>
+                                  <td data-label="Deskripsi">{ticket.title}</td>
+                                  <td data-label="Workshop">{ticket.workshop}</td>
+                                  <td data-label="Tanggal Dibuat">
+                                    {format(new Date(ticket.created_at), 'dd MMM yyyy')}
+                                  </td>
+                                  <td data-label="Waktu Pengerjaan">
+                                    {(() => {
+                                      if (ticket.started_at) {
+                                        return ticket.completed_at
+                                          ? `${format(new Date(ticket.started_at), 'HH:mm')} - ${format(
+                                            new Date(ticket.completed_at),
+                                            'HH:mm'
+                                          )}`
+                                          : `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}`;
+                                      }
+                                      if (ticket.requested_date && ticket.requested_time) {
+                                        return `Request: ${format(new Date(ticket.requested_date), 'dd-MM-yy')} ${ticket.requested_time
+                                          }`;
+                                      }
+                                      if (ticket.requested_date) {
+                                        return `Request: ${format(new Date(ticket.requested_date), 'dd-MM-yy')}`;
+                                      }
+                                      if (ticket.requested_time) {
+                                        return `Request: ${ticket.requested_time}`;
+                                      }
+                                      return 'Waktu Pekerjaan Flexible';
+                                    })()}
+                                  </td>
+                                  <td data-label="Status">
+                                    <span
+                                      className={`status-badge status-${ticket.status
+                                        .toLowerCase()
+                                        .replace(' ', '-')}`}
+                                    >
+                                      {ticket.status}
+                                    </span>
+                                  </td>
+                                  <td data-label="Aksi">
+                                    {ticket.status === 'Selesai' && ticket.proof_description ? (
+                                      <button
+                                        onClick={() => handleViewProofClick(ticket)}
+                                        className="btn-start"
+                                      >
+                                        Lihat Bukti
+                                      </button>
+                                    ) : ticket.status === 'Ditolak' ? (
+                                      <button
+                                        onClick={() => handleShowReasonClick(ticket)}
+                                        className="btn-reason"
+                                      >
+                                        Alasan
+                                      </button>
+                                    ) : (
+                                      <button
+                                        onClick={() => handleDeleteClick(ticket)}
+                                        className="btn-cancel-aksi"
+                                      >
+                                        Delete
+                                      </button>
+                                    )}
+                                  </td>
+                                </tr>
+                              ))
+                            )
+                              /* 4. Tampilkan pesan "Belum ada tiket" jika data benar-benar kosong */
+                              : (
+                                <tr>
+                                  <td colSpan="6">You haven't created a ticket yet.</td>
+                                </tr>
+                              )}
+                      </tbody>
+                    </table>
                   </div>
-                  {/* Kosongkan bagian tengah header untuk tampilan publik */}
-                  <div className="user-view-tabs"></div>
-                  <div className="main-header-controls-user">
-                    <span className="breadcrump">Status Tiket</span>
-                  </div>
-                </header>
-                <div className="content-area">
-                    <div className="user-view-container">
-                        <div className="user-view-content">
-                            {/* Di sini kita langsung render konten tab history */}
-                            <div className="history-tab">
-                                <h2>Status untuk Tiket: {publicTicketCode}</h2>
-                                <div className="job-list" style={{ marginTop: '20px' }}>
-                                    <table className="job-table user-history-table">
-                                      <thead>
-                                        <tr>
-                                          <th>Deskripsi</th>
-                                          <th>Workshop</th>
-                                          <th>Tanggal Dibuat</th>
-                                          <th>Waktu Pengerjaan</th>
-                                          <th>Status</th>
-                                          <th>Aksi</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                      {/* 1. Tampilkan pesan "Memuat..." jika data belum ada */}
-                                      {!createdTicketsData ? (
-                                        <tr>
-                                          <td colSpan="6">Memuat riwayat tiket...</td>
-                                        </tr>
-                                      ) 
-                                      /* 2. Tampilkan pesan error spesifik jika tiket tidak ditemukan */
-                                      : createdTicketsData.message ? (
-                                        <tr>
-                                          <td colSpan="6">{createdTicketsData.message}</td>
-                                        </tr>
-                                      ) 
-                                      /* 3. Tampilkan tiket jika data ada */
-                                      : createdTicketsOnPage.length > 0 ? (
-                                        createdTicketsOnPage.map(ticket => (
-                                          <tr key={ticket.id}>
-                                            <td data-label="Deskripsi">{ticket.title}</td>
-                                            <td data-label="Workshop">{ticket.workshop}</td>
-                                            <td data-label="Tanggal Dibuat">
-                                              {format(new Date(ticket.created_at), 'dd MMM yyyy')}
-                                            </td>
-                                            <td data-label="Waktu Pengerjaan">
-                                              {(() => {
-                                                if (ticket.started_at) {
-                                                  return ticket.completed_at
-                                                    ? `${format(new Date(ticket.started_at), 'HH:mm')} - ${format(
-                                                        new Date(ticket.completed_at),
-                                                        'HH:mm'
-                                                      )}`
-                                                    : `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}`;
-                                                }
-                                                if (ticket.requested_date && ticket.requested_time) {
-                                                  return `Request: ${format(new Date(ticket.requested_date), 'dd-MM-yy')} ${ticket.requested_time
-                                                    }`;
-                                                }
-                                                if (ticket.requested_date) {
-                                                  return `Request: ${format(new Date(ticket.requested_date), 'dd-MM-yy')}`;
-                                                }
-                                                if (ticket.requested_time) {
-                                                  return `Request: ${ticket.requested_time}`;
-                                                }
-                                                return 'Flexible Work Schedule';
-                                              })()}
-                                            </td>
-                                            <td data-label="Status">
-                                              <span
-                                                className={`status-badge status-${ticket.status
-                                                  .toLowerCase()
-                                                  .replace(' ', '-')}`}
-                                              >
-                                                {ticket.status}
-                                              </span>
-                                            </td>
-                                            <td data-label="Aksi">
-                                              {ticket.status === 'Selesai' && ticket.proof_description ? (
-                                                <button
-                                                  onClick={() => handleViewProofClick(ticket)}
-                                                  className="btn-start"
-                                                >
-                                                  Lihat Bukti
-                                                </button>
-                                              ) : ticket.status === 'Ditolak' ? (
-                                                <button
-                                                  onClick={() => handleShowReasonClick(ticket)}
-                                                  className="btn-reason"
-                                                >
-                                                  Alasan
-                                                </button>
-                                              ) : (
-                                                <button
-                                                  onClick={() => handleDeleteClick(ticket)}
-                                                  className="btn-cancel-aksi"
-                                                >
-                                                  Delete
-                                                </button>
-                                              )}
-                                            </td>
-                                          </tr>
-                                        ))
-                                      ) 
-                                      /* 4. Tampilkan pesan "Belum ada tiket" jika data benar-benar kosong */
-                                      : (
-                                        <tr>
-                                          <td colSpan="6">You haven't created a ticket yet.</td>
-                                        </tr>
-                                      )}
-                                    </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-            </main>
-            {showViewProofModal && ticketToShowProof && ( <ViewProofModal ticket={ticketToShowProof} onClose={handleCloseViewProofModal} onDelete={handleDeleteFromViewProofModal} /> )}
-            {showRejectionInfoModal && ticketToShowReason && ( <RejectionInfoModal ticket={ticketToShowReason} onClose={handleCloseReasonModal} onDelete={handleDeleteFromReasonModal} /> )}
-            {showConfirmModal && ticketToDelete && (<ConfirmationModalUser message={`Delete job "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
-        </div>
+              </div>
+            </div>
+          </div>
+        </main>
+        {showViewProofModal && ticketToShowProof && (<ViewProofModal ticket={ticketToShowProof} onClose={handleCloseViewProofModal} onDelete={handleDeleteFromViewProofModal} />)}
+        {showRejectionInfoModal && ticketToShowReason && (<RejectionInfoModal ticket={ticketToShowReason} onClose={handleCloseReasonModal} onDelete={handleDeleteFromReasonModal} />)}
+        {showConfirmModal && ticketToDelete && (<ConfirmationModalUser message={`Delete job "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
+      </div>
     );
   }
 
@@ -950,6 +914,21 @@ function App() {
                 >
                   Home
                 </button>
+
+                <button
+                  className={publicPage === "features" ? "active" : ""}
+                  onClick={() => setPublicPage("features")}
+                >
+                  Features
+                </button>
+
+                <button
+                  className={publicPage === "faq" ? "active" : ""}
+                  onClick={() => setPublicPage("faq")}
+                >
+                  FAQ
+                </button>
+
                 <button
                   className={publicPage === "aboutus" ? "active" : ""}
                   onClick={() => setPublicPage("aboutus")}
@@ -973,6 +952,8 @@ function App() {
                 <WelcomeHomeUser onGetStarted={() => setAppPage("login")} />
               )}
               {publicPage === "aboutus" && <AboutUsPage adminList={adminList} />}
+              {publicPage === "features" && <FeaturesPage />}
+              {publicPage === "faq" && <FAQPage />}
             </div>
 
           </main>
@@ -1015,10 +996,10 @@ function App() {
                 <button
                   onClick={() => setCurrentPage('Welcome')}
                   className={`sidebar-button ${currentPage === 'Welcome' ? 'active' : ''}`}>
-                  <i className="fas fa-hand-sparkles"></i><span>Home</span>
+                  <i className="fas fa-home"></i><span>Home</span>
                 </button>
               </li>
-              <li className="sidebar-nav-item"><button onClick={handleHomeClick} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-home"></i><span>Daftar Tiket</span></button></li>
+              <li className="sidebar-nav-item"><button onClick={handleHomeClick} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-ticket-alt"></i><span>Daftar Tiket</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('MyTickets')} className={`sidebar-button ${currentPage === 'MyTickets' ? 'active' : ''}`}><i className="fas fa-user-tag"></i><span>Tiket Saya</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>Pengguna</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Notifications')} className={`sidebar-button ${currentPage === 'Notifications' ? 'active' : ''}`}><i className="fas fa-bell"></i><span>Notifikasi</span></button></li>
@@ -1122,6 +1103,7 @@ function App() {
                       <div className="card-icon yellow-icon"><i className="fas fa-tasks"></i></div>
                     </div>
                     <h3 className="card-value">{stats ? stats.total_tickets : '...'}</h3>
+                  
                   </div>
 
                   {/* Kartu Total Pengguna */}
@@ -1170,16 +1152,17 @@ function App() {
                     <div className="dashboard-card bar-chart-card">
                       <h4>Performa Admin</h4>
                       <BarChartComponent
-  data={adminPerformanceData}
-  onBarClick={(admin) => {
-    // Misal admin = { id, name, ticketsCompleted }
-    setCurrentPage('Tickets');          // pindah ke daftar tiket
-    setStatusFilter('Selesai');         // filter tiket selesai
-    fetchData(1, '', 'Selesai', admin.id); // fetch tiket sesuai admin
-  }}
-/>
+                        data={adminPerformanceData}
+                        onBarClick={(admin) => {
+                          // Misal admin = { id, name, ticketsCompleted }
+                          setCurrentPage('Tickets');          // pindah ke daftar tiket
+                          setStatusFilter('Selesai');         // filter tiket selesai
+                          fetchData(1, '', 'Selesai', admin.id); // fetch tiket sesuai admin
+                        }}
+                      />
 
                     </div>
+                    
                     <div className="dashboard-card map-chart-card">
                       <h4>Geografi Traffic</h4>
                       <MapComponent data={locationsData} />
@@ -1339,18 +1322,17 @@ function App() {
             )}
           </div>
           <div className="main-header-controls-user">
-            <span className="breadcrump">{publicTicketCode ? `Status Tiket` : (userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1))}</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <NotificationBell
-                notifications={notifications}
-                unreadCount={unreadCount}
-                onToggle={handleNotificationToggle}
-                onDelete={handleDeleteNotification}
-              />
-              <button onClick={handleLogout} className="logout-buttonuser">
-                <i className="fas fa-sign-out-alt"></i>
-              </button>
-            </div>
+            <span className="breadcrump">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
+            <UserHeader
+              userName={userName}
+              userAvatar={userAvatar}
+              handleLogout={handleLogout}
+              notifications={notifications}
+              unreadCount={unreadCount}
+              handleNotificationToggle={handleNotificationToggle}
+              handleDeleteNotification={handleDeleteNotification}
+            />
+
           </div>
         </header>
 
@@ -1358,7 +1340,7 @@ function App() {
           <div className="user-view-container">
             <div className="user-view-content">
               {/* {userViewTab === 'home' && <WelcomeHomeUser user={userName} onExploreClick={() => setUserViewTab('request')} />} */}
-              {userViewTab === 'request' && !publicTicketCode &&(
+              {userViewTab === 'request' && !publicTicketCode && (
                 <div className="request-tab">
                   <h2>Submit a Request</h2>
                   <p>Please fill in the job details below.</p>
@@ -1404,12 +1386,12 @@ function App() {
                                     const datePart = ticket.requested_date
                                       ? format(new Date(ticket.requested_date), 'dd-MM-yy')
                                       : '';
-                                    
+
                                     // Siapkan bagian waktu (kosong jika tidak ada)
                                     const timePart = ticket.requested_time || '';
                                     return `Request: ${datePart} ${timePart}`.trim();
                                   }
-                                  return 'Flexible Work Schedule';
+                                  return 'Waktu Pekerjaan Flexible';
                                 })()}
                               </td>
                               <td data-label="Status">
@@ -1427,21 +1409,21 @@ function App() {
                                     onClick={() => handleViewProofClick(ticket)}
                                     className="btn-start"
                                   >
-                                    See Evidence
+                                    Lihat Bukti
                                   </button>
                                 ) : ticket.status === 'Ditolak' ? (
                                   <button
                                     onClick={() => handleShowReasonClick(ticket)}
                                     className="btn-reason"
                                   >
-                                    Reason
+                                    Alasan
                                   </button>
                                 ) : (
                                   <button
                                     onClick={() => handleDeleteClick(ticket)}
                                     className="btn-cancel-aksi"
                                   >
-                                    Delete
+                                    Hapus
                                   </button>
                                 )}
                               </td>
@@ -1449,7 +1431,7 @@ function App() {
                           ))
                         ) : (
                           <tr>
-                            <td colSpan="6">You haven't created a ticket yet.</td>
+                            <td colSpan="6">Anda belum membuat tiket.</td>
                           </tr>
                         )}
                       </tbody>

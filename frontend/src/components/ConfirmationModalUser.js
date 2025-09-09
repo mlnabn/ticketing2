@@ -10,13 +10,13 @@ const ConfirmationModalUser = ({ message, onConfirm, onCancel }) => {
             onClick={onCancel}
             className="btn-cancel"
           >
-            Cancel
+            Batal
           </button>
           <button
             onClick={onConfirm}
             className="btn-confirm"
           >
-            Delete
+            Hapus
           </button>
         </div>
       </div>
