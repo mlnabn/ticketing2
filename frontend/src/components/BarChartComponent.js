@@ -6,7 +6,7 @@ const BarChartComponent = ({ data, onBarClick }) => {
     <ResponsiveContainer width="100%" height={300}>
       <BarChart
         data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        margin={{ top: 50, right: 30, left: 20, bottom: 1 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
@@ -15,7 +15,7 @@ const BarChartComponent = ({ data, onBarClick }) => {
         <Legend />
         <Bar 
           dataKey="ticketsCompleted" 
-          fill="#8884d8" 
+          fill="#8ebfe8c1" 
           name="Tiket Selesai" 
           cursor="pointer"
           onClick={(entry) => onBarClick(entry)} // <-- panggil handler
@@ -25,4 +25,4 @@ const BarChartComponent = ({ data, onBarClick }) => {
   );
 };
 
-export default BarChartComponent;
+export default React.memo(BarChartComponent);;

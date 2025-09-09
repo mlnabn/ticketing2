@@ -204,7 +204,7 @@ function JobFormUser({ users, addTicket, userRole }) {
       />
 
       {/* Tombol Tambah */}
-      <button type="submit" className="btn-submituser">Add</button>
+      <button type="submit" className="btn-submituser">Submit</button>
     </form >
   );
 

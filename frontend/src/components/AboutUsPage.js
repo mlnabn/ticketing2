@@ -20,7 +20,7 @@ const AboutUsPage = ({ adminList }) => {
     <div className="about-us-container">
       {/* Header */}
       <header className="about-us-header">
-        <h1>About Company</h1>
+        <h1>Tentang Perusahaan</h1>
       </header>
 
       {/* Mission */}
@@ -30,17 +30,17 @@ const AboutUsPage = ({ adminList }) => {
           <h3>Redefine Technology</h3>
           <div className="underline"></div>
           <p>
-            DTECH-ENGINEERING is a research and technology company founded in 2009, specializing in mechanical engineering, manufacturing, and consumer product research and development.
+            DTECH-ENGINEERING adalah perusahaan riset dan teknologi yang didirikan pada tahun 2009, dengan spesialisasi di bidang teknik mesin, manufaktur, serta riset dan pengembangan produk konsumen.
           </p>
           <p>
-            We have expanded our world-class team to provide superior services for our customers from around the globe. Our team works tirelessly as we aim to provide the best service in the industry, with support that is second to none.
+            Kami telah mengembangkan tim kelas dunia untuk memberikan layanan terbaik bagi pelanggan kami di seluruh dunia. Tim kami bekerja tanpa lelah demi memberikan pelayanan terbaik di industri ini, dengan dukungan yang tiada duanya.
           </p>
         </div>
       </section>
 
       {/* Team */}
       <section className="about-us-section team-section">
-        <h2>Team Collaboration</h2>
+        <h2>Team Support</h2>
         <div className="underline"></div>
 
         <div className="team-grid">
@@ -78,7 +78,7 @@ const AboutUsPage = ({ adminList }) => {
       {/* Values */}
       <section className="about-us-section values-and-image-section">
         <div className="values-grid">
-          <h2>Team Values</h2>
+          <h2>Values</h2>
           <div className="underline"></div>
 
           {/* Passion */}
@@ -98,7 +98,7 @@ const AboutUsPage = ({ adminList }) => {
             <div>
               <h3>Passion</h3>
               <p>
-                We bring energy and enthusiasm to everything we do, turning challenges into opportunities and ideas into impact.
+                Kami membawa energi dan antusiasme dalam setiap hal yang kami lakukan, mengubah tantangan menjadi peluang dan ide menjadi dampak nyata.
               </p>
             </div>
           </div>
@@ -121,7 +121,7 @@ const AboutUsPage = ({ adminList }) => {
             <div>
               <h3>Integrity</h3>
               <p>
-                Trust is at the heart of our work. We act with honesty, transparency, and responsibility in every step.
+                Kepercayaan adalah inti dari pekerjaan kami. Kami bertindak dengan jujur, transparan, dan penuh tanggung jawab di setiap langkah.
               </p>
             </div>
           </div>
@@ -144,7 +144,7 @@ const AboutUsPage = ({ adminList }) => {
             <div>
               <h3>Innovation</h3>
               <p>
-                We embrace creativity and forward-thinking, constantly exploring new ways to deliver smarter and better solutions.
+                Kami merangkul kreativitas dan pemikiran ke depan, terus mencari cara baru untuk menghadirkan solusi yang lebih cerdas dan lebih baik.
               </p>
             </div>
           </div>
@@ -166,7 +166,7 @@ const AboutUsPage = ({ adminList }) => {
             <div>
               <h3>Collaboration</h3>
               <p>
-                We believe teamwork multiplies strength. By sharing knowledge and supporting each other, we achieve greater success together.
+                Kami percaya kerja sama tim melipatgandakan kekuatan. Dengan berbagi pengetahuan dan saling mendukung, kami mencapai kesuksesan yang lebih besar bersama.
               </p>
             </div>
           </div>
@@ -186,7 +186,7 @@ const AboutUsPage = ({ adminList }) => {
             <div>
               <h3>Excellence</h3>
               <p>
-                We strive for excellence in everything we do, setting high standards and continuously improving to deliver outstanding results.
+                Kami berkomitmen untuk selalu unggul dalam segala hal yang kami lakukan, menetapkan standar tinggi dan terus meningkatkan diri demi memberikan hasil terbaik.
               </p>
             </div>
           </div>
@@ -203,10 +203,10 @@ const AboutUsPage = ({ adminList }) => {
           <h2 className="heading-gradient">Office Life</h2>
           <div className="underline-line"></div>
           <p>
-            Behind the screen of coding, our team stays fully focused on delivering the best solutions. The office is more than just a workspace.
+            Di balik layar coding, tim kami tetap fokus penuh untuk menghadirkan solusi terbaik. Kantor bukan sekadar ruang kerja.
           </p>
           <p>
-            it’s a collaborative hub where every idea is shared, refined, and transformed into real innovation.
+            Melainkan pusat kolaborasi di mana setiap ide dibagikan, disempurnakan, dan diwujudkan menjadi inovasi nyata.
           </p>
         </div>
       </section>
@@ -219,7 +219,7 @@ const AboutUsPage = ({ adminList }) => {
           <h2 className="heading-gradient">Work & Fun</h2>
           <div className="underline-line"></div>
           <p>
-            Hard work is always balanced with moments of joy. Between tasks, there’s laughter, jokes, and togetherness that make work not only productive but also enjoyable.
+            Kerja keras selalu diimbangi dengan momen penuh keceriaan. Di sela-sela tugas, ada tawa, canda, dan kebersamaan yang membuat pekerjaan tidak hanya produktif tetapi juga menyenangkan.
           </p>
         </div>
       </section>
@@ -230,7 +230,7 @@ const AboutUsPage = ({ adminList }) => {
         <div className="underline"></div>
         <p>If you need assistance or want to connect with us, you can find us on:</p>
         <div className="social-links">
-          <a href="https://wa.me/628996271122" target="_blank" rel="noopener noreferrer">
+          <a href="https://wa.me/+628978830033" target="_blank" rel="noopener noreferrer">
             <i className="fab fa-whatsapp"></i> WhatsApp
           </a>
           <a href="https://www.instagram.com/dtech.engineering?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer">

@@ -63,4 +63,4 @@ const MapComponent = ({ data }) => {
   );
 };
 
-export default MapComponent;
+export default React.memo(MapComponent);
