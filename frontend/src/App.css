@@ -48,7 +48,7 @@
   /* Warna hover tombol header */
 
   /* Konten Utama */
-  --content-bg-light: #FFFFFF;
+  --content-bg-light: #f1ecec;
   /* Latar belakang area konten utama dashboard (putih bersih) */
 
   /* Header Tabel Joblist (Muted Slate Blue, sesuai screenshot) */
@@ -217,7 +217,7 @@ body.dark-mode {
   /* Warna teks utama dashboard */
 
   /* Sidebar */
-  --sidebar-bg-dark: #4A5568;
+  --sidebar-bg-dark: #1f2937;
   /* Latar belakang sidebar (slightly lighter slate) */
   --sidebar-text-dark: #E0E0E0;
   /* Warna teks sidebar */
@@ -227,7 +227,7 @@ body.dark-mode {
   /* Warna hover tombol sidebar */
 
   /* Header Dashboard */
-  --header-bg-dark: #4A5568;
+  --header-bg-dark: #1f2937;
   /* Latar belakang header dashboard */
   --header-text-dark: #E0E0E0;
   /* Warna teks di header */
@@ -1293,13 +1293,13 @@ body.dark-mode .sidebar-header {
   /* Default: memastikan gambar tidak melebihi lebar kontainer */
   height: auto;
   /* Default: mempertahankan rasio aspek */
-  display: block;
+  /* display: block; */
   /* Default: menghapus spasi ekstra di bawah gambar */
   margin: 0 auto;
   /* Default: memusatkan gambar jika kontainer lebih lebar dari gambar */
-  padding: 0rem 0;
+  padding: 0.5rem 0;
   /* Default: menambahkan sedikit padding vertikal */
-  width: 80%;
+  width: 100%;
 }
 
 .sidebar-nav {
