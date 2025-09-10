@@ -990,7 +990,7 @@ function App() {
       <div className={`dashboard-container ${isSidebarOpen ? '' : ' sidebar-closed'}`}>
         <aside className={`sidebar ${!isSidebarOpen ? 'closed' : ''}`}>
           <div className="sidebar-header">
-            <img src={yourLogo} alt="Logo" className="sidebar-logo" />
+            <img src={yourLogok} alt="Logo" className="sidebar-logo" />
           </div>
           <nav className="sidebar-nav">
             <ul>
