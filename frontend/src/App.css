@@ -7473,3 +7473,361 @@ body.dark-mode .dashboard-card h4 {
   padding-bottom: 0.5rem;
   
 }
+
+
+/* ========== LIGHT MODE (default) ========== */
+/* ========== LIGHT MODE (default) ========== */
+.calendar-wrapper {
+  background: #f1f5f9;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+  /* Ubah nilai max-width di sini untuk melebarkan komponen */
+  max-width: 1500px; /* Contoh nilai yang lebih lebar */ 
+  margin: 0 auto;
+  font-family: 'Inter', sans-serif;
+  color: #222;
+  transition: all 0.3s ease-in-out;
+}
+/* ... sisa kode CSS lainnya */
+
+/* Calendar */
+.calendar-wrapper .react-calendar {
+  width: 100% ;
+  border: 1px solid #e5e7eb ;
+  border-radius: 8px ;
+  background: #fff ;
+  color: #222 ;
+  padding: 10px ;
+}
+
+/* Header bulan + tombol */
+.calendar-wrapper .react-calendar__navigation {
+  display: flex ;
+  justify-content: center ;
+  margin-bottom: 10px ;
+}
+
+.calendar-wrapper .react-calendar__navigation button {
+  min-width: 30px ;
+  font-size: 14px ;
+  font-weight: 600 ;
+  color: #1e293b ;
+  background: transparent ;
+  border-radius: 6px ;
+  cursor: pointer ;
+}
+
+.calendar-wrapper .react-calendar__navigation button:hover {
+  background: #e5e7eb ;
+}
+
+/* Hari */
+.calendar-wrapper .react-calendar__month-view__weekdays {
+  font-weight: bold ;
+  text-transform: uppercase ;
+  font-size: 12px ;
+  color: #475569 ;
+}
+
+/* Tile tanggal */
+.calendar-wrapper .react-calendar__tile {
+  height: 45px ;
+  border-radius: 6px ;
+  transition: all 0.2s;
+  color: #222 ;
+}
+
+.calendar-wrapper .react-calendar__tile--now {
+  background: #e0f2fe ;
+  color: #0284c7 ;
+  font-weight: 600 ;
+}
+
+.calendar-wrapper .react-calendar__tile--active {
+  background: #2563eb ;
+  color: #fff ;
+}
+
+.calendar-wrapper .react-calendar__tile:hover {
+  background: #dbeafe ;
+}
+
+.calendar-wrapper .react-calendar__tile--now:hover {
+  background: #dbeafe !important; /* Warna kuning pudar saat hover */
+  color: #3B82F6 !important; /* Warna teks yang kontras */
+}
+
+
+/* Info text */
+.calendar-info {
+  margin-top: 10px ;
+  text-align: center ;
+  font-size: 14px ;
+  color: #555 ;
+}
+
+/* Ticket card */
+.ticket-card {
+  background-color: #f9f9f9 ;
+  border: 1px solid #e5e5e5 ;
+  border-radius: 10px ;
+  padding: 15px ;
+  margin-top: 15px ;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05) ;
+}
+
+.ticket-card p {
+  margin: 5px 0 ;
+  font-size: 14px ;
+  color: #222 ;
+}
+
+/* Slider controls */
+.slider-controls {
+  display: flex ;
+  justify-content: center ;
+  align-items: center ;
+  gap: 8px ;
+  margin-top: 12px ;
+}
+
+.slider-btn {
+  background-color: #dbeafe ;
+  color: #2563eb ;
+  border: none ;
+  padding: 8px 12px ;
+  border-radius: 8px ;
+  cursor: pointer ;
+  font-weight: bold ;
+  transition: all 0.2s ;
+}
+
+.slider-btn:hover:not(:disabled) {
+  background-color: #2563eb ;
+  color: white ;
+}
+
+.slider-btn:disabled {
+  opacity: 0.4 ;
+  cursor: not-allowed ;
+}
+
+.slider-page {
+  font-weight: bold ;
+  color: #2563eb ;
+  padding: 6px 12px ;
+  border-radius: 6px ;
+  background: #dbeafe ;
+}
+
+/* DARK MODE STYLES */
+
+.dark-mode .calendar-wrapper {
+  background: #2C2F40 !important;
+  color: #E6E8F7 !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5) !important;
+}
+
+.dark-mode .react-calendar {
+  background: #3A3E52 !important;
+  border-color: #4A4E6C !important;
+  color: #E6E8F7 !important;
+}
+
+.dark-mode .react-calendar__navigation button {
+  color: #7E88C7 !important;
+  background: transparent !important;
+}
+
+.dark-mode .react-calendar__navigation button:hover {
+  background: #4A4E6C !important;
+}
+
+.dark-mode .react-calendar__month-view__weekdays {
+  color: #AAB0CC !important;
+}
+
+.dark-mode .react-calendar__tile {
+  color: #E6E8F7 !important;
+}
+
+.dark-mode .react-calendar__tile--now {
+  background: #4A4E6C !important;
+  color: #E6E8F7 !important;
+}
+
+.dark-mode .react-calendar__tile--active {
+  background: #6D28D9 !important;
+  color: #fff !important;
+}
+
+.dark-mode .react-calendar__tile:hover {
+  background: #4A4E6C !important;
+}
+
+.dark-mode .ticket-card {
+  background-color: #3A3E52 !important;
+  border: 1px solid #4A4E6C !important;
+  color: #E6E8F7 !important;
+}
+
+.dark-mode .ticket-card p {
+  color: #E6E8F7 !important;
+}
+
+.dark-mode .slider-btn {
+  background-color: #4A4E6C !important;
+  color: #7E88C7 !important;
+}
+
+.dark-mode .slider-btn:hover:not(:disabled) {
+  background-color: #7E88C7 !important;
+  color: white !important;
+}
+
+.dark-mode .slider-page {
+  background: #4A4E6C !important;
+  color: #7E88C7 !important;
+}
+
+/* LIGHT MODE STYLES (default) */
+.info-text {
+  text-align: center;
+  font-style: italic;
+  margin-top: 20px;
+  color: #6b7280; /* Warna default untuk mode terang */
+}
+
+/* DARK MODE STYLES */
+/* Pastikan ini ada dan selektornya spesifik */
+.darkmode .info-text {
+  color: #9ca3af !important; /* Warna yang lebih terang untuk mode gelap */
+}
+
+/* ========================================================= */
+/* =================== RESPONSIVE STYLES =================== */
+/* ========================================================= */
+
+@media (max-width: 1024px) {
+  .calendar-wrapper {
+    /* Mengubah max-width agar lebih sesuai dengan layar tablet */
+    max-width: 90%;
+    /* Mengurangi padding agar tidak terlalu besar di layar kecil */
+    padding: 16px;
+  }
+
+  /* Mengurangi ukuran font agar lebih mudah dibaca di layar kecil */
+  .calendar-wrapper .react-calendar__navigation button {
+    font-size: 13px;
+  }
+
+  .calendar-wrapper .react-calendar__month-view__weekdays {
+    font-size: 11px;
+  }
+
+  /* Mengubah ukuran tile agar sesuai dengan ukuran layar yang lebih kecil */
+  .calendar-wrapper .react-calendar__tile {
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .calendar-info {
+    /* Mengurangi margin dan ukuran font */
+    margin-top: 15px;
+    font-size: 13px;
+  }
+
+  .ticket-card p {
+    /* Mengurangi ukuran font pada detail tiket */
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Pengaturan untuk perangkat seluler */
+  .calendar-wrapper {
+    /* Memastikan komponen mengambil hampir seluruh lebar layar */
+    max-width: 95%;
+    padding: 12px;
+  }
+
+  /* Mengatur tata letak kalender agar lebih ringkas */
+  .react-calendar {
+    padding: 5px;
+  }
+
+  /* Menyesuaikan ukuran font lebih lanjut */
+  .react-calendar__navigation__label {
+    font-size: 16px;
+  }
+
+  .react-calendar__navigation button {
+    min-width: 25px;
+    font-size: 12px;
+  }
+
+  .react-calendar__tile {
+    height: 35px;
+    font-size: 12px;
+  }
+
+  .slider-controls {
+    /* Mengatur ulang layout kontrol slider jika perlu */
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .slider-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .slider-page {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+}
+
+/* ========================================================= */
+/* =================== FITUR BARU CSS =================== */
+/* ========================================================= */
+
+/* Indikator tiket (titik di bawah tanggal) */
+.ticket-indicator {
+  height: 6px;
+  width: 6px;
+  background-color: #2563eb; /* Biru */
+  border-radius: 50%;
+  margin: auto;
+  margin-top: 5px;
+}
+
+/* Gaya untuk status tiket yang sedang dikerjakan */
+.react-calendar__tile.tile-in-progress {
+  background-color: #fcd34d !important; /* Kuning */
+  color: #a16207 !important;
+  font-weight: bold;
+}
+
+/* Gaya untuk status tiket yang sudah selesai */
+.react-calendar__tile.tile-completed {
+  background-color: #4ade80 ; /* Hijau */
+  color: #15803d ;
+  font-weight: bold;
+}
+
+/* Gaya untuk mode gelap */
+.darkmode .react-calendar__tile.tile-in-progress {
+  background-color: #b45309 !important; /* Oranye gelap untuk dark mode */
+  color: #fff !important;
+}
+
+.darkmode .react-calendar__tile.tile-completed {
+  background-color: #166534 !important; /* Hijau gelap untuk dark mode */
+  color: #fff !important;
+}
+
+.darkmode .ticket-indicator {
+  background-color: #7E88C7; /* Warna lebih terang untuk dark mode */
+}

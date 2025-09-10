@@ -11,7 +11,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import UserManagement from './components/UserManagement';
 import NotificationForm from './components/NotificationForm';
-import NotificationBell from './components/NotificationBell';
+// import NotificationBell from './components/NotificationBell';
 import UserFormModal from './components/UserFormModal';
 import ConfirmationModal from './components/ConfirmationModal';
 import ConfirmationModalUser from './components/ConfirmationModalUser';
@@ -40,6 +40,8 @@ import { FaUser } from "react-icons/fa";
 import UserHeader from './components/UserHeader';
 import FeaturesPage from './components/FeaturesPage';
 import FAQPage from './components/FAQPage';
+import CalendarComponent from './components/CalendarComponent';
+
 
 
 // =================================================================
@@ -1103,7 +1105,7 @@ function App() {
                       <div className="card-icon yellow-icon"><i className="fas fa-tasks"></i></div>
                     </div>
                     <h3 className="card-value">{stats ? stats.total_tickets : '...'}</h3>
-                  
+
                   </div>
 
                   {/* Kartu Total Pengguna */}
@@ -1162,10 +1164,18 @@ function App() {
                       />
 
                     </div>
-                    
+
                     <div className="dashboard-card map-chart-card">
                       <h4>Geografi Traffic</h4>
                       <MapComponent data={locationsData} />
+                    </div>
+                  </div>
+
+                  <div className="dashboard-column2">
+                    <div className="dashboard-card calendar-card">
+                      <h4>Kalender Tiket</h4>
+                      <CalendarComponent tickets={ticketsOnPage} />
+
                     </div>
                   </div>
 

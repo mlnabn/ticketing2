@@ -2,7 +2,6 @@
 import React from 'react';
 
 const WelcomeHome = ({ userRole, userName, onExploreClick }) => {
-  const isAdmin = userRole && userRole.toLowerCase() === 'admin';
 
   return (
     <div 

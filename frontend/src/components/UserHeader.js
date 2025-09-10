@@ -14,7 +14,7 @@ const UserHeader = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // fungsi cek apakah avatar valid
-  const isValidAvatar = userAvatar && userAvatar.startsWith("data:image") || userAvatar?.startsWith("http");
+  const isValidAvatar = (userAvatar && userAvatar.startsWith("data:image")) || userAvatar?.startsWith("http");
 
   return (
     <div className="user-header" style={{ display: 'flex', alignItems: 'center', gap: '15px', position: 'relative' }}>
@@ -42,23 +42,22 @@ const UserHeader = ({
 
       {/* Dropdown */}
       {dropdownOpen && (
-  <>
-    {/* Overlay blur background */}
-    <div
-      className="dropdown-overlay"
-      onClick={() => setDropdownOpen(false)} // klik di luar nutup dropdown
-    ></div>
+        <>
+          {/* Overlay blur background */}
+          <div
+            className="dropdown-overlay"
+            onClick={() => setDropdownOpen(false)} // klik di luar nutup dropdown
+          ></div>
 
-    {/* Dropdown menu */}
-    <div className="user-dropdown">
-      <button onClick={handleLogout} className="logout-buttonuser">
-        <i className="fas fa-sign-out-alt" style={{ marginRight: "8px" }}></i>
-        Logout
-      </button>
-    </div>
-  </>
-)}
-
+          {/* Dropdown menu */}
+          <div className="user-dropdown">
+            <button onClick={handleLogout} className="logout-buttonuser">
+              <i className="fas fa-sign-out-alt" style={{ marginRight: "8px" }}></i>
+              Logout
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
