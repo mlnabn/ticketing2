@@ -26,13 +26,13 @@
   /* Warna teks utama dashboard (dark slate) */
 
   /* Sidebar */
-  --sidebar-bg-light: #E2E8F0;
+  --sidebar-bg-light: #1f2937;
   /* Latar belakang sidebar (putih bersih) */
-  --sidebar-text-light: #334155;
+  --sidebar-text-light: #E0E0E0;
   /* Warna teks sidebar */
-  --sidebar-border-light: #d6cece;
+  --sidebar-border-light: #6d7785;
   /* Warna border di sidebar */
-  --sidebar-hover-bg-light: #F1F5F9;
+  --sidebar-hover-bg-light: #374151;
   /* Warna hover tombol sidebar (soft light gray) */
 
   /* Header Dashboard */
@@ -1640,7 +1640,7 @@ body.dark-mode .logout-button:hover {
 
 
 .main-header {
-  background-color: #CBD5E1;
+  background-color: #ffffff;
   /* Latar belakang header di mode terang */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   /* Bayangan lebih halus dan tegas */
