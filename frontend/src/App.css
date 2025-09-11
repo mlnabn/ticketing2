@@ -3753,57 +3753,100 @@ body.dark-mode .history-tab {
 }
 
 
-/* Container tombol */
+/* Modern Theme Switch */
 .theme-switch {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  margin: 0 10px;
+}
+
+.theme-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.theme-switch-slider {
+  position: absolute;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  /* bisa diubah sesuai ukuran */
-  height: 40px;
-  background: transparent;
-  /* tanpa border / background */
-  border: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(145deg, #2c3e50, #34495e);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 34px;
+  box-shadow: 
+    3px 3px 6px rgba(0,0,0,0.2),
+    -3px -3px 6px rgba(255,255,255,0.1);
 }
 
-/* Area icon */
-.theme-switch-ball {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  /* ukuran icon */
-  transition: color 0.3s ease, transform 0.3s ease;
+.theme-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 24px;
+  width: 24px;
+  left: 4px;
+  bottom: 4px;
+  background: linear-gradient(145deg, #34495e, #2c3e50);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 
+    2px 2px 4px rgba(0,0,0,0.3),
+    -2px -2px 4px rgba(255,255,255,0.1);
 }
 
-/* Ikon matahari (default = light mode) */
+/* Hanya mengubah posisi toggle tanpa mengubah warna */
+.theme-switch.dark .theme-switch-slider:before {
+  transform: translateX(28px);
+}
+
+/* Icons */
+.theme-switch .fa-sun,
+.theme-switch .fa-moon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  font-size: 14px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .theme-switch .fa-sun {
-  color: #f59e0b;
-  /* kuning */
+  left: 7px;
+  color: #f1c40f;
+  text-shadow: 0 0 10px rgba(241,196,15,0.5);
   opacity: 1;
-  transform: scale(1);
-  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-/* Sembunyikan matahari di dark mode */
+.theme-switch .fa-moon {
+  right: 7px;
+  color: #ecf0f1;
+  text-shadow: 0 0 10px rgba(236,240,241,0.5);
+  opacity: 0;
+}
+
 .theme-switch.dark .fa-sun {
   opacity: 0;
-  transform: scale(0);
 }
 
-/* Ikon bulan (default = hidden) */
-.theme-switch .fa-moon {
-  color: var(--primary-color, #3b82f6);
-  opacity: 0;
-  transform: scale(0);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-/* Tampilkan bulan di dark mode */
 .theme-switch.dark .fa-moon {
   opacity: 1;
-  transform: scale(1);
+}
+
+/* Hover Effects - konsisten dark */
+.theme-switch-slider:hover {
+  box-shadow: 
+    4px 4px 8px rgba(0,0,0,0.3),
+    -4px -4px 8px rgba(255,255,255,0.1);
+  background: linear-gradient(145deg, #34495e, #2c3e50);
+}
+
+/* Active State */
+.theme-switch-slider:active:before {
+  transform: scale(0.95);
+  transition: 0.1s;
 }
 
 /* ====== JOB FORM USER ====== */
