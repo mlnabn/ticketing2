@@ -7741,7 +7741,7 @@ body.dark-mode .dashboard-card h4 {
 
 .react-calendar__tile--now {
   background: hsl(214, 89%, 70%) !important;
-  color: hsl(214, 89%, 40%) !important;
+  color: #fff !important;
   font-weight: 600;
 }
 
