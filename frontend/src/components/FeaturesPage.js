@@ -70,6 +70,28 @@ const FeaturesPage = () => {
         </div>
       </div>
 
+      {/* Bagian 4: Trust Signals */}
+      <div className="features-group">
+        <h2>Kepercayaan Pengguna</h2>
+        <div className="trust-grid">
+          <div className="trust-card">✅ <span className="highlight">500+</span> tiket berhasil diselesaikan tiap bulan</div>
+          <div className="trust-card">⚡ <span className="highlight">95%</span> user puas dengan respon cepat</div>
+          <div className="trust-card">
+            👥 <span className="highlight">2.000+</span> pengguna aktif setiap minggu
+          </div>
+          <div className="trust-card">
+            ⏱ <span className="highlight">&lt; 5 menit</span> rata-rata respon tiket
+          </div>
+          <div className="trust-card">
+            ⭐ <span className="highlight">4.8/5</span> rating kepuasan pengguna
+          </div>
+          <div className="trust-card">
+            🏢 Digunakan oleh <span className="highlight">30+</span> Karyawan Perusahaan
+          </div>
+
+        </div>
+      </div>
+
       {/* Footer */}
       <footer className="w-full text-center py-6 border-t border-gray-800 text-gray-400 text-xs sm:text-sm relative z-10">
         © 2025 Politeknik Negeri Semarang. All rights reserved.

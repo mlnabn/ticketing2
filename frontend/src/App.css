@@ -7461,6 +7461,36 @@ body.dark-mode .dashboard-card h4 {
   line-height: 1.5;
 }
 
+/* Trust signals */
+.trust-grid {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.trust-card {
+  background: rgba(0, 170, 255, 0.1);
+  border: 1px solid rgba(0, 170, 255, 0.3);
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #e0e0e0;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.trust-card:hover {
+  transform: translateY(-4px);
+  background: rgba(0, 170, 255, 0.15);
+}
+
+.highlight {
+  color: #3aa8ff;
+  font-weight: 700;
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
   .features-container {
@@ -7714,9 +7744,17 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .react-calendar__tile--now {
-  background: hsl(214, 100%, 94%);
-  color: hsl(214, 89%, 52%);
+  background: hsl(214, 100%, 94%) !important;
+  color: hsl(214, 89%, 40%) !important;
   font-weight: 600;
+}
+
+.react-calendar__tile--now:hover {
+  background: hsl(214, 95%, 85%) !important; /* biru lebih pekat */
+  color: hsl(214, 89%, 40%);
+  font-weight: 700;
+  border-radius: 6px; /* opsional biar lebih lembut */
+  transition: all 0.3s ease;
 }
 
 .react-calendar__tile--active {
@@ -7891,7 +7929,7 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .dark-mode .react-calendar__tile--now {
-  background: hsl(214, 89%, 45%);
+  background: hsl(214, 89%, 45%) ;
   color: hsl(210, 36%, 96%);
 }
 
