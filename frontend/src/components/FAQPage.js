@@ -41,7 +41,7 @@ const FAQItem = ({ question, answer }) => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-           id={`faq-answer-${question}`}
+            id={`faq-answer-${question}`}
             key="content"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
@@ -183,17 +183,18 @@ const FAQPage = () => {
       ))}
 
       {/* CTA jika belum ketemu jawaban */}
-      <div className="text-center mt-10">
-        <p className="text-gray-300 mb-4">
-          Tidak menemukan jawaban yang Anda cari?
-        </p>
+      <div className="faq-cta">
+        Tidak menemukan jawaban?
         <a
           href="https://wa.me/+628978830033"
-          className="inline-block px-6 py-3 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium shadow-md transition"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           Hubungi Admin
         </a>
       </div>
+
+
 
       {/* Footer */}
       <footer className="w-full text-center py-6 border-t border-gray-800 text-gray-400 text-xs sm:text-sm relative z-10 mt-12">
