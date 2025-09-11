@@ -1022,18 +1022,17 @@ function App() {
               <span>{userName || "User"}</span>
 
               {/* Theme Switch */}
-              <div
-                className={`theme-switch ${darkMode ? "dark" : ""}`}
-                onClick={toggleDarkMode}
-              >
-                <div className="theme-switch-ball">
-                  {darkMode ? (
-                    <i className="fas fa-moon moon-icon"></i>
-                  ) : (
+              <label className={`theme-switch ${darkMode ? "dark" : ""}`}>
+                <input type="checkbox" checked={darkMode} onChange={toggleDarkMode} />
+                <div className="theme-switch-slider round">
+                  <div className="sun-icon-wrapper">
                     <i className="fas fa-sun sun-icon"></i>
-                  )}
+                  </div>
+                  <div className="moon-icon-wrapper">
+                    <i className="fas fa-moon moon-icon"></i>
+                  </div>
                 </div>
-              </div>
+              </label>
             </div>
           </div>
         </aside>
