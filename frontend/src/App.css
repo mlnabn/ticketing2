@@ -7432,7 +7432,7 @@ body.dark-mode .dashboard-card h4 {
 
 
 /* ==================================== */
-/* FAQ PAGE STYLES */
+/* FAQ PAGE STYLES UPGRADE */
 /* ==================================== */
 
 /* Animasi masuk dari bawah ke atas */
@@ -7449,32 +7449,168 @@ body.dark-mode .dashboard-card h4 {
 
 /* Container Utama */
 .faq-container {
-  max-width: 800px;
-  margin: auto;
+  width: 85%;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 4rem 2rem;
-  background: rgba(255, 255, 255, 0.15); /* putih transparan */
-  backdrop-filter: blur(10px); /* efek kaca blur */
-  border-radius: 12px;
-  box-shadow: 0px 0px 50px rgba(0, 0, 0, 0.5);
-  animation: fadeInUp 0.6s ease-out; /* pakai animasi yang benar */
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.4);
+  animation: fadeInUp 0.6s ease-out;
   color: #fff;
-  text-align: center;
 }
 
-/* Judul FAQ */
+/* Judul Utama */
 .faq-container h2 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: bold;
   color: #3aa8ff;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
-  border-bottom: 2px solid rgba(58, 168, 255, 0.5);
-  display: inline-block;
-  padding-bottom: 0.5rem;
-  
 }
 
+/* Judul Kategori */
+.faq-container h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #60a5fa;
+  border-left: 4px solid #3aa8ff;
+  padding-left: 10px;
+}
 
+/* Item FAQ */
+.faq-item {
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.faq-item button {
+  font-size: 1rem;
+}
+
+.faq-item:hover {
+  background: rgba(58, 168, 255, 0.08);
+}
+
+/* Teks Jawaban */
+.faq-item p {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.7;
+  font-size: 0.95rem;
+  color: #d1d5db;
+  margin-top: 0.5rem;
+}
+
+/* ============================= */
+/* FEEDBACK SECTION */
+/* ============================= */
+.faq-item .feedback {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+/* Tombol feedback */
+.faq-item .feedback button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.faq-item .feedback button:hover {
+  transform: scale(1.1);
+}
+
+/* Pesan setelah klik feedback */
+.feedback-message {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Jika klik YA */
+.feedback-yes {
+  color: #4ade80; /* hijau terang */
+  text-shadow: 0 0 6px rgba(74, 222, 128, 0.4);
+}
+
+/* Jika klik TIDAK */
+/* Feedback setelah klik Tidak */
+.feedback-no {
+  display: flex;
+  align-items: center;
+  gap: 8px;               /* kasih jarak antar teks & link */
+  color: #f87171;         /* merah soft */
+  font-weight: 500;
+}
+
+.feedback-no a {
+  color: #60a5fa;
+  text-decoration: underline;
+  transition: color 0.3s;
+}
+
+.feedback-no a:hover {
+  color: #3b82f6;
+}
+
+/* Animasi muncul */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================= */
+/* CTA Hubungi Admin */
+/* ============================= */
+.faq-container .cta-button {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #3aa8ff, #1d4ed8);
+  color: white;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0px 4px 12px rgba(58, 168, 255, 0.3);
+}
+
+.faq-container .cta-button:hover {
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+  transform: translateY(-2px);
+}
+
+/* Footer */
+.faq-container footer {
+  margin-top: 3rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
 /* ========================================================= */
 /* ============== LIGHT MODE & CORE STYLES ================= */
 /* ========================================================= */
