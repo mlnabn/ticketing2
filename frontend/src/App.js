@@ -987,8 +987,8 @@ function App() {
   // Tampilan untuk ADMIN
   if (isAdmin) {
     return (
-      <div className={`dashboard-container ${isSidebarOpen ? '' : ' sidebar-closed'}`}>
-        <aside className={`sidebar ${!isSidebarOpen ? 'closed' : ''}`}>
+      <div className={`dashboard-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+        <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
           <div className="sidebar-header">
             <img src={yourLogok} alt="Logo" className="sidebar-logo" />
           </div>
@@ -1037,12 +1037,16 @@ function App() {
           </div>
         </aside>
 
-        {isSidebarOpen && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
+        {isSidebarOpen && <div className="content-overlay" onClick={toggleSidebar}></div>}
 
         <main className="main-content">
           <header className="main-header">
             <div className="header-left-group">
-              <button className="hamburger-menu-button" onClick={toggleSidebar}><i className="fas fa-bars"></i></button>
+              <button className="hamburger-menu-button" onClick={toggleSidebar}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </button>
               <h1 className="dashboard-header-title">Admin Dashboard</h1>
             </div>
             <div className="main-header-controls">

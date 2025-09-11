@@ -583,60 +583,178 @@ body.dark-mode {
   color: #7bb0ff;
 }
 
+/* =================================================================== */
+/* ===   ATURAN DASAR (MOBILE-FIRST) UNTUK DASHBOARD               === */
+/* =================================================================== */
+
+/* --- Tata Letak Utama --- */
+.main-content {
+  width: 100%;
+  padding: 15px;
+  margin-left: 0;
+  transition: margin-left 0.3s ease-in-out; /* Hanya untuk desktop */
+}
+
+/* --- Sidebar (Default untuk Mobile) --- */
+.sidebar {
+  position: fixed; /* Kunci untuk overlay */
+  top: 0;
+  left: 0;
+  width: 280px; /* Selalu lebar penuh saat terbuka di mobile */
+  height: 100vh;
+  z-index: 1000;
+  transform: translateX(-100%); /* Sembunyi secara default */
+  transition: transform 0.3s ease-in-out;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+/* --- Tombol Hamburger & Overlay (Default untuk Mobile) --- */
+.hamburger-menu-button {
+  /* Properties umum */
+  display: flex;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+
+  /* Properties untuk tampilan mobile */
+  flex-direction: column;
+  justify-content: space-around;
+  width: 28px;
+  height: 22px;
+  color: var(--hamburger-icon-color-light);
+  transition: color 0.15s ease-in-out;
+}
+
+.hamburger-menu-button span {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background-color: #333;
+  border-radius: 3px;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Pastikan warna hamburger juga berubah di dark mode */
+body.dark-mode .hamburger-menu-button span {
+  background-color: #fff; /* Warna terang untuk tema gelap */
+}
+
+/* Animasi ke 'X' */
+.sidebar-open .hamburger-menu-button span:nth-child(1) {
+  transform: translateY(9.5px) rotate(45deg);
+}
+.sidebar-open .hamburger-menu-button span:nth-child(2) {
+  opacity: 0;
+}
+.sidebar-open .hamburger-menu-button span:nth-child(3) {
+  transform: translateY(-9.5px) rotate(-45deg);
+}
+
+.content-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+  
+.sidebar-open .content-overlay {
+  opacity: 1;
+  visibility: visible;
+}
+
 @media (min-width: 1291px) {
-  .job-list-mobile {
-    display: none;
+  /* Sembunyikan elemen mobile di desktop */
+  .hamburger-menu-button,
+  .content-overlay,
+  .job-list-mobile,
+  .user-list-mobile {
+    display: none !important; /* Gunakan !important untuk memastikan tersembunyi */
+  }
+
+  /* KEMBALIKAN PERILAKU SIDEBAR DESKTOP */
+  .sidebar {
+    position: static; /* Ganti dari 'fixed' ke 'static' */
+    transform: translateX(0); /* Batalkan efek sembunyi */
+    width: 80px; /* Kembali ke mode ramping */
+    height: auto; /* Biarkan tinggi mengikuti konten */
+    transition: width 0.3s ease-in-out; /* Ubah transisi ke lebar */
+  }
+
+  /* Efek hover untuk melebarkan sidebar */
+  .sidebar:hover {
+    width: 280px;
+  }
+
+  /* Sesuaikan kembali margin konten untuk desktop */
+  .main-content {
+    margin-left: 80px;
+  }
+
+  .sidebar:hover ~ .main-content {
+    margin-left: 280px;
   }
 }
 
 @media (max-width: 1290px) {
 
   /* =========================================== */
-  /* ===      STYLE UNTUK HALAMAN LOGIN        === */
+  /* ===   STYLE UNTUK HALAMAN LOGIN           === */
   /* =========================================== */
-  /* ... (kode untuk login tetap sama) ... */
   .split-card {
     flex-direction: column;
     width: 95%;
-    /* etc... */
   }
 
-  /* ... (dan seterusnya untuk login) ... */
   .auth-toggle {
     font-size: 13px;
   }
+  
+  /* ... (Kode lain untuk halaman login) ... */
 
 
   /* =========================================== */
-  /* ===     STYLE UNTUK DASHBOARD ADMIN       === */
+  /* ===   STYLE UNTUK DASHBOARD ADMIN         === */
   /* =========================================== */
 
   /* --- Layout & Sidebar --- */
-  .dashboard-container.sidebar-closed .main-content {
-    margin-left: 0;
-  }
-
   .main-content {
-    padding: 10px;
-    margin-left: 0 !important;
-    transition: none;
+    margin-left: 0 !important; 
   }
 
+  /* Properti sidebar untuk mobile sudah didefinisikan di atas */
   .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    z-index: 1000;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
+    z-index: 1002;
+  }
+  
+  /* --- Tombol Hamburger & Overlay --- */
+  /* Styles untuk hamburger sudah didefinisikan di atas */
+  
+  /* Animasi hamburger ke 'X' saat kontainer memiliki kelas 'sidebar-open' */
+  /* Perbaikan: Gunakan selector yang lebih umum agar bisa diterapkan di body atau container */
+  .sidebar-open .hamburger-menu-button span:nth-child(1) {
+    transform: translateY(9.5px) rotate(45deg);
   }
 
-  .sidebar:not(.closed) {
-    transform: translateX(0);
+  .sidebar-open .hamburger-menu-button span:nth-child(2) {
+    opacity: 0;
   }
 
-  .sidebar-overlay {
+  .sidebar-open .hamburger-menu-button span:nth-child(3) {
+    transform: translateY(-9.5px) rotate(-45deg);
+  }
+
+  .content-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -644,22 +762,32 @@ body.dark-mode {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  }
+  
+  /* Perbaikan: Gunakan selector yang sama seperti hamburger */
+  .sidebar-open .content-overlay {
+    opacity: 1;
+    visibility: visible;
   }
 
-  /* --- Header --- */
+  /* --- Penyesuaian Komponen Dashboard Lainnya --- */
+  
+  /* Header */
+  .main-header {
+    padding: 10px 15px;
+  }
   .dashboard-header-title {
     font-size: 20px;
   }
 
-  .main-header {
-    padding: 10px 15px;
-  }
-
-  /* --- Info Cards --- */
+  /* Info Cards */
   .info-cards-grid {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
+    gap: 10px !important; /* Sedikit lebih besar untuk touch */
   }
 
   .info-card h3 {
@@ -1227,42 +1355,78 @@ body.dark-mode .dashboard-container {
   ---------------------------------------------------
   SIDEBAR
   ---------------------------------------------------
-  Gaya untuk sidebar navigasi.
-  Menambahkan transisi untuk efek slide in/out.
+  Gaya untuk sidebar navigasi dengan animasi expand/collapse
 */
 .sidebar {
-  width: 16rem;
-  /* Lebar sidebar (w-64) */
   background-color: var(--sidebar-bg-light);
-  /* Latar belakang sidebar di mode terang */
   color: var(--sidebar-text-light);
-  /* Warna teks sidebar di mode terang */
   display: flex;
   flex-direction: column;
-  border-top-right-radius: 0rem;
-  /* Sudut membulat kanan atas */
-  border-bottom-right-radius: 0rem;
-  /* DISESUAIKAN: Sudut membulat kanan bawah diubah menjadi 0 */
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  /* Bayangan */
-  transition: all 0.3s ease;
-  /* Transisi untuk lebar dan properti lainnya */
-
-  /* === Penyesuaian untuk sidebar tetap (fixed) === */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   position: fixed;
-  /* Menjadikan sidebar tetap di viewport */
   top: 0;
-  /* Jaga sidebar di bagian atas viewport */
   left: 0;
-  /* Jaga sidebar di sisi kiri viewport */
   height: 100vh;
-  /* Buat sidebar mengambil seluruh tinggi viewport */
-  z-index: 2100;
-  /* Pastikan sidebar di atas elemen lain */
+  overflow: hidden;
+  
+  /* Mobile first - default state */
+  width: 280px;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
 }
 
-.sidebar-overlay {
-  z-index: 2000; /* lebih tinggi dari Leaflet */
+/* State saat sidebar terbuka di mobile */
+.sidebar.open {
+  transform: translateX(0);
+}
+
+/* Desktop styles */
+@media (min-width: 1291px) {
+  .sidebar {
+    width: 80px;
+    transform: none;
+    transition: width 0.3s ease-in-out;
+  }
+
+  .sidebar:hover {
+    width: 280px;
+  }
+}
+
+/* Text visibility in sidebar */
+.sidebar span {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+  white-space: nowrap;
+}
+
+/* Show text when sidebar is open (mobile) */
+.sidebar.open span {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Desktop hover behavior */
+@media (min-width: 1291px) {
+  .sidebar:hover span {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* Main content adjustment */
+.main-content {
+  /* 1. Atur margin default sesuai lebar sidebar collapsed */
+  margin-left: 80px;
+  flex-grow: 1; /* Pastikan ini ada */
+
+  /* 2. Tambahkan transisi agar pergeseran mulus */
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.sidebar:hover ~ .main-content {
+  margin-left: 280px;
 }
 
 body.dark-mode .sidebar {
@@ -1362,7 +1526,7 @@ body.dark-mode .sidebar-button:hover {
 }
 
 .sidebar-button.active {
-  background-color: #5B85E5;
+  background-color: #3b72b9;
   /* Warna latar belakang tombol aktif (orange) */
   color: #fff;
   /* Warna teks tombol aktif */
@@ -1609,34 +1773,28 @@ body.dark-mode .logout-button:hover {
   ---------------------------------------------------
   Gaya untuk area konten utama di samping sidebar.
 */
-.main-content {
+/* .main-content {
   flex: 1 1 0%;
-  /* Memenuhi sisa ruang horizontal */
   display: flex;
   flex-direction: column;
 
-  /* === Penyesuaian untuk ruang sidebar yang tetap === */
   margin-left: 16rem;
-  /* Memberikan ruang seukuran sidebar di sebelah kiri */
   transition: margin-left 0.3s ease;
-  /* Transisi halus saat sidebar dibuka/ditutup */
   height: 100vh;
   overflow: hidden;
-}
+} */
 
 
 /* Mendorong konten utama ke kiri saat sidebar ditutup */
-.dashboard-container.sidebar-closed .main-content {
+/* .dashboard-container.sidebar-closed .main-content {
   margin-left: 0;
-  /* Atau nilai kecil jika ada ikon hamburger yang terlihat */
-}
+} */
 
-.sidebar.closed {
+/* .sidebar.closed {
   width: 0;
   padding: 0;
   overflow: hidden;
-  /* Sembunyikan semua isinya */
-}
+} */
 
 
 .main-header {
@@ -1779,28 +1937,7 @@ body.dark-mode .header-icon-button:hover {
 }
 
 
-/* Tombol Hamburger Menu */
-.hamburger-menu-button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  /* padding: 0.25rem; */
-  /* 💡 DIHAPUS: Hapus padding di sini */
-  cursor: pointer;
-  color: var(--hamburger-icon-color-light);
-  transition: color 0.15s ease-in-out;
-  /* 💡 PENYESUAIAN UNTUK KESELARASAN */
-  line-height: 1;
-  /* Pastikan line-height konsisten dengan teks */
-  display: flex;
-  /* Gunakan flexbox untuk perataan sempurna */
-  align-items: center;
-  /* Tengahkan ikon secara vertikal */
-  justify-content: center;
-  /* Tengahkan ikon secara horizontal */
-
-}
-
+/* Tombol Hamburger Menu hover states */
 .hamburger-menu-button:hover {
   color: var(--hamburger-hover-color-light);
 }
@@ -3615,10 +3752,10 @@ body.dark-mode .btn-delete:hover {
   min-height: 100vh;
 }
 
-.main-content {
+/* .main-content {
   transition: margin-left 0.3s ease;
   background: transparent;
-}
+} */
 
 .content-area {
   background: transparent;
