@@ -1172,11 +1172,13 @@ function App() {
                   </div>
 
                   <div className="dashboard-column2">
+                  
                     <div className="dashboard-card calendar-card">
                       <h4>Kalender Tiket</h4>
                       <CalendarComponent tickets={ticketsOnPage} />
-
+                        
                     </div>
+                    
                   </div>
 
                 </div>

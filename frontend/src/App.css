@@ -7475,359 +7475,351 @@ body.dark-mode .dashboard-card h4 {
 }
 
 
-/* ========== LIGHT MODE (default) ========== */
-/* ========== LIGHT MODE (default) ========== */
-.calendar-wrapper {
-  background: #f1f5f9;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-  /* Ubah nilai max-width di sini untuk melebarkan komponen */
-  max-width: 1500px; /* Contoh nilai yang lebih lebar */ 
-  margin: 0 auto;
-  font-family: 'Inter', sans-serif;
-  color: #222;
-  transition: all 0.3s ease-in-out;
-}
-/* ... sisa kode CSS lainnya */
+/* ========================================================= */
+/* ============== LIGHT MODE & CORE STYLES ================= */
+/* ========================================================= */
 
-/* Calendar */
 .calendar-wrapper .react-calendar {
-  width: 100% ;
-  border: 1px solid #e5e7eb ;
-  border-radius: 8px ;
-  background: #fff ;
-  color: #222 ;
-  padding: 10px ;
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  color: #222;
+  padding: 10px;
 }
 
-/* Header bulan + tombol */
-.calendar-wrapper .react-calendar__navigation {
-  display: flex ;
-  justify-content: center ;
-  margin-bottom: 10px ;
+.react-calendar {
+  width: 100%;
+  border: 1px solid hsl(210, 10%, 85%);
+  border-radius: 12px;
+  background: #fff;
+  padding: 15px;
 }
 
-.calendar-wrapper .react-calendar__navigation button {
-  min-width: 30px ;
-  font-size: 14px ;
-  font-weight: 600 ;
-  color: #1e293b ;
-  background: transparent ;
-  border-radius: 6px ;
-  cursor: pointer ;
+.react-calendar__navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-.calendar-wrapper .react-calendar__navigation button:hover {
-  background: #e5e7eb ;
+.react-calendar__navigation button {
+  min-width: 40px;
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(210, 10%, 25%);
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 8px;
+  transition: background-color 0.2s;
 }
 
-/* Hari */
-.calendar-wrapper .react-calendar__month-view__weekdays {
-  font-weight: bold ;
-  text-transform: uppercase ;
-  font-size: 12px ;
-  color: #475569 ;
+.react-calendar__navigation button:hover {
+  background: hsl(210, 10%, 90%);
 }
 
-/* Tile tanggal */
-.calendar-wrapper .react-calendar__tile {
-  height: 45px ;
-  border-radius: 6px ;
+.react-calendar__month-view__weekdays {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 13px;
+  color: hsl(210, 10%, 50%);
+}
+
+.react-calendar__tile {
+  height: 50px;
+  border-radius: 8px;
   transition: all 0.2s;
-  color: #222 ;
+  color: hsl(210, 10%, 25%);
+  position: relative;
 }
 
-.calendar-wrapper .react-calendar__tile--now {
-  background: #e0f2fe ;
-  color: #0284c7 ;
-  font-weight: 600 ;
+.react-calendar__tile--now {
+  background: hsl(214, 100%, 94%);
+  color: hsl(214, 89%, 52%);
+  font-weight: 600;
 }
 
-.calendar-wrapper .react-calendar__tile--active {
-  background: #2563eb ;
-  color: #fff ;
+.react-calendar__tile--active {
+  background: hsl(214, 89%, 52%);
+  color: #fff;
 }
 
-.calendar-wrapper .react-calendar__tile:hover {
-  background: #dbeafe ;
+.react-calendar__tile:hover {
+  background: hsl(214, 100%, 94%);
 }
 
-.calendar-wrapper .react-calendar__tile--now:hover {
-  background: #dbeafe !important; /* Warna kuning pudar saat hover */
-  color: #3B82F6 !important; /* Warna teks yang kontras */
+.ticket-dot-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 3px;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.ticket-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* Status colors */
+.dot-green {
+  background-color: #22c55e; /* selesai */
+}
+
+.dot-yellow {
+  background-color: #facc15; /* sedang dikerjakan */
+}
+
+.dot-blue {
+  background-color: #3b82f6; /* ditunda */
+}
+
+.dot-red {
+  background-color: #ef4444; /* ditolak */
+}
+
+.dot-gray {
+  background-color: #9ca3af; /* belum dikerjakan */
 }
 
 
-/* Info text */
-.calendar-info {
-  margin-top: 10px ;
-  text-align: center ;
-  font-size: 14px ;
-  color: #555 ;
-}
 
-/* Ticket card */
-.ticket-card {
-  background-color: #f9f9f9 ;
-  border: 1px solid #e5e5e5 ;
-  border-radius: 10px ;
-  padding: 15px ;
-  margin-top: 15px ;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05) ;
-}
-
-.ticket-card p {
-  margin: 5px 0 ;
-  font-size: 14px ;
-  color: #222 ;
-}
-
-/* Slider controls */
-.slider-controls {
-  display: flex ;
-  justify-content: center ;
-  align-items: center ;
-  gap: 8px ;
-  margin-top: 12px ;
-}
-
-.slider-btn {
-  background-color: #dbeafe ;
-  color: #2563eb ;
-  border: none ;
-  padding: 8px 12px ;
-  border-radius: 8px ;
-  cursor: pointer ;
-  font-weight: bold ;
-  transition: all 0.2s ;
-}
-
-.slider-btn:hover:not(:disabled) {
-  background-color: #2563eb ;
-  color: white ;
-}
-
-.slider-btn:disabled {
-  opacity: 0.4 ;
-  cursor: not-allowed ;
-}
-
-.slider-page {
-  font-weight: bold ;
-  color: #2563eb ;
-  padding: 6px 12px ;
-  border-radius: 6px ;
-  background: #dbeafe ;
-}
-
-/* DARK MODE STYLES */
-
-.dark-mode .calendar-wrapper {
-  background: #2C2F40 !important;
-  color: #E6E8F7 !important;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.5) !important;
-}
-
-.dark-mode .react-calendar {
-  background: #3A3E52 !important;
-  border-color: #4A4E6C !important;
-  color: #E6E8F7 !important;
-}
-
-.dark-mode .react-calendar__navigation button {
-  color: #7E88C7 !important;
-  background: transparent !important;
-}
-
-.dark-mode .react-calendar__navigation button:hover {
-  background: #4A4E6C !important;
-}
-
-.dark-mode .react-calendar__month-view__weekdays {
-  color: #AAB0CC !important;
-}
-
-.dark-mode .react-calendar__tile {
-  color: #E6E8F7 !important;
-}
-
-.dark-mode .react-calendar__tile--now {
-  background: #4A4E6C !important;
-  color: #E6E8F7 !important;
-}
-
-.dark-mode .react-calendar__tile--active {
-  background: #6D28D9 !important;
-  color: #fff !important;
-}
-
-.dark-mode .react-calendar__tile:hover {
-  background: #4A4E6C !important;
-}
-
-.dark-mode .ticket-card {
-  background-color: #3A3E52 !important;
-  border: 1px solid #4A4E6C !important;
-  color: #E6E8F7 !important;
-}
-
-.dark-mode .ticket-card p {
-  color: #E6E8F7 !important;
-}
-
-.dark-mode .slider-btn {
-  background-color: #4A4E6C !important;
-  color: #7E88C7 !important;
-}
-
-.dark-mode .slider-btn:hover:not(:disabled) {
-  background-color: #7E88C7 !important;
-  color: white !important;
-}
-
-.dark-mode .slider-page {
-  background: #4A4E6C !important;
-  color: #7E88C7 !important;
-}
-
-/* LIGHT MODE STYLES (default) */
 .info-text {
   text-align: center;
   font-style: italic;
   margin-top: 20px;
-  color: #6b7280; /* Warna default untuk mode terang */
+  color: hsl(210, 10%, 50%);
 }
 
-/* DARK MODE STYLES */
-/* Pastikan ini ada dan selektornya spesifik */
-.darkmode .info-text {
-  color: #9ca3af !important; /* Warna yang lebih terang untuk mode gelap */
+.calendar-info {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 15px;
+  color: hsl(210, 10%, 40%);
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 550px;
+  width: 90%;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease-in-out;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid hsl(210, 10%, 85%);
+}
+
+.modal-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: hsl(210, 10%, 25%);
+  margin: 0;
+}
+
+.modal-body {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 15px;
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ticket-modal-card {
+  background-color: hsl(210, 10%, 90%);
+  border-left: 5px solid hsl(214, 89%, 52%);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ticket-modal-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.ticket-modal-card p {
+  margin: 0 0 10px 0;
+  line-height: 1.5;
+  font-size: 15px;
+  color: hsl(210, 10%, 25%);
+}
+
+.ticket-modal-card p b {
+  color: hsl(210, 10%, 5%);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid hsl(210, 10%, 85%);
+  padding-top: 20px;
 }
 
 /* ========================================================= */
-/* =================== RESPONSIVE STYLES =================== */
+/* ==================== DARK MODE STYLES =================== */
+/* ========================================================= */
+
+.dark-mode .react-calendar {
+  background: #2b2b3c;
+  border-color: hsl(210, 10%, 35%);
+  color: hsl(210, 36%, 96%);
+}
+
+.dark-mode .react-calendar__navigation button {
+  color: hsl(210, 36%, 96%);
+}
+
+.dark-mode .react-calendar__navigation button:hover {
+  background: hsl(210, 10%, 35%) !important;
+}
+
+.dark-mode .react-calendar__month-view__weekdays {
+  color: hsl(210, 10%, 65%);
+}
+
+.dark-mode .react-calendar__tile {
+  color: hsl(210, 36%, 96%);
+}
+
+.dark-mode .react-calendar__tile--now {
+  background: hsl(214, 89%, 45%);
+  color: hsl(210, 36%, 96%);
+}
+
+.dark-mode .react-calendar__tile--active {
+  background: hsl(214, 89%, 52%);
+  color: #fff;
+}
+
+.dark-mode .react-calendar__tile:hover {
+  background: hsl(210, 10%, 35%) !important;
+}
+
+.dark-mode .info-text {
+  color: hsl(210, 10%, 75%);
+}
+
+.dark-mode .calendar-info {
+  color: hsl(210, 10%, 75%);
+}
+
+.dark-mode .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.dark-mode .modal-content {
+  background: hsl(210, 10%, 25%);
+  color: hsl(210, 36%, 96%);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .modal-header {
+  border-bottom: 1px solid hsl(210, 10%, 35%);
+}
+
+.dark-mode .modal-title {
+  color: hsl(210, 36%, 96%);
+}
+
+.dark-mode .ticket-modal-card {
+  background-color: hsl(210, 10%, 20%);
+  border-left-color: hsl(214, 89%, 52%);
+}
+
+.dark-mode .ticket-modal-card:hover {
+  background-color: hsl(210, 10%, 30%);
+}
+
+.dark-mode .ticket-modal-card p {
+  color: hsl(210, 36%, 96%);
+}
+
+.dark-mode .ticket-modal-card p b {
+  color: hsl(210, 36%, 99%);
+}
+
+.dark-mode .modal-footer {
+  border-top: 1px solid hsl(210, 10%, 35%);
+}
+
+/* ========================================================= */
+/* ================== RESPONSIVE STYLES ==================== */
 /* ========================================================= */
 
 @media (max-width: 1024px) {
   .calendar-wrapper {
-    /* Mengubah max-width agar lebih sesuai dengan layar tablet */
     max-width: 90%;
-    /* Mengurangi padding agar tidak terlalu besar di layar kecil */
-    padding: 16px;
-  }
-
-  /* Mengurangi ukuran font agar lebih mudah dibaca di layar kecil */
-  .calendar-wrapper .react-calendar__navigation button {
-    font-size: 13px;
-  }
-
-  .calendar-wrapper .react-calendar__month-view__weekdays {
-    font-size: 11px;
-  }
-
-  /* Mengubah ukuran tile agar sesuai dengan ukuran layar yang lebih kecil */
-  .calendar-wrapper .react-calendar__tile {
-    height: 40px;
-    font-size: 14px;
-  }
-
-  .calendar-info {
-    /* Mengurangi margin dan ukuran font */
-    margin-top: 15px;
-    font-size: 13px;
-  }
-
-  .ticket-card p {
-    /* Mengurangi ukuran font pada detail tiket */
-    font-size: 13px;
+    padding: 24px;
   }
 }
 
 @media (max-width: 768px) {
-  /* Pengaturan untuk perangkat seluler */
   .calendar-wrapper {
-    /* Memastikan komponen mengambil hampir seluruh lebar layar */
     max-width: 95%;
-    padding: 12px;
+    padding: 16px;
   }
-
-  /* Mengatur tata letak kalender agar lebih ringkas */
   .react-calendar {
-    padding: 5px;
+    padding: 10px;
   }
-
-  /* Menyesuaikan ukuran font lebih lanjut */
-  .react-calendar__navigation__label {
-    font-size: 16px;
-  }
-
   .react-calendar__navigation button {
-    min-width: 25px;
+    font-size: 14px;
+    min-width: 30px;
+  }
+  .react-calendar__month-view__weekdays {
     font-size: 12px;
   }
+  .react-calendar__tile {
+    height: 45px;
+    font-size: 14px;
+  }
+  .modal-content {
+    padding: 20px;
+  }
+}
 
+@media (max-width: 480px) {
+  .calendar-wrapper {
+    padding: 12px;
+  }
+  .react-calendar__navigation button {
+    font-size: 12px;
+    min-width: 25px;
+  }
+  .react-calendar__month-view__weekdays {
+    font-size: 10px;
+  }
   .react-calendar__tile {
     height: 35px;
     font-size: 12px;
   }
-
-  .slider-controls {
-    /* Mengatur ulang layout kontrol slider jika perlu */
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .slider-btn {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-
-  .slider-page {
-    font-size: 12px;
-    padding: 4px 8px;
-  }
-}
-
-/* ========================================================= */
-/* =================== FITUR BARU CSS =================== */
-/* ========================================================= */
-
-/* Indikator tiket (titik di bawah tanggal) */
-.ticket-indicator {
-  height: 6px;
-  width: 6px;
-  background-color: #2563eb; /* Biru */
-  border-radius: 50%;
-  margin: auto;
-  margin-top: 5px;
-}
-
-/* Gaya untuk status tiket yang sedang dikerjakan */
-.react-calendar__tile.tile-in-progress {
-  background-color: #fcd34d !important; /* Kuning */
-  color: #a16207 !important;
-  font-weight: bold;
-}
-
-/* Gaya untuk status tiket yang sudah selesai */
-.react-calendar__tile.tile-completed {
-  background-color: #4ade80 ; /* Hijau */
-  color: #15803d ;
-  font-weight: bold;
-}
-
-/* Gaya untuk mode gelap */
-.darkmode .react-calendar__tile.tile-in-progress {
-  background-color: #b45309 !important; /* Oranye gelap untuk dark mode */
-  color: #fff !important;
-}
-
-.darkmode .react-calendar__tile.tile-completed {
-  background-color: #166534 !important; /* Hijau gelap untuk dark mode */
-  color: #fff !important;
-}
-
-.darkmode .ticket-indicator {
-  background-color: #7E88C7; /* Warna lebih terang untuk dark mode */
 }

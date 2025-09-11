@@ -6,146 +6,165 @@ import { format } from 'date-fns';
 function CalendarComponent({ tickets = [] }) {
   const [date, setDate] = useState(new Date());
   const [ticketsForDate, setTicketsForDate] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  
-  // Asumsikan isDarkMode akan diatur dari parent component,
-  // tetapi kita biarkan untuk contoh styling
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Efek untuk memuat data pertama kali dan mengatur tanggal awal
+  const [showModal, setShowModal] = useState(false);
+  const [selectedTickets, setSelectedTickets] = useState([]);
+
+  // Baca dark mode dari localStorage
+  useEffect(() => {
+    const updateModeFromStorage = () => {
+      const savedMode = localStorage.getItem('darkMode');
+      if (savedMode !== null) {
+        setIsDarkMode(JSON.parse(savedMode));
+      }
+    };
+    updateModeFromStorage();
+    window.addEventListener('storage', updateModeFromStorage);
+    return () => {
+      window.removeEventListener('storage', updateModeFromStorage);
+    };
+  }, []);
+
+  // Load data tiket awal
   useEffect(() => {
     if (!tickets || tickets.length === 0) {
       setTicketsForDate([]);
       return;
     }
-
-    // Mengurutkan tiket berdasarkan tanggal terbaru
-    const sortedTickets = [...tickets].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-    // Mengatur tanggal awal ke tanggal tiket terbaru jika ada
+    const sortedTickets = [...tickets].sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
     if (sortedTickets.length > 0) {
       setDate(new Date(sortedTickets[0].created_at));
     }
-
-    // Memfilter tiket untuk tanggal awal yang sudah ditentukan
     const formatted = format(date, 'yyyy-MM-dd');
-    const filtered = tickets.filter(t =>
-      format(new Date(t.created_at), 'yyyy-MM-dd') === formatted
+    const filtered = tickets.filter(
+      (t) => format(new Date(t.created_at), 'yyyy-MM-dd') === formatted
     );
     setTicketsForDate(filtered);
-    setCurrentIndex(0);
   }, [tickets]);
 
-  // Efek untuk menangani perubahan tanggal yang dipilih oleh pengguna
+  // Update data ketika tanggal berubah
   useEffect(() => {
     if (!tickets || tickets.length === 0) {
       setTicketsForDate([]);
       return;
     }
     const formatted = format(date, 'yyyy-MM-dd');
-    const filtered = tickets.filter(t =>
-      format(new Date(t.created_at), 'yyyy-MM-dd') === formatted
+    const filtered = tickets.filter(
+      (t) => format(new Date(t.created_at), 'yyyy-MM-dd') === formatted
     );
     setTicketsForDate(filtered);
-    setCurrentIndex(0);
   }, [date, tickets]);
 
-  const handleNext = () => {
-    if (currentIndex < ticketsForDate.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
+  // Klik tanggal
+  const handleDayClick = (clickedDate) => {
+    const formatted = format(clickedDate, 'yyyy-MM-dd');
+    const filtered = tickets.filter(
+      (t) => format(new Date(t.created_at), 'yyyy-MM-dd') === formatted
+    );
+    setSelectedTickets(filtered);
+    setShowModal(filtered.length > 0);
+    setDate(clickedDate);
   };
 
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
-
-  // Fungsi untuk menentukan konten ubin (tanggal)
+  // Indikator titik status
   const tileContent = ({ date, view }) => {
     if (view === 'month') {
       const formattedDate = format(date, 'yyyy-MM-dd');
-      const hasTickets = tickets.some(t => format(new Date(t.created_at), 'yyyy-MM-dd') === formattedDate);
-      return hasTickets ? <div className="ticket-indicator"></div> : null;
-    }
-    return null;
-  };
-
-  // Fungsi untuk menetapkan nama kelas ubin (tanggal)
-  const tileClassName = ({ date, view }) => {
-    if (view === 'month') {
-      const formattedDate = format(date, 'yyyy-MM-dd');
-      const dayTickets = tickets.filter(t => format(new Date(t.created_at), 'yyyy-MM-dd') === formattedDate);
+      const dayTickets = tickets.filter(
+        (t) => format(new Date(t.created_at), 'yyyy-MM-dd') === formattedDate
+      );
 
       if (dayTickets.length > 0) {
-        // Cek jika ada tiket yang "Sedang Dikerjakan"
-        const hasInProgress = dayTickets.some(t => t.status === 'Sedang Dikerjakan');
-        if (hasInProgress) {
-          return 'tile-in-progress';
-        }
+        const hasCompleted = dayTickets.some((t) => t.status === 'Selesai');
+        const hasInProgress = dayTickets.some((t) => t.status === 'Sedang Dikerjakan');
+        const hasPending = dayTickets.some((t) => t.status === 'Belum Dikerjakan');
+        const hasDelayed = dayTickets.some((t) => t.status === 'Ditunda');
+        const hasRejected = dayTickets.some((t) => t.status === 'Ditolak');
 
-        // Cek jika semua tiket "Selesai"
-        const allCompleted = dayTickets.every(t => t.status === 'Selesai');
-        if (allCompleted) {
-          return 'tile-completed';
-        }
+        return (
+          <div className="ticket-dot-wrapper">
+            {hasCompleted && <span className="ticket-dot dot-green"></span>}
+            {hasInProgress && <span className="ticket-dot dot-yellow"></span>}
+            {hasDelayed && <span className="ticket-dot dot-blue"></span>}
+            {hasRejected && <span className="ticket-dot dot-red"></span>}
+            {hasPending && <span className="ticket-dot dot-gray"></span>}
+          </div>
+        );
       }
     }
     return null;
   };
 
-  const wrapperClasses = `calendar-wrapper ${isDarkMode ? 'darkmode' : ''}`;
+  const wrapperClasses = `calendar-wrapper ${isDarkMode ? 'dark-mode' : ''}`;
 
   return (
     <div className={wrapperClasses}>
       <Calendar
-        onChange={setDate}
+        onChange={handleDayClick}
         value={date}
         className={isDarkMode ? 'react-calendar--dark' : ''}
         tileContent={tileContent}
-        tileClassName={tileClassName}
       />
+
       <p className="calendar-info">
         Tanggal dipilih: <b>{format(date, 'dd MMM yyyy')}</b>
       </p>
 
-      {(!tickets || tickets.length === 0) ? (
-        <p className="info-text"><i>Memuat data tiket...</i></p>
-      ) : ticketsForDate.length === 0 ? (
-        <p className="info-text"><i>Tidak ada tiket pada tanggal ini</i></p>
-      ) : (
-        <div className="ticket-slider">
-          <div className="ticket-card">
-            <p><b>Pengirim:</b> {ticketsForDate[currentIndex].creator?.name}</p>
-            <p><b>Workshop:</b> {ticketsForDate[currentIndex].workshop}</p>
-            <p><b>Deskripsi:</b> {ticketsForDate[currentIndex].title}</p>
-            <p><b>Status:</b> {ticketsForDate[currentIndex].status}</p>
-          </div>
-
-          {ticketsForDate.length > 1 && (
-            <div className="slider-controls">
+      {/* Modal Detail Tiket */}
+      {showModal && selectedTickets.length > 0 && (
+        <div className={`modal-overlay ${isDarkMode ? 'dark-mode' : ''}`}>
+          <div className={`modal-content ${isDarkMode ? 'dark-mode' : ''}`}>
+            <div className={`modal-header ${isDarkMode ? 'dark-mode' : ''}`}>
+              <h3 className="modal-title">
+                Tiket untuk {format(date, 'dd MMM yyyy')}
+              </h3>
+            </div>
+            <div className={`modal-body ${isDarkMode ? 'dark-mode' : ''}`}>
+              {selectedTickets.map((ticket, index) => (
+                <div
+                  key={index}
+                  className={`ticket-modal-card ${isDarkMode ? 'dark-mode' : ''}`}
+                >
+                  <p>
+                    <b>Pengirim:</b> {ticket.creator?.name}
+                  </p>
+                  <p>
+                    <b>Workshop:</b> {ticket.workshop}
+                  </p>
+                  <p>
+                    <b>Deskripsi:</b> {ticket.title}
+                  </p>
+                  <p>
+                    <b>Status:</b> {ticket.status}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className={`modal-footer ${isDarkMode ? 'dark-mode' : ''}`}>
               <button
-                className="slider-btn"
-                onClick={handlePrev}
-                disabled={currentIndex === 0}
+                className={`btn-canceluser ${isDarkMode ? 'dark-mode' : ''}`}
+                onClick={() => setShowModal(false)}
               >
-                «
-              </button>
-              <span className="slider-page">
-                {`${currentIndex + 1} / ${ticketsForDate.length}`}
-              </span>
-              <button
-                className="slider-btn"
-                onClick={handleNext}
-                disabled={currentIndex === ticketsForDate.length - 1}
-              >
-                »
+                Tutup
               </button>
             </div>
-          )}
+          </div>
         </div>
       )}
+
+      {/* Info jika tidak ada tiket */}
+      {(!tickets || tickets.length === 0) ? (
+        <p className="info-text">
+          <i>Memuat data tiket...</i>
+        </p>
+      ) : ticketsForDate.length === 0 ? (
+        <p className="info-text">
+          <i>Tidak ada tiket pada tanggal ini</i>
+        </p>
+      ) : null}
     </div>
   );
 }
