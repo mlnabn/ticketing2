@@ -321,6 +321,7 @@ function App() {
     try {
       await axios.patch(`${API_URL}/tickets/${id}/status`, { status: newStatus }, { headers: { Authorization: `Bearer ${getToken()}` } });
       fetchData(dataPage, searchQuery);
+      fetchMyTickets(myTicketsPage);
       if (!isAdmin) {
         fetchCreatedTickets(createdTicketsPage);
       }
@@ -374,6 +375,7 @@ function App() {
       await axios.patch(`${API_URL}/tickets/${ticketId}/assign`, { user_id: adminId }, { headers: { Authorization: `Bearer ${getToken()}` } });
       handleCloseAssignModal();
       fetchData(dataPage, searchQuery); // Refresh data tiket
+      fetchMyTickets(myTicketsPage);
     } catch (error) {
       console.error("Gagal menugaskan tiket:", error);
       alert("Gagal menugaskan tiket.");
@@ -395,6 +397,7 @@ function App() {
       await axios.patch(`${API_URL}/tickets/${ticketId}/reject`, { reason }, { headers: { Authorization: `Bearer ${getToken()}` } });
       handleCloseRejectModal();
       fetchData(dataPage, searchQuery);
+      fetchMyTickets(myTicketsPage);
     } catch (error) {
       console.error("Gagal menolak tiket:", error);
       alert("Gagal menolak tiket.");
@@ -433,6 +436,7 @@ function App() {
       try {
         await axios.delete(`${API_URL}/tickets/${ticketToDelete.id}`, { headers: { Authorization: `Bearer ${getToken()}` } });
         fetchData(dataPage, searchQuery);
+        fetchMyTickets(myTicketsPage);
         fetchCreatedTickets(createdTicketsPage);
       } catch (error) {
         console.error("Gagal hapus tiket:", error);
@@ -495,6 +499,7 @@ function App() {
       alert('Bukti pengerjaan berhasil disimpan.');
       handleCloseProofModal();
       fetchData(dataPage, searchQuery); // Refresh data
+      fetchMyTickets(myTicketsPage);
     } catch (error) {
       console.error("Gagal menyimpan bukti:", error);
       const errorMessage = error.response?.data?.error || "Gagal menyimpan bukti. Pastikan deskripsi diisi.";
@@ -1191,60 +1196,6 @@ function App() {
 
             {currentPage === 'Tickets' && (
               <>
-                {/* <div className="info-cards-grid">
-               
-                  <div className={`info-card red-card ${statusFilter === 'Belum Selesai' ? 'active' : ''}`} onClick={() => handleStatusFilterClick('Belum Selesai')}>
-                    <div className="card-header">
-                      <p className="card-label">Tiket Belum Selesai</p>
-                      <div className="card-icon red-icon"><i className="fas fa-exclamation-triangle"></i></div>
-                    </div>
-                    <h3 className="card-value">{stats ? stats.pending_tickets : '...'}</h3>
-                    <div className="card-footer">
-                      <span className="card-change up"><i className="fas fa-arrow-up"></i> 3.43%</span>
-                      <span className="card-period">Since last month</span>
-                    </div>
-                  </div>
-
-                  
-                  <div className={`info-card green-card ${statusFilter === 'Selesai' ? 'active' : ''}`} onClick={() => handleStatusFilterClick('Selesai')}>
-                    <div className="card-header">
-                      <p className="card-label">Tiket Selesai</p>
-                      <div className="card-icon green-icon"><i className="fas fa-check-circle"></i></div>
-                    </div>
-                    <h3 className="card-value">{stats ? stats.completed_tickets : '...'}</h3>
-                    <div className="card-footer">
-                      <span className="card-change down"><i className="fas fa-arrow-down"></i> 1.10%</span>
-                      <span className="card-period">Since yesterday</span>
-                    </div>
-                  </div>
-
-                  
-                  <div className={`info-card yellow-card ${!statusFilter ? 'active' : ''}`} onClick={() => handleStatusFilterClick(null)}>
-                    <div className="card-header">
-                      <p className="card-label">Total Tiket</p>
-                      <div className="card-icon yellow-icon"><i className="fas fa-tasks"></i></div>
-                    </div>
-                    <h3 className="card-value">{stats ? stats.total_tickets : '...'}</h3>
-                    <div className="card-footer">
-                      <span className="card-change up"><i className="fas fa-arrow-up"></i> 1.2%</span>
-                      <span className="card-period">Since last month</span>
-                    </div>
-                  </div>
-
-                  
-                  <div className="info-card blue-card" onClick={() => setCurrentPage('userManagement')}>
-                    <div className="card-header">
-                      <p className="card-label">Total Pengguna</p>
-                      <div className="card-icon blue-icon"><i className="fas fa-users"></i></div>
-                    </div>
-                    <h3 className="card-value">{stats ? stats.total_users : '...'}</h3>
-                    <div className="card-footer">
-                      <span className="card-change down"><i className="fas fa-arrow-down"></i> 3.48%</span>
-                      <span className="card-period">Since last week</span>
-                    </div>
-                  </div>
-                </div> */}
-                {/* <JobForm users={users} addTicket={addTicket} /> */}
                 <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
                   <input type="text" placeholder="Cari berdasarkan nama pekerja..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} style={{ flexGrow: 1, padding: '8px' }} />
                   <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
@@ -1266,6 +1217,7 @@ function App() {
                       updateTicketStatus={updateTicketStatus}
                       deleteTicket={handleDeleteClick}
                       userRole={userRole}
+                      onSelectionChange={handleSelectionChange}
                       onAssignClick={handleAssignClick}
                       onRejectClick={handleRejectClick}
                       onProofClick={handleProofClick}

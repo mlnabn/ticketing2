@@ -3,163 +3,109 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
-
-/* Import Google Fonts - Inter (hanya satu kali) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* Root Variables untuk tema terang/gelap */
 :root {
   /* -- Variabel Umum untuk Input -- */
   --input-bg-light: #FBFBFB;
-  /* Latar belakang input sangat terang */
   --text-color-light: #334155;
-  /* Warna teks umum (dark slate) */
   --placeholder-color-light: #64748B;
-  /* Warna placeholder (medium slate) */
   --border-color-light: #E2E8F0;
-  /* Warna border umum (light gray-blue) */
 
   /* -- Warna Dashboard (Light Mode) -- */
   --bg-color-dashboard-light: #F7F9FC;
-  /* Latar belakang utama dashboard (very light blue-gray) */
   --text-color-dashboard-light: #334155;
-  /* Warna teks utama dashboard (dark slate) */
 
   /* Sidebar */
   --sidebar-bg-light: #1f2937;
-  /* Latar belakang sidebar (putih bersih) */
   --sidebar-text-light: #E0E0E0;
-  /* Warna teks sidebar */
   --sidebar-border-light: #6d7785;
-  /* Warna border di sidebar */
   --sidebar-hover-bg-light: #374151;
-  /* Warna hover tombol sidebar (soft light gray) */
 
   /* Header Dashboard */
   --header-bg-light: whitesmoke;
-  /* Latar belakang header dashboard (putih bersih) */
   --header-text-light: #334155;
-  /* Warna teks di header (medium slate) */
   --header-button-bg-light: #757171;
-  /* Latar belakang tombol header */
   --header-button-text-light: #334155;
-  /* Warna teks tombol header */
   --header-button-hover-bg-light: #CBD5E1;
-  /* Warna hover tombol header */
 
   /* Konten Utama */
   --content-bg-light: #f1ecec;
-  /* Latar belakang area konten utama dashboard (putih bersih) */
 
-  /* Header Tabel Joblist (Muted Slate Blue, sesuai screenshot) */
+  /* Header Tabel Joblist */
   --joblist-header-bg-light: #BFDBFE;
   --joblist-header-text-light: #111827;
-  /* Teks putih di atas background header */
 
   /* Border & Shadow Input/Select Form */
   --form-input-border-light: #E2E8F0;
-  /* Border input/select yang terang */
   --form-input-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.05) inset;
-  /* Shadow inset untuk efek terangkat */
 
   /* Ikon Hamburger */
   --hamburger-icon-color-light: #64748B;
-  /* Warna ikon hamburger (medium slate) */
   --hamburger-hover-color-light: #334155;
-  /* Warna hover ikon hamburger */
 
-  /* Login Page Background (Light Mode) */
+  /* Login Page Background */
   --auth-bg-light: #F7F9FC;
-  /* Sama dengan latar belakang dashboard */
   --auth-background-image-light: none;
-  /* Default, akan diisi dari JS */
 
-  /* Warna Kartu Informasi (Sesuai dengan screenshot dan penyesuaian sebelumnya) */
+  /* Warna Kartu Informasi */
   --info-card-red: #EF4444;
   --info-card-green: #22C55E;
   --info-card-yellow: #F59E0B;
   --info-card-blue: #3B82F6;
 
-  /* Warna untuk pesan (sukses/error) di mode terang */
+  /* Warna untuk pesan */
   --success-bg-light: #D1FAE5;
-  /* Hijau terang */
   --success-text-light: #065F46;
-  /* Hijau gelap */
   --success-border-light: #34D399;
-  /* Hijau medium */
 
   --error-bg-light: #FEE2E2;
-  /* Merah terang */
   --error-text-light: #991B1B;
-  /* Merah gelap */
   --error-border-light: #EF4444;
-  /* Merah medium */
 
-  /* Warna Status Badge (Light Mode - disesuaikan dengan input user) */
+  /* Warna Status Badge */
   --status-belum-bg-light: #EF4444;
-  /* Gray-400 */
   --status-belum-text-light: #fff;
   --status-sedang-bg-light: #FBBF24;
-  /* Yellow / Amber-400 */
   --status-sedang-text-light: #444;
   --status-selesai-bg-light: #5CC98F;
-  /* Green lembut */
   --status-selesai-text-light: #fff;
   --status-ditunda-bg-light: #6B7280;
   --status-ditunda-text-light: #fff;
 
-  /* Tombol Utama (Biru kalem) */
+  /* Tombol Utama */
   --btn-submit: #5B86E5;
   --btn-submit-hover: #4A7CD1;
 
-  /* Tombol Aksi Lainnya (dibuat lebih kalem) */
+  /* Tombol Aksi Lainnya */
   --btn-start: #3B82F6;
-  /* Biru untuk "Mulai Kerjakan" */
   --btn-start-hover: #2563EB;
-  /* Biru lebih gelap saat hover */
   --btn-finish: #F59E0B;
-  /* Kuning/Oranye untuk "Selesaikan" */
   --btn-finish-hover: #D97706;
-  /* Kuning/Oranye lebih gelap saat hover */
   --btn-pause: #6B7280;
-  /* Warna abu-abu yang lebih netral untuk "Tunda" */
   --btn-pause-hover: #4B5563;
-  /* Abu-abu lebih gelap saat hover */
   --btn-delete: #EF4444;
-  /* Merah untuk "Delete" */
   --btn-delete-hover: #DC2626;
-  /* Merah lebih gelap saat hover */
 
   /* Pagination */
   --pagination-bg-light: #e0f2fe;
-  /* biru muda */
   --pagination-border-light: #93c5fd;
-  /* biru lembut */
   --pagination-text-light: #1e3a8a;
-  /* biru tua */
   --pagination-hover-bg-light: #bfdbfe;
-  /* biru lebih gelap saat hover */
-  --pagination-active-bg-light: #2563eb;
-  /* biru solid */
-  --pagination-active-text-light: #ffffff;
-  /* putih */
+  --pagination-active-bg-light: #a3ccfe;
+  --pagination-active-text-light: #040404;
   --pagination-disabled-bg-light: #e5e7eb;
-  /* abu terang */
   --pagination-disabled-text-light: #9ca3af;
-  /* abu gelap */
 
-  /* Search Form Specific - Light Mode (Aesthetic) */
+  /* Search Form */
   --search-form-bg-light: #E5E7EB;
   --search-form-shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08);
-  /* Shadow yang lebih lembut */
   --search-input-bg-light: #fcfcfc;
   --search-input-border-light: #dde2e8;
-  /* Border lebih soft */
   --search-input-text-light: #333;
   --search-input-placeholder-light: #888;
-  /* Placeholder lebih terang */
   --search-button-bg-light: #d6eaf8;
-  /* Biru yang lebih modern */
   --search-button-hover-bg-light: #aed6f1;
   --search-button-text-light: #154360;
 
@@ -190,156 +136,84 @@
   --button-confirm-hover-dark: #3a7ed9;
   --button-cancel-bg-dark: #e25c5c;
   --button-cancel-hover-dark: #c84d4d;
-
 }
 
-/*
-  ---------------------------------------------------
-  VARIABEL CSS (DARK MODE VARIABLES)
-  ---------------------------------------------------
-  Definisi variabel CSS untuk tema gelap.
-*/
+/* Dark Mode Variables */
 body.dark-mode {
-  /* -- Variabel Umum untuk Input -- */
   --input-bg-dark: #2A333C;
-  /* Latar belakang input gelap */
   --text-color-dark: #E0E0E0;
-  /* Warna teks umum (soft off-white) */
   --placeholder-color-dark: #A0AEC0;
-  /* Warna placeholder (medium gray) */
   --border-color-dark: #4A5568;
-  /* Warna border umum (dark gray) */
 
-  /* -- Warna Dashboard (Dark Mode) -- */
   --bg-color-dashboard-dark: #212B36;
-  /* Latar belakang utama dashboard (deep slate blue-gray) */
   --text-color-dashboard-dark: #E0E0E0;
-  /* Warna teks utama dashboard */
 
-  /* Sidebar */
   --sidebar-bg-dark: #1f2937;
-  /* Latar belakang sidebar (slightly lighter slate) */
   --sidebar-text-dark: #E0E0E0;
-  /* Warna teks sidebar */
   --sidebar-border-dark: #6d7785;
-  /* Warna border di sidebar */
   --sidebar-hover-bg-dark: #374151;
-  /* Warna hover tombol sidebar */
 
-  /* Header Dashboard */
   --header-bg-dark: #1f2937;
-  /* Latar belakang header dashboard */
   --header-text-dark: #E0E0E0;
-  /* Warna teks di header */
   --header-button-bg-dark: #E0E0E0;
-  /* Latar belakang tombol header */
   --header-button-text-dark: #E0E0E0;
-  /* Warna teks tombol header */
   --header-button-hover-bg-dark: #5A6A80;
-  /* Warna hover tombol header */
 
-  /* Konten Utama */
   --content-bg-dark: #1e1e2f;
-  /* Latar belakang area konten utama dashboard */
 
-  /* Header Tabel Joblist (Darker Muted Slate Blue) */
   --joblist-header-bg-dark: #1f2937;
-  /* --joblist-header-shadow-dark: 0 4px 12px rgba(0, 0, 0, 0.4); */
   --joblist-header-text-dark: #FFFFFF;
 
-  /* Border & Shadow Input/Select Form */
   --form-input-border-dark: #4A5568;
-  /* Border input/select yang gelap */
   --form-input-shadow-dark: 0 1px 3px rgba(0, 0, 0, 0.2) inset;
-  /* Shadow inset untuk efek terangkat */
 
-  /* Ikon Hamburger */
   --hamburger-icon-color-dark: #A0AEC0;
-  /* Warna ikon hamburger */
   --hamburger-hover-color-dark: #F8F9FC;
-  /* Warna hover ikon hamburger */
 
-  /* Login Page Background (Dark Mode) */
   --auth-bg-dark: #212B36;
-  /* Sama dengan latar belakang dashboard */
 
-  /* Warna Kartu Informasi (Darker, Desaturated) */
   --info-card-red: #AF7070;
-  /* Darker Muted Rose */
   --info-card-green: #7DAA80;
   --info-card-yellow: #C7AF7A;
   --info-card-blue: #7A96AF;
 
-  /* Warna untuk pesan (sukses/error) di mode gelap */
   --success-bg-dark: #052e16;
-  /* Hijau gelap */
   --success-text-dark: #a7f3d0;
-  /* Hijau terang */
   --success-border-dark: #15803d;
-  /* Hijau medium */
 
   --error-bg-dark: #450a0a;
-  /* Merah gelap */
   --error-text-dark: #fecaca;
-  /* Merah terang */
   --error-border-dark: #b91c1c;
-  /* Merah medium */
 
-  /* Warna Status Badge (Dark Mode - disesuaikan dengan input user dan harmonisasi) */
   --status-belum-bg-dark: #e13333;
-  /* Gray-600 */
   --status-belum-text-dark: #fff;
   --status-sedang-bg-dark: #D97706;
-  /* Amber-700 */
   --status-sedang-text-dark: #fff;
   --status-selesai-bg-dark: #16A34A;
-  /* Green-700 */
-
-
   --status-ditunda-bg-dark: #6B7280;
   --status-ditunda-text-dark: #fff;
 
-  /* Tombol Utama (Biru kalem) */
   --btn-submit: #4A7CD1;
   --btn-submit-hover: #3A62B0;
 
-  /* Tombol Aksi Lainnya (dibuat lebih kalem) */
   --btn-start: #2563EB;
-  /* Biru untuk "Mulai Kerjakan" */
   --btn-start-hover: #1D4ED8;
-  /* Biru lebih gelap saat hover */
   --btn-finish: #D97706;
-  /* Kuning/Oranye untuk "Selesaikan" */
   --btn-finish-hover: #B45309;
-  /* Kuning/Oranye lebih gelap saat hover */
   --btn-pause-dark: #4B5563;
-  /* Warna abu-abu yang lebih netral untuk "Tunda" */
   --btn-pause-hover-dark: #374151;
-  /* Abu-abu lebih gelap saat hover */
   --btn-delete: #DC2626;
-  /* Merah untuk "Delete" */
   --btn-delete-hover: #B91C1C;
-  /* Merah lebih gelap saat hover */
 
-  /* Pagination */
   --pagination-text-dark: #e0f2fe;
-  /* teks putih kebiruan */
   --pagination-border-dark: #334155;
-  /* abu gelap seperti horizon malam */
   --pagination-bg-dark: #0a0f2c;
-  /* biru navy gelap */
   --pagination-hover-bg-dark: #1e293b;
-  /* sedikit lebih terang saat hover */
-  --pagination-active-bg-dark: #6d28d9;
-  /* ungu galaxy */
+  --pagination-active-bg-dark: #4A7CD1;
   --pagination-active-text-dark: #ffffff;
-  /* teks putih terang */
   --pagination-disabled-bg-dark: #111827;
-  /* hitam pekat */
   --pagination-disabled-text-dark: #475569;
-  /* abu biru redup */
 
-  /* Search Form Specific - Dark Mode */
   --search-form-bg-dark: #1f2937;
   --search-form-shadow-dark: 0 4px 12px rgba(0, 0, 0, 0.4);
   --search-input-bg-dark: #2d3748;
@@ -349,72 +223,55 @@ body.dark-mode {
   --search-button-bg-dark: #d6eaf8;
   --search-button-hover-bg-dark: #aed6f1;
   --search-button-text-dark: #154360;
-
-
-
 }
 
-/*
-  ---------------------------------------------------
-  RESET CSS DASAR
-  ---------------------------------------------------
-  Mengatur ulang margin dan padding default browser untuk konsistensi.
-*/
+/* Base Styles */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/*
-  ---------------------------------------------------
-  GAYA DASAR BODY
-  ---------------------------------------------------
-  Mengatur font, latar belakang, dan warna teks default untuk seluruh aplikasi.
-  Transisi halus untuk perubahan mode.
-*/
 body {
   font-family: 'Inter', sans-serif;
-  /* Latar belakang body di mode terang - ini akan ditimpa oleh .auth-page-container di halaman login */
   background-color: var(--bg-color-dashboard-light);
   color: var(--text-color-dashboard-light);
-  /* Warna teks body di mode terang */
   min-height: 100vh;
   transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden; /* Mencegah scroll horizontal */
 }
 
 body.dark-mode {
   background-color: var(--bg-color-dashboard-dark);
-  /* Latar belakang body di mode gelap */
   color: var(--text-color-dashboard-dark);
-  /* Warna teks body di mode gelap */
 }
 
-/*
-  ---------------------------------------------------
-  GAYA UNTUK H1 (TICKETING TRACKER TITLE)
-  ---------------------------------------------------
-  Gaya spesifik untuk judul utama "Ticketing Tracker" di area konten.
-*/
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-color-dashboard-light);
+  color: var(--text-color-dashboard-light);
+  font-family: 'Inter', sans-serif;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+body.dark-mode .dashboard-container {
+  background-color: var(--bg-color-dashboard-dark);
+  color: var(--text-color-dashboard-dark);
+}
+
 .ticketing-tracker-title {
-  /* Kelas ini untuk h1 di content-area */
   text-align: center;
   font-size: 2.5rem;
   font-weight: 800;
   background: linear-gradient(to right, #007bff, #00c6ff);
-  /* Gradien biru untuk teks */
   -webkit-background-clip: text;
-  /* Untuk efek gradien pada teks */
   -webkit-text-fill-color: transparent;
-  /* Untuk efek gradien pada teks */
   margin-bottom: 3.5rem;
 }
 
-/* =========================================
-   GAYA HALAMAN LOGIN & REGISTER
-   ========================================= */
-
-/* Container utama */
+/* Auth Pages */
 .auth-page-container {
   display: flex;
   justify-content: center;
@@ -429,10 +286,8 @@ body.dark-mode {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   transition: background-color 0.3s ease;
   background-image: var(--auth-background-image-light);
-
 }
 
-/* Card 2 kolom */
 .split-card {
   display: flex;
   flex-direction: row;
@@ -443,23 +298,16 @@ body.dark-mode {
   overflow: hidden;
   width: 900px;
   max-width: 100%;
-  /* transparansi sama */
-  /* backdrop-filter: blur(6px); efek blur */
 }
 
-/* Bagian form kiri & kanan */
 .login-card,
 .register-card,
 .login-background-side {
   flex: 1;
   padding: 50px;
   background: rgba(255, 255, 255, 0.432);
-  /* sama persis */
-  /* backdrop-filter: blur(6px); */
   text-align: center;
-
 }
-
 
 .login-card h2,
 .register-card h2 {
@@ -470,7 +318,6 @@ body.dark-mode {
   font-size: 40px;
 }
 
-/* Bagian background kanan */
 .login-background-side {
   flex: 1;
   background-size: contain;
@@ -481,7 +328,6 @@ body.dark-mode {
   justify-content: center;
 }
 
-/* Input group */
 .input-group {
   position: relative;
   margin-bottom: 20px;
@@ -513,7 +359,6 @@ body.dark-mode {
   color: #757575;
 }
 
-/* Opsi login/register */
 .login-options {
   display: flex;
   justify-content: space-between;
@@ -538,7 +383,6 @@ body.dark-mode {
   color: #7bb0ff;
 }
 
-/* Tombol */
 .login-btn,
 .register-btn {
   background: linear-gradient(to right, #1976d2, #1565c0);
@@ -559,7 +403,6 @@ body.dark-mode {
   transform: scale(1.02);
 }
 
-/* Toggle link */
 .auth-toggle {
   margin-top: 20px;
   font-size: 14px;
@@ -583,45 +426,43 @@ body.dark-mode {
   color: #7bb0ff;
 }
 
-/* =================================================================== */
-/* ===   ATURAN DASAR (MOBILE-FIRST) UNTUK DASHBOARD               === */
-/* =================================================================== */
-
-/* --- Tata Letak Utama --- */
+/* Dashboard Layout */
 .main-content {
   width: 100%;
   padding: 15px;
   margin-left: 0;
-  transition: margin-left 0.3s ease-in-out; /* Hanya untuk desktop */
+  transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+  min-height: 100vh;
 }
 
-/* --- Sidebar (Default untuk Mobile) --- */
 .sidebar {
-  position: fixed; /* Kunci untuk overlay */
+  position: fixed;
   top: 0;
   left: 0;
-  width: 280px; /* Selalu lebar penuh saat terbuka di mobile */
+  width: 280px;
   height: 100vh;
   z-index: 1000;
-  transform: translateX(-100%); /* Sembunyi secara default */
+  transform: translateX(-100%);
   transition: transform 0.3s ease-in-out;
+  background-color: var(--sidebar-bg-light);
+  color: var(--sidebar-text-light);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  overflow-y: auto; /* Scroll jika konten melebihi tinggi */
 }
 
 .sidebar.open {
   transform: translateX(0);
 }
 
-/* --- Tombol Hamburger & Overlay (Default untuk Mobile) --- */
 .hamburger-menu-button {
-  /* Properties umum */
   display: flex;
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
   z-index: 1001;
-
-  /* Properties untuk tampilan mobile */
   flex-direction: column;
   justify-content: space-around;
   width: 28px;
@@ -639,18 +480,18 @@ body.dark-mode {
   transition: all 0.3s ease-in-out;
 }
 
-/* Pastikan warna hamburger juga berubah di dark mode */
 body.dark-mode .hamburger-menu-button span {
-  background-color: #fff; /* Warna terang untuk tema gelap */
+  background-color: #fff;
 }
 
-/* Animasi ke 'X' */
 .sidebar-open .hamburger-menu-button span:nth-child(1) {
   transform: translateY(9.5px) rotate(45deg);
 }
+
 .sidebar-open .hamburger-menu-button span:nth-child(2) {
   opacity: 0;
 }
+
 .sidebar-open .hamburger-menu-button span:nth-child(3) {
   transform: translateY(-9.5px) rotate(-45deg);
 }
@@ -667,50 +508,97 @@ body.dark-mode .hamburger-menu-button span {
   visibility: hidden;
   transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
 }
-  
+
 .sidebar-open .content-overlay {
   opacity: 1;
   visibility: visible;
 }
 
+/* Desktop Styles */
 @media (min-width: 1291px) {
-  /* Sembunyikan elemen mobile di desktop */
   .hamburger-menu-button,
   .content-overlay,
   .job-list-mobile,
   .user-list-mobile {
-    display: none !important; /* Gunakan !important untuk memastikan tersembunyi */
+    display: none !important;
   }
 
-  /* KEMBALIKAN PERILAKU SIDEBAR DESKTOP */
   .sidebar {
-    position: static; /* Ganti dari 'fixed' ke 'static' */
-    transform: translateX(0); /* Batalkan efek sembunyi */
-    width: 80px; /* Kembali ke mode ramping */
-    height: auto; /* Biarkan tinggi mengikuti konten */
-    transition: width 0.3s ease-in-out; /* Ubah transisi ke lebar */
+    position: fixed;
+    transform: translateX(0);
+    width: 80px;
+    height: 100vh;
+    transition: width 0.3s ease-in-out;
   }
 
-  /* Efek hover untuk melebarkan sidebar */
   .sidebar:hover {
     width: 280px;
+     z-index: 1001;
   }
 
-  /* Sesuaikan kembali margin konten untuk desktop */
   .main-content {
     margin-left: 80px;
+    transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
   }
 
-  .sidebar:hover ~ .main-content {
+  .sidebar:not(:hover) .nav-text,
+  .sidebar:not(:hover) .sidebar-footer,
+  .sidebar:not(:hover) .sidebar-nav span,
+  .sidebar:not(:hover) .sidebar-footer span,
+  .sidebar:not(:hover) .sidebar-footer .nav-text {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .sidebar:hover ~ .main-content,
+  .sidebar:hover + .main-content {
     margin-left: 280px;
+    width: calc(100% - 280px);
+  }
+  
+  /* Pastikan hanya logo yang terlihat */
+  .sidebar:not(:hover) .sidebar-header {
+    padding: 1rem 0.5rem;
+    text-align: center;
+    justify-content: center;
+  }
+  
+  .sidebar:not(:hover) .sidebar-logo {
+    margin: 0 auto;
+    max-width: 50px;
+  }
+  
+  /* Pusatkan item navigasi saat sidebar kecil */
+  .sidebar:not(:hover) .sidebar-button {
+    justify-content: center;
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .sidebar:not(:hover) .sidebar-button i {
+    margin-right: 0;
+  }
+
+  /* PERBAIKAN: Pastikan toggle dark mode tetap visible */
+  .sidebar:not(:hover) .dark-mode-toggle {
+    left: 28px;
+    transform: scale(0.8);
+  }
+
+  .sidebar:hover .nav-text {
+    opacity: 1;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    display: inline-block;
   }
 }
 
+/* Tablet & Mobile Styles */
 @media (max-width: 1290px) {
-
-  /* =========================================== */
-  /* ===   STYLE UNTUK HALAMAN LOGIN           === */
-  /* =========================================== */
   .split-card {
     flex-direction: column;
     width: 95%;
@@ -719,75 +607,30 @@ body.dark-mode .hamburger-menu-button span {
   .auth-toggle {
     font-size: 13px;
   }
-  
-  /* ... (Kode lain untuk halaman login) ... */
 
-
-  /* =========================================== */
-  /* ===   STYLE UNTUK DASHBOARD ADMIN         === */
-  /* =========================================== */
-
-  /* --- Layout & Sidebar --- */
   .main-content {
-    margin-left: 0 !important; 
+    width: 100%;
+    padding: 15px;
+    transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+    min-height: 100vh;
   }
 
-  /* Properti sidebar untuk mobile sudah didefinisikan di atas */
   .sidebar {
     z-index: 1002;
   }
-  
-  /* --- Tombol Hamburger & Overlay --- */
-  /* Styles untuk hamburger sudah didefinisikan di atas */
-  
-  /* Animasi hamburger ke 'X' saat kontainer memiliki kelas 'sidebar-open' */
-  /* Perbaikan: Gunakan selector yang lebih umum agar bisa diterapkan di body atau container */
-  .sidebar-open .hamburger-menu-button span:nth-child(1) {
-    transform: translateY(9.5px) rotate(45deg);
-  }
 
-  .sidebar-open .hamburger-menu-button span:nth-child(2) {
-    opacity: 0;
-  }
-
-  .sidebar-open .hamburger-menu-button span:nth-child(3) {
-    transform: translateY(-9.5px) rotate(-45deg);
-  }
-
-  .content-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-  }
-  
-  /* Perbaikan: Gunakan selector yang sama seperti hamburger */
-  .sidebar-open .content-overlay {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  /* --- Penyesuaian Komponen Dashboard Lainnya --- */
-  
-  /* Header */
   .main-header {
     padding: 10px 15px;
   }
+
   .dashboard-header-title {
     font-size: 20px;
   }
 
-  /* Info Cards */
   .info-cards-grid {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important; /* Sedikit lebih besar untuk touch */
+    gap: 10px !important;
   }
 
   .info-card h3 {
@@ -798,7 +641,6 @@ body.dark-mode .hamburger-menu-button span {
     font-size: 14px;
   }
 
-  /* --- Form & Tombol Umum --- */
   .search-form {
     flex-direction: column;
     gap: 10px;
@@ -825,18 +667,18 @@ body.dark-mode .hamburger-menu-button span {
     font-size: 0.8rem;
   }
 
-  /* Sembunyikan tabel desktop di mobile */
-  .job-table {
+  .job-table,
+  .user-list-table {
     display: none;
   }
 
-  /* Tampilkan daftar kartu mobile (secara default disembunyikan) */
-  .job-list-mobile {
+  .job-list-mobile,
+  .user-list-mobile {
     display: block;
   }
 
-  /* Styling untuk setiap kartu */
-  .ticket-card-mobile {
+  .ticket-card-mobile,
+  .user-card-mobile {
     background: #E5E7EB;
     box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25);
     border-radius: 12px;
@@ -845,12 +687,18 @@ body.dark-mode .hamburger-menu-button span {
     margin-bottom: 15px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    /* Jarak antar baris di dalam kartu */
   }
 
-  /* Styling untuk setiap baris di dalam kartu */
-  .card-row {
+  .ticket-card-mobile {
+    gap: 12px;
+  }
+
+  .user-card-mobile {
+    gap: 15px;
+  }
+
+  .card-row,
+  .user-card-row {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -858,13 +706,14 @@ body.dark-mode .hamburger-menu-button span {
     padding-bottom: 10px;
   }
 
-  .ticket-card-mobile .card-row:last-child {
+  .ticket-card-mobile .card-row:last-child,
+  .user-card-mobile .user-card-row:last-child {
     border-bottom: none;
     padding-bottom: 0;
   }
 
-  /* Grup data (label + value) */
-  .data-group {
+  .data-group,
+  .user-data-group {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -874,13 +723,15 @@ body.dark-mode .hamburger-menu-button span {
     width: 100%;
   }
 
-  .data-group .label {
+  .data-group .label,
+  .user-data-group .label {
     font-size: 11px;
     color: #888;
     text-transform: uppercase;
   }
 
-  .data-group .value {
+  .data-group .value,
+  .user-data-group .value {
     font-size: 14px;
     font-weight: 500;
     color: var(--text-color-primary);
@@ -888,11 +739,17 @@ body.dark-mode .hamburger-menu-button span {
 
   .data-group .value.description {
     white-space: pre-wrap;
-    /* Agar deskripsi panjang bisa wrap */
     word-break: break-word;
   }
 
-  /* Penataan khusus untuk baris status dan aksi */
+  .user-data-group .value {
+    word-break: break-all;
+  }
+
+  .user-data-group .value.role {
+    text-transform: capitalize;
+  }
+
   .status-row {
     justify-content: center;
   }
@@ -902,22 +759,22 @@ body.dark-mode .hamburger-menu-button span {
     padding-top: 5px;
   }
 
-  /* Pastikan style dark mode juga berlaku */
-  body.dark-mode .ticket-card-mobile {
+  body.dark-mode .ticket-card-mobile,
+  body.dark-mode .user-card-mobile {
     box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
     -webkit-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
     background-color: #393955;
-    /* Latar belakang tabel di mode gelap */
     border: 1px solid var(--border-color-dark);
   }
 
-  body.dark-mode .card-row {
+  body.dark-mode .card-row,
+  body.dark-mode .user-card-row {
     border-bottom-color: var(--border-color-dark);
   }
 
   .user-history-table {
-    border: none
+    border: none;
   }
 
   .user-history-table thead {
@@ -956,7 +813,6 @@ body.dark-mode .hamburger-menu-button span {
     margin-right: 10px;
   }
 
-  /* Dark mode compatibility */
   body.dark-mode .job-table tr {
     border-color: var(--border-color-dark);
   }
@@ -969,7 +825,6 @@ body.dark-mode .hamburger-menu-button span {
     color: var(--text-color-dashboard-dark);
   }
 
-  /* --- Bagian Template --- */
   .templates-section {
     margin-bottom: 20px;
     padding-bottom: 20px;
@@ -988,8 +843,8 @@ body.dark-mode .hamburger-menu-button span {
     filter: brightness(90%);
   }
 
-  /* Grup individual (label + input) */
-  .notification-form__group {
+  .notification-form__group,
+  .proof-modal__group {
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -998,7 +853,10 @@ body.dark-mode .hamburger-menu-button span {
 
   .notification-form__group input,
   .notification-form__group select,
-  .notification-form__group textarea {
+  .notification-form__group textarea,
+  .proof-modal__group input,
+  .proof-modal__group select,
+  .proof-modal__group textarea {
     width: 100%;
     padding: 10px;
     border-radius: 5px;
@@ -1006,109 +864,24 @@ body.dark-mode .hamburger-menu-button span {
     font-size: 14px;
   }
 
-  /* Style KHUSUS untuk modal bukti (bisa Anda sesuaikan) */
   .proof-modal__group {
-    display: flex;
-    flex-direction: column;
     gap: 8px;
-    /* Contoh: beri jarak berbeda */
-    width: 100%;
     margin-bottom: 15px;
-    /* Contoh: beri margin bawah */
   }
 
-  .notification-form-container h2 {
-    font-size: 30px !important;
-  }
-
+  .notification-form-container h2,
   .global-notification-history h2 {
     font-size: 30px !important;
   }
 
   .history-item {
-    /* Susun konten di atas, tombol di bawah jika perlu */
     flex-direction: column;
     align-items: flex-start;
-    /* Rata kiri semua */
     gap: 10px;
   }
 
   .btn-delete-small {
     align-self: flex-end;
-    /* Posisikan tombol tetap di kanan bawah */
-  }
-
-  /* =========================================== */
-  /* ===     STYLE UNTUK USER MANAGEMENT ADMIN       === */
-  /* =========================================== */
-
-  /* Sembunyikan tabel versi desktop di mobile */
-  .user-list-table {
-    display: none;
-  }
-
-  /* Tampilkan daftar kartu versi mobile */
-  .user-list-mobile {
-    display: block;
-  }
-
-  /* Gaya untuk setiap kartu */
-  .user-card-mobile {
-    background: #E5E7EB;
-    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    padding: 15px;
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    /* Jarak antara baris atas dan bawah */
-  }
-
-  /* Gaya untuk setiap baris di dalam kartu */
-  .user-card-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    /* Sejajarkan item di tengah secara vertikal */
-  }
-
-  /* Grup data (label + value) */
-  .user-data-group {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .user-data-group .label {
-    font-size: 11px;
-    color: #888;
-    text-transform: uppercase;
-  }
-
-  .user-data-group .value {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-color-primary);
-    word-break: break-all;
-    /* Agar email panjang tidak overflow */
-  }
-
-  .user-data-group .value.role {
-    text-transform: capitalize;
-    /* Membuat 'admin' atau 'user' menjadi 'Admin'/'User' */
-  }
-
-
-  /* Dark mode compatibility */
-  body.dark-mode .user-card-mobile {
-    box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-    -webkit-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-    -moz-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-    background-color: #393955;
-    /* Latar belakang tabel di mode gelap */
-    border: 1px solid var(--border-color-dark);
   }
 }
 
@@ -1123,14 +896,11 @@ body.dark-mode .hamburger-menu-button span {
 }
 
 @media (max-width: 480px) {
-
-  /* --- Aturan untuk Halaman Login --- */
   .login-card h2,
   .register-card h2 {
     font-size: 24px;
   }
 
-  /* --- Perbaikan Header di Layar Sangat Kecil --- */
   .main-header .breadcrumb {
     display: none;
   }
@@ -1153,33 +923,26 @@ body.dark-mode .hamburger-menu-button span {
     text-overflow: ellipsis;
   }
 
-  /* === PERBAIKAN UTAMA UNTUK INFO CARD === */
   .info-cards-grid {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px !important;
   }
 
-  /* Perkecil ukuran konten di dalam kartu */
   .info-card {
     padding: 12px;
   }
 
   .info-card h3 {
     font-size: 24px;
-    /* Perkecil angka statistik */
     margin-bottom: 4px;
   }
 
   .info-card p {
     font-size: 12px;
-    /* Perkecil teks deskripsi */
   }
 
-  .confirmation-modal-content {
-    max-width: 80%;
-  }
-
+  .confirmation-modal-content,
   .modal-content {
     max-width: 80%;
   }
@@ -1194,16 +957,494 @@ body.dark-mode .hamburger-menu-button span {
   }
 }
 
-/* =========================================== */
-/* ===      STYLE UNTUK MODAL BUKTI        === */
-/* =========================================== */
+/* Desktop sidebar text visibility */
+.sidebar span {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+  white-space: nowrap;
+}
 
-/* Konten utama modal */
+.sidebar.open span {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (min-width: 1291px) {
+  .sidebar:hover span {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .info-cards-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 500px) {
+  .card-label {
+    font-size: 0.9rem !important;
+  }
+
+  .card-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .card-icon i {
+    font-size: 12px;
+  }
+}
+
+/* Dashboard Components */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-color-dashboard-light);
+  color: var(--text-color-dashboard-light);
+  font-family: 'Inter', sans-serif;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .dashboard-container {
+  background-color: var(--bg-color-dashboard-dark);
+  color: var(--text-color-dashboard-dark);
+}
+
+.dashboard-container.sidebar-closed .sidebar {
+  grid-template-columns: 0 1fr;
+  width: 0;
+  overflow: hidden;
+  padding: 0;
+  box-shadow: none;
+}
+
+.sidebar-header {
+  padding: 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-bottom: 1px solid var(--sidebar-border-light);
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 70px;
+}
+
+.nav-text {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+body.dark-mode .sidebar-header {
+  border-bottom-color: var(--sidebar-border-dark);
+}
+
+.sidebar-logo {
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  padding: 0.5rem 0;
+  width: 100%;
+}
+
+.sidebar-nav {
+  flex: 1 1 0%;
+  padding: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-nav-item {
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-button {
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+  background-color: transparent;
+  color: var(--sidebar-text-light);
+}
+
+body.dark-mode .sidebar-button {
+  color: var(--sidebar-text-dark);
+}
+
+.sidebar-button:hover {
+  background-color: var(--sidebar-hover-bg-light);
+}
+
+body.dark-mode .sidebar-button:hover {
+  background-color: var(--sidebar-hover-bg-dark);
+}
+
+.sidebar-button.active {
+  background-color: #3b72b9;
+  color: #fff;
+}
+
+.sidebar-button.active:hover {
+  background-color: #4A7CD1;
+}
+
+.sidebar-footer {
+  padding: 1rem;
+  border-top: 1px solid var(--sidebar-border-light);
+  white-space: nowrap;
+  overflow: hidden;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sidebar:not(:hover) .user-info {
+  justify-content: center;
+}
+
+.sidebar:not(:hover) .user-info .nav-text {
+  display: none;
+}
+
+body.dark-mode .sidebar-footer {
+  border-top-color: var(--sidebar-border-dark);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.user-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #d1ceceb6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.leaflet-control-container {
+  z-index: 0 !important;
+}
+
+.leaflet-control-attribution {
+  z-index: 0 !important;
+}
+
+.logout-button {
+  width: 50px;
+  height: 50px;
+  font-size: 28px;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  color: #000000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.logout-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #000000;
+}
+
+body.dark-mode .logout-button {
+  background-color: transparent;
+  color: #CCCCCC;
+}
+
+body.dark-mode .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+}
+
+.logout-button i {
+  color: inherit;
+}
+
+.dark-mode-toggle {
+  width: 60px;
+  height: 30px;
+  background-color: #0d121c;
+  border-radius: 20px;
+  position: relative;
+  left: 63px;
+  top: 3.5px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.dark-mode-toggle.dark {
+  background-color: #007bff;
+  border-color: #fff;
+}
+
+.dark-mode-toggle-ball {
+  width: 25px;
+  height: 25px;
+  background-color: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 2.5px;
+  left: 1px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+  color: #333;
+}
+
+.dark-mode-toggle.dark .dark-mode-toggle-ball {
+  transform: translateX(29px);
+  background-color: #f7d000;
+}
+
+.dark-mode-toggle-ball .sun-icon {
+  color: #f39c12;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.dark-mode-toggle.dark .dark-mode-toggle-ball .sun-icon {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.dark-mode-toggle-ball .moon-icon {
+  color: #fff;
+  position: absolute;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.dark-mode-toggle.dark .dark-mode-toggle-ball .moon-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.dark-mode-toggle .moon-background-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #f7d000;
+  font-size: 1.2em;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.dark-mode-toggle.dark .moon-background-icon {
+  opacity: 0;
+}
+
+.main-header {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.main-header-user {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.main-header-user nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+body.dark-mode .main-header {
+  background-color: var(--header-bg-dark);
+  border-bottom: 1px solid #2d3748;
+}
+
+.header-left-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color-dashboard-light);
+  white-space: nowrap;
+  transition: color 0.3s ease;
+  margin: 0;
+  line-height: 1;
+}
+
+body.dark-mode .dashboard-header-title {
+  color: var(--text-color-dashboard-dark);
+  margin: 0;
+  line-height: 1;
+}
+
+.main-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.breadcrump {
+  color: #fff !important;
+}
+
+.breadcrumb {
+  color: var(--header-text-light);
+}
+
+body.dark-mode .breadcrumb {
+  color: var(--header-text-dark);
+}
+
+.header-icon-button {
+  color: var(--header-text-light);
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  transition: color 0.15s ease-in-out;
+}
+
+.header-icon-button:hover {
+  color: #111827;
+}
+
+body.dark-mode .header-icon-button {
+  color: var(--header-text-dark);
+}
+
+body.dark-mode .header-icon-button:hover {
+  color: #fff;
+}
+
+.header-icon-button.error-icon {
+  color: #E74C3C;
+}
+
+.header-icon-button.error-icon:hover {
+  color: #C0392B;
+}
+
+.hamburger-menu-button:hover {
+  color: var(--hamburger-hover-color-light);
+}
+
+body.dark-mode .hamburger-menu-button {
+  color: var(--hamburger-icon-color-dark);
+}
+
+body.dark-mode .hamburger-menu-button:hover {
+  color: var(--hamburger-hover-color-dark);
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background-color: var(--content-bg-light);
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+body.dark-mode .content-area {
+  background-color: var(--content-bg-dark);
+}
+
+.info-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.info-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 120px;
+  padding: 1.25rem 1.5rem;
+  border-radius: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.card-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-weight: 500;
+  text-align: center;
+}
+
+.card-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal Proof Styles */
 .modal-content {
   padding: 24px;
 }
 
-/* Judul modal */
 .modal-content h3 {
   text-align: center;
   font-size: 20px;
@@ -1212,7 +1453,6 @@ body.dark-mode .hamburger-menu-button span {
   margin-bottom: 20px;
 }
 
-/* Grup form di dalam modal bukti */
 .proof-modal__group {
   display: flex;
   flex-direction: column;
@@ -1225,11 +1465,9 @@ body.dark-mode .hamburger-menu-button span {
   font-weight: 500;
   font-size: 14px;
   text-align: left;
-  /* Label rata kiri */
   color: var(--text-color-primary);
 }
 
-/* Textarea dan input di dalam modal bukti */
 .proof-modal__group textarea,
 .proof-modal__group input {
   width: 100%;
@@ -1237,17 +1475,12 @@ body.dark-mode .hamburger-menu-button span {
   border-radius: 6px;
   font-size: 14px;
   border: 1px solid #d1d5db;
-  /* Warna border light mode */
   background-color: #ffffff;
-  /* Warna background light mode */
   color: #111827;
-  /* Warna teks light mode */
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
-  /* Penting agar padding tidak merusak layout */
 }
 
-/* Fokus input */
 .proof-modal__group textarea:focus,
 .proof-modal__group input:focus {
   outline: none;
@@ -1255,10 +1488,8 @@ body.dark-mode .hamburger-menu-button span {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
-/* Styling khusus untuk input file agar lebih modern */
 .proof-modal__group input[type="file"] {
   padding: 0;
-  /* Hapus padding default */
 }
 
 .proof-modal__group input[type="file"]::file-selector-button {
@@ -1276,20 +1507,14 @@ body.dark-mode .hamburger-menu-button span {
   background-color: #e5e7eb;
 }
 
-/* Kontainer untuk tombol aksi di modal */
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  /* Tombol rata kanan */
   gap: 10px;
   margin-top: 24px;
 }
 
-
-/* =========================================== */
-/* ===         DARK MODE (MODAL BUKTI)       === */
-/* =========================================== */
-
+/* Dark Mode for Modal Proof */
 body.dark-mode .proof-modal__group label {
   color: #d1d5db;
 }
@@ -1309,771 +1534,6 @@ body.dark-mode .proof-modal__group input[type="file"]::file-selector-button {
 
 body.dark-mode .proof-modal__group input[type="file"]::file-selector-button:hover {
   background-color: #6b7280;
-}
-
-/*
-  ---------------------------------------------------
-  GAYA DASHBOARD
-  ---------------------------------------------------
-  Gaya untuk container utama dashboard (flexbox layout).
-  Menambahkan transisi untuk perubahan layout saat sidebar dibuka/ditutup.
-*/
-.dashboard-container {
-  display: flex;
-  min-height: 100vh;
-  background-color: var(--bg-color-dashboard-light);
-  /* Latar belakang dashboard di mode terang */
-  color: var(--text-color-dashboard-light);
-  /* Warna teks dashboard di mode terang */
-  font-family: 'Inter', sans-serif;
-  transition: all 0.3s ease;
-  /* Transisi untuk perubahan layout */
-}
-
-body.dark-mode .dashboard-container {
-  background-color: var(--bg-color-dashboard-dark);
-  /* Latar belakang dashboard di mode gelap */
-  color: var(--text-color-dashboard-dark);
-  /* Warna teks dashboard di mode gelap */
-}
-
-/* Kelas untuk saat sidebar tertutup */
-.dashboard-container.sidebar-closed .sidebar {
-  grid-template-columns: 0 1fr;
-  width: 0;
-  /* Sembunyikan sidebar dengan lebar 0 */
-  overflow: hidden;
-  /* Sembunyikan konten yang meluap */
-  padding: 0;
-  /* Hapus padding */
-  box-shadow: none;
-  /* Hapus bayangan */
-}
-
-
-/*
-  ---------------------------------------------------
-  SIDEBAR
-  ---------------------------------------------------
-  Gaya untuk sidebar navigasi dengan animasi expand/collapse
-*/
-.sidebar {
-  background-color: var(--sidebar-bg-light);
-  color: var(--sidebar-text-light);
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  overflow: hidden;
-  
-  /* Mobile first - default state */
-  width: 280px;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease-in-out;
-}
-
-/* State saat sidebar terbuka di mobile */
-.sidebar.open {
-  transform: translateX(0);
-}
-
-/* Desktop styles */
-@media (min-width: 1291px) {
-  .sidebar {
-    width: 80px;
-    transform: none;
-    transition: width 0.3s ease-in-out;
-  }
-
-  .sidebar:hover {
-    width: 280px;
-  }
-}
-
-/* Text visibility in sidebar */
-.sidebar span {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease-in-out;
-  white-space: nowrap;
-}
-
-/* Show text when sidebar is open (mobile) */
-.sidebar.open span {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* Desktop hover behavior */
-@media (min-width: 1291px) {
-  .sidebar:hover span {
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
-
-/* Main content adjustment */
-.main-content {
-  /* 1. Atur margin default sesuai lebar sidebar collapsed */
-  margin-left: 80px;
-  flex-grow: 1; /* Pastikan ini ada */
-
-  /* 2. Tambahkan transisi agar pergeseran mulus */
-  transition: margin-left 0.3s ease-in-out;
-}
-
-.sidebar:hover ~ .main-content {
-  margin-left: 280px;
-}
-
-body.dark-mode .sidebar {
-  background-color: var(--sidebar-bg-dark);
-  /* Latar belakang sidebar di mode gelap */
-  color: var(--sidebar-text-dark);
-  /* Warna teks sidebar di mode gelap */
-}
-
-.sidebar-header {
-  padding: 1rem;
-  /* Padding */
-  font-size: 1.5rem;
-  /* Ukuran font */
-  font-weight: 700;
-  /* Tebal font */
-  border-bottom: 1px solid var(--sidebar-border-light);
-  /* Border bawah */
-  white-space: nowrap;
-  /* Pastikan teks tidak wrap saat menyembunyikan sidebar */
-  overflow: hidden;
-  /* Sembunyikan teks yang meluap */
-}
-
-body.dark-mode .sidebar-header {
-  border-bottom-color: var(--sidebar-border-dark);
-  /* Warna border di mode gelap */
-}
-
-/* Gaya baru untuk gambar logo di sidebar header */
-.sidebar-logo {
-  max-width: 100%;
-  /* Default: memastikan gambar tidak melebihi lebar kontainer */
-  height: auto;
-  /* Default: mempertahankan rasio aspek */
-  /* display: block; */
-  /* Default: menghapus spasi ekstra di bawah gambar */
-  margin: 0 auto;
-  /* Default: memusatkan gambar jika kontainer lebih lebar dari gambar */
-  padding: 0.5rem 0;
-  /* Default: menambahkan sedikit padding vertikal */
-  width: 100%;
-}
-
-.sidebar-nav {
-  flex: 1 1 0%;
-  /* Memenuhi sisa ruang vertikal */
-  padding: 1rem;
-  /* Padding */
-  white-space: nowrap;
-  /* Pastikan teks tidak wrap saat menyembunyikan sidebar */
-  overflow: hidden;
-  /* Sembunyikan teks yang meluap */
-
-}
-
-.sidebar-nav-item {
-  margin-bottom: 0.5rem;
-
-  /* Margin bawah antar item */
-}
-
-.sidebar-button {
-  width: 100%;
-  /* Lebar penuh */
-  text-align: left;
-  /* Teks rata kiri */
-  padding: 0.75rem;
-  /* Padding */
-  border-radius: 0.5rem;
-  /* Sudut membulat */
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  /* Jarak antar ikon dan teks */
-  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
-  /* Transisi halus */
-  background-color: transparent;
-  /* Latar belakang transparan default */
-  color: var(--sidebar-text-light);
-  /* Warna teks di mode terang */
-}
-
-body.dark-mode .sidebar-button {
-  color: var(--sidebar-text-dark);
-  /* Warna teks di mode gelap */
-}
-
-.sidebar-button:hover {
-  background-color: var(--sidebar-hover-bg-light);
-  /* Warna hover di mode terang */
-}
-
-body.dark-mode .sidebar-button:hover {
-  background-color: var(--sidebar-hover-bg-dark);
-  /* Warna hover di mode gelap */
-}
-
-.sidebar-button.active {
-  background-color: #3b72b9;
-  /* Warna latar belakang tombol aktif (orange) */
-  color: #fff;
-  /* Warna teks tombol aktif */
-}
-
-.sidebar-button.active:hover {
-  background-color: #4A7CD1;
-  /* Biru lebih gelap saat hover aktif */
-}
-
-.sidebar-footer {
-  padding: 1rem;
-  /* Padding */
-  border-top: 1px solid var(--sidebar-border-light);
-  /* Border atas */
-  white-space: nowrap;
-  /* Pastikan teks tidak wrap saat menyembunyikan sidebar */
-  overflow: hidden;
-  /* Sembunyikan teks yang meluap */
-}
-
-body.dark-mode .sidebar-footer {
-  border-top-color: var(--sidebar-border-dark);
-  /* Warna border di mode gelap */
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  /* Jarak antar elemen */
-  margin-bottom: 1rem;
-  /* Margin bawah */
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.user-avatar {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #d1ceceb6;
-  /* abu soft untuk default */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Atur semua kontrol Leaflet */
-.leaflet-control-container {
-  z-index: 0 !important; /* lebih rendah dari sidebar */
-}
-
-/* Atur attribution (watermark) */
-.leaflet-control-attribution {
-  z-index: 0 !important;
-}
-
-
-
-
-/* =================================================================
-   Gaya untuk Tombol Logout (Mode Terang)
-   ================================================================= */
-.logout-button {
-  width: 50px;
-  /* Lebar tombol */
-  height: 50px;
-  /* Tinggi tombol */
-  font-size: 28px;
-  /* Ukuran ikon, sedikit lebih kecil agar pas */
-  padding: 0;
-  /* Menghilangkan padding agar ikon terpusat */
-  border-radius: 50%;
-  /* Membuat tombol bulat */
-  border: none;
-  /* Menghilangkan border */
-  background-color: transparent;
-  /* Latar belakang transparan di mode terang */
-  color: #000000;
-  /* Warna ikon default (abu-abu gelap) */
-  display: flex;
-  justify-content: center;
-  /* Memposisikan ikon di tengah secara horizontal */
-  align-items: center;
-  /* Memposisikan ikon di tengah secara vertikal */
-  cursor: pointer;
-  /* Menunjukkan bahwa ini adalah elemen yang dapat diklik */
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-  /* Transisi halus untuk hover */
-  /* text-align: left; dan gap: 0.75rem; dihilangkan karena hanya ikon */
-}
-
-/* Efek hover untuk tombol logout di mode terang */
-.logout-button:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  /* Latar belakang abu-abu transparan saat hover */
-  color: #000000;
-  /* Warna ikon menjadi hitam saat hover */
-}
-
-/* =================================================================
-   Gaya untuk Tombol Logout (Mode Gelap)
-   ================================================================= */
-/* Saat elemen body memiliki kelas 'dark-mode' */
-body.dark-mode .logout-button {
-  background-color: transparent;
-  /* Latar belakang transparan di mode gelap */
-  color: #CCCCCC;
-  /* Warna ikon (abu-abu terang) yang terlihat jelas di latar belakang gelap */
-}
-
-/* Efek hover untuk tombol logout di mode gelap */
-body.dark-mode .logout-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  /* Latar belakang putih transparan saat hover */
-  color: #FFFFFF;
-  /* Warna ikon menjadi putih saat hover */
-}
-
-/* Pastikan elemen ikon (misalnya, dari Font Awesome) mewarisi warna dari tombol induk */
-.logout-button i {
-  color: inherit;
-}
-
-
-/* Gaya untuk Dark Mode Toggle Switch - SESUAI GAMBAR */
-.dark-mode-toggle {
-  width: 60px;
-  /* Lebar total saklar */
-  height: 30px;
-  /* Tinggi total saklar */
-  background-color: #0d121c;
-  /* Latar belakang gelap (mode terang) */
-  border-radius: 20px;
-  /* Setengah dari tinggi untuk bentuk kapsul */
-  position: relative;
-  left: 63px;
-  top: 3.5px;
-  cursor: pointer;
-  overflow: hidden;
-  /* Penting untuk menyembunyikan bagian bola yang keluar */
-  /* border: 2px solid rgba(255, 255, 255, 0.8);  */
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-/* Latar belakang toggle saat dark mode aktif */
-.dark-mode-toggle.dark {
-  background-color: #007bff;
-  /* Warna biru saat dark mode aktif */
-  border-color: #fff;
-}
-
-.dark-mode-toggle-ball {
-  width: 25px;
-  /* Lebar bola */
-  height: 25px;
-  /* Tinggi bola */
-  background-color: #fff;
-  /* Warna bola (putih) */
-  border-radius: 50%;
-  /* Bentuk lingkaran */
-  position: absolute;
-  top: 2.5px;
-  /* Posisi di dalam toggle */
-  left: 1px;
-  /* Posisi di dalam toggle */
-  transition: transform 0.3s ease, background-color 0.3s ease;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1em;
-  /* Ukuran ikon */
-  color: #333;
-  /* Warna ikon saat light mode */
-}
-
-/* Pindahkan bola ke kanan saat dark mode aktif */
-.dark-mode-toggle.dark .dark-mode-toggle-ball {
-  transform: translateX(29px);
-  /* Pindahkan bola ke kanan (lebar toggle - lebar bola - padding) */
-  background-color: #f7d000;
-  /* Warna kuning untuk bola saat dark mode (bulan) */
-}
-
-/* Icon matahari (saat light mode) - di dalam bola */
-.dark-mode-toggle-ball .sun-icon {
-  color: #f39c12;
-  /* Warna kuning untuk matahari */
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-/* Sembunyikan matahari saat dark mode aktif */
-.dark-mode-toggle.dark .dark-mode-toggle-ball .sun-icon {
-  opacity: 0;
-  transform: scale(0.5);
-  /* Kecilkan sedikit saat menghilang */
-}
-
-/* Icon bulan (saat dark mode) - di dalam bola */
-.dark-mode-toggle-ball .moon-icon {
-  color: #fff;
-  /* Warna putih untuk bulan */
-  position: absolute;
-  /* Posisikan absolut di dalam bola */
-  opacity: 0;
-  /* Sembunyikan secara default */
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-/* Tampilkan bulan saat dark mode aktif */
-.dark-mode-toggle.dark .dark-mode-toggle-ball .moon-icon {
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* Bulan sabit di latar belakang (saat light mode) - ini adalah bulan dari gambar yang bukan di dalam bola */
-.dark-mode-toggle .moon-background-icon {
-  /* Ini adalah contoh, tambahkan ke JSX jika ingin ikon bulan di luar bola */
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #f7d000;
-  /* Warna kuning bulan */
-  font-size: 1.2em;
-  opacity: 1;
-  transition: opacity 0.3s ease;
-}
-
-.dark-mode-toggle.dark .moon-background-icon {
-  opacity: 0;
-  /* Sembunyikan bulan background saat dark mode */
-}
-
-/*
-  ---------------------------------------------------
-  KONTEN UTAMA DASHBOARD
-  ---------------------------------------------------
-  Gaya untuk area konten utama di samping sidebar.
-*/
-/* .main-content {
-  flex: 1 1 0%;
-  display: flex;
-  flex-direction: column;
-
-  margin-left: 16rem;
-  transition: margin-left 0.3s ease;
-  height: 100vh;
-  overflow: hidden;
-} */
-
-
-/* Mendorong konten utama ke kiri saat sidebar ditutup */
-/* .dashboard-container.sidebar-closed .main-content {
-  margin-left: 0;
-} */
-
-/* .sidebar.closed {
-  width: 0;
-  padding: 0;
-  overflow: hidden;
-} */
-
-
-.main-header {
-  background-color: #ffffff;
-  /* Latar belakang header di mode terang */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  /* Bayangan lebih halus dan tegas */
-  border-bottom: 1px solid #e0e0e0;
-  /* Garis bawah tegas di light mode */
-  padding: 1rem;
-  /* Padding */
-  display: flex;
-  align-items: center;
-  /* Mengatur item secara vertikal di tengah */
-  justify-content: space-between;
-  /* Untuk mendorong grup kiri dan kontrol kanan */
-  gap: 1rem;
-  /* Jarak antar elemen di header */
-  flex-shrink: 0;
-}
-
-.main-header-user {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  /* Bayangan lebih halus dan tegas */
-  border-bottom: 1px solid #e0e0e0;
-  /* Garis bawah tegas di light mode */
-  padding: 1rem;
-  /* Padding */
-  display: flex;
-  align-items: center;
-  /* Mengatur item secara vertikal di tengah */
-  justify-content: space-between;
-  /* Untuk mendorong grup kiri dan kontrol kanan */
-  gap: 0.5rem;
-  /* Jarak antar elemen di header */
-  flex-shrink: 0;
-  flex-wrap: wrap;
-}
-
-.main-header-user nav {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-}
-
-body.dark-mode .main-header {
-  background-color: var(--header-bg-dark);
-  /* Latar belakang header di mode gelap */
-  border-bottom: 1px solid #2d3748;
-  /* Garis bawah tegas di dark mode */
-}
-
-/* Grup Kiri Header (Hamburger + Dashboard Title) */
-.header-left-group {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  /* Jarak antara hamburger dan judul */
-}
-
-/* Judul "Dashboard v3" di dalam header */
-.dashboard-header-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-color-dashboard-light);
-  white-space: nowrap;
-  transition: color 0.3s ease;
-  /* 💡 PENYESUAIAN UNTUK KESELARASAN */
-  margin: 0;
-  /* Hapus margin default pada h1 */
-  line-height: 1;
-  /* Atur line-height agar sesuai dengan font-size */
-}
-
-body.dark-mode .dashboard-header-title {
-  color: var(--text-color-dashboard-dark);
-  /* 💡 PENYESUAIAN UNTUK KESELARASAN DI DARK MODE */
-  margin: 0;
-  line-height: 1;
-}
-
-
-.main-header-controls {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  /* Jarak antar elemen kontrol */
-}
-
-.breadcrump {
-  color: #fff !important;
-}
-
-.breadcrumb {
-  color: var(--header-text-light);
-  /* Warna teks breadcrumb di mode terang */
-}
-
-body.dark-mode .breadcrumb {
-  color: var(--header-text-dark);
-  /* Warna teks breadcrumb di mode gelap */
-}
-
-.header-icon-button {
-  color: var(--header-text-light);
-  /* Warna ikon tombol di mode terang */
-  background: none;
-  border: none;
-  padding: 0.25rem;
-  /* Padding minimal untuk ikon */
-  cursor: pointer;
-  transition: color 0.15s ease-in-out;
-  /* Transisi halus */
-}
-
-.header-icon-button:hover {
-  color: #111827;
-  /* Warna hover di mode terang */
-}
-
-body.dark-mode .header-icon-button {
-  color: var(--header-text-dark);
-  /* Warna ikon tombol di mode gelap */
-}
-
-body.dark-mode .header-icon-button:hover {
-  color: #fff;
-  /* Warna hover di mode gelap */
-}
-
-.header-icon-button.error-icon {
-  color: #E74C3C;
-  /* Warna merah untuk ikon error */
-}
-
-.header-icon-button.error-icon:hover {
-  color: #C0392B;
-  /* Warna hover merah */
-}
-
-
-/* Tombol Hamburger Menu hover states */
-.hamburger-menu-button:hover {
-  color: var(--hamburger-hover-color-light);
-}
-
-body.dark-mode .hamburger-menu-button {
-  color: var(--hamburger-icon-color-dark);
-}
-
-body.dark-mode .hamburger-menu-button:hover {
-  color: var(--hamburger-hover-color-dark);
-}
-
-
-.content-area {
-  flex: 1 1 0%;
-  overflow-y: auto;
-  padding: 1.5rem;
-  background-color: var(--content-bg-light);
-  transition: background-color 0.3s ease;
-}
-
-body.dark-mode .content-area {
-  background-color: var(--content-bg-dark);
-}
-
-
-.content-area {
-  flex: 1 1 0%;
-  /* Memenuhi sisa ruang vertikal */
-  overflow-y: auto;
-  /* Scroll jika konten melebihi tinggi */
-  padding: 2rem;
-  /* Padding */
-  background-color: var(--content-bg-light);
-  /* Latar belakang area konten di mode terang */
-}
-
-body.dark-mode .content-area {
-  background-color: var(--content-bg-dark);
-  /* Latar belakang area konten di mode gelap (hitam) */
-}
-
-/*
-  ---------------------------------------------------
-  INFO CARDS (KARTU INFORMASI DASHBOARD)
-  ---------------------------------------------------
-  Gaya untuk kartu-kartu ringkasan di dashboard.
-*/
-.info-cards-grid {
-  /* Mengatur layout grid yang responsif dan fleksibel */
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-
-  /* Mengatur jarak antar kartu */
-  gap: 24px;
-  /* Meningkatkan jarak agar terlihat lebih rapi */
-
-  /* Mengatur margin bawah untuk pemisahan dari konten di bawahnya */
-  margin-bottom: 30px;
-}
-
-@media (min-width: 1024px) {
-  .info-cards-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-/* ================================ */
-/* Info Card Styles                 */
-/* ================================ */
-
-.info-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-
-  min-height: 120px; /* tinggi minimum kartu */
-  padding: 1.25rem 1.5rem;
-  border-radius: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.info-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-}
-
-/* ================================ */
-/* Header and Icon Styles           */
-/* ================================ */
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.card-label {
-  font-size: 0.75rem; /* default kecil */
-  color: #6c757d;
-  font-weight: 500;
-  text-align: center;
-}
-
-.card-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  font-size: 1rem; /* ukuran ikon di dalamnya */
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Responsive ukuran label & icon */
-@media (max-width: 500px) {
-  .card-label {
-    font-size: 0.9rem !important; /* biar lebih enak dibaca */
-  }
-
-  .card-icon {
-    width: 22px;
-    height: 22px;
-  }
-
-  .card-icon i {
-    font-size: 12px; /* ikon ikut mengecil */
-  }
 }
 
 /* ================================ */
@@ -3751,12 +3211,6 @@ body.dark-mode .btn-delete:hover {
 .dashboard-container.no-sidebar {
   min-height: 100vh;
 }
-
-/* .main-content {
-  transition: margin-left 0.3s ease;
-  background: transparent;
-} */
-
 .content-area {
   background: transparent;
 }
