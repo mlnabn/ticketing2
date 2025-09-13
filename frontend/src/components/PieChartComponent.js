@@ -5,46 +5,60 @@ const PieChartComponent = ({ stats, handleHomeClick, handleStatusFilterClick, st
   if (!stats) return null;
 
   const data = [
-    { name: 'Belum Selesai', value: stats.pending_tickets },
-    { name: 'Selesai', value: stats.completed_tickets },
+    { name: 'Belum Dikerjakan', value: stats.belum_dikerjakan },
+    { name: 'Ditunda', value: stats.ditunda },
+    { name: 'Sedang Dikerjakan', value: stats.sedang_dikerjakan },
+    { name: 'Selesai', value: stats.selesai },
+    { name: 'Ditolak', value: stats.ditolak },
   ];
 
-  const COLORS = ['#f5dd06ae', '#45e0b4f7', '#FFBB28'];
+  const total = data.reduce((sum, item) => sum + item.value, 0);
 
-  // Klik slice pie chart
+  const dataWithPercent = data.map((item) => ({
+    ...item,
+    percent: total > 0 ? ((item.value / total) * 100).toFixed(1) : 0
+  }));
+
+  const COLORS = ['#8884d8', '#95a5a6', '#FFBB28', '#82ca9d', '#ff2828'];
+
   const onPieClick = (entry) => {
     if (!entry || !entry.name) return;
-
-    handleHomeClick();                // pindah ke halaman Tiket
-    handleStatusFilterClick(entry.name); // filter sesuai slice
+    handleHomeClick();
+    handleStatusFilterClick(entry.name);
   };
 
   return (
-    <ResponsiveContainer width="100%" height={250}>
+    <ResponsiveContainer width="100%" height={300}>
       <PieChart>
         <Pie
-          data={data}
+          data={dataWithPercent}
           cx="50%"
           cy="50%"
-          innerRadius={60}
-          outerRadius={80}
+          innerRadius={50}   // ⬅️ lebih kecil
+          outerRadius={80}   // ⬅️ lebih kecil
           fill="#8884d8"
-          paddingAngle={5}
+          paddingAngle={2}
           dataKey="value"
           onClick={(entry) => onPieClick(entry.payload)}
+          label={({ percent }) => `${percent}%`} // ⬅️ hanya persentase
         >
-          {data.map((entry, index) => (
+          {dataWithPercent.map((entry, index) => (
             <Cell
               key={`cell-${index}`}
               fill={COLORS[index % COLORS.length]}
               cursor="pointer"
-              stroke={statusFilter === entry.name ? '#000' : 'none'} // highlight jika aktif
+              stroke={statusFilter === entry.name ? '#000' : 'none'}
               strokeWidth={statusFilter === entry.name ? 3 : 0}
             />
           ))}
         </Pie>
-        <Tooltip />
-        <Legend />
+        <Tooltip
+          formatter={(value, name, props) => {
+            const percent = props.payload.percent;
+            return [`${value} tiket (${percent}%)`, name];
+          }}
+        />
+        <Legend verticalAlign="bottom" height={50} />
       </PieChart>
     </ResponsiveContainer>
   );

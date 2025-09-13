@@ -34,28 +34,41 @@ const LineChartComponent = ({ data, onPointClick }) => {
 
         <Line
           type="monotone"
-          dataKey="created"
-          stroke="#8ebfe8c1"
-          name="Dibuat"
+          dataKey="belum"
+          stroke="#8884d8"
+          name="Belum Dikerjakan"
           activeDot={{
-            onClick: (e, payload) => handlePointClick(payload.payload, 'Dibuat'),
+            onClick: (e, payload) => handlePointClick(payload.payload, 'Belum Dikerjakan'),
             cursor: 'pointer'
           }}
         />
+
         <Line
           type="monotone"
-          dataKey="completed"
-          stroke="#45e0b4f7"
+          dataKey="sedang"
+          stroke="#FFBB28"
+          name="Sedang Dikerjakan"
+          activeDot={{
+            onClick: (e, payload) => handlePointClick(payload.payload, 'Sedang Dikerjakan'),
+            cursor: 'pointer'
+          }}
+        />
+
+        <Line
+          type="monotone"
+          dataKey="selesai"
+          stroke="#82ca9d"
           name="Selesai"
           activeDot={{
             onClick: (e, payload) => handlePointClick(payload.payload, 'Selesai'),
             cursor: 'pointer'
           }}
         />
+
         <Line
           type="monotone"
-          dataKey="rejected"
-          stroke="#f5dd06ae"
+          dataKey="ditolak"
+          stroke="#ff2828"
           name="Ditolak"
           activeDot={{
             onClick: (e, payload) => handlePointClick(payload.payload, 'Ditolak'),
@@ -63,6 +76,7 @@ const LineChartComponent = ({ data, onPointClick }) => {
           }}
         />
       </LineChart>
+
     </ResponsiveContainer>
   );
 };

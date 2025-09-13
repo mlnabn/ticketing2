@@ -3,7 +3,7 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { format } from 'date-fns';
 
-function CalendarComponent({ tickets = [] }) {
+function CalendarComponent({ tickets = [], onTicketClick }) {
   const [date, setDate] = useState(new Date());
   const [ticketsForDate, setTicketsForDate] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -11,7 +11,7 @@ function CalendarComponent({ tickets = [] }) {
   const [showModal, setShowModal] = useState(false);
   const [selectedTickets, setSelectedTickets] = useState([]);
 
-  // Baca dark mode dari localStorage
+  // Sync dark mode dari localStorage
   useEffect(() => {
     const updateModeFromStorage = () => {
       const savedMode = localStorage.getItem('darkMode');
@@ -26,26 +26,7 @@ function CalendarComponent({ tickets = [] }) {
     };
   }, []);
 
-  // Load data tiket awal
-  useEffect(() => {
-    if (!tickets || tickets.length === 0) {
-      setTicketsForDate([]);
-      return;
-    }
-    const sortedTickets = [...tickets].sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at)
-    );
-    if (sortedTickets.length > 0) {
-      setDate(new Date(sortedTickets[0].created_at));
-    }
-    const formatted = format(date, 'yyyy-MM-dd');
-    const filtered = tickets.filter(
-      (t) => format(new Date(t.created_at), 'yyyy-MM-dd') === formatted
-    );
-    setTicketsForDate(filtered);
-  }, [tickets]);
-
-  // Update data ketika tanggal berubah
+  // Update data tiket awal
   useEffect(() => {
     if (!tickets || tickets.length === 0) {
       setTicketsForDate([]);
@@ -56,7 +37,7 @@ function CalendarComponent({ tickets = [] }) {
       (t) => format(new Date(t.created_at), 'yyyy-MM-dd') === formatted
     );
     setTicketsForDate(filtered);
-  }, [date, tickets]);
+  }, [tickets, date]);
 
   // Klik tanggal
   const handleDayClick = (clickedDate) => {
@@ -69,7 +50,7 @@ function CalendarComponent({ tickets = [] }) {
     setDate(clickedDate);
   };
 
-  // Indikator titik status
+  // Render titik di kalender
   const tileContent = ({ date, view }) => {
     if (view === 'month') {
       const formattedDate = format(date, 'yyyy-MM-dd');
@@ -103,7 +84,7 @@ function CalendarComponent({ tickets = [] }) {
   return (
     <div className={wrapperClasses}>
       <Calendar
-        onChange={handleDayClick}
+        onClickDay={handleDayClick}   // ganti ke onClickDay biar lebih akurat
         value={date}
         className={isDarkMode ? 'react-calendar--dark' : ''}
         tileContent={tileContent}
@@ -127,19 +108,17 @@ function CalendarComponent({ tickets = [] }) {
                 <div
                   key={index}
                   className={`ticket-modal-card ${isDarkMode ? 'dark-mode' : ''}`}
+                  onClick={() => {
+                    setShowModal(false);
+                    if (onTicketClick) {
+                      onTicketClick(ticket.id);
+                    }
+                  }}
                 >
-                  <p>
-                    <b>Pengirim:</b> {ticket.creator?.name}
-                  </p>
-                  <p>
-                    <b>Workshop:</b> {ticket.workshop}
-                  </p>
-                  <p>
-                    <b>Deskripsi:</b> {ticket.title}
-                  </p>
-                  <p>
-                    <b>Status:</b> {ticket.status}
-                  </p>
+                  <p><b>Pengirim:</b> {ticket.creator?.name}</p>
+                  <p><b>Workshop:</b> {ticket.workshop}</p>
+                  <p><b>Deskripsi:</b> {ticket.title}</p>
+                  <p><b>Status:</b> {ticket.status}</p>
                 </div>
               ))}
             </div>
@@ -155,7 +134,7 @@ function CalendarComponent({ tickets = [] }) {
         </div>
       )}
 
-      {/* Info jika tidak ada tiket */}
+      {/* Info jika kosong */}
       {(!tickets || tickets.length === 0) ? (
         <p className="info-text">
           <i>Memuat data tiket...</i>

@@ -41,6 +41,7 @@ Route::middleware('jwt')->group(function () {
     Route::post('/tickets/{ticket}/submit-proof', [TicketController::class, 'submitProof']);
     Route::apiResource('tickets', TicketController::class)->only(['index', 'store', 'destroy']);
     Route::get('/tickets/my-tickets', [TicketController::class, 'myTickets']);
+    Route::get('/tickets/all', [TicketController::class, 'allTickets']);
     
     Route::get('/users/all', [UserController::class, 'all']);
 

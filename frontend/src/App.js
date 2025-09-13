@@ -121,6 +121,8 @@ function App() {
   const [analyticsData, setAnalyticsData] = useState([]);
   const [locationsData, setLocationsData] = useState([]);
   const [adminPerformanceData, setAdminPerformanceData] = useState([]);
+  const [allTickets, setAllTickets] = useState([]);
+
 
   // === State ===
   const [userAvatar, setUserAvatar] = useState(null);
@@ -141,23 +143,39 @@ function App() {
   // #3. DATA FETCHING FUNCTIONS (Fungsi Pengambilan Data)
   // -----------------------------------------------------------------
 
-  const fetchData = useCallback(async (page = 1, search = '', status = null) => {
+  const fetchData = useCallback(
+    async (page = 1, search = '', status = null, adminId = null, date = null, ticketId = null) => {
+      try {
+        const config = { headers: { Authorization: `Bearer ${getToken()}` } };
+        let ticketsUrl = `${API_URL}/tickets?page=${page}`;
+        if (search) ticketsUrl += `&search=${search}`;
+        if (status) ticketsUrl += `&status=${status}`;
+        if (adminId) ticketsUrl += `&admin_id=${adminId}`;
+        if (date) ticketsUrl += `&date=${date}`;
+        if (ticketId) ticketsUrl += `&id=${ticketId}`; // ✅ tambahkan ini
+
+        const [ticketsRes, statsRes] = await Promise.all([
+          axios.get(ticketsUrl, config),
+          axios.get(`${API_URL}/tickets/stats`, config)
+        ]);
+
+        setTicketData(ticketsRes.data);
+        setStats(statsRes.data);
+      } catch (error) {
+        console.error("Gagal mengambil data utama:", error);
+        if (error.response && error.response.status === 401) handleLogout();
+      }
+    },
+    []
+  );
+
+  const fetchAllTickets = useCallback(async () => {
     try {
       const config = { headers: { Authorization: `Bearer ${getToken()}` } };
-      let ticketsUrl = `${API_URL}/tickets?page=${page}`;
-      if (search) ticketsUrl += `&search=${search}`;
-      if (status) ticketsUrl += `&status=${status}`;
-
-      const [ticketsRes, statsRes] = await Promise.all([
-        axios.get(ticketsUrl, config),
-        axios.get(`${API_URL}/tickets/stats`, config)
-      ]);
-
-      setTicketData(ticketsRes.data);
-      setStats(statsRes.data);
+      const response = await axios.get(`${API_URL}/tickets/all`, config);
+      setAllTickets(response.data);
     } catch (error) {
-      console.error("Gagal mengambil data utama:", error);
-      if (error.response && error.response.status === 401) handleLogout();
+      console.error("Gagal mengambil semua tiket:", error);
     }
   }, []);
 
@@ -633,6 +651,13 @@ function App() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (isAdmin && isLogin) {
+      fetchAllTickets();
+    }
+  }, [isAdmin, isLogin, fetchAllTickets]);
+
 
   useEffect(() => {
     // Jika ada kode tiket publik DAN user belum login, ambil datanya
@@ -1138,11 +1163,12 @@ function App() {
                       <LineChartComponent
                         data={analyticsData}
                         onPointClick={(status, date) => {
-                          handleHomeClick();           // pindah ke halaman tiket
-                          handleStatusFilterClick(status); // filter sesuai status
-                          console.log('Filter status:', status, 'Tanggal:', date);
+                          setCurrentPage('Tickets');
+                          fetchData(1, '', status, null, date);
                         }}
                       />
+
+
 
                     </div>
 
@@ -1151,11 +1177,13 @@ function App() {
                       <PieChartComponent
                         stats={stats}
                         handleHomeClick={handleHomeClick}
-                        handleStatusFilterClick={handleStatusFilterClick}
+                        handleStatusFilterClick={(status) => {
+                          setCurrentPage('Tickets');
+                          fetchData(1, '', status); // ✅ status
+                        }}
                         statusFilter={statusFilter}
                       />
                     </div>
-
                   </div>
                   {/* Baris 2: Bar Chart + Map */}
                   <div className="dashboard-row">
@@ -1164,13 +1192,10 @@ function App() {
                       <BarChartComponent
                         data={adminPerformanceData}
                         onBarClick={(admin) => {
-                          // Misal admin = { id, name, ticketsCompleted }
-                          setCurrentPage('Tickets');          // pindah ke daftar tiket
-                          setStatusFilter('Selesai');         // filter tiket selesai
-                          fetchData(1, '', 'Selesai', admin.id); // fetch tiket sesuai admin
+                          setCurrentPage('Tickets');
+                          fetchData(1, '', admin.status, admin.id); // ✅ admin + status
                         }}
                       />
-
                     </div>
 
                     <div className="dashboard-card map-chart-card">
@@ -1180,13 +1205,19 @@ function App() {
                   </div>
 
                   <div className="dashboard-column2">
-                  
+
                     <div className="dashboard-card calendar-card">
                       <h4>Kalender Tiket</h4>
-                      <CalendarComponent tickets={ticketsOnPage} />
-                        
+                      <CalendarComponent
+                        tickets={allTickets} // ✅ sekarang kalender dapat semua tiket
+                        onTicketClick={(ticketId) => {
+                          setCurrentPage("Tickets");
+                          fetchData(1, '', null, null, null, ticketId); // tetap bisa load detail tiket itu saja
+                        }}
+                      />
+
                     </div>
-                    
+
                   </div>
 
                 </div>
