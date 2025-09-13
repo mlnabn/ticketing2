@@ -11,12 +11,11 @@ const notificationTemplates = [
 ];
 
 // Terima props dari App.js
-function NotificationForm({ users, globalNotifications, refreshNotifications }) {
+function NotificationForm({ users, globalNotifications, refreshNotifications, showToast }) {
     const [title, setTitle] = useState('');
     const [message, setMessage] = useState('');
     const [target, setTarget] = useState('all');
     const [isLoading, setIsLoading] = useState(false);
-    const [feedback, setFeedback] = useState('');
 
     // Fungsi fetch dan useEffect telah dihapus dari sini
 
@@ -30,9 +29,10 @@ function NotificationForm({ users, globalNotifications, refreshNotifications }) 
             });
             // Panggil fungsi refresh dari App.js
             refreshNotifications();
+            showToast('Notifikasi berhasil dihapus.', 'success');
         } catch (error) {
             console.error('Gagal menghapus notifikasi:', error);
-            alert('Gagal menghapus notifikasi.');
+            showToast('Gagal menghapus notifikasi.', 'error');
         }
     };
 
@@ -44,13 +44,11 @@ function NotificationForm({ users, globalNotifications, refreshNotifications }) 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        setFeedback('');
         try {
             const payload = { title, message, target_user_id: target === 'all' ? null : target };
             await axios.post(`${API_URL}/notifications`, payload, {
                 headers: { Authorization: `Bearer ${getToken()}` },
             });
-            setFeedback('Notifikasi berhasil dikirim!');
             setTitle('');
             setMessage('');
             setTarget('all');
@@ -59,12 +57,12 @@ function NotificationForm({ users, globalNotifications, refreshNotifications }) 
                 // Panggil fungsi refresh dari App.js
                 refreshNotifications();
             }
+            showToast('Notifikasi berhasil dikirim.', 'success');
         } catch (error) {
             console.error('Gagal mengirim notifikasi:', error);
-            setFeedback('Gagal mengirim notifikasi. Coba lagi.');
+            showToast('Gagal mengirim notifikasi.', 'error');
         } finally {
             setIsLoading(false);
-            setTimeout(() => setFeedback(''), 3000);
         }
     };
 
@@ -139,9 +137,6 @@ function NotificationForm({ users, globalNotifications, refreshNotifications }) 
           <button type="submit" className="btn-primary" disabled={isLoading}>
             {isLoading ? 'Mengirim...' : 'Kirim Notifikasi'}
           </button>
-
-          {/* Feedback */}
-          {feedback && <p className="feedback-message">{feedback}</p>}
         </form>
       </div>
 

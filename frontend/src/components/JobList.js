@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 
-function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelectionChange, onAssignClick, onRejectClick, onProofClick }) {
+function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelectionChange, onAssignClick, onRejectClick, onProofClick, showToast }) {
     const [selectedIds, setSelectedIds] = useState([]);
     const isAdmin = userRole && userRole.toLowerCase() === 'admin';
 
@@ -47,12 +47,12 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
             case 'Sedang Dikerjakan':
                 return (
                     <>
-                        <button onClick={() => updateTicketStatus(ticket.id, 'Selesai')} className="btn-finish">Selesaikan</button>
-                        <button onClick={() => updateTicketStatus(ticket.id, 'Ditunda')} className="btn-pause">Tunda</button>
+                        <button onClick={() => { updateTicketStatus(ticket.id, 'Selesai'); showToast('Ticket selesai.', 'success'); }} className="btn-finish">Selesaikan</button>
+                        <button onClick={() => { updateTicketStatus(ticket.id, 'Ditunda'); showToast('Ticket ditunda.', 'info'); }} className="btn-pause">Tunda</button>
                     </>
                 );
             case 'Ditunda':
-                return <button onClick={() => updateTicketStatus(ticket.id, 'Sedang Dikerjakan')} className="btn-start">Lanjutkan</button>;
+                return <button onClick={() => { updateTicketStatus(ticket.id, 'Sedang Dikerjakan'); showToast('Ticket dilanjutkan.', 'success'); }} className="btn-start">Lanjutkan</button>;
             case 'Selesai':
                 return (
                     <>
