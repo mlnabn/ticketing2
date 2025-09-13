@@ -34,8 +34,8 @@
   --content-bg-light: #f1ecec;
 
   /* Header Tabel Joblist */
-  --joblist-header-bg-light: #BFDBFE;
-  --joblist-header-text-light: #111827;
+  --joblist-header-bg-light: #334155;
+  --joblist-header-text-light: #E2E8F0;
 
   /* Border & Shadow Input/Select Form */
   --form-input-border-light: #E2E8F0;
@@ -161,8 +161,8 @@ body.dark-mode {
 
   --content-bg-dark: #1e1e2f;
 
-  --joblist-header-bg-dark: #1f2937;
-  --joblist-header-text-dark: #FFFFFF;
+  --joblist-header-bg-dark: #182a48c1;
+  --joblist-header-text-dark: #cbd5e1;
 
   --form-input-border-dark: #4A5568;
   --form-input-shadow-dark: 0 1px 3px rgba(0, 0, 0, 0.2) inset;
@@ -2082,11 +2082,6 @@ body.dark-mode .job-form .input-like-select:focus {
   background-color: #285a96;
 }
 
-/* Row table selected */
-.job-table tbody tr.selected-row {
-  background-color: #73767a;
-}
-
 
 /*
   ---------------------------------------------------
@@ -2196,93 +2191,89 @@ button.btn-pause {
   Gaya untuk tabel daftar tiket.
 */
 
+/* --- Gaya Dasar Tabel --- */
 .job-table {
   width: 100%;
   border-collapse: collapse;
-  /* Tetap gunakan collapse untuk garis yang rapi */
   background: #fdfdfd;
   box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25);
   border-radius: 12px;
   overflow: hidden;
-  /* Penting agar radius terlihat */
   margin-top: 1rem;
 }
 
+/* [DIUBAH] Gaya dasar tabel untuk dark mode */
 body.dark-mode .job-table {
-  box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-  -webkit-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-  -moz-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-  background-color: #393955;
-  /* Latar belakang tabel di mode gelap */
-  border: 1px solid var(--border-color-dark);
-  /* Border untuk seluruh tabel di mode gelap */
+  box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.5);
+  background-color: transparent; /* Latar belakang dikontrol oleh sel (td) */
+  border: none; /* Border dikontrol oleh sel (td) */
 }
 
 
+/* --- Gaya Sel Umum (th & td) --- */
 .job-table th,
 .job-table td {
   padding: 1rem;
-  /* Mengurangi padding agar lebih compact */
   text-align: left;
-  /* Teks rata kiri di header dan sel */
-  border-bottom: 1px solid var(--border-color-light);
-  /* Menggunakan variabel border */
-  color: #000000;
-  /* Warna teks sel di mode terang */
-  transition: border-color 0.3s ease, color 0.3s ease;
+  border-bottom: 1px solid #e2e8f0; /* Garis bawah untuk light mode */
+  color: #1e293b; /* Warna teks untuk light mode */
+  transition: all 0.3s ease;
 }
 
+/* [DIUBAH] Gaya sel data (td) untuk dark mode */
 body.dark-mode .job-table td {
-  border-bottom: 1px solid var(--border-color-dark);
-  /* Menggunakan variabel border di dark mode */
-  color: #ffffff;
-  /* Warna teks sel di mode gelap */
+  border-bottom: 1px solid #2d3748; /* Warna garis pemisah baris */
+  color: #e2e8f0; /* Warna teks utama (putih gading) */
+  border-right: none; /* Hapus border kanan default, kita atur di header */
 }
 
+
+/* --- Gaya Header Tabel (th) --- */
 .job-table th {
   background-color: var(--joblist-header-bg-light);
   font-weight: 600;
   text-align: center;
   color: var(--joblist-header-text-light);
-  border-bottom: 2px solid #aba8a1;
-  /* Garis bawah lebih tegas untuk header (kuning/oranye) */
-  /* Hapus border-right untuk th agar tidak ada garis vertikal di header */
-  border-right: none;
+  border-bottom: 2px solid #e2e8f0;
 }
 
 body.dark-mode .job-table th {
-  background-color: var(--joblist-header-bg-dark);
-  color: var(--joblist-header-text-dark);
-  border-bottom: 2px solid #aba8a1;
-  /* Garis bawah lebih tegas untuk header (kuning/oranye) */
-  /* Hapus border-right untuk th di dark mode */
-  border-right: none;
+  background-color: var(--joblist-header-bg-dark); /* Menggunakan variabel baru */
+  color: var(--joblist-header-text-dark); /* Menggunakan variabel baru */
+  border-bottom: 2px solid #4a5568; /* Garis bawah header yang tegas */
 }
 
-/* Menambahkan garis vertikal pada sel data (td) */
-.job-table td {
-  border-right: 1px solid var(--border-color-light);
-  /* Garis vertikal di mode terang */
+/* Divider untuk header */
+.job-table thead th:not(:last-child) {
+  border-right: 1px solid #4a5568;
 }
 
-body.dark-mode .job-table td {
-  border-right: 1px solid var(--border-color-dark);
-  /* Garis vertikal di mode gelap */
+
+/* --- Gaya Badan Tabel (tbody) --- */
+
+/* [BARU] Menetapkan warna dasar untuk baris ganjil di dark mode */
+body.dark-mode .job-table tbody tr td {
+  background-color: #262f3e;
 }
 
-/* Hapus garis vertikal pada sel terakhir di setiap baris */
-.job-table td:last-child {
-  border-right: none;
+/* Warna baris selang-seling (Zebra Striping) */
+.job-table tbody tr:nth-child(even) td {
+  background-color: #f8f9fa; /* Warna untuk Light Mode */
 }
 
-.job-table tbody tr:hover {
-  background-color: #F1F5F9;
-  /* Warna hover baris di mode terang */
+/* [DIUBAH] Warna baris selang-seling untuk dark mode */
+body.dark-mode .job-table tbody tr:nth-child(even) td {
+  background-color: #212936; /* Warna lebih gelap untuk kontras halus */
 }
 
-body.dark-mode .job-table tbody tr:hover {
-  background-color: #4a4a66;
-  /* Warna hover baris di mode gelap */
+/* [DIUBAH] Warna hover baris untuk dark mode */
+body.dark-mode .job-table tbody tr:hover td {
+  background-color: #384252;
+}
+
+/* Menengahkan teks di kolom ke-7 (Waktu Pengerjaan) */
+.job-table tbody tr td:nth-child(7) {
+  text-align: center;
 }
 
 /* =========================================== */
