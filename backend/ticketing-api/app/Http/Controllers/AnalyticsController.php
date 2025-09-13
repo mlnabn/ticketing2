@@ -16,65 +16,74 @@ class AnalyticsController extends Controller
      */
     public function getTicketAnalytics()
     {
-        // Mendapatkan data tiket 30 hari terakhir
-        $tickets = Ticket::where('created_at', '>=', Carbon::now()->subDays(30))
-            ->get()
-            ->groupBy(function($date) {
-                return Carbon::parse($date->created_at)->format('Y-m-d');
-            });
-
         $analyticsData = [];
+
         for ($i = 29; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i)->format('Y-m-d');
-            $ticketsOnDate = $tickets[$date] ?? collect();
 
-            $created = $ticketsOnDate->count();
-            $completed = $ticketsOnDate->where('status', 'Selesai')->count();
-            $rejected = $ticketsOnDate->where('status', 'Ditolak')->count();
+            $belum = Ticket::where('status', 'Belum Dikerjakan')
+                ->whereDate('created_at', $date)
+                ->count();
+
+            $sedang = Ticket::where('status', 'Sedang Dikerjakan')
+                ->whereDate('updated_at', $date) // pakai updated_at biar sesuai kapan mulai dikerjakan
+                ->count();
+
+            $selesai = Ticket::where('status', 'Selesai')
+                ->whereDate('completed_at', $date)
+                ->count();
+
+            $ditolak = Ticket::where('status', 'Ditolak')
+                ->whereDate('updated_at', $date) // atau rejected_at kalau ada
+                ->count();
 
             $analyticsData[] = [
                 'date' => $date,
-                'created' => $created,
-                'completed' => $completed,
-                'rejected' => $rejected,
+                'belum' => $belum,
+                'sedang' => $sedang,
+                'selesai' => $selesai,
+                'ditolak' => $ditolak,
             ];
         }
 
         return response()->json($analyticsData);
     }
 
+
     /**
      * Get admin performance data for charts.
      */
     public function getAdminPerformance()
-    {
-        try {
-            // Ambil semua pengguna dengan peran 'admin' atau 'super-admin'
-            $admins = User::whereIn('role', ['admin', 'super-admin'])->get();
-    
-            // PERBAIKAN: Menggunakan 'user_id' bukan 'admin_id' atau 'assigned_to'
-            $data = $admins->map(function ($admin) {
-                $completedTickets = Ticket::where('user_id', $admin->id)
-                    ->where('status', 'Selesai')
-                    ->count();
-
-                // Tambahkan perhitungan tiket yang ditolak
-                $rejectedTickets = Ticket::where('user_id', $admin->id)
-                    ->where('status', 'Ditolak')
-                    ->count();
-    
+{
+    try {
+        $data = Ticket::select(
+            'user_id',
+            DB::raw("SUM(CASE WHEN status = 'Selesai' THEN 1 ELSE 0 END) as ticketsCompleted"),
+            DB::raw("SUM(CASE WHEN status = 'Ditolak' THEN 1 ELSE 0 END) as ticketsRejected"),
+            DB::raw("SUM(CASE WHEN status = 'Sedang Dikerjakan' THEN 1 ELSE 0 END) as ticketsInProgress"),
+            DB::raw("COUNT(*) as totalTickets")
+        )
+            ->whereNotNull('user_id')
+            ->groupBy('user_id')
+            ->with('user:id,name') // eager load nama admin
+            ->get()
+            ->map(function ($row) {
                 return [
-                    'name' => $admin->name,
-                    'ticketsCompleted' => $completedTickets,
-                    'ticketsRejected' => $rejectedTickets
+                    'id' => $row->user_id,
+                    'name' => $row->user->name ?? 'Unknown',
+                    'ticketsCompleted' => (int) $row->ticketsCompleted,
+                    'ticketsRejected' => (int) $row->ticketsRejected,
+                    'ticketsInProgress' => (int) $row->ticketsInProgress,
+                    'totalTickets' => (int) $row->totalTickets,
                 ];
             });
-    
-            return response()->json($data);
 
-        } catch (Exception $e) {
-            // Tangkap dan kembalikan pesan error yang jelas
-            return response()->json(['error' => 'Gagal mengambil data performa admin: ' . $e->getMessage()], 500);
-        }
+        return response()->json($data);
+    } catch (Exception $e) {
+        return response()->json([
+            'error' => 'Gagal mengambil data performa admin: ' . $e->getMessage()
+        ], 500);
     }
+}
+
 }
