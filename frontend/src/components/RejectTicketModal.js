@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
-function RejectTicketModal({ ticket, onReject, onClose }) {
+function RejectTicketModal({ ticket, onReject, onClose, showToast }) {
   const [reason, setReason] = useState('');
 
   const handleSubmit = () => {
     if (reason.trim()) {
       onReject(ticket.id, reason);
     } else {
-      alert('Mohon isi alasan penolakan.');
+      showToast('Mohon isi alasan penolakan.', 'info');
     }
   };
 

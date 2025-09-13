@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 
-function AssignAdminModal({ ticket, admins, onAssign, onClose }) {
+function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast }) {
   const [selectedAdminId, setSelectedAdminId] = useState(null);
 
   const adminOptions = admins.map(admin => ({
@@ -13,7 +13,7 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose }) {
     if (selectedAdminId) {
       onAssign(ticket.id, selectedAdminId);
     } else {
-      alert('Pilih salah satu admin.');
+      showToast('Pilih salah satu admin.', 'info');
     }
   };
 

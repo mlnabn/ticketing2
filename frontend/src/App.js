@@ -4,14 +4,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { format } from 'date-fns';
 import axios from 'axios';
-// import JobForm from './components/JobForm';
 import JobFormUser from './components/JobFormUser';
 import JobList from './components/JobList';
 import Login from './components/Login';
 import Register from './components/Register';
 import UserManagement from './components/UserManagement';
 import NotificationForm from './components/NotificationForm';
-// import NotificationBell from './components/NotificationBell';
 import UserFormModal from './components/UserFormModal';
 import ConfirmationModal from './components/ConfirmationModal';
 import ConfirmationModalUser from './components/ConfirmationModalUser';
@@ -24,7 +22,6 @@ import Pagination from './components/Pagination';
 import PaginationUser from './components/PaginationUser';
 import { getToken, isLoggedIn, logout, getUser } from './auth';
 import './App.css';
-import yourLogo from './Image/Logo.png';
 import loginBackground from './Image/LoginBg.jpg';
 import bgImage from './Image/homeBg.jpg';
 import yourLogok from './Image/DTECH-Logo.png';
@@ -41,7 +38,8 @@ import UserHeader from './components/UserHeader';
 import FeaturesPage from './components/FeaturesPage';
 import FAQPage from './components/FAQPage';
 import CalendarComponent from './components/CalendarComponent';
-
+import Toast from './components/Toast';
+import { AnimatePresence } from 'framer-motion';
 
 
 // =================================================================
@@ -126,6 +124,7 @@ function App() {
 
   // === State ===
   const [userAvatar, setUserAvatar] = useState(null);
+  const [toasts, setToasts] = useState([]);
 
   // -----------------------------------------------------------------
   // #1.A. VARIABEL TURUNAN (Derived State)
@@ -360,12 +359,11 @@ function App() {
       await axios.delete(`${API_URL}/notifications/${notificationId}`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
-
-      // Setelah berhasil, panggil ulang fetchNotifications untuk memperbarui daftar
+      showToast("Notifikasi berhasil dihapus.", 'error');
       fetchNotifications();
     } catch (error) {
       console.error("Gagal menghapus notifikasi:", error);
-      alert("Gagal menghapus notifikasi.");
+      showToast("Gagal menghapus notifikasi.", 'error');
     }
   };
 
@@ -394,9 +392,10 @@ function App() {
       handleCloseAssignModal();
       fetchData(dataPage, searchQuery); // Refresh data tiket
       fetchMyTickets(myTicketsPage);
+      showToast('Tiket berhasil ditugaskan.', 'success');
     } catch (error) {
       console.error("Gagal menugaskan tiket:", error);
-      alert("Gagal menugaskan tiket.");
+      showToast("Gagal menugaskan tiket.", 'error');
     }
   };
 
@@ -416,9 +415,10 @@ function App() {
       handleCloseRejectModal();
       fetchData(dataPage, searchQuery);
       fetchMyTickets(myTicketsPage);
+      showToast('Tiket berhasil ditolak.', 'success');
     } catch (error) {
       console.error("Gagal menolak tiket:", error);
-      alert("Gagal menolak tiket.");
+      showToast("Gagal menolak tiket.", 'error');
     }
   };
 
@@ -456,11 +456,14 @@ function App() {
         fetchData(dataPage, searchQuery);
         fetchMyTickets(myTicketsPage);
         fetchCreatedTickets(createdTicketsPage);
+        showToast('Tiket berhasil dihapus.', 'success');
       } catch (error) {
         console.error("Gagal hapus tiket:", error);
         if (error.response && error.response.status === 403) {
-          alert(error.response.data.error);
-        }
+          showToast(error.response.data.error, 'error');
+        } else {
+        showToast("Gagal menghapus tiket.", 'error'); 
+      }
       }
       finally {
         setShowConfirmModal(false);
@@ -479,7 +482,7 @@ function App() {
 
   const handleBulkDelete = async () => {
     if (selectedTicketIds.length === 0) {
-      alert("Pilih setidaknya satu tiket untuk dihapus.");
+      showToast("Pilih setidaknya satu tiket untuk dihapus.", 'info');
       return;
     }
     if (window.confirm(`Anda yakin ingin menghapus ${selectedTicketIds.length} tiket yang dipilih?`)) {
@@ -488,10 +491,11 @@ function App() {
           { ids: selectedTicketIds },
           { headers: { Authorization: `Bearer ${getToken()}` } }
         );
+        showToast(`${selectedTicketIds.length} tiket berhasil dihapus.`, 'success');
         fetchData(1, '');
       } catch (error) {
         console.error("Gagal menghapus tiket secara massal:", error);
-        alert("Terjadi kesalahan saat mencoba menghapus tiket.");
+        showToast("Terjadi kesalahan saat mencoba menghapus tiket.", 'error');
       }
     }
   };
@@ -514,14 +518,14 @@ function App() {
           'Content-Type': 'multipart/form-data', // Penting untuk file upload
         },
       });
-      alert('Bukti pengerjaan berhasil disimpan.');
+      showToast('Bukti pengerjaan berhasil disimpan.', 'success');
       handleCloseProofModal();
       fetchData(dataPage, searchQuery); // Refresh data
       fetchMyTickets(myTicketsPage);
     } catch (error) {
       console.error("Gagal menyimpan bukti:", error);
       const errorMessage = error.response?.data?.error || "Gagal menyimpan bukti. Pastikan deskripsi diisi.";
-      alert(errorMessage);
+      showToast(errorMessage, 'error');
     }
   };
 
@@ -542,7 +546,7 @@ function App() {
 
   const handleUserDeleteClick = (user) => {
     if (user.id === loggedInUserId) {
-      alert("Anda tidak bisa menghapus akun Anda sendiri.");
+      showToast("Anda tidak bisa menghapus akun Anda sendiri.", 'info');
       return;
     }
     setUserToDelete(user);
@@ -555,11 +559,11 @@ function App() {
         await axios.delete(`${API_URL}/users/${userToDelete.id}`, {
           headers: { Authorization: `Bearer ${getToken()}` }
         });
-        alert(`User "${userToDelete.name}" berhasil dihapus.`);
+        showToast(`User "${userToDelete.name}" berhasil dihapus.`, 'success');
         fetchUsers(1, '');
       } catch (error) {
         console.error("Gagal menghapus pengguna:", error);
-        alert("Gagal menghapus pengguna.");
+        showToast("Gagal menghapus pengguna.", 'error');
       } finally {
         setShowUserConfirmModal(false);
         setUserToDelete(null);
@@ -596,9 +600,9 @@ function App() {
         headers: { Authorization: `Bearer ${getToken()}` }
       });
       if (isEditMode) {
-        alert(`User "${response.data.name}" berhasil di-edit.`);
+        showToast(`User "${response.data.name}" berhasil di-edit.`, 'success');
       } else {
-        alert("User baru berhasil dibuat.");
+        showToast("User baru berhasil dibuat.", 'success');
       }
       fetchUsers(1, '');
       handleCloseUserForm();
@@ -606,9 +610,9 @@ function App() {
       console.error("Gagal menyimpan pengguna:", error);
       if (error.response && error.response.data.errors) {
         const errorMessages = Object.values(error.response.data.errors).flat().join('\n');
-        alert(errorMessages);
+        showToast(errorMessages, 'error');
       } else {
-        alert("Gagal menyimpan pengguna.");
+        showToast("Gagal menyimpan pengguna.", 'error');
       }
     }
   };
@@ -634,6 +638,15 @@ function App() {
   };
   const toggleDarkMode = () => setDarkMode(!darkMode);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  const showToast = useCallback((message, type = 'success') => {
+    const id = Date.now() + Math.random();
+    setToasts((prevToasts) => [...prevToasts, { id, message, type }]);
+  }, []);
+
+  const removeToast = (id) => {
+    setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
+  };
 
   // -----------------------------------------------------------------
   // #2. SIDE EFFECTS (useEffect Hooks)
@@ -1018,6 +1031,18 @@ function App() {
   if (isAdmin) {
     return (
       <div className={`dashboard-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+        <div className="toast-container">
+          <AnimatePresence>
+            {toasts.map((toast) => (
+              <Toast
+                key={toast.id}
+                message={toast.message}
+                type={toast.type}
+                onClose={() => removeToast(toast.id)}
+              />
+            ))}
+          </AnimatePresence>
+        </div>
         <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
           <div className="sidebar-header">
             <img src={yourLogok} alt="Logo" className="sidebar-logo" />
@@ -1232,7 +1257,7 @@ function App() {
                   <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
                 </form>
                 {selectedTicketIds.length > 0 && (<div className="bulk-action-bar" style={{ margin: '20px 0' }}><button onClick={handleBulkDelete} className="btn-delete">Hapus {selectedTicketIds.length} Tiket yang Dipilih</button></div>)}
-                <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} userRole={userRole} onSelectionChange={handleSelectionChange} onAssignClick={handleAssignClick} onRejectClick={handleRejectClick} onProofClick={handleProofClick} />
+                <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} userRole={userRole} onSelectionChange={handleSelectionChange} onAssignClick={handleAssignClick} onRejectClick={handleRejectClick} onProofClick={handleProofClick} showToast={showToast} />
                 <Pagination currentPage={dataPage} lastPage={ticketData ? ticketData.last_page : 1} onPageChange={handlePageChange} />
               </>
             )}
@@ -1252,6 +1277,7 @@ function App() {
                       onAssignClick={handleAssignClick}
                       onRejectClick={handleRejectClick}
                       onProofClick={handleProofClick}
+                      showToast={showToast}
                     />
                     <Pagination
                       currentPage={myTicketsPage}
@@ -1275,6 +1301,7 @@ function App() {
                 users={users}
                 globalNotifications={notifications.filter(n => n.user_id === null)}
                 refreshNotifications={fetchNotifications}
+                showToast={showToast}
               />
             )}
           </div>
@@ -1283,9 +1310,9 @@ function App() {
           <ProofModal ticket={ticketForProof} onSave={handleSaveProof} onClose={handleCloseProofModal} />
         )}
         {showAssignModal && ticketToAssign && (
-          <AssignAdminModal ticket={ticketToAssign} admins={adminList} onAssign={handleConfirmAssign} onClose={handleCloseAssignModal} />
+          <AssignAdminModal ticket={ticketToAssign} admins={adminList} onAssign={handleConfirmAssign} onClose={handleCloseAssignModal} showToast={showToast} />
         )}
-        {showRejectModal && ticketToReject && (<RejectTicketModal ticket={ticketToReject} onReject={handleConfirmReject} onClose={handleCloseRejectModal} />)}
+        {showRejectModal && ticketToReject && (<RejectTicketModal ticket={ticketToReject} onReject={handleConfirmReject} onClose={handleCloseRejectModal} showToast={showToast} />)}
         {showConfirmModal && ticketToDelete && (<ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />)}
         {showUserConfirmModal && userToDelete && (<ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete.name}"?`} onConfirm={confirmUserDelete} onCancel={cancelUserDelete} />)}
         {showUserFormModal && (<UserFormModal userToEdit={userToEdit} onClose={handleCloseUserForm} onSave={handleSaveUser} />)}
