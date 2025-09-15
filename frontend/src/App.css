@@ -34,8 +34,8 @@
   --content-bg-light: #f1ecec;
 
   /* Header Tabel Joblist */
-  --joblist-header-bg-light: #BFDBFE;
-  --joblist-header-text-light: #111827;
+  --joblist-header-bg-light: #334155;
+  --joblist-header-text-light: #E2E8F0;
 
   /* Border & Shadow Input/Select Form */
   --form-input-border-light: #E2E8F0;
@@ -161,8 +161,8 @@ body.dark-mode {
 
   --content-bg-dark: #1e1e2f;
 
-  --joblist-header-bg-dark: #1f2937;
-  --joblist-header-text-dark: #FFFFFF;
+  --joblist-header-bg-dark: #182a48c1;
+  --joblist-header-text-dark: #cbd5e1;
 
   --form-input-border-dark: #4A5568;
   --form-input-shadow-dark: 0 1px 3px rgba(0, 0, 0, 0.2) inset;
@@ -2082,11 +2082,6 @@ body.dark-mode .job-form .input-like-select:focus {
   background-color: #285a96;
 }
 
-/* Row table selected */
-.job-table tbody tr.selected-row {
-  background-color: #73767a;
-}
-
 
 /*
   ---------------------------------------------------
@@ -2104,15 +2099,6 @@ button {
   color: white;
   transition: background 0.2s ease, transform 0.1s ease;
 
-}
-
-.btn-reason {
-  background-color: #d6eaf8;
-  color: #154360;
-}
-
-.btn-reason:hover {
-  background-color: #aed6f1;
 }
 
 button:hover {
@@ -2196,94 +2182,155 @@ button.btn-pause {
   Gaya untuk tabel daftar tiket.
 */
 
+/* --- Gaya Dasar Tabel --- */
 .job-table {
   width: 100%;
   border-collapse: collapse;
-  /* Tetap gunakan collapse untuk garis yang rapi */
   background: #fdfdfd;
   box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25);
   border-radius: 12px;
   overflow: hidden;
-  /* Penting agar radius terlihat */
   margin-top: 1rem;
 }
 
+/* [DIUBAH] Gaya dasar tabel untuk dark mode */
 body.dark-mode .job-table {
-  box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-  -webkit-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-  -moz-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-  background-color: #393955;
-  /* Latar belakang tabel di mode gelap */
-  border: 1px solid var(--border-color-dark);
-  /* Border untuk seluruh tabel di mode gelap */
+  box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.5);
+  background-color: transparent; /* Latar belakang dikontrol oleh sel (td) */
+  border: none; /* Border dikontrol oleh sel (td) */
 }
 
 
+/* --- Gaya Sel Umum (th & td) --- */
 .job-table th,
 .job-table td {
   padding: 1rem;
-  /* Mengurangi padding agar lebih compact */
   text-align: left;
-  /* Teks rata kiri di header dan sel */
-  border-bottom: 1px solid var(--border-color-light);
-  /* Menggunakan variabel border */
-  color: #000000;
-  /* Warna teks sel di mode terang */
-  transition: border-color 0.3s ease, color 0.3s ease;
+  border-bottom: 1px solid #e2e8f0; /* Garis bawah untuk light mode */
+  color: #1e293b; /* Warna teks untuk light mode */
+  transition: all 0.3s ease;
 }
 
+/* [DIUBAH] Gaya sel data (td) untuk dark mode */
 body.dark-mode .job-table td {
-  border-bottom: 1px solid var(--border-color-dark);
-  /* Menggunakan variabel border di dark mode */
-  color: #ffffff;
-  /* Warna teks sel di mode gelap */
+  border-bottom: 1px solid #2d3748; /* Warna garis pemisah baris */
+  color: #e2e8f0; /* Warna teks utama (putih gading) */
+  border-right: none; /* Hapus border kanan default, kita atur di header */
 }
 
+
+/* --- Gaya Header Tabel (th) --- */
 .job-table th {
   background-color: var(--joblist-header-bg-light);
   font-weight: 600;
   text-align: center;
   color: var(--joblist-header-text-light);
-  border-bottom: 2px solid #aba8a1;
-  /* Garis bawah lebih tegas untuk header (kuning/oranye) */
-  /* Hapus border-right untuk th agar tidak ada garis vertikal di header */
-  border-right: none;
+  border-bottom: 2px solid #e2e8f0;
 }
 
 body.dark-mode .job-table th {
-  background-color: var(--joblist-header-bg-dark);
-  color: var(--joblist-header-text-dark);
-  border-bottom: 2px solid #aba8a1;
-  /* Garis bawah lebih tegas untuk header (kuning/oranye) */
-  /* Hapus border-right untuk th di dark mode */
-  border-right: none;
+  background-color: var(--joblist-header-bg-dark); /* Menggunakan variabel baru */
+  color: var(--joblist-header-text-dark); /* Menggunakan variabel baru */
+  border-bottom: 2px solid #4a5568; /* Garis bawah header yang tegas */
 }
 
-/* Menambahkan garis vertikal pada sel data (td) */
-.job-table td {
-  border-right: 1px solid var(--border-color-light);
-  /* Garis vertikal di mode terang */
+/* Divider untuk header */
+.job-table thead th:not(:last-child) {
+  border-right: 1px solid #4a5568;
 }
 
-body.dark-mode .job-table td {
-  border-right: 1px solid var(--border-color-dark);
-  /* Garis vertikal di mode gelap */
+
+/* --- Gaya Badan Tabel (tbody) --- */
+
+/* [BARU] Menetapkan warna dasar untuk baris ganjil di dark mode */
+body.dark-mode .job-table tbody tr td {
+  background-color: #262f3e;
 }
 
-/* Hapus garis vertikal pada sel terakhir di setiap baris */
-.job-table td:last-child {
-  border-right: none;
+/* Warna baris selang-seling (Zebra Striping) */
+.job-table tbody tr:nth-child(even) td {
+  background-color: #f8f9fa; /* Warna untuk Light Mode */
 }
 
-.job-table tbody tr:hover {
-  background-color: #F1F5F9;
-  /* Warna hover baris di mode terang */
+/* [DIUBAH] Warna baris selang-seling untuk dark mode */
+body.dark-mode .job-table tbody tr:nth-child(even) td {
+  background-color: #212936; /* Warna lebih gelap untuk kontras halus */
 }
 
-body.dark-mode .job-table tbody tr:hover {
-  background-color: #4a4a66;
-  /* Warna hover baris di mode gelap */
+/* [DIUBAH] Warna hover baris untuk dark mode */
+body.dark-mode .job-table tbody tr:hover td {
+  background-color: #384252;
 }
+
+/* Menengahkan teks di kolom ke-7 (Waktu Pengerjaan) */
+.job-table tbody tr td:nth-child(7) {
+  text-align: center;
+}
+
+/*
+  ---------------------------------------------------
+  GAYA JOB LIST (TABEL TIKET) UNTUK USER
+  ---------------------------------------------------
+  Gaya untuk tabel daftar tiket.
+*/
+
+/* --- Gaya Dasar Tabel --- */
+.job-table-user {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fdfdfd;
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+/* [DIUBAH] Gaya dasar tabel untuk dark mode */
+body.dark-mode .job-table-user {
+  box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.5);
+  background-color: transparent; /* Latar belakang dikontrol oleh sel (td) */
+  border: none; /* Border dikontrol oleh sel (td) */
+}
+
+
+/* --- Gaya Sel Umum (th & td) --- */
+.job-table-user th,
+.job-table-user td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0; /* Garis bawah untuk light mode */
+  color: #1e293b; /* Warna teks untuk light mode */
+  transition: all 0.3s ease;
+}
+
+/* [DIUBAH] Gaya sel data (td) untuk dark mode */
+body.dark-mode .job-table-user td {
+  border-bottom: 1px solid #2d3748; /* Warna garis pemisah baris */
+  color: #e2e8f0; /* Warna teks utama (putih gading) */
+  border-right: none; /* Hapus border kanan default, kita atur di header */
+}
+
+
+/* --- Gaya Header Tabel (th) --- */
+.job-table-user th {
+  background-color: var(--joblist-header-bg-light);
+  font-weight: 600;
+  text-align: center;
+  color: var(--joblist-header-text-light);
+  border-bottom: 2px solid #e2e8f0;
+}
+
+body.dark-mode .job-table-user th {
+  background-color: var(--joblist-header-bg-dark); /* Menggunakan variabel baru */
+  color: var(--joblist-header-text-dark); /* Menggunakan variabel baru */
+  border-bottom: 2px solid #4a5568; /* Garis bawah header yang tegas */
+}
+
+/* Divider untuk header */
+.job-table-user thead th:not(:last-child) {
+  border-right: 1px solid #4a5568;
+}
+
 
 /* =========================================== */
 /* ===    STYLE DASAR UNTUK TABEL PENGGUNA   === */
@@ -3118,78 +3165,77 @@ body.dark-mode .btn-primary:hover {
   box-shadow: 0 6px 12px rgba(91, 143, 249, 0.4);
 }
 
-/*
- ---------------------------------------------------
- TOMBOL AKSI (Edit, Hapus)
- ---------------------------------------------------
-*/
+/* ======================================================= */
+/* GAYA TOMBOL AKSI MANAJEMEN PENGGUNA (TEMA BARU)      */
+/* ======================================================= */
+
+/* --- Grup Tombol --- */
 .action-buttons-group {
   display: flex;
   gap: 8px;
-  /* Jarak antar tombol */
   justify-content: center;
-  /* Pusatkan tombol dalam sel */
 }
 
-.btn-edit,
-.btn-delete {
+/* --- [BARU] Class Dasar untuk Tombol Edit & Hapus --- */
+.btn-user-action {
   padding: 8px 15px;
-  border: none;
+  border: 1px solid transparent; /* [DIUBAH] Menggunakan border, bukan shadow */
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease-in-out; /* [DIUBAH] Transisi untuk semua properti */
 }
 
+/* --- Tema Tombol Edit (Hijau) --- */
 .btn-edit {
-  background-color: #d4edda;
-  /* hijau muda (lembut) */
-  color: #155724;
-  box-shadow: 0 3px 6px rgba(40, 167, 69, 0.2);
+  background-color: #d1e7dd; /* [DIUBAH] Warna dari JobList */
+  color: #0f5132;
+  border-color: #badbcc;
 }
 
 .btn-edit:hover {
-  background-color: #c3e6cb;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+  background-color: #a8d5b7; /* [DIUBAH] Warna dari JobList */
+  border-color: #a8d5b7;
+  transform: translateY(-1px); /* Efek hover tetap dipertahankan */
 }
 
-/* Mode Gelap untuk Tombol Edit */
+/* [DIUBAH] Dark Mode untuk Tombol Edit (Solid) */
 body.dark-mode .btn-edit {
-  background-color: #d4edda;
-  /* Hijau yang lebih terang untuk dark mode */
-  box-shadow: 0 3px 6px rgba(76, 175, 80, 0.3);
+  background-color: #38a169;
+  color: #ffffff;
+  border-color: #38a169;
 }
 
 body.dark-mode .btn-edit:hover {
-  background-color: #c3e6cb;
-  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4);
+  background-color: #2f855a;
+  border-color: #2f855a;
 }
 
+
+/* --- Tema Tombol Hapus (Merah) --- */
 .btn-delete {
-  background-color: #f8d7da;
-  /* merah muda (background lembut) */
+  background-color: #f8d7da; /* Warna ini sudah sesuai */
   color: #721c24;
-  box-shadow: 0 3px 6px rgba(220, 53, 69, 0.2);
+  border-color: #f5c6cb;
 }
 
 .btn-delete:hover {
-  background-color: #f5c6cb;
+  background-color: #f1b0b7; /* [DIUBAH] Warna dari JobList */
+  border-color: #f1b0b7;
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
 
-/* Mode Gelap untuk Tombol Hapus */
+/* [DIUBAH] Dark Mode untuk Tombol Hapus (Solid) */
 body.dark-mode .btn-delete {
-  background-color: #f8d7da;
-  /* Merah yang lebih terang untuk dark mode */
-  box-shadow: 0 3px 6px rgba(239, 83, 80, 0.3);
+  background-color: #e53e3e;
+  color: #ffffff;
+  border-color: #e53e3e;
 }
 
 body.dark-mode .btn-delete:hover {
-  background-color: #f5c6cb;
-  box-shadow: 0 4px 8px rgba(239, 83, 80, 0.4);
+  background-color: #c53030;
+  border-color: #c53030;
 }
 
 /* =================================================================
@@ -4997,25 +5043,6 @@ body.dark-mode .feedback-message {
   /* ✅ rata kiri */
 }
 
-.btn-delete-small {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
-}
-
-.btn-delete-small:hover {
-  background-color: #f5c6cb;
-}
-
-.btn-delete-small i {
-  margin-right: 5px;
-}
-
 /* 🌙 Dark Mode */
 body.dark-mode .global-notification-history {
   background-color: #1f2937;
@@ -5041,19 +5068,136 @@ body.dark-mode .history-item-content small {
   color: #888;
 }
 
+/* ============================================= */
+/* GAYA TOMBOL AKSI JOB LIST                     */
+/* ============================================= */
+
+/* --- Class Dasar untuk Semua Tombol Aksi --- */
+.btn-action {
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-action i {
+  margin-right: 5px;
+}
+
+/* --- Tombol Hapus (Merah) - Milik Anda, disesuaikan dengan base class --- */
+.btn-delete-small {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-color: #f5c6cb;
+}
+.btn-delete-small:hover {
+  background-color: #f1b0b7;
+  border-color: #f1b0b7;
+}
+/* --- Dark Mode: Tombol Hapus (Merah Solid) --- */
 body.dark-mode .btn-delete-small {
-  background-color: #3a1c1c;
-  color: #ffb3b3;
-  border: 1px solid #662222;
+  background-color: #e53e3e; /* Merah terang */
+  color: #ffffff; /* Teks putih */
+  border-color: #e53e3e;
 }
-
 body.dark-mode .btn-delete-small:hover {
-  background-color: #991b1b;
+  background-color: #c53030; /* Merah lebih gelap saat hover */
+  border-color: #c53030;
 }
 
-body.dark-mode .btn-delete-small i {
-  color: #ffb3b3;
+/* --- Tombol Start / Lanjutkan / Bukti (Biru) --- */
+.btn-start {
+  background-color: #d1e7fd;
+  color: #084298;
+  border-color: #b6d4fe;
 }
+.btn-start:hover {
+  background-color: #a3c7fe;
+  border-color: #a3c7fe;
+}
+/* --- Dark Mode: Tombol Start / Lanjutkan / Bukti (Biru Solid) --- */
+body.dark-mode .btn-start {
+  background-color: #3b82f6; /* Biru terang */
+  color: #ffffff;
+  border-color: #3b82f6;
+}
+body.dark-mode .btn-start:hover {
+  background-color: #2563eb; /* Biru lebih gelap saat hover */
+  border-color: #2563eb;
+}
+
+
+/* --- Tombol Tolak (Kuning/Amber) --- */
+.btn-cancel-aksi {
+  background-color: #fff3cd;
+  color: #856404;
+  border-color: #ffeeba;
+}
+.btn-cancel-aksi:hover {
+  background-color: #ffde89;
+  border-color: #ffde89;
+}
+/* --- Dark Mode: Tombol Tolak (Kuning/Amber Solid) --- */
+body.dark-mode .btn-cancel-aksi {
+  background-color: #dd6b20; /* Amber/Oranye */
+  color: #ffffff;
+  border-color: #dd6b20;
+}
+body.dark-mode .btn-cancel-aksi:hover {
+  background-color: #c05621; /* Amber lebih gelap saat hover */
+  border-color: #c05621;
+}
+
+
+/* --- Tombol Selesaikan (Hijau) --- */
+.btn-finish {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border-color: #badbcc;
+}
+.btn-finish:hover {
+  background-color: #a8d5b7;
+  border-color: #a8d5b7;
+}
+/* --- Dark Mode: Tombol Selesaikan (Hijau Solid) --- */
+body.dark-mode .btn-finish {
+  background-color: #38a169; /* Hijau terang */
+  color: #ffffff;
+  border-color: #38a169;
+}
+body.dark-mode .btn-finish:hover {
+  background-color: #2f855a; /* Hijau lebih gelap saat hover */
+  border-color: #2f855a;
+}
+
+
+/* --- Tombol Tunda (Abu-abu) --- */
+.btn-pause {
+  background-color: #e2e3e5;
+  color: #383d41;
+  border-color: #d6d8db;
+}
+.btn-pause:hover {
+  background-color: #c8cbcf;
+  border-color: #c8cbcf;
+}
+/* --- Dark Mode: Tombol Tunda (Abu-abu Solid) --- */
+body.dark-mode .btn-pause {
+  background-color: #718096; /* Abu-abu netral */
+  color: #ffffff;
+  border-color: #718096;
+}
+body.dark-mode .btn-pause:hover {
+  background-color: #4a5568; /* Abu-abu lebih gelap saat hover */
+  border-color: #4a5568;
+}
+
 
 /* Container utama */
 .welcome-card-container {

@@ -51,8 +51,8 @@ const UserManagement = ({ userData, onAddClick, onEditClick, onDeleteClick, onPa
                                 <td>{user.role}</td>
                                 <td>
                                     <div className="action-buttons-group">
-                                        <button onClick={() => onEditClick(user)} className="btn-edit">Edit</button>
-                                        <button onClick={() => onDeleteClick(user)} className="btn-delete">Hapus</button>
+                                        <button onClick={() => onEditClick(user)} className="btn-user-action btn-edit">Edit</button>
+                                        <button onClick={() => onDeleteClick(user)} className="btn-user-action btn-delete">Hapus</button>
                                     </div>
                                 </td>
                             </tr>
