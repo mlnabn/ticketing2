@@ -238,7 +238,8 @@ body {
   color: var(--text-color-dashboard-light);
   min-height: 100vh;
   transition: background-color 0.3s ease, color 0.3s ease;
-  overflow-x: hidden; /* Mencegah scroll horizontal */
+  overflow-x: hidden;
+  /* Mencegah scroll horizontal */
 }
 
 body.dark-mode {
@@ -449,7 +450,8 @@ body.dark-mode .dashboard-container {
   display: flex;
   flex-direction: column;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  overflow-y: auto; /* Scroll jika konten melebihi tinggi */
+  overflow-y: auto;
+  /* Scroll jika konten melebihi tinggi */
 }
 
 .sidebar.open {
@@ -516,6 +518,7 @@ body.dark-mode .hamburger-menu-button span {
 
 /* Desktop Styles */
 @media (min-width: 1291px) {
+
   .hamburger-menu-button,
   .content-overlay,
   .job-list-mobile,
@@ -533,7 +536,7 @@ body.dark-mode .hamburger-menu-button span {
 
   .sidebar:hover {
     width: 280px;
-     z-index: 1001;
+    z-index: 1001;
   }
 
   .main-content {
@@ -554,30 +557,30 @@ body.dark-mode .hamburger-menu-button span {
     overflow: hidden !important;
   }
 
-  .sidebar:hover ~ .main-content,
-  .sidebar:hover + .main-content {
+  .sidebar:hover~.main-content,
+  .sidebar:hover+.main-content {
     margin-left: 280px;
     width: calc(100% - 280px);
   }
-  
+
   /* Pastikan hanya logo yang terlihat */
   .sidebar:not(:hover) .sidebar-header {
     padding: 1rem 0.5rem;
     text-align: center;
     justify-content: center;
   }
-  
+
   .sidebar:not(:hover) .sidebar-logo {
     margin: 0 auto;
     max-width: 50px;
   }
-  
+
   /* Pusatkan item navigasi saat sidebar kecil */
   .sidebar:not(:hover) .sidebar-button {
     justify-content: center;
     padding: 0.75rem 0.5rem;
   }
-  
+
   .sidebar:not(:hover) .sidebar-button i {
     margin-right: 0;
   }
@@ -896,6 +899,7 @@ body.dark-mode .hamburger-menu-button span {
 }
 
 @media (max-width: 480px) {
+
   .login-card h2,
   .register-card h2 {
     font-size: 24px;
@@ -1545,7 +1549,8 @@ body.dark-mode .proof-modal__group input[type="file"]::file-selector-button:hove
   font-weight: 700;
   color: #333;
   margin: 10px 0;
-  text-align: center; /* rata tengah */
+  text-align: center;
+  /* rata tengah */
 }
 
 .card-change {
@@ -1860,12 +1865,15 @@ body.dark-mode .search-form input[type="text"]::placeholder {
 }
 
 body.dark-mode .search-form button[type="submit"] {
-  background-color: var(--search-button-bg-dark);
-  color: var(--search-button-text-dark);
+  background-color: #3b82f6; /* Biru terang */
+  color: #ffffff;
+  border-color: #3b82f6;
+
 }
 
 body.dark-mode .search-form button[type="submit"]:hover {
-  background-color: var(--search-button-hover-bg-dark);
+  background-color: #2563eb; /* Biru lebih gelap saat hover */
+  border-color: #2563eb;
 }
 
 /*
@@ -2152,7 +2160,8 @@ button:hover {
 } */
 
 button.btn-pause {
-  background-color: #e5e2e2; /* soft gray */
+  background-color: #e5e2e2;
+  /* soft gray */
   color: #383d41;
   border-color: #d6d8db;
   padding: 8px 12px;
@@ -2196,8 +2205,10 @@ button.btn-pause {
 /* [DIUBAH] Gaya dasar tabel untuk dark mode */
 body.dark-mode .job-table {
   box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.5);
-  background-color: transparent; /* Latar belakang dikontrol oleh sel (td) */
-  border: none; /* Border dikontrol oleh sel (td) */
+  background-color: transparent;
+  /* Latar belakang dikontrol oleh sel (td) */
+  border: none;
+  /* Border dikontrol oleh sel (td) */
 }
 
 
@@ -2206,16 +2217,21 @@ body.dark-mode .job-table {
 .job-table td {
   padding: 1rem;
   text-align: left;
-  border-bottom: 1px solid #e2e8f0; /* Garis bawah untuk light mode */
-  color: #1e293b; /* Warna teks untuk light mode */
+  border-bottom: 1px solid #e2e8f0;
+  /* Garis bawah untuk light mode */
+  color: #1e293b;
+  /* Warna teks untuk light mode */
   transition: all 0.3s ease;
 }
 
 /* [DIUBAH] Gaya sel data (td) untuk dark mode */
 body.dark-mode .job-table td {
-  border-bottom: 1px solid #2d3748; /* Warna garis pemisah baris */
-  color: #e2e8f0; /* Warna teks utama (putih gading) */
-  border-right: none; /* Hapus border kanan default, kita atur di header */
+  border-bottom: 1px solid #2d3748;
+  /* Warna garis pemisah baris */
+  color: #e2e8f0;
+  /* Warna teks utama (putih gading) */
+  border-right: none;
+  /* Hapus border kanan default, kita atur di header */
 }
 
 
@@ -2229,9 +2245,12 @@ body.dark-mode .job-table td {
 }
 
 body.dark-mode .job-table th {
-  background-color: var(--joblist-header-bg-dark); /* Menggunakan variabel baru */
-  color: var(--joblist-header-text-dark); /* Menggunakan variabel baru */
-  border-bottom: 2px solid #4a5568; /* Garis bawah header yang tegas */
+  background-color: var(--joblist-header-bg-dark);
+  /* Menggunakan variabel baru */
+  color: var(--joblist-header-text-dark);
+  /* Menggunakan variabel baru */
+  border-bottom: 2px solid #4a5568;
+  /* Garis bawah header yang tegas */
 }
 
 /* Divider untuk header */
@@ -2249,12 +2268,14 @@ body.dark-mode .job-table tbody tr td {
 
 /* Warna baris selang-seling (Zebra Striping) */
 .job-table tbody tr:nth-child(even) td {
-  background-color: #f8f9fa; /* Warna untuk Light Mode */
+  background-color: #f8f9fa;
+  /* Warna untuk Light Mode */
 }
 
 /* [DIUBAH] Warna baris selang-seling untuk dark mode */
 body.dark-mode .job-table tbody tr:nth-child(even) td {
-  background-color: #212936; /* Warna lebih gelap untuk kontras halus */
+  background-color: #212936;
+  /* Warna lebih gelap untuk kontras halus */
 }
 
 /* [DIUBAH] Warna hover baris untuk dark mode */
@@ -2288,8 +2309,10 @@ body.dark-mode .job-table tbody tr:hover td {
 /* [DIUBAH] Gaya dasar tabel untuk dark mode */
 body.dark-mode .job-table-user {
   box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.5);
-  background-color: transparent; /* Latar belakang dikontrol oleh sel (td) */
-  border: none; /* Border dikontrol oleh sel (td) */
+  background-color: transparent;
+  /* Latar belakang dikontrol oleh sel (td) */
+  border: none;
+  /* Border dikontrol oleh sel (td) */
 }
 
 
@@ -2298,16 +2321,21 @@ body.dark-mode .job-table-user {
 .job-table-user td {
   padding: 1rem;
   text-align: left;
-  border-bottom: 1px solid #e2e8f0; /* Garis bawah untuk light mode */
-  color: #1e293b; /* Warna teks untuk light mode */
+  border-bottom: 1px solid #e2e8f0;
+  /* Garis bawah untuk light mode */
+  color: #1e293b;
+  /* Warna teks untuk light mode */
   transition: all 0.3s ease;
 }
 
 /* [DIUBAH] Gaya sel data (td) untuk dark mode */
 body.dark-mode .job-table-user td {
-  border-bottom: 1px solid #2d3748; /* Warna garis pemisah baris */
-  color: #e2e8f0; /* Warna teks utama (putih gading) */
-  border-right: none; /* Hapus border kanan default, kita atur di header */
+  border-bottom: 1px solid #2d3748;
+  /* Warna garis pemisah baris */
+  color: #e2e8f0;
+  /* Warna teks utama (putih gading) */
+  border-right: none;
+  /* Hapus border kanan default, kita atur di header */
 }
 
 
@@ -2321,9 +2349,12 @@ body.dark-mode .job-table-user td {
 }
 
 body.dark-mode .job-table-user th {
-  background-color: var(--joblist-header-bg-dark); /* Menggunakan variabel baru */
-  color: var(--joblist-header-text-dark); /* Menggunakan variabel baru */
-  border-bottom: 2px solid #4a5568; /* Garis bawah header yang tegas */
+  background-color: var(--joblist-header-bg-dark);
+  /* Menggunakan variabel baru */
+  color: var(--joblist-header-text-dark);
+  /* Menggunakan variabel baru */
+  border-bottom: 2px solid #4a5568;
+  /* Garis bawah header yang tegas */
 }
 
 /* Divider untuk header */
@@ -3152,19 +3183,6 @@ body.dark-mode .content-area h3 {
  ---------------------------------------------------
 */
 
-/* Mode Gelap untuk Tombol Utama */
-body.dark-mode .btn-primary {
-  background-color: #5b8ff9;
-  /* Biru yang lebih terang untuk dark mode */
-  box-shadow: 0 4px 8px rgba(91, 143, 249, 0.3);
-}
-
-body.dark-mode .btn-primary:hover {
-  background-color: #4074d9;
-  /* Biru gelap saat hover di dark mode */
-  box-shadow: 0 6px 12px rgba(91, 143, 249, 0.4);
-}
-
 /* ======================================================= */
 /* GAYA TOMBOL AKSI MANAJEMEN PENGGUNA (TEMA BARU)      */
 /* ======================================================= */
@@ -3179,25 +3197,30 @@ body.dark-mode .btn-primary:hover {
 /* --- [BARU] Class Dasar untuk Tombol Edit & Hapus --- */
 .btn-user-action {
   padding: 8px 15px;
-  border: 1px solid transparent; /* [DIUBAH] Menggunakan border, bukan shadow */
+  border: 1px solid transparent;
+  /* [DIUBAH] Menggunakan border, bukan shadow */
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease-in-out; /* [DIUBAH] Transisi untuk semua properti */
+  transition: all 0.2s ease-in-out;
+  /* [DIUBAH] Transisi untuk semua properti */
 }
 
 /* --- Tema Tombol Edit (Hijau) --- */
 .btn-edit {
-  background-color: #d1e7dd; /* [DIUBAH] Warna dari JobList */
+  background-color: #d1e7dd;
+  /* [DIUBAH] Warna dari JobList */
   color: #0f5132;
   border-color: #badbcc;
 }
 
 .btn-edit:hover {
-  background-color: #a8d5b7; /* [DIUBAH] Warna dari JobList */
+  background-color: #a8d5b7;
+  /* [DIUBAH] Warna dari JobList */
   border-color: #a8d5b7;
-  transform: translateY(-1px); /* Efek hover tetap dipertahankan */
+  transform: translateY(-1px);
+  /* Efek hover tetap dipertahankan */
 }
 
 /* [DIUBAH] Dark Mode untuk Tombol Edit (Solid) */
@@ -3215,13 +3238,15 @@ body.dark-mode .btn-edit:hover {
 
 /* --- Tema Tombol Hapus (Merah) --- */
 .btn-delete {
-  background-color: #f8d7da; /* Warna ini sudah sesuai */
+  background-color: #f8d7da;
+  /* Warna ini sudah sesuai */
   color: #721c24;
   border-color: #f5c6cb;
 }
 
 .btn-delete:hover {
-  background-color: #f1b0b7; /* [DIUBAH] Warna dari JobList */
+  background-color: #f1b0b7;
+  /* [DIUBAH] Warna dari JobList */
   border-color: #f1b0b7;
   transform: translateY(-1px);
 }
@@ -3257,6 +3282,7 @@ body.dark-mode .btn-delete:hover {
 .dashboard-container.no-sidebar {
   min-height: 100vh;
 }
+
 .content-area {
   background: transparent;
 }
@@ -3414,9 +3440,9 @@ body.dark-mode .history-tab {
   background: linear-gradient(145deg, #2c3e50, #34495e);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 34px;
-  box-shadow: 
-    3px 3px 6px rgba(0,0,0,0.2),
-    -3px -3px 6px rgba(255,255,255,0.1);
+  box-shadow:
+    3px 3px 6px rgba(0, 0, 0, 0.2),
+    -3px -3px 6px rgba(255, 255, 255, 0.1);
 }
 
 .theme-switch-slider:before {
@@ -3429,9 +3455,9 @@ body.dark-mode .history-tab {
   background: linear-gradient(145deg, #34495e, #2c3e50);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 50%;
-  box-shadow: 
-    2px 2px 4px rgba(0,0,0,0.3),
-    -2px -2px 4px rgba(255,255,255,0.1);
+  box-shadow:
+    2px 2px 4px rgba(0, 0, 0, 0.3),
+    -2px -2px 4px rgba(255, 255, 255, 0.1);
 }
 
 /* Hanya mengubah posisi toggle tanpa mengubah warna */
@@ -3453,14 +3479,14 @@ body.dark-mode .history-tab {
 .theme-switch .fa-sun {
   left: 7px;
   color: #f1c40f;
-  text-shadow: 0 0 10px rgba(241,196,15,0.5);
+  text-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
   opacity: 1;
 }
 
 .theme-switch .fa-moon {
   right: 7px;
   color: #ecf0f1;
-  text-shadow: 0 0 10px rgba(236,240,241,0.5);
+  text-shadow: 0 0 10px rgba(236, 240, 241, 0.5);
   opacity: 0;
 }
 
@@ -3474,9 +3500,9 @@ body.dark-mode .history-tab {
 
 /* Hover Effects - konsisten dark */
 .theme-switch-slider:hover {
-  box-shadow: 
-    4px 4px 8px rgba(0,0,0,0.3),
-    -4px -4px 8px rgba(255,255,255,0.1);
+  box-shadow:
+    4px 4px 8px rgba(0, 0, 0, 0.3),
+    -4px -4px 8px rgba(255, 255, 255, 0.1);
   background: linear-gradient(145deg, #34495e, #2c3e50);
 }
 
@@ -3762,9 +3788,12 @@ body.dark-mode .btn-submit:hover {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.4); /* gelap transparan */
-  backdrop-filter: blur(6px);      /* efek blur */
-  z-index: 999; /* harus di bawah dropdown */
+  background: rgba(0, 0, 0, 0.4);
+  /* gelap transparan */
+  backdrop-filter: blur(6px);
+  /* efek blur */
+  z-index: 999;
+  /* harus di bawah dropdown */
 }
 
 /* Dropdown menu */
@@ -3772,12 +3801,14 @@ body.dark-mode .btn-submit:hover {
   position: absolute;
   top: 50px;
   right: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(15, 32, 80, 0.95) 0%,   /* biru malam pekat */
-    rgba(30, 64, 140, 0.85) 50%, /* biru tengah */
-    rgba(70, 130, 180, 0.75) 100% /* biru langit lembut */
-  );
+  background: linear-gradient(135deg,
+      rgba(15, 32, 80, 0.95) 0%,
+      /* biru malam pekat */
+      rgba(30, 64, 140, 0.85) 50%,
+      /* biru tengah */
+      rgba(70, 130, 180, 0.75) 100%
+      /* biru langit lembut */
+    );
   border-radius: 10px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
   padding: 10px;
@@ -3804,8 +3835,10 @@ body.dark-mode .btn-submit:hover {
 }
 
 .user-dropdown button:hover {
-  background: transparent; /* efek kaca terang pas hover */
-  transform: translateX(3px); /* animasi geser dikit */
+  background: transparent;
+  /* efek kaca terang pas hover */
+  transform: translateX(3px);
+  /* animasi geser dikit */
 }
 
 @keyframes fadeIn {
@@ -3813,6 +3846,7 @@ body.dark-mode .btn-submit:hover {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -4634,12 +4668,10 @@ body.dark-mode .notification-form-container label {
   cursor: pointer;
   background: #d6eaf8;
   color: #154360;
-  transition: transform 0.2s ease, background 0.3s ease;
 }
 
 .btn-primary:hover {
   background-color: #aed6f1;
-  /* Warna biru sedikit lebih gelap saat hover */
   transform: scale(1);
 }
 
@@ -4789,12 +4821,14 @@ body.dark-mode .form-group2 textarea:focus {
 }
 
 body.dark-mode .btn-primary {
-  background: #d6eaf8;
-  color: #154360;
+  background: #3b82f6;
+  color: #ffffff;
+  border-color: #3b82f6;
 }
 
 body.dark-mode .btn-primary:hover {
-  background: #aed6f1;
+  background-color: #2563eb;
+  border-color: #2563eb;
 }
 
 body.dark-mode .feedback-message {
@@ -5096,18 +5130,24 @@ body.dark-mode .history-item-content small {
   color: #721c24;
   border-color: #f5c6cb;
 }
+
 .btn-delete-small:hover {
   background-color: #f1b0b7;
   border-color: #f1b0b7;
 }
+
 /* --- Dark Mode: Tombol Hapus (Merah Solid) --- */
 body.dark-mode .btn-delete-small {
-  background-color: #e53e3e; /* Merah terang */
-  color: #ffffff; /* Teks putih */
+  background-color: #e53e3e;
+  /* Merah terang */
+  color: #ffffff;
+  /* Teks putih */
   border-color: #e53e3e;
 }
+
 body.dark-mode .btn-delete-small:hover {
-  background-color: #c53030; /* Merah lebih gelap saat hover */
+  background-color: #c53030;
+  /* Merah lebih gelap saat hover */
   border-color: #c53030;
 }
 
@@ -5117,18 +5157,23 @@ body.dark-mode .btn-delete-small:hover {
   color: #084298;
   border-color: #b6d4fe;
 }
+
 .btn-start:hover {
   background-color: #a3c7fe;
   border-color: #a3c7fe;
 }
+
 /* --- Dark Mode: Tombol Start / Lanjutkan / Bukti (Biru Solid) --- */
 body.dark-mode .btn-start {
-  background-color: #3b82f6; /* Biru terang */
+  background-color: #3b82f6;
+  /* Biru terang */
   color: #ffffff;
   border-color: #3b82f6;
 }
+
 body.dark-mode .btn-start:hover {
-  background-color: #2563eb; /* Biru lebih gelap saat hover */
+  background-color: #2563eb;
+  /* Biru lebih gelap saat hover */
   border-color: #2563eb;
 }
 
@@ -5139,18 +5184,23 @@ body.dark-mode .btn-start:hover {
   color: #856404;
   border-color: #ffeeba;
 }
+
 .btn-cancel-aksi:hover {
   background-color: #ffde89;
   border-color: #ffde89;
 }
+
 /* --- Dark Mode: Tombol Tolak (Kuning/Amber Solid) --- */
 body.dark-mode .btn-cancel-aksi {
-  background-color: #dd6b20; /* Amber/Oranye */
+  background-color: #dd6b20;
+  /* Amber/Oranye */
   color: #ffffff;
   border-color: #dd6b20;
 }
+
 body.dark-mode .btn-cancel-aksi:hover {
-  background-color: #c05621; /* Amber lebih gelap saat hover */
+  background-color: #c05621;
+  /* Amber lebih gelap saat hover */
   border-color: #c05621;
 }
 
@@ -5161,18 +5211,23 @@ body.dark-mode .btn-cancel-aksi:hover {
   color: #0f5132;
   border-color: #badbcc;
 }
+
 .btn-finish:hover {
   background-color: #a8d5b7;
   border-color: #a8d5b7;
 }
+
 /* --- Dark Mode: Tombol Selesaikan (Hijau Solid) --- */
 body.dark-mode .btn-finish {
-  background-color: #38a169; /* Hijau terang */
+  background-color: #38a169;
+  /* Hijau terang */
   color: #ffffff;
   border-color: #38a169;
 }
+
 body.dark-mode .btn-finish:hover {
-  background-color: #2f855a; /* Hijau lebih gelap saat hover */
+  background-color: #2f855a;
+  /* Hijau lebih gelap saat hover */
   border-color: #2f855a;
 }
 
@@ -5183,18 +5238,23 @@ body.dark-mode .btn-finish:hover {
   color: #383d41;
   border-color: #d6d8db;
 }
+
 .btn-pause:hover {
   background-color: #c8cbcf;
   border-color: #c8cbcf;
 }
+
 /* --- Dark Mode: Tombol Tunda (Abu-abu Solid) --- */
 body.dark-mode .btn-pause {
-  background-color: #718096; /* Abu-abu netral */
+  background-color: #718096;
+  /* Abu-abu netral */
   color: #ffffff;
   border-color: #718096;
 }
+
 body.dark-mode .btn-pause:hover {
-  background-color: #4a5568; /* Abu-abu lebih gelap saat hover */
+  background-color: #4a5568;
+  /* Abu-abu lebih gelap saat hover */
   border-color: #4a5568;
 }
 
@@ -5567,7 +5627,7 @@ body.dark-mode .welcome-title {
     display: none;
   }
 
-  .main-header-user .notification-button{
+  .main-header-user .notification-button {
     font-size: 1rem;
     width: 24px;
     height: 24px;
@@ -5576,18 +5636,21 @@ body.dark-mode .welcome-title {
   .logout-buttonuser {
     font-size: 18px;
     padding: 14px 18px;
-    justify-content: center; /* biar tombol & icon di tengah */
+    justify-content: center;
+    /* biar tombol & icon di tengah */
     text-align: center;
   }
 
   .logout-buttonuser i {
-    font-size: 20px;   /* icon lebih besar di mobile */
+    font-size: 20px;
+    /* icon lebih besar di mobile */
     margin-right: 10px;
   }
 
-    .user-dropdown {
+  .user-dropdown {
     right: 10px;
-    left: 10px; /* biar agak full width */
+    left: 10px;
+    /* biar agak full width */
     top: 60px;
     border-radius: 12px;
     padding: 12px;
@@ -5596,7 +5659,8 @@ body.dark-mode .welcome-title {
   .user-dropdown button {
     font-size: 16px;
     padding: 14px 18px;
-    justify-content: center; /* tombol jadi tengah */
+    justify-content: center;
+    /* tombol jadi tengah */
     text-align: center;
     border-radius: 8px;
   }
@@ -6466,8 +6530,10 @@ body.dark-mode .dashboard-card h4 {
 
 .team-member-card:hover {
   transform: translateY(-8px);
-  background: rgba(59, 130, 246, 0.1); /* biru transparan */
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4); /* glow biru */
+  background: rgba(59, 130, 246, 0.1);
+  /* biru transparan */
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+  /* glow biru */
 }
 
 .member-avatar {
@@ -6602,7 +6668,8 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .social-links a:hover {
-  background: linear-gradient(135deg, #2563eb, #3b82f6, #38bdf8); /* biru tua → biru → biru muda */
+  background: linear-gradient(135deg, #2563eb, #3b82f6, #38bdf8);
+  /* biru tua → biru → biru muda */
   color: #fff;
   transform: translateY(-3px);
   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
@@ -6619,6 +6686,7 @@ body.dark-mode .dashboard-card h4 {
     opacity: 0;
     transform: translateY(40px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -6631,10 +6699,12 @@ body.dark-mode .dashboard-card h4 {
     box-shadow: 0 0 5px rgba(168, 85, 247, 0.4),
       0 0 10px rgba(236, 72, 153, 0.2);
   }
+
   50% {
     box-shadow: 0 0 15px rgba(168, 85, 247, 0.6),
       0 0 25px rgba(236, 72, 153, 0.3);
   }
+
   100% {
     box-shadow: 0 0 5px rgba(168, 85, 247, 0.4),
       0 0 10px rgba(236, 72, 153, 0.2);
@@ -6646,9 +6716,11 @@ body.dark-mode .dashboard-card h4 {
   0% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-8px);
   }
+
   100% {
     transform: translateY(0px);
   }
@@ -6659,6 +6731,7 @@ body.dark-mode .dashboard-card h4 {
   0% {
     background-position: 0% 50%;
   }
+
   100% {
     background-position: 100% 50%;
   }
@@ -7045,54 +7118,56 @@ body.dark-mode .dashboard-card h4 {
    Responsive WelcomeHomeUser
    ================================ */
 
-/* Tablet & HP Medium (<= 1008px) */
-@media (max-width: 1008px) {
-  /* Judul */
-  .welcome-card-container h2 {
-    font-size: 1.5rem;
-    font-weight: 800;
+  /* Tablet & HP Medium (<= 1008px) */
+  @media (max-width: 1008px) {
+
+    /* Judul */
+    .welcome-card-container h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    /* Sub Judul / teks isi */
+    .welcome-card-container p {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: #f1f1f1;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    /* Tombol */
+    .welcome-card-container button {
+      font-size: 0.9rem;
+      padding: 0.6rem 1.2rem;
+    }
   }
 
-  /* Sub Judul / teks isi */
-  .welcome-card-container p {
-    font-size: 0.9rem;
-    line-height: 1.7;
-    color: #f1f1f1;
-    margin-bottom: 1.5rem;
-    text-align: center;
-  }
+  /* HP Kecil (<= 400px) */
+  @media (max-width: 400px) {
 
-  /* Tombol */
-  .welcome-card-container button {
-    font-size: 0.9rem;
-    padding: 0.6rem 1.2rem;
-  }
-}
+    /* Judul lebih kecil */
+    .welcome-card-container h2 {
+      font-size: 1.2rem;
+    }
 
-/* HP Kecil (<= 400px) */
-@media (max-width: 400px) {
-  /* Judul lebih kecil */
-  .welcome-card-container h2 {
-    font-size: 1.2rem;
-  }
+    /* Sub Judul / teks isi */
+    .welcome-card-container p {
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
 
-  /* Sub Judul / teks isi */
-  .welcome-card-container p {
-    font-size: 0.8rem;
-    line-height: 1.4;
-  }
+    /* List item */
+    .welcome-card-container li span {
+      font-size: 0.8rem;
+    }
 
-  /* List item */
-  .welcome-card-container li span {
-    font-size: 0.8rem;
+    /* Tombol lebih kecil */
+    .welcome-card-container button {
+      font-size: 0.8rem;
+      padding: 0.5rem 1rem;
+    }
   }
-
-  /* Tombol lebih kecil */
-  .welcome-card-container button {
-    font-size: 0.8rem;
-    padding: 0.5rem 1rem;
-  }
-}
 }
 
 
@@ -7120,7 +7195,8 @@ body.dark-mode .dashboard-card h4 {
   padding: 4rem 2rem;
   color: #fff;
   text-align: center;
-  max-width: 1200px;   /* Lebarkan area */
+  max-width: 1200px;
+  /* Lebarkan area */
   margin: auto;
   animation: fadeSlideIn 0.6s ease-out;
 }
@@ -7134,7 +7210,8 @@ body.dark-mode .dashboard-card h4 {
 .features-group h2 {
   font-size: 2rem;
   margin-bottom: 2rem;
-  color: #3aa8ff; /* biru seperti About Us */
+  color: #3aa8ff;
+  /* biru seperti About Us */
   font-weight: 700;
   text-align: center;
   position: relative;
@@ -7170,7 +7247,8 @@ body.dark-mode .dashboard-card h4 {
   background: rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  min-height: 280px;  /* Biar semua tinggi seimbang */
+  min-height: 280px;
+  /* Biar semua tinggi seimbang */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -7234,7 +7312,8 @@ body.dark-mode .dashboard-card h4 {
   }
 
   .feature-card {
-    min-height: auto; /* biar fleksibel di HP */
+    min-height: auto;
+    /* biar fleksibel di HP */
   }
 }
 
@@ -7249,6 +7328,7 @@ body.dark-mode .dashboard-card h4 {
     opacity: 0;
     transform: translateY(40px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -7354,7 +7434,8 @@ body.dark-mode .dashboard-card h4 {
 
 /* Jika klik YA */
 .feedback-yes {
-  color: #4ade80; /* hijau terang */
+  color: #4ade80;
+  /* hijau terang */
   text-shadow: 0 0 6px rgba(74, 222, 128, 0.4);
 }
 
@@ -7363,8 +7444,10 @@ body.dark-mode .dashboard-card h4 {
 .feedback-no {
   display: flex;
   align-items: center;
-  gap: 8px;               /* kasih jarak antar teks & link */
-  color: #f87171;         /* merah soft */
+  gap: 8px;
+  /* kasih jarak antar teks & link */
+  color: #f87171;
+  /* merah soft */
   font-weight: 500;
 }
 
@@ -7383,11 +7466,13 @@ body.dark-mode .dashboard-card h4 {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px; /* kasih jarak antar teks & link */
+  gap: 8px;
+  /* kasih jarak antar teks & link */
   margin-top: 2rem;
   font-size: 0.95rem;
   font-weight: 500;
-  color: #f87171; /* merah soft */
+  color: #f87171;
+  /* merah soft */
   animation: fadeIn 0.4s ease-in-out;
 }
 
@@ -7409,6 +7494,7 @@ body.dark-mode .dashboard-card h4 {
     opacity: 0;
     transform: translateY(4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -7481,10 +7567,12 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .react-calendar__tile--now:hover {
-  background: hsl(214, 89%, 45%)  !important; /* biru lebih pekat */
+  background: hsl(214, 89%, 45%) !important;
+  /* biru lebih pekat */
   color: hsl(214, 89%, 40%);
   font-weight: 700;
-  border-radius: 6px; /* opsional biar lebih lembut */
+  border-radius: 6px;
+  /* opsional biar lebih lembut */
   transition: all 0.3s ease;
 }
 
@@ -7513,23 +7601,28 @@ body.dark-mode .dashboard-card h4 {
 
 /* Status colors */
 .dot-green {
-  background-color: #22c55e; /* selesai */
+  background-color: #22c55e;
+  /* selesai */
 }
 
 .dot-yellow {
-  background-color: #facc15; /* sedang dikerjakan */
+  background-color: #facc15;
+  /* sedang dikerjakan */
 }
 
 .dot-blue {
-  background-color: #3b82f6; /* ditunda */
+  background-color: #3b82f6;
+  /* ditunda */
 }
 
 .dot-red {
-  background-color: #ef4444; /* ditolak */
+  background-color: #ef4444;
+  /* ditolak */
 }
 
 .dot-gray {
-  background-color: #9ca3af; /* belum dikerjakan */
+  background-color: #9ca3af;
+  /* belum dikerjakan */
 }
 
 
@@ -7660,7 +7753,7 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .dark-mode .react-calendar__tile--now {
-  background: hsl(214, 89%, 45%) ;
+  background: hsl(214, 89%, 45%);
   color: hsl(210, 36%, 96%);
 }
 
@@ -7736,20 +7829,25 @@ body.dark-mode .dashboard-card h4 {
     max-width: 95%;
     padding: 16px;
   }
+
   .react-calendar {
     padding: 10px;
   }
+
   .react-calendar__navigation button {
     font-size: 14px;
     min-width: 30px;
   }
+
   .react-calendar__month-view__weekdays {
     font-size: 12px;
   }
+
   .react-calendar__tile {
     height: 45px;
     font-size: 14px;
   }
+
   .modal-content {
     padding: 20px;
   }
@@ -7759,13 +7857,16 @@ body.dark-mode .dashboard-card h4 {
   .calendar-wrapper {
     padding: 12px;
   }
+
   .react-calendar__navigation button {
     font-size: 12px;
     min-width: 25px;
   }
+
   .react-calendar__month-view__weekdays {
     font-size: 10px;
   }
+
   .react-calendar__tile {
     height: 35px;
     font-size: 12px;
