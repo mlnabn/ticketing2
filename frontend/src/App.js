@@ -1378,7 +1378,7 @@ function App() {
                 <div className="history-tab">
                   <h2>{publicTicketCode ? `Status untuk Tiket: ${publicTicketCode}` : 'Your Tickets'}</h2>
                   <div className="job-list" style={{ marginTop: '20px' }}>
-                    <table className="job-table user-history-table">
+                    <table className="job-table-user user-history-table">
                       <thead>
                         <tr>
                           <th>Deskripsi</th>

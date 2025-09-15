@@ -31,39 +31,38 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
     };
 
     const renderActionButtons = (ticket) => {
-        // ... (Fungsi renderActionButtons Anda tidak perlu diubah, tetap sama)
         if (!isAdmin) { return null; }
         switch (ticket.status) {
             case 'Belum Dikerjakan':
                 if (!ticket.user) {
                     return (
                         <>
-                            <button onClick={() => onAssignClick(ticket)} className="btn-start">Mulai Kerjakan</button>
-                            <button onClick={() => onRejectClick(ticket)} className="btn-cancel-aksi">Tolak</button>
+                            <button onClick={() => onAssignClick(ticket)} className="btn-action btn-start">Mulai Kerjakan</button>
+                            <button onClick={() => onRejectClick(ticket)} className="btn-action btn-cancel-aksi">Tolak</button>
                         </>
                     );
                 }
-                return <button onClick={() => updateTicketStatus(ticket.id, 'Sedang Dikerjakan')} className="btn-start">Mulai Kerjakan</button>;
+                return <button onClick={() => updateTicketStatus(ticket.id, 'Sedang Dikerjakan')} className="btn-action btn-start">Mulai Kerjakan</button>;
             case 'Sedang Dikerjakan':
                 return (
                     <>
-                        <button onClick={() => { updateTicketStatus(ticket.id, 'Selesai'); showToast('Ticket selesai.', 'success'); }} className="btn-finish">Selesaikan</button>
-                        <button onClick={() => { updateTicketStatus(ticket.id, 'Ditunda'); showToast('Ticket ditunda.', 'info'); }} className="btn-pause">Tunda</button>
+                        <button onClick={() => { updateTicketStatus(ticket.id, 'Selesai'); showToast('Ticket selesai.', 'success'); }} className="btn-action btn-finish">Selesaikan</button>
+                        <button onClick={() => { updateTicketStatus(ticket.id, 'Ditunda'); showToast('Ticket ditunda.', 'info'); }} className="btn-action btn-pause">Tunda</button>
                     </>
                 );
             case 'Ditunda':
-                return <button onClick={() => { updateTicketStatus(ticket.id, 'Sedang Dikerjakan'); showToast('Ticket dilanjutkan.', 'success'); }} className="btn-start">Lanjutkan</button>;
+                return <button onClick={() => { updateTicketStatus(ticket.id, 'Sedang Dikerjakan'); showToast('Ticket dilanjutkan.', 'success'); }} className="btn-action btn-start">Lanjutkan</button>;
             case 'Selesai':
                 return (
                     <>
                         {!ticket.proof_description && (
-                            <button onClick={() => onProofClick(ticket)} className="btn-start">Bukti</button>
+                            <button onClick={() => onProofClick(ticket)} className="btn-action btn-start">Bukti</button>
                         )}
-                        <button onClick={() => deleteTicket(ticket)} className="btn-cancel-aksi">Hapus</button>
+                        <button onClick={() => deleteTicket(ticket)} className="btn-action btn-delete-small">Hapus</button>
                     </>
                 );
             case 'Ditolak':
-                return <button onClick={() => deleteTicket(ticket)} className="btn-cancel-aksi">Hapus</button>;
+                return <button onClick={() => deleteTicket(ticket)} className="btn-action btn-delete-small">Hapus</button>;
             default:
                 return null;
         }
