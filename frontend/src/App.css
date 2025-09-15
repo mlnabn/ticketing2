@@ -7611,7 +7611,7 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .dot-blue {
-  background-color: #3b82f6;
+  background-color: #9ca3af;
   /* ditunda */
 }
 
@@ -7621,7 +7621,7 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .dot-gray {
-  background-color: #9ca3af;
+  background-color: #3b82f6;
   /* belum dikerjakan */
 }
 
@@ -7696,12 +7696,34 @@ body.dark-mode .dashboard-card h4 {
 
 .ticket-modal-card {
   background-color: hsl(210, 10%, 90%);
-  border-left: 5px solid hsl(214, 89%, 52%);
+  border-left: 5px solid transparent;
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
+/* Warna border sesuai status */
+.status-selesai {
+  border-left-color: #4caf50; /* hijau */
+}
+
+.status-ditolak {
+  border-left-color: #f44336; /* merah */
+}
+
+.status-sedang-dikerjakan {
+  border-left-color: #ff9800; /* kuning */
+}
+
+.status-ditunda {
+  border-left-color: #9e9e9e; /* biru */
+}
+
+.status-belum-dikerjakan {
+  border-left-color: #2196f3; /* abu-abu */
+}
+
 
 .ticket-modal-card:hover {
   transform: translateY(-3px);
@@ -7793,8 +7815,9 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .dark-mode .ticket-modal-card {
-  background-color: hsl(210, 10%, 20%);
-  border-left-color: hsl(214, 89%, 52%);
+  background-color: hsl(210, 10%, 20%) !important; /* abu-abu gelap */
+  color: #f5f5f5; /* teks lebih terang */
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.08);
 }
 
 .dark-mode .ticket-modal-card:hover {

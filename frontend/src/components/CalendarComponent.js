@@ -84,7 +84,7 @@ function CalendarComponent({ tickets = [], onTicketClick }) {
   return (
     <div className={wrapperClasses}>
       <Calendar
-        onClickDay={handleDayClick}   // ganti ke onClickDay biar lebih akurat
+        onClickDay={handleDayClick}
         value={date}
         className={isDarkMode ? 'react-calendar--dark' : ''}
         tileContent={tileContent}
@@ -107,7 +107,7 @@ function CalendarComponent({ tickets = [], onTicketClick }) {
               {selectedTickets.map((ticket, index) => (
                 <div
                   key={index}
-                  className={`ticket-modal-card ${isDarkMode ? 'dark-mode' : ''}`}
+                  className={`ticket-modal-card ${isDarkMode ? 'dark-mode' : ''} status-${ticket.status.toLowerCase().replace(/\s/g, '-')}`}
                   onClick={() => {
                     setShowModal(false);
                     if (onTicketClick) {
