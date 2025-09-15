@@ -1432,21 +1432,21 @@ function App() {
                                 {ticket.status === 'Selesai' && ticket.proof_description ? (
                                   <button
                                     onClick={() => handleViewProofClick(ticket)}
-                                    className="btn-start"
+                                    className="btn-action btn-start"
                                   >
                                     Lihat Bukti
                                   </button>
                                 ) : ticket.status === 'Ditolak' ? (
                                   <button
                                     onClick={() => handleShowReasonClick(ticket)}
-                                    className="btn-reason"
+                                    className="btn-action btn-start"
                                   >
                                     Alasan
                                   </button>
                                 ) : (
                                   <button
                                     onClick={() => handleDeleteClick(ticket)}
-                                    className="btn-cancel-aksi"
+                                    className="btn-action btn-delete-small"
                                   >
                                     Hapus
                                   </button>
