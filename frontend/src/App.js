@@ -148,7 +148,14 @@ function App() {
         const config = { headers: { Authorization: `Bearer ${getToken()}` } };
         let ticketsUrl = `${API_URL}/tickets?page=${page}`;
         if (search) ticketsUrl += `&search=${search}`;
-        if (status) ticketsUrl += `&status=${status}`;
+        if (status) {
+          if (Array.isArray(status)) {
+            status.forEach(s => ticketsUrl += `&status[]=${encodeURIComponent(s)}`);
+          } else {
+            ticketsUrl += `&status=${encodeURIComponent(status)}`;
+          }
+        }
+
         if (adminId) ticketsUrl += `&admin_id=${adminId}`;
         if (date) ticketsUrl += `&date=${date}`;
         if (ticketId) ticketsUrl += `&id=${ticketId}`; // ✅ tambahkan ini
@@ -462,8 +469,8 @@ function App() {
         if (error.response && error.response.status === 403) {
           showToast(error.response.data.error, 'error');
         } else {
-        showToast("Gagal menghapus tiket.", 'error'); 
-      }
+          showToast("Gagal menghapus tiket.", 'error');
+        }
       }
       finally {
         setShowConfirmModal(false);
