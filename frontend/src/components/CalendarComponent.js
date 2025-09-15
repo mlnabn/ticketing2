@@ -90,8 +90,8 @@ function CalendarComponent({ tickets = [], onTicketClick }) {
         tileContent={tileContent}
       />
 
-      <p className="calendar-info">
-        Tanggal dipilih: <b>{format(date, 'dd MMM yyyy')}</b>
+      <p className="calendar-info" style={{ fontSize: "14px" }}>
+        Tanggal dipilih: <b style={{ fontSize: "15px" }}>{format(date, 'dd MMM yyyy')}</b>
       </p>
 
       {/* Modal Detail Tiket */}

@@ -12,7 +12,29 @@ const BarChartComponent = ({ data, onBarClick }) => {
         <XAxis dataKey="name" />
         <YAxis allowDecimals={false} />
         <Tooltip />
-        <Legend />
+        <Legend
+                  verticalAlign="bottom"
+                  align="center"
+                  content={({ payload }) => (
+                    <ul style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 10 }}>
+                      {payload.map((entry, index) => (
+                        <li key={`item-${index}`} style={{ display: "flex", alignItems: "center", fontSize: 13 }}>
+                          <span
+                            style={{
+                              display: "inline-block",
+                              width: 14, // ukuran ikon
+                              height: 14,
+                              backgroundColor: entry.color,
+                              borderRadius: "50%", // biar bulat
+                              marginRight: 6
+                            }}
+                          />
+                          {entry.value} {/* label legend */}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                />
 
         {/* Tiket Selesai */}
         <Bar
@@ -30,15 +52,6 @@ const BarChartComponent = ({ data, onBarClick }) => {
           name="Sedang Dikerjakan"
           cursor="pointer"
           onClick={(entry) => onBarClick({ ...entry, status: 'Sedang Dikerjakan' })}
-        />
-
-        {/* Ditolak */}
-        <Bar
-          dataKey="ticketsRejected"
-          fill="#ff2828"
-          name="Ditolak"
-          cursor="pointer"
-          onClick={(entry) => onBarClick({ ...entry, status: 'Ditolak' })}
         />
       </BarChart>
     </ResponsiveContainer>
