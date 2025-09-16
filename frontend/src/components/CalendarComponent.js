@@ -89,6 +89,32 @@ function CalendarComponent({ tickets = [], onTicketClick }) {
         className={isDarkMode ? 'react-calendar--dark' : ''}
         tileContent={tileContent}
       />
+      <div className="ticket-legend" style={{ marginTop: "10px", fontSize: "13px" }}>
+        {/* Legend Warna */}
+        <div className="ticket-legend">
+          <div className="legend-item legend-green">
+            <span className="legend-dot dot-green"></span>
+            <span className="legend-text">Selesai</span>
+          </div>
+          <div className="legend-item legend-yellow">
+            <span className="legend-dot dot-yellow"></span>
+            <span className="legend-text">Sedang Dikerjakan</span>
+          </div>
+          <div className="legend-item legend-gray">
+            <span className="legend-dot dot-gray"></span>
+            <span className="legend-text">Belum Dikerjakan</span>
+          </div>
+          <div className="legend-item legend-blue">
+            <span className="legend-dot dot-blue"></span>
+            <span className="legend-text">Ditunda</span>
+          </div>
+          <div className="legend-item legend-red">
+            <span className="legend-dot dot-red"></span>
+            <span className="legend-text">Ditolak</span>
+          </div>
+        </div>
+
+      </div>
 
       <p className="calendar-info" style={{ fontSize: "14px" }}>
         Tanggal dipilih: <b style={{ fontSize: "15px" }}>{format(date, 'dd MMM yyyy')}</b>
