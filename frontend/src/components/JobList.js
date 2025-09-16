@@ -42,16 +42,20 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                         </>
                     );
                 }
+                // HANYA panggil updateTicketStatus
                 return <button onClick={() => updateTicketStatus(ticket.id, 'Sedang Dikerjakan')} className="btn-action btn-start">Mulai Kerjakan</button>;
             case 'Sedang Dikerjakan':
                 return (
                     <>
-                        <button onClick={() => { updateTicketStatus(ticket.id, 'Selesai'); showToast('Ticket selesai.', 'success'); }} className="btn-action btn-finish">Selesaikan</button>
-                        <button onClick={() => { updateTicketStatus(ticket.id, 'Ditunda'); showToast('Ticket ditunda.', 'info'); }} className="btn-action btn-pause">Tunda</button>
+                        {/* HAPUS showToast dari sini */}
+                        <button onClick={() => updateTicketStatus(ticket.id, 'Selesai')} className="btn-action btn-finish">Selesaikan</button>
+                        {/* HAPUS showToast dari sini */}
+                        <button onClick={() => updateTicketStatus(ticket.id, 'Ditunda')} className="btn-action btn-pause">Tunda</button>
                     </>
                 );
             case 'Ditunda':
-                return <button onClick={() => { updateTicketStatus(ticket.id, 'Sedang Dikerjakan'); showToast('Ticket dilanjutkan.', 'success'); }} className="btn-action btn-start">Lanjutkan</button>;
+                // HAPUS showToast dari sini
+                return <button onClick={() => updateTicketStatus(ticket.id, 'Sedang Dikerjakan')} className="btn-action btn-start">Lanjutkan</button>;
             case 'Selesai':
                 return (
                     <>
@@ -67,7 +71,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                 return null;
         }
     };
-    
+
     // Fungsi untuk memformat waktu pengerjaan, agar bisa dipakai di kedua tampilan
     const formatWorkTime = (ticket) => {
         if (ticket.started_at && ticket.completed_at) {
@@ -137,7 +141,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                 {tickets && tickets.length > 0 ? (
                     tickets.map(ticket => (
                         <div key={ticket.id} className="ticket-card-mobile">
-                            
+
                             <div className="card-row">
                                 <div className="data-group">
                                     <span className="label">Pengirim</span>
@@ -148,7 +152,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                                     <span className="value">{ticket.user ? ticket.user.name : '-'}</span>
                                 </div>
                             </div>
-                            
+
                             <div className="card-row">
                                 <div className="data-group single">
                                     <span className="label">Workshop</span>
@@ -162,7 +166,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                                     <span className="value description">{ticket.title}</span>
                                 </div>
                             </div>
-                            
+
                             <div className="card-row">
                                 <div className="data-group">
                                     <span className="label">Tanggal Dibuat</span>

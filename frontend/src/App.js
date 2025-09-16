@@ -1,5 +1,5 @@
 // =================================================================
-//  IMPOR LIBRARY & KOMPONЕН
+//  IMPOR LIBRARY & KOMPONEN
 // =================================================================
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { format } from 'date-fns';
@@ -66,10 +66,11 @@ function App() {
   const [unreadCount, setUnreadCount] = useState(0);
 
   // --- State Autentikasi ---
+  const initialUser = getUser(); // <-- baru: ambil user sekali (sinkron) untuk cegah flicker
   const [isLogin, setIsLogin] = useState(isLoggedIn());
-  const [userRole, setUserRole] = useState(null); // "admin" | "user"
-  const [userName, setUserName] = useState("");
-  const [loggedInUserId, setLoggedInUserId] = useState(null);
+  const [userRole, setUserRole] = useState(initialUser ? initialUser.role : null); // <-- ubah: bukan null lagi
+  const [userName, setUserName] = useState(initialUser ? initialUser.name : "");   // <-- ubah
+  const [loggedInUserId, setLoggedInUserId] = useState(initialUser ? initialUser.id : null); // <-- ubah
 
   // --- State User Management ---
   const [userToDelete, setUserToDelete] = useState(null);
@@ -318,6 +319,19 @@ function App() {
   // #4. HANDLER FUNCTIONS (Fungsi untuk Menangani Aksi Pengguna)
   // -----------------------------------------------------------------
 
+  // === Auth Success Handlers (fix error undefined) ===
+  const handleLoginSuccess = () => {
+    const u = getUser();
+    if (u) {
+      setUserRole(u.role);
+      setUserName(u.name);
+      setLoggedInUserId(u.id);
+    }
+    setIsLogin(true);
+    setAppPage('dashboard'); // opsional, bisa dihapus jika tidak diperlukan
+  };
+  const handleRegisterSuccess = handleLoginSuccess;
+
   const addTicket = async (formData) => {
     try {
       await axios.post(`${API_URL}/tickets`, formData, { headers: { Authorization: `Bearer ${getToken()}` } });
@@ -343,14 +357,29 @@ function App() {
 
   const updateTicketStatus = async (id, newStatus) => {
     try {
-      await axios.patch(`${API_URL}/tickets/${id}/status`, { status: newStatus }, { headers: { Authorization: `Bearer ${getToken()}` } });
-      fetchData(dataPage, searchQuery);
-      fetchMyTickets(myTicketsPage);
-      if (!isAdmin) {
-        fetchCreatedTickets(createdTicketsPage);
-      }
-    } catch (error) { console.error("Gagal update status:", error); }
-  };
+        // Kirim request ke server dan tunggu hasilnya
+        await axios.patch(`${API_URL}/tickets/${id}/status`, { status: newStatus }, { 
+            headers: { Authorization: `Bearer ${getToken()}` } 
+        });
+
+        // HANYA JIKA BERHASIL, tampilkan notifikasi sukses
+        showToast('Status tiket berhasil diupdate.', 'success');
+
+        // Refresh data di tabel
+        fetchData(dataPage, searchQuery);
+        fetchMyTickets(myTicketsPage);
+        if (!isAdmin) {
+            fetchCreatedTickets(createdTicketsPage);
+        }
+        
+    } catch (error) {
+        console.error("Gagal update status:", error);
+
+        // JIKA GAGAL, tampilkan pesan error dari server
+        const errorMessage = error.response?.data?.error || "Gagal mengupdate status tiket.";
+        showToast(errorMessage, 'error');
+    }
+};
 
   const handleNotificationToggle = () => {
     setUnreadCount(0);
@@ -635,6 +664,9 @@ function App() {
   const handleLogout = () => {
     logout();
     setIsLogin(false);
+    setUserRole(null);        // <-- tambahan: reset agar bersih
+    setUserName("");
+    setLoggedInUserId(null);
     setCurrentPage('Tickets');
     setDataPage(1);
     setTicketData(null);
@@ -1018,15 +1050,15 @@ function App() {
       <div className="auth-page-container">
         {showRegister ? (
           <Register
-            onRegister={() => setIsLogin(true)}
+            onRegister={handleRegisterSuccess}        // <-- ubah
             onShowLogin={() => setShowRegister(false)}
-            onBackToLanding={() => setAppPage("landing")}  // 👈 tambahin ini
+            onBackToLanding={() => setAppPage("landing")}
           />
         ) : (
           <Login
-            onLogin={() => setIsLogin(true)}
+            onLogin={handleLoginSuccess}              // <-- ubah
             onShowRegister={() => setShowRegister(true)}
-            onBackToLanding={() => setAppPage("landing")}  // 👈 tambahin ini
+            onBackToLanding={() => setAppPage("landing")}
           />
         )}
       </div>

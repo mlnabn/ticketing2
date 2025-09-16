@@ -27,7 +27,7 @@ class TicketController extends Controller
 
         $query = Ticket::with(['user', 'creator']);
 
-        // --- Jika role User (bukan admin) hanya lihat tiketnya sendiri
+        // Jika user biasa → hanya tiket miliknya
         if ($user->role !== 'admin') {
             $query->where('user_id', $user->id);
         } else {
@@ -38,7 +38,7 @@ class TicketController extends Controller
             }
         }
 
-        // --- Filter status
+        // Filter status
         if ($statusFilter) {
             if (is_array($statusFilter)) {
                 $query->whereIn('status', $statusFilter);
@@ -46,9 +46,9 @@ class TicketController extends Controller
                 if ($statusFilter === 'Belum Selesai') {
                     $query->whereIn('status', ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan']);
                 } elseif ($statusFilter === 'Selesai') {
-                    $query->where('status', 'Selesai'); // ✅ hanya selesai
+                    $query->where('status', 'Selesai');
                 } elseif ($statusFilter === 'Ditolak') {
-                    $query->where('status', 'Ditolak'); // ✅ dipisahkan
+                    $query->where('status', 'Ditolak');
                 } elseif ($statusFilter === 'Sedang Dikerjakan') {
                     $query->whereIn('status', ['Sedang Dikerjakan', 'Ditunda']);
                 } elseif (in_array($statusFilter, ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'])) {
@@ -57,12 +57,12 @@ class TicketController extends Controller
             }
         }
 
-        // --- Filter admin tertentu
+        // Filter admin tertentu
         if ($adminId) {
             $query->where('user_id', $adminId);
         }
 
-        // --- Filter tanggal
+        // Filter tanggal
         if ($date) {
             if ($statusFilter === 'Selesai' || $statusFilter === 'Ditolak') {
                 $query->whereDate('completed_at', $date);
@@ -76,7 +76,7 @@ class TicketController extends Controller
             }
         }
 
-        // --- Filter by ID
+        // Filter ID
         if ($ticketId) {
             $query->where('id', $ticketId);
         }
@@ -101,6 +101,9 @@ class TicketController extends Controller
         return response()->json($tickets);
     }
 
+    /**
+     * Generate kode tiket.
+     */
     private function generateKodeTiket($workshopName)
     {
         $workshopMap = [
@@ -137,6 +140,7 @@ class TicketController extends Controller
         $kodeTiket = $this->generateKodeTiket($validated['workshop']);
 
         $ticket = Ticket::create([
+            'kode_tiket' => $kodeTiket,
             'title' => $validated['title'],
             'workshop' => $validated['workshop'],
             'requested_time' => $validated['requested_time'] ?? null,
@@ -150,7 +154,7 @@ class TicketController extends Controller
     }
 
     /**
-     * Store dari WhatsApp
+     * Store tiket dari WhatsApp.
      */
     public function storeFromWhatsapp(Request $request)
     {
@@ -221,7 +225,7 @@ class TicketController extends Controller
     }
 
     /**
-     * Menampilkan tiket milik admin yang login
+     * Menampilkan tiket milik admin yang login.
      */
     public function myTickets(Request $request)
     {
@@ -256,22 +260,92 @@ class TicketController extends Controller
 
         $ticket->status = 'Ditolak';
         $ticket->rejection_reason = $validated['reason'];
-        $ticket->completed_at = now(); // ✅ supaya terhitung selesai proses
+        $ticket->completed_at = now();
         $ticket->save();
 
         return response()->json($ticket->load(['user', 'creator']));
     }
 
     /**
+     * Ambil tiket yang dibuat oleh user login.
+     */
+    public function createdTickets(Request $request)
+    {
+        $tickets = Ticket::with(['user', 'creator'])
+            ->where('creator_id', auth()->id())
+            ->latest()
+            ->paginate(5);
+
+        return response()->json($tickets);
+    }
+
+    /**
+     * Hapus beberapa tiket sekaligus (hanya admin).
+     */
+    public function bulkDelete(Request $request)
+    {
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'Akses ditolak.'], 403);
+        }
+
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'exists:tickets,id',
+        ]);
+
+        Ticket::whereIn('id', $validated['ids'])->delete();
+        return response()->json(['message' => 'Tiket yang dipilih telah dihapus.']);
+    }
+
+    /**
+     * Hapus satu tiket.
+     */
+    public function destroy(Ticket $ticket)
+    {
+        $user = auth()->user();
+        $isAdmin = $user->role === 'admin';
+        $isCreator = $user->id === $ticket->creator_id;
+        $isAssigneeOfCompletedTicket = ($user->id === $ticket->user_id && $ticket->status === 'Selesai');
+
+        if ($isAdmin || $isCreator || $isAssigneeOfCompletedTicket) {
+            $ticket->delete();
+            return response()->json(null, 204);
+        }
+
+        return response()->json(['error' => 'Anda tidak memiliki izin untuk menghapus tiket ini.'], 403);
+    }
+
+    /**
+     * Update status tiket.
+     */
+    /**
      * Update status tiket.
      */
     public function updateStatus(Request $request, Ticket $ticket)
     {
+        $user = auth()->user();
+
+        // --- [LOGIKA BARU] Otorisasi Kepemilikan Tiket ---
+        // 1. Pastikan yang mengubah adalah admin.
+        if ($user->role !== 'admin') {
+            return response()->json(['error' => 'Hanya admin yang bisa mengubah status.'], 403);
+        }
+
+        // 2. Jika tiket sudah ada penanggung jawabnya, pastikan hanya dia yang bisa mengubah.
+        if ($ticket->user_id && $ticket->user_id !== $user->id) {
+            return response()->json(['error' => 'Anda tidak berhak mengubah status tiket yang sedang dikerjakan oleh admin lain.'], 403);
+        }
+        // --- Akhir Logika Baru ---
+
         $validated = $request->validate(['status' => 'required|string']);
         $updateData = ['status' => $validated['status']];
 
         if ($validated['status'] === 'Sedang Dikerjakan' && is_null($ticket->started_at)) {
             $updateData['started_at'] = now();
+            // Jika tiket belum ada penanggung jawab, otomatis tugaskan ke admin yang menekan tombol.
+            if (is_null($ticket->user_id)) {
+                $updateData['user_id'] = $user->id;
+            }
         } elseif ($validated['status'] === 'Selesai') {
             $updateData['completed_at'] = now();
         } elseif ($validated['status'] === 'Ditolak') {
@@ -300,9 +374,8 @@ class TicketController extends Controller
             $stats['selesai']          = Ticket::where('status', 'Selesai')->count();
             $stats['ditolak']          = Ticket::where('status', 'Ditolak')->count();
 
-            // Agregat
-            $stats['completed_tickets'] = $stats['selesai']; // ✅ hanya selesai
-            $stats['rejected_tickets']  = $stats['ditolak']; // ✅ dipisahkan
+            $stats['completed_tickets'] = $stats['selesai'];
+            $stats['rejected_tickets']  = $stats['ditolak'];
             $stats['pending_tickets']   = $stats['belum_dikerjakan'] + $stats['ditunda'] + $stats['sedang_dikerjakan'];
         } else {
             $stats['total_tickets']    = Ticket::where('user_id', $user->id)->count();
@@ -318,5 +391,36 @@ class TicketController extends Controller
         }
 
         return response()->json($stats);
+    }
+
+    /**
+     * Submit bukti penyelesaian tiket.
+     */
+    public function submitProof(Request $request, $id)
+    {
+        $request->validate([
+            'proof_description' => 'required|string',
+            'proof_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $ticket = Ticket::findOrFail($id);
+
+        if (auth()->user()->id !== $ticket->user_id) {
+            return response()->json(['error' => 'Anda tidak berwenang untuk aksi ini.'], 403);
+        }
+
+        $ticket->proof_description = $request->proof_description;
+
+        if ($request->hasFile('proof_image')) {
+            if ($ticket->proof_image_path) {
+                Storage::disk('public')->delete($ticket->proof_image_path);
+            }
+            $path = $request->file('proof_image')->store('proofs', 'public');
+            $ticket->proof_image_path = $path;
+        }
+
+        $ticket->save();
+
+        return response()->json($ticket);
     }
 }
