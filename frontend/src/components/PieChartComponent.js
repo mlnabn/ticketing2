@@ -5,10 +5,13 @@ const PieChartComponent = ({ stats, handleHomeClick, handleStatusFilterClick, st
   if (!stats) return null;
 
   const data = [
-    { name: 'Ditunda', value: stats.ditunda },
-    { name: 'Selesai', value: stats.selesai },
-    { name: 'Ditolak', value: stats.ditolak },
+    { name: 'Ditunda', value: stats.ditunda || 0, color: '#95a5a6', dotClass: 'dot-gray' },
+    { name: 'Selesai', value: stats.selesai || 0, color: '#82ca9d', dotClass: 'dot-green' },
+    { name: 'Ditolak', value: stats.ditolak || 0, color: '#ff2828', dotClass: 'dot-red' },
+    { name: 'Belum Dikerjakan', value: stats.belum_dikerjakan || 0, color: '#3498db', dotClass: 'dot-blue' },
   ];
+
+
 
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
@@ -17,8 +20,6 @@ const PieChartComponent = ({ stats, handleHomeClick, handleStatusFilterClick, st
     percent: total > 0 ? ((item.value / total) * 100).toFixed(1) : 0,
   }));
 
-  const COLORS = ['#95a5a6', '#82ca9d', '#ff2828'];
-
   const onPieClick = (entry) => {
     if (!entry || !entry.name) return;
     handleHomeClick();
@@ -26,18 +27,18 @@ const PieChartComponent = ({ stats, handleHomeClick, handleStatusFilterClick, st
   };
 
   return (
-    <div style={{ width: "100%", height: 320, display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div style={{ width: "100%", height: 300, display: "flex", flexDirection: "column", alignItems: "center" }}>
       {/* Chart */}
-      <div style={{ width: "100%", height: 250 }}>
+      <div style={{ width: "100%", height: 240 }}>
         <ResponsiveContainer>
           <PieChart>
             <Pie
               data={dataWithPercent}
               cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={90}
-              paddingAngle={2}
+              cy="45%"
+              innerRadius={40}
+              outerRadius={70}
+              paddingAngle={0}
               dataKey="value"
               onClick={(entry) => onPieClick(entry.payload)}
               label={({ percent, x, y, fill }) => (
@@ -56,7 +57,7 @@ const PieChartComponent = ({ stats, handleHomeClick, handleStatusFilterClick, st
               {dataWithPercent.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
+                  fill={entry.color}
                   cursor="pointer"
                   stroke={statusFilter === entry.name ? '#000' : 'none'}
                   strokeWidth={statusFilter === entry.name ? 3 : 0}
@@ -73,31 +74,14 @@ const PieChartComponent = ({ stats, handleHomeClick, handleStatusFilterClick, st
         </ResponsiveContainer>
       </div>
 
-      {/* Legend (dipisah biar ga ngedorong chart) */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: 20,
-          marginTop: -10, // atur supaya lebih dekat ke chart
-        }}
-      >
+      {/* Legend model sama kayak LineChart */}
+      <div className="chart-legend">
         {dataWithPercent.map((entry, index) => (
-          <div
-            key={index}
-            style={{ display: "flex", alignItems: "center", fontSize: 13 }}
-          >
-            <span
-              style={{
-                display: "inline-block",
-                width: 14,
-                height: 14,
-                backgroundColor: COLORS[index],
-                borderRadius: "50%",
-                marginRight: 6,
-              }}
-            />
-            {entry.name} ({entry.value})
+          <div className="legend-item2" key={index}>
+            <span className={`legend-dot ${entry.dotClass}`}></span>
+            <span className="legend-text">
+              {entry.name} ({entry.value})
+            </span>
           </div>
         ))}
       </div>

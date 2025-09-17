@@ -100,12 +100,12 @@ function CalendarComponent({ tickets = [], onTicketClick }) {
             <span className="legend-dot dot-yellow"></span>
             <span className="legend-text">Sedang Dikerjakan</span>
           </div>
-          <div className="legend-item legend-gray">
-            <span className="legend-dot dot-gray"></span>
-            <span className="legend-text">Belum Dikerjakan</span>
-          </div>
           <div className="legend-item legend-blue">
             <span className="legend-dot dot-blue"></span>
+            <span className="legend-text">Belum Dikerjakan</span>
+          </div>
+          <div className="legend-item legend-gray">
+            <span className="legend-dot dot-gray"></span>
             <span className="legend-text">Ditunda</span>
           </div>
           <div className="legend-item legend-red">
