@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
@@ -17,26 +19,37 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
-            // 'division' => 'nullable|string|max:255' opsional, jika form frontend menampung ini
+            'phone' => 'required|string|min:10|unique:users',
         ]);
+
+         $otpCode = rand(100000, 999999);
+        $otpExpiresAt = Carbon::now()->addMinutes(5);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'phone' => $request->phone,
             'role' => 'user', // secara default user biasa
-            // 'division' => $request->division ?? null, jika disediakan
+            'otp_code' => $otpCode, // Simpan OTP
+            'otp_expires_at' => $otpExpiresAt,
         ]);
 
+        $n8nWebhookUrl = 'http://localhost:5678/webhook/whatsapp-otp';
+
         try {
-            $token = JWTAuth::fromUser($user);
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
+            Http::get($n8nWebhookUrl, [
+                'phone' => $user->phone,
+                'otp' => $otpCode,
+            ]);
+        } catch (\Exception $e) {
+            $user->delete(); 
+            return response()->json(['message' => 'Gagal mengirim OTP. Silakan coba lagi.'], 503);
         }
 
         return response()->json([
-            'token' => $token,
-            'user' => $user,
+            'message' => 'Registrasi berhasil. Silakan cek WhatsApp Anda untuk kode verifikasi.',
+            'phone' => $user->phone
         ], 201);
     }
 
