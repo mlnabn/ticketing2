@@ -6,10 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str; // Import Str
+use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -109,6 +113,54 @@ class AuthController extends Controller
             return response()->json($user);
         } catch (JWTException $e) {
             return response()->json(['error' => 'Failed to update user'], 500);
+        }
+    }
+
+    public function redirectToGoogle()
+{
+    return Socialite::driver('google')
+        ->stateless()
+        ->with(['prompt' => 'select_account']) 
+        ->redirect();
+}
+
+    /**
+     * Menangani callback dari Google setelah otentikasi.
+     */
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->user();
+            
+            // Menggunakan firstOrNew untuk mendapatkan instance user, baik baru maupun yang sudah ada
+            $user = User::firstOrNew(['email' => $googleUser->getEmail()]);
+
+            // Isi atau update data
+            $user->name = $googleUser->getName();
+            $user->google_id = $googleUser->getId();
+            $user->avatar = $googleUser->getAvatar();
+            
+            // Jika user baru (belum ada di DB), beri password acak dan role default
+            if (!$user->exists) {
+                $user->password = Hash::make(Str::random(24));
+                $user->role = 'user'; // Atur role default untuk pendaftar baru via Google
+            }
+            
+            $user->save(); // Simpan perubahan atau user baru
+
+            // Buat token JWT untuk user tersebut
+            $token = JWTAuth::fromUser($user);
+            
+            // PERBAIKAN: Kirim token DAN user object yang sudah di-encode ke frontend
+            // Ini akan menyamakan alur data dengan login manual
+            $user_data = urlencode(json_encode($user));
+
+            return redirect('http://localhost:3000?token=' . $token . '&user=' . $user_data);
+
+        } catch (Exception $e) {
+            // Log error untuk debugging di sisi server
+            \Log::error('Google Callback Error: '.$e->getMessage());
+            return redirect('http://localhost:3000/login?error=google_auth_failed');
         }
     }
 }

@@ -25,6 +25,8 @@ class User extends Authenticatable implements JWTSubject
         'otp_code',
         'otp_expires_at',
         'phone_verified_at',
+        'google_id',
+        'avatar',
     ];
 
     /**

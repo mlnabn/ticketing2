@@ -20,7 +20,7 @@ import ProofModal from './components/ProofModal';
 import ViewProofModal from './components/ViewProofModal';
 import Pagination from './components/Pagination';
 import PaginationUser from './components/PaginationUser';
-import { getToken, isLoggedIn, logout, getUser } from './auth';
+import { getToken, isLoggedIn, logout, getUser, login } from './auth';
 import './App.css';
 import loginBackground from './Image/LoginBg.jpg';
 import bgImage from './Image/homeBg.jpg';
@@ -65,6 +65,8 @@ function App() {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const [appPage, setAppPage] = useState("loading");
+
   // --- State Autentikasi ---
   const initialUser = getUser(); // <-- baru: ambil user sekali (sinkron) untuk cegah flicker
   const [isLogin, setIsLogin] = useState(isLoggedIn());
@@ -79,7 +81,6 @@ function App() {
   const [userToEdit, setUserToEdit] = useState(null);
 
   // --- State Navigasi ---
-  const [appPage, setAppPage] = useState("landing"); // "landing" | "login" | "register" | "dashboard"
   const [publicPage, setPublicPage] = useState("home"); // khusus landing
   const [currentPage, setCurrentPage] = useState("Welcome"); // admin dashboard
   const [userViewTab, setUserViewTab] = useState("request"); // user dashboard
@@ -320,16 +321,40 @@ function App() {
   // -----------------------------------------------------------------
 
   // === Auth Success Handlers (fix error undefined) ===
-  const handleLoginSuccess = () => {
+  const handleLogout = useCallback(() => {
+    logout();
+    setIsLogin(false);
+    setUserRole(null);
+    setUserName("");
+    setLoggedInUserId(null);
+    setAppPage("landing");
+    setCurrentPage('Tickets');
+    setDataPage(1);
+    setTicketData(null);
+    setStats(null);
+    setCreatedTicketsData(null);
+    setSearchQuery('');
+    setSearchInput('');
+  }, []);
+
+  const handleLoginSuccess = useCallback(() => {
     const u = getUser();
     if (u) {
+      setIsLogin(true);
       setUserRole(u.role);
       setUserName(u.name);
       setLoggedInUserId(u.id);
+      if (u.role === 'admin') {
+        setAppPage("dashboard");
+        setCurrentPage("Welcome");
+      } else {
+        setAppPage("user_dashboard");
+      }
+    } else {
+      // Jika karena suatu hal user tidak ditemukan, paksa logout
+      handleLogout();
     }
-    setIsLogin(true);
-    setAppPage('dashboard'); // opsional, bisa dihapus jika tidak diperlukan
-  };
+  }, [handleLogout]);
   const handleRegisterSuccess = handleLoginSuccess;
 
   const addTicket = async (formData) => {
@@ -660,21 +685,6 @@ function App() {
     setUserSearchQuery(query);
   };
   const handleCreatedTicketsPageChange = (page) => setCreatedTicketsPage(page);
-
-  const handleLogout = () => {
-    logout();
-    setIsLogin(false);
-    setUserRole(null);        // <-- tambahan: reset agar bersih
-    setUserName("");
-    setLoggedInUserId(null);
-    setCurrentPage('Tickets');
-    setDataPage(1);
-    setTicketData(null);
-    setStats(null);
-    setCreatedTicketsData(null);
-    setSearchQuery('');
-    setSearchInput('');
-  };
   const toggleDarkMode = () => setDarkMode(!darkMode);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -690,6 +700,35 @@ function App() {
   // -----------------------------------------------------------------
   // #2. SIDE EFFECTS (useEffect Hooks)
   // -----------------------------------------------------------------
+
+  useEffect(() => {
+    const initializeApp = () => {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+      const userParam = params.get('user');
+
+      if (token && userParam) {
+        // Skenario 1: Baru kembali dari login Google
+        try {
+            const user = JSON.parse(decodeURIComponent(userParam));
+            login(token, user); // Simpan token DAN user
+            handleLoginSuccess();
+            // Hapus parameter dari URL agar bersih
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } catch (e) {
+            console.error("Gagal mem-parsing data user dari URL", e);
+            setAppPage("landing");
+        }
+      } else if (isLoggedIn()) {
+        // Skenario 2: Sesi login sudah ada di localStorage
+        handleLoginSuccess();
+      } else {
+        // Skenario 3: Tidak ada sesi login, tampilkan landing page
+        setAppPage("landing");
+      }
+    };
+    initializeApp();
+  }, [handleLoginSuccess]);
 
   useEffect(() => {
     const path = window.location.pathname.split('/');

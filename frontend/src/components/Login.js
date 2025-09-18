@@ -3,6 +3,7 @@ import axios from 'axios';
 import { login } from '../auth';
 import '../App.css';
 import bgImage2 from '../Image/Login.png';
+import { FaGoogle } from 'react-icons/fa';
 
 const API_URL = 'http://127.0.0.1:8000/api';
 
@@ -38,6 +39,11 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {   // 👈 tambah 
   const handleForgotPassword = () => {
     alert('Silakan hubungi admin atau reset melalui email.');
   };
+
+  const handleGoogleLogin = () => {
+        // Arahkan ke endpoint redirect di backend Laravel Anda
+        window.location.href = 'http://127.0.0.1:8000/api/auth/google/redirect';
+    };
 
   return (
     <div className="auth-page-container">
@@ -86,6 +92,13 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {   // 👈 tambah 
 
             <button type="submit" className="login-btn" disabled={loading}>
               {loading ? 'Processing...' : 'Login'}
+            </button>
+
+            <div className="divider">atau</div>
+
+            <button onClick={handleGoogleLogin} className="google-login-button">
+                <FaGoogle style={{ marginRight: '10px' }} />
+                Sign in with Google
             </button>
 
             <p className="auth-toggle">

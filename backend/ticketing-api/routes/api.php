@@ -22,6 +22,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/tickets/by-code/{kode_tiket}', [TicketController::class, 'showByCode']);
 Route::post('/otp/send', [OtpController::class, 'sendOtp']);
 Route::post('/otp/verify', [OtpController::class, 'verifyOtp']);
+Route::get('/auth/google/redirect', [AuthController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
 Route::post('/tickets/whatsapp', [TicketController::class, 'storeFromWhatsapp'])->middleware('apikey.auth');
 
