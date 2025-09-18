@@ -51,6 +51,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users',
+            'phone'    => 'required|string|min:10|unique:users',
             'password' => 'required|string|min:6|confirmed',
             'role'     => 'required|in:admin,user',
         ]);
@@ -58,6 +59,7 @@ class UserController extends Controller
         $user = User::create([
             'name'     => $validated['name'],
             'email'    => $validated['email'],
+            'phone'    => $validated['phone'],
             'password' => bcrypt($validated['password']),
             'role'     => $validated['role'], 
         ]);
@@ -92,6 +94,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             // Pastikan email unik, kecuali untuk user yang sedang diedit
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'phone' => ['required', 'string', 'min:10', Rule::unique('users')->ignore($user->id)],
             // Password bersifat opsional: hanya divalidasi jika tidak kosong
             'password' => 'nullable|string|min:8|confirmed',
             'role' => 'required|in:admin,user',
@@ -100,6 +103,7 @@ class UserController extends Controller
         // Update data nama dan email
         $user->name = $validated['name'];
         $user->email = $validated['email'];
+        $user->phone = $validated['phone'];
         $user->role = $validated['role'];
 
         // Jika field password diisi oleh admin, maka hash dan update passwordnya

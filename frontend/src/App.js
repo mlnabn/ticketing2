@@ -40,6 +40,8 @@ import FAQPage from './components/FAQPage';
 import CalendarComponent from './components/CalendarComponent';
 import Toast from './components/Toast';
 import { AnimatePresence } from 'framer-motion';
+import ProfileModal from './components/ProfileModal';
+import AvatarUploader from './components/AvatarUploader';
 
 
 // =================================================================
@@ -123,7 +125,10 @@ function App() {
   const [allTickets, setAllTickets] = useState([]);
 
 
+
   // === State ===
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [currentUserProfile, setCurrentUserProfile] = useState(null);
   const [userAvatar, setUserAvatar] = useState(null);
   const [toasts, setToasts] = useState([]);
 
@@ -318,18 +323,63 @@ function App() {
   // -----------------------------------------------------------------
   // #4. HANDLER FUNCTIONS (Fungsi untuk Menangani Aksi Pengguna)
   // -----------------------------------------------------------------
+  // buka modal profil
+  const handleOpenProfileModal = () => {
+    setCurrentUserProfile(getUser());
+    setShowProfileModal(true);
+  };
+
+  // callback saat profil berhasil disimpan
+  const handleProfileSaved = (updatedUser) => {
+    setUserName(updatedUser.name);
+    setUserAvatar(updatedUser.avatar_url || null);
+    localStorage.removeItem("user");
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    try {
+      const stored = JSON.parse(localStorage.getItem('user') || '{}');
+      const merged = { ...stored, ...updatedUser };
+      localStorage.setItem('user', JSON.stringify(merged));
+    } catch (e) { }
+
+    fetchAllUsers();
+    fetchUsers(1, '');
+  };
+
 
   // === Auth Success Handlers (fix error undefined) ===
-  const handleLoginSuccess = () => {
-    const u = getUser();
-    if (u) {
-      setUserRole(u.role);
+  const handleLoginSuccess = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/user`, {
+        headers: { Authorization: `Bearer ${getToken()}` }
+      });
+      const u = res.data;
+
+      // Hapus cache lama biar nggak bentrok
+      localStorage.removeItem("user");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("userAvatar");
+
+      // Simpan data user baru
+      localStorage.setItem("user", JSON.stringify(u));
+      localStorage.setItem("userName", u.name);
+      if (u.avatar_url) localStorage.setItem("userAvatar", u.avatar_url);
+
+      // Update state
+      setUserRole(u.role || null);
       setUserName(u.name);
+      setUserAvatar(u.avatar_url || null);
       setLoggedInUserId(u.id);
+
+    } catch (err) {
+      console.error("Gagal fetch user setelah login:", err);
     }
+
     setIsLogin(true);
-    setAppPage('dashboard'); // opsional, bisa dihapus jika tidak diperlukan
+    setAppPage("dashboard");
   };
+
+
   const handleRegisterSuccess = handleLoginSuccess;
 
   const addTicket = async (formData) => {
@@ -357,29 +407,29 @@ function App() {
 
   const updateTicketStatus = async (id, newStatus) => {
     try {
-        // Kirim request ke server dan tunggu hasilnya
-        await axios.patch(`${API_URL}/tickets/${id}/status`, { status: newStatus }, { 
-            headers: { Authorization: `Bearer ${getToken()}` } 
-        });
+      // Kirim request ke server dan tunggu hasilnya
+      await axios.patch(`${API_URL}/tickets/${id}/status`, { status: newStatus }, {
+        headers: { Authorization: `Bearer ${getToken()}` }
+      });
 
-        // HANYA JIKA BERHASIL, tampilkan notifikasi sukses
-        showToast('Status tiket berhasil diupdate.', 'success');
+      // HANYA JIKA BERHASIL, tampilkan notifikasi sukses
+      showToast('Status tiket berhasil diupdate.', 'success');
 
-        // Refresh data di tabel
-        fetchData(dataPage, searchQuery);
-        fetchMyTickets(myTicketsPage);
-        if (!isAdmin) {
-            fetchCreatedTickets(createdTicketsPage);
-        }
-        
+      // Refresh data di tabel
+      fetchData(dataPage, searchQuery);
+      fetchMyTickets(myTicketsPage);
+      if (!isAdmin) {
+        fetchCreatedTickets(createdTicketsPage);
+      }
+
     } catch (error) {
-        console.error("Gagal update status:", error);
+      console.error("Gagal update status:", error);
 
-        // JIKA GAGAL, tampilkan pesan error dari server
-        const errorMessage = error.response?.data?.error || "Gagal mengupdate status tiket.";
-        showToast(errorMessage, 'error');
+      // JIKA GAGAL, tampilkan pesan error dari server
+      const errorMessage = error.response?.data?.error || "Gagal mengupdate status tiket.";
+      showToast(errorMessage, 'error');
     }
-};
+  };
 
   const handleNotificationToggle = () => {
     setUnreadCount(0);
@@ -662,6 +712,10 @@ function App() {
   const handleCreatedTicketsPageChange = (page) => setCreatedTicketsPage(page);
 
   const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userAvatar");
+
     logout();
     setIsLogin(false);
     setUserRole(null);        // <-- tambahan: reset agar bersih
@@ -690,6 +744,30 @@ function App() {
   // -----------------------------------------------------------------
   // #2. SIDE EFFECTS (useEffect Hooks)
   // -----------------------------------------------------------------
+  useEffect(() => {
+    if (isLogin) {
+      const u = getUser();
+      if (u) {
+        setCurrentUserProfile(u);
+        setUserName(u.name);
+        setUserAvatar(u.avatar_url || null);
+        setLoggedInUserId(u.id);
+      }
+    }
+  }, [isLogin]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("user");
+    if (stored) {
+      const u = JSON.parse(stored);
+      setUserName(u.name);
+      setUserAvatar(u.avatar_url || null);
+      setLoggedInUserId(u.id);
+      setUserRole(u.role || null);
+      setIsLogin(true);
+    }
+  }, []);
+
 
   useEffect(() => {
     const path = window.location.pathname.split('/');
@@ -1395,6 +1473,7 @@ function App() {
               unreadCount={unreadCount}
               handleNotificationToggle={handleNotificationToggle}
               handleDeleteNotification={handleDeleteNotification}
+              onEditProfile={handleOpenProfileModal}
             />
 
           </div>
@@ -1518,6 +1597,13 @@ function App() {
 
       {showViewProofModal && ticketToShowProof && (
         <ViewProofModal ticket={ticketToShowProof} onClose={handleCloseViewProofModal} onDelete={handleDeleteFromViewProofModal} />
+      )}
+      {showProfileModal && currentUserProfile && (
+        <ProfileModal
+          user={currentUserProfile}
+          onClose={() => setShowProfileModal(false)}
+          onSaved={handleProfileSaved}
+        />
       )}
       {showRejectionInfoModal && ticketToShowReason && (
         <RejectionInfoModal ticket={ticketToShowReason} onClose={handleCloseReasonModal} onDelete={handleDeleteFromReasonModal} />

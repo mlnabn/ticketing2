@@ -5,11 +5,12 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     password: '',
     password_confirmation: '',
     role: 'user',
   });
-  
+
   const isEditMode = Boolean(userToEdit);
 
   useEffect(() => {
@@ -17,12 +18,13 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
       setFormData({
         name: userToEdit.name,
         email: userToEdit.email,
+        phone: userToEdit.phone || '',
         password: '',
         password_confirmation: '',
         role: userToEdit.role,
       });
     } else {
-      setFormData({ name: '', email: '', password: '', password_confirmation: '', role: 'user' });
+      setFormData({ name: '', email: '', phone: '', password: '', password_confirmation: '', role: 'user' });
     }
   }, [userToEdit, isEditMode]);
 
@@ -50,6 +52,18 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
               <label htmlFor="email">Email:</label>
               <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
             </div>
+            <div>
+              <label htmlFor="phone">Nomor Telepon:</label>
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
             <div>
               <label htmlFor="role">Peran:</label>
               <select id="role" name="role" value={formData.role} onChange={handleChange} required className="form-input">
