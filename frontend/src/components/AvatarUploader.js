@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+
+import { IoClose } from "react-icons/io5";
 
 const AvatarUploader = ({ initialAvatar, onFileSelect }) => {
   const [preview, setPreview] = useState(initialAvatar || null);
+  const [showFullPreview, setShowFullPreview] = useState(false); // state untuk modal preview
 
   useEffect(() => {
     setPreview(initialAvatar || null);
@@ -11,19 +14,47 @@ const AvatarUploader = ({ initialAvatar, onFileSelect }) => {
     const file = e.target.files[0];
     if (!file) return;
     setPreview(URL.createObjectURL(file));
-    onFileSelect(file); // kirim File ke parent untuk di-append ke FormData nanti
+    onFileSelect(file);
   };
 
   return (
     <div className="avatar-uploader">
-      <div className="avatar-preview" style={{marginBottom: 8}}>
+      {/* Avatar kecil (klik untuk lihat full) */}
+      <div
+        className="avatar-preview"
+        onClick={() => preview && setShowFullPreview(true)}
+        style={{ cursor: preview ? "pointer" : "default" }}
+      >
         {preview ? (
-          <img src={preview} alt="avatar preview" style={{width: 96, height: 96, borderRadius: '50%', objectFit: 'cover'}}/>
+          <img src={preview} alt="avatar preview" />
         ) : (
-          <div style={{width: 96, height: 96, borderRadius: '50%', background:'#eee', display:'flex',alignItems:'center',justifyContent:'center'}}>No Avatar</div>
+          <span>No Avatar</span>
         )}
       </div>
-      <input type="file" accept="image/*" onChange={handleFileChange} />
+
+      {/* Custom label trigger input */}
+      <label htmlFor="avatarInput">Ganti Avatar</label>
+      <input
+        id="avatarInput"
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+      />
+
+      {/* Modal full preview */}
+      {showFullPreview && (
+        <div className="avatar-modal-overlay" onClick={() => setShowFullPreview(false)}>
+          <div
+            className="avatar-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img src={preview} alt="Full Avatar" />
+            <button className="btn-ttp" onClick={() => setShowFullPreview(false)}>
+              <IoClose size={20} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

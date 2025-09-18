@@ -73,31 +73,31 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content" style={{ maxWidth: 700 }}>
+    <div className="modal-overlay4">
+      <div className="modal-content4" style={{ maxWidth: 700 }}>
         <h2>Edit Profil</h2>
 
         <AvatarUploader initialAvatar={initialAvatar} onFileSelect={handleFileSelect} />
 
-        <div className="form-group">
+        <div className="form-group4">
           <label>Nama</label>
           <input value={name} onChange={(e) => setName(e.target.value)} />
         </div>
 
-        <div className="form-group">
+        <div className="form-group4">
           <label>Email</label>
           <input value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
 
-        <div className="form-group">
+        <div className="form-group4">
           <label>Nomor Telepon</label>
           <input
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
-          
+
         </div>
-        <div className="form-group">
+        <div className="form-group4">
           <label>
             Password <small>(Kosongkan jika tidak diubah)</small>
           </label>
@@ -108,7 +108,7 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
           />
         </div>
 
-        <div className="form-group">
+        <div className="form-group4">
           <label>Konfirmasi Password</label>
           <input
             type="password"
@@ -120,10 +120,10 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
         {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
 
         <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-          <button onClick={onClose} disabled={loading} className="btn btn-secondary">
+          <button onClick={onClose} disabled={loading} className="btn btn-cancel">
             Batal
           </button>
-          <button onClick={handleSave} disabled={loading} className="btn btn-primary">
+          <button onClick={handleSave} disabled={loading} className="btn btn-confirm">
             {loading ? 'Menyimpan...' : 'Simpan'}
           </button>
         </div>
