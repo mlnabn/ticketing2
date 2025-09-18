@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -6,28 +6,43 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer
 } from "recharts";
 import dayjs from "dayjs";
 
 const LineChartComponent = ({ data, onPointClick }) => {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // ambil status darkmode dari localStorage
+  useEffect(() => {
+    const updateModeFromStorage = () => {
+      const savedMode = localStorage.getItem("darkMode");
+      if (savedMode !== null) {
+        setIsDarkMode(JSON.parse(savedMode));
+      }
+    };
+
+    updateModeFromStorage();
+    window.addEventListener("storage", updateModeFromStorage);
+
+    return () => {
+      window.removeEventListener("storage", updateModeFromStorage);
+    };
+  }, []);
+
   if (!data || data.length === 0) return null;
 
-  // Ubah semua date ke timestamp (biar bisa pakai scale time)
   const formattedData = data.map((d) => ({
     ...d,
-    date: new Date(d.date).getTime() // jadikan timestamp
+    date: new Date(d.date).getTime()
   }));
 
-  // Hitung nilai maksimum Y
   const maxValue = Math.max(
     ...formattedData.map((d) =>
       Math.max(d.belum || 0, d.sedang || 0, d.selesai || 0, d.ditolak || 0)
     )
   );
 
-  // Handler klik titik chart
   const handlePointClick = (dataPoint, status) => {
     if (onPointClick) {
       onPointClick(status, dayjs(dataPoint.date).format("YYYY-MM-DD"));
@@ -35,111 +50,119 @@ const LineChartComponent = ({ data, onPointClick }) => {
   };
 
   return (
-    <ResponsiveContainer width="100%" height={280}>
-      <LineChart
-        data={formattedData}
-        margin={{ top: 10, right: 30, left: 10, bottom: 30 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
+    <div className="linechart-wrapper">
+      <ResponsiveContainer width="100%" height={220}>
+        <LineChart
+          data={formattedData}
+          margin={{ top: 10, right: 30, left: -10, bottom: 30 }}
+        >
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke={isDarkMode ? "#444" : "#ddd"}
+          />
 
-        {/* Sumbu X pakai scale waktu */}
-        <XAxis
-          dataKey="date"
-          type="number"
-          scale="time"
-          domain={["auto", "auto"]}
-          tickFormatter={(date) => dayjs(date).format("DD/MM")}
-          tick={{ fontSize: 11 }}
-          tickMargin={10}
-        />
+          <XAxis
+            dataKey="date"
+            type="number"
+            scale="time"
+            domain={["auto", "auto"]}
+            tickFormatter={(date) => dayjs(date).format("DD/MM")}
+            tick={{ fontSize: 11 }}
+            tickMargin={10}
+            axisLine={{ stroke: isDarkMode ? "#888" : "#ccc" }}
+            tickLine={{ stroke: isDarkMode ? "#888" : "#ccc" }}
+          />
 
-        {/* Sumbu Y hanya genap */}
-        <YAxis
-          allowDecimals={false}
-          tick={{ fontSize: 11 }}
-          domain={[0, maxValue + 2]}
-          ticks={Array.from(
-            { length: Math.ceil((maxValue + 2) / 2) + 1 },
-            (_, i) => i * 2
-          )}
-        />
+          <YAxis
+            allowDecimals={false}
+            tick={{ fontSize: 11 }}
+            domain={[0, maxValue + 2]}
+            ticks={Array.from(
+              { length: Math.ceil((maxValue + 2) / 2) + 1 },
+              (_, i) => i * 2
+            )}
+            axisLine={{ stroke: isDarkMode ? "#888" : "#ccc" }}
+            tickLine={{ stroke: isDarkMode ? "#888" : "#ccc" }}
+          />
 
-        <Tooltip
-          labelFormatter={(label) => dayjs(label).format("DD MMM YYYY")}
-        />
-        <Legend
-          verticalAlign="bottom"
-          align="center"
-          content={({ payload }) => (
-            <ul style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 10 }}>
-              {payload.map((entry, index) => (
-                <li key={`item-${index}`} style={{ display: "flex", alignItems: "center", fontSize: 13 }}>
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: 14, // ukuran ikon
-                      height: 14,
-                      backgroundColor: entry.color,
-                      borderRadius: "50%", // biar bulat
-                      marginRight: 6
-                    }}
-                  />
-                  {entry.value} {/* label legend */}
-                </li>
-              ))}
-            </ul>
-          )}
-        />
+          <Tooltip
+            labelFormatter={(label) => dayjs(label).format("DD MMM YYYY")}
+            contentStyle={{
+              backgroundColor: isDarkMode ? "#2c2c2c" : "#fff",
+              border: "1px solid",
+              borderColor: isDarkMode ? "#555" : "#ccc",
+              color: isDarkMode ? "#fff" : "#333",
+              fontSize: "12px"
+            }}
+          />
 
-        <Line
-          type="monotone"
-          dataKey="belum"
-          stroke="#8884d8"
-          name="Belum Dikerjakan"
-          activeDot={{
-            onClick: (e, payload) =>
-              handlePointClick(payload.payload, "Belum Dikerjakan"),
-            cursor: "pointer"
-          }}
-        />
+          <Line
+            type="monotone"
+            dataKey="belum"
+            stroke="#2196f3"
+            name="Belum Dikerjakan"
+            activeDot={{
+              onClick: (e, payload) =>
+                handlePointClick(payload.payload, "Belum Dikerjakan"),
+              cursor: "pointer"
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="sedang"
+            stroke="#FFBB28"
+            name="Sedang Dikerjakan"
+            activeDot={{
+              onClick: (e, payload) =>
+                handlePointClick(payload.payload, "Sedang Dikerjakan"),
+              cursor: "pointer"
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="selesai"
+            stroke="#82ca9d"
+            name="Selesai"
+            activeDot={{
+              onClick: (e, payload) =>
+                handlePointClick(payload.payload, "Selesai"),
+              cursor: "pointer"
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="ditolak"
+            stroke="#ff2828"
+            name="Ditolak"
+            activeDot={{
+              onClick: (e, payload) =>
+                handlePointClick(payload.payload, "Ditolak"),
+              cursor: "pointer"
+            }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
 
-        <Line
-          type="monotone"
-          dataKey="sedang"
-          stroke="#FFBB28"
-          name="Sedang Dikerjakan"
-          activeDot={{
-            onClick: (e, payload) =>
-              handlePointClick(payload.payload, "Sedang Dikerjakan"),
-            cursor: "pointer"
-          }}
-        />
-
-        <Line
-          type="monotone"
-          dataKey="selesai"
-          stroke="#82ca9d"
-          name="Selesai"
-          activeDot={{
-            onClick: (e, payload) =>
-              handlePointClick(payload.payload, "Selesai"),
-            cursor: "pointer"
-          }}
-        />
-
-        <Line
-          type="monotone"
-          dataKey="ditolak"
-          stroke="#ff2828"
-          name="Ditolak"
-          activeDot={{
-            onClick: (e, payload) =>
-              handlePointClick(payload.payload, "Ditolak"),
-            cursor: "pointer"
-          }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+      {/* Legend di luar chart */}
+      <div className="chart-legend">
+        <div className="legend-item2">
+          <span className="legend-dot dot-blue"></span>
+          <span className="legend-text">Belum Dikerjakan</span>
+        </div>
+        <div className="legend-item2">
+          <span className="legend-dot dot-yellow"></span>
+          <span className="legend-text">Sedang Dikerjakan</span>
+        </div>
+        <div className="legend-item2">
+          <span className="legend-dot dot-green"></span>
+          <span className="legend-text">Selesai</span>
+        </div>
+        <div className="legend-item2">
+          <span className="legend-dot dot-red"></span>
+          <span className="legend-text">Ditolak</span>
+        </div>
+      </div>
+    </div>
   );
 };
 

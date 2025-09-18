@@ -9,15 +9,22 @@ const UserHeader = ({
   notifications,
   unreadCount,
   handleNotificationToggle,
-  handleDeleteNotification
+  handleDeleteNotification,
+  onEditProfile, // ✅ tambah prop baru
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // fungsi cek apakah avatar valid
-  const isValidAvatar = (userAvatar && userAvatar.startsWith("data:image")) || userAvatar?.startsWith("http");
+  // cek apakah avatar valid (harus berupa URL atau base64 data:image)
+  const isValidAvatar =
+    typeof userAvatar === 'string' &&
+    (userAvatar.startsWith('http') || userAvatar.startsWith('data:image'));
 
   return (
-    <div className="user-header" style={{ display: 'flex', alignItems: 'center', gap: '15px', position: 'relative' }}>
+    <div
+      className="user-header"
+      style={{ display: 'flex', alignItems: 'center', gap: '15px', position: 'relative' }}
+    >
+      {/* Notifikasi */}
       <NotificationBell
         notifications={notifications}
         unreadCount={unreadCount}
@@ -29,6 +36,7 @@ const UserHeader = ({
       <div
         className="user-avatar2-container"
         onClick={() => setDropdownOpen(!dropdownOpen)}
+        style={{ cursor: 'pointer' }}
       >
         <div className="user-avatar2">
           {isValidAvatar ? (
@@ -43,16 +51,32 @@ const UserHeader = ({
       {/* Dropdown */}
       {dropdownOpen && (
         <>
-          {/* Overlay blur background */}
+          {/* Overlay agar klik di luar bisa menutup */}
           <div
             className="dropdown-overlay"
-            onClick={() => setDropdownOpen(false)} // klik di luar nutup dropdown
+            onClick={() => setDropdownOpen(false)}
           ></div>
 
-          {/* Dropdown menu */}
           <div className="user-dropdown">
-            <button onClick={handleLogout} className="logout-buttonuser">
-              <i className="fas fa-sign-out-alt" style={{ marginRight: "8px" }}></i>
+            <button
+              onClick={() => {
+                setDropdownOpen(false);
+                onEditProfile && onEditProfile(); // ✅ panggil modal edit profil
+              }}
+              className="dropdown-button"
+            >
+              <i className="fas fa-user-edit" style={{ marginRight: '8px' }}></i>
+              Edit Profil
+            </button>
+
+            <button
+              onClick={() => {
+                setDropdownOpen(false);
+                handleLogout();
+              }}
+              className="logout-buttonuser"
+            >
+              <i className="fas fa-sign-out-alt" style={{ marginRight: '8px' }}></i>
               Logout
             </button>
           </div>

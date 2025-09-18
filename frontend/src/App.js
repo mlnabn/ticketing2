@@ -40,6 +40,8 @@ import FAQPage from './components/FAQPage';
 import CalendarComponent from './components/CalendarComponent';
 import Toast from './components/Toast';
 import { AnimatePresence } from 'framer-motion';
+import ProfileModal from './components/ProfileModal';
+import AvatarUploader from './components/AvatarUploader';
 
 
 // =================================================================
@@ -124,7 +126,10 @@ function App() {
   const [allTickets, setAllTickets] = useState([]);
 
 
+
   // === State ===
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [currentUserProfile, setCurrentUserProfile] = useState(null);
   const [userAvatar, setUserAvatar] = useState(null);
   const [toasts, setToasts] = useState([]);
 
@@ -319,6 +324,29 @@ function App() {
   // -----------------------------------------------------------------
   // #4. HANDLER FUNCTIONS (Fungsi untuk Menangani Aksi Pengguna)
   // -----------------------------------------------------------------
+  // buka modal profil
+  const handleOpenProfileModal = () => {
+    setCurrentUserProfile(getUser());
+    setShowProfileModal(true);
+  };
+
+  // callback saat profil berhasil disimpan
+  const handleProfileSaved = (updatedUser) => {
+    setUserName(updatedUser.name);
+    setUserAvatar(updatedUser.avatar_url || null);
+    localStorage.removeItem("user");
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    try {
+      const stored = JSON.parse(localStorage.getItem('user') || '{}');
+      const merged = { ...stored, ...updatedUser };
+      localStorage.setItem('user', JSON.stringify(merged));
+    } catch (e) { }
+
+    fetchAllUsers();
+    fetchUsers(1, '');
+  };
+
 
   // === Auth Success Handlers (fix error undefined) ===
   const handleLogout = useCallback(() => {
@@ -335,26 +363,50 @@ function App() {
     setCreatedTicketsData(null);
     setSearchQuery('');
     setSearchInput('');
-  }, []);
+}, []);
 
-  const handleLoginSuccess = useCallback(() => {
-    const u = getUser();
-    if (u) {
-      setIsLogin(true);
-      setUserRole(u.role);
-      setUserName(u.name);
-      setLoggedInUserId(u.id);
-      if (u.role === 'admin') {
-        setAppPage("dashboard");
-        setCurrentPage("Welcome");
-      } else {
-        setAppPage("user_dashboard");
-      }
-    } else {
-      // Jika karena suatu hal user tidak ditemukan, paksa logout
-      handleLogout();
+// Perbaikan untuk handleLoginSuccess
+const handleLoginSuccess = useCallback(async () => {
+    try {
+        // 1. Ambil token yang sudah tersimpan untuk otentikasi request
+        const token = getToken();
+        if (!token) {
+            // Jika karena alasan tertentu token tidak ada, hentikan proses
+            throw new Error("Token tidak ditemukan");
+        }
+
+        // 2. Ambil data user terbaru dari server untuk memastikan data selalu sinkron
+        const response = await axios.get(`${API_URL}/user`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const u = response.data; // Data user terbaru dari API
+
+        // 3. Perbarui data di localStorage menggunakan fungsi login yang sudah ada
+        // Ini akan menimpa data user lama dengan yang baru didapat dari server
+        login(token, u); 
+
+        // 4. Perbarui state React dengan data terbaru
+        setIsLogin(true);
+        setUserRole(u.role);
+        setUserName(u.name);
+        setLoggedInUserId(u.id);
+        setUserAvatar(u.avatar_url || null); // Menggunakan avatar dari data user
+
+        // 5. Arahkan pengguna ke halaman yang sesuai berdasarkan rolenya
+        if (u.role === 'admin') {
+            setAppPage("dashboard");
+            setCurrentPage("Welcome");
+        } else {
+            setAppPage("user_dashboard");
+        }
+
+    } catch (error) {
+        // 6. Jika terjadi error (misal: token tidak valid), paksa logout
+        // Blok catch akan menangkap error dari axios atau jika token tidak ada
+        console.error("Gagal memvalidasi sesi login:", error);
+        handleLogout();
     }
-  }, [handleLogout]);
+}, [handleLogout]);
   const handleRegisterSuccess = handleLoginSuccess;
 
   const addTicket = async (formData) => {
@@ -382,29 +434,29 @@ function App() {
 
   const updateTicketStatus = async (id, newStatus) => {
     try {
-        // Kirim request ke server dan tunggu hasilnya
-        await axios.patch(`${API_URL}/tickets/${id}/status`, { status: newStatus }, { 
-            headers: { Authorization: `Bearer ${getToken()}` } 
-        });
+      // Kirim request ke server dan tunggu hasilnya
+      await axios.patch(`${API_URL}/tickets/${id}/status`, { status: newStatus }, {
+        headers: { Authorization: `Bearer ${getToken()}` }
+      });
 
-        // HANYA JIKA BERHASIL, tampilkan notifikasi sukses
-        showToast('Status tiket berhasil diupdate.', 'success');
+      // HANYA JIKA BERHASIL, tampilkan notifikasi sukses
+      showToast('Status tiket berhasil diupdate.', 'success');
 
-        // Refresh data di tabel
-        fetchData(dataPage, searchQuery);
-        fetchMyTickets(myTicketsPage);
-        if (!isAdmin) {
-            fetchCreatedTickets(createdTicketsPage);
-        }
-        
+      // Refresh data di tabel
+      fetchData(dataPage, searchQuery);
+      fetchMyTickets(myTicketsPage);
+      if (!isAdmin) {
+        fetchCreatedTickets(createdTicketsPage);
+      }
+
     } catch (error) {
-        console.error("Gagal update status:", error);
+      console.error("Gagal update status:", error);
 
-        // JIKA GAGAL, tampilkan pesan error dari server
-        const errorMessage = error.response?.data?.error || "Gagal mengupdate status tiket.";
-        showToast(errorMessage, 'error');
+      // JIKA GAGAL, tampilkan pesan error dari server
+      const errorMessage = error.response?.data?.error || "Gagal mengupdate status tiket.";
+      showToast(errorMessage, 'error');
     }
-};
+  };
 
   const handleNotificationToggle = () => {
     setUnreadCount(0);
@@ -685,6 +737,7 @@ function App() {
     setUserSearchQuery(query);
   };
   const handleCreatedTicketsPageChange = (page) => setCreatedTicketsPage(page);
+
   const toggleDarkMode = () => setDarkMode(!darkMode);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -729,6 +782,30 @@ function App() {
     };
     initializeApp();
   }, [handleLoginSuccess]);
+  useEffect(() => {
+    if (isLogin) {
+      const u = getUser();
+      if (u) {
+        setCurrentUserProfile(u);
+        setUserName(u.name);
+        setUserAvatar(u.avatar_url || null);
+        setLoggedInUserId(u.id);
+      }
+    }
+  }, [isLogin]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("user");
+    if (stored) {
+      const u = JSON.parse(stored);
+      setUserName(u.name);
+      setUserAvatar(u.avatar_url || null);
+      setLoggedInUserId(u.id);
+      setUserRole(u.role || null);
+      setIsLogin(true);
+    }
+  }, []);
+
 
   useEffect(() => {
     const path = window.location.pathname.split('/');
@@ -1434,6 +1511,7 @@ function App() {
               unreadCount={unreadCount}
               handleNotificationToggle={handleNotificationToggle}
               handleDeleteNotification={handleDeleteNotification}
+              onEditProfile={handleOpenProfileModal}
             />
 
           </div>
@@ -1557,6 +1635,13 @@ function App() {
 
       {showViewProofModal && ticketToShowProof && (
         <ViewProofModal ticket={ticketToShowProof} onClose={handleCloseViewProofModal} onDelete={handleDeleteFromViewProofModal} />
+      )}
+      {showProfileModal && currentUserProfile && (
+        <ProfileModal
+          user={currentUserProfile}
+          onClose={() => setShowProfileModal(false)}
+          onSaved={handleProfileSaved}
+        />
       )}
       {showRejectionInfoModal && ticketToShowReason && (
         <RejectionInfoModal ticket={ticketToShowReason} onClose={handleCloseReasonModal} onDelete={handleDeleteFromReasonModal} />

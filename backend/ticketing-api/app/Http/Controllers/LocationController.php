@@ -29,6 +29,23 @@ class LocationController extends Controller
                 "description" => "Lokasi Bener",
                 "url" => "https://maps.app.goo.gl/JnK7GnZeC4B4rQFu7"
             ],
+            [
+                "id" => 3,
+                "label" => "Workshop Dtech Engineering",
+                "lat" => -7.3785594,
+                "lng" => 110.5063332,
+                "description" => "Lokasi Nobo",
+                "url" => "https://maps.app.goo.gl/x2DWL7RQi1BLSZpP9"
+            ],
+
+            [
+                "id" => 4,
+                "label" => "Workshop Dtech x Muhasa Salatiga",
+                "lat" => -7.3047184,
+                "lng" => 110.4875557,
+                "description" => "Lokasi Muhasa",
+                "url" => "https://maps.app.goo.gl/9i5fv9n5dzzp11ME6"
+            ],
             // Tambahkan lokasi lain di sini
         ];
 

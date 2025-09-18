@@ -145,7 +145,7 @@ body.dark-mode {
   --placeholder-color-dark: #A0AEC0;
   --border-color-dark: #4A5568;
 
-  --bg-color-dashboard-dark: #212B36;
+  --bg-color-dashboard-dark: #1e1e2f;
   --text-color-dashboard-dark: #E0E0E0;
 
   --sidebar-bg-dark: #1f2937;
@@ -1865,15 +1865,17 @@ body.dark-mode .search-form input[type="text"]::placeholder {
 }
 
 body.dark-mode .search-form button[type="submit"] {
-  background-color: #3b82f6; /* Biru terang */
+  background-color: #3b82f6;
+  /* Biru terang */
   color: #ffffff;
   border-color: #3b82f6;
 
 }
 
 body.dark-mode .search-form button[type="submit"]:hover {
-  background-color: #2563eb; /* Biru lebih gelap saat hover */
-  border-color: #2563eb;
+  background-color: #2563eb;
+  /* Biru lebih gelap saat hover */
+  border-color: #2563eb;
 }
 
 /*
@@ -2149,16 +2151,6 @@ button:hover {
 }
 
 
-
-
-/* .btn-pause {
-  background-color: var(--btn-pause);
-}
-
-.btn-pause:hover {
-  background-color: var(--btn-pause-hover); 
-} */
-
 button.btn-pause {
   background-color: #e5e2e2;
   /* soft gray */
@@ -2170,6 +2162,7 @@ button.btn-pause {
   font-size: 14px;
   font-weight: 600;
   transition: background-color 0.2s;
+  box-shadow: 0 4px 12px rgba(56, 61, 65, 0.25);
 }
 
 .btn-pause:hover {
@@ -2557,6 +2550,7 @@ body.dark-mode .job-filter select {
   background-color: var(--status-belum-bg-light);
   color: var(--status-belum-text-light);
   border-color: var(--status-belum-bg-light);
+  box-shadow: 0 4px 12px rgba(114, 28, 36, 0.35);
 }
 
 body.dark-mode .status-belum-dikerjakan {
@@ -2574,6 +2568,7 @@ body.dark-mode .status-belum-dikerjakan {
   background-color: var(--status-sedang-bg-light);
   color: var(--status-sedang-text-light);
   border-color: var(--status-sedang-bg-light);
+  box-shadow: 0 4px 12px rgba(133, 100, 4, 0.35);
 }
 
 body.dark-mode .status-sedang-dikerjakan {
@@ -2591,6 +2586,7 @@ body.dark-mode .status-sedang-dikerjakan {
   background-color: var(--status-ditunda-bg-light);
   color: var(--status-ditunda-text-light);
   border-color: var(--status-ditunda-bg-light);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.35);
 }
 
 body.dark-mode .status-ditunda {
@@ -2608,6 +2604,7 @@ body.dark-mode .status-ditunda {
   background-color: var(--status-selesai-bg-light);
   color: var(--status-selesai-text-light);
   border-color: var(--status-selesai-bg-light);
+  box-shadow: 0 4px 12px rgba(15, 81, 50, 0.35);
 }
 
 body.dark-mode .status-selesai {
@@ -2625,21 +2622,7 @@ body.dark-mode .status-selesai {
   background-color: var(--status-belum-bg-light);
   color: var(--status-belum-text-light);
   border-color: var(--status-belum-bg-light);
-}
-
-/* ====== Tombol Pause ====== */
-.btn-pause {
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-pause:hover {
-  background-color: #d3d5d6;
-  color: #383d41;
+  box-shadow: 0 4px 12px rgba(114, 28, 36, 0.35);
 }
 
 /* ====== Container Tombol ====== */
@@ -3213,6 +3196,9 @@ body.dark-mode .content-area h3 {
   /* [DIUBAH] Warna dari JobList */
   color: #0f5132;
   border-color: #badbcc;
+  box-shadow: 0 4px 12px rgba(15, 81, 50, 0.35);
+  /* hijau muda */
+
 }
 
 .btn-edit:hover {
@@ -3801,6 +3787,8 @@ body.dark-mode .btn-submit:hover {
   position: absolute;
   top: 50px;
   right: 0;
+  z-index: 1000;
+
   background: linear-gradient(135deg,
       rgba(15, 32, 80, 0.95) 0%,
       /* biru malam pekat */
@@ -3809,11 +3797,12 @@ body.dark-mode .btn-submit:hover {
       rgba(70, 130, 180, 0.75) 100%
       /* biru langit lembut */
     );
+  backdrop-filter: blur(12px);
+
+  padding: 10px;
   border-radius: 10px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-  padding: 10px;
-  z-index: 1000;
-  backdrop-filter: blur(12px);
+
   animation: fadeIn 0.3s ease-in-out;
 }
 
@@ -3821,24 +3810,27 @@ body.dark-mode .btn-submit:hover {
   display: flex;
   align-items: center;
   gap: 8px;
+
   width: 100%;
-  height: 10px;
   padding: 10px 14px;
+
   background: transparent;
   border: none;
+  border-radius: 6px;
+
   color: #fff;
   font-weight: 500;
   text-align: left;
   cursor: pointer;
-  border-radius: 6px;
+
   transition: all 0.3s ease;
 }
 
 .user-dropdown button:hover {
-  background: transparent;
-  /* efek kaca terang pas hover */
+  background: rgba(255, 255, 255, 0.1);
+  /* kaca terang pas hover */
   transform: translateX(3px);
-  /* animasi geser dikit */
+  /* geser dikit */
 }
 
 @keyframes fadeIn {
@@ -3852,9 +3844,6 @@ body.dark-mode .btn-submit:hover {
     transform: translateY(0);
   }
 }
-
-
-
 
 
 /* --- Styling Backdrop Modal (Latar Belakang) --- */
@@ -4044,24 +4033,6 @@ body.dark-mode .btn-submit:hover {
   background-color: var(--button-cancel-hover-light);
   transform: translateY(-2px);
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-}
-
-/* CANCEL (Merah / Danger) */
-.btn-cancel-aksi {
-  background-color: #f8d7da;
-  /* soft red */
-  color: #721c24;
-  border-color: #f5c6cb;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: background-color 0.2s;
-}
-
-.btn-cancel-aksi:hover {
-  background-color: #f5c6cb;
 }
 
 /* --- Animasi --- */
@@ -5129,6 +5100,8 @@ body.dark-mode .history-item-content small {
   background-color: #f8d7da;
   color: #721c24;
   border-color: #f5c6cb;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+
 }
 
 .btn-delete-small:hover {
@@ -5156,6 +5129,7 @@ body.dark-mode .btn-delete-small:hover {
   background-color: #d1e7fd;
   color: #084298;
   border-color: #b6d4fe;
+  box-shadow: 0 4px 12px rgba(8, 66, 152, 0.35);
 }
 
 .btn-start:hover {
@@ -5183,6 +5157,7 @@ body.dark-mode .btn-start:hover {
   background-color: #fff3cd;
   color: #856404;
   border-color: #ffeeba;
+  box-shadow: 0 4px 12px rgba(133, 100, 4, 0.35);
 }
 
 .btn-cancel-aksi:hover {
@@ -5210,6 +5185,7 @@ body.dark-mode .btn-cancel-aksi:hover {
   background-color: #d1e7dd;
   color: #0f5132;
   border-color: #badbcc;
+  box-shadow: 0 4px 12px rgba(15, 81, 50, 0.35);
 }
 
 .btn-finish:hover {
@@ -5229,19 +5205,6 @@ body.dark-mode .btn-finish:hover {
   background-color: #2f855a;
   /* Hijau lebih gelap saat hover */
   border-color: #2f855a;
-}
-
-
-/* --- Tombol Tunda (Abu-abu) --- */
-.btn-pause {
-  background-color: #e2e3e5;
-  color: #383d41;
-  border-color: #d6d8db;
-}
-
-.btn-pause:hover {
-  background-color: #c8cbcf;
-  border-color: #c8cbcf;
 }
 
 /* --- Dark Mode: Tombol Tunda (Abu-abu Solid) --- */
@@ -7617,7 +7580,7 @@ body.dark-mode .dashboard-card h4 {
   background: #f9f9f9;
   padding: 4px 10px;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   transition: all 0.2s ease-in-out;
 }
 
@@ -7627,17 +7590,45 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .legend-dot {
+  display: inline-block;
   width: 12px;
   height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-.dot-green { background: #4caf50; }
-.dot-yellow { background: #ffb300; }
-.dot-gray { background: #9e9e9e; }
-.dot-blue { background: #2196f3; }
-.dot-red { background: #f44336; }
+.dot-green {
+  background: #4caf50;
+}
+
+.dot-yellow {
+  background: #ffb300;
+}
+
+.dot-blue {
+  background: #2196f3;
+}
+
+.dot-gray {
+  background: #9e9e9e;
+}
+
+.dot-red {
+  background: #f44336;
+}
+
+.dark-mode .legend-item {
+  background: hsl(210, 10%, 25%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .legend-item:hover {
+  background: hsl(210, 10%, 30%);
+}
+
+.dark-mode .legend-dot {
+  border: 1px solid hsl(210, 10%, 40%);
+}
 
 
 
@@ -7646,34 +7637,6 @@ body.dark-mode .dashboard-card h4 {
   height: 6px;
   border-radius: 50%;
 }
-
-/* Status colors */
-.dot-green {
-  background-color: #22c55e;
-  /* selesai */
-}
-
-.dot-yellow {
-  background-color: #facc15;
-  /* sedang dikerjakan */
-}
-
-.dot-blue {
-  background-color: #9ca3af;
-  /* ditunda */
-}
-
-.dot-red {
-  background-color: #ef4444;
-  /* ditolak */
-}
-
-.dot-gray {
-  background-color: #3b82f6;
-  /* belum dikerjakan */
-}
-
-
 
 .info-text {
   text-align: center;
@@ -7753,23 +7716,28 @@ body.dark-mode .dashboard-card h4 {
 
 /* Warna border sesuai status */
 .status-selesai {
-  border-left-color: #4caf50; /* hijau */
+  border-left-color: #4caf50;
+  /* hijau */
 }
 
 .status-ditolak {
-  border-left-color: #f44336; /* merah */
+  border-left-color: #f44336;
+  /* merah */
 }
 
 .status-sedang-dikerjakan {
-  border-left-color: #ff9800; /* kuning */
+  border-left-color: #ff9800;
+  /* kuning */
 }
 
 .status-ditunda {
-  border-left-color: #9e9e9e; /* biru */
+  border-left-color: #9e9e9e;
+  /* biru */
 }
 
 .status-belum-dikerjakan {
-  border-left-color: #2196f3; /* abu-abu */
+  border-left-color: #2196f3;
+  /* abu-abu */
 }
 
 
@@ -7863,8 +7831,10 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .dark-mode .ticket-modal-card {
-  background-color: hsl(210, 10%, 20%) !important; /* abu-abu gelap */
-  color: #f5f5f5; /* teks lebih terang */
+  background-color: hsl(210, 10%, 20%) !important;
+  /* abu-abu gelap */
+  color: #f5f5f5;
+  /* teks lebih terang */
   box-shadow: 0 2px 8px rgba(255, 255, 255, 0.08);
 }
 
@@ -7943,3 +7913,293 @@ body.dark-mode .dashboard-card h4 {
     font-size: 12px;
   }
 }
+
+.legend-item2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  color: var(--text-color);
+}
+
+.legend-item2:hover {
+  transform: scale(1.05);
+
+}
+
+.dark-mode .legend-item2 {
+  background: hsl(210, 10%, 25%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .legend-item2:hover {
+  background: hsl(210, 10%, 30%);
+}
+
+.linechart-wrapper {
+  padding: 15px;
+  border-radius: 10px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+
+}
+
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: -10px;
+  flex-wrap: wrap;
+}
+
+/* === Responsiveness === */
+@media (max-width: 768px) {
+  .linechart-wrapper {
+    padding: 10px;
+  }
+
+  .chart-legend {
+    flex-direction: row;
+    /* Legend stack ke bawah di layar kecil */
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: -15px;
+  }
+
+  .legend-item2 {
+    font-size: 10px;
+    gap: 4px;
+    padding: 3px 6px;
+  }
+}
+
+/* === Modal Overlay === */
+.modal-overlay4 {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 999;
+  padding: 16px;
+  animation: fadeOverlay 0.4s ease;
+}
+
+/* === Modal Content === */
+.modal-content4 {
+  background: linear-gradient(160deg, #0b0f29, #1a1f3a);
+  color: #f1f5f9;
+  padding: 24px;
+  border-radius: 16px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7),
+    0 0 25px rgba(96, 165, 250, 0.25);
+  animation: fadeInScale 0.35s ease;
+  line-height: 1.6;
+  overflow-y: auto;
+  max-height: 95vh;
+}
+
+/* === Title === */
+.modal-content4 h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #c7d2fe;
+  text-shadow: 0 0 8px rgba(147, 197, 253, 0.4);
+}
+
+/* === Avatar Uploader === */
+.avatar-uploader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.avatar-preview {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #111827, #1f2937);
+  border: 2px solid rgba(147, 197, 253, 0.5);
+  box-shadow: 0 0 12px rgba(147, 197, 253, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-preview:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 18px rgba(96, 165, 250, 0.7);
+}
+
+.avatar-uploader input[type="file"] {
+  display: none;
+}
+
+.avatar-uploader label {
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  transition: all 0.25s ease;
+}
+
+.avatar-uploader label:hover {
+  background: linear-gradient(90deg, #2563eb, #4f46e5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.55);
+}
+
+/* === Form Group === */
+.form-group4 {
+  margin-bottom: 14px;
+}
+
+.form-group4 label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #e0e7ff;
+}
+
+.form-group4 input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  background: rgba(17, 24, 39, 0.9);
+  color: #f3f4f6;
+  font-size: 14px;
+  transition: all 0.25s;
+}
+
+.form-group4 input:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
+  outline: none;
+}
+
+.modal-content4 .btn-confirm,
+.modal-content4 .btn-cancel {
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: 6px;
+  min-width: 70px;
+  width: auto;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* === Animations === */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeOverlay {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* === Responsive === */
+@media (max-width: 480px) {
+  .modal-content4 {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .modal-content4 h2 {
+    font-size: 20px;
+  }
+}
+
+/* Overlay tetap */
+.avatar-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;   /* vertikal tengah */
+  justify-content: center; /* horizontal tengah */
+  z-index: 2000;
+}
+
+/* Konten modal */
+.avatar-modal-content {
+  position: relative;
+  max-width: 90vw;   /* batasi lebar max */
+  max-height: 90vh;  /* batasi tinggi max */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Gambar di dalam modal */
+.avatar-modal-content img {
+  width: auto;
+  height: auto;
+  max-width: 50%;
+  max-height: 50%;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+  object-fit: contain; /* biar gak ketarik aneh */
+}
+
+/* Tombol close dengan gradasi */
+.btn-ttp {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #ff4d4f, #ff7a45); /* gradasi merah ke oranye */
+  border: none;
+  border-radius: 50%;
+  padding: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: #fff; /* biar icon/text putih */
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.btn-ttp:hover {
+  background: linear-gradient(135deg, #e60023, #ff4d4f); /* lebih gelap pas hover */
+  transform: scale(1.15);
+}
+
