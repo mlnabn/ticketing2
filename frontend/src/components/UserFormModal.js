@@ -11,6 +11,8 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
     role: 'user',
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const isEditMode = Boolean(userToEdit);
 
   useEffect(() => {
@@ -36,6 +38,10 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(formData);
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -73,11 +79,34 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
             </div>
             <div>
               <label htmlFor="password">Password:</label>
-              <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : ''} />
+              <div className="password-input-container">
+                <input 
+                  type={showPassword ? 'text' : 'password'} 
+                  id="password" 
+                  name="password" 
+                  value={formData.password} 
+                  onChange={handleChange} 
+                  placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : ''} 
+                />
+                <button type="button" onClick={togglePasswordVisibility} className="password-toggle-btn">
+                  <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                </button>
+              </div>
             </div>
             <div>
               <label htmlFor="password_confirmation">Konfirmasi Password:</label>
-              <input type="password" id="password_confirmation" name="password_confirmation" value={formData.password_confirmation} onChange={handleChange} />
+              <div className="password-input-container">
+                <input 
+                  type={showPassword ? 'text' : 'password'} 
+                  id="password_confirmation" 
+                  name="password_confirmation" 
+                  value={formData.password_confirmation} 
+                  onChange={handleChange} 
+                />
+                <button type="button" onClick={togglePasswordVisibility} className="password-toggle-btn">
+                  <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                </button>
+              </div>
             </div>
             <div className="form-actions">
               <button type="button" onClick={onClose} className="btn-secondary">Batal</button>
