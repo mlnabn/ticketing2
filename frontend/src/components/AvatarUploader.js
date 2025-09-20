@@ -1,10 +1,10 @@
+// AvatarUploader.jsx
 import React, { useState, useEffect } from "react";
-
 import { IoClose } from "react-icons/io5";
 
-const AvatarUploader = ({ initialAvatar, onFileSelect }) => {
+const AvatarUploader = ({ initialAvatar, onFileSelect, onRemoveAvatar }) => {
   const [preview, setPreview] = useState(initialAvatar || null);
-  const [showFullPreview, setShowFullPreview] = useState(false); // state untuk modal preview
+  const [showFullPreview, setShowFullPreview] = useState(false);
 
   useEffect(() => {
     setPreview(initialAvatar || null);
@@ -17,9 +17,14 @@ const AvatarUploader = ({ initialAvatar, onFileSelect }) => {
     onFileSelect(file);
   };
 
+  const handleRemove = () => {
+    setPreview(null);
+    onRemoveAvatar && onRemoveAvatar();
+  };
+
   return (
     <div className="avatar-uploader">
-      {/* Avatar kecil (klik untuk lihat full) */}
+      {/* Avatar kecil */}
       <div
         className="avatar-preview"
         onClick={() => preview && setShowFullPreview(true)}
@@ -32,7 +37,7 @@ const AvatarUploader = ({ initialAvatar, onFileSelect }) => {
         )}
       </div>
 
-      {/* Custom label trigger input */}
+      {/* Ganti avatar */}
       <label htmlFor="avatarInput">Ganti Avatar</label>
       <input
         id="avatarInput"
@@ -41,15 +46,33 @@ const AvatarUploader = ({ initialAvatar, onFileSelect }) => {
         onChange={handleFileChange}
       />
 
+      {/* Hapus avatar */}
+      {preview && (
+        <button
+          type="button"
+          onClick={handleRemove}
+          className="btn btn-danger"
+          style={{ marginTop: 8 }}
+        >
+          Hapus Avatar
+        </button>
+      )}
+
       {/* Modal full preview */}
       {showFullPreview && (
-        <div className="avatar-modal-overlay" onClick={() => setShowFullPreview(false)}>
+        <div
+          className="avatar-modal-overlay"
+          onClick={() => setShowFullPreview(false)}
+        >
           <div
             className="avatar-modal-content"
             onClick={(e) => e.stopPropagation()}
           >
             <img src={preview} alt="Full Avatar" />
-            <button className="btn-ttp" onClick={() => setShowFullPreview(false)}>
+            <button
+              className="btn-ttp"
+              onClick={() => setShowFullPreview(false)}
+            >
               <IoClose size={20} />
             </button>
           </div>

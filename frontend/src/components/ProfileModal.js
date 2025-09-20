@@ -13,6 +13,7 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [avatarFile, setAvatarFile] = useState(null);
+  const [removeAvatar, setRemoveAvatar] = useState(false);
   const [initialAvatar, setInitialAvatar] = useState(user?.avatar_url || null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -26,6 +27,10 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
 
   const handleFileSelect = (file) => {
     setAvatarFile(file);
+  };
+  const handleRemoveAvatar = () => {
+    setAvatarFile(null);
+    setRemoveAvatar(true);
   };
 
   const handleSave = async () => {
@@ -43,8 +48,10 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
       formData.append('password_confirmation', passwordConfirmation);
     }
     if (avatarFile) {
-      formData.append('avatar', avatarFile);
-    }
+    formData.append("avatar", avatarFile);
+  } else if (removeAvatar) {
+    formData.append("avatar_remove", "1"); // kirim flag hapus avatar
+  }
 
     // Laravel butuh spoof method
     formData.append('_method', 'PUT');
@@ -77,7 +84,12 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
       <div className="modal-content4" style={{ maxWidth: 700 }}>
         <h2>Edit Profil</h2>
 
-        <AvatarUploader initialAvatar={initialAvatar} onFileSelect={handleFileSelect} />
+        <AvatarUploader
+          initialAvatar={initialAvatar}
+          onFileSelect={handleFileSelect}
+          onRemoveAvatar={handleRemoveAvatar}
+        />
+
 
         <div className="form-group4">
           <label>Nama</label>
