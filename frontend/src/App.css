@@ -3725,7 +3725,7 @@ body.dark-mode .btn-submit:hover {
   /* gelap transparan */
   backdrop-filter: blur(6px);
   /* efek blur */
-  z-index: 999;
+  z-index: 1000;
   /* harus di bawah dropdown */
 }
 
@@ -3734,7 +3734,7 @@ body.dark-mode .btn-submit:hover {
   position: absolute;
   top: 50px;
   right: 0;
-  z-index: 1000;
+  z-index: 1500;
 
   background: linear-gradient(135deg,
       rgba(15, 32, 80, 0.95) 0%,
@@ -8362,41 +8362,35 @@ body.dark-mode .dashboard-card h4 {
   transform: scale(1.15);
 }
 
+.divider {
+  text-align: center;
+  color: #fff;
+  font-size: 14px;
+  margin: 16px 0;   /* jarak atas & bawah */
+  position: relative;
+}
 
-/* === Google Login Button (Smaller) === */
 .google-login-button {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: #ffffff;
-  color: #3c4043;
-  font-size: 12px;
-  /* lebih kecil */
+  gap: 8px;
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
   font-weight: 500;
-  padding: 6px 14px;
-  /* padding diperkecil */
+  padding: 8px 16px;
   border: 1px solid #dadce0;
   border-radius: 20px;
-  /* radius lebih kecil */
   cursor: pointer;
   transition: all 0.25s ease;
-  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.25);
 }
 
 .google-login-button:hover {
-  background: #f8f9fa;
-  box-shadow: 0 2px 4px rgba(60, 64, 67, 0.3);
-  transform: translateY(-1px);
+  background: transparent;
 }
 
-.google-login-button:active {
-  background: #f1f3f4;
-  transform: translateY(0);
-  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.25);
+.google-icon {
+  width: 20px;
+  height: 20px;
 }
 
-.google-login-button svg {
-  font-size: 14px;
-  /* icon lebih kecil */
-}
