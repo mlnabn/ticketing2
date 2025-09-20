@@ -103,6 +103,7 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showRegister, setShowRegister] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isAdminDropdownOpen, setIsAdminDropdownOpen] = useState(false);
 
   // --- State Ticket Interactions ---
   const [ticketToDelete, setTicketToDelete] = useState(null);
@@ -1217,34 +1218,9 @@ const handleLoginSuccess = useCallback(async () => {
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Notifications')} className={`sidebar-button ${currentPage === 'Notifications' ? 'active' : ''}`}><i className="fas fa-bell"></i><span>Notifikasi</span></button></li>
             </ul>
           </nav>
-          <div className="sidebar-footer">
-            {/* === Sidebar User Info === */}
-            <div className="user-info">
-              {/* Avatar */}
-              <div
-                className="user-avatar cursor-pointer w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <FaUser className="text-gray-500 text-xl" />
-              </div>
-
-              {/* User Name */}
-              <span>{userName || "User"}</span>
-
-              {/* Theme Switch */}
-              <label className={`theme-switch ${darkMode ? "dark" : ""}`}>
-                <input type="checkbox" checked={darkMode} onChange={toggleDarkMode} />
-                <div className="theme-switch-slider round">
-                  <div className="sun-icon-wrapper">
-                    <i className="fas fa-sun sun-icon"></i>
-                  </div>
-                  <div className="moon-icon-wrapper">
-                    <i className="fas fa-moon moon-icon"></i>
-                  </div>
-                </div>
-              </label>
-            </div>
-          </div>
+          {/* <div className="sidebar-footer">
+            <button onClick={handleLogout} className="logout-button"><i className="fas fa-sign-out-alt"></i></button>
+          </div> */}
         </aside>
 
         {isSidebarOpen && <div className="content-overlay" onClick={toggleSidebar}></div>}
@@ -1259,9 +1235,38 @@ const handleLoginSuccess = useCallback(async () => {
               </button>
               <h1 className="dashboard-header-title">Admin Dashboard</h1>
             </div>
-            <div className="main-header-controls">
-              <span className="breadcrumb">Home / {currentPage}</span>
-              <button onClick={handleLogout} className="logout-button"><i className="fas fa-sign-out-alt"></i></button>
+            <div className="admin-user-info-container">
+              <div className="user-info">
+                {/* Theme Switch */}
+                <button onClick={toggleDarkMode} className="theme-toggle-button" aria-label="Toggle Dark Mode">
+                  {darkMode ? <i className="fas fa-sun"></i> : <i className="fas fa-moon"></i>}
+                </button>
+                {/* -- Wrapper baru yang bisa diklik -- */}
+                <div className="user-profile-clickable" onClick={() => setIsAdminDropdownOpen(!isAdminDropdownOpen)}>
+                  {/* Avatar */}
+                  <div
+                    className="user-avatar cursor-pointer w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"
+                  >
+                    <FaUser className="text-gray-500 text-xl" />
+                  </div>
+
+                  {/* User Name */}
+                  <span><strong>{userName || "User"}</strong></span>
+                </div>
+              </div>
+
+              {/* Dropdown Menu Admin */}
+              {isAdminDropdownOpen && (
+                <>
+                  <div className="dropdown-overlay" onClick={() => setIsAdminDropdownOpen(false)}></div>
+                  <div className="admin-dropdown"> {/* <-- Nama kelas diubah */}
+                    <button onClick={handleLogout}>
+                      <i className="fas fa-sign-out-alt"></i>
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </header>
 

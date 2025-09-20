@@ -1128,8 +1128,8 @@ body.dark-mode .sidebar-footer {
 .user-info {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: 1rem;
+  margin-right: 1rem;
 }
 
 .user-avatar {
@@ -3403,99 +3403,46 @@ body.dark-mode .history-tab {
 
 
 /* Modern Theme Switch */
-.theme-switch {
-  position: relative;
-  width: 60px;
-  height: 30px;
+/* Elegant Theme Toggle Button */
+.theme-toggle-button {
+  background-color: transparent;
+  border: 1px solid var(--border-color-light);
+  color: var(--text-color-dashboard-light);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 17px;
+  transition: all 0.3s ease;
   margin: 0 10px;
 }
 
-.theme-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+.theme-toggle-button:hover {
+  background-color: var(--header-button-hover-bg-light);
+  border-color: var(--header-button-hover-bg-light);
+  transform: scale(1.1);
 }
 
-.theme-switch-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(145deg, #2c3e50, #34495e);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 34px;
-  box-shadow:
-    3px 3px 6px rgba(0, 0, 0, 0.2),
-    -3px -3px 6px rgba(255, 255, 255, 0.1);
+.theme-toggle-button .fas {
+  transition: transform 0.4s ease;
 }
 
-.theme-switch-slider:before {
-  position: absolute;
-  content: "";
-  height: 24px;
-  width: 24px;
-  left: 4px;
-  bottom: 4px;
-  background: linear-gradient(145deg, #34495e, #2c3e50);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 50%;
-  box-shadow:
-    2px 2px 4px rgba(0, 0, 0, 0.3),
-    -2px -2px 4px rgba(255, 255, 255, 0.1);
+.theme-toggle-button:hover .fas {
+  transform: rotate(20deg);
 }
 
-/* Hanya mengubah posisi toggle tanpa mengubah warna */
-.theme-switch.dark .theme-switch-slider:before {
-  transform: translateX(28px);
+/* Dark Mode styles for the button */
+body.dark-mode .theme-toggle-button {
+  border-color: var(--border-color-dark);
+  color: var(--text-color-dashboard-dark);
 }
 
-/* Icons */
-.theme-switch .fa-sun,
-.theme-switch .fa-moon {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1;
-  font-size: 14px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.theme-switch .fa-sun {
-  left: 7px;
-  color: #f1c40f;
-  text-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
-  opacity: 1;
-}
-
-.theme-switch .fa-moon {
-  right: 7px;
-  color: #ecf0f1;
-  text-shadow: 0 0 10px rgba(236, 240, 241, 0.5);
-  opacity: 0;
-}
-
-.theme-switch.dark .fa-sun {
-  opacity: 0;
-}
-
-.theme-switch.dark .fa-moon {
-  opacity: 1;
-}
-
-/* Hover Effects - konsisten dark */
-.theme-switch-slider:hover {
-  box-shadow:
-    4px 4px 8px rgba(0, 0, 0, 0.3),
-    -4px -4px 8px rgba(255, 255, 255, 0.1);
-  background: linear-gradient(145deg, #34495e, #2c3e50);
-}
-
-/* Active State */
-.theme-switch-slider:active:before {
-  transform: scale(0.95);
-  transition: 0.1s;
+body.dark-mode .theme-toggle-button:hover {
+  background-color: var(--header-button-hover-bg-dark);
+  border-color: var(--header-button-hover-bg-dark);
 }
 
 /* ====== JOB FORM USER ====== */
@@ -3831,6 +3778,171 @@ body.dark-mode .btn-submit:hover {
   /* kaca terang pas hover */
   transform: translateX(3px);
   /* geser dikit */
+}
+
+/* =================================== */
+/* === ADMIN HEADER DROPDOWN STYLES === */
+/* =================================== */
+
+/* --- Kontainer utama dropdown --- */
+.admin-user-info-container {
+  position: relative;
+}
+
+/* --- Wrapper untuk Avatar & Nama yang bisa di-klik --- */
+.user-profile-clickable {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 5px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* --- Efek hover (Light & Dark Mode) --- */
+.user-profile-clickable:hover {
+  background-color: var(--header-button-hover-bg-light);
+}
+
+body.dark-mode .user-profile-clickable:hover {
+  background-color: var(--header-button-hover-bg-dark);
+}
+
+/* --- Menu Dropdown Admin --- */
+.admin-dropdown {
+  position: absolute;
+  top: 100%;
+  /* Posisi tepat di bawah header */
+  right: 0;
+  margin-top: 8px;
+  /* Jarak kecil dari header */
+  z-index: 1000;
+  width: 180px;
+  /* Lebar yang pas */
+
+  /* Light Mode Styles */
+  background-color: #ffffff;
+  border: 1px solid var(--border-color-light);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+
+  padding: 8px;
+  border-radius: 10px;
+  animation: fadeIn 0.2s ease-in-out;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* --- Dark Mode Styles --- */
+body.dark-mode .admin-dropdown {
+  background-color: #2d3748;
+  /* Warna abu-abu gelap */
+  border-color: var(--border-color-dark);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* --- Tombol di dalam Dropdown --- */
+.admin-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+
+  /* Light Mode Text */
+  color: var(--text-color-dashboard-light);
+
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* --- Hover Tombol (Light Mode) --- */
+.admin-dropdown button:hover {
+  background-color: #f1f5f9;
+  /* Abu-abu sangat terang */
+}
+
+/* --- Dark Mode Text & Hover --- */
+body.dark-mode .admin-dropdown button {
+  color: var(--text-color-dashboard-dark);
+}
+
+body.dark-mode .admin-dropdown button:hover {
+  background-color: var(--header-button-hover-bg-dark);
+  /* Abu-abu sedikit lebih terang */
+}
+
+/* Styling Ikon di dalam Tombol */
+.admin-dropdown button i {
+  width: 20px;
+  /* Agar ikon dan teks sejajar */
+  text-align: center;
+  font-size: 1rem;
+  color: #64748b;
+  /* Abu-abu netral */
+}
+
+body.dark-mode .admin-dropdown button i {
+  color: #94a3b8;
+  /* Abu-abu lebih terang di dark mode */
+}
+
+/* ============================================= */
+/* === PASSWORD INPUT WITH SHOW/HIDE TOGGLE === */
+/* ============================================= */
+
+/* --- Kontainer untuk input dan tombol --- */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* --- Input password --- */
+.password-input-container input {
+  width: 100%;
+  /* Input mengisi seluruh lebar kontainer */
+  padding-right: 45px !important;
+  /* Beri ruang di kanan untuk tombol */
+}
+
+/* --- Tombol toggle (mata) --- */
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  /* Posisi di dalam input, sebelah kanan */
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Warna ikon (Light Mode) */
+  color: #9ca3af;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+  color: #374151;
+}
+
+/* --- Penyesuaian Dark Mode --- */
+body.dark-mode .password-toggle-btn {
+  color: #6b7280;
+}
+
+body.dark-mode .password-toggle-btn:hover {
+  color: #9ca3af;
 }
 
 @keyframes fadeIn {
