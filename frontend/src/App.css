@@ -123,8 +123,7 @@
   --button-cancel-bg-light: #dc3545;
   --button-cancel-hover-light: #c82333;
 
-  --modal-bg-dark: #2d2d2d;
-  --text-color-dark: #f0f0f0;
+  /* --text-color-dark: #f0f0f0;
   --secondary-text-color-dark: #b0b0b0;
   --input-bg-dark: #444;
   --border-color-dark: #555;
@@ -135,66 +134,70 @@
   --button-confirm-bg-dark: #4a90e2;
   --button-confirm-hover-dark: #3a7ed9;
   --button-cancel-bg-dark: #e25c5c;
-  --button-cancel-hover-dark: #c84d4d;
+  --button-cancel-hover-dark: #c84d4d; */
 }
 
 /* Dark Mode Variables */
 body.dark-mode {
-  --input-bg-dark: #2A333C;
   --text-color-dark: #E0E0E0;
   --placeholder-color-dark: #A0AEC0;
-  --border-color-dark: #4A5568;
-
-  --bg-color-dashboard-dark: #1e1e2f;
+  
+  --bg-color-dashboard-dark: #0A0A0A;
   --text-color-dashboard-dark: #E0E0E0;
+  --border-color-dark: #2D3748;
 
-  --sidebar-bg-dark: #1f2937;
+  --sidebar-bg-dark: #111111;
   --sidebar-text-dark: #E0E0E0;
-  --sidebar-border-dark: #6d7785;
-  --sidebar-hover-bg-dark: #374151;
+  --sidebar-border-dark: #2D3748;
+  --sidebar-hover-bg-dark: #2D3748;
 
-  --header-bg-dark: #1f2937;
+  --header-bg-dark: #111111;
   --header-text-dark: #E0E0E0;
   --header-button-bg-dark: #E0E0E0;
   --header-button-text-dark: #E0E0E0;
-  --header-button-hover-bg-dark: #5A6A80;
+  --header-button-hover-bg-dark: #2D3748;
 
-  --content-bg-dark: #1e1e2f;
+  --content-bg-dark: #0A0A0A;
+  --modal-bg-dark: #111111;
 
-  --joblist-header-bg-dark: #182a48c1;
+  --joblist-header-bg-dark: #1F2937;
   --joblist-header-text-dark: #cbd5e1;
 
-  --form-input-border-dark: #4A5568;
-  --form-input-shadow-dark: 0 1px 3px rgba(0, 0, 0, 0.2) inset;
+  --input-bg-dark: #1F2937;
+  --placeholder-color-dark: #A0AEC0;
+
+  --form-input-border-dark: #111111;
+  --form-input-shadow-dark: none;
 
   --hamburger-icon-color-dark: #A0AEC0;
-  --hamburger-hover-color-dark: #F8F9FC;
+  --hamburger-hover-color-dark: #FFFFFF;
 
-  --auth-bg-dark: #212B36;
+  --auth-bg-dark: #0A0A0A;
 
   --info-card-red: #AF7070;
   --info-card-green: #7DAA80;
   --info-card-yellow: #C7AF7A;
   --info-card-blue: #7A96AF;
 
-  --success-bg-dark: #052e16;
-  --success-text-dark: #a7f3d0;
-  --success-border-dark: #15803d;
+  --success-bg-dark: #10B9811A;
+  --success-text-dark: #A7F3D0;
+  --success-border-dark: #10B981;
 
-  --error-bg-dark: #450a0a;
-  --error-text-dark: #fecaca;
-  --error-border-dark: #b91c1c;
+  --error-bg-dark: #EF44441A;
+  --error-text-dark: #FECACA;
+  --error-border-dark: #EF4444;
 
-  --status-belum-bg-dark: #e13333;
-  --status-belum-text-dark: #fff;
-  --status-sedang-bg-dark: #D97706;
-  --status-sedang-text-dark: #fff;
-  --status-selesai-bg-dark: #16A34A;
-  --status-ditunda-bg-dark: #6B7280;
-  --status-ditunda-text-dark: #fff;
+  --status-belum-bg-dark: transparent;
+  --status-belum-text-dark: #A78BFA;
+  --status-sedang-bg-dark: transparent;
+  --status-sedang-text-dark: #FBBF24;
+  --status-selesai-bg-dark: transparent;
+  --status-selesai-text-dark: #34D399;
+  --status-ditunda-bg-dark: transparent;
+  --status-ditunda-text-dark: #9CA3AF;
 
-  --btn-submit: #4A7CD1;
-  --btn-submit-hover: #3A62B0;
+  --btn-submit: #4F46E5;
+  --btn-submit-hover: #4338CA;
 
   --btn-start: #2563EB;
   --btn-start-hover: #1D4ED8;
@@ -205,24 +208,24 @@ body.dark-mode {
   --btn-delete: #DC2626;
   --btn-delete-hover: #B91C1C;
 
-  --pagination-text-dark: #e0f2fe;
-  --pagination-border-dark: #334155;
-  --pagination-bg-dark: #0a0f2c;
-  --pagination-hover-bg-dark: #1e293b;
-  --pagination-active-bg-dark: #4A7CD1;
+  --pagination-text-dark: #E0E0E0;
+  --pagination-border-dark: #2D3748;
+  --pagination-bg-dark: #111111;
+  --pagination-hover-bg-dark: #1F2937;
+  --pagination-active-bg-dark: #4F46E5;
   --pagination-active-text-dark: #ffffff;
-  --pagination-disabled-bg-dark: #111827;
-  --pagination-disabled-text-dark: #475569;
+  --pagination-disabled-bg-dark: #1F2937;
+  --pagination-disabled-text-dark: #4A5568;
 
-  --search-form-bg-dark: #1f2937;
-  --search-form-shadow-dark: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --search-input-bg-dark: #2d3748;
-  --search-input-border-dark: #4b5563;
-  --search-input-text-dark: #e5e7eb;
-  --search-input-placeholder-dark: #a0aec0;
-  --search-button-bg-dark: #d6eaf8;
-  --search-button-hover-bg-dark: #aed6f1;
-  --search-button-text-dark: #154360;
+  --search-form-bg-dark: #111111;
+  --search-form-shadow-dark: none;
+  --search-input-bg-dark: #1F2937;
+  --search-input-border-dark: #2D3748;
+  --search-input-text-dark: #E0E0E0;
+  --search-input-placeholder-dark: #A0AEC0;
+  --search-button-bg-dark: #4F46E5;
+  --search-button-hover-bg-dark: #4338CA;
+  --search-button-text-dark: #ffffff;
 }
 
 /* Base Styles */
@@ -453,6 +456,11 @@ body.dark-mode .dashboard-container {
   overflow-y: auto;
   /* Scroll jika konten melebihi tinggi */
 }
+
+.dark-mode .sidebar {
+  background-color: var(--sidebar-bg-dark);
+  color: var(--sidebar-text-dark);
+} 
 
 .sidebar.open {
   transform: translateX(0);
@@ -1098,8 +1106,16 @@ body.dark-mode .sidebar-button:hover {
   color: #fff;
 }
 
+.dark-mode .sidebar-button.active {
+  background-color: #4F46E5;
+}
+
 .sidebar-button.active:hover {
   background-color: #4A7CD1;
+}
+
+.dark-mode .sidebar-button.active:hover {
+  background-color: #4338CA;
 }
 
 .sidebar-footer {
@@ -1607,20 +1623,24 @@ body.dark-mode .proof-modal__group input[type="file"]::file-selector-button:hove
 
 /* Dark Mode: Latar Belakang Kartu Lebih Gelap */
 body.dark-mode .red-card {
-  background-color: #451a03;
-}
+    border-left: 5px solid #8B5CF6;
+    /* Ungu sebagai aksen "Belum Selesai" */
+  }
 
-body.dark-mode .green-card {
-  background-color: #166534;
-}
+  body.dark-mode .green-card {
+    border-left: 5px solid #22C55E;
+    /* Hijau tetap untuk "Selesai" */
+  }
 
-body.dark-mode .yellow-card {
-  background-color: #78350f;
-}
+  body.dark-mode .yellow-card {
+    border-left: 5px solid #F59E0B;
+    /* Kuning tetap untuk "Total" */
+  }
 
-body.dark-mode .blue-card {
-  background-color: #0c4a6e;
-}
+  body.dark-mode .blue-card {
+    border-left: 5px solid #3B82F6;
+    /* Biru untuk "Pengguna" */
+  }
 
 /* Mengubah warna teks dan icon di dalam kartu yang memiliki warna latar belakang */
 .red-card .card-value,
@@ -1744,17 +1764,22 @@ body.dark-mode .card-change.down {
 /* ================================ */
 
 body.dark-mode .info-card {
-  background-color: #2D3748;
+  background-color: #111111 !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   /* Bayangan yang lebih gelap */
   color: #F7FAFC;
+  border: 1px solid #2D3748;
 }
 
-body.dark-mode .card-value {
-  color: #F7FAFC;
+body.dark-mode .card-value,
+body.dark-mode .card-label {
+  color: #E0E0E0 !important;
 }
 
-body.dark-mode .card-label,
+body.dark-mode .card-icon {
+  background-color: transparent !important;
+}
+
 body.dark-mode .card-period {
   color: #CBD5E1;
 }
@@ -1865,17 +1890,15 @@ body.dark-mode .search-form input[type="text"]::placeholder {
 }
 
 body.dark-mode .search-form button[type="submit"] {
-  background-color: #3b82f6;
+  background-color: var(--search-button-bg-dark);
   /* Biru terang */
   color: #ffffff;
-  border-color: #3b82f6;
+  /* border-color: #3b82f6; */
 
 }
 
 body.dark-mode .search-form button[type="submit"]:hover {
-  background-color: #2563eb;
-  /* Biru lebih gelap saat hover */
-  border-color: #2563eb;
+  background-color: var(--search-button-hover-bg-dark);
 }
 
 /*
@@ -2192,16 +2215,18 @@ button.btn-pause {
   box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25);
   border-radius: 12px;
   overflow: hidden;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
 /* [DIUBAH] Gaya dasar tabel untuk dark mode */
 body.dark-mode .job-table {
+  border-collapse: separate;
   box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.5);
   background-color: transparent;
-  /* Latar belakang dikontrol oleh sel (td) */
-  border: none;
-  /* Border dikontrol oleh sel (td) */
+  border: 1px solid var(--border-color-dark, #2D3748);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
 }
 
 
@@ -2217,33 +2242,43 @@ body.dark-mode .job-table {
   transition: all 0.3s ease;
 }
 
-/* [DIUBAH] Gaya sel data (td) untuk dark mode */
 body.dark-mode .job-table td {
-  border-bottom: 1px solid #2d3748;
-  /* Warna garis pemisah baris */
-  color: #e2e8f0;
-  /* Warna teks utama (putih gading) */
-  border-right: none;
-  /* Hapus border kanan default, kita atur di header */
+  padding: 16px 16px;
+  border-bottom: 1px solid var(--border-color-dark, #2D3748);
+  border-right: 1px solid var(--border-color-dark, #2D3748);
+  color: #E0E1E2;
+  vertical-align: middle; /* Penting: Rata tengah vertikal */
+  font-size: 1rem;
+  background-color: transparent;
 }
-
 
 /* --- Gaya Header Tabel (th) --- */
 .job-table th {
   background-color: var(--joblist-header-bg-light);
   font-weight: 600;
   text-align: center;
+  text-transform: uppercase;
   color: var(--joblist-header-text-light);
   border-bottom: 2px solid #e2e8f0;
+  border-right: 1px solid var(--border-color-dark, #2D3748);
 }
 
 body.dark-mode .job-table th {
-  background-color: var(--joblist-header-bg-dark);
-  /* Menggunakan variabel baru */
-  color: var(--joblist-header-text-dark);
-  /* Menggunakan variabel baru */
-  border-bottom: 2px solid #4a5568;
-  /* Garis bawah header yang tegas */
+  background-color: transparent;
+  color: #8A919E;
+  padding: 12px 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-color-dark, #2D3748);
+  border-right: 1px solid var(--border-color-dark, #2D3748);
+  
+}
+
+body.dark-mode .job-table th:first-child {
+  text-align: left;
 }
 
 /* Divider untuk header */
@@ -2254,10 +2289,16 @@ body.dark-mode .job-table th {
 
 /* --- Gaya Badan Tabel (tbody) --- */
 
-/* [BARU] Menetapkan warna dasar untuk baris ganjil di dark mode */
-body.dark-mode .job-table tbody tr td {
-  background-color: #262f3e;
+body.dark-mode .job-table th:last-child,
+body.dark-mode .job-table td:last-child {
+  border-right: none;
 }
+
+body.dark-mode .job-table th:nth-child(8),
+body.dark-mode .job-table td:nth-child(8) {
+  text-align: center;
+}
+
 
 /* Warna baris selang-seling (Zebra Striping) */
 .job-table tbody tr:nth-child(even) td {
@@ -2267,18 +2308,20 @@ body.dark-mode .job-table tbody tr td {
 
 /* [DIUBAH] Warna baris selang-seling untuk dark mode */
 body.dark-mode .job-table tbody tr:nth-child(even) td {
-  background-color: #212936;
-  /* Warna lebih gelap untuk kontras halus */
+  background-color: transparent
 }
 
-/* [DIUBAH] Warna hover baris untuk dark mode */
 body.dark-mode .job-table tbody tr:hover td {
-  background-color: #384252;
+  background-color: rgba(45, 55, 72, 0.5);
 }
 
 /* Menengahkan teks di kolom ke-7 (Waktu Pengerjaan) */
 .job-table tbody tr td:nth-child(7) {
   text-align: center;
+}
+
+body.dark-mode .job-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 /*
@@ -2516,35 +2559,14 @@ body.dark-mode .job-filter select {
 */
 /* Gaya umum untuk semua status */
 .status-badge {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 9999px; /* Bentuk pil */
+  font-size: 0.8rem;
   font-weight: 600;
-  padding: 0.4rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  min-width: 140px;
-  justify-content: center;
-  border: 1px solid;
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  text-align: center;
+  white-space: nowrap; /* Mencegah teks turun baris */
 }
-
-/* ====== Status Badge Base ====== */
-.status-badge {
-  display: flex;
-  /* ubah dari flex jadi block agar justify text bisa jalan */
-  font-weight: 600;
-  padding: 0.4rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  min-width: 140px;
-  border: 1px solid;
-  text-align: justify;
-  /* rata kanan kiri */
-  justify-content: center;
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
 /* === Belum Dikerjakan === */
 .status-belum-dikerjakan {
   background-color: var(--status-belum-bg-light);
@@ -2554,9 +2576,9 @@ body.dark-mode .job-filter select {
 }
 
 body.dark-mode .status-belum-dikerjakan {
-  background-color: var(--status-belum-bg-dark);
-  color: var(--status-belum-text-dark);
-  border-color: var(--status-belum-bg-dark);
+  background-color: rgba(167, 139, 250, 0.15);
+  color: var(--status-belum-text-dark, #A78BFA);
+  box-shadow: 0 4px 12px rgba(100, 28, 114, 0.35);
 }
 
 .status-belum-dikerjakan::before {
@@ -2572,9 +2594,8 @@ body.dark-mode .status-belum-dikerjakan {
 }
 
 body.dark-mode .status-sedang-dikerjakan {
-  background-color: var(--status-sedang-bg-dark);
-  color: var(--status-sedang-text-dark);
-  border-color: var(--status-sedang-bg-dark);
+  background-color: rgba(251, 191, 36, 0.15);
+  color: var(--status-sedang-text-dark, #FBBF24);
 }
 
 .status-sedang-dikerjakan::before {
@@ -2590,9 +2611,8 @@ body.dark-mode .status-sedang-dikerjakan {
 }
 
 body.dark-mode .status-ditunda {
-  background-color: var(--status-ditunda-bg-dark);
-  color: var(--status-ditunda-text-dark);
-  border-color: var(--status-ditunda-bg-dark);
+  background-color: rgba(156, 163, 175, 0.15);
+  color: var(--status-ditunda-text-dark, #9CA3AF);
 }
 
 .status-ditunda::before {
@@ -2608,9 +2628,8 @@ body.dark-mode .status-ditunda {
 }
 
 body.dark-mode .status-selesai {
-  background-color: var(--status-selesai-bg-dark);
-  color: var(--status-selesai-text-dark);
-  border-color: var(--status-selesai-bg-dark);
+  background-color: rgba(52, 211, 153, 0.15);
+  color: var(--status-selesai-text-dark, #34D399);
 }
 
 .status-selesai::before {
@@ -2625,11 +2644,9 @@ body.dark-mode .status-selesai {
   box-shadow: 0 4px 12px rgba(114, 28, 36, 0.35);
 }
 
-/* ====== Container Tombol ====== */
-.action-buttons-group {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-start;
+body.dark-mode .status-ditolak {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #f87171; /* Merah terang */
 }
 
 /* ADD USER PAGE */
@@ -3211,7 +3228,7 @@ body.dark-mode .content-area h3 {
 
 /* [DIUBAH] Dark Mode untuk Tombol Edit (Solid) */
 body.dark-mode .btn-edit {
-  background-color: #38a169;
+  background-color: #22C55E;
   color: #ffffff;
   border-color: #38a169;
 }
@@ -4630,7 +4647,7 @@ body.dark-mode .rejection-reason-display p {
 /* ===       DARK MODE (FORM NOTIFIKASI)     === */
 /* =========================================== */
 body.dark-mode .notification-form-container {
-  background: #1f2937;
+  background: #111111;
   color: #f9fafb;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
@@ -4904,14 +4921,12 @@ body.dark-mode .form-group2 textarea:focus {
 }
 
 body.dark-mode .btn-primary {
-  background: #3b82f6;
+  background-color: #4F46E5;
   color: #ffffff;
-  border-color: #3b82f6;
 }
 
 body.dark-mode .btn-primary:hover {
-  background-color: #2563eb;
-  border-color: #2563eb;
+  background-color: #4338CA;
 }
 
 body.dark-mode .feedback-message {
@@ -5162,7 +5177,7 @@ body.dark-mode .feedback-message {
 
 /* 🌙 Dark Mode */
 body.dark-mode .global-notification-history {
-  background-color: #1f2937;
+  background-color: #111111;
   color: #e0e0e0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
   border: 1px solid #333;
@@ -5191,16 +5206,22 @@ body.dark-mode .history-item-content small {
 
 /* --- Class Dasar untuk Semua Tombol Aksi --- */
 .btn-action {
-  padding: 8px 12px;
-  border-radius: 5px;
+  padding: 6px 14px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0.85rem;
   font-weight: 500;
   transition: all 0.2s ease-in-out;
-  border: 1px solid transparent;
+  border: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
+}
+
+.btn-action:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
 }
 
 .btn-action i {
@@ -5222,12 +5243,9 @@ body.dark-mode .history-item-content small {
 }
 
 /* --- Dark Mode: Tombol Hapus (Merah Solid) --- */
-body.dark-mode .btn-delete-small {
-  background-color: #e53e3e;
-  /* Merah terang */
+body.dark-mode .btn-delete-small { /* Hapus */
+  background-color: #EF4444;
   color: #ffffff;
-  /* Teks putih */
-  border-color: #e53e3e;
 }
 
 body.dark-mode .btn-delete-small:hover {
@@ -5250,11 +5268,9 @@ body.dark-mode .btn-delete-small:hover {
 }
 
 /* --- Dark Mode: Tombol Start / Lanjutkan / Bukti (Biru Solid) --- */
-body.dark-mode .btn-start {
-  background-color: #3b82f6;
-  /* Biru terang */
+body.dark-mode .btn-start { /* Mulai, Lanjutkan, Bukti */
+  background-color: var(--btn-submit, #4F46E5);
   color: #ffffff;
-  border-color: #3b82f6;
 }
 
 body.dark-mode .btn-start:hover {
@@ -5278,11 +5294,9 @@ body.dark-mode .btn-start:hover {
 }
 
 /* --- Dark Mode: Tombol Tolak (Kuning/Amber Solid) --- */
-body.dark-mode .btn-cancel-aksi {
-  background-color: #dd6b20;
-  /* Amber/Oranye */
-  color: #ffffff;
-  border-color: #dd6b20;
+body.dark-mode .btn-cancel-aksi { /* Tolak */
+  background-color: #F59E0B;
+  color: #1F2937;
 }
 
 body.dark-mode .btn-cancel-aksi:hover {
@@ -5306,11 +5320,9 @@ body.dark-mode .btn-cancel-aksi:hover {
 }
 
 /* --- Dark Mode: Tombol Selesaikan (Hijau Solid) --- */
-body.dark-mode .btn-finish {
-  background-color: #38a169;
-  /* Hijau terang */
+body.dark-mode .btn-finish { /* Selesaikan */
+  background-color: #22C55E;
   color: #ffffff;
-  border-color: #38a169;
 }
 
 body.dark-mode .btn-finish:hover {
@@ -5320,11 +5332,9 @@ body.dark-mode .btn-finish:hover {
 }
 
 /* --- Dark Mode: Tombol Tunda (Abu-abu Solid) --- */
-body.dark-mode .btn-pause {
-  background-color: #718096;
-  /* Abu-abu netral */
+body.dark-mode .btn-pause { /* Tunda */
+  background-color: #64748B;
   color: #ffffff;
-  border-color: #718096;
 }
 
 body.dark-mode .btn-pause:hover {
@@ -6198,16 +6208,15 @@ body.dark-mode .welcome-title {
 
 /* 🌙 Dark Mode */
 body.dark-mode .dashboard-container2 {
-  background-color: #1e1e2f;
+  background-color: #0A0A0A;
   /* latar belakang gelap */
   color: #f0f0f0;
 }
 
 body.dark-mode .dashboard-card {
-  background: #2b2b3c;
+  background: #111111;
   /* warna kartu lebih gelap */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
-  color: #f0f0f0;
 }
 
 body.dark-mode .dashboard-card h4 {
@@ -7589,6 +7598,10 @@ body.dark-mode .dashboard-card h4 {
   padding: 10px;
 }
 
+.dark-mode .calendar-wrapper .react-calendar {
+  background-color: #111111;
+}
+
 .react-calendar {
   width: 100%;
   border: 1px solid hsl(210, 10%, 85%);
@@ -8056,7 +8069,10 @@ body.dark-mode .dashboard-card h4 {
   border-radius: 10px;
   background-color: var(--bg-color);
   color: var(--text-color);
+}
 
+.dark-mode .linechart-wrapper {
+  background-color: #111111;
 }
 
 .chart-legend {

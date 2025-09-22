@@ -31,8 +31,8 @@ const UserManagement = ({ userData, onAddClick, onEditClick, onDeleteClick, onPa
             {/* ======================================================= */}
             {/* ===    TAMPILAN TABEL UNTUK DESKTOP (TETAP SAMA)    === */}
             {/* ======================================================= */}
-            <div className="user-list-table">
-                <table className='user-table'>
+            <div className="job-list-table">
+                <table className='job-table'>
                     <thead>
                         <tr>
                             <th>No.</th>
