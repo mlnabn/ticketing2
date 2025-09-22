@@ -67,12 +67,18 @@ function App() {
   const [myTicketsData, setMyTicketsData] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const initialUser = getUser();
+  const initialToken = getToken();
 
-  const [appPage, setAppPage] = useState("landing");
+  const [appPage, setAppPage] = useState(
+    !!initialUser && !!initialToken
+      ? (initialUser.role === "admin" ? "dashboard" : "user_dashboard")
+      : "landing"
+  );
 
   // --- State Autentikasi ---
-  const initialUser = getUser(); // <-- baru: ambil user sekali (sinkron) untuk cegah flicker
-  const [isLogin, setIsLogin] = useState(false);
+  // <-- baru: ambil user sekali (sinkron) untuk cegah flicker
+  const [isLogin, setIsLogin] = useState(!!initialUser && !!initialToken);
   const [userRole, setUserRole] = useState(initialUser ? initialUser.role : null); // <-- ubah: bukan null lagi
   const [userName, setUserName] = useState(initialUser ? initialUser.name : "");   // <-- ubah
   const [loggedInUserId, setLoggedInUserId] = useState(initialUser ? initialUser.id : null); // <-- ubah
@@ -1099,92 +1105,92 @@ function App() {
   }
 
   if (!isLogin) {
-  // 🔹 kalau appPage landing → langsung render landing page
-  if (appPage === "landing") {
-    return (
-      <div
-        className="dashboard-container no-sidebar landing-page"
-        style={{
-          backgroundImage: `url(${bgImage})`,
-        }}
-      >
-        <main className="main-content">
-          {/* Header */}
-          <header className="main-header-user landing-header">
-            <div className="header-left-group">
-              <img src={yourLogok} alt="Logo" className="header-logo" />
+    // 🔹 kalau appPage landing → langsung render landing page
+    if (appPage === "landing") {
+      return (
+        <div
+          className="dashboard-container no-sidebar landing-page"
+          style={{
+            backgroundImage: `url(${bgImage})`,
+          }}
+        >
+          <main className="main-content">
+            {/* Header */}
+            <header className="main-header-user landing-header">
+              <div className="header-left-group">
+                <img src={yourLogok} alt="Logo" className="header-logo" />
+              </div>
+
+              <nav className="header-nav">
+                <button
+                  className={publicPage === "home" ? "active" : ""}
+                  onClick={() => setPublicPage("home")}
+                >
+                  Home
+                </button>
+                <button
+                  className={publicPage === "features" ? "active" : ""}
+                  onClick={() => setPublicPage("features")}
+                >
+                  Features
+                </button>
+                <button
+                  className={publicPage === "faq" ? "active" : ""}
+                  onClick={() => setPublicPage("faq")}
+                >
+                  FAQ
+                </button>
+                <button
+                  className={publicPage === "aboutus" ? "active" : ""}
+                  onClick={() => setPublicPage("aboutus")}
+                >
+                  About Us
+                </button>
+              </nav>
+
+              <div className="header-right-group">
+                <button onClick={() => setAppPage("login")} className="login-btn2">
+                  <i className="fas fa-user-circle"></i>
+                  <span>Login</span>
+                </button>
+              </div>
+            </header>
+
+            {/* Konten Dinamis */}
+            <div className="public-content">
+              {publicPage === "home" && (
+                <WelcomeHomeUser onGetStarted={() => setAppPage("login")} />
+              )}
+              {publicPage === "aboutus" && <AboutUsPage adminList={adminList} />}
+              {publicPage === "features" && <FeaturesPage />}
+              {publicPage === "faq" && <FAQPage />}
             </div>
+          </main>
+        </div>
+      );
+    }
 
-            <nav className="header-nav">
-              <button
-                className={publicPage === "home" ? "active" : ""}
-                onClick={() => setPublicPage("home")}
-              >
-                Home
-              </button>
-              <button
-                className={publicPage === "features" ? "active" : ""}
-                onClick={() => setPublicPage("features")}
-              >
-                Features
-              </button>
-              <button
-                className={publicPage === "faq" ? "active" : ""}
-                onClick={() => setPublicPage("faq")}
-              >
-                FAQ
-              </button>
-              <button
-                className={publicPage === "aboutus" ? "active" : ""}
-                onClick={() => setPublicPage("aboutus")}
-              >
-                About Us
-              </button>
-            </nav>
-
-            <div className="header-right-group">
-              <button onClick={() => setAppPage("login")} className="login-btn2">
-                <i className="fas fa-user-circle"></i>
-                <span>Login</span>
-              </button>
-            </div>
-          </header>
-
-          {/* Konten Dinamis */}
-          <div className="public-content">
-            {publicPage === "home" && (
-              <WelcomeHomeUser onGetStarted={() => setAppPage("login")} />
-            )}
-            {publicPage === "aboutus" && <AboutUsPage adminList={adminList} />}
-            {publicPage === "features" && <FeaturesPage />}
-            {publicPage === "faq" && <FAQPage />}
-          </div>
-        </main>
-      </div>
-    );
+    // 🔹 kalau appPage login/register → render auth page
+    if (appPage === "login" || appPage === "register") {
+      return (
+        <div className="auth-page-container">
+          {showRegister ? (
+            <Register
+              onRegister={handleRegisterSuccess}
+              onShowLogin={() => setShowRegister(false)}
+              onBackToLanding={() => setAppPage("landing")}
+            />
+          ) : (
+            <Login
+              onLogin={handleLoginSuccess}
+              onShowRegister={() => setShowRegister(true)}
+              onBackToLanding={() => setAppPage("landing")}
+            />
+          )}
+        </div>
+      );
+    }
   }
-
-  // 🔹 kalau appPage login/register → render auth page
-  if (appPage === "login" || appPage === "register") {
-    return (
-      <div className="auth-page-container">
-        {showRegister ? (
-          <Register
-            onRegister={handleRegisterSuccess}
-            onShowLogin={() => setShowRegister(false)}
-            onBackToLanding={() => setAppPage("landing")}
-          />
-        ) : (
-          <Login
-            onLogin={handleLoginSuccess}
-            onShowRegister={() => setShowRegister(true)}
-            onBackToLanding={() => setAppPage("landing")}
-          />
-        )}
-      </div>
-    );
-  }
-}
 
 
   // Tampilan untuk ADMIN

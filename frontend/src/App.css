@@ -775,7 +775,7 @@ body.dark-mode .hamburger-menu-button span {
     box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
     -webkit-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-    background-color: #393955;
+    background-color: #111111;
     border: 1px solid var(--border-color-dark);
   }
 
