@@ -109,8 +109,8 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
               </div>
             </div>
             <div className="form-actions">
-              <button type="button" onClick={onClose} className="btn-secondary">Batal</button>
-              <button type="submit" className="btn-primary">Simpan</button>
+              <button type="button" onClick={onClose} className="btn btn-cancel">Batal</button>
+              <button type="submit" className="btn btn-confirm">Simpan</button>
             </div>
           </form>
         </div>

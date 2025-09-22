@@ -122,8 +122,8 @@ function CalendarComponent({ tickets = [], onTicketClick }) {
 
       {/* Modal Detail Tiket */}
       {showModal && selectedTickets.length > 0 && (
-        <div className={`modal-overlay ${isDarkMode ? 'dark-mode' : ''}`}>
-          <div className={`modal-content ${isDarkMode ? 'dark-mode' : ''}`}>
+        <div className={`modal-overlay2 ${isDarkMode ? 'dark-mode' : ''}`}>
+          <div className={`modal-content2 ${isDarkMode ? 'dark-mode' : ''}`}>
             <div className={`modal-header ${isDarkMode ? 'dark-mode' : ''}`}>
               <h3 className="modal-title">
                 Tiket untuk {format(date, 'dd MMM yyyy')}
