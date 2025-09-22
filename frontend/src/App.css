@@ -525,7 +525,7 @@ body.dark-mode .hamburger-menu-button span {
 }
 
 /* Desktop Styles */
-@media (min-width: 1291px) {
+@media (min-width: 1290px) {
 
   .hamburger-menu-button,
   .content-overlay,
@@ -896,7 +896,7 @@ body.dark-mode .hamburger-menu-button span {
   }
 }
 
-@media (min-width: 665px) {
+/* @media (min-width: 665px) {
   .user-list-mobile {
     display: none;
   }
@@ -904,7 +904,7 @@ body.dark-mode .hamburger-menu-button span {
   .user-list-table {
     display: block;
   }
-}
+} */
 
 @media (max-width: 480px) {
 
