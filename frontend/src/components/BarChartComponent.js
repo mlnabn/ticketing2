@@ -51,14 +51,23 @@ const BarChartComponent = ({ data, onBarClick }) => {
 
       {/* ✅ Custom Legend (konsisten dengan Line & Pie) */}
       <div className="chart-legend">
-        <div className="legend-item2">
+        <div
+          className="legend-item2"
+          onClick={() => onBarClick({ status: "Selesai" })}
+          style={{ cursor: "pointer" }}
+        >
           <span
             className="legend-dot"
             style={{ backgroundColor: "#82ca9d" }}
           ></span>
           <span className="legend-text">Tiket Selesai</span>
         </div>
-        <div className="legend-item2">
+
+        <div
+          className="legend-item2"
+          onClick={() => onBarClick({ status: ["Sedang Dikerjakan", "Ditunda"] })}
+          style={{ cursor: "pointer" }}
+        >
           <span
             className="legend-dot"
             style={{ backgroundColor: "#FFBB28" }}

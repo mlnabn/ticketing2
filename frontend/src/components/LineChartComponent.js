@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import dayjs from "dayjs";
 
-const LineChartComponent = ({ data, onPointClick }) => {
+const LineChartComponent = ({ data, onPointClick, onLegendClick }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // ambil status darkmode dari localStorage
@@ -145,19 +145,35 @@ const LineChartComponent = ({ data, onPointClick }) => {
 
       {/* Legend di luar chart */}
       <div className="chart-legend">
-        <div className="legend-item2">
+        <div
+          className="legend-item2"
+          onClick={() => onLegendClick && onLegendClick("Belum Dikerjakan")}
+          style={{ cursor: "pointer" }}
+        >
           <span className="legend-dot dot-blue"></span>
           <span className="legend-text">Belum Dikerjakan</span>
         </div>
-        <div className="legend-item2">
+        <div
+          className="legend-item2"
+          onClick={() => onLegendClick && onLegendClick("Sedang Dikerjakan")}
+          style={{ cursor: "pointer" }}
+        >
           <span className="legend-dot dot-yellow"></span>
           <span className="legend-text">Sedang Dikerjakan</span>
         </div>
-        <div className="legend-item2">
+        <div
+          className="legend-item2"
+          onClick={() => onLegendClick && onLegendClick("Selesai")}
+          style={{ cursor: "pointer" }}
+        >
           <span className="legend-dot dot-green"></span>
           <span className="legend-text">Selesai</span>
         </div>
-        <div className="legend-item2">
+        <div
+          className="legend-item2"
+          onClick={() => onLegendClick && onLegendClick("Ditolak")}
+          style={{ cursor: "pointer" }}
+        >
           <span className="legend-dot dot-red"></span>
           <span className="legend-text">Ditolak</span>
         </div>

@@ -74,10 +74,17 @@ const PieChartComponent = ({ stats, handleHomeClick, handleStatusFilterClick, st
         </ResponsiveContainer>
       </div>
 
-      {/* Legend model sama kayak LineChart */}
       <div className="chart-legend">
         {dataWithPercent.map((entry, index) => (
-          <div className="legend-item2" key={index}>
+          <div
+            key={index}
+            className="legend-item2"
+            onClick={() => {
+              handleHomeClick();
+              handleStatusFilterClick(entry.name);
+            }}
+            style={{ cursor: "pointer" }}
+          >
             <span className={`legend-dot ${entry.dotClass}`}></span>
             <span className="legend-text">
               {entry.name} ({entry.value})

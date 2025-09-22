@@ -1361,9 +1361,11 @@ function App() {
                           setCurrentPage('Tickets');
                           fetchData(1, '', status, null, date);
                         }}
+                        onLegendClick={(status) => {
+                          setCurrentPage('Tickets');
+                          fetchData(1, '', status); // langsung filter berdasarkan status legend
+                        }}
                       />
-
-
 
                     </div>
 
