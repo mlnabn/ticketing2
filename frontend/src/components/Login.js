@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { login } from '../auth';
 import '../App.css';
-import bgImage2 from '../Image/Login.png';
-import { FaGoogle } from 'react-icons/fa';
+import bgImage2 from '../Image/Login.png';   // ✅ pakai react-icons Google
+import GoogleLogo from "../Image/google.svg";
 
 const API_URL = 'http://127.0.0.1:8000/api';
 
-function Login({ onLogin, onShowRegister, onBackToLanding }) {   // 👈 tambah prop baru
+function Login({ onLogin, onShowRegister, onBackToLanding }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,9 +41,8 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {   // 👈 tambah 
   };
 
   const handleGoogleLogin = () => {
-        // Arahkan ke endpoint redirect di backend Laravel Anda
-        window.location.href = 'http://127.0.0.1:8000/api/auth/google/redirect';
-    };
+    window.location.href = 'http://127.0.0.1:8000/api/auth/google/redirect';
+  };
 
   return (
     <div className="auth-page-container">
@@ -89,17 +88,19 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {   // 👈 tambah 
                 Forgot password?
               </button>
             </div>
-            
+
             <button type="submit" className="login-btn" disabled={loading}>
               {loading ? 'Processing...' : 'Login'}
             </button>
 
             <div className="divider">atau</div>
 
+            {/* Tombol Google */}
             <button onClick={handleGoogleLogin} className="google-login-button">
-                <FaGoogle style={{ marginRight: '10px' }} />
-                Sign in with Google
+              <img src={GoogleLogo} alt="Google Logo" className="google-icon" />
+              <span>Login with Google</span>
             </button>
+
 
             <p className="auth-toggle">
               Don't have an account?{' '}
@@ -112,7 +113,6 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {   // 👈 tambah 
               </button>
             </p>
 
-            {/* ✅ Tambahin tombol Back to Landing */}
             <button
               type="button"
               onClick={onBackToLanding}

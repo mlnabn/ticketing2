@@ -57,6 +57,7 @@ function App() {
   // #1. STATE MANAGEMENT (Manajemen Data Aplikasi)
   // -----------------------------------------------------------------
   // --- State untuk Data dari API ---
+  const [initialized, setInitialized] = useState(false);
   const [ticketData, setTicketData] = useState(null);
   const [users, setUsers] = useState([]);
   const [adminList, setAdminList] = useState([]);
@@ -67,11 +68,11 @@ function App() {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  const [appPage, setAppPage] = useState("loading");
+  const [appPage, setAppPage] = useState("landing");
 
   // --- State Autentikasi ---
   const initialUser = getUser(); // <-- baru: ambil user sekali (sinkron) untuk cegah flicker
-  const [isLogin, setIsLogin] = useState(isLoggedIn());
+  const [isLogin, setIsLogin] = useState(false);
   const [userRole, setUserRole] = useState(initialUser ? initialUser.role : null); // <-- ubah: bukan null lagi
   const [userName, setUserName] = useState(initialUser ? initialUser.name : "");   // <-- ubah
   const [loggedInUserId, setLoggedInUserId] = useState(initialUser ? initialUser.id : null); // <-- ubah
@@ -364,50 +365,50 @@ function App() {
     setCreatedTicketsData(null);
     setSearchQuery('');
     setSearchInput('');
-}, []);
+  }, []);
 
-// Perbaikan untuk handleLoginSuccess
-const handleLoginSuccess = useCallback(async () => {
+  // Perbaikan untuk handleLoginSuccess
+  const handleLoginSuccess = useCallback(async () => {
     try {
-        // 1. Ambil token yang sudah tersimpan untuk otentikasi request
-        const token = getToken();
-        if (!token) {
-            // Jika karena alasan tertentu token tidak ada, hentikan proses
-            throw new Error("Token tidak ditemukan");
-        }
+      // 1. Ambil token yang sudah tersimpan untuk otentikasi request
+      const token = getToken();
+      if (!token) {
+        // Jika karena alasan tertentu token tidak ada, hentikan proses
+        throw new Error("Token tidak ditemukan");
+      }
 
-        // 2. Ambil data user terbaru dari server untuk memastikan data selalu sinkron
-        const response = await axios.get(`${API_URL}/user`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        const u = response.data; // Data user terbaru dari API
+      // 2. Ambil data user terbaru dari server untuk memastikan data selalu sinkron
+      const response = await axios.get(`${API_URL}/user`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const u = response.data; // Data user terbaru dari API
 
-        // 3. Perbarui data di localStorage menggunakan fungsi login yang sudah ada
-        // Ini akan menimpa data user lama dengan yang baru didapat dari server
-        login(token, u); 
+      // 3. Perbarui data di localStorage menggunakan fungsi login yang sudah ada
+      // Ini akan menimpa data user lama dengan yang baru didapat dari server
+      login(token, u);
 
-        // 4. Perbarui state React dengan data terbaru
-        setIsLogin(true);
-        setUserRole(u.role);
-        setUserName(u.name);
-        setLoggedInUserId(u.id);
-        setUserAvatar(u.avatar_url || null); // Menggunakan avatar dari data user
+      // 4. Perbarui state React dengan data terbaru
+      setIsLogin(true);
+      setUserRole(u.role);
+      setUserName(u.name);
+      setLoggedInUserId(u.id);
+      setUserAvatar(u.avatar_url || null); // Menggunakan avatar dari data user
 
-        // 5. Arahkan pengguna ke halaman yang sesuai berdasarkan rolenya
-        if (u.role === 'admin') {
-            setAppPage("dashboard");
-            setCurrentPage("Welcome");
-        } else {
-            setAppPage("user_dashboard");
-        }
+      // 5. Arahkan pengguna ke halaman yang sesuai berdasarkan rolenya
+      if (u.role === 'admin') {
+        setAppPage("dashboard");
+        setCurrentPage("Welcome");
+      } else {
+        setAppPage("user_dashboard");
+      }
 
     } catch (error) {
-        // 6. Jika terjadi error (misal: token tidak valid), paksa logout
-        // Blok catch akan menangkap error dari axios atau jika token tidak ada
-        console.error("Gagal memvalidasi sesi login:", error);
-        handleLogout();
+      // 6. Jika terjadi error (misal: token tidak valid), paksa logout
+      // Blok catch akan menangkap error dari axios atau jika token tidak ada
+      console.error("Gagal memvalidasi sesi login:", error);
+      handleLogout();
     }
-}, [handleLogout]);
+  }, [handleLogout]);
   const handleRegisterSuccess = handleLoginSuccess;
 
   const addTicket = async (formData) => {
@@ -764,14 +765,14 @@ const handleLoginSuccess = useCallback(async () => {
       if (token && userParam) {
         // Skenario 1: Baru kembali dari login Google
         try {
-            const user = JSON.parse(decodeURIComponent(userParam));
-            login(token, user); // Simpan token DAN user
-            handleLoginSuccess();
-            // Hapus parameter dari URL agar bersih
-            window.history.replaceState({}, document.title, window.location.pathname);
+          const user = JSON.parse(decodeURIComponent(userParam));
+          login(token, user); // Simpan token DAN user
+          handleLoginSuccess();
+          // Hapus parameter dari URL agar bersih
+          window.history.replaceState({}, document.title, window.location.pathname);
         } catch (e) {
-            console.error("Gagal mem-parsing data user dari URL", e);
-            setAppPage("landing");
+          console.error("Gagal mem-parsing data user dari URL", e);
+          setAppPage("landing");
         }
       } else if (isLoggedIn()) {
         // Skenario 2: Sesi login sudah ada di localStorage
@@ -780,6 +781,7 @@ const handleLoginSuccess = useCallback(async () => {
         // Skenario 3: Tidak ada sesi login, tampilkan landing page
         setAppPage("landing");
       }
+      setInitialized(true); // ✅ tandai sudah siap render
     };
     initializeApp();
   }, [handleLoginSuccess]);
@@ -949,6 +951,10 @@ const handleLoginSuccess = useCallback(async () => {
   // -----------------------------------------------------------------
 
   if (publicTicketCode) {
+
+    // if (!initialized) {
+    //   return <div className="splash-screen">Loading...</div>;
+    // }
     // Jika ada kode tiket di URL dan user belum login, tampilkan halaman history publik
     return (
       <div
@@ -1093,87 +1099,84 @@ const handleLoginSuccess = useCallback(async () => {
   }
 
   if (!isLogin) {
-    if (appPage === "landing") {
-      return (
-        <div
-          className="dashboard-container no-sidebar landing-page"
-          style={{
-            backgroundImage: `url(${bgImage})`,
-          }}
-        >
-          <main className="main-content">
-            {/* Header */}
-            <header className="main-header-user landing-header">
-              <div className="header-left-group">
-                <img src={yourLogok} alt="Logo" className="header-logo" />
-              </div>
-
-              <nav className="header-nav">
-                <button
-                  className={publicPage === "home" ? "active" : ""}
-                  onClick={() => setPublicPage("home")}
-                >
-                  Home
-                </button>
-
-                <button
-                  className={publicPage === "features" ? "active" : ""}
-                  onClick={() => setPublicPage("features")}
-                >
-                  Features
-                </button>
-
-                <button
-                  className={publicPage === "faq" ? "active" : ""}
-                  onClick={() => setPublicPage("faq")}
-                >
-                  FAQ
-                </button>
-
-                <button
-                  className={publicPage === "aboutus" ? "active" : ""}
-                  onClick={() => setPublicPage("aboutus")}
-                >
-                  About Us
-                </button>
-              </nav>
-
-              <div className="header-right-group">
-                <button onClick={() => setAppPage("login")} className="login-btn2">
-                  <i className="fas fa-user-circle"></i>
-                  <span>Login</span>
-                </button>
-              </div>
-
-            </header>
-
-            {/* Konten Dinamis */}
-            <div className="public-content">
-              {publicPage === "home" && (
-                <WelcomeHomeUser onGetStarted={() => setAppPage("login")} />
-              )}
-              {publicPage === "aboutus" && <AboutUsPage adminList={adminList} />}
-              {publicPage === "features" && <FeaturesPage />}
-              {publicPage === "faq" && <FAQPage />}
+  // 🔹 kalau appPage landing → langsung render landing page
+  if (appPage === "landing") {
+    return (
+      <div
+        className="dashboard-container no-sidebar landing-page"
+        style={{
+          backgroundImage: `url(${bgImage})`,
+        }}
+      >
+        <main className="main-content">
+          {/* Header */}
+          <header className="main-header-user landing-header">
+            <div className="header-left-group">
+              <img src={yourLogok} alt="Logo" className="header-logo" />
             </div>
 
-          </main>
-        </div>
-      );
-    }
+            <nav className="header-nav">
+              <button
+                className={publicPage === "home" ? "active" : ""}
+                onClick={() => setPublicPage("home")}
+              >
+                Home
+              </button>
+              <button
+                className={publicPage === "features" ? "active" : ""}
+                onClick={() => setPublicPage("features")}
+              >
+                Features
+              </button>
+              <button
+                className={publicPage === "faq" ? "active" : ""}
+                onClick={() => setPublicPage("faq")}
+              >
+                FAQ
+              </button>
+              <button
+                className={publicPage === "aboutus" ? "active" : ""}
+                onClick={() => setPublicPage("aboutus")}
+              >
+                About Us
+              </button>
+            </nav>
 
-    // ✅ Login & Register
+            <div className="header-right-group">
+              <button onClick={() => setAppPage("login")} className="login-btn2">
+                <i className="fas fa-user-circle"></i>
+                <span>Login</span>
+              </button>
+            </div>
+          </header>
+
+          {/* Konten Dinamis */}
+          <div className="public-content">
+            {publicPage === "home" && (
+              <WelcomeHomeUser onGetStarted={() => setAppPage("login")} />
+            )}
+            {publicPage === "aboutus" && <AboutUsPage adminList={adminList} />}
+            {publicPage === "features" && <FeaturesPage />}
+            {publicPage === "faq" && <FAQPage />}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // 🔹 kalau appPage login/register → render auth page
+  if (appPage === "login" || appPage === "register") {
     return (
       <div className="auth-page-container">
         {showRegister ? (
           <Register
-            onRegister={handleRegisterSuccess}        // <-- ubah
+            onRegister={handleRegisterSuccess}
             onShowLogin={() => setShowRegister(false)}
             onBackToLanding={() => setAppPage("landing")}
           />
         ) : (
           <Login
-            onLogin={handleLoginSuccess}              // <-- ubah
+            onLogin={handleLoginSuccess}
             onShowRegister={() => setShowRegister(true)}
             onBackToLanding={() => setAppPage("landing")}
           />
@@ -1181,6 +1184,7 @@ const handleLoginSuccess = useCallback(async () => {
       </div>
     );
   }
+}
 
 
   // Tampilan untuk ADMIN
