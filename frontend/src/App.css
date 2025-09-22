@@ -4368,7 +4368,7 @@ body.dark-mode .rejection-reason-display p {
 
 /* === DARK MODE === */
 .dark-mode .modal-content {
-  background: rgba(0, 0, 0, 0.5);
+  background: #111111;
   border: 1px solid rgba(148, 163, 184, 0.25);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
 }
