@@ -7942,7 +7942,7 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .dark-mode .modal-content2 {
-  background: hsl(210, 10%, 25%);
+  background: #111111;
   color: hsl(210, 36%, 96%);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
 }
