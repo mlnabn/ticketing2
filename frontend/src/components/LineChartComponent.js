@@ -10,8 +10,14 @@ import {
 } from "recharts";
 import dayjs from "dayjs";
 
-const LineChartComponent = ({ data, onPointClick, onLegendClick }) => {
+const LineChartComponent = ({ data, onPointClick }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [visibleStatuses, setVisibleStatuses] = useState([
+    "Belum Dikerjakan",
+    "Sedang Dikerjakan",
+    "Selesai",
+    "Ditolak",
+  ]);
 
   // ambil status darkmode dari localStorage
   useEffect(() => {
@@ -21,13 +27,9 @@ const LineChartComponent = ({ data, onPointClick, onLegendClick }) => {
         setIsDarkMode(JSON.parse(savedMode));
       }
     };
-
     updateModeFromStorage();
     window.addEventListener("storage", updateModeFromStorage);
-
-    return () => {
-      window.removeEventListener("storage", updateModeFromStorage);
-    };
+    return () => window.removeEventListener("storage", updateModeFromStorage);
   }, []);
 
   if (!data || data.length === 0) return null;
@@ -46,6 +48,25 @@ const LineChartComponent = ({ data, onPointClick, onLegendClick }) => {
   const handlePointClick = (dataPoint, status) => {
     if (onPointClick) {
       onPointClick(status, dayjs(dataPoint.date).format("YYYY-MM-DD"));
+    }
+  };
+
+  // klik legend → filter lane
+  const handleLegendClick = (status) => {
+    if (visibleStatuses.length === 4) {
+      // default semua tampil → klik pertama, filter jadi hanya 1
+      setVisibleStatuses([status]);
+    } else if (visibleStatuses.length === 1 && visibleStatuses[0] === status) {
+      // kalau sudah 1 dan diklik ulang → reset tampilkan semua lagi
+      setVisibleStatuses([
+        "Belum Dikerjakan",
+        "Sedang Dikerjakan",
+        "Selesai",
+        "Ditolak",
+      ]);
+    } else {
+      // kalau sudah difilter ke 1 lain → ganti ke status baru
+      setVisibleStatuses([status]);
     }
   };
 
@@ -96,87 +117,82 @@ const LineChartComponent = ({ data, onPointClick, onLegendClick }) => {
             }}
           />
 
-          <Line
-            type="monotone"
-            dataKey="belum"
-            stroke="#2196f3"
-            name="Belum Dikerjakan"
-            activeDot={{
-              onClick: (e, payload) =>
-                handlePointClick(payload.payload, "Belum Dikerjakan"),
-              cursor: "pointer"
-            }}
-          />
-          <Line
-            type="monotone"
-            dataKey="sedang"
-            stroke="#FFBB28"
-            name="Sedang Dikerjakan"
-            activeDot={{
-              onClick: (e, payload) =>
-                handlePointClick(payload.payload, "Sedang Dikerjakan"),
-              cursor: "pointer"
-            }}
-          />
-          <Line
-            type="monotone"
-            dataKey="selesai"
-            stroke="#82ca9d"
-            name="Selesai"
-            activeDot={{
-              onClick: (e, payload) =>
-                handlePointClick(payload.payload, "Selesai"),
-              cursor: "pointer"
-            }}
-          />
-          <Line
-            type="monotone"
-            dataKey="ditolak"
-            stroke="#ff2828"
-            name="Ditolak"
-            activeDot={{
-              onClick: (e, payload) =>
-                handlePointClick(payload.payload, "Ditolak"),
-              cursor: "pointer"
-            }}
-          />
+          {visibleStatuses.includes("Belum Dikerjakan") && (
+            <Line
+              type="monotone"
+              dataKey="belum"
+              stroke="#2196f3"
+              name="Belum Dikerjakan"
+              activeDot={{
+                onClick: (e, payload) =>
+                  handlePointClick(payload.payload, "Belum Dikerjakan"),
+                cursor: "pointer"
+              }}
+            />
+          )}
+          {visibleStatuses.includes("Sedang Dikerjakan") && (
+            <Line
+              type="monotone"
+              dataKey="sedang"
+              stroke="#FFBB28"
+              name="Sedang Dikerjakan"
+              activeDot={{
+                onClick: (e, payload) =>
+                  handlePointClick(payload.payload, "Sedang Dikerjakan"),
+                cursor: "pointer"
+              }}
+            />
+          )}
+          {visibleStatuses.includes("Selesai") && (
+            <Line
+              type="monotone"
+              dataKey="selesai"
+              stroke="#82ca9d"
+              name="Selesai"
+              activeDot={{
+                onClick: (e, payload) =>
+                  handlePointClick(payload.payload, "Selesai"),
+                cursor: "pointer"
+              }}
+            />
+          )}
+          {visibleStatuses.includes("Ditolak") && (
+            <Line
+              type="monotone"
+              dataKey="ditolak"
+              stroke="#ff2828"
+              name="Ditolak"
+              activeDot={{
+                onClick: (e, payload) =>
+                  handlePointClick(payload.payload, "Ditolak"),
+                cursor: "pointer"
+              }}
+            />
+          )}
         </LineChart>
       </ResponsiveContainer>
 
-      {/* Legend di luar chart */}
+      {/* Legend custom */}
       <div className="chart-legend">
-        <div
-          className="legend-item2"
-          onClick={() => onLegendClick && onLegendClick("Belum Dikerjakan")}
-          style={{ cursor: "pointer" }}
-        >
-          <span className="legend-dot dot-blue"></span>
-          <span className="legend-text">Belum Dikerjakan</span>
-        </div>
-        <div
-          className="legend-item2"
-          onClick={() => onLegendClick && onLegendClick("Sedang Dikerjakan")}
-          style={{ cursor: "pointer" }}
-        >
-          <span className="legend-dot dot-yellow"></span>
-          <span className="legend-text">Sedang Dikerjakan</span>
-        </div>
-        <div
-          className="legend-item2"
-          onClick={() => onLegendClick && onLegendClick("Selesai")}
-          style={{ cursor: "pointer" }}
-        >
-          <span className="legend-dot dot-green"></span>
-          <span className="legend-text">Selesai</span>
-        </div>
-        <div
-          className="legend-item2"
-          onClick={() => onLegendClick && onLegendClick("Ditolak")}
-          style={{ cursor: "pointer" }}
-        >
-          <span className="legend-dot dot-red"></span>
-          <span className="legend-text">Ditolak</span>
-        </div>
+        {[
+          { status: "Belum Dikerjakan", color: "dot-blue" },
+          { status: "Sedang Dikerjakan", color: "dot-yellow" },
+          { status: "Selesai", color: "dot-green" },
+          { status: "Ditolak", color: "dot-red" },
+        ].map((item) => (
+          <div
+            key={item.status}
+            className="legend-item2"
+            onClick={() => handleLegendClick(item.status)}
+            style={{
+              cursor: "pointer",
+              opacity: visibleStatuses.includes(item.status) ? 1 : 0.4,
+            }}
+          >
+            <span className={`legend-dot ${item.color}`}></span>
+            <span className="legend-text">{item.status}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
