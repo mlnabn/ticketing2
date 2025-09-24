@@ -2551,22 +2551,33 @@ body.dark-mode .job-filter select {
   /* Warna teks input di mode gelap */
 }
 
-/*
-  ---------------------------------------------------
-  GAYA STATUS BADGE
-  ---------------------------------------------------
-  Gaya untuk badge status tiket (Belum Dikerjakan, Sedang Dikerjakan, Selesai).
-*/
-/* Gaya umum untuk semua status */
+/* ================================
+   STATUS BADGE — POSISI TENGAH
+   ================================ */
+
+/* Gaya umum untuk badge */
 .status-badge {
-  display: inline-block;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   padding: 5px 12px;
-  border-radius: 9999px; /* Bentuk pil */
+  border-radius: 9999px;  
   font-size: 0.8rem;
   font-weight: 600;
   text-align: center;
-  white-space: nowrap; /* Mencegah teks turun baris */
+  white-space: nowrap;        
 }
+
+
+.job-table td:nth-child(8) {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.job-table td .status-badge {
+  margin: 0 auto;
+}
+
 /* === Belum Dikerjakan === */
 .status-belum-dikerjakan {
   background-color: var(--status-belum-bg-light);
@@ -6233,61 +6244,118 @@ body.dark-mode .dashboard-card h4 {
 
 
 
-/* ===== LANDING PAGE ===== */
-.landing-page {
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Header */
+/* ===== HEADER LANDING PAGE ===== */
 .landing-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background: rgba(10, 15, 30, 0.6);
+  padding: 0.8rem 2rem;
+  background: rgba(10, 15, 30, 0.65);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+  position: relative;
+  z-index: 10;
 }
 
-.landing-header .header-logo {
-  height: 40px;
+/* Logo kiri */
+.header-left-group .header-logo {
+  height: 42px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+.header-left-group .header-logo:hover {
+  transform: scale(1.05);
 }
 
-/* Nav */
+/* NAVIGATION ACTIVE UNDERLINE ANIMATION */
 .header-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
-.header-nav button {
-  background: none;
-  border: none;
-  color: #ddd;
+.header-nav a {
+  position: relative;
+  text-decoration: none;
+  color: #e2e8f0;
   font-size: 1rem;
-  cursor: pointer;
-  padding-bottom: 0.25rem;
-  transition: color 0.3s, border-color 0.3s;
-  border-bottom: 2px solid transparent;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  transition: color 0.3s ease;
 }
 
-.header-nav button.active,
-.header-nav button:hover {
+/* Garis bawah animasi */
+.header-nav a::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: #60a5fa;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+/* Saat hover */
+.header-nav a:hover {
   color: #60a5fa;
-  border-color: #60a5fa;
 }
 
-/* Login Button */
-.login-icon-btn {
+.header-nav a:hover::after {
+  width: 60%;
+}
+
+/* Aktif */
+.header-nav a.active {
+  color: #60a5fa;
+}
+
+.header-nav a.active::after {
+  width: 60%;
+}
+
+/* Efek gradient animasi underline */
+.header-nav a.active::after {
+  background: linear-gradient(90deg, #60a5fa, #3b82f6, #60a5fa);
+  background-size: 200% auto;
+  animation: shine 2s linear infinite;
+}
+
+@keyframes shine {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+
+/* Login button kanan */
+.header-right-group .btn-btn2 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   background: transparent;
   border: none;
+  color: #fff;
+  font-size: 1rem;
   cursor: pointer;
-  font-size: 24px;
-  color: white;
+  transition: color 0.3s, transform 0.2s;
 }
+
+.header-right-group .btn-btn2:hover {
+  color: #60a5fa;
+  transform: translateY(-2px);
+}
+
+.header-right-group .btn-btn2 i {
+  font-size: 1.2rem;
+}
+
 
 /* Content */
 .public-content {
