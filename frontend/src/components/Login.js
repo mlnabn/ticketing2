@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { login } from '../auth';
 import '../App.css';
 import bgImage2 from '../Image/Login.png';   // ✅ pakai react-icons Google
 import GoogleLogo from "../Image/google.svg";
@@ -23,8 +22,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
       const { token, user } = response.data;
 
       if (token && user) {
-        login(token, user);
-        onLogin();
+        onLogin(token, user);
       } else {
         setError('Login gagal: Respons dari server tidak lengkap.');
       }

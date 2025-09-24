@@ -1,10 +1,7 @@
 // src/components/ProfileModal.jsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import AvatarUploader from './AvatarUploader';
-import { getToken } from '../auth'; // helper untuk ambil token dari localStorage
-
-const API_URL = 'http://127.0.0.1:8000/api';
 
 const ProfileModal = ({ user, onClose, onSaved }) => {
   const [name, setName] = useState(user?.name || '');
@@ -52,25 +49,18 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
   } else if (removeAvatar) {
     formData.append("avatar_remove", "1"); // kirim flag hapus avatar
   }
-
-    // Laravel butuh spoof method
     formData.append('_method', 'PUT');
 
     setLoading(true);
     setError(null);
 
     try {
-      const res = await axios.post(`${API_URL}/user?_method=PUT`, formData, {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
+      // 2. Gunakan api.post. Header otorisasi dan URL dasar sudah diatur otomatis.
+      const res = await api.post('/user', formData);
 
       const updatedUser = res.data;
-      onSaved(updatedUser);
-      onClose();
+      onSaved(updatedUser); // Kirim data baru ke parent
+      onClose(); // Tutup modal
     } catch (err) {
       console.error('Profile update error:', err.response?.data || err.message);
       setError(err.response?.data?.message || err.response?.data?.error || 'Gagal menyimpan profil.');
@@ -78,6 +68,7 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="modal-overlay4">

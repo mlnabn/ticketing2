@@ -1,25 +1,18 @@
-/**
- * Menyimpan token dan data user ke localStorage setelah login berhasil.
- * @param {string} token - JWT token dari server.
- * @param {object} user - Objek user (id, name, email, role) dari server.
- */
+const TOKEN_KEY = 'auth.token';
+const USER_KEY = 'auth.user';
+
 export const login = (token, user) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user)); // Simpan objek user sebagai string JSON
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
 };
 
 /**
  * Mengambil token dari localStorage.
  */
-export const getToken = () => localStorage.getItem('token');
+export const getToken = () => localStorage.getItem(TOKEN_KEY);
 
-/**
- * Mengambil data user dari localStorage.
- * @returns {object|null} - Mengembalikan objek user jika ada, atau null jika tidak.
- */
 export const getUser = () => {
-    const user = localStorage.getItem('user');
-    // Ubah kembali dari string JSON ke objek JavaScript
+    const user = localStorage.getItem(USER_KEY);
     return user ? JSON.parse(user) : null;
 };
 
@@ -27,14 +20,9 @@ export const getUser = () => {
  * Menghapus token dan data user dari localStorage saat logout.
  */
 export const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user'); // Hapus juga data user
-    // Arahkan kembali ke halaman login untuk pengalaman pengguna yang lebih baik
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
     window.location.href = '/login';
 };
 
-/**
- * Memeriksa apakah user sudah login dengan melihat keberadaan token.
- * @returns {boolean}
- */
 export const isLoggedIn = () => !!getToken();
