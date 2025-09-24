@@ -70,6 +70,10 @@ export default function AdminDashboard() {
   const [userToDelete, setUserToDelete] = useState(null);
   const [showUserFormModal, setShowUserFormModal] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
+
+  const [adminIdFilter, setAdminIdFilter] = useState(null);
+  const [dateFilter, setDateFilter] = useState(null);
+  const [ticketIdFilter, setTicketIdFilter] = useState(null);
   
   const ticketsOnPage = useMemo(() => (ticketData ? ticketData.data : []), [ticketData]);
   
@@ -204,6 +208,19 @@ export default function AdminDashboard() {
     }
   }, [handleLogout]);
 
+  const handleChartFilter = useCallback((filters) => {
+    setDataPage(1);
+    setSearchQuery('');
+    setSearchInput('');
+    setAdminIdFilter(filters.adminId || null);
+    setDateFilter(filters.date || null);
+    setTicketIdFilter(filters.ticketId || null);
+    setStatusFilter(filters.status || null); // Selalu set status terakhir
+    
+    // Pindah ke halaman tiket
+    setCurrentPage('Tickets');
+  }, []);
+
   // =================================================================
   // Handlers (SEMUA SUDAH DIPERBAIKI)
   // =================================================================
@@ -221,7 +238,9 @@ export default function AdminDashboard() {
     setSearchQuery('');
     setSearchInput('');
     setStatusFilter(null);
-    fetchData(1, '', null);
+    setAdminIdFilter(null);
+    setDateFilter(null);
+    setTicketIdFilter(null);
   };
 
   const handleAssignClick = (ticket) => {
@@ -426,34 +445,33 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!isAdmin) return;
-    
+    fetchAdmins();
+    fetchAllUsers();
+    fetchNotifications();
     // Panggil semua data yang dibutuhkan saat halaman Welcome/Dashboard pertama kali dimuat
     if (currentPage === 'Welcome') {
         fetchAnalyticsData();
         fetchLocationsData();
         fetchAdminPerformance();
         fetchAllTickets(); // Untuk kalender
+        fetchData(1, '', null, null, null, null)
     }
     
-    // Selalu fetch data utama (tiket & stats) saat filter berubah
-    fetchData(dataPage, searchQuery, statusFilter);
-    
-    // Fetch data lain yang mungkin dibutuhkan di halaman lain
-    fetchAdmins();
-    fetchAllUsers();
-    fetchNotifications();
-
-    // Auto-refresh hanya jika di halaman daftar tiket utama
-    if (currentPage === 'Tickets') {
-      const id = setInterval(() => {
-        fetchData(dataPage, searchQuery, statusFilter);
-      }, 60000);
-      return () => clearInterval(id);
+    else if (currentPage === 'Tickets') {
+      fetchData(dataPage, searchQuery, statusFilter, adminIdFilter, dateFilter, ticketIdFilter);
+      
+      // Auto-refresh hanya jika tidak ada filter aktif
+      if (!searchQuery && !statusFilter && !adminIdFilter && !dateFilter && !ticketIdFilter) {
+          const id = setInterval(() => {
+            fetchData(dataPage, searchQuery, statusFilter, adminIdFilter, dateFilter, ticketIdFilter);
+          }, 60000);
+          return () => clearInterval(id);
+      }
     }
   }, [
-    isAdmin, currentPage, dataPage, searchQuery, statusFilter, 
-    fetchData, fetchAdmins, fetchAllUsers, fetchAnalyticsData, 
-    fetchLocationsData, fetchAdminPerformance, fetchAllTickets, fetchNotifications
+    isAdmin, currentPage, dataPage, searchQuery, statusFilter, adminIdFilter, dateFilter, ticketIdFilter,
+    fetchAdmins, fetchAllUsers, fetchNotifications, fetchAnalyticsData, 
+    fetchLocationsData, fetchAdminPerformance, fetchAllTickets, fetchData
   ]);
 
   useEffect(() => {
@@ -597,22 +615,14 @@ export default function AdminDashboard() {
                     <div className="dashboard-card line-chart-card">
                       <h4>Tren Tiket (30 Hari Terakhir)</h4>
                       <LineChartComponent data={analyticsData}
-                        onPointClick={(status, date) => {
-                          setCurrentPage('Tickets');
-                          fetchData(1, '', status, null, date);
-                        }}
-                        onLegendClick={(status) => {
-                          setCurrentPage('Tickets');
-                          fetchData(1, '', status);
-                        }}/>
+                        onPointClick={(status, date) => handleChartFilter({ status, date })}
+                        onLegendClick={(status) => handleChartFilter({ status })}/>
                     </div>
                     <div className="dashboard-card pie-chart-card">
                       <h4>Status Tiket</h4>
-                      <PieChartComponent stats={stats} handleHomeClick={handleHomeClick}
-                        handleStatusFilterClick={(status) => {
-                          setCurrentPage('Tickets');
-                          fetchData(1, '', status);
-                        }}
+                      <PieChartComponent stats={stats}
+                        handleHomeClick={handleHomeClick}
+                        handleStatusFilterClick={(status) => handleChartFilter({ status })}
                         statusFilter={statusFilter}/>
                     </div>
                   </div>
@@ -620,10 +630,7 @@ export default function AdminDashboard() {
                     <div className="dashboard-card bar-chart-card">
                       <h4>Performa Admin</h4>
                       <BarChartComponent data={adminPerformanceData}
-                        onBarClick={(admin) => {
-                          setCurrentPage('Tickets');
-                          fetchData(1, '', admin.status, admin.id);
-                        }}/>
+                        onBarClick={(admin) => handleChartFilter({ status: admin.status, adminId: admin.id })}/>
                     </div>
                     <div className="dashboard-card map-chart-card">
                       <h4>Geografi Traffic</h4>
@@ -634,10 +641,7 @@ export default function AdminDashboard() {
                     <div className="dashboard-card calendar-card">
                       <h4>Kalender Tiket</h4>
                       <CalendarComponent tickets={allTickets}
-                        onTicketClick={(ticketId) => {
-                          setCurrentPage("Tickets");
-                          fetchData(1, '', null, null, null, ticketId);
-                        }}/>
+                        onTicketClick={(ticketId) => handleChartFilter({ ticketId })}/>
                     </div>
                   </div>
                 </div>
