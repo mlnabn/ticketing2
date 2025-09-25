@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react'; // Impor useCallback
 import api from '../services/api';
 
 export default function TicketReportDetail({ admin, onBack }) {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [filter, setFilter] = useState('all'); // NEW: filter state
+  const [filter, setFilter] = useState('all');
 
-  useEffect(() => {
-    if (admin) {
-      fetchAdminReport();
-    }
-  }, [admin]);
+  // Gunakan useCallback untuk menstabilkan fungsi dan menjadikannya dependency yang sah
+  const fetchAdminReport = useCallback(async () => {
+    // Pastikan admin ada sebelum memanggil
+    if (!admin || !admin.id) return;
 
-  const fetchAdminReport = async () => {
     try {
       setLoading(true);
       const res = await api.get(`/tickets/admin-report/${admin.id}`);
@@ -23,7 +21,14 @@ export default function TicketReportDetail({ admin, onBack }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [admin]); // admin dijadikan dependency untuk useCallback
+
+  useEffect(() => {
+    // useEffect sekarang memanggil fungsi yang stabil
+    fetchAdminReport();
+  }, [fetchAdminReport]); // fetchAdminReport dijadikan dependency untuk useEffect
+
+  // ... (Sisa kode component Anda)
 
   const calculateDuration = (startedAt, completedAt) => {
     if (!startedAt || !completedAt) return 'N/A';

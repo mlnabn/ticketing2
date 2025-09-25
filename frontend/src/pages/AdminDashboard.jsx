@@ -73,6 +73,7 @@ export default function AdminDashboard() {
   const [userToDelete, setUserToDelete] = useState(null);
   const [showUserFormModal, setShowUserFormModal] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
+  const [selectedAdmin, setSelectedAdmin] = useState(null); 
 
   const [adminIdFilter, setAdminIdFilter] = useState(null);
   const [dateFilter, setDateFilter] = useState(null);
