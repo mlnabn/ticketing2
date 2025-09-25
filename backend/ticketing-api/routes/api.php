@@ -47,7 +47,7 @@ Route::middleware('jwt')->group(function () {
     Route::apiResource('tickets', TicketController::class)->only(['index', 'store', 'destroy']);
     Route::get('/tickets/my-tickets', [TicketController::class, 'myTickets']);
     Route::get('/tickets/all', [TicketController::class, 'allTickets']);
-    
+    Route::get('/tickets/admin-report/{adminId}', [TicketController::class, 'getAdminReport']); // Rute baru
     Route::get('/users/all', [UserController::class, 'all']);
 
     // --- Rute untuk Manajemen Pengguna oleh Admin ---
