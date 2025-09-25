@@ -19,10 +19,10 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
 
     try {
       const response = await axios.post(`${API_URL}/login`, { email, password });
-      const { token, user } = response.data;
+      const { access_token, user } = response.data;
 
-      if (token && user) {
-        onLogin(token, user);
+      if (access_token && user) {
+        onLogin(response.data);
       } else {
         setError('Login gagal: Respons dari server tidak lengkap.');
       }

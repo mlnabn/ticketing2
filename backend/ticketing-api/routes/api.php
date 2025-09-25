@@ -29,6 +29,7 @@ Route::post('/tickets/whatsapp', [TicketController::class, 'storeFromWhatsapp'])
 
 // Route Terproteksi (Memerlukan Token JWT)
 Route::middleware('jwt')->group(function () {
+    Route::post('/auth/refresh', [AuthController::class, 'refresh']);
 
     // --- Rute Autentikasi Pengguna ---
     Route::get('/user', [AuthController::class, 'getUser']);

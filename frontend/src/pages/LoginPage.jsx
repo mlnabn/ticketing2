@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import Login from '../components/Login';
 import loginBackground from '../Image/LoginBg.jpg';
 
 export default function LoginPage() {
-  const { setUser, setToken, loggedIn } = useAuth();
+  const { setUser, setAccessToken, loggedIn } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,16 +19,17 @@ export default function LoginPage() {
   }, []);
 
   // Fungsi ini HANYA mengatur state
-  const handleLoginSuccess = React.useCallback(
-    (newToken, newUser) => {
-      if (newToken && newUser) {
-        setToken(newToken);
-        setUser(newUser);
+  const handleLoginSuccess = useCallback(
+    // Parameter pertama sekarang adalah 'response' dari API
+    (response) => {
+      if (response.access_token && response.user) {
+        setAccessToken(response.access_token);
+        setUser(response.user);
       } else {
-        console.error("handleLoginSuccess dipanggil tanpa token atau user.");
+        console.error("handleLoginSuccess dipanggil dengan respons yang tidak valid.");
       }
     },
-    [setToken, setUser]
+    [setAccessToken, setUser]
   );
 
   // useEffect ini HANYA menangani navigasi setelah state diperbarui

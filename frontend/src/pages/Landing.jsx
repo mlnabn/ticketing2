@@ -5,19 +5,19 @@ import yourLogok from '../Image/DTECH-Logo.png';
 import { useAuth } from '../AuthContext';
 
 export default function LandingLayout() {
-  const { loggedIn, setUser, setToken } = useAuth();
+  const { loggedIn, setUser, setAccessToken } = useAuth();
   const navigate = useNavigate();
 
   // Efek untuk menangani callback Google Login (HANYA MENGATUR STATE)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const urlToken = params.get('token');
+    const urlAccessToken = params.get('access_token');
     const userParam = params.get('user');
 
-    if (urlToken && userParam) {
+    if (urlAccessToken && userParam) {
       try {
         const u = JSON.parse(decodeURIComponent(userParam));
-        setToken(urlToken);
+        setAccessToken(urlAccessToken);
         setUser(u);
         window.history.replaceState({}, document.title, window.location.pathname);
       } catch (e) {
@@ -25,7 +25,7 @@ export default function LandingLayout() {
         window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
-  }, [setToken, setUser]);
+  }, [setAccessToken, setUser]);
 
   // --- TAMBAHAN PENTING ---
   // Efek ini sekarang menangani navigasi SETELAH state 'loggedIn' diperbarui.

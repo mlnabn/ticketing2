@@ -4,15 +4,15 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Load dari localStorage saat awal
   useEffect(() => {
     try {
-      const t = localStorage.getItem('auth.token');
+      const t = localStorage.getItem('auth.accessToken');
       const u = localStorage.getItem('auth.user');
-      if (t) setToken(t);
+      if (t) setAccessToken(t);
       if (u) setUser(JSON.parse(u));
     } catch (e) {
       console.error("Gagal memuat auth state dari localStorage", e);
@@ -24,19 +24,19 @@ export function AuthProvider({ children }) {
   // Persist ke localStorage
   useEffect(() => {
     try {
-      if (token) localStorage.setItem('auth.token', token);
-      else localStorage.removeItem('auth.token');
+      if (accessToken) localStorage.setItem('auth.accessToken', accessToken);
+      else localStorage.removeItem('auth.accessToken');
       if (user) localStorage.setItem('auth.user', JSON.stringify(user));
       else localStorage.removeItem('auth.user');
     } catch {}
-  }, [user, token]);
+  }, [user, accessToken]);
 
   const logout = useCallback(() => {
     setUser(null);
-    setToken(null);
+    setAccessToken(null);
     // Hapus dari localStorage secara manual untuk memastikan
     try {
-      localStorage.removeItem('auth.token');
+      localStorage.removeItem('auth.accessToken');
       localStorage.removeItem('auth.user');
     } catch {}
   }, []);
@@ -44,17 +44,17 @@ export function AuthProvider({ children }) {
   const value = useMemo(
     () => ({
       user,
-      token,
+      accessToken,
       loading,
-      loggedIn: !loading && Boolean(user && token),
+      loggedIn: !loading && Boolean(user && accessToken),
       role: user?.role ?? null,
       name: user?.name ?? null,
       userId: user?.id ?? null,
       logout,
       setUser,
-      setToken,
+      setAccessToken,
     }),
-    [user, token, loading, logout]
+    [user, accessToken, loading, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
