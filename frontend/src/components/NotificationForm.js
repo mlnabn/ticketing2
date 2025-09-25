@@ -70,7 +70,7 @@ function NotificationForm({ users, globalNotifications, refreshNotifications, sh
     <>
       {/* Form Notifikasi Baru */}
       <div className="notification-form-container card">
-        <h2>Kirim Notifikasi Baru</h2>
+        <h2 className="page-title">Kirim Notifikasi Baru</h2>
 
         {/* Template */}
         <div className="templates-section">
@@ -142,7 +142,7 @@ function NotificationForm({ users, globalNotifications, refreshNotifications, sh
 
       {/* Riwayat Notifikasi Global */}
       <div className="global-notification-history card">
-                <h2>Riwayat Pengumuman Global</h2>
+                <h2 className="page-title2">Riwayat Pengumuman Global</h2>
                 {/* Gunakan globalNotifications dari props */}
                 {globalNotifications && globalNotifications.length > 0 ? (
                     <ul className="history-list">

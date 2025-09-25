@@ -65,7 +65,7 @@
   --error-border-light: #EF4444;
 
   /* Warna Status Badge */
-  --status-belum-bg-light: #EF4444;
+  --status-belum-bg-light: #3498db;
   --status-belum-text-light: #fff;
   --status-sedang-bg-light: #FBBF24;
   --status-sedang-text-light: #444;
@@ -73,6 +73,7 @@
   --status-selesai-text-light: #fff;
   --status-ditunda-bg-light: #6B7280;
   --status-ditunda-text-light: #fff;
+  --status-tolak-bg-light: #EF4444;
 
   /* Tombol Utama */
   --btn-submit: #5B86E5;
@@ -141,7 +142,7 @@
 body.dark-mode {
   --text-color-dark: #E0E0E0;
   --placeholder-color-dark: #A0AEC0;
-  
+
   --bg-color-dashboard-dark: #0A0A0A;
   --text-color-dashboard-dark: #E0E0E0;
   --border-color-dark: #2D3748;
@@ -460,7 +461,7 @@ body.dark-mode .dashboard-container {
 .dark-mode .sidebar {
   background-color: var(--sidebar-bg-dark);
   color: var(--sidebar-text-dark);
-} 
+}
 
 .sidebar.open {
   transform: translateX(0);
@@ -1159,12 +1160,14 @@ body.dark-mode .sidebar-footer {
   justify-content: center;
 }
 
-.leaflet-control-container {
-  z-index: 0 !important;
+/* Styling untuk komponen peta secara keseluruhan */
+.leaflet-container {
+  z-index: 1; /* Atur z-index container peta. Anda bisa sesuaikan sesuai kebutuhan */
 }
 
-.leaflet-control-attribution {
-  z-index: 0 !important;
+/* Mengatur z-index untuk semua kontrol di peta, seperti zoom, layer, dll. */
+.leaflet-control-container {
+  z-index: 200 !important; /* Nilai yang lebih tinggi agar terlihat di atas peta */
 }
 
 .logout-button {
@@ -1623,24 +1626,24 @@ body.dark-mode .proof-modal__group input[type="file"]::file-selector-button:hove
 
 /* Dark Mode: Latar Belakang Kartu Lebih Gelap */
 body.dark-mode .red-card {
-    border-left: 5px solid #8B5CF6;
-    /* Ungu sebagai aksen "Belum Selesai" */
-  }
+  border-left: 5px solid #8B5CF6;
+  /* Ungu sebagai aksen "Belum Selesai" */
+}
 
-  body.dark-mode .green-card {
-    border-left: 5px solid #22C55E;
-    /* Hijau tetap untuk "Selesai" */
-  }
+body.dark-mode .green-card {
+  border-left: 5px solid #22C55E;
+  /* Hijau tetap untuk "Selesai" */
+}
 
-  body.dark-mode .yellow-card {
-    border-left: 5px solid #F59E0B;
-    /* Kuning tetap untuk "Total" */
-  }
+body.dark-mode .yellow-card {
+  border-left: 5px solid #F59E0B;
+  /* Kuning tetap untuk "Total" */
+}
 
-  body.dark-mode .blue-card {
-    border-left: 5px solid #3B82F6;
-    /* Biru untuk "Pengguna" */
-  }
+body.dark-mode .blue-card {
+  border-left: 5px solid #3B82F6;
+  /* Biru untuk "Pengguna" */
+}
 
 /* Mengubah warna teks dan icon di dalam kartu yang memiliki warna latar belakang */
 .red-card .card-value,
@@ -2220,6 +2223,7 @@ button.btn-pause {
 
 /* [DIUBAH] Gaya dasar tabel untuk dark mode */
 body.dark-mode .job-table {
+  width: 100%;
   border-collapse: separate;
   box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.5);
   background-color: transparent;
@@ -2247,7 +2251,8 @@ body.dark-mode .job-table td {
   border-bottom: 1px solid var(--border-color-dark, #2D3748);
   border-right: 1px solid var(--border-color-dark, #2D3748);
   color: #E0E1E2;
-  vertical-align: middle; /* Penting: Rata tengah vertikal */
+  vertical-align: middle;
+  /* Penting: Rata tengah vertikal */
   font-size: 1rem;
   background-color: transparent;
 }
@@ -2274,7 +2279,7 @@ body.dark-mode .job-table th {
   letter-spacing: 0.5px;
   border-bottom: 1px solid var(--border-color-dark, #2D3748);
   border-right: 1px solid var(--border-color-dark, #2D3748);
-  
+
 }
 
 body.dark-mode .job-table th:first-child {
@@ -2561,11 +2566,11 @@ body.dark-mode .job-filter select {
   justify-content: center;
   align-items: center;
   padding: 5px 12px;
-  border-radius: 9999px;  
+  border-radius: 9999px;
   font-size: 0.8rem;
   font-weight: 600;
   text-align: center;
-  white-space: nowrap;        
+  white-space: nowrap;
 }
 
 
@@ -2583,7 +2588,8 @@ body.dark-mode .job-filter select {
   background-color: var(--status-belum-bg-light);
   color: var(--status-belum-text-light);
   border-color: var(--status-belum-bg-light);
-  box-shadow: 0 4px 12px rgba(114, 28, 36, 0.35);
+  /* Box shadow diubah menjadi biru tua (RGB 0, 123, 255) */
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.35); 
 }
 
 body.dark-mode .status-belum-dikerjakan {
@@ -2649,15 +2655,16 @@ body.dark-mode .status-selesai {
 
 /* Badge Ditolak */
 .status-ditolak {
-  background-color: var(--status-belum-bg-light);
+  background-color: var(--status-tolak-bg-light);
   color: var(--status-belum-text-light);
-  border-color: var(--status-belum-bg-light);
+  border-color: var(--status-tolak-bg-light);
   box-shadow: 0 4px 12px rgba(114, 28, 36, 0.35);
 }
 
 body.dark-mode .status-ditolak {
   background-color: rgba(239, 68, 68, 0.15);
-  color: #f87171; /* Merah terang */
+  color: #f87171;
+  /* Merah terang */
 }
 
 /* ADD USER PAGE */
@@ -3752,9 +3759,7 @@ body.dark-mode .btn-submit:hover {
   background: rgba(0, 0, 0, 0.4);
   /* gelap transparan */
   backdrop-filter: blur(6px);
-  /* efek blur */
   z-index: 1000;
-  /* harus di bawah dropdown */
 }
 
 /* Dropdown menu */
@@ -4602,6 +4607,8 @@ body.dark-mode .rejection-reason-display p {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
+
+
 /* --- Judul --- */
 .notification-form-container h2 {
   margin: 0 0 20px 0;
@@ -4881,18 +4888,46 @@ body {
 }
 
 /* =========================
-   USER MANAGEMENT STYLING
-   ========================= */
+   USER MANAGEMENT STYLING
+   ========================= */
 
 .user-management-container h1 {
   font-size: 2.8rem;
   font-weight: 700;
-  margin: 0 0 16px 0;
   text-align: center;
   background: black;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  padding-left: 0;
+  margin-bottom: 50px; 
+}
+
+/* Garis Horizontal di Bawah Judul */
+.user-management-container h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 1.5px; 
+  width: 90%;
+  background-color: rgba(160, 160, 160, 0.3);
+  border-radius: 2px; 
+}
+
+/* Garis Horizontal di Bawah Judul */
+.dark-mode .user-management-container h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 1.5px; 
+  width: 90%;
+  background-color: #4a667a;
+  border-radius: 2px; 
 }
 
 .dark-mode .user-management-container h1 {
@@ -5254,7 +5289,8 @@ body.dark-mode .history-item-content small {
 }
 
 /* --- Dark Mode: Tombol Hapus (Merah Solid) --- */
-body.dark-mode .btn-delete-small { /* Hapus */
+body.dark-mode .btn-delete-small {
+  /* Hapus */
   background-color: #EF4444;
   color: #ffffff;
 }
@@ -5279,7 +5315,8 @@ body.dark-mode .btn-delete-small:hover {
 }
 
 /* --- Dark Mode: Tombol Start / Lanjutkan / Bukti (Biru Solid) --- */
-body.dark-mode .btn-start { /* Mulai, Lanjutkan, Bukti */
+body.dark-mode .btn-start {
+  /* Mulai, Lanjutkan, Bukti */
   background-color: var(--btn-submit, #4F46E5);
   color: #ffffff;
 }
@@ -5305,7 +5342,8 @@ body.dark-mode .btn-start:hover {
 }
 
 /* --- Dark Mode: Tombol Tolak (Kuning/Amber Solid) --- */
-body.dark-mode .btn-cancel-aksi { /* Tolak */
+body.dark-mode .btn-cancel-aksi {
+  /* Tolak */
   background-color: #F59E0B;
   color: #1F2937;
 }
@@ -5331,7 +5369,8 @@ body.dark-mode .btn-cancel-aksi:hover {
 }
 
 /* --- Dark Mode: Tombol Selesaikan (Hijau Solid) --- */
-body.dark-mode .btn-finish { /* Selesaikan */
+body.dark-mode .btn-finish {
+  /* Selesaikan */
   background-color: #22C55E;
   color: #ffffff;
 }
@@ -5343,7 +5382,8 @@ body.dark-mode .btn-finish:hover {
 }
 
 /* --- Dark Mode: Tombol Tunda (Abu-abu Solid) --- */
-body.dark-mode .btn-pause { /* Tunda */
+body.dark-mode .btn-pause {
+  /* Tunda */
   background-color: #64748B;
   color: #ffffff;
 }
@@ -6263,6 +6303,7 @@ body.dark-mode .dashboard-card h4 {
   object-fit: contain;
   transition: transform 0.3s ease;
 }
+
 .header-left-group .header-logo:hover {
   transform: scale(1.05);
 }
@@ -6328,6 +6369,7 @@ body.dark-mode .dashboard-card h4 {
   0% {
     background-position: 200% center;
   }
+
   100% {
     background-position: -200% center;
   }
@@ -7665,19 +7707,6 @@ body.dark-mode .dashboard-card h4 {
   color: #222;
   padding: 10px;
 }
-
-.dark-mode .calendar-wrapper .react-calendar {
-  background-color: #111111;
-}
-
-.react-calendar {
-  width: 100%;
-  border: 1px solid hsl(210, 10%, 85%);
-  border-radius: 12px;
-  background: #fff;
-  padding: 15px;
-}
-
 .react-calendar__navigation {
   display: flex;
   justify-content: space-between;
@@ -7749,14 +7778,6 @@ body.dark-mode .dashboard-card h4 {
   gap: 2px;
 }
 
-.ticket-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-right: 4px;
-}
-
 .ticket-legend {
   display: flex;
   flex-wrap: wrap;
@@ -7823,12 +7844,12 @@ body.dark-mode .dashboard-card h4 {
   border: 1px solid hsl(210, 10%, 40%);
 }
 
-
-
 .ticket-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
+  display: inline-block;
+  margin-right: 4px;
 }
 
 .info-text {
@@ -7957,30 +7978,75 @@ body.dark-mode .dashboard-card h4 {
   padding-top: 20px;
 }
 
+.legend-item2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  color: var(--text-color);
+}
+
+.legend-item2:hover {
+  transform: scale(1.05);
+
+}
+
+.linechart-wrapper {
+  padding: 15px;
+  border-radius: 10px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: -10px;
+  flex-wrap: wrap;
+}
 /* ========================================================= */
 /* ==================== DARK MODE STYLES =================== */
 /* ========================================================= */
 
-.dark-mode .react-calendar {
-  background: #2b2b3c;
+.dark-mode .calendar-wrapper .react-calendar,
+.dark-mode .modal-content2,
+.dark-mode .linechart-wrapper {
+  background-color: #111111;
+}
+
+.dark-mode .react-calendar,
+.dark-mode .react-calendar__navigation button,
+.dark-mode .react-calendar__tile,
+.dark-mode .modal-content2,
+.dark-mode .modal-title,
+.dark-mode .ticket-modal-card p {
+  color: hsl(210, 36%, 96%);
+}
+
+.dark-mode .react-calendar,
+.dark-mode .modal-header,
+.dark-mode .modal-footer {
   border-color: hsl(210, 10%, 35%);
-  color: hsl(210, 36%, 96%);
 }
 
-.dark-mode .react-calendar__navigation button {
-  color: hsl(210, 36%, 96%);
-}
-
-.dark-mode .react-calendar__navigation button:hover {
+.dark-mode .react-calendar__navigation button:hover,
+.dark-mode .react-calendar__tile:hover {
   background: hsl(210, 10%, 35%) !important;
 }
 
-.dark-mode .react-calendar__month-view__weekdays {
-  color: hsl(210, 10%, 65%);
+.dark-mode .info-text,
+.dark-mode .calendar-info {
+  color: hsl(210, 10%, 75%);
 }
 
-.dark-mode .react-calendar__tile {
-  color: hsl(210, 36%, 96%);
+/* Sisa kode tanpa duplikasi yang jelas */
+.dark-mode .react-calendar__month-view__weekdays {
+  color: hsl(210, 10%, 65%);
 }
 
 .dark-mode .react-calendar__tile--now {
@@ -7993,41 +8059,16 @@ body.dark-mode .dashboard-card h4 {
   color: #fff;
 }
 
-.dark-mode .react-calendar__tile:hover {
-  background: hsl(210, 10%, 35%) !important;
-}
-
-.dark-mode .info-text {
-  color: hsl(210, 10%, 75%);
-}
-
-.dark-mode .calendar-info {
-  color: hsl(210, 10%, 75%);
-}
-
 .dark-mode .modal-overlay2 {
   background-color: rgba(0, 0, 0, 0.75);
 }
 
 .dark-mode .modal-content2 {
-  background: #111111;
-  color: hsl(210, 36%, 96%);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-}
-
-.dark-mode .modal-header {
-  border-bottom: 1px solid hsl(210, 10%, 35%);
-}
-
-.dark-mode .modal-title {
-  color: hsl(210, 36%, 96%);
 }
 
 .dark-mode .ticket-modal-card {
   background-color: hsl(210, 10%, 20%) !important;
-  /* abu-abu gelap */
-  color: #f5f5f5;
-  /* teks lebih terang */
   box-shadow: 0 2px 8px rgba(255, 255, 255, 0.08);
 }
 
@@ -8035,16 +8076,17 @@ body.dark-mode .dashboard-card h4 {
   background-color: hsl(210, 10%, 30%);
 }
 
-.dark-mode .ticket-modal-card p {
-  color: hsl(210, 36%, 96%);
-}
-
 .dark-mode .ticket-modal-card p b {
   color: hsl(210, 36%, 99%);
 }
 
-.dark-mode .modal-footer {
-  border-top: 1px solid hsl(210, 10%, 35%);
+.dark-mode .legend-item2 {
+  background: hsl(210, 10%, 25%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .legend-item2:hover {
+  background: hsl(210, 10%, 30%);
 }
 
 /* ========================================================= */
@@ -8105,51 +8147,6 @@ body.dark-mode .dashboard-card h4 {
     height: 35px;
     font-size: 12px;
   }
-}
-
-.legend-item2 {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 12px;
-  background-color: #f9f9f9;
-  color: var(--text-color);
-}
-
-.legend-item2:hover {
-  transform: scale(1.05);
-
-}
-
-.dark-mode .legend-item2 {
-  background: hsl(210, 10%, 25%);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.dark-mode .legend-item2:hover {
-  background: hsl(210, 10%, 30%);
-}
-
-.linechart-wrapper {
-  padding: 15px;
-  border-radius: 10px;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-}
-
-.dark-mode .linechart-wrapper {
-  background-color: #111111;
-}
-
-.chart-legend {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin-top: -10px;
-  flex-wrap: wrap;
 }
 
 /* === Responsiveness === */
@@ -8262,7 +8259,8 @@ body.dark-mode .dashboard-card h4 {
   color: #fff;
   transition: all 0.25s ease;
   text-align: center;
-  min-width: 120px; /* biar nggak terlalu lebar tapi tetap konsisten */
+  min-width: 120px;
+  /* biar nggak terlalu lebar tapi tetap konsisten */
 }
 
 /* Ganti Avatar */
@@ -8279,12 +8277,14 @@ body.dark-mode .dashboard-card h4 {
 
 /* Hapus Avatar */
 .btn-danger {
-  background-color: #ef4444; /* Tailwind red-500 */
+  background-color: #ef4444;
+  /* Tailwind red-500 */
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
 
 .btn-danger:hover {
-  background-color: #dc2626; /* Tailwind red-600 */
+  background-color: #dc2626;
+  /* Tailwind red-600 */
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(239, 68, 68, 0.6);
 }
@@ -8450,7 +8450,8 @@ body.dark-mode .dashboard-card h4 {
   text-align: center;
   color: #fff;
   font-size: 14px;
-  margin: 16px 0;   /* jarak atas & bawah */
+  margin: 16px 0;
+  /* jarak atas & bawah */
   position: relative;
 }
 
@@ -8478,3 +8479,379 @@ body.dark-mode .dashboard-card h4 {
   height: 20px;
 }
 
+
+/* ==================================== */
+/* ======= ADMIN LIST PAGE STYLES ====== */
+/* ==================================== */
+.report-container {
+  padding: 2rem;
+  background-color: #f4f7f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  min-height: 50vh;
+}
+
+.report-container h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 1rem;
+}
+
+.admin-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.admin-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.admin-card .avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #3f51b5;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.admin-card .info h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0;
+}
+
+.admin-card .info p {
+  font-size: 0.9rem;
+  color: #777;
+  margin: 0;
+}
+
+/* --- Gaya Mode Gelap --- */
+.dark-mode .report-container {
+  background-color: var(--bg-color-dashboard-dark);
+}
+
+.dark-mode .report-container h2 {
+  color: #ecf0f1;
+  border-bottom-color: #4a667a;
+}
+
+.dark-mode .admin-card {
+  background-color: #111111;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  /* Bayangan yang lebih gelap */
+  color: #F7FAFC;
+  border: 1px solid #2D3748;
+}
+
+.dark-mode .admin-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .admin-card .info h3 {
+  color: #ecf0f1;
+}
+
+.dark-mode .admin-card .info p {
+  color: #bdc3c7;
+}
+
+.dark-mode .admin-card .avatar {
+  background-color: #4a667a;
+}
+
+.admin-card .info h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #2d3748;
+}
+
+.admin-card .info p {
+  margin: 0.2rem 0 0;
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+/* Responsive design untuk layar yang lebih kecil */
+@media (max-width: 768px) {
+  .admin-list-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .report-container {
+    padding: 1.5rem;
+  }
+
+  .report-container h2 {
+    font-size: 1.6rem;
+  }
+
+  .admin-card {
+    padding: 1rem;
+  }
+}
+
+/* ==================================== */
+/* ======= LAPORAN DETAIL PAGE STYLES ====== */
+
+/* Gaya Dasar untuk Report Detail */
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  transition: color 0.2s ease;
+}
+
+.back-btn:hover {
+  color: #3f51b5;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.summary-cards .card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+/* Hover effect */
+.summary-cards .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+  background: #f9f9f9;
+}
+
+/* Active (selected) card */
+.summary-cards .card.active {
+  border: 2px solid #007bff;
+  /* garis tegas */
+  background: #eaf3ff;
+  /* biru muda */
+  box-shadow: 0 6px 14px rgba(0, 123, 255, 0.25);
+}
+
+/* Title & number styling */
+.summary-cards .card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: #444;
+}
+
+
+.summary-cards .card p {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #3f51b5;
+  margin: 0.5rem 0 0;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.report-table thead tr {
+  background-color: #f2f2f2;
+}
+
+.report-table th,
+.report-table td {
+  text-align: left;
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.report-table th {
+  font-weight: bold;
+  color: #555;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.report-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.report-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.dark-mode .back-btn {
+  color: #bbb;
+}
+
+.dark-mode .back-btn:hover {
+  color: #3498db;
+}
+
+.dark-mode .summary-cards .card {
+  background-color: #111111 ;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  /* Bayangan yang lebih gelap */
+  color: #F7FAFC;
+  border: 1px solid #2D3748;
+}
+
+body.dark-mode .summary-cards .card:hover {
+  background: #2a2a2a;
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .summary-cards .card.active {
+  border: 2px solid #5d53a6; /* Border ungu kebiruan yang lebih lembut */
+  background: #202446; /* Latar belakang biru tua keunguan */
+  box-shadow: 0 6px 14px rgba(93, 83, 166, 0.4); /* Bayangan yang serasi */
+}
+
+
+/* Title & number styling di Dark Mode */
+body.dark-mode .summary-cards .card h3 {
+  color: #bbb;
+}
+
+.dark-mode .summary-cards .card p {
+  color: #f0f0f0;
+}
+
+.dark-mode .report-table {
+  background-color: #111111;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .report-table thead tr {
+  background-color: #111111;
+}
+
+.dark-mode .report-table th,
+.dark-mode .report-table td {
+  color: #ecf0f1;
+  border-bottom-color: #4a667a;
+}
+
+.dark-mode .report-table tbody tr:hover {
+  background-color: #1F2937;
+}
+
+/* =========================
+   UNIVERSAL PAGE TITLE STYLING
+   ========================= */
+
+.page-title {
+  /* Hapus margin agar pseudo-element bisa diposisikan */
+  margin: 0;
+  text-align: center;
+  position: relative;
+  
+  /* Jarak di bawah garis. Meningkatkan menjadi 60px untuk jarak yang lebih lega. */
+  margin-bottom: 60px; 
+}
+
+/* Garis Horizontal di Bawah Judul (Tipis, Transparan) */
+.page-title::after {
+  content: '';
+  position: absolute;
+  
+  /* Garis diletakkan 10px di bawah batas bawah H2 */
+  bottom: -10px; 
+  left: 50%;
+  transform: translateX(-50%);
+  
+  /* Properti garis (tipis, transparan, abu-abu) */
+  height: 1.5px;
+  width: 90%; 
+  background-color: rgba(160, 160, 160, 0.3);
+  border-radius: 2px;
+}
+
+.dark-mode .page-title::after {
+  content: '';
+  position: absolute;
+  
+  /* Garis diletakkan 10px di bawah batas bawah H2 */
+  bottom: -10px; 
+  left: 50%;
+  transform: translateX(-50%);
+  
+  /* Properti garis (tipis, transparan, abu-abu) */
+  height: 1.5px;
+  width: 90%; 
+  background-color: #4a667a;
+  border-radius: 2px;
+}
+
+/* =========================
+   UNIVERSAL PAGE TITLE STYLING
+   ========================= */
+
+.page-title2 {
+  /* Atur margin dan posisi relatif */
+  margin: 0;
+  text-align: center;
+  position: relative;
+  
+  /* Jarak di bawah garis (membuat jarak dari elemen di bawahnya) */
+  margin-bottom: 50px; 
+}
+
+/* Garis Horizontal di Bawah Judul (Tipis, Transparan, Abu-abu) */
+.page-title2::after {
+  content: '';
+  position: absolute;
+  
+  /* Posisi di bawah judul dan di tengah */
+  bottom: -10px; /* Jarak antara teks judul dan garis */
+  left: 50%;
+  transform: translateX(-50%);
+  
+  /* Properti garis yang Anda tentukan */
+  height: 1.5px;
+  width: 100%;
+  background-color: rgba(160, 160, 160, 0.3);
+  border-radius: 2px;
+}
+
+
+/* Garis Horizontal di Bawah Judul (Tipis, Transparan, Abu-abu) */
+.dark-mode .page-title2::after {
+ display: none;
+}

@@ -23,6 +23,9 @@ import AssignAdminModal from '../components/AssignAdminModal';
 import RejectTicketModal from '../components/RejectTicketModal';
 import ConfirmationModal from '../components/ConfirmationModal';
 import UserFormModal from '../components/UserFormModal';
+import TicketReportAdminList from '../components/TicketReportAdminList';
+import TicketReportDetail from '../components/TicketReportDetail'; // Pastikan ini sudah diupdate
+
 
 // Assets
 import yourLogok from '../Image/DTECH-Logo.png';
@@ -70,13 +73,14 @@ export default function AdminDashboard() {
   const [userToDelete, setUserToDelete] = useState(null);
   const [showUserFormModal, setShowUserFormModal] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
+  const [selectedAdmin, setSelectedAdmin] = useState(null); 
 
   const [adminIdFilter, setAdminIdFilter] = useState(null);
   const [dateFilter, setDateFilter] = useState(null);
   const [ticketIdFilter, setTicketIdFilter] = useState(null);
   
   const ticketsOnPage = useMemo(() => (ticketData ? ticketData.data : []), [ticketData]);
-  
+
   // Utilities (tidak ada perubahan di sini)
   const showToast = useCallback((message, type = 'success') => {
     const id = Date.now() + Math.random();
@@ -150,8 +154,8 @@ export default function AdminDashboard() {
 
   const fetchUsers = useCallback(async (page = 1, search = '') => {
     try {
-        const response = await api.get('/users', { params: { page, search } });
-        setUserData(response.data);
+      const response = await api.get('/users', { params: { page, search } });
+      setUserData(response.data);
     } catch (e) {
       console.error('Gagal mengambil data pengguna:', e);
       if (e.response?.status === 401) handleLogout();
@@ -518,6 +522,13 @@ export default function AdminDashboard() {
               <li className="sidebar-nav-item"><button onClick={handleHomeClick} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-ticket-alt"></i><span>Daftar Tiket</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('MyTickets')} className={`sidebar-button ${currentPage === 'MyTickets' ? 'active' : ''}`}><i className="fas fa-user-tag"></i><span>Tiket Saya</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>Pengguna</span></button></li>
+              <li className="sidebar-nav-item">
+                <button onClick={() => setCurrentPage('ticketReport')}
+                  className={`sidebar-button ${currentPage === 'ticketReport' ? 'active' : ''}`}>
+                  <i className="fas fa-file-alt"></i><span>Laporan Tiket</span>
+                </button>
+              </li>
+
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Notifications')} className={`sidebar-button ${currentPage === 'Notifications' ? 'active' : ''}`}><i className="fas fa-bell"></i><span>Notifikasi</span></button></li>
             </ul>
           </nav>
@@ -663,14 +674,14 @@ export default function AdminDashboard() {
                 <Pagination currentPage={dataPage} lastPage={ticketData ? ticketData.last_page : 1} onPageChange={handlePageChange} />
               </>
             )}
-            
+
             {currentPage === 'MyTickets' && (
               <>
-                <h2 style={{ marginBottom: '20px' }}>Tiket yang Saya Kerjakan</h2>
+                 <h2 className="page-title">Tiket yang Saya Kerjakan</h2>
                 {myTicketsData && myTicketsData.data && myTicketsData.data.length > 0 ? (
                   <>
                     <JobList tickets={myTicketsData.data} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} userRole={userRole} onSelectionChange={handleSelectionChange} onAssignClick={handleAssignClick} onRejectClick={handleRejectClick} onProofClick={handleProofClick} showToast={showToast} />
-                    <Pagination currentPage={myTicketsPage} lastPage={myTicketsData.last_page} onPageChange={(page) => setMyTicketsPage(page)}/>
+                    <Pagination currentPage={myTicketsPage} lastPage={myTicketsData.last_page} onPageChange={(page) => setMyTicketsPage(page)} />
                   </>
                 ) : (
                   <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
@@ -684,12 +695,23 @@ export default function AdminDashboard() {
               <UserManagement userData={userData} onDeleteClick={handleUserDeleteClick} onAddClick={handleAddUserClick} onEditClick={handleUserEditClick} onPageChange={handleUserPageChange} onSearch={handleUserSearch} />
             )}
 
+            {currentPage === 'ticketReport' && (
+              selectedAdmin ? (
+                <TicketReportDetail
+                  admin={selectedAdmin}
+                  onBack={() => setSelectedAdmin(null)}
+                />
+              ) : (
+                <TicketReportAdminList onSelectAdmin={setSelectedAdmin} />
+              )
+            )}
+
             {currentPage === 'Notifications' && (
-              <NotificationForm users={users} globalNotifications={notifications.filter(n => n.user_id === null)} refreshNotifications={fetchNotifications} showToast={showToast}/>
+              <NotificationForm users={users} globalNotifications={notifications.filter(n => n.user_id === null)} refreshNotifications={fetchNotifications} showToast={showToast} />
             )}
           </div>
         </main>
-        
+
         {showProofModal && ticketForProof && (
           <ProofModal ticket={ticketForProof} onSave={handleSaveProof} onClose={handleCloseProofModal} />
         )}

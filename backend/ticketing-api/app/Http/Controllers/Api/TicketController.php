@@ -69,7 +69,7 @@ class TicketController extends Controller
             } elseif ($statusFilter === 'Sedang Dikerjakan') {
                 $query->where(function ($q) use ($date) {
                     $q->whereDate('started_at', $date)
-                      ->orWhereDate('updated_at', $date);
+                        ->orWhereDate('updated_at', $date);
                 });
             } else {
                 $query->whereDate('created_at', $date);
@@ -195,6 +195,34 @@ class TicketController extends Controller
     {
         $ticket = Ticket::where('kode_tiket', $kode_tiket)->firstOrFail();
         return response()->json($ticket);
+    }
+
+    /**
+     * Ambil laporan statistik tiket per admin.
+     */
+    public function getAdminReport(string $adminId)
+    {
+        $admin = User::findOrFail($adminId);
+
+        // Pastikan user adalah admin
+        if ($admin->role !== 'admin') {
+            return response()->json(['error' => 'Hanya admin yang bisa dilihat laporannya.'], 403);
+        }
+
+        $totalTickets = Ticket::where('user_id', $adminId)->count();
+        $completedTickets = Ticket::where('user_id', $adminId)->where('status', 'Selesai')->count();
+        $rejectedTickets = Ticket::where('user_id', $adminId)->where('status', 'Ditolak')->count();
+        $inProgressTickets = Ticket::where('user_id', $adminId)
+            ->whereIn('status', ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'])
+            ->count();
+
+        return response()->json([
+            'total' => $totalTickets,
+            'completed' => $completedTickets,
+            'rejected' => $rejectedTickets,
+            'in_progress' => $inProgressTickets,
+            'tickets' => Ticket::with(['user', 'creator'])->where('user_id', $adminId)->latest()->get(),
+        ]);
     }
 
     /**
@@ -370,7 +398,7 @@ class TicketController extends Controller
 
             $stats['belum_dikerjakan'] = Ticket::where('status', 'Belum Dikerjakan')->count();
             $stats['ditunda']          = Ticket::where('status', 'Ditunda')->count();
-            $stats['sedang_dikerjakan']= Ticket::where('status', 'Sedang Dikerjakan')->count();
+            $stats['sedang_dikerjakan'] = Ticket::where('status', 'Sedang Dikerjakan')->count();
             $stats['selesai']          = Ticket::where('status', 'Selesai')->count();
             $stats['ditolak']          = Ticket::where('status', 'Ditolak')->count();
 
@@ -381,7 +409,7 @@ class TicketController extends Controller
             $stats['total_tickets']    = Ticket::where('user_id', $user->id)->count();
             $stats['belum_dikerjakan'] = Ticket::where('user_id', $user->id)->where('status', 'Belum Dikerjakan')->count();
             $stats['ditunda']          = Ticket::where('user_id', $user->id)->where('status', 'Ditunda')->count();
-            $stats['sedang_dikerjakan']= Ticket::where('user_id', $user->id)->where('status', 'Sedang Dikerjakan')->count();
+            $stats['sedang_dikerjakan'] = Ticket::where('user_id', $user->id)->where('status', 'Sedang Dikerjakan')->count();
             $stats['selesai']          = Ticket::where('user_id', $user->id)->where('status', 'Selesai')->count();
             $stats['ditolak']          = Ticket::where('user_id', $user->id)->where('status', 'Ditolak')->count();
 
