@@ -8855,3 +8855,157 @@ body.dark-mode .summary-cards .card h3 {
 .dark-mode .page-title2::after {
  display: none;
 }
+
+/* ==================================== */
+/* 1. KEYFRAME ANIMASI SPINNER (TETAP SAMA) */
+/* ==================================== */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==================================== */
+/* 2. LIGHT MODE (DEFAULT) */
+/* ==================================== */
+.loading-screen-light {
+  /* CONTAINER STYLE */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  transition: background-color 0.3s ease;
+
+  /* THEME COLORS (Light Mode) */
+  background-color: #ffffff; /* Latar belakang putih */
+  color: #333333; /* Teks gelap */
+}
+
+.loading-spinner-light {
+  border: 4px solid #f3f3f3; /* Warna batas spinner */
+  border-top: 4px solid #3498db; /* Warna utama spinner (Biru terang) */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+/* ==================================== */
+/* 3. DARK MODE */
+/* ==================================== */
+.loading-screen-dark {
+  /* CONTAINER STYLE (Sama dengan light, hanya ganti warna) */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  transition: background-color 0.3s ease;
+
+  /* THEME COLORS (Dark Mode) */
+  background-color: #121212; /* Latar belakang sangat gelap */
+  color: #e0e0e0; /* Teks terang */
+}
+
+.loading-spinner-dark {
+  border: 4px solid #333333; /* Warna batas spinner */
+  border-top: 4px solid #64b5f6; /* Warna utama spinner (Biru terang untuk dark mode) */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+
+/* Background elegan biru navy */
+.not-found-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #0f172a, #000); /* biru navy gelap */
+  font-family: "Poppins", sans-serif;
+  overflow: hidden;
+  text-align: center;
+  padding: 2rem;
+  color: #e2e8f0; /* abu terang */
+}
+
+/* Konten utama */
+.not-found-content {
+  position: relative;
+  z-index: 2;
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Icon biru soft */
+.not-found-icon {
+  font-size: 4rem;
+  color: #38bdf8; /* cyan soft */
+  margin-bottom: 1rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Judul 404 */
+.not-found-title {
+  font-size: 6rem;
+  font-weight: 800;
+  color: #60a5fa; /* biru muda */
+  margin: 0;
+}
+
+/* Pesan utama */
+.not-found-message {
+  font-size: 1.8rem;
+  margin: 1rem 0;
+  color: #cbd5e1; /* abu kebiruan */
+}
+
+/* Subteks */
+.not-found-subtext {
+  font-size: 1rem;
+  color: #94a3b8;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+/* Tombol elegan */
+.not-found-link-btn {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  border-radius: 0.5rem;
+  background: #2563eb; /* biru solid */
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(37,99,235,0.25);
+}
+
+.not-found-link-btn:hover {
+  background: #1d4ed8; /* biru lebih gelap */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(29,78,216,0.35);
+}
+
+/* Animasi halus */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
