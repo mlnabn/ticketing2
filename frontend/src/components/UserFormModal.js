@@ -66,7 +66,7 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                required
+                placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : ''} 
               />
             </div>
 

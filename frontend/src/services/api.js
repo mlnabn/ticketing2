@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useAuth } from '../AuthContext';
 
 export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000/api';
 
@@ -17,6 +16,22 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+
+// --- PERBAIKAN LOGIKA REFRESH TOKEN ---
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 let interceptor;
 
 export const injectAuthHooks = (authHooks) => {
@@ -29,24 +44,41 @@ export const injectAuthHooks = (authHooks) => {
         async (error) => {
             const originalRequest = error.config;
 
-            if (error.response.status !== 401 || originalRequest._retry) {
-                return Promise.reject(error);
+            if (error.response.status === 401) {
+              if (originalRequest.url === '/auth/refresh') {
+                  authHooks.logout();
+                  return Promise.reject(error);
+              }
+
+              if (isRefreshing) {
+                return new Promise(function(resolve, reject) {
+                  failedQueue.push({resolve, reject})
+                }).then(token => {
+                  originalRequest.headers['Authorization'] = 'Bearer ' + token;
+                  return api(originalRequest);
+                });
+              }
+
+              originalRequest._retry = true;
+              isRefreshing = true;
+
+              return new Promise(function (resolve, reject) {
+                api.post('/auth/refresh').then(({data}) => {
+                  authHooks.setAccessToken(data.access_token);
+                  originalRequest.headers['Authorization'] = 'Bearer ' + data.access_token;
+                  processQueue(null, data.access_token);
+                  resolve(api(originalRequest));
+                }).catch((err) => {
+                  processQueue(err, null);
+                  authHooks.logout();
+                  reject(err);
+                }).finally(() => { 
+                  isRefreshing = false 
+                });
+              });
             }
 
-            originalRequest._retry = true; 
-
-            try {
-                const { data } = await api.post('/auth/refresh');
-                
-                authHooks.setAccessToken(data.access_token);
-                
-                originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
-                
-                return api(originalRequest);
-            } catch (_error) {
-                authHooks.logout();
-                return Promise.reject(_error);
-            }
+            return Promise.reject(error);
         }
     );
 };

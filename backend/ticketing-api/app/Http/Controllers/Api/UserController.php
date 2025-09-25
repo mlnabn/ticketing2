@@ -94,7 +94,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             // Pastikan email unik, kecuali untuk user yang sedang diedit
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'phone' => ['required', 'string', 'min:10', Rule::unique('users')->ignore($user->id)],
+            'phone' => ['nullable', 'string', 'min:10', Rule::unique('users')->ignore($user->id)],
             // Password bersifat opsional: hanya divalidasi jika tidak kosong
             'password' => 'nullable|string|min:8|confirmed',
             'role' => 'required|in:admin,user',

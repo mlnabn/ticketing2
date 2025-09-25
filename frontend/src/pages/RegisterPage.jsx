@@ -6,7 +6,7 @@ import Register from '../components/Register';
 import loginBackground from '../Image/LoginBg.jpg';
 
 export default function RegisterPage() {
-  const { setToken, setUser, loggedIn } = useAuth();
+  const { setAccessToken, setUser, loggedIn } = useAuth();
   const navigate = useNavigate();
 
   // --- State Management ---
@@ -72,12 +72,12 @@ export default function RegisterPage() {
   };
 
   // Handler setelah registrasi berhasil (sama seperti di LoginPage)
-  const handleRegisterSuccess = useCallback((newToken, newUser) => {
-    if (newToken && newUser) {
-      setToken(newToken);
+  const handleRegisterSuccess = useCallback((newAccessToken, newUser) => {
+    if (newAccessToken && newUser) {
+      setAccessToken(newAccessToken);
       setUser(newUser);
     }
-  }, [setToken, setUser]);
+  }, [setAccessToken, setUser]);
 
   // useEffect untuk navigasi setelah login berhasil
   useEffect(() => {

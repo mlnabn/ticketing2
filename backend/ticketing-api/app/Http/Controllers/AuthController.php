@@ -64,11 +64,11 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        if (! $token = auth('api')->attempt($credentials)) {
+        if (! $access_token = auth('api')->attempt($credentials)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
-        return $this->respondWithToken($token);
+        return $this->respondWithToken($access_token);
     }
 
     /**
@@ -118,7 +118,7 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required','string','email','max:255',Rule::unique('users')->ignore($user->id)],
-            'phone' => ['required','string','min:10',Rule::unique('users')->ignore($user->id)],
+            'phone' => ['nullable','string','min:10',Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:8|confirmed',
             'avatar'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
@@ -147,6 +147,7 @@ class AuthController extends Controller
             'name'       => $user->name,
             'email'      => $user->email,
             'phone'      => $user->phone,
+            'role'       => $user->role,
             'avatar_url' => $user->avatar ? asset('storage/' . $user->avatar) : null,
         ]);
     }
@@ -180,11 +181,11 @@ class AuthController extends Controller
      * Fungsi helper untuk membuat format respons token yang konsisten.
      * (Fungsi ini sudah benar)
      */
-    protected function respondWithToken($token)
+    protected function respondWithToken($access_token)
     {
         $user = auth('api')->user();
         return response()->json([
-            'access_token' => $token,
+            'access_token' => $access_token,
             'token_type'   => 'bearer',
             'expires_in'   => auth('api')->factory()->getTTL() * 60,
             'user'         => [

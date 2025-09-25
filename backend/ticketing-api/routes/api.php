@@ -25,11 +25,12 @@ Route::post('/otp/verify', [OtpController::class, 'verifyOtp']);
 Route::get('/auth/google/redirect', [AuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
+Route::post('/auth/refresh', [AuthController::class, 'refresh'])->middleware('jwt.refresh');
+
 Route::post('/tickets/whatsapp', [TicketController::class, 'storeFromWhatsapp'])->middleware('apikey.auth');
 
 // Route Terproteksi (Memerlukan Token JWT)
 Route::middleware('jwt')->group(function () {
-    Route::post('/auth/refresh', [AuthController::class, 'refresh']);
 
     // --- Rute Autentikasi Pengguna ---
     Route::get('/user', [AuthController::class, 'getUser']);
