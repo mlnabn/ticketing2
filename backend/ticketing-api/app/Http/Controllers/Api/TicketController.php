@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class TicketController extends Controller
 {
@@ -25,6 +27,8 @@ class TicketController extends Controller
         $date = $request->query('date');
         $ticketId = $request->query('id');
 
+        $handledStatus = $request->query('handled_status');
+
         $query = Ticket::with(['user', 'creator']);
 
         // Jika user biasa → hanya tiket miliknya
@@ -36,6 +40,10 @@ class TicketController extends Controller
                     $q->where('name', 'like', '%' . $search . '%');
                 });
             }
+        }
+
+        if ($handledStatus === 'handled') {
+            $query->whereNotNull('user_id');
         }
 
         // Filter status
@@ -197,10 +205,61 @@ class TicketController extends Controller
         return response()->json($ticket);
     }
 
+    public function getReportAnalytics(Request $request)
+    {
+        // Validasi input, jika tidak ada, gunakan bulan dan tahun saat ini
+        $year = $request->input('year', Carbon::now()->year);
+        $month = $request->input('month', Carbon::now()->month);
+
+        // Tentukan tanggal awal dan akhir dari bulan yang dipilih
+        $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+        $endDate = $startDate->copy()->endOfMonth();
+
+        // 1. Ambil jumlah tiket yang DIBUAT per hari dalam bulan yang dipilih
+        $dailyCreatedCounts = Ticket::select(
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('count(*) as count')
+        )
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy('date')
+            ->get()
+            ->keyBy(fn($item) => Carbon::parse($item->date)->toDateString());
+
+        // 2. Ambil jumlah tiket yang MULAI DIKERJAKAN per hari dalam bulan yang dipilih
+        $dailyStartedCounts = Ticket::select(
+            DB::raw('DATE(started_at) as date'),
+            DB::raw('count(*) as count')
+        )
+            ->whereNotNull('user_id')
+            ->whereNotNull('started_at')
+            ->whereBetween('started_at', [$startDate, $endDate])
+            ->groupBy('date')
+            ->get()
+            ->keyBy(fn($item) => Carbon::parse($item->date)->toDateString());
+
+        $report = [];
+
+        // 3. Iterasi untuk setiap hari di bulan yang dipilih
+        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+            $dateString = $date->toDateString();
+
+            // Ambil jumlah untuk hari ini, jika tidak ada data maka nilainya 0
+            $totalForDay = $dailyCreatedCounts[$dateString]->count ?? 0;
+            $workedOnForDay = $dailyStartedCounts[$dateString]->count ?? 0;
+
+            $report[] = [
+                'date' => $dateString,
+                'total' => $totalForDay,      // Jumlah tiket BARU pada hari ini
+                'dikerjakan' => $workedOnForDay, // Jumlah tiket MULAI DIKERJAKAN pada hari ini
+            ];
+        }
+
+        return response()->json($report);
+    }
     /**
      * Ambil laporan statistik tiket per admin.
      */
-    public function getAdminReport(string $adminId)
+    public function getAdminReport(Request $request, string $adminId) // Tambahkan Request $request
     {
         $admin = User::findOrFail($adminId);
 
@@ -209,21 +268,34 @@ class TicketController extends Controller
             return response()->json(['error' => 'Hanya admin yang bisa dilihat laporannya.'], 403);
         }
 
-        $totalTickets = Ticket::where('user_id', $adminId)->count();
-        $completedTickets = Ticket::where('user_id', $adminId)->where('status', 'Selesai')->count();
-        $rejectedTickets = Ticket::where('user_id', $adminId)->where('status', 'Ditolak')->count();
-        $inProgressTickets = Ticket::where('user_id', $adminId)
+        // Ambil data agregat dari semua tiket milik admin tersebut
+        $allTicketsQuery = Ticket::where('user_id', $adminId);
+
+        $totalTickets = $allTicketsQuery->count();
+        $completedTickets = (clone $allTicketsQuery)->where('status', 'Selesai')->count();
+        $rejectedTickets = (clone $allTicketsQuery)->where('status', 'Ditolak')->count();
+        $inProgressTickets = (clone $allTicketsQuery)
             ->whereIn('status', ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'])
             ->count();
 
+        // Ambil data tiket dengan paginasi
+        $perPage = $request->query('per_page', 10); // Default 10 tiket per halaman
+        $paginatedTickets = Ticket::with(['user', 'creator'])
+            ->where('user_id', $adminId)
+            ->latest()
+            ->paginate($perPage);
+
+        // Gabungkan semua data dalam satu respons
         return response()->json([
             'total' => $totalTickets,
             'completed' => $completedTickets,
             'rejected' => $rejectedTickets,
             'in_progress' => $inProgressTickets,
-            'tickets' => Ticket::with(['user', 'creator'])->where('user_id', $adminId)->latest()->get(),
+            'tickets' => $paginatedTickets, // 'tickets' sekarang berisi data paginasi
         ]);
     }
+
+
 
     /**
      * Menugaskan tiket ke admin.
@@ -450,5 +522,26 @@ class TicketController extends Controller
         $ticket->save();
 
         return response()->json($ticket);
+    }
+
+    public function reportStats()
+    {
+        $total = Ticket::count();
+        $handled = Ticket::whereNotNull('user_id')->count();
+        $completed = Ticket::where('status', 'Selesai')->count();
+        $rejected = Ticket::where('status', 'Ditolak')->count();
+        
+        // Tiket yang sedang dalam progres (sudah ditangani tapi belum selesai/ditolak)
+        $in_progress = Ticket::whereNotNull('user_id')
+            ->whereNotIn('status', ['Selesai', 'Ditolak'])
+            ->count();
+
+        return response()->json([
+            'total' => $total,
+            'handled' => $handled,
+            'completed' => $completed,
+            'rejected' => $rejected,
+            'in_progress' => $in_progress,
+        ]);
     }
 }

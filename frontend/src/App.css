@@ -136,6 +136,23 @@
   --button-confirm-hover-dark: #3a7ed9;
   --button-cancel-bg-dark: #e25c5c;
   --button-cancel-hover-dark: #c84d4d; */
+
+  /* Palet Warna - Light Mode */
+  --primary-color: #3f51b5;
+  /* Biru utama untuk aksi & highlight */
+  --primary-color-light: #e8eaf6;
+  /* Biru muda untuk latar belakang avatar */
+  --bg-color: #f4f7f9;
+  /* Latar belakang utama halaman */
+  --card-bg-color: #ffffff;
+  /* Latar belakang semua kartu */
+  --text-primary: #1a202c;
+  /* Warna teks utama (hampir hitam) */
+  --text-secondary: #718096;
+  /* Warna teks sekunder (abu-abu) */
+  --border-color: #e2e8f0;
+  /* Warna garis tepi */
+  --shadow-color: rgba(0, 0, 0, 0.08);
 }
 
 /* Dark Mode Variables */
@@ -227,6 +244,17 @@ body.dark-mode {
   --search-button-bg-dark: #4F46E5;
   --search-button-hover-bg-dark: #4338CA;
   --search-button-text-dark: #ffffff;
+
+  /* Palet Warna - Dark Mode */
+  --primary-color: #ffffff;
+  --primary-color-light: #303759;
+  --bg-color: #111111;
+  --card-bg-color: #111111;
+  --text-primary: #f7fafc;
+  --text-secondary: #a0aec0;
+  --border-color: #111111;
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --card-small: #202020;
 }
 
 /* Base Styles */
@@ -243,7 +271,6 @@ body {
   min-height: 100vh;
   transition: background-color 0.3s ease, color 0.3s ease;
   overflow-x: hidden;
-  /* Mencegah scroll horizontal */
 }
 
 body.dark-mode {
@@ -1162,12 +1189,14 @@ body.dark-mode .sidebar-footer {
 
 /* Styling untuk komponen peta secara keseluruhan */
 .leaflet-container {
-  z-index: 1; /* Atur z-index container peta. Anda bisa sesuaikan sesuai kebutuhan */
+  z-index: 1;
+  /* Atur z-index container peta. Anda bisa sesuaikan sesuai kebutuhan */
 }
 
 /* Mengatur z-index untuk semua kontrol di peta, seperti zoom, layer, dll. */
 .leaflet-control-container {
-  z-index: 200 !important; /* Nilai yang lebih tinggi agar terlihat di atas peta */
+  z-index: 200 !important;
+  /* Nilai yang lebih tinggi agar terlihat di atas peta */
 }
 
 .logout-button {
@@ -2589,7 +2618,7 @@ body.dark-mode .job-filter select {
   color: var(--status-belum-text-light);
   border-color: var(--status-belum-bg-light);
   /* Box shadow diubah menjadi biru tua (RGB 0, 123, 255) */
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.35); 
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.35);
 }
 
 body.dark-mode .status-belum-dikerjakan {
@@ -4901,7 +4930,7 @@ body {
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
   position: relative;
   padding-left: 0;
-  margin-bottom: 50px; 
+  margin-bottom: 50px;
 }
 
 /* Garis Horizontal di Bawah Judul */
@@ -4911,10 +4940,10 @@ body {
   bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
-  height: 1.5px; 
+  height: 1.5px;
   width: 90%;
   background-color: rgba(160, 160, 160, 0.3);
-  border-radius: 2px; 
+  border-radius: 2px;
 }
 
 /* Garis Horizontal di Bawah Judul */
@@ -4924,10 +4953,10 @@ body {
   bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
-  height: 1.5px; 
+  height: 1.5px;
   width: 90%;
   background-color: #4a667a;
-  border-radius: 2px; 
+  border-radius: 2px;
 }
 
 .dark-mode .user-management-container h1 {
@@ -7707,6 +7736,7 @@ body.dark-mode .dashboard-card h4 {
   color: #222;
   padding: 10px;
 }
+
 .react-calendar__navigation {
   display: flex;
   justify-content: space-between;
@@ -7997,7 +8027,7 @@ body.dark-mode .dashboard-card h4 {
 .linechart-wrapper {
   padding: 15px;
   border-radius: 10px;
-  background-color: var(--bg-color);
+  background-color: #FFFFFF;
   color: var(--text-color);
 }
 
@@ -8009,6 +8039,7 @@ body.dark-mode .dashboard-card h4 {
   margin-top: -10px;
   flex-wrap: wrap;
 }
+
 /* ========================================================= */
 /* ==================== DARK MODE STYLES =================== */
 /* ========================================================= */
@@ -8480,25 +8511,226 @@ body.dark-mode .dashboard-card h4 {
 }
 
 
-/* ==================================== */
-/* ======= ADMIN LIST PAGE STYLES ====== */
-/* ==================================== */
-.report-container {
-  padding: 2rem;
-  background-color: #f4f7f9;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  min-height: 50vh;
+/* ======================================================= */
+/* ==          2. STRUKTUR UTAMA HALAMAN LAPORAN        == */
+/* ======================================================= */
+.report-divider {
+  border: none;
+  /* Hapus garis default */
+  border-top: 1px solid #4a667a;
+  margin: 3rem auto;
+  /* INI KUNCI untuk memberi jarak atas dan bawah */
+  width: 90%;
+  /* Buat garis tidak terlalu panjang agar lebih elegan */
 }
 
-.report-container h2 {
-  font-size: 1.8rem;
-  color: #333;
-  margin-bottom: 1.5rem;
-  border-bottom: 2px solid #e0e0e0;
-  padding-bottom: 1rem;
+.adminselect-card {
+  background-color: var(--card-bg-color);
+  padding: 2rem;
+  border-radius: 16px;
+  /* Samakan dengan kartu chart */
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px var(--shadow-color);
+  transition: all 0.3s ease;
 }
+
+.adminselect-card h2 {
+  text-align: center;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  /* Font lebih kecil dari judul utama */
+  font-weight: 1000;
+  margin-top: 0;
+  margin-bottom: 2rem;
+  /* Jarak dari judul ke daftar admin */
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.report-container {
+  background-color: var(--bg-color);
+  padding: 2rem;
+  transition: background-color 0.3s ease;
+}
+
+/* ======================================================= */
+/* ==     GARIS BAWAH UNTUK JUDUL HALAMAN LAPORAN       == */
+/* ======================================================= */
+
+/* Menargetkan h2 yang merupakan anak langsung dari .report-container */
+.report-container > h2 {
+  position: relative;     /* Diperlukan agar garis ::after bisa diposisikan */
+  width: 100%;            /* Pastikan judul memenuhi lebar container */
+  text-align: center;     /* Tengahkan teks judul */
+  padding-bottom: 1rem;   /* Beri ruang di bawah teks untuk garis */
+  margin-bottom: 1.5rem;  /* Jarak dari garis ke konten di bawahnya (kartu/tabel) */
+  margin-top: 0;
+  border-bottom: none;    /* Hapus jika ada border-bottom lain */
+}
+
+/* Membuat elemen garis tipis di bawah judul */
+.report-container > h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;            /* Posisi garis di bagian paling bawah dari padding */
+  left: 0;              /* Mulai dari ujung kiri */
+  
+  height: 1px;                              /* Ketebalan garis */
+  width: 100%;                              /* Lebar garis penuh */
+  background-color: var(--border-color);    /* Gunakan warna border dari tema Anda */
+}
+.dark-mode .report-container > h2::after {
+  background-color: #4a667a; /* Warna garis di dark mode */
+}
+
+/* ======================================================= */
+/* ==      3. KARTU UTAMA (CHART & PEMILIH BULAN)       == */
+/* ======================================================= */
+
+/* Header di dalam kartu chart */
+.report-header {
+  display: flex;
+  flex-direction: column;
+  /* Tata letak vertikal */
+  align-items: center;
+  /* Pusatkan item secara horizontal */
+  gap: 1rem;
+  /* Jarak antara judul dan pemilih bulan */
+  margin-bottom: 2rem;
+}
+
+.report-header h2 {
+  position: relative;
+  padding-bottom: 16px;
+  text-align: center;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 1000;
+  margin-top: 0;
+  margin-bottom: 2rem;
+  border-bottom: none;
+  width: 100%;
+}
+
+.report-header h2::after {
+  content: '';
+  position: absolute;
+
+  /* Posisi di bawah judul dan di tengah */
+  bottom: 0px;
+  /* Jarak antara teks judul dan garis */
+  left: 50%;
+  transform: translateX(-50%);
+
+  /* Properti garis yang Anda tentukan */
+  height: 1.5px;
+  width: 90%;
+  background-color: rgba(160, 160, 160, 0.3);
+  border-radius: 2px;
+}
+
+
+/* Garis Horizontal di Bawah Judul (Tipis, Transparan, Abu-abu) */
+.dark-mode .report-header h2::after {
+  background-color: #4a667a;
+}
+
+/* Container untuk pemilih bulan */
+.month-picker-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.month-picker-container label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Input pemilih bulan */
+.month-input {
+  padding: 8px 16px;
+  border: 1px solid var(--text-secondary);
+  border-radius: 8px;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.month-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
+}
+
+.dark-mode .month-input:focus {
+  box-shadow: 0 0 0 3px rgba(108, 136, 255, 0.2);
+}
+
+
+/* ======================================================= */
+/* ==             4. KARTU NAVIGASI LAPORAN             == */
+/* ======================================================= */
+
+.report-navigation-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.nav-card {
+  background-color: var(--card-bg-color);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.nav-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px var(--shadow-color);
+  border-color: var(--primary-color);
+}
+
+.nav-card h3 {
+  margin-top: 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+.nav-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0;
+}
+
+.nav-card .fa-arrow-right {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  opacity: 0.6;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.nav-card:hover .fa-arrow-right {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+
+/* ======================================================= */
+/* ==                 5. DAFTAR KARTU ADMIN               == */
+/* ======================================================= */
 
 .admin-list-grid {
   display: grid;
@@ -8507,111 +8739,106 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .admin-card {
-  background-color: #fff;
+  background-color: var(--card-small);
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px var(--shadow-color);
   padding: 1.5rem;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   cursor: pointer;
+  border: 1px solid var(--border-color);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .admin-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px var(--shadow-color);
 }
 
 .admin-card .avatar {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  /* Agar tidak gepeng saat nama panjang */
   border-radius: 50%;
-  background-color: #3f51b5;
-  color: #fff;
+  background-color: var(--primary-color-light);
+  color: var(--primary-color);
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: bold;
 }
 
-.admin-card .info h3 {
-  font-size: 1.2rem;
-  color: #333;
-  margin: 0;
-}
-
-.admin-card .info p {
-  font-size: 0.9rem;
-  color: #777;
-  margin: 0;
-}
-
-/* --- Gaya Mode Gelap --- */
-.dark-mode .report-container {
-  background-color: var(--bg-color-dashboard-dark);
-}
-
-.dark-mode .report-container h2 {
-  color: #ecf0f1;
-  border-bottom-color: #4a667a;
-}
-
-.dark-mode .admin-card {
-  background-color: #111111;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  /* Bayangan yang lebih gelap */
-  color: #F7FAFC;
-  border: 1px solid #2D3748;
-}
-
-.dark-mode .admin-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-.dark-mode .admin-card .info h3 {
-  color: #ecf0f1;
-}
-
-.dark-mode .admin-card .info p {
-  color: #bdc3c7;
-}
-
 .dark-mode .admin-card .avatar {
-  background-color: #4a667a;
+  color: #f0f0f0;
 }
 
 .admin-card .info h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
   margin: 0;
-  font-size: 1.2rem;
-  color: #2d3748;
+  font-weight: 600;
 }
 
 .admin-card .info p {
-  margin: 0.2rem 0 0;
-  color: #718096;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0.1rem 0 0;
 }
 
-/* Responsive design untuk layar yang lebih kecil */
-@media (max-width: 768px) {
-  .admin-list-grid {
-    grid-template-columns: 1fr;
-  }
+/* ======================================================= */
+/* ==       6. CSS DARK MODE UNTUK DATE PICKER          == */
+/* ==     (Disalin dari jawaban sebelumnya, sudah OK)     == */
+/* ======================================================= */
+.dark-mode .react-datepicker {
+  background-color: #2c2c2c;
+  border: 1px solid #555555;
+  color: #f1f1f1;
+}
 
-  .report-container {
-    padding: 1.5rem;
-  }
+.dark-mode .react-datepicker__triangle::before,
+.dark-mode .react-datepicker__triangle::after {
+  border-bottom-color: #2c2c2c !important;
+}
 
-  .report-container h2 {
-    font-size: 1.6rem;
-  }
+.dark-mode .react-datepicker__header {
+  background-color: #3a3a3a;
+  border-bottom: 1px solid #555555;
+  color: #f1f1f1;
+}
 
-  .admin-card {
-    padding: 1rem;
-  }
+.dark-mode .react-datepicker__current-month {
+  color: #f1f1f1;
+  font-weight: 500;
+}
+
+.dark-mode .react-datepicker__navigation-icon::before {
+  border-color: #f1f1f1;
+}
+
+.dark-mode .react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+  border-color: #bbbbbb;
+}
+
+.dark-mode .react-datepicker__month-container {
+  background-color: #2c2c2c;
+}
+
+.dark-mode .react-datepicker__month-option {
+  color: #f1f1f1;
+  transition: background-color 0.2s ease;
+}
+
+.dark-mode .react-datepicker__month-option--selected_month {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.dark-mode .react-datepicker__month-option--selected_month:hover {
+  background-color: var(--primary-color);
 }
 
 /* ==================================== */
@@ -8620,14 +8847,14 @@ body.dark-mode .dashboard-card h4 {
 /* Gaya Dasar untuk Report Detail */
 
 .back-btn {
-  background: none;
-  border: none;
-  color: #555;
-  font-size: 1rem;
-  font-weight: bold;
+  background-color: var(--card-bg-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
   cursor: pointer;
-  margin-bottom: 1.5rem;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
 }
 
 .back-btn:hover {
@@ -8717,6 +8944,7 @@ body.dark-mode .dashboard-card h4 {
 
 .dark-mode .back-btn {
   color: #bbb;
+  border-color: #1f2937;
 }
 
 .dark-mode .back-btn:hover {
@@ -8724,7 +8952,7 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .dark-mode .summary-cards .card {
-  background-color: #111111 ;
+  background-color: #111111;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   /* Bayangan yang lebih gelap */
   color: #F7FAFC;
@@ -8738,9 +8966,12 @@ body.dark-mode .summary-cards .card:hover {
 }
 
 body.dark-mode .summary-cards .card.active {
-  border: 2px solid #5d53a6; /* Border ungu kebiruan yang lebih lembut */
-  background: #202446; /* Latar belakang biru tua keunguan */
-  box-shadow: 0 6px 14px rgba(93, 83, 166, 0.4); /* Bayangan yang serasi */
+  border: 2px solid #5d53a6;
+  /* Border ungu kebiruan yang lebih lembut */
+  background: #202446;
+  /* Latar belakang biru tua keunguan */
+  box-shadow: 0 6px 14px rgba(93, 83, 166, 0.4);
+  /* Bayangan yang serasi */
 }
 
 
@@ -8781,24 +9012,24 @@ body.dark-mode .summary-cards .card h3 {
   margin: 0;
   text-align: center;
   position: relative;
-  
+
   /* Jarak di bawah garis. Meningkatkan menjadi 60px untuk jarak yang lebih lega. */
-  margin-bottom: 60px; 
+  margin-bottom: 60px;
 }
 
 /* Garis Horizontal di Bawah Judul (Tipis, Transparan) */
 .page-title::after {
   content: '';
   position: absolute;
-  
+
   /* Garis diletakkan 10px di bawah batas bawah H2 */
-  bottom: -10px; 
+  bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
-  
+
   /* Properti garis (tipis, transparan, abu-abu) */
   height: 1.5px;
-  width: 90%; 
+  width: 90%;
   background-color: rgba(160, 160, 160, 0.3);
   border-radius: 2px;
 }
@@ -8806,15 +9037,15 @@ body.dark-mode .summary-cards .card h3 {
 .dark-mode .page-title::after {
   content: '';
   position: absolute;
-  
+
   /* Garis diletakkan 10px di bawah batas bawah H2 */
-  bottom: -10px; 
+  bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
-  
+
   /* Properti garis (tipis, transparan, abu-abu) */
   height: 1.5px;
-  width: 90%; 
+  width: 90%;
   background-color: #4a667a;
   border-radius: 2px;
 }
@@ -8828,21 +9059,22 @@ body.dark-mode .summary-cards .card h3 {
   margin: 0;
   text-align: center;
   position: relative;
-  
+
   /* Jarak di bawah garis (membuat jarak dari elemen di bawahnya) */
-  margin-bottom: 50px; 
+  margin-bottom: 50px;
 }
 
 /* Garis Horizontal di Bawah Judul (Tipis, Transparan, Abu-abu) */
 .page-title2::after {
   content: '';
   position: absolute;
-  
+
   /* Posisi di bawah judul dan di tengah */
-  bottom: -10px; /* Jarak antara teks judul dan garis */
+  bottom: -10px;
+  /* Jarak antara teks judul dan garis */
   left: 50%;
   transform: translateX(-50%);
-  
+
   /* Properti garis yang Anda tentukan */
   height: 1.5px;
   width: 100%;
@@ -8853,15 +9085,21 @@ body.dark-mode .summary-cards .card h3 {
 
 /* Garis Horizontal di Bawah Judul (Tipis, Transparan, Abu-abu) */
 .dark-mode .page-title2::after {
- display: none;
+  display: none;
 }
+
 
 /* ==================================== */
 /* 1. KEYFRAME ANIMASI SPINNER (TETAP SAMA) */
 /* ==================================== */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==================================== */
@@ -8882,13 +9120,17 @@ body.dark-mode .summary-cards .card h3 {
   transition: background-color 0.3s ease;
 
   /* THEME COLORS (Light Mode) */
-  background-color: #ffffff; /* Latar belakang putih */
-  color: #333333; /* Teks gelap */
+  background-color: #ffffff;
+  /* Latar belakang putih */
+  color: #333333;
+  /* Teks gelap */
 }
 
 .loading-spinner-light {
-  border: 4px solid #f3f3f3; /* Warna batas spinner */
-  border-top: 4px solid #3498db; /* Warna utama spinner (Biru terang) */
+  border: 4px solid #f3f3f3;
+  /* Warna batas spinner */
+  border-top: 4px solid #3498db;
+  /* Warna utama spinner (Biru terang) */
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -8913,13 +9155,17 @@ body.dark-mode .summary-cards .card h3 {
   transition: background-color 0.3s ease;
 
   /* THEME COLORS (Dark Mode) */
-  background-color: #121212; /* Latar belakang sangat gelap */
-  color: #e0e0e0; /* Teks terang */
+  background-color: #121212;
+  /* Latar belakang sangat gelap */
+  color: #e0e0e0;
+  /* Teks terang */
 }
 
 .loading-spinner-dark {
-  border: 4px solid #333333; /* Warna batas spinner */
-  border-top: 4px solid #64b5f6; /* Warna utama spinner (Biru terang untuk dark mode) */
+  border: 4px solid #333333;
+  /* Warna batas spinner */
+  border-top: 4px solid #64b5f6;
+  /* Warna utama spinner (Biru terang untuk dark mode) */
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -8933,12 +9179,14 @@ body.dark-mode .summary-cards .card h3 {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: radial-gradient(circle at top, #0f172a, #000); /* biru navy gelap */
+  background: radial-gradient(circle at top, #0f172a, #000);
+  /* biru navy gelap */
   font-family: "Poppins", sans-serif;
   overflow: hidden;
   text-align: center;
   padding: 2rem;
-  color: #e2e8f0; /* abu terang */
+  color: #e2e8f0;
+  /* abu terang */
 }
 
 /* Konten utama */
@@ -8951,7 +9199,8 @@ body.dark-mode .summary-cards .card h3 {
 /* Icon biru soft */
 .not-found-icon {
   font-size: 4rem;
-  color: #38bdf8; /* cyan soft */
+  color: #38bdf8;
+  /* cyan soft */
   margin-bottom: 1rem;
   animation: float 3s ease-in-out infinite;
 }
@@ -8960,7 +9209,8 @@ body.dark-mode .summary-cards .card h3 {
 .not-found-title {
   font-size: 6rem;
   font-weight: 800;
-  color: #60a5fa; /* biru muda */
+  color: #60a5fa;
+  /* biru muda */
   margin: 0;
 }
 
@@ -8968,7 +9218,8 @@ body.dark-mode .summary-cards .card h3 {
 .not-found-message {
   font-size: 1.8rem;
   margin: 1rem 0;
-  color: #cbd5e1; /* abu kebiruan */
+  color: #cbd5e1;
+  /* abu kebiruan */
 }
 
 /* Subteks */
@@ -8984,28 +9235,45 @@ body.dark-mode .summary-cards .card h3 {
   display: inline-block;
   padding: 0.8rem 2rem;
   border-radius: 0.5rem;
-  background: #2563eb; /* biru solid */
+  background: #2563eb;
+  /* biru solid */
   color: #fff;
   font-weight: 600;
   text-decoration: none;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(37,99,235,0.25);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.25);
 }
 
 .not-found-link-btn:hover {
-  background: #1d4ed8; /* biru lebih gelap */
+  background: #1d4ed8;
+  /* biru lebih gelap */
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(29,78,216,0.35);
+  box-shadow: 0 6px 12px rgba(29, 78, 216, 0.35);
 }
 
 /* Animasi halus */
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

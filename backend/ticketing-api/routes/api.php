@@ -34,7 +34,7 @@ Route::middleware('jwt')->group(function () {
 
     // --- Rute Autentikasi Pengguna ---
     Route::get('/user', [AuthController::class, 'getUser']);
-    Route::put('/user', [AuthController::class, 'updateUser']); // Untuk user update profil sendiri
+    Route::put('/user', [AuthController::class, 'updateUser']); 
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/admins', [UserController::class, 'getAdmins']);
 
@@ -49,7 +49,9 @@ Route::middleware('jwt')->group(function () {
     Route::apiResource('tickets', TicketController::class)->only(['index', 'store', 'destroy']);
     Route::get('/tickets/my-tickets', [TicketController::class, 'myTickets']);
     Route::get('/tickets/all', [TicketController::class, 'allTickets']);
-    Route::get('/tickets/admin-report/{adminId}', [TicketController::class, 'getAdminReport']); // Rute baru
+    Route::get('/tickets/admin-report/{adminId}', [TicketController::class, 'getAdminReport']);
+    Route::get('/tickets/report-analytics', [TicketController::class, 'getReportAnalytics']);
+    Route::get('/tickets/report-stats', [TicketController::class, 'reportStats']);
     Route::get('/users/all', [UserController::class, 'all']);
 
     // --- Rute untuk Manajemen Pengguna oleh Admin ---
