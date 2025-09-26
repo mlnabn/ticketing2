@@ -8558,29 +8558,42 @@ body.dark-mode .dashboard-card h4 {
 /* ======================================================= */
 
 /* Menargetkan h2 yang merupakan anak langsung dari .report-container */
-.report-container > h2 {
-  position: relative;     /* Diperlukan agar garis ::after bisa diposisikan */
-  width: 100%;            /* Pastikan judul memenuhi lebar container */
-  text-align: center;     /* Tengahkan teks judul */
-  padding-bottom: 1rem;   /* Beri ruang di bawah teks untuk garis */
-  margin-bottom: 1.5rem;  /* Jarak dari garis ke konten di bawahnya (kartu/tabel) */
+.report-container>h2 {
+  position: relative;
+  /* Diperlukan agar garis ::after bisa diposisikan */
+  width: 100%;
+  /* Pastikan judul memenuhi lebar container */
+  text-align: center;
+  /* Tengahkan teks judul */
+  padding-bottom: 1rem;
+  /* Beri ruang di bawah teks untuk garis */
+  margin-bottom: 1.5rem;
+  /* Jarak dari garis ke konten di bawahnya (kartu/tabel) */
   margin-top: 0;
-  border-bottom: none;    /* Hapus jika ada border-bottom lain */
+  border-bottom: none;
+  /* Hapus jika ada border-bottom lain */
 }
 
 /* Membuat elemen garis tipis di bawah judul */
-.report-container > h2::after {
+.report-container>h2::after {
   content: '';
   position: absolute;
-  bottom: 0;            /* Posisi garis di bagian paling bawah dari padding */
-  left: 0;              /* Mulai dari ujung kiri */
-  
-  height: 1px;                              /* Ketebalan garis */
-  width: 100%;                              /* Lebar garis penuh */
-  background-color: var(--border-color);    /* Gunakan warna border dari tema Anda */
+  bottom: 0;
+  /* Posisi garis di bagian paling bawah dari padding */
+  left: 0;
+  /* Mulai dari ujung kiri */
+
+  height: 1px;
+  /* Ketebalan garis */
+  width: 100%;
+  /* Lebar garis penuh */
+  background-color: var(--border-color);
+  /* Gunakan warna border dari tema Anda */
 }
-.dark-mode .report-container > h2::after {
-  background-color: #4a667a; /* Warna garis di dark mode */
+
+.dark-mode .report-container>h2::after {
+  background-color: #4a667a;
+  /* Warna garis di dark mode */
 }
 
 /* ======================================================= */
@@ -9276,4 +9289,34 @@ body.dark-mode .summary-cards .card h3 {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.download-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  /* Tambahkan baris ini */
+}
+
+.btn-download {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.btn-download.pdf {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.btn-download.excel {
+  background-color: rgba(52, 211, 153, 0.15);
+  color: var(--status-selesai-text-dark, #34D399);
 }

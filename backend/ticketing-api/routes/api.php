@@ -53,6 +53,7 @@ Route::middleware('jwt')->group(function () {
     Route::get('/tickets/report-analytics', [TicketController::class, 'getReportAnalytics']);
     Route::get('/tickets/report-stats', [TicketController::class, 'reportStats']);
     Route::get('/users/all', [UserController::class, 'all']);
+    Route::get('/tickets/export', [TicketController::class, 'export']);
 
     // --- Rute untuk Manajemen Pengguna oleh Admin ---
     // Route manual untuk update menggunakan POST agar sesuai dengan frontend

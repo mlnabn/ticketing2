@@ -26,18 +26,16 @@ const calculateDuration = (startedAt, completedAt) => {
 
 export default function ComprehensiveReportPage({ title, onBack }) {
   const [tableData, setTableData] = useState(null);
-  const [stats, setStats] = useState(null); // State baru untuk data statistik
+  const [stats, setStats] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [filter, setFilter] = useState('all'); // State baru untuk filter lokal
+  const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
 
-  // Fungsi untuk mengambil data tabel dan statistik
+  // Fungsi ini sudah BENAR
   const fetchData = useCallback(async (page, currentFilter) => {
     setLoading(true);
     try {
       const params = { page, per_page: 15 };
-
-      // Terapkan filter berdasarkan state 'filter'
       if (currentFilter === 'handled') {
         params.handled_status = 'handled';
       } else if (currentFilter === 'completed') {
@@ -45,15 +43,13 @@ export default function ComprehensiveReportPage({ title, onBack }) {
       } else if (currentFilter === 'rejected') {
         params.status = 'Ditolak';
       } else if (currentFilter === 'in_progress') {
-        params.handled_status = 'handled';
-        params.status = ['Sedang Dikerjakan', 'Ditunda'];
+        // Ini mungkin perlu disesuaikan dengan backend
+        // Untuk saat ini kita anggap backend bisa menangani 'in_progress'
+        params.status = 'in_progress';
       }
-      // 'all' tidak memerlukan filter khusus
 
-      // Ambil data tabel dan statistik secara bersamaan
       const [tableRes, statsRes] = await Promise.all([
         api.get('/tickets', { params }),
-        // Hanya fetch statistik jika belum ada
         stats ? Promise.resolve(null) : api.get('/tickets/report-stats')
       ]);
 
@@ -61,31 +57,62 @@ export default function ComprehensiveReportPage({ title, onBack }) {
       if (statsRes) {
         setStats(statsRes.data);
       }
-
     } catch (err) {
       console.error('Gagal mengambil data laporan:', err);
     } finally {
       setLoading(false);
     }
-  }, [stats]); // 'stats' ditambahkan agar tidak fetch ulang jika sudah ada
+  }, [stats]);
 
-  // useEffect untuk memanggil data saat halaman atau filter berubah
+  // useEffect ini sudah BENAR
   useEffect(() => {
     fetchData(currentPage, filter);
   }, [currentPage, filter, fetchData]);
 
-  // Handler untuk mengubah filter dan reset halaman ke 1
+  // Handler ini sudah BENAR
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);
     setCurrentPage(1);
   };
 
+  // ================================================================
+  // DIUBAH: Fungsi handleDownload diperbaiki
+  // ================================================================
+  const handleDownload = (type) => {
+    const baseURL = api.defaults.baseURL;
+    const params = new URLSearchParams();
+    params.append('type', type);
+
+    if (filter === 'completed') {
+      params.append('status', 'Selesai');
+    } else if (filter === 'rejected') {
+      params.append('status', 'Ditolak');
+    } else if (filter === 'in_progress') {
+      params.append('status', 'in_progress');
+    } else if (filter === 'handled') {
+      params.append('handled_status', 'handled');
+    }
+
+    const downloadUrl = `${baseURL}/tickets/export?${params.toString()}`;
+
+    // GANTI 'auth_token' DENGAN NAMA KEY YANG BENAR DARI LOCAL STORAGE ANDA
+    const token = localStorage.getItem('auth.accessToken');
+
+    // Tambahkan pengecekan keamanan
+    if (token) {
+      window.open(`${downloadUrl}&token=${token}`, '_blank');
+    } else {
+      alert('Gagal mengunduh file. Sesi Anda mungkin telah berakhir, silakan login kembali.');
+    }
+  };
+  // ================================================================
+
   const tickets = tableData ? tableData.data : [];
 
   return (
     <div className="report-container">
-        <button className="back-btn" onClick={onBack}>Kembali</button>
-        <h2>{title}</h2>
+      <button className="back-btn" onClick={onBack}>Kembali</button>
+      <h2>{title}</h2>
       {loading && (!stats || !tableData) ? <p className="report-status-message">Memuat data...</p> : (
         <>
           {stats && (
@@ -104,16 +131,21 @@ export default function ComprehensiveReportPage({ title, onBack }) {
               </div>
             </div>
           )}
-
-          <h3>
-            Daftar Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}
-          </h3>
-
+          <h3>Daftar Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</h3>
+          <div className="download-buttons">
+            <button className="btn-download pdf" onClick={() => handleDownload('pdf')}>
+              <i className="fas fa-file-pdf"></i> Download PDF
+            </button>
+            <button className="btn-download excel" onClick={() => handleDownload('excel')}>
+              <i className="fas fa-file-excel"></i> Download Excel
+            </button>
+          </div>
           {loading ? <p>Memuat tabel...</p> : tickets.length === 0 ? (
             <p>Tidak ada tiket yang sesuai dengan filter ini.</p>
           ) : (
             <>
               <table className="report-table">
+                {/* ... Thead and Tbody tidak berubah ... */}
                 <thead>
                   <tr>
                     <th>Kode Tiket</th>
