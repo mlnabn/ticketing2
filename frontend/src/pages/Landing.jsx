@@ -5,38 +5,38 @@ import yourLogok from '../Image/DTECH-Logo.png';
 import { useAuth } from '../AuthContext';
 
 export default function LandingLayout() {
-  const { loggedIn, setUser, setAccessToken } = useAuth();
+  const { loggedIn, login } = useAuth();
   const navigate = useNavigate();
 
   // Efek untuk menangani callback Google Login (HANYA MENGATUR STATE)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const urlAccessToken = params.get('access_token');
+    const access_token = params.get('access_token');
     const userParam = params.get('user');
+    const expires_in = params.get('expires_in');
 
-    if (urlAccessToken && userParam) {
+    if (access_token && userParam && expires_in) {
       try {
-        const u = JSON.parse(decodeURIComponent(userParam));
-        setAccessToken(urlAccessToken);
-        setUser(u);
+        const user = JSON.parse(decodeURIComponent(userParam));
+        
+        // Panggil fungsi login terpusat kita dengan semua data yang dibutuhkan
+        login({ access_token, user, expires_in });
+        
+        // Hapus parameter dari URL setelah digunakan
         window.history.replaceState({}, document.title, window.location.pathname);
       } catch (e) {
-        console.error('Gagal mem-parsing data user dari URL di Landing:', e);
+        console.error('Gagal mem-parsing data dari URL di Landing:', e);
         window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
-  }, [setAccessToken, setUser]);
+  }, [login]);
 
-  // --- TAMBAHAN PENTING ---
-  // Efek ini sekarang menangani navigasi SETELAH state 'loggedIn' diperbarui.
   useEffect(() => {
     if (loggedIn) {
       navigate('/dashboard', { replace: true });
     }
   }, [loggedIn, navigate]);
 
-
-  // Render layout seperti biasa
   return (
     <div
       className="dashboard-container no-sidebar landing-page"
