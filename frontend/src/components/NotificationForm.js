@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { getToken } from '../auth';
 import { format } from 'date-fns';
 
-const API_URL = 'http://127.0.0.1:8000/api';
 const notificationTemplates = [
     { title: 'Pemberitahuan Maintenance', message: 'Workshop Candi sedang mengalami kendala. Semua ticket akan dilanjutkan setelah maintenance workshop Candi selesai. Terima Kasih.' },
     { title: 'Update', message: 'Ticket Anda sudah selesai, silahkan refresh halaman Anda.' },
@@ -24,10 +23,9 @@ function NotificationForm({ users, globalNotifications, refreshNotifications, sh
             return;
         }
         try {
-            await axios.delete(`${API_URL}/notifications/${id}`, {
-                headers: { Authorization: `Bearer ${getToken()}` },
-            });
-            // Panggil fungsi refresh dari App.js
+            // DIUBAH: Gunakan 'api' instance, tidak perlu header manual
+            await api.delete(`/notifications/${id}`);
+            
             refreshNotifications();
             showToast('Notifikasi berhasil dihapus.', 'success');
         } catch (error) {
@@ -46,15 +44,13 @@ function NotificationForm({ users, globalNotifications, refreshNotifications, sh
         setIsLoading(true);
         try {
             const payload = { title, message, target_user_id: target === 'all' ? null : target };
-            await axios.post(`${API_URL}/notifications`, payload, {
-                headers: { Authorization: `Bearer ${getToken()}` },
-            });
+            await api.post('/notifications', payload);
+
             setTitle('');
             setMessage('');
             setTarget('all');
 
             if (payload.target_user_id === null) {
-                // Panggil fungsi refresh dari App.js
                 refreshNotifications();
             }
             showToast('Notifikasi berhasil dikirim.', 'success');

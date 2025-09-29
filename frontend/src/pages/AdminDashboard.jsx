@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { AnimatePresence } from 'framer-motion';
 import { FaUser } from 'react-icons/fa';
-import api from '../services/api'; // Pastikan ini diimpor
+import api from '../services/api';
 
 // Components
 import Toast from '../components/Toast';
@@ -24,8 +24,7 @@ import RejectTicketModal from '../components/RejectTicketModal';
 import ConfirmationModal from '../components/ConfirmationModal';
 import UserFormModal from '../components/UserFormModal';
 import TicketReportAdminList from '../components/TicketReportAdminList';
-import TicketReportDetail from '../components/TicketReportDetail'; // Pastikan ini sudah diupdate
-
+import TicketReportDetail from '../components/TicketReportDetail';
 
 // Assets
 import yourLogok from '../Image/DTECH-Logo.png';
@@ -33,7 +32,7 @@ import yourLogok from '../Image/DTECH-Logo.png';
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
 
-  // State Management (tidak ada perubahan di sini)
+  // State Management
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [dataPage, setDataPage] = useState(1);
@@ -50,7 +49,7 @@ export default function AdminDashboard() {
   const [userData, setUserData] = useState(null);
   const [stats, setStats] = useState(null);
   const [analyticsData, setAnalyticsData] = useState([]);
-  const [locationsData, setLocationsData] = useState([]);
+  const [locationsData, setLocationsData] = useState([]); // Note: This is not part of bootstrap yet
   const [adminPerformanceData, setAdminPerformanceData] = useState([]);
   const [allTickets, setAllTickets] = useState([]);
   const [notifications, setNotifications] = useState([]);
@@ -74,14 +73,13 @@ export default function AdminDashboard() {
   const [showUserFormModal, setShowUserFormModal] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
   const [selectedAdmin, setSelectedAdmin] = useState(null); 
-
   const [adminIdFilter, setAdminIdFilter] = useState(null);
   const [dateFilter, setDateFilter] = useState(null);
   const [ticketIdFilter, setTicketIdFilter] = useState(null);
   
   const ticketsOnPage = useMemo(() => (ticketData ? ticketData.data : []), [ticketData]);
 
-  // Utilities (tidak ada perubahan di sini)
+  // Utilities
   const showToast = useCallback((message, type = 'success') => {
     const id = Date.now() + Math.random();
     setToasts(prev => [...prev, { id, message, type }]);
@@ -97,60 +95,42 @@ export default function AdminDashboard() {
   const handleSelectionChange = useCallback((ids) => setSelectedTicketIds(ids), []);
 
   // =================================================================
-  // Fetchers (SEMUA SUDAH DIPERBAIKI)
+  // Fetchers (VERSI FINAL YANG LEBIH RAMPING)
   // =================================================================
-  const fetchData = useCallback(
-    async (page = 1, search = '', status = null, adminId = null, date = null, ticketId = null) => {
+
+  const fetchDashboardData = useCallback(async () => {
       try {
-        const params = { page };
-        if (search) params.search = search;
-        if (status) params.status = status;
-        if (adminId) params.admin_id = adminId;
-        if (date) params.date = date;
-        if (ticketId) params.id = ticketId;
+        const response = await api.get('/dashboard-data', {
+          params: {
+            page: dataPage,
+            search: searchQuery,
+            status: statusFilter,
+            admin_id: adminIdFilter,
+            date: dateFilter,
+            id: ticketIdFilter,
+          },
+        });
+        
+        const data = response.data;
 
-        const [ticketsRes, statsRes] = await Promise.all([
-          api.get('/tickets', { params }),
-          api.get('/tickets/stats')
-        ]);
-        setTicketData(ticketsRes.data);
-        setStats(statsRes.data);
+        setTicketData(data.tickets);
+        setStats(data.stats);
+        setAnalyticsData(data.analyticsData);
+        setAdminPerformanceData(data.adminPerformance);
+        setAllTickets(data.allTicketsForCalendar);
+        setAdminList(data.admins);
+        setLocationsData(data.locations);
+
       } catch (error) {
-        console.error("Gagal mengambil data utama:", error);
-        if (error.response?.status === 401) handleLogout();
+        console.error("Gagal mengambil data dashboard:", error);
+        if (error.response?.status === 401) {
+          handleLogout();
+        }
       }
-    }, [handleLogout]
-  );
-
-  const fetchAllTickets = useCallback(async () => {
-    try {
-      const response = await api.get('/tickets/all');
-      setAllTickets(response.data);
-    } catch (e) {
-      console.error('Gagal mengambil semua tiket:', e);
-      if (e.response?.status === 401) handleLogout();
-    }
-  }, [handleLogout]);
-
-  const fetchAdmins = useCallback(async () => {
-    try {
-      const response = await api.get('/admins');
-      setAdminList(response.data);
-    } catch (e) {
-      console.error('Gagal mengambil daftar admin:', e);
-      if (e.response?.status === 401) handleLogout();
-    }
-  }, [handleLogout]);
-
-  const fetchAllUsers = useCallback(async () => {
-    try {
-      const response = await api.get('/users/all');
-      if (Array.isArray(response.data)) setUsers(response.data);
-    } catch (e) {
-      console.error('Gagal mengambil daftar semua pengguna:', e);
-      if (e.response?.status === 401) handleLogout();
-    }
-  }, [handleLogout]);
+  }, [
+      dataPage, searchQuery, statusFilter, adminIdFilter, dateFilter, ticketIdFilter,
+      handleLogout
+  ]);
 
   const fetchUsers = useCallback(async (page = 1, search = '') => {
     try {
@@ -174,7 +154,7 @@ export default function AdminDashboard() {
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const response = await api.get('/notifications'); // URL sudah benar
+      const response = await api.get('/notifications');
       setNotifications(response.data);
     } catch (e) {
       console.error('Gagal mengambil notifikasi:', e);
@@ -182,36 +162,19 @@ export default function AdminDashboard() {
     }
   }, [handleLogout]);
 
-  const fetchAnalyticsData = useCallback(async () => {
+  const fetchAllUsers = useCallback(async () => {
     try {
-      const response = await api.get('/tickets/analytics');
-      setAnalyticsData(response.data);
+      const response = await api.get('/users/all');
+      if (Array.isArray(response.data)) setUsers(response.data);
     } catch (e) {
-      console.error('Gagal mengambil data analitik:', e);
+      console.error('Gagal mengambil daftar semua pengguna:', e);
       if (e.response?.status === 401) handleLogout();
     }
   }, [handleLogout]);
 
-  const fetchLocationsData = useCallback(async () => {
-    try {
-      const response = await api.get('/locations'); // URL sudah benar
-      setLocationsData(response.data);
-    } catch (e) {
-      console.error('Gagal mengambil data lokasi:', e);
-      if (e.response?.status === 401) handleLogout();
-    }
-  }, [handleLogout]);
-
-  const fetchAdminPerformance = useCallback(async () => {
-    try {
-      const response = await api.get('/tickets/admin-performance');
-      setAdminPerformanceData(response.data);
-    } catch (e) {
-      console.error('Gagal mengambil data performa admin:', e);
-      if (e.response?.status === 401) handleLogout();
-    }
-  }, [handleLogout]);
-
+  // =================================================================
+  // Handlers
+  // =================================================================
   const handleChartFilter = useCallback((filters) => {
     setDataPage(1);
     setSearchQuery('');
@@ -219,15 +182,10 @@ export default function AdminDashboard() {
     setAdminIdFilter(filters.adminId || null);
     setDateFilter(filters.date || null);
     setTicketIdFilter(filters.ticketId || null);
-    setStatusFilter(filters.status || null); // Selalu set status terakhir
-    
-    // Pindah ke halaman tiket
+    setStatusFilter(filters.status || null);
     setCurrentPage('Tickets');
   }, []);
-
-  // =================================================================
-  // Handlers (SEMUA SUDAH DIPERBAIKI)
-  // =================================================================
+  
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setSearchQuery(searchInput);
@@ -259,7 +217,7 @@ export default function AdminDashboard() {
     try {
       await api.patch(`/tickets/${ticketId}/assign`, { user_id: adminId });
       handleCloseAssignModal();
-      fetchData(dataPage, searchQuery, statusFilter);
+      fetchDashboardData(); // DIUBAH
       fetchMyTickets(myTicketsPage);
       showToast('Tiket berhasil ditugaskan.', 'success');
     } catch (e) {
@@ -280,7 +238,7 @@ export default function AdminDashboard() {
     try {
       await api.patch(`/tickets/${ticketId}/reject`, { reason });
       handleCloseRejectModal();
-      fetchData(dataPage, searchQuery, statusFilter);
+      fetchDashboardData(); // DIUBAH
       fetchMyTickets(myTicketsPage);
       showToast('Tiket berhasil ditolak.', 'success');
     } catch (e) {
@@ -299,7 +257,7 @@ export default function AdminDashboard() {
     if (!ticketToDelete) return;
     try {
       await api.delete(`/tickets/${ticketToDelete.id}`);
-      fetchData(dataPage, searchQuery, statusFilter);
+      fetchDashboardData(); // DIUBAH
       fetchMyTickets(myTicketsPage);
       showToast('Tiket berhasil dihapus.', 'success');
     } catch (e) {
@@ -330,7 +288,7 @@ export default function AdminDashboard() {
       try {
         await api.post('/tickets/bulk-delete', { ids: selectedTicketIds });
         showToast(`${selectedTicketIds.length} tiket berhasil dihapus.`, 'success');
-        fetchData(1, '');
+        fetchDashboardData(); // DIUBAH
         setSelectedTicketIds([]);
       } catch (e) {
         console.error('Gagal menghapus tiket secara massal:', e);
@@ -354,7 +312,7 @@ export default function AdminDashboard() {
       });
       showToast('Bukti pengerjaan berhasil disimpan.', 'success');
       handleCloseProofModal();
-      fetchData(dataPage, searchQuery, statusFilter);
+      fetchDashboardData(); // DIUBAH
       fetchMyTickets(myTicketsPage);
     } catch (e) {
       console.error('Gagal menyimpan bukti:', e);
@@ -367,7 +325,7 @@ export default function AdminDashboard() {
     try {
       await api.patch(`/tickets/${id}/status`, { status: newStatus });
       showToast('Status tiket berhasil diupdate.', 'success');
-      fetchData(dataPage, searchQuery, statusFilter);
+      fetchDashboardData(); // DIUBAH
       fetchMyTickets(myTicketsPage);
     } catch (e) {
       console.error('Gagal update status:', e);
@@ -385,7 +343,7 @@ export default function AdminDashboard() {
     try {
       await api.delete(`/users/${userToDelete.id}`);
       showToast(`User "${userToDelete.name}" berhasil dihapus.`, 'success');
-      fetchUsers(1, '');
+      fetchUsers(1, ''); // Tetap, karena ini untuk halaman user management
     } catch (e) {
       console.error('Gagal menghapus pengguna:', e);
       showToast('Gagal menghapus pengguna.', 'error');
@@ -414,9 +372,9 @@ export default function AdminDashboard() {
     const isEditMode = Boolean(userToEdit);
     const url = isEditMode ? `/users/${userToEdit.id}` : '/users';
     try {
-      const res = await api.post(url, formData); // post works for update with _method in Laravel
+      const res = await api.post(url, formData);
       showToast(isEditMode ? `User "${res.data.name}" berhasil di-edit.` : 'User baru berhasil dibuat.', 'success');
-      fetchUsers(1, '');
+      fetchUsers(1, ''); // Tetap
       handleCloseUserForm();
     } catch (e) {
       console.error('Gagal menyimpan pengguna:', e);
@@ -448,34 +406,39 @@ export default function AdminDashboard() {
   }, [darkMode]);
 
   useEffect(() => {
-    if (!isAdmin) return;
-    fetchAdmins();
-    fetchAllUsers();
-    fetchNotifications();
-    // Panggil semua data yang dibutuhkan saat halaman Welcome/Dashboard pertama kali dimuat
-    if (currentPage === 'Welcome') {
-        fetchAnalyticsData();
-        fetchLocationsData();
-        fetchAdminPerformance();
-        fetchAllTickets(); // Untuk kalender
-        fetchData(1, '', null, null, null, null)
-    }
-    
-    else if (currentPage === 'Tickets') {
-      fetchData(dataPage, searchQuery, statusFilter, adminIdFilter, dateFilter, ticketIdFilter);
-      
-      // Auto-refresh hanya jika tidak ada filter aktif
-      if (!searchQuery && !statusFilter && !adminIdFilter && !dateFilter && !ticketIdFilter) {
-          const id = setInterval(() => {
-            fetchData(dataPage, searchQuery, statusFilter, adminIdFilter, dateFilter, ticketIdFilter);
-          }, 60000);
-          return () => clearInterval(id);
+      if (!isAdmin) return;
+
+      if (currentPage === 'Welcome' || currentPage === 'Tickets') {
+          fetchDashboardData();
       }
-    }
+      
+      // Dipanggil terpisah karena untuk UI yang berbeda (form notifikasi)
+      fetchAllUsers();
+      fetchNotifications();
+      
+      let intervalId = null;
+      if (currentPage === 'Tickets' && !searchQuery && !statusFilter && !adminIdFilter && !dateFilter && !ticketIdFilter) {
+        intervalId = setInterval(() => {
+          fetchDashboardData();
+        }, 60000);
+      }
+      
+      return () => {
+        if (intervalId) {
+          clearInterval(intervalId);
+        }
+      };
   }, [
-    isAdmin, currentPage, dataPage, searchQuery, statusFilter, adminIdFilter, dateFilter, ticketIdFilter,
-    fetchAdmins, fetchAllUsers, fetchNotifications, fetchAnalyticsData, 
-    fetchLocationsData, fetchAdminPerformance, fetchAllTickets, fetchData
+      isAdmin, 
+      currentPage, 
+      fetchDashboardData,
+      fetchAllUsers, 
+      fetchNotifications,
+      searchQuery,
+      statusFilter,
+      adminIdFilter,
+      dateFilter,
+      ticketIdFilter
   ]);
 
   useEffect(() => {
@@ -490,7 +453,9 @@ export default function AdminDashboard() {
     }
   }, [currentPage, userPage, userSearchQuery, fetchUsers]);
 
+  // =================================================================
   // Render Logic
+  // =================================================================
   if (isAdmin) {
     return (
       <div className={`dashboard-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
@@ -733,5 +698,5 @@ export default function AdminDashboard() {
       </div>
     );
   }
-  return null; // Atau tampilkan sesuatu jika bukan admin
+  return null;
 }

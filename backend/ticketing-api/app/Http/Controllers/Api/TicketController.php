@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -18,52 +19,40 @@ use App\Exports\TicketsExport;
 
 class TicketController extends Controller
 {
-    /**
-     * Ambil tiket berdasarkan peran pengguna.
-     */
-    public function index(Request $request)
+
+    protected function applyFilters(Builder $query, Request $request): Builder
     {
-        $user = auth()->user();
-        $perPage = $request->query('per_page', 10);
         $search = $request->query('search');
         $statusFilter = $request->query('status');
         $adminId = $request->query('admin_id');
         $date = $request->query('date');
         $ticketId = $request->query('id');
-
         $handledStatus = $request->query('handled_status');
 
-        $query = Ticket::with(['user', 'creator']);
-
-        // Jika user biasa → hanya tiket miliknya
-        if ($user->role !== 'admin') {
-            $query->where('user_id', $user->id);
-        } else {
-            if ($search) {
-                $query->whereHas('user', function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%');
-                });
-            }
+        // Filter search (berdasarkan nama user pengerja)
+        if ($search) {
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
+            });
         }
 
+        // Filter status 'handled'
         if ($handledStatus === 'handled') {
             $query->whereNotNull('user_id');
         }
 
-        // Filter status
+        // Filter status tiket
         if ($statusFilter) {
             if (is_array($statusFilter)) {
                 $query->whereIn('status', $statusFilter);
             } else {
-                if ($statusFilter === 'Belum Selesai') {
-                    $query->whereIn('status', ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan']);
-                } elseif ($statusFilter === 'Selesai') {
-                    $query->where('status', 'Selesai');
-                } elseif ($statusFilter === 'Ditolak') {
-                    $query->where('status', 'Ditolak');
-                } elseif ($statusFilter === 'Sedang Dikerjakan') {
-                    $query->whereIn('status', ['Sedang Dikerjakan', 'Ditunda']);
-                } elseif (in_array($statusFilter, ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'])) {
+                $statusMap = [
+                    'Belum Selesai' => ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'],
+                    'Sedang Dikerjakan' => ['Sedang Dikerjakan', 'Ditunda'],
+                ];
+                if (isset($statusMap[$statusFilter])) {
+                    $query->whereIn('status', $statusMap[$statusFilter]);
+                } else {
                     $query->where('status', $statusFilter);
                 }
             }
@@ -76,22 +65,35 @@ class TicketController extends Controller
 
         // Filter tanggal
         if ($date) {
-            if ($statusFilter === 'Selesai' || $statusFilter === 'Ditolak') {
-                $query->whereDate('completed_at', $date);
-            } elseif ($statusFilter === 'Sedang Dikerjakan') {
-                $query->where(function ($q) use ($date) {
-                    $q->whereDate('started_at', $date)
-                        ->orWhereDate('updated_at', $date);
-                });
-            } else {
-                $query->whereDate('created_at', $date);
-            }
+            // DIUBAH: Logika ini disederhanakan untuk konsistensi dengan Line Chart.
+            // Selalu filter berdasarkan tanggal tiket dibuat.
+            $query->whereDate('created_at', $date);
         }
 
-        // Filter ID
+        // Filter ID tiket tunggal
         if ($ticketId) {
             $query->where('id', $ticketId);
         }
+
+        return $query;
+    }
+
+    /**
+     * Ambil tiket berdasarkan peran pengguna.
+     */
+    public function index(Request $request)
+    {
+        $user = auth()->user();
+        $perPage = $request->query('per_page', 10);
+        $query = Ticket::with(['user', 'creator']);
+
+        // Jika user biasa → hanya tiket miliknya
+        if ($user->role !== 'admin') {
+            $query->where('creator_id', $user->id); // Logika yang lebih umum, tiket yang dia buat
+        }
+
+        // Terapkan semua filter dari request
+        $query = $this->applyFilters($query, $request);
 
         $ticketsData = $query->latest()->paginate($perPage);
         return response()->json($ticketsData);
@@ -270,44 +272,43 @@ class TicketController extends Controller
             return response()->json(['error' => 'Hanya admin yang bisa dilihat laporannya.'], 403);
         }
 
-        // --- QUERY UNTUK STATISTIK KESELURUHAN (TIDAK BERUBAH) ---
-        $allTicketsQuery = Ticket::where('user_id', $adminId);
-        $totalTickets = $allTicketsQuery->count();
-        $completedTickets = (clone $allTicketsQuery)->where('status', 'Selesai')->count();
-        $rejectedTickets = (clone $allTicketsQuery)->where('status', 'Ditolak')->count();
-        $inProgressTickets = (clone $allTicketsQuery)
-            ->whereIn('status', ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'])
-            ->count();
+        // --- OPTIMASI: Query untuk statistik digabung menjadi satu ---
+        $stats = Ticket::where('user_id', $adminId)
+            ->select(
+                DB::raw("COUNT(*) as total"),
+                DB::raw("SUM(CASE WHEN status = 'Selesai' THEN 1 ELSE 0 END) as completed"),
+                DB::raw("SUM(CASE WHEN status = 'Ditolak' THEN 1 ELSE 0 END) as rejected"),
+                DB::raw("SUM(CASE WHEN status IN ('Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan') THEN 1 ELSE 0 END) as in_progress")
+            )
+            ->first();
 
-        // --- (DIUBAH) QUERY UNTUK DATA TABEL DENGAN PAGINASI DAN FILTER ---
+        // Query untuk data tabel paginasi
         $paginatedQuery = Ticket::with(['user', 'creator'])->where('user_id', $adminId);
 
-        // Tambahkan logika untuk menangani filter status dari request
+        // Logika filter status untuk tabel
         if ($request->has('status')) {
             $status = $request->query('status');
-            if ($status === 'completed') {
-                $paginatedQuery->where('status', 'Selesai');
-            } elseif ($status === 'rejected') {
-                $paginatedQuery->where('status', 'Ditolak');
-            } elseif ($status === 'in_progress') {
-                $paginatedQuery->whereIn('status', ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan']);
+            $statusMap = [
+                'completed' => ['Selesai'],
+                'rejected' => ['Ditolak'],
+                'in_progress' => ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan']
+            ];
+            if (isset($statusMap[$status])) {
+                $paginatedQuery->whereIn('status', $statusMap[$status]);
             }
-            // Jika status 'all', tidak perlu filter tambahan
         }
 
         $perPage = $request->query('per_page', 10);
         $paginatedTickets = $paginatedQuery->latest()->paginate($perPage);
 
         return response()->json([
-            'total' => $totalTickets,
-            'completed' => $completedTickets,
-            'rejected' => $rejectedTickets,
-            'in_progress' => $inProgressTickets,
-            'tickets' => $paginatedTickets, // Kirim hasil paginasi yang sudah difilter
+            'total' => (int) $stats->total,
+            'completed' => (int) $stats->completed,
+            'rejected' => (int) $stats->rejected,
+            'in_progress' => (int) $stats->in_progress,
+            'tickets' => $paginatedTickets,
         ]);
     }
-
-
 
     /**
      * Menugaskan tiket ke admin.
@@ -473,33 +474,42 @@ class TicketController extends Controller
      */
     public function stats()
     {
-        $user = Auth::user();
-        $stats = [];
+        $user = auth()->user();
+        $query = Ticket::query();
+
+        if ($user->role !== 'admin') {
+            $query->where('user_id', $user->id);
+        }
+
+        $counts = $query->select(
+                'status',
+                DB::raw('count(*) as total')
+            )
+            ->groupBy('status')
+            ->get()
+            ->keyBy('status');
+
+        $stats = [
+            'belum_dikerjakan' => $counts['Belum Dikerjakan']->total ?? 0,
+            'sedang_dikerjakan' => $counts['Sedang Dikerjakan']->total ?? 0,
+            'ditunda' => $counts['Ditunda']->total ?? 0,
+            'selesai' => $counts['Selesai']->total ?? 0,
+            'ditolak' => $counts['Ditolak']->total ?? 0,
+        ];
+
+        // 🚀 PERBAIKAN: Hitung total HANYA dari status dasar.
+        $totalTickets = array_sum($stats);
+
+        // Setelah total dihitung, baru tambahkan subtotal untuk frontend.
+        $stats['pending_tickets']   = $stats['belum_dikerjakan'] + $stats['ditunda'] + $stats['sedang_dikerjakan'];
+        $stats['completed_tickets'] = $stats['selesai'];
+        $stats['rejected_tickets']  = $stats['ditolak'];
+
+        // Masukkan total yang sudah benar ke dalam array.
+        $stats['total_tickets'] = $totalTickets;
 
         if ($user->role === 'admin') {
-            $stats['total_tickets']    = Ticket::count();
-            $stats['total_users']      = User::count();
-
-            $stats['belum_dikerjakan'] = Ticket::where('status', 'Belum Dikerjakan')->count();
-            $stats['ditunda']          = Ticket::where('status', 'Ditunda')->count();
-            $stats['sedang_dikerjakan'] = Ticket::where('status', 'Sedang Dikerjakan')->count();
-            $stats['selesai']          = Ticket::where('status', 'Selesai')->count();
-            $stats['ditolak']          = Ticket::where('status', 'Ditolak')->count();
-
-            $stats['completed_tickets'] = $stats['selesai'];
-            $stats['rejected_tickets']  = $stats['ditolak'];
-            $stats['pending_tickets']   = $stats['belum_dikerjakan'] + $stats['ditunda'] + $stats['sedang_dikerjakan'];
-        } else {
-            $stats['total_tickets']    = Ticket::where('user_id', $user->id)->count();
-            $stats['belum_dikerjakan'] = Ticket::where('user_id', $user->id)->where('status', 'Belum Dikerjakan')->count();
-            $stats['ditunda']          = Ticket::where('user_id', $user->id)->where('status', 'Ditunda')->count();
-            $stats['sedang_dikerjakan'] = Ticket::where('user_id', $user->id)->where('status', 'Sedang Dikerjakan')->count();
-            $stats['selesai']          = Ticket::where('user_id', $user->id)->where('status', 'Selesai')->count();
-            $stats['ditolak']          = Ticket::where('user_id', $user->id)->where('status', 'Ditolak')->count();
-
-            $stats['completed_tickets'] = $stats['selesai'];
-            $stats['rejected_tickets']  = $stats['ditolak'];
-            $stats['pending_tickets']   = $stats['belum_dikerjakan'] + $stats['ditunda'] + $stats['sedang_dikerjakan'];
+            $stats['total_users'] = User::count();
         }
 
         return response()->json($stats);
@@ -556,55 +566,22 @@ class TicketController extends Controller
             'in_progress' => $in_progress,
         ]);
     }
+
     public function export(Request $request)
     {
-        // 1. Validasi tipe ekspor
         $validated = $request->validate([
             'type' => 'required|in:pdf,excel',
-            // Tambahkan validasi untuk filter lain jika perlu
-            'status' => 'nullable|string',
-            'admin_id' => 'nullable|exists:users,id',
-            'handled_status' => 'nullable|string',
         ]);
 
-        // 2. Gunakan logika query yang sama dengan method index()
-        // Ini penting agar data yang diekspor sama dengan yang ditampilkan
+        // Gunakan logika query yang sama dengan method index()
         $query = Ticket::with(['user', 'creator']);
+        
+        // Terapkan semua filter yang mungkin ada di request
+        $query = $this->applyFilters($query, $request);
 
-        // Filter dari ComprehensiveReportPage.js
-        if ($request->handled_status === 'handled') {
-            $query->whereNotNull('user_id');
-        }
-
-        if ($request->status) {
-            $statusFilter = $request->status;
-            if ($statusFilter === 'Selesai' || $statusFilter === 'Ditolak') {
-                $query->where('status', $statusFilter);
-            } elseif ($statusFilter === 'in_progress') {
-                // asumsi dari frontend: in_progress = 'Sedang Dikerjakan' atau 'Ditunda'
-                $query->whereIn('status', ['Sedang Dikerjakan', 'Ditunda']);
-            }
-        }
-
-        // Filter dari TicketReportDetail.js
-        if ($request->admin_id) {
-            $query->where('user_id', $request->admin_id);
-            // Jika ada filter status tambahan dari detail admin
-            if ($request->status && $request->status !== 'all') {
-                if ($request->status === 'completed') {
-                    $query->where('status', 'Selesai');
-                } elseif ($request->status === 'rejected') {
-                    $query->where('status', 'Ditolak');
-                } elseif ($request->status === 'in_progress') {
-                    $query->whereIn('status', ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan']);
-                }
-            }
-        }
-
-        // 3. Ambil semua data (tanpa paginasi)
+        // Ambil semua data (tanpa paginasi)
         $tickets = $query->latest()->get();
 
-        // 4. Generate file berdasarkan tipe
         $fileName = 'laporan-tiket-' . date('Y-m-d_H-i-s');
 
         if ($validated['type'] === 'excel') {
@@ -617,15 +594,8 @@ class TicketController extends Controller
                 $admin = User::find($request->admin_id);
                 $title = 'Laporan Penyelesaian - ' . ($admin->name ?? 'Admin');
             }
-
-            $pdf = PDF::loadView('reports.tickets_pdf', [
-                'tickets' => $tickets,
-                'title' => $title
-            ]);
-
-            // Untuk orientasi landscape jika kolomnya banyak
+            $pdf = PDF::loadView('reports.tickets_pdf', compact('tickets', 'title'));
             $pdf->setPaper('a4', 'landscape');
-
             return $pdf->stream($fileName . '.pdf');
         }
     }
