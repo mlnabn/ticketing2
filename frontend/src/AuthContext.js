@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
-import api from './services/api';
 
 const AuthContext = createContext(null);
 
@@ -13,6 +12,7 @@ export function AuthProvider({ children }) {
     try {
       const t = localStorage.getItem('auth.accessToken');
       const u = localStorage.getItem('auth.user');
+      // Tidak perlu load expiresAt ke state, cukup di localStorage
       if (t) setAccessToken(t);
       if (u) setUser(JSON.parse(u));
     } catch (e) {
@@ -22,25 +22,35 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // Persist ke localStorage
-  useEffect(() => {
-    try {
-      if (accessToken) localStorage.setItem('auth.accessToken', accessToken);
-      else localStorage.removeItem('auth.accessToken');
-      if (user) localStorage.setItem('auth.user', JSON.stringify(user));
-      else localStorage.removeItem('auth.user');
-    } catch {}
-  }, [user, accessToken]);
+  // DIUBAH: Fungsi login sekarang menjadi bagian dari context
+  const login = useCallback((data) => {
+    const { access_token, user, expires_in } = data;
+    const expiresAt = Date.now() + (expires_in * 1000) - 60000;
+
+    localStorage.setItem('auth.accessToken', access_token);
+    localStorage.setItem('auth.user', JSON.stringify(user));
+    localStorage.setItem('auth.expiresAt', expiresAt.toString());
+
+    setAccessToken(access_token);
+    setUser(user);
+  }, []);
 
   const logout = useCallback(() => {
+    localStorage.removeItem('auth.accessToken');
+    localStorage.removeItem('auth.user');
+    localStorage.removeItem('auth.expiresAt');
+
     setUser(null);
     setAccessToken(null);
-    // Hapus dari localStorage secara manual untuk memastikan
-    try {
-      localStorage.removeItem('auth.accessToken');
-      localStorage.removeItem('auth.user');
-    } catch {}
   }, []);
+
+  useEffect(() => {
+    const handleLogoutEvent = () => logout();
+    window.addEventListener('auth-logout', handleLogoutEvent);
+    return () => {
+      window.removeEventListener('auth-logout', handleLogoutEvent);
+    };
+  }, [logout]);
 
   const value = useMemo(
     () => ({
@@ -51,11 +61,12 @@ export function AuthProvider({ children }) {
       role: user?.role ?? null,
       name: user?.name ?? null,
       userId: user?.id ?? null,
+      login, // DIUBAH: Tambahkan login ke context
       logout,
       setUser,
       setAccessToken,
     }),
-    [user, accessToken, loading, logout]
+    [user, accessToken, loading, login, logout] // DIUBAH: Tambahkan login & logout
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
