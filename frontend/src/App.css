@@ -139,19 +139,12 @@
 
   /* Palet Warna - Light Mode */
   --primary-color: #3f51b5;
-  /* Biru utama untuk aksi & highlight */
   --primary-color-light: #e8eaf6;
-  /* Biru muda untuk latar belakang avatar */
   --bg-color: #f4f7f9;
-  /* Latar belakang utama halaman */
   --card-bg-color: #ffffff;
-  /* Latar belakang semua kartu */
   --text-primary: #1a202c;
-  /* Warna teks utama (hampir hitam) */
   --text-secondary: #718096;
-  /* Warna teks sekunder (abu-abu) */
   --border-color: #e2e8f0;
-  /* Warna garis tepi */
   --shadow-color: rgba(0, 0, 0, 0.08);
 }
 
@@ -8701,15 +8694,20 @@ body.dark-mode .dashboard-card h4 {
   margin-top: 2rem;
 }
 
-.nav-card {
+.dark-mode .nav-card {
   background-color: var(--card-small);
+
+}
+
+.nav-card{
   padding: 1.5rem;
   border-radius: 12px;
-  border: 1px solid var(--card-small);
-  cursor: pointer;
+  border: 1px solid var(--border-color);
+  cursor: pointer; 
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
   box-shadow: 0 4px 12px var(--shadow-color);
+  background-color: #fff;
 }
 
 .nav-card:hover {

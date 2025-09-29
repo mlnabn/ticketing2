@@ -9,6 +9,7 @@ const UserManagement = ({ userData, onAddClick, onEditClick, onDeleteClick, onPa
         onSearch(searchInput);
     };
 
+    // Definisikan 'users' di atas agar bisa diakses di kondisi render
     const users = userData ? userData.data : [];
 
     return (
@@ -29,76 +30,78 @@ const UserManagement = ({ userData, onAddClick, onEditClick, onDeleteClick, onPa
             </form>
 
             {/* ======================================================= */}
-            {/* ===    TAMPILAN TABEL UNTUK DESKTOP (TETAP SAMA)    === */}
+            {/* ===         LOGIKA KONDISIONAL UNTUK LOADING        === */}
             {/* ======================================================= */}
-            <div className="job-list-table">
-                <table className='job-table'>
-                    <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>Nama</th>
-                            <th>Email</th>
-                            <th>Peran</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {users.map((user, index) => (
-                            <tr key={user.id}>
-                                <td>{userData.from + index}</td>
-                                <td>{user.name}</td>
-                                <td>{user.email}</td>
-                                <td>{user.role}</td>
-                                <td>
-                                    <div className="action-buttons-group">
-                                        <button onClick={() => onEditClick(user)} className="btn-user-action btn-edit">Edit</button>
-                                        <button onClick={() => onDeleteClick(user)} className="btn-user-action btn-delete">Hapus</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* ======================================================= */}
-            {/* ===      TAMPILAN KARTU BARU UNTUK MOBILE           === */}
-            {/* ======================================================= */}
-            <div className="user-list-mobile">
-                {users.map(user => (
-                    <div key={user.id} className="user-card-mobile">
-                        {/* Baris 1: Nama dan Email */}
-                        <div className="user-card-row">
-                            <div className="user-data-group">
-                                <span className="label">Nama</span>
-                                <span className="value">{user.name}</span>
-                            </div>
-                            <div className="user-data-group">
-                                <span className="label">Email</span>
-                                <span className="value">{user.email}</span>
-                            </div>
-                        </div>
-                        {/* Baris 2: Peran dan Aksi */}
-                        <div className="user-card-row">
-                            <div className="user-data-group">
-                                <span className="label">Peran</span>
-                                <span className="value role">{user.role}</span>
-                            </div>
-                            <div className="action-buttons-group">
-                                <button onClick={() => onEditClick(user)} className="btn-edit">Edit</button>
-                                <button onClick={() => onDeleteClick(user)} className="btn-delete">Hapus</button>
-                            </div>
-                        </div>
+            {!userData ? (
+                <p>Memuat data pengguna...</p>
+            ) : users.length === 0 ? (
+                <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
+                    <p>Tidak ada pengguna yang ditemukan.</p>
+                </div>
+            ) : (
+                <>
+                    {/* Tampilan Tabel untuk Desktop */}
+                    <div className="job-list-table">
+                        <table className='job-table'>
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Nama</th>
+                                    <th>Email</th>
+                                    <th>Peran</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.map((user, index) => (
+                                    <tr key={user.id}>
+                                        <td>{userData.from + index}</td>
+                                        <td>{user.name}</td>
+                                        <td>{user.email}</td>
+                                        <td>{user.role}</td>
+                                        <td>
+                                            <div className="action-buttons-group">
+                                                <button onClick={() => onEditClick(user)} className="btn-user-action btn-edit">Edit</button>
+                                                <button onClick={() => onDeleteClick(user)} className="btn-user-action btn-delete">Hapus</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
-                ))}
-            </div>
-            
-            {userData && (
-                <Pagination
-                    currentPage={userData.current_page}
-                    lastPage={userData.last_page}
-                    onPageChange={onPageChange}
-                />
+
+                    {/* Tampilan Kartu untuk Mobile */}
+                    <div className="user-list-mobile">
+                        {users.map((user, index) => (
+                            <div key={user.id} className="user-card-mobile">
+                                <div className="user-card-header">
+                                  <span className="user-number">{userData.from + index}</span>
+                                  <span className="user-role">{user.role}</span>
+                                </div>
+                                <div className="user-card-body">
+                                  <div className="user-info">
+                                    <span className="user-name">{user.name}</span>
+                                    <span className="user-email">{user.email}</span>
+                                  </div>
+                                  <div className="action-buttons-group">
+                                      <button onClick={() => onEditClick(user)} className="btn-edit">Edit</button>
+                                      <button onClick={() => onDeleteClick(user)} className="btn-delete">Hapus</button>
+                                  </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {/* Tampilkan Pagination hanya jika ada data */}
+                    {userData.last_page > 1 && (
+                        <Pagination
+                            currentPage={userData.current_page}
+                            lastPage={userData.last_page}
+                            onPageChange={onPageChange}
+                        />
+                    )}
+                </>
             )}
         </div>
     );
