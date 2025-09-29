@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Api\OtpController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,8 @@ Route::post('/tickets/whatsapp', [TicketController::class, 'storeFromWhatsapp'])
 
 // Route Terproteksi (Memerlukan Token JWT)
 Route::middleware('jwt')->group(function () {
+
+    Route::get('/dashboard-data', [DashboardController::class, 'getBootstrapData']);
 
     // --- Rute Autentikasi Pengguna ---
     Route::get('/user', [AuthController::class, 'getUser']);
