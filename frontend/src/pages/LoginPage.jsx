@@ -5,7 +5,7 @@ import Login from '../components/Login';
 import loginBackground from '../Image/LoginBg.jpg';
 
 export default function LoginPage() {
-  const { setUser, setAccessToken, loggedIn } = useAuth();
+  const { login, loggedIn } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,13 +23,12 @@ export default function LoginPage() {
     // Parameter pertama sekarang adalah 'response' dari API
     (response) => {
       if (response.access_token && response.user) {
-        setAccessToken(response.access_token);
-        setUser(response.user);
+        login(response);
       } else {
         console.error("handleLoginSuccess dipanggil dengan respons yang tidak valid.");
       }
     },
-    [setAccessToken, setUser]
+    [login]
   );
 
   // useEffect ini HANYA menangani navigasi setelah state diperbarui
