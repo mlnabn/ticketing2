@@ -160,17 +160,34 @@ class AuthController extends Controller
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
             $user = User::firstOrNew(['email' => $googleUser->getEmail()]);
-            $user->name = $googleUser->getName();
-            $user->google_id = $googleUser->getId();
-            $user->avatar = $googleUser->getAvatar();
+
             if (!$user->exists) {
+                $user->name = $googleUser->getName();
+                $user->google_id = $googleUser->getId();
+                $user->avatar = $googleUser->getAvatar();
                 $user->password = Hash::make(Str::random(24));
                 $user->role = 'user';
+                $user->save();
             }
-            $user->save();
+
+            // Buat token dari user yang sudah ada atau yang baru dibuat
             $access_token = JWTAuth::fromUser($user);
-            $user_data = urlencode(json_encode($user));
-            return redirect('http://localhost:3000?access_token=' . $access_token . '&user=' . $user_data);
+
+            $expires_in = auth('api')->factory()->getTTL() * 60; // Dapatkan masa berlaku token (dalam detik)
+            
+            $user_data_for_frontend = [
+                'id'         => $user->id,
+                'name'       => $user->name,
+                'email'      => $user->email,
+                'phone'      => $user->phone,
+                'role'       => $user->role,
+                'avatar_url' => $user->avatar,
+            ];
+            
+            $user_param = urlencode(json_encode($user_data_for_frontend));
+
+            return redirect('http://localhost:3000?access_token=' . $access_token . '&user=' . $user_param . '&expires_in=' . $expires_in);
+
         } catch (Exception $e) {
             \Log::error('Google Callback Error: ' . $e->getMessage());
             return redirect('http://localhost:3000/login?error=google_auth_failed');
