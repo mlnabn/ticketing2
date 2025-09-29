@@ -29,20 +29,14 @@ class TicketController extends Controller
         $ticketId = $request->query('id');
         $handledStatus = $request->query('handled_status');
 
-        // Filter search (berdasarkan nama user pengerja)
         if ($search) {
             $query->whereHas('user', function ($q) use ($search) {
                 $q->where('name', 'like', '%' . $search . '%');
             });
         }
-
-        // Filter status 'handled'
         if ($handledStatus === 'handled') {
-            $query->whereNotNull('user_id')
-                ->where('status', '!=', 'Belum Dikerjakan');
+            $query->whereNotNull('user_id');
         }
-
-        // Filter status tiket
         if ($statusFilter) {
             if (is_array($statusFilter)) {
                 $query->whereIn('status', $statusFilter);
@@ -50,32 +44,24 @@ class TicketController extends Controller
                 $statusMap = [
                     'Belum Selesai' => ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'],
                     'Sedang Dikerjakan' => ['Sedang Dikerjakan', 'Ditunda'],
+                    'in_progress' => ['Sedang Dikerjakan', 'Ditunda'],
                 ];
                 if (isset($statusMap[$statusFilter])) {
                     $query->whereIn('status', $statusMap[$statusFilter]);
                 } else {
-                    $query->where('status', $statusFilter);
+                    $query->where('status', 'Selesai');
                 }
             }
         }
-
-        // Filter admin tertentu
         if ($adminId) {
             $query->where('user_id', $adminId);
         }
-
-        // Filter tanggal
         if ($date) {
-            // DIUBAH: Logika ini disederhanakan untuk konsistensi dengan Line Chart.
-            // Selalu filter berdasarkan tanggal tiket dibuat.
             $query->whereDate('created_at', $date);
         }
-
-        // Filter ID tiket tunggal
         if ($ticketId) {
             $query->where('id', $ticketId);
         }
-
         return $query;
     }
 
@@ -547,28 +533,31 @@ class TicketController extends Controller
         return response()->json($ticket);
     }
 
-    public function reportStats(Request $request)
+    public function reportStats()
     {
-        $baseQuery = Ticket::query();
-        $filteredQuery = $this->applyFilters($baseQuery, $request);
-        $total = $filteredQuery->clone()->count();
-        $handled = $filteredQuery->clone()->whereNotNull('user_id')->count();
-        $completed = $filteredQuery->clone()->where('status', 'Selesai')->count();
-        $rejected = $filteredQuery->clone()->where('status', 'Ditolak')->count();
+        $stats = Ticket::select(
+            DB::raw("COUNT(*) as total"),
+            DB::raw("SUM(CASE WHEN user_id IS NOT NULL THEN 1 ELSE 0 END) as handled"),
+            DB::raw("SUM(CASE WHEN status = 'Selesai' THEN 1 ELSE 0 END) as completed"),
+            DB::raw("SUM(CASE WHEN status = 'Ditolak' THEN 1 ELSE 0 END) as rejected"),
+            DB::raw("SUM(CASE WHEN user_id IS NOT NULL AND status NOT IN ('Selesai', 'Ditolak') THEN 1 ELSE 0 END) as in_progress")
+        )->first();
 
-        // Tiket yang sedang dalam progres (sudah ditangani tapi belum selesai/ditolak)
-        $in_progress = $filteredQuery->clone()
-            ->whereNotNull('user_id')
-            ->whereNotIn('status', ['Selesai', 'Ditolak'])
-            ->count();
+        // Konversi hasil ke integer untuk konsistensi JSON
+        $result = [
+            'total'       => (int) $stats->total,
+            'handled'     => (int) $stats->handled,
+            'completed'   => (int) $stats->completed,
+            'rejected'    => (int) $stats->rejected,
+            'in_progress' => (int) $stats->in_progress,
+        ];
+        
+        return response()->json($result);
+    }
 
-        return response()->json([
-            'total' => $total,
-            'handled' => $handled,
-            'completed' => $completed,
-            'rejected' => $rejected,
-            'in_progress' => $in_progress,
-        ]);
+    public function downloadExport(Request $request)
+    {
+        return $this->export($request);
     }
 
     public function export(Request $request)
@@ -577,15 +566,9 @@ class TicketController extends Controller
             'type' => 'required|in:pdf,excel',
         ]);
 
-        // Gunakan logika query yang sama dengan method index()
         $query = Ticket::with(['user', 'creator']);
-
-        // Terapkan semua filter yang mungkin ada di request
         $query = $this->applyFilters($query, $request);
-
-        // Ambil semua data (tanpa paginasi)
         $tickets = $query->latest()->get();
-
         $fileName = 'laporan-tiket-' . date('Y-m-d_H-i-s');
 
         if ($validated['type'] === 'excel') {
@@ -600,7 +583,9 @@ class TicketController extends Controller
             }
             $pdf = PDF::loadView('reports.tickets_pdf', compact('tickets', 'title'));
             $pdf->setPaper('a4', 'landscape');
-            return $pdf->stream($fileName . '.pdf');
+
+            // DIUBAH: Kembalikan sebagai download stream, bukan file biasa
+            return $pdf->download($fileName . '.pdf');
         }
     }
 }

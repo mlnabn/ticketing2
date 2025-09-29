@@ -75,6 +75,7 @@ Route::middleware('jwt')->group(function () {
     // Tambahkan rute untuk Analytics di dalam group ini
     Route::get('/tickets/analytics', [AnalyticsController::class, 'getTicketAnalytics']);
     Route::get('/tickets/admin-performance', [AnalyticsController::class, 'getAdminPerformance']);
+    Route::get('/tickets/download-export', [TicketController::class, 'downloadExport']);
 
     Route::get('/locations', [LocationController::class, 'index']);
 });
