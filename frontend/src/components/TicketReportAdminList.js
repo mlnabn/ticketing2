@@ -126,7 +126,7 @@ export default function TicketReportAdminList({ onSelectAdmin }) {
       case 'worked_on_report':
         return <ComprehensiveReportPage
           title="Laporan yang Dikerjakan Seluruh Admin"
-          filterType="worked_on"
+          filterType="handled"
           onBack={() => setView('main')}
         />;
       default:
