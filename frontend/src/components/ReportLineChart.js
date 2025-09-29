@@ -14,8 +14,6 @@ import dayjs from "dayjs";
 
 const ReportLineChart = ({ data }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  
-  // (BARU) State untuk mengontrol garis mana yang terlihat
   const [visibleLines, setVisibleLines] = useState(["Total Tiket", "Tiket Dikerjakan"]);
 
   useEffect(() => {
@@ -30,43 +28,40 @@ const ReportLineChart = ({ data }) => {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // (BARU) Fungsi untuk menangani klik pada legend
   const handleLegendClick = (lineName) => {
-    // Jika semua garis terlihat, klik satu untuk menampilkan hanya satu itu
     if (visibleLines.length === 2) {
       setVisibleLines([lineName]);
-    } 
-    // Jika hanya satu garis yang terlihat dan diklik lagi, tampilkan semua
-    else if (visibleLines.length === 1 && visibleLines[0] === lineName) {
+    } else if (visibleLines.length === 1 && visibleLines[0] === lineName) {
       setVisibleLines(["Total Tiket", "Tiket Dikerjakan"]);
-    } 
-    // Jika hanya satu garis yang terlihat dan garis lain diklik, ganti
-    else {
+    } else {
       setVisibleLines([lineName]);
     }
   };
 
-  if (!data || data.length === 0) return <p>Tidak ada data untuk ditampilkan pada chart.</p>;
+  if (!data || data.length === 0) {
+    return <p>Tidak ada data untuk ditampilkan pada chart.</p>;
+  }
 
-  const formattedData = data.map((d) => ({
-    ...d,
-    date: new Date(d.date).getTime()
-  }));
+  // (DIUBAH) Cek apakah data yang masuk adalah data bulanan atau harian
+  // Ini adalah kunci perbaikan: mendeteksi tipe data secara dinamis
+  const isMonthlyData = data[0] && data[0].month;
+
+  // (DIUBAH) Kunci data untuk sumbu-X juga dinamis
+  const xAxisDataKey = isMonthlyData ? "month" : "date";
+  
 
   return (
     <div className="linechart-wrapper">
       <ResponsiveContainer width="100%" height={250}>
         <LineChart
-          data={formattedData}
+          data={data} // (DIUBAH) Gunakan data asli tanpa format paksa
           margin={{ top: 10, right: 30, left: -10, bottom: 30 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#444" : "#ddd"} />
           <XAxis
-            dataKey="date"
-            type="number"
-            scale="time"
-            domain={["auto", "auto"]}
-            tickFormatter={(date) => dayjs(date).format("DD")} // Tampilkan tanggal saja agar tidak penuh
+            dataKey={xAxisDataKey} // Dinamis: 'month' atau 'date'
+            // (DIUBAH) Terapkan formatter yang sesuai berdasarkan tipe data
+            tickFormatter={(tick) => isMonthlyData ? tick : dayjs(tick).format("DD")}
             tick={{ fontSize: 11 }}
             tickMargin={10}
             axisLine={{ stroke: isDarkMode ? "#888" : "#ccc" }}
@@ -80,7 +75,11 @@ const ReportLineChart = ({ data }) => {
             tickLine={{ stroke: isDarkMode ? "#888" : "#ccc" }}
           />
           <Tooltip
-            labelFormatter={(label) => dayjs(label).format("DD MMM YYYY")}
+            // (DIUBAH) Label pada tooltip juga dibuat dinamis
+            labelFormatter={(label) => {
+                if (isMonthlyData) return `Bulan ${label}`; // Tampilkan nama bulan jika data bulanan
+                return dayjs(label).format("DD MMM YYYY"); // Format tanggal lengkap jika harian
+            }}
             contentStyle={{
               backgroundColor: isDarkMode ? "#2c2c2c" : "#fff",
               border: `1px solid ${isDarkMode ? "#555" : "#ccc"}`,
@@ -89,7 +88,7 @@ const ReportLineChart = ({ data }) => {
             }}
           />
 
-          {/* (DIUBAH) Render Line secara kondisional berdasarkan state visibleLines */}
+          {/* Render Line secara kondisional berdasarkan state visibleLines */}
           {visibleLines.includes("Total Tiket") && (
             <Line type="monotone" dataKey="total" stroke="#2196f3" name="Total Tiket" dot={false} />
           )}
@@ -99,7 +98,7 @@ const ReportLineChart = ({ data }) => {
         </LineChart>
       </ResponsiveContainer>
       
-      {/* (DIUBAH) Legend custom dibuat interaktif */}
+      {/* Legend custom yang interaktif */}
       <div className="chart-legend">
         <div
           className="legend-item2"

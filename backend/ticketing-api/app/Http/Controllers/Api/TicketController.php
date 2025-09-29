@@ -28,6 +28,8 @@ class TicketController extends Controller
         $date = $request->query('date');
         $ticketId = $request->query('id');
         $handledStatus = $request->query('handled_status');
+        $year = $request->query('year');
+        $month = $request->query('month');
 
         if ($search) {
             $query->whereHas('user', function ($q) use ($search) {
@@ -62,6 +64,13 @@ class TicketController extends Controller
         if ($ticketId) {
             $query->where('id', $ticketId);
         }
+        if ($year) {
+            $query->whereYear('created_at', $year);
+        }
+        if ($month) {
+            $query->whereMonth('created_at', $month);
+        }
+
         return $query;
     }
 
@@ -200,50 +209,70 @@ class TicketController extends Controller
 
     public function getReportAnalytics(Request $request)
     {
-        // Validasi input, jika tidak ada, gunakan bulan dan tahun saat ini
         $year = $request->input('year', Carbon::now()->year);
-        $month = $request->input('month', Carbon::now()->month);
+        $month = $request->input('month');
 
-        // Tentukan tanggal awal dan akhir dari bulan yang dipilih
-        $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
-        $endDate = $startDate->copy()->endOfMonth();
+        // --- LOGIKA 1: HANYA TAHUN DIPILIH (ATAU DEFAULT) ---
+        if (!$month) {
+            $monthlyCreated = Ticket::select(
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('count(*) as count')
+            )
+                ->whereYear('created_at', $year)
+                ->groupBy('month')
+                ->get()->pluck('count', 'month');
 
-        // 1. Ambil jumlah tiket yang DIBUAT per hari dalam bulan yang dipilih
+            $monthlyStarted = Ticket::select(
+                DB::raw('MONTH(started_at) as month'),
+                DB::raw('count(*) as count')
+            )
+                ->whereYear('started_at', $year)
+                ->whereNotNull('user_id')
+                ->whereNotNull('started_at')
+                ->groupBy('month')
+                ->get()->pluck('count', 'month');
+
+            $report = [];
+            for ($m = 1; $m <= 12; $m++) {
+                $report[] = [
+                    'month' => Carbon::create()->month($m)->format('M'), // e.g., 'Jan', 'Feb'
+                    'total' => $monthlyCreated[$m] ?? 0,
+                    'dikerjakan' => $monthlyStarted[$m] ?? 0,
+                ];
+            }
+            return response()->json($report);
+        }
+
+        // --- LOGIKA 2: TAHUN DAN BULAN DIPILIH ---
         $dailyCreatedCounts = Ticket::select(
             DB::raw('DATE(created_at) as date'),
             DB::raw('count(*) as count')
         )
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
             ->groupBy('date')
-            ->get()
-            ->keyBy(fn($item) => Carbon::parse($item->date)->toDateString());
+            ->get()->keyBy(fn($item) => Carbon::parse($item->date)->toDateString());
 
-        // 2. Ambil jumlah tiket yang MULAI DIKERJAKAN per hari dalam bulan yang dipilih
         $dailyStartedCounts = Ticket::select(
             DB::raw('DATE(started_at) as date'),
             DB::raw('count(*) as count')
         )
             ->whereNotNull('user_id')
             ->whereNotNull('started_at')
-            ->whereBetween('started_at', [$startDate, $endDate])
+            ->whereYear('started_at', $year)
+            ->whereMonth('started_at', $month)
             ->groupBy('date')
-            ->get()
-            ->keyBy(fn($item) => Carbon::parse($item->date)->toDateString());
+            ->get()->keyBy(fn($item) => Carbon::parse($item->date)->toDateString());
 
+        $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+        $endDate = $startDate->copy()->endOfMonth();
         $report = [];
-
-        // 3. Iterasi untuk setiap hari di bulan yang dipilih
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
             $dateString = $date->toDateString();
-
-            // Ambil jumlah untuk hari ini, jika tidak ada data maka nilainya 0
-            $totalForDay = $dailyCreatedCounts[$dateString]->count ?? 0;
-            $workedOnForDay = $dailyStartedCounts[$dateString]->count ?? 0;
-
             $report[] = [
                 'date' => $dateString,
-                'total' => $totalForDay,      // Jumlah tiket BARU pada hari ini
-                'dikerjakan' => $workedOnForDay, // Jumlah tiket MULAI DIKERJAKAN pada hari ini
+                'total' => $dailyCreatedCounts[$dateString]->count ?? 0,
+                'dikerjakan' => $dailyStartedCounts[$dateString]->count ?? 0,
             ];
         }
 
@@ -259,21 +288,35 @@ class TicketController extends Controller
             return response()->json(['error' => 'Hanya admin yang bisa dilihat laporannya.'], 403);
         }
 
-        // --- OPTIMASI: Query untuk statistik digabung menjadi satu ---
-        $stats = Ticket::where('user_id', $adminId)
-            ->select(
-                DB::raw("COUNT(*) as total"),
-                DB::raw("SUM(CASE WHEN status = 'Selesai' THEN 1 ELSE 0 END) as completed"),
-                DB::raw("SUM(CASE WHEN status = 'Ditolak' THEN 1 ELSE 0 END) as rejected"),
-                DB::raw("SUM(CASE WHEN status IN ('Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan') THEN 1 ELSE 0 END) as in_progress")
-            )
-            ->first();
+        // (BARU) Ambil filter tahun dan bulan
+        $year = $request->input('year');
+        $month = $request->input('month');
 
-        // Query untuk data tabel paginasi
-        $paginatedQuery = Ticket::with(['user', 'creator'])->where('user_id', $adminId);
+        // Buat query dasar
+        $baseQuery = Ticket::where('user_id', $adminId);
 
-        // Logika filter status untuk tabel
-        if ($request->has('status')) {
+        // (BARU) Terapkan filter tahun dan bulan jika ada
+        if ($year) {
+            $baseQuery->whereYear('created_at', $year);
+        }
+        if ($month) {
+            $baseQuery->whereMonth('created_at', $month);
+        }
+
+        // Clone query dasar untuk statistik
+        $statsQuery = clone $baseQuery;
+
+        $stats = $statsQuery->select(
+            DB::raw("COUNT(*) as total"),
+            DB::raw("SUM(CASE WHEN status = 'Selesai' THEN 1 ELSE 0 END) as completed"),
+            DB::raw("SUM(CASE WHEN status = 'Ditolak' THEN 1 ELSE 0 END) as rejected"),
+            DB::raw("SUM(CASE WHEN status IN ('Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan') THEN 1 ELSE 0 END) as in_progress")
+        )->first();
+
+        // Clone query dasar untuk data paginasi, lalu terapkan filter status
+        $paginatedQuery = $baseQuery->with(['user', 'creator']);
+
+        if ($request->has('status') && $request->query('status') !== 'all') {
             $status = $request->query('status');
             $statusMap = [
                 'completed' => ['Selesai'],
@@ -533,25 +576,43 @@ class TicketController extends Controller
         return response()->json($ticket);
     }
 
-    public function reportStats()
+    public function reportStats(Request $request)
     {
-        $stats = Ticket::select(
-            DB::raw("COUNT(*) as total"),
+        $query = Ticket::query();
+
+        // Terapkan filter tanggal (kode ini sudah benar)
+        if ($request->has('year')) {
+            $query->whereYear('created_at', $request->year);
+        }
+        if ($request->has('month')) {
+            $query->whereMonth('created_at', $request->month);
+        }
+
+        // (DIUBAH) Cek apakah ini untuk laporan "handled"
+        $isHandledReport = $request->has('handled_status');
+
+        $stats = $query->select(
+            // Ganti nama 'total' menjadi 'total_created' agar tidak ambigu
+            DB::raw("COUNT(*) as total_created"),
             DB::raw("SUM(CASE WHEN user_id IS NOT NULL THEN 1 ELSE 0 END) as handled"),
             DB::raw("SUM(CASE WHEN status = 'Selesai' THEN 1 ELSE 0 END) as completed"),
             DB::raw("SUM(CASE WHEN status = 'Ditolak' THEN 1 ELSE 0 END) as rejected"),
             DB::raw("SUM(CASE WHEN user_id IS NOT NULL AND status NOT IN ('Selesai', 'Ditolak') THEN 1 ELSE 0 END) as in_progress")
         )->first();
 
-        // Konversi hasil ke integer untuk konsistensi JSON
         $result = [
-            'total'       => (int) $stats->total,
+            // (DIUBAH) Logika penentuan nilai 'total'
+            // Jika ini laporan "handled", maka total = completed + in_progress.
+            // Jika bukan, maka total = total tiket yang dibuat.
+            'total'       => $isHandledReport
+                ? (int)$stats->completed + (int)$stats->in_progress
+                : (int)$stats->total_created,
             'handled'     => (int) $stats->handled,
             'completed'   => (int) $stats->completed,
             'rejected'    => (int) $stats->rejected,
             'in_progress' => (int) $stats->in_progress,
         ];
-        
+
         return response()->json($result);
     }
 

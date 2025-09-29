@@ -3,8 +3,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import api from '../services/api';
 import Pagination from './Pagination';
+import { saveAs } from 'file-saver';
 
-// Helper ditambahkan di dalam agar komponen mandiri
+// Helper di luar komponen agar lebih rapi
 const formatDate = (dateString) => {
   if (!dateString) return '-';
   return new Date(dateString).toLocaleDateString('id-ID', {
@@ -24,7 +25,8 @@ const calculateDuration = (startedAt, completedAt) => {
   return `${hours}j ${minutes}m`;
 };
 
-export default function TicketReportDetail({ admin, onBack }) {
+// (DIUBAH) Menerima prop 'filters'
+export default function TicketReportDetail({ admin, onBack, filters }) {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -38,6 +40,13 @@ export default function TicketReportDetail({ admin, onBack }) {
       if (statusFilter !== 'all') {
         params.status = statusFilter;
       }
+
+      // (BARU) Tambahkan filter tanggal dari props 'filters' saat mengambil data
+      if (filters) {
+        if (filters.year) params.year = filters.year;
+        if (filters.month) params.month = filters.month;
+      }
+
       const res = await api.get(`/tickets/admin-report/${admin.id}`, { params });
       setReportData(res.data);
     } catch (err) {
@@ -45,7 +54,7 @@ export default function TicketReportDetail({ admin, onBack }) {
     } finally {
       setLoading(false);
     }
-  }, [admin]);
+  }, [admin, filters]); // (DIUBAH) Tambahkan 'filters' sebagai dependency
 
   useEffect(() => {
     fetchAdminReport(currentPage, filter);
@@ -56,23 +65,31 @@ export default function TicketReportDetail({ admin, onBack }) {
     setCurrentPage(1);
   };
 
-  const handleDownload = (type) => {
-    const baseURL = api.defaults.baseURL;
-    const params = new URLSearchParams();
-    params.append('type', type);
-    params.append('admin_id', admin.id);
+  const handleDownload = async (type) => {
+    const params = new URLSearchParams({ type, admin_id: admin.id });
 
     if (filter !== 'all') {
       params.append('status', filter);
     }
 
-    const downloadUrl = `${baseURL}/tickets/export?${params.toString()}`;
-    const token = localStorage.getItem('auth.accessToken');
+    // (BARU) Tambahkan filter tanggal ke parameter download
+    if (filters) {
+      if (filters.year) params.append('year', filters.year);
+      if (filters.month) params.append('month', filters.month);
+    }
 
-    if (token) {
-      window.open(`${downloadUrl}&token=${token}`, '_blank');
-    } else {
-      alert('Sesi Anda telah berakhir. Silakan login kembali.');
+    try {
+      const response = await api.get('/tickets/download-export', {
+        params,
+        responseType: 'blob',
+      });
+
+      const extension = type === 'excel' ? 'xlsx' : 'pdf';
+      const fileName = `laporan-${admin.name}-${new Date().toISOString().split('T')[0]}.${extension}`;
+      saveAs(response.data, fileName);
+    } catch (err) {
+      console.error('Gagal mengunduh file laporan:', err);
+      alert('Gagal mengunduh file. Mohon coba lagi.');
     }
   };
 
@@ -89,7 +106,14 @@ export default function TicketReportDetail({ admin, onBack }) {
       <button className="back-btn" onClick={onBack}>Kembali</button>
       <h2>Laporan Penyelesaian - {admin.name}</h2>
 
-      {loading && !reportData ? <p>Memuat data...</p> : (
+      {/* (BARU) Menampilkan info filter yang aktif untuk UX yang lebih baik */}
+      <p className="report-filter-info">
+        Menampilkan data untuk: <strong>
+          {filters?.month ? new Date(0, filters.month - 1).toLocaleString('id-ID', { month: 'long' }) : 'Semua Bulan'} {filters?.year}
+        </strong>
+      </p>
+
+      {!reportData ? <p>Memuat data statistik...</p> : (
         <>
           <div className="summary-cards">
             <div className={`card ${filter === 'all' ? 'active' : ''}`} onClick={() => handleFilterClick('all')}><h3>Total Tiket</h3><p>{total}</p></div>
@@ -106,12 +130,16 @@ export default function TicketReportDetail({ admin, onBack }) {
               <i className="fas fa-file-excel"></i> Download Excel
             </button>
           </div>
-          
+
           {loading ? <p>Memuat tabel...</p> : ticketsOnPage.length === 0 ? (<p>Tidak ada tiket yang sesuai dengan filter ini.</p>) : (
             <>
               <div className="report-detail-table-wrapper">
                 <table className="report-table">
-                  <thead><tr><th>Kode Tiket</th><th>Judul</th><th>Status</th><th>Workshop</th><th>Pembuat</th><th>Tgl Dibuat</th><th>Tgl Mulai</th><th>Tgl Selesai</th><th>Durasi</th></tr></thead>
+                  <thead>
+                    <tr>
+                      <th>Kode Tiket</th><th>Judul</th><th>Status</th><th>Workshop</th><th>Pembuat</th><th>Tgl Dibuat</th><th>Tgl Mulai</th><th>Tgl Selesai</th><th>Durasi</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     {ticketsOnPage.map(t => (
                       <tr key={t.id}>
@@ -128,48 +156,6 @@ export default function TicketReportDetail({ admin, onBack }) {
                     ))}
                   </tbody>
                 </table>
-              </div>
-              
-              <div className="report-detail-list-mobile">
-                {ticketsOnPage.map(t => (
-                  <div key={t.id} className="report-card-mobile">
-                    <div className="card-row">
-                      <div className="data-group">
-                        <span className="label">Kode Tiket</span>
-                        <span className="value">{t.kode_tiket || '-'}</span>
-                      </div>
-                      <div className="data-group">
-                        <span className="label">Status</span>
-                        <span className="value status">{t.status}</span>
-                      </div>
-                    </div>
-                    <div className="card-row">
-                      <div className="data-group single">
-                        <span className="label">Deskripsi</span>
-                        <span className="value description">{t.title}</span>
-                      </div>
-                    </div>
-                    <div className="card-row">
-                      <div className="data-group">
-                        <span className="label">Workshop</span>
-                        <span className="value">{t.workshop || '-'}</span>
-                      </div>
-                      <div className="data-group">
-                        <span className="label">Pengirim</span>
-                        <span className="value">{t.creator?.name ?? 'N/A'}</span>
-                      </div>
-                    </div>
-                    <div className="card-row">
-                      <div className="data-group single">
-                        <span className="label">Durasi Pengerjaan</span>
-                        <span className="value time-duration">
-                          {formatDate(t.started_at)} s/d {formatDate(t.completed_at)}
-                          <strong> ({calculateDuration(t.started_at, t.completed_at)})</strong>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
               </div>
 
               {ticketsData && ticketsData.last_page > 1 && (

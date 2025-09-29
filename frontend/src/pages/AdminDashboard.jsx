@@ -72,11 +72,11 @@ export default function AdminDashboard() {
   const [userToDelete, setUserToDelete] = useState(null);
   const [showUserFormModal, setShowUserFormModal] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
-  const [selectedAdmin, setSelectedAdmin] = useState(null); 
+  const [selectedAdminWithFilters, setSelectedAdminWithFilters] = useState(null);
   const [adminIdFilter, setAdminIdFilter] = useState(null);
   const [dateFilter, setDateFilter] = useState(null);
   const [ticketIdFilter, setTicketIdFilter] = useState(null);
-  
+
   const ticketsOnPage = useMemo(() => (ticketData ? ticketData.data : []), [ticketData]);
 
   // Utilities
@@ -99,37 +99,37 @@ export default function AdminDashboard() {
   // =================================================================
 
   const fetchDashboardData = useCallback(async () => {
-      try {
-        const response = await api.get('/dashboard-data', {
-          params: {
-            page: dataPage,
-            search: searchQuery,
-            status: statusFilter,
-            admin_id: adminIdFilter,
-            date: dateFilter,
-            id: ticketIdFilter,
-          },
-        });
-        
-        const data = response.data;
+    try {
+      const response = await api.get('/dashboard-data', {
+        params: {
+          page: dataPage,
+          search: searchQuery,
+          status: statusFilter,
+          admin_id: adminIdFilter,
+          date: dateFilter,
+          id: ticketIdFilter,
+        },
+      });
 
-        setTicketData(data.tickets);
-        setStats(data.stats);
-        setAnalyticsData(data.analyticsData);
-        setAdminPerformanceData(data.adminPerformance);
-        setAllTickets(data.allTicketsForCalendar);
-        setAdminList(data.admins);
-        setLocationsData(data.locations);
+      const data = response.data;
 
-      } catch (error) {
-        console.error("Gagal mengambil data dashboard:", error);
-        if (error.response?.status === 401) {
-          handleLogout();
-        }
+      setTicketData(data.tickets);
+      setStats(data.stats);
+      setAnalyticsData(data.analyticsData);
+      setAdminPerformanceData(data.adminPerformance);
+      setAllTickets(data.allTicketsForCalendar);
+      setAdminList(data.admins);
+      setLocationsData(data.locations);
+
+    } catch (error) {
+      console.error("Gagal mengambil data dashboard:", error);
+      if (error.response?.status === 401) {
+        handleLogout();
       }
+    }
   }, [
-      dataPage, searchQuery, statusFilter, adminIdFilter, dateFilter, ticketIdFilter,
-      handleLogout
+    dataPage, searchQuery, statusFilter, adminIdFilter, dateFilter, ticketIdFilter,
+    handleLogout
   ]);
 
   const fetchUsers = useCallback(async (page = 1, search = '') => {
@@ -185,7 +185,7 @@ export default function AdminDashboard() {
     setStatusFilter(filters.status || null);
     setCurrentPage('Tickets');
   }, []);
-  
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setSearchQuery(searchInput);
@@ -406,39 +406,39 @@ export default function AdminDashboard() {
   }, [darkMode]);
 
   useEffect(() => {
-      if (!isAdmin) return;
+    if (!isAdmin) return;
 
-      if (currentPage === 'Welcome' || currentPage === 'Tickets') {
-          fetchDashboardData();
+    if (currentPage === 'Welcome' || currentPage === 'Tickets') {
+      fetchDashboardData();
+    }
+
+    // Dipanggil terpisah karena untuk UI yang berbeda (form notifikasi)
+    fetchAllUsers();
+    fetchNotifications();
+
+    let intervalId = null;
+    if (currentPage === 'Tickets' && !searchQuery && !statusFilter && !adminIdFilter && !dateFilter && !ticketIdFilter) {
+      intervalId = setInterval(() => {
+        fetchDashboardData();
+      }, 60000);
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
       }
-      
-      // Dipanggil terpisah karena untuk UI yang berbeda (form notifikasi)
-      fetchAllUsers();
-      fetchNotifications();
-      
-      let intervalId = null;
-      if (currentPage === 'Tickets' && !searchQuery && !statusFilter && !adminIdFilter && !dateFilter && !ticketIdFilter) {
-        intervalId = setInterval(() => {
-          fetchDashboardData();
-        }, 60000);
-      }
-      
-      return () => {
-        if (intervalId) {
-          clearInterval(intervalId);
-        }
-      };
+    };
   }, [
-      isAdmin, 
-      currentPage, 
-      fetchDashboardData,
-      fetchAllUsers, 
-      fetchNotifications,
-      searchQuery,
-      statusFilter,
-      adminIdFilter,
-      dateFilter,
-      ticketIdFilter
+    isAdmin,
+    currentPage,
+    fetchDashboardData,
+    fetchAllUsers,
+    fetchNotifications,
+    searchQuery,
+    statusFilter,
+    adminIdFilter,
+    dateFilter,
+    ticketIdFilter
   ]);
 
   useEffect(() => {
@@ -592,21 +592,21 @@ export default function AdminDashboard() {
                       <h4>Tren Tiket (30 Hari Terakhir)</h4>
                       <LineChartComponent data={analyticsData}
                         onPointClick={(status, date) => handleChartFilter({ status, date })}
-                        onLegendClick={(status) => handleChartFilter({ status })}/>
+                        onLegendClick={(status) => handleChartFilter({ status })} />
                     </div>
                     <div className="dashboard-card pie-chart-card">
                       <h4>Status Tiket</h4>
                       <PieChartComponent stats={stats}
                         handleHomeClick={handleHomeClick}
                         handleStatusFilterClick={(status) => handleChartFilter({ status })}
-                        statusFilter={statusFilter}/>
+                        statusFilter={statusFilter} />
                     </div>
                   </div>
                   <div className="dashboard-row">
                     <div className="dashboard-card bar-chart-card">
                       <h4>Performa Admin</h4>
                       <BarChartComponent data={adminPerformanceData}
-                        onBarClick={(admin) => handleChartFilter({ status: admin.status, adminId: admin.id })}/>
+                        onBarClick={(admin) => handleChartFilter({ status: admin.status, adminId: admin.id })} />
                     </div>
                     <div className="dashboard-card map-chart-card">
                       <h4>Geografi Traffic</h4>
@@ -617,7 +617,7 @@ export default function AdminDashboard() {
                     <div className="dashboard-card calendar-card">
                       <h4>Kalender Tiket</h4>
                       <CalendarComponent tickets={allTickets}
-                        onTicketClick={(ticketId) => handleChartFilter({ ticketId })}/>
+                        onTicketClick={(ticketId) => handleChartFilter({ ticketId })} />
                     </div>
                   </div>
                 </div>
@@ -642,7 +642,7 @@ export default function AdminDashboard() {
 
             {currentPage === 'MyTickets' && (
               <>
-                 <h2 className="page-title">Tiket yang Saya Kerjakan</h2>
+                <h2 className="page-title">Tiket yang Saya Kerjakan</h2>
                 {myTicketsData && myTicketsData.data && myTicketsData.data.length > 0 ? (
                   <>
                     <JobList tickets={myTicketsData.data} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} userRole={userRole} onSelectionChange={handleSelectionChange} onAssignClick={handleAssignClick} onRejectClick={handleRejectClick} onProofClick={handleProofClick} showToast={showToast} />
@@ -661,13 +661,18 @@ export default function AdminDashboard() {
             )}
 
             {currentPage === 'ticketReport' && (
-              selectedAdmin ? (
+              selectedAdminWithFilters ? (
                 <TicketReportDetail
-                  admin={selectedAdmin}
-                  onBack={() => setSelectedAdmin(null)}
+                  admin={selectedAdminWithFilters.admin}
+                  filters={selectedAdminWithFilters.filters} // (DIUBAH) Pastikan prop 'filters' dikirim
+                  onBack={() => setSelectedAdminWithFilters(null)}
                 />
               ) : (
-                <TicketReportAdminList onSelectAdmin={setSelectedAdmin} />
+                <TicketReportAdminList
+                  onSelectAdmin={(admin, filters) => { // Pastikan callback ini menerima filters
+                    setSelectedAdminWithFilters({ admin, filters });
+                  }}
+                />
               )
             )}
 

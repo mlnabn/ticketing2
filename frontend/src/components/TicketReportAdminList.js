@@ -1,26 +1,33 @@
 // file: src/components/TicketReportAdminList.js
-import "react-datepicker/dist/react-datepicker.css";
+
 import React, { useEffect, useState, useCallback } from 'react';
 import api from '../services/api';
 import ReportLineChart from './ReportLineChart';
 import ComprehensiveReportPage from './ComprehensiveReportPage';
-import DatePicker from "react-datepicker";
+import TicketReportDetail from './TicketReportDetail'; // (BARU) Import komponen detail
 
-export default function TicketReportAdminList({ onSelectAdmin }) {
+// Helper untuk generate pilihan tahun
+const generateYearOptions = () => {
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for (let i = 0; i < 5; i++) {
+    years.push(currentYear - i);
+  }
+  return years;
+};
+
+// (DIUBAH) Hapus prop onSelectAdmin karena tidak dibutuhkan lagi
+export default function TicketReportAdminList() {
   const [view, setView] = useState('main');
-
-  // (DIUBAH) Kita hanya butuh satu state untuk tanggal
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
-  // State untuk daftar admin
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(null);
   const [admins, setAdmins] = useState([]);
   const [loadingAdmins, setLoadingAdmins] = useState(false);
-
-  // State untuk chart
   const [chartData, setChartData] = useState([]);
   const [loadingChart, setLoadingChart] = useState(false);
 
-
+  // (BARU) State untuk menyimpan data admin yang dipilih untuk ditampilkan detailnya
+  const [selectedAdminData, setSelectedAdminData] = useState(null);
 
   const fetchAdmins = useCallback(async () => {
     setLoadingAdmins(true);
@@ -34,18 +41,15 @@ export default function TicketReportAdminList({ onSelectAdmin }) {
     }
   }, []);
 
-  // (DIUBAH) Fungsi ini sekarang menerima objek Date, bukan string
-  const fetchChartData = useCallback(async (date) => {
-    if (!date) return;
+  const fetchChartData = useCallback(async (year, month) => {
+    if (!year) return;
     setLoadingChart(true);
     try {
-
-      const year = date.getFullYear();
-      const monthValue = date.getMonth() + 1;
-
-      const res = await api.get('/tickets/report-analytics', {
-        params: { year, month: monthValue }
-      });
+      const params = { year };
+      if (month) {
+        params.month = month;
+      }
+      const res = await api.get('/tickets/report-analytics', { params });
       setChartData(res.data);
     } catch (err) {
       console.error('Gagal mengambil data chart:', err);
@@ -58,25 +62,51 @@ export default function TicketReportAdminList({ onSelectAdmin }) {
     fetchAdmins();
   }, [fetchAdmins]);
 
-
   useEffect(() => {
-    fetchChartData(selectedDate);
-  }, [selectedDate, fetchChartData]);
+    fetchChartData(selectedYear, selectedMonth);
+  }, [selectedYear, selectedMonth, fetchChartData]);
+
+  const yearOptions = generateYearOptions();
+  const monthOptions = [
+    { value: 1, label: 'Januari' }, { value: 2, label: 'Februari' },
+    { value: 3, label: 'Maret' }, { value: 4, label: 'April' },
+    { value: 5, label: 'Mei' }, { value: 6, label: 'Juni' },
+    { value: 7, label: 'Juli' }, { value: 8, label: 'Agustus' },
+    { value: 9, label: 'September' }, { value: 10, label: 'Oktober' },
+    { value: 11, label: 'November' }, { value: 12, label: 'Desember' },
+  ];
+
+  // (BARU) Fungsi untuk menangani saat admin dipilih dari daftar
+  const handleAdminSelect = (admin) => {
+    setSelectedAdminData({
+      admin: admin,
+      filters: {
+        year: selectedYear,
+        month: selectedMonth
+      }
+    });
+    setView('admin_detail'); // Ganti view untuk menampilkan komponen detail
+  };
 
   const renderMainView = () => (
     <>
       <div className="dashboard-card" style={{ marginBottom: '2rem' }}>
         <div className="report-header">
           <h2>Laporan Tiket</h2>
-          <div className="month-picker-container">
-            <label htmlFor="month-selector">Pilih Bulan:</label>
-            <DatePicker
-              selected={selectedDate}
-              onChange={(date) => setSelectedDate(date)}
-              dateFormat="MMMM yyyy"
-              showMonthYearPicker
-              className="month-input"
-            />
+          <div className="report-filters">
+            <div className="filter-group">
+              <label htmlFor="month-selector">Pilih Bulan:</label>
+              <select id="month-selector" value={selectedMonth || ''} onChange={(e) => setSelectedMonth(e.target.value ? parseInt(e.target.value) : null)} className="month-input">
+                <option value="">Semua Bulan</option>
+                {monthOptions.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+              </select>
+            </div>
+            <div className="filter-group">
+              <label htmlFor="year-selector">Pilih Tahun:</label>
+              <select id="year-selector" value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="month-input">
+                {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </div>
           </div>
         </div>
         {loadingChart ? <p>Memuat data chart...</p> : <ReportLineChart data={chartData} />}
@@ -84,49 +114,48 @@ export default function TicketReportAdminList({ onSelectAdmin }) {
       <div className="report-navigation-cards">
         <div className="nav-card" onClick={() => setView('all_report')}>
           <h3>Laporan Seluruh Pekerjaan</h3>
-          <p>Lihat semua tiket dengan berbagai status.</p>
+          <p>Lihat semua tiket sesuai filter di atas.</p>
           <i className="fas fa-arrow-right"></i>
         </div>
         <div className="nav-card" onClick={() => setView('worked_on_report')}>
           <h3>Laporan Tiket Dikerjakan</h3>
-          <p>Hanya tiket yang sudah ditangani admin.</p>
+          <p>Hanya tiket yang ditangani admin (sesuai filter).</p>
           <i className="fas fa-arrow-right"></i>
         </div>
       </div>
       <hr className="report-divider" />
-
       <div className="adminselect-card" style={{ marginBottom: '2rem' }}>
-      <h2 className="page-title">Pilih Admin</h2>
-      {loadingAdmins ? <p>Memuat data admin...</p> : (
-        <div className="admin-list-grid">
-          {admins.map(admin => (
-            <div key={admin.id} className="admin-card" onClick={() => onSelectAdmin(admin)}>
-              <div className="avatar">{admin.name.charAt(0)}</div>
-              <div className="info">
-                <h3>{admin.name}</h3>
-                <p>{admin.email}</p>
+        <h2 className="page-title">Pilih Admin Untuk Laporan Detail</h2>
+        {loadingAdmins ? <p>Memuat data admin...</p> : (
+          <div className="admin-list-grid">
+            {admins.map(admin => (
+              // (DIUBAH) onClick kini memanggil fungsi internal handleAdminSelect
+              <div key={admin.id} className="admin-card" onClick={() => handleAdminSelect(admin)}>
+                <div className="avatar">{admin.name.charAt(0)}</div>
+                <div className="info">
+                  <h3>{admin.name}</h3>
+                  <p>{admin.email}</p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
       </div>
     </>
   );
 
-  // Fungsi renderCurrentView tidak berubah
   const renderCurrentView = () => {
+    const filters = { year: selectedYear, month: selectedMonth };
     switch (view) {
       case 'all_report':
-        return <ComprehensiveReportPage
-          title="Laporan Seluruh Pekerjaan Admin"
-          filterType="all"
-          onBack={() => setView('main')}
-        />;
+        return <ComprehensiveReportPage title="Laporan Seluruh Pekerjaan Admin" filterType="all" onBack={() => setView('main')} dateFilters={filters} />;
       case 'worked_on_report':
-        return <ComprehensiveReportPage
-          title="Laporan yang Dikerjakan Seluruh Admin"
-          filterType="handled"
+        return <ComprehensiveReportPage title="Laporan yang Dikerjakan Seluruh Admin" filterType="handled" onBack={() => setView('main')} dateFilters={filters} />;
+      // (BARU) Tambahkan case untuk menampilkan TicketReportDetail
+      case 'admin_detail':
+        return <TicketReportDetail
+          admin={selectedAdminData.admin}
+          filters={selectedAdminData.filters}
           onBack={() => setView('main')}
         />;
       default:

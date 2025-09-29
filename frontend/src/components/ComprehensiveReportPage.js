@@ -25,26 +25,32 @@ const calculateDuration = (startedAt, completedAt) => {
   return `${hours}j ${minutes}m`;
 };
 
-export default function ComprehensiveReportPage({ title, onBack, filterType = 'all' }) {
+export default function ComprehensiveReportPage({ title, onBack, filterType = 'all', dateFilters }) {
   const [tableData, setTableData] = useState(null);
   const [stats, setStats] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState(filterType);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   const fetchTableData = useCallback(async (page, currentFilter) => {
     setLoading(true);
     try {
-      const params = { page, per_page: 15 };
+      const params = { page, per_page: 10 };
+
+      // (DIUBAH) Selalu sertakan filter tanggal dari props
+      if (dateFilters) {
+        if (dateFilters.year) params.year = dateFilters.year;
+        if (dateFilters.month) params.month = dateFilters.month;
+      }
+
+      // (DIUBAH) Logika filter disederhanakan dan dibuat konsisten
       if (currentFilter === 'handled') {
         params.handled_status = 'handled';
-      } else if (currentFilter === 'completed') {
-        params.status = 'Selesai';
-      } else if (currentFilter === 'rejected') {
-        params.status = 'Ditolak';
-      } else if (currentFilter === 'in_progress') {
-        params.status = 'in_progress';
+      } else if (currentFilter !== 'all') {
+        // Gunakan nilai 'completed', 'rejected', 'in_progress' yang konsisten dengan backend
+        params.status = currentFilter;
       }
+
       const res = await api.get('/tickets', { params });
       setTableData(res.data);
     } catch (err) {
@@ -52,19 +58,31 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [dateFilters]);
 
+  // (DIUBAH) useEffect untuk fetchStats sekarang bergantung pada dateFilters
+  // agar statistik yang ditampilkan sesuai dengan filter tanggal yang aktif.
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await api.get('/tickets/report-stats');
+        const params = {};
+        if (dateFilters) {
+          if (dateFilters.year) params.year = dateFilters.year;
+          if (dateFilters.month) params.month = dateFilters.month;
+        }
+        // (DIUBAH) Kirim parameter 'handled_status' jika ini adalah laporan "dikerjakan"
+        if (filterType === 'handled') {
+          params.handled_status = 'true';
+        }
+
+        const res = await api.get('/tickets/report-stats', { params });
         setStats(res.data);
       } catch (err) {
         console.error('Gagal mengambil data statistik laporan:', err);
       }
     };
     fetchStats();
-  }, []);
+  }, [dateFilters, filterType]);
 
   useEffect(() => {
     fetchTableData(currentPage, filter);
@@ -76,28 +94,34 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
   };
 
   const handleDownload = async (type) => {
-        const params = {
-            type,
-            // Sertakan filter yang sedang aktif
-            status: filter === 'all' ? null : filter,
-            handled_status: filter === 'handled' ? 'handled' : null,
-        };
+    // (DIUBAH) Logika parameter disederhanakan dan disamakan dengan fetchTableData
+    const params = new URLSearchParams({ type });
 
-        try {
-            const response = await api.get('/tickets/download-export', {
-                params,
-                responseType: 'blob', // Penting: agar axios menerima file
-            });
+    if (filter === 'handled') {
+      params.append('handled_status', 'handled');
+    } else if (filter !== 'all') {
+      params.append('status', filter);
+    }
 
-            const extension = type === 'excel' ? 'xlsx' : 'pdf';
-            const fileName = `laporan-tiket-${new Date().toISOString().split('T')[0]}.${extension}`;
-            saveAs(response.data, fileName); // Memicu unduhan di browser
+    // Selalu sertakan filter tanggal saat download
+    if (dateFilters?.year) params.append('year', dateFilters.year);
+    if (dateFilters?.month) params.append('month', dateFilters.month);
 
-        } catch (err) {
-            console.error('Gagal mengunduh file laporan:', err);
-            alert('Gagal mengunduh file. Mohon coba lagi.');
-        }
-    };
+    try {
+      const response = await api.get('/tickets/download-export', {
+        params,
+        responseType: 'blob', // Penting: agar axios menerima file
+      });
+
+      const extension = type === 'excel' ? 'xlsx' : 'pdf';
+      const fileName = `laporan-tiket-${new Date().toISOString().split('T')[0]}.${extension}`;
+      saveAs(response.data, fileName); // Memicu unduhan di browser
+
+    } catch (err) {
+      console.error('Gagal mengunduh file laporan:', err);
+      alert('Gagal mengunduh file. Mohon coba lagi.');
+    }
+  };
 
   const tickets = tableData ? tableData.data : [];
 
@@ -105,11 +129,20 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
     <div className="report-container">
       <button className="back-btn" onClick={onBack}>Kembali</button>
       <h2>{title}</h2>
+      {/* (BARU) Menampilkan info filter yang aktif */}
+      <p className="report-filter-info">
+        Menampilkan data untuk: <strong>
+          {dateFilters?.month ? new Date(0, dateFilters.month - 1).toLocaleString('id-ID', { month: 'long' }) : 'Semua Bulan'} {dateFilters?.year}
+        </strong>
+      </p>
+
       {(!stats) ? <p className="report-status-message">Memuat data statistik...</p> : (
         <>
           <div className="summary-cards">
-            <div className={`card ${filter === 'all' ? 'active' : ''}`} onClick={() => handleFilterChange('all')}>
-              <h3>Total Tiket</h3><p>{stats.total}</p>
+            <div className={`card ${filter === 'all' || filter === 'handled' ? 'active' : ''}`} onClick={() => handleFilterChange(filterType)}>
+              {/* Judul kartu disesuaikan */}
+              <h3>{filterType === 'handled' ? 'Total Dikerjakan' : 'Total Tiket'}</h3>
+              <p>{stats.total}</p>
             </div>
             <div className={`card ${filter === 'completed' ? 'active' : ''}`} onClick={() => handleFilterChange('completed')}>
               <h3>Tiket Selesai</h3><p>{stats.completed}</p>
@@ -117,11 +150,12 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
             <div className={`card ${filter === 'in_progress' ? 'active' : ''}`} onClick={() => handleFilterChange('in_progress')}>
               <h3>Sedang Dikerjakan</h3><p>{stats.in_progress}</p>
             </div>
-            {filterType !== 'handled' && (
-                <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterChange('rejected')}>
-                  <h3>Tiket Ditolak</h3><p>{stats.rejected}</p>
-                </div>
-              )}
+            {/* (DIUBAH) Tampilkan kartu 'Ditolak' HANYA jika filterType adalah 'all' */}
+            {filterType === 'all' && (
+              <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterChange('rejected')}>
+                <h3>Tiket Ditolak</h3><p>{stats.rejected}</p>
+              </div>
+            )}
           </div>
           <h3>Daftar Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</h3>
           <div className="download-buttons">
@@ -136,34 +170,39 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
             <p>Tidak ada tiket yang sesuai dengan filter ini.</p>
           ) : (
             <>
-              <table className="report-table">
-                <thead>
-                  <tr>
-                    <th>Kode Tiket</th><th>Judul</th><th>Status</th><th>Workshop</th><th>Admin Pengerja</th><th>Pembuat</th><th>Tgl Dibuat</th><th>Tgl Mulai</th><th>Tgl Selesai</th><th>Durasi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tickets.map(t => (
-                    <tr key={t.id}>
-                      <td>{t.kode_tiket || '-'}</td>
-                      <td>{t.title}</td>
-                      <td>{t.status}</td>
-                      <td>{t.workshop || '-'}</td>
-                      <td>{t.user?.name ?? 'N/A'}</td>
-                      <td>{t.creator?.name ?? 'N/A'}</td>
-                      <td>{formatDate(t.created_at)}</td>
-                      <td>{formatDate(t.started_at)}</td>
-                      <td>{formatDate(t.completed_at)}</td>
-                      <td>{calculateDuration(t.started_at, t.completed_at)}</td>
+              <div className="report-detail-table-wrapper">
+                <table className="report-table">
+                  <thead>
+                    <tr>
+                      <th>Kode Tiket</th><th>Judul</th><th>Status</th><th>Workshop</th><th>Admin Pengerja</th><th>Pembuat</th><th>Tgl Dibuat</th><th>Tgl Mulai</th><th>Tgl Selesai</th><th>Durasi</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-              <Pagination
-                currentPage={tableData.current_page}
-                lastPage={tableData.last_page}
-                onPageChange={setCurrentPage}
-              />
+                  </thead>
+                  <tbody>
+                    {tickets.map(t => (
+                      <tr key={t.id}>
+                        <td>{t.kode_tiket || '-'}</td>
+                        <td>{t.title}</td>
+                        <td>{t.status}</td>
+                        <td>{t.workshop || '-'}</td>
+                        <td>{t.user?.name ?? 'N/A'}</td>
+                        <td>{t.creator?.name ?? 'N/A'}</td>
+                        <td>{formatDate(t.created_at)}</td>
+                        <td>{formatDate(t.started_at)}</td>
+                        <td>{formatDate(t.completed_at)}</td>
+                        <td>{calculateDuration(t.started_at, t.completed_at)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {tableData && tableData.last_page > 1 && (
+                <Pagination
+                  currentPage={tableData.current_page}
+                  lastPage={tableData.last_page}
+                  onPageChange={setCurrentPage}
+                />
+              )}
             </>
           )}
         </>
