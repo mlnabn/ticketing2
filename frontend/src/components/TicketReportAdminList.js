@@ -95,14 +95,10 @@ export default function TicketReportAdminList() {
           <h2>Laporan Tiket</h2>
           <div className="report-filters">
             <div className="filter-group">
-              <label htmlFor="month-selector">Pilih Bulan:</label>
               <select id="month-selector" value={selectedMonth || ''} onChange={(e) => setSelectedMonth(e.target.value ? parseInt(e.target.value) : null)} className="month-input">
                 <option value="">Semua Bulan</option>
                 {monthOptions.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
               </select>
-            </div>
-            <div className="filter-group">
-              <label htmlFor="year-selector">Pilih Tahun:</label>
               <select id="year-selector" value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="month-input">
                 {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
               </select>
