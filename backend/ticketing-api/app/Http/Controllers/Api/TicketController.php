@@ -38,7 +38,8 @@ class TicketController extends Controller
 
         // Filter status 'handled'
         if ($handledStatus === 'handled') {
-            $query->whereNotNull('user_id');
+            $query->whereNotNull('user_id')
+                ->where('status', '!=', 'Belum Dikerjakan');
         }
 
         // Filter status tiket
@@ -482,9 +483,9 @@ class TicketController extends Controller
         }
 
         $counts = $query->select(
-                'status',
-                DB::raw('count(*) as total')
-            )
+            'status',
+            DB::raw('count(*) as total')
+        )
             ->groupBy('status')
             ->get()
             ->keyBy('status');
@@ -546,15 +547,18 @@ class TicketController extends Controller
         return response()->json($ticket);
     }
 
-    public function reportStats()
+    public function reportStats(Request $request)
     {
-        $total = Ticket::count();
-        $handled = Ticket::whereNotNull('user_id')->count();
-        $completed = Ticket::where('status', 'Selesai')->count();
-        $rejected = Ticket::where('status', 'Ditolak')->count();
+        $baseQuery = Ticket::query();
+        $filteredQuery = $this->applyFilters($baseQuery, $request);
+        $total = $filteredQuery->clone()->count();
+        $handled = $filteredQuery->clone()->whereNotNull('user_id')->count();
+        $completed = $filteredQuery->clone()->where('status', 'Selesai')->count();
+        $rejected = $filteredQuery->clone()->where('status', 'Ditolak')->count();
 
         // Tiket yang sedang dalam progres (sudah ditangani tapi belum selesai/ditolak)
-        $in_progress = Ticket::whereNotNull('user_id')
+        $in_progress = $filteredQuery->clone()
+            ->whereNotNull('user_id')
             ->whereNotIn('status', ['Selesai', 'Ditolak'])
             ->count();
 
@@ -575,7 +579,7 @@ class TicketController extends Controller
 
         // Gunakan logika query yang sama dengan method index()
         $query = Ticket::with(['user', 'creator']);
-        
+
         // Terapkan semua filter yang mungkin ada di request
         $query = $this->applyFilters($query, $request);
 

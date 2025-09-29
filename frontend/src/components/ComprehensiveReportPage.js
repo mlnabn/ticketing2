@@ -24,14 +24,15 @@ const calculateDuration = (startedAt, completedAt) => {
   return `${hours}j ${minutes}m`;
 };
 
-export default function ComprehensiveReportPage({ title, onBack }) {
+export default function ComprehensiveReportPage({ title, onBack, filterType = 'all' }) {
   const [tableData, setTableData] = useState(null);
-  const [stats, setStats] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState(filterType);
   const [loading, setLoading] = useState(true);
+  
+  const [baseStats, setBaseStats] = useState(null); 
+  const [currentStats, setCurrentStats] = useState(null);
 
-  // Fungsi ini sudah BENAR
   const fetchData = useCallback(async (page, currentFilter) => {
     setLoading(true);
     try {
@@ -43,41 +44,37 @@ export default function ComprehensiveReportPage({ title, onBack }) {
       } else if (currentFilter === 'rejected') {
         params.status = 'Ditolak';
       } else if (currentFilter === 'in_progress') {
-        // Ini mungkin perlu disesuaikan dengan backend
-        // Untuk saat ini kita anggap backend bisa menangani 'in_progress'
-        params.status = 'in_progress';
+        params.status = ['Sedang Dikerjakan', 'Ditunda'];
       }
 
       const [tableRes, statsRes] = await Promise.all([
         api.get('/tickets', { params }),
-        stats ? Promise.resolve(null) : api.get('/tickets/report-stats')
+        api.get('/tickets/report-stats', { params })
       ]);
-
+      
       setTableData(tableRes.data);
-      if (statsRes) {
-        setStats(statsRes.data);
+      setCurrentStats(statsRes.data);
+
+      if (!baseStats) {
+        setBaseStats(statsRes.data);
       }
+      
     } catch (err) {
       console.error('Gagal mengambil data laporan:', err);
     } finally {
       setLoading(false);
     }
-  }, [stats]);
+  }, [baseStats]);
 
-  // useEffect ini sudah BENAR
   useEffect(() => {
     fetchData(currentPage, filter);
   }, [currentPage, filter, fetchData]);
 
-  // Handler ini sudah BENAR
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);
     setCurrentPage(1);
   };
 
-  // ================================================================
-  // DIUBAH: Fungsi handleDownload diperbaiki
-  // ================================================================
   const handleDownload = (type) => {
     const baseURL = api.defaults.baseURL;
     const params = new URLSearchParams();
@@ -88,24 +85,20 @@ export default function ComprehensiveReportPage({ title, onBack }) {
     } else if (filter === 'rejected') {
       params.append('status', 'Ditolak');
     } else if (filter === 'in_progress') {
-      params.append('status', 'in_progress');
+      ['Sedang Dikerjakan', 'Ditunda'].forEach(s => params.append('status[]', s));
     } else if (filter === 'handled') {
       params.append('handled_status', 'handled');
     }
 
     const downloadUrl = `${baseURL}/tickets/export?${params.toString()}`;
-
-    // GANTI 'auth_token' DENGAN NAMA KEY YANG BENAR DARI LOCAL STORAGE ANDA
     const token = localStorage.getItem('auth.accessToken');
 
-    // Tambahkan pengecekan keamanan
     if (token) {
       window.open(`${downloadUrl}&token=${token}`, '_blank');
     } else {
-      alert('Gagal mengunduh file. Sesi Anda mungkin telah berakhir, silakan login kembali.');
+      alert('Sesi Anda mungkin telah berakhir. Silakan login kembali.');
     }
   };
-  // ================================================================
 
   const tickets = tableData ? tableData.data : [];
 
@@ -113,25 +106,28 @@ export default function ComprehensiveReportPage({ title, onBack }) {
     <div className="report-container">
       <button className="back-btn" onClick={onBack}>Kembali</button>
       <h2>{title}</h2>
-      {loading && (!stats || !tableData) ? <p className="report-status-message">Memuat data...</p> : (
+      {loading && !baseStats ? <p className="report-status-message">Memuat data...</p> : (
         <>
-          {stats && (
+          {baseStats && (
             <div className="summary-cards">
-              <div className={`card ${filter === 'all' ? 'active' : ''}`} onClick={() => handleFilterChange('all')}>
-                <h3>Total Tiket</h3><p>{stats.total}</p>
+              <div className={`card ${filter === 'all' || filter === 'handled' ? 'active' : ''}`} onClick={() => handleFilterChange(filterType)}>
+                <h3>Total Tiket</h3><p>{baseStats.total}</p>
               </div>
               <div className={`card ${filter === 'completed' ? 'active' : ''}`} onClick={() => handleFilterChange('completed')}>
-                <h3>Tiket Selesai</h3><p>{stats.completed}</p>
+                <h3>Tiket Selesai</h3><p>{baseStats.completed}</p>
               </div>
               <div className={`card ${filter === 'in_progress' ? 'active' : ''}`} onClick={() => handleFilterChange('in_progress')}>
-                <h3>Sedang Dikerjakan</h3><p>{stats.in_progress}</p>
+                <h3>Sedang Dikerjakan</h3><p>{baseStats.in_progress}</p>
               </div>
-              <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterChange('rejected')}>
-                <h3>Tiket Ditolak</h3><p>{stats.rejected}</p>
-              </div>
+              
+              {filterType !== 'handled' && (
+                <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterChange('rejected')}>
+                  <h3>Tiket Ditolak</h3><p>{baseStats.rejected}</p>
+                </div>
+              )}
             </div>
           )}
-          <h3>Daftar Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</h3>
+          <h3>Daftar Tiket {filter !== 'all' && filter !== 'handled' ? `(${filter.replace('_', ' ')})` : ''}</h3>
           <div className="download-buttons">
             <button className="btn-download pdf" onClick={() => handleDownload('pdf')}>
               <i className="fas fa-file-pdf"></i> Download PDF
@@ -144,44 +140,100 @@ export default function ComprehensiveReportPage({ title, onBack }) {
             <p>Tidak ada tiket yang sesuai dengan filter ini.</p>
           ) : (
             <>
-              <table className="report-table">
-                {/* ... Thead and Tbody tidak berubah ... */}
-                <thead>
-                  <tr>
-                    <th>Kode Tiket</th>
-                    <th>Judul</th>
-                    <th>Status</th>
-                    <th>Workshop</th>
-                    <th>Admin Pengerja</th>
-                    <th>Pembuat</th>
-                    <th>Tgl Dibuat</th>
-                    <th>Tgl Mulai</th>
-                    <th>Tgl Selesai</th>
-                    <th>Durasi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tickets.map(t => (
-                    <tr key={t.id}>
-                      <td>{t.kode_tiket || '-'}</td>
-                      <td>{t.title}</td>
-                      <td>{t.status}</td>
-                      <td>{t.workshop || '-'}</td>
-                      <td>{t.user?.name ?? 'N/A'}</td>
-                      <td>{t.creator?.name ?? 'N/A'}</td>
-                      <td>{formatDate(t.created_at)}</td>
-                      <td>{formatDate(t.started_at)}</td>
-                      <td>{formatDate(t.completed_at)}</td>
-                      <td>{calculateDuration(t.started_at, t.completed_at)}</td>
+              <div className="report-table-wrapper">
+                <table className="report-table">
+                  <thead>
+                    <tr>
+                      <th>Kode Tiket</th>
+                      <th>Judul</th>
+                      <th>Status</th>
+                      <th>Workshop</th>
+                      <th>Admin Pengerja</th>
+                      <th>Pembuat</th>
+                      <th>Tgl Dibuat</th>
+                      <th>Tgl Mulai</th>
+                      <th>Tgl Selesai</th>
+                      <th>Durasi</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-              <Pagination
-                currentPage={tableData.current_page}
-                lastPage={tableData.last_page}
-                onPageChange={setCurrentPage}
-              />
+                  </thead>
+                  <tbody>
+                    {tickets.map(t => (
+                      <tr key={t.id}>
+                        <td>{t.kode_tiket || '-'}</td>
+                        <td>{t.title}</td>
+                        <td>{t.status}</td>
+                        <td>{t.workshop || '-'}</td>
+                        <td>{t.user?.name ?? 'N/A'}</td>
+                        <td>{t.creator?.name ?? 'N/A'}</td>
+                        <td>{formatDate(t.created_at)}</td>
+                        <td>{formatDate(t.started_at)}</td>
+                        <td>{formatDate(t.completed_at)}</td>
+                        <td>{calculateDuration(t.started_at, t.completed_at)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="report-list-mobile">
+                {tickets.map(t => (
+                  <div key={t.id} className="report-card-mobile">
+                    <div className="card-row">
+                      <div className="data-group">
+                        <span className="label">Kode Tiket</span>
+                        <span className="value">{t.kode_tiket || '-'}</span>
+                      </div>
+                      <div className="data-group">
+                        <span className="label">Status</span>
+                        <span className="value status">{t.status}</span>
+                      </div>
+                    </div>
+                    <div className="card-row">
+                      <div className="data-group single">
+                        <span className="label">Deskripsi</span>
+                        <span className="value description">{t.title}</span>
+                      </div>
+                    </div>
+                    <div className="card-row">
+                      <div className="data-group">
+                        <span className="label">Admin</span>
+                        <span className="value">{t.user?.name ?? 'N/A'}</span>
+                      </div>
+                      <div className="data-group">
+                        <span className="label">Pengirim</span>
+                        <span className="value">{t.creator?.name ?? 'N/A'}</span>
+                      </div>
+                    </div>
+                    <div className="card-row">
+                      <div className="data-group">
+                        <span className="label">Workshop</span>
+                        <span className="value">{t.workshop || '-'}</span>
+                      </div>
+                      <div className="data-group">
+                        <span className="label">Dibuat</span>
+                        <span className="value">{formatDate(t.created_at)}</span>
+                      </div>
+                    </div>
+                    <div className="card-row">
+                      <div className="data-group single">
+                        <span className="label">Durasi Pengerjaan</span>
+                        <span className="value time-duration">
+                          {formatDate(t.started_at)} s/d {formatDate(t.completed_at)}
+                          <strong> ({calculateDuration(t.started_at, t.completed_at)})</strong>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {tableData && tableData.last_page > 1 && (
+                <Pagination
+                  currentPage={tableData.current_page}
+                  lastPage={tableData.last_page}
+                  onPageChange={setCurrentPage}
+                />
+              )}
             </>
           )}
         </>

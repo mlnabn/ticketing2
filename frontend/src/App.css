@@ -1796,11 +1796,10 @@ body.dark-mode .card-change.down {
 /* ================================ */
 
 body.dark-mode .info-card {
-  background-color: #111111 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  /* Bayangan yang lebih gelap */
+  background-color: var(--card-small);
+  box-shadow: 0 4px 12px var(--shadow-color);
   color: #F7FAFC;
-  border: 1px solid #2D3748;
+  border: 1px solid var(--border-color);
 }
 
 body.dark-mode .card-value,
@@ -8703,10 +8702,10 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .nav-card {
-  background-color: var(--card-bg-color);
+  background-color: var(--card-small);
   padding: 1.5rem;
   border-radius: 12px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--card-small);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
@@ -8716,7 +8715,6 @@ body.dark-mode .dashboard-card h4 {
 .nav-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 25px var(--shadow-color);
-  border-color: var(--primary-color);
 }
 
 .nav-card h3 {
@@ -8805,7 +8803,7 @@ body.dark-mode .dashboard-card h4 {
   font-size: 0.85rem;
   color: var(--text-secondary);
   margin: 0.1rem 0 0;
-} 
+}
 
 /* ======================================================= */
 /* ==       6. CSS DARK MODE UNTUK DATE PICKER          == */
@@ -9435,7 +9433,7 @@ body.dark-mode .summary-cards .card h3 {
 
 /* --- Gaya Dark Mode untuk Kartu Mobile --- */
 .dark-mode .report-card-mobile {
-  background-color: #1a202c;
+  background-color: #111111;
   border-color: #2d3748;
   box-shadow: none;
 }
@@ -9524,5 +9522,10 @@ body.dark-mode .summary-cards .card h3 {
 
   .admin-card .info p {
     font-size: 0.8rem;
+  }
+
+  .back-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
   }
 }
