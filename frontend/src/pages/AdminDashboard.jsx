@@ -596,8 +596,8 @@ export default function AdminDashboard() {
                     </div>
                     <div className="dashboard-card pie-chart-card">
                       <h4>Status Tiket</h4>
-                      <PieChartComponent stats={stats}
-                        handleHomeClick={handleHomeClick}
+                      <PieChartComponent
+                        stats={stats}
                         handleStatusFilterClick={(status) => handleChartFilter({ status })}
                         statusFilter={statusFilter} />
                     </div>

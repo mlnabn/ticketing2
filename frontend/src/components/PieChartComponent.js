@@ -1,7 +1,7 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
-const PieChartComponent = ({ stats, handleHomeClick, handleStatusFilterClick, statusFilter }) => {
+const PieChartComponent = ({ stats, handleStatusFilterClick, statusFilter }) => {
   if (!stats) return null;
 
   const data = [
@@ -10,8 +10,6 @@ const PieChartComponent = ({ stats, handleHomeClick, handleStatusFilterClick, st
     { name: 'Ditolak', value: stats.ditolak || 0, color: '#ff2828', dotClass: 'dot-red' },
     { name: 'Belum Dikerjakan', value: stats.belum_dikerjakan || 0, color: '#3498db', dotClass: 'dot-blue' },
   ];
-
-
 
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
@@ -22,7 +20,6 @@ const PieChartComponent = ({ stats, handleHomeClick, handleStatusFilterClick, st
 
   const onPieClick = (entry) => {
     if (!entry || !entry.name) return;
-    handleHomeClick();
     handleStatusFilterClick(entry.name);
   };
 
@@ -80,7 +77,6 @@ const PieChartComponent = ({ stats, handleHomeClick, handleStatusFilterClick, st
             key={index}
             className="legend-item2"
             onClick={() => {
-              handleHomeClick();
               handleStatusFilterClick(entry.name);
             }}
             style={{ cursor: "pointer" }}

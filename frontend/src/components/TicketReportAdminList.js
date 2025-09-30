@@ -109,12 +109,12 @@ export default function TicketReportAdminList() {
       </div>
       <div className="report-navigation-cards">
         <div className="nav-card" onClick={() => setView('all_report')}>
-          <h3>Laporan Seluruh Pekerjaan</h3>
+          <h3>Laporan Seluruh Tiket</h3>
           <p>Lihat semua tiket sesuai filter di atas.</p>
           <i className="fas fa-arrow-right"></i>
         </div>
         <div className="nav-card" onClick={() => setView('worked_on_report')}>
-          <h3>Laporan Tiket Dikerjakan</h3>
+          <h3>Laporan Tiket yang Dikerjakan</h3>
           <p>Hanya tiket yang ditangani admin (sesuai filter).</p>
           <i className="fas fa-arrow-right"></i>
         </div>
