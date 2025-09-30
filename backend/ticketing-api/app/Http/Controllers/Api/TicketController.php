@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Maatwebsite\Excel\Facades\Excel;
 use PDF;
 use App\Exports\TicketsExport;
@@ -61,7 +62,7 @@ class TicketController extends Controller
                 $query->where('status', $statusFilter);
             }
         }
-        
+
         if ($adminId) {
             $query->where('user_id', $adminId);
         }
@@ -182,17 +183,35 @@ class TicketController extends Controller
             'sender_name' => 'required|string',
         ]);
 
-        $cleanPhoneNumber = preg_replace('/[^0-9]/', '', $validated['sender_phone']);
+        $phoneParts = preg_split('/[,\s]+/', $validated['sender_phone']);
+        $firstPhoneNumber = $phoneParts[0];
+        $cleanPhoneNumber = preg_replace('/[^0-9]/', '', $firstPhoneNumber);
 
-        $user = User::firstOrCreate(
-            ['phone' => $cleanPhoneNumber],
-            [
-                'name' => $validated['sender_name'],
-                'email' => $cleanPhoneNumber . '@whatsapp.user',
-                'password' => bcrypt(Str::random(16)),
-                'role' => 'user'
-            ]
-        );
+        $lockKey = 'creating-user-lock-' . $cleanPhoneNumber;
+        $lock = Cache::lock($lockKey, 10);
+
+        try {
+            if ($lock->get()) {
+                $user = User::firstOrCreate(
+                    ['phone' => $cleanPhoneNumber],
+                    [
+                        'name' => $validated['sender_name'],
+                        'email' => $cleanPhoneNumber . '@whatsapp.user', // Sekarang menggunakan nomor yang sudah bersih
+                        'password' => bcrypt(Str::random(16)),
+                        'role' => 'user'
+                    ]
+                );
+                $lock->release();
+            } else {
+                sleep(1);
+                $user = User::where('phone', $cleanPhoneNumber)->firstOrFail();
+            }
+        } catch (\Exception $e) {
+            if ($lock && $lock->isOwned()) {
+                $lock->release();
+            }
+            return response()->json(['error' => 'Gagal memproses user: ' . $e->getMessage()], 500);
+        }
 
         $kodeTiket = $this->generateKodeTiket($validated['workshop']);
 
