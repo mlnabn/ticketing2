@@ -2,12 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react'; // BARU: Tambah
 import api from '../services/api';
 import { format } from 'date-fns';
 
-const notificationTemplates = [
-    { title: 'Pemberitahuan Maintenance', message: 'Workshop Candi sedang mengalami kendala. Semua ticket akan dilanjutkan setelah maintenance workshop Candi selesai. Terima Kasih.' },
-    { title: 'Update', message: 'Ticket Anda sudah selesai, silahkan refresh halaman Anda.' },
-    { title: 'Pengumuman Penting', message: '' },
-];
-
 // PENYESUAIAN: Hapus props yang tidak perlu, sisakan 'showToast'
 export default function NotificationForm({ showToast }) {
     const [title, setTitle] = useState('');
@@ -17,6 +11,7 @@ export default function NotificationForm({ showToast }) {
     
     const [users, setUsers] = useState([]);
     const [globalNotifications, setGlobalNotifications] = useState([]);
+    const [templates, setTemplates] = useState([]);
 
     const fetchAllUsers = useCallback(async () => {
         try {
@@ -39,10 +34,21 @@ export default function NotificationForm({ showToast }) {
         }
     }, []);
 
+    const fetchTemplates = useCallback(async () => {
+        try {
+            const response = await api.get('/notification-templates');
+            setTemplates(response.data.data || response.data);
+        } catch (e) {
+            console.error('Gagal mengambil template:', e);
+            showToast('Gagal memuat template notifikasi.', 'error');
+        }
+    }, [showToast]);
+
     useEffect(() => {
         fetchAllUsers();
         fetchNotifications();
-    }, [fetchAllUsers, fetchNotifications]);
+        fetchTemplates();
+    }, [fetchAllUsers, fetchNotifications, fetchTemplates]);
 
     const handleDelete = async (id) => {
         if (!window.confirm('Anda yakin ingin menghapus pengumuman ini secara permanen?')) {
@@ -95,9 +101,9 @@ export default function NotificationForm({ showToast }) {
           {/* Template */}
           <div className="templates-section">
             <h4>Gunakan Template</h4>
-            {notificationTemplates.map((template, index) => (
+            {templates.map((template) => (
               <button
-                key={index}
+                key={template.id}
                 onClick={() => handleTemplateClick(template)}
                 className="btn-template"
               >

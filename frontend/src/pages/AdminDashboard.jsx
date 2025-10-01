@@ -13,6 +13,7 @@ import JobList from '../components/JobList';
 import Pagination from '../components/Pagination';
 import UserManagement from '../components/UserManagement';
 import NotificationForm from '../components/NotificationForm';
+import NotificationTemplateManagement from '../components/NotificationTemplateManagement';
 import LineChartComponent from '../components/LineChartComponent';
 import PieChartComponent from '../components/PieChartComponent';
 import BarChartComponent from '../components/BarChartComponent';
@@ -526,6 +527,12 @@ export default function AdminDashboard() {
               <li className="sidebar-nav-item"><button onClick={handleHomeClick} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-ticket-alt"></i><span>Daftar Tiket</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('MyTickets')} className={`sidebar-button ${currentPage === 'MyTickets' ? 'active' : ''}`}><i className="fas fa-user-tag"></i><span>Tiket Saya</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>Pengguna</span></button></li>
+              <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Notifications')} className={`sidebar-button ${currentPage === 'Notifications' ? 'active' : ''}`}><i className="fas fa-bell"></i><span>Notifikasi</span></button></li>
+              <li className="sidebar-nav-item">
+                <button onClick={() => setCurrentPage('notificationTemplates')} className={`sidebar-button ${currentPage === 'notificationTemplates' ? 'active' : ''}`}>
+                  <i className="fas fa-paste"></i><span>Template Notif</span>
+                </button>
+              </li>
               <li className="sidebar-nav-item">
                 <button
                   onClick={() => setCurrentPage('toolManagement')}
@@ -543,8 +550,6 @@ export default function AdminDashboard() {
                   <i className="fas fa-file-alt"></i><span>Laporan Tiket</span>
                 </button>
               </li>
-
-              <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('Notifications')} className={`sidebar-button ${currentPage === 'Notifications' ? 'active' : ''}`}><i className="fas fa-bell"></i><span>Notifikasi</span></button></li>
             </ul>
           </nav>
         </aside>
@@ -736,6 +741,10 @@ export default function AdminDashboard() {
 
             {currentPage === 'Notifications' && (
               <NotificationForm showToast={showToast} />
+            )}
+
+            {currentPage === 'notificationTemplates' && (
+              <NotificationTemplateManagement showToast={showToast} />
             )}
           </div>
         </main>

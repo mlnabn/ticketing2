@@ -548,6 +548,10 @@ body.dark-mode .hamburger-menu-button span {
 /* Desktop Styles */
 @media (min-width: 1290px) {
 
+  .notification-template-list-mobile {
+    display: none;
+  }
+
   .hamburger-menu-button,
   .content-overlay,
   .job-list-mobile,
@@ -708,7 +712,8 @@ body.dark-mode .hamburger-menu-button span {
 
   .job-list-mobile,
   .user-list-mobile,
-  .workshop-list-mobile {
+  .workshop-list-mobile,
+  .notification-template-list-mobile {
     display: block;
   }
 
@@ -750,7 +755,6 @@ body.dark-mode .hamburger-menu-button span {
       flex-shrink: 0;
   }
 
-  /* BARU: Style untuk value (misal: "Bener") */
   .info-value {
       color: #111827; /* Hitam untuk light mode */
       font-weight: 500;
@@ -767,28 +771,18 @@ body.dark-mode .hamburger-menu-button span {
       color: #e5e7eb; /* Putih untuk dark mode */
   }
 
-  /* BARU: Aturan untuk menata info (Nama/Email/Kode) secara vertikal */
-  /* .user-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px; 
-  } */
-
-  /* BARU: Style untuk teks nama agar lebih menonjol */
   .user-name {
     font-weight: 600;
     font-size: 1rem;
     color: var(--text-color-primary);
   }
 
-  /* BARU: Style untuk teks email/kode agar lebih subtil */
   .user-email {
     font-size: 0.85rem;
     color: #555;
     word-break: break-all;
   }
   
-  /* BARU: Aturan untuk grup tombol agar memiliki jarak */
   .action-buttons-group {
     display: flex;
     gap: 8px; /* Jarak antara tombol Edit dan Hapus */
@@ -4860,9 +4854,11 @@ body.dark-mode .notification-form-container label {
 
 .form-group input,
 .form-group select,
+.form-group textarea,
 .form-group2 input,
 .form-group2 select,
 .form-group2 textarea {
+  width: 100%;
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 0.95rem;
@@ -8009,7 +8005,7 @@ body.dark-mode .dashboard-card h4 {
 .modal-body {
   flex-grow: 1;
   overflow-y: auto;
-  padding-right: 15px;
+  /* padding-right: 15px; */
   margin-bottom: 25px;
   display: flex;
   flex-direction: column;
