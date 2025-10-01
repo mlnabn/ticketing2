@@ -25,6 +25,8 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import UserFormModal from '../components/UserFormModal';
 import TicketReportAdminList from '../components/TicketReportAdminList';
 import TicketReportDetail from '../components/TicketReportDetail';
+import ToolManagement from '../components/ToolManagement';
+import ReturnItemsModal from '../components/ReturnItemsModal'
 
 // Assets
 import yourLogok from '../Image/DTECH-Logo.png';
@@ -76,8 +78,10 @@ export default function AdminDashboard() {
   const [adminIdFilter, setAdminIdFilter] = useState(null);
   const [dateFilter, setDateFilter] = useState(null);
   const [ticketIdFilter, setTicketIdFilter] = useState(null);
-
+  const [toolList, setToolList] = useState([]);
   const ticketsOnPage = useMemo(() => (ticketData ? ticketData.data : []), [ticketData]);
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [ticketToReturn, setTicketToReturn] = useState(null);
 
   // Utilities
   const showToast = useCallback((message, type = 'success') => {
@@ -172,6 +176,15 @@ export default function AdminDashboard() {
     }
   }, [handleLogout]);
 
+  const fetchTools = useCallback(async () => {
+    try {
+      const response = await api.get('/tools');
+      if (Array.isArray(response.data)) setToolList(response.data);
+    } catch (e) {
+      console.error('Gagal mengambil daftar alat:', e);
+    }
+  }, []);
+
   // =================================================================
   // Handlers
   // =================================================================
@@ -213,16 +226,18 @@ export default function AdminDashboard() {
     setTicketToAssign(null);
     setShowAssignModal(false);
   };
-  const handleConfirmAssign = async (ticketId, adminId) => {
+  const handleConfirmAssign = async (ticketId, adminId, tools) => {
     try {
-      await api.patch(`/tickets/${ticketId}/assign`, { user_id: adminId });
+      await api.patch(`/tickets/${ticketId}/assign`, { user_id: adminId, tools: tools });
       handleCloseAssignModal();
-      fetchDashboardData(); // DIUBAH
+      fetchDashboardData();
       fetchMyTickets(myTicketsPage);
+      fetchTools();
       showToast('Tiket berhasil ditugaskan.', 'success');
     } catch (e) {
       console.error('Gagal menugaskan tiket:', e);
-      showToast('Gagal menugaskan tiket.', 'error');
+      const errorMsg = e.response?.data?.errors?.tools || 'Gagal menugaskan tiket.';
+      showToast(errorMsg, 'error');
     }
   };
 
@@ -321,16 +336,33 @@ export default function AdminDashboard() {
     }
   };
 
-  const updateTicketStatus = async (id, newStatus) => {
-    try {
-      await api.patch(`/tickets/${id}/status`, { status: newStatus });
-      showToast('Status tiket berhasil diupdate.', 'success');
-      fetchDashboardData(); // DIUBAH
-      fetchMyTickets(myTicketsPage);
-    } catch (e) {
-      console.error('Gagal update status:', e);
-      const errorMessage = e.response?.data?.error || 'Gagal mengupdate status tiket.';
-      showToast(errorMessage, 'error');
+  const updateTicketStatus = async (ticketIdentifier, newStatus) => {
+    // Langkah 1: Cari tiket lengkap berdasarkan identifier (bisa berupa ID atau objek)
+    const ticket = typeof ticketIdentifier === 'object'
+      ? ticketIdentifier
+      : ticketsOnPage.find(t => t.id === ticketIdentifier);
+
+    // Langkah 2: Lakukan pengecekan jika tiket tidak ditemukan
+    if (!ticket) {
+      console.error("Tiket tidak ditemukan dengan identifier:", ticketIdentifier);
+      showToast("Gagal memperbarui status: Tiket tidak ditemukan.", "error");
+      return;
+    }
+
+    // Langkah 3: Sisa logika berjalan seperti semula menggunakan objek 'ticket' yang sudah ditemukan
+    if (newStatus === 'Selesai' && ticket.tools && ticket.tools.length > 0) {
+      setTicketToReturn(ticket);
+      setShowReturnModal(true);
+    } else {
+      try {
+        await api.patch(`/tickets/${ticket.id}/status`, { status: newStatus });
+        showToast('Status tiket berhasil diupdate.', 'success');
+        fetchDashboardData();
+        fetchMyTickets(myTicketsPage);
+      } catch (e) {
+        console.error('Gagal update status:', e);
+        showToast(e.response?.data?.error || 'Gagal mengupdate status tiket.', 'error');
+      }
     }
   };
 
@@ -388,6 +420,22 @@ export default function AdminDashboard() {
     setUserSearchQuery(query);
   };
 
+  const handleConfirmReturn = async (ticketId, items) => {
+    try {
+      await api.post(`/tickets/${ticketId}/process-return`, { items });
+      showToast('Tiket selesai dan barang telah diproses.', 'success');
+      setShowReturnModal(false);
+      setTicketToReturn(null);
+      fetchDashboardData();
+      fetchMyTickets(myTicketsPage);
+      fetchTools(); // PENTING: Refresh stok alat di UI
+    } catch (e) {
+      console.error('Gagal memproses pengembalian:', e);
+      showToast(e.response?.data?.message || 'Gagal memproses pengembalian.', 'error');
+    }
+  };
+
+
   // =================================================================
   // Effects (Logika Utama)
   // =================================================================
@@ -415,6 +463,7 @@ export default function AdminDashboard() {
     // Dipanggil terpisah karena untuk UI yang berbeda (form notifikasi)
     fetchAllUsers();
     fetchNotifications();
+    fetchTools();
 
     let intervalId = null;
     if (currentPage === 'Tickets' && !searchQuery && !statusFilter && !adminIdFilter && !dateFilter && !ticketIdFilter) {
@@ -434,6 +483,7 @@ export default function AdminDashboard() {
     fetchDashboardData,
     fetchAllUsers,
     fetchNotifications,
+    fetchTools,
     searchQuery,
     statusFilter,
     adminIdFilter,
@@ -487,6 +537,13 @@ export default function AdminDashboard() {
               <li className="sidebar-nav-item"><button onClick={handleHomeClick} className={`sidebar-button ${currentPage === 'Tickets' ? 'active' : ''}`}><i className="fas fa-ticket-alt"></i><span>Daftar Tiket</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('MyTickets')} className={`sidebar-button ${currentPage === 'MyTickets' ? 'active' : ''}`}><i className="fas fa-user-tag"></i><span>Tiket Saya</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>Pengguna</span></button></li>
+              <li className="sidebar-nav-item">
+                <button
+                  onClick={() => setCurrentPage('toolManagement')}
+                  className={`sidebar-button ${currentPage === 'toolManagement' ? 'active' : ''}`}>
+                  <i className="fas fa-tools"></i><span>Manajemen Gudang</span>
+                </button>
+              </li>
               <li className="sidebar-nav-item">
                 <button onClick={() => setCurrentPage('ticketReport')}
                   className={`sidebar-button ${currentPage === 'ticketReport' ? 'active' : ''}`}>
@@ -660,6 +717,10 @@ export default function AdminDashboard() {
               <UserManagement userData={userData} onDeleteClick={handleUserDeleteClick} onAddClick={handleAddUserClick} onEditClick={handleUserEditClick} onPageChange={handleUserPageChange} onSearch={handleUserSearch} />
             )}
 
+            {currentPage === 'toolManagement' && (
+              <ToolManagement />
+            )}
+
             {currentPage === 'ticketReport' && (
               selectedAdminWithFilters ? (
                 <TicketReportDetail
@@ -686,7 +747,7 @@ export default function AdminDashboard() {
           <ProofModal ticket={ticketForProof} onSave={handleSaveProof} onClose={handleCloseProofModal} />
         )}
         {showAssignModal && ticketToAssign && (
-          <AssignAdminModal ticket={ticketToAssign} admins={adminList} onAssign={handleConfirmAssign} onClose={handleCloseAssignModal} showToast={showToast} />
+          <AssignAdminModal ticket={ticketToAssign} admins={adminList} tools={toolList} onAssign={handleConfirmAssign} onClose={handleCloseAssignModal} showToast={showToast} />
         )}
         {showRejectModal && ticketToReject && (
           <RejectTicketModal ticket={ticketToReject} onReject={handleConfirmReject} onClose={handleCloseRejectModal} showToast={showToast} />
@@ -699,6 +760,14 @@ export default function AdminDashboard() {
         )}
         {showUserFormModal && (
           <UserFormModal userToEdit={userToEdit} onClose={handleCloseUserForm} onSave={handleSaveUser} />
+        )}
+        {showReturnModal && ticketToReturn && (
+          <ReturnItemsModal
+            ticket={ticketToReturn}
+            onSave={handleConfirmReturn}
+            onClose={() => setShowReturnModal(false)}
+            showToast={showToast}
+          />
         )}
       </div>
     );

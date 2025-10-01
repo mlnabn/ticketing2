@@ -12,28 +12,30 @@ class Ticket extends Model
     protected $appends = ['proof_image_url'];
 
     protected $fillable = [
-        'title', 
-        'status', 
-        'user_id', 
-        'workshop', 
-        'creator_id', 
-        'started_at', 
-        'completed_at', 
-        'requested_time', 
-        'requested_date', 
-        'rejection_reason', 
-        'proof_description', 
+        'title',
+        'status',
+        'user_id',
+        'workshop',
+        'creator_id',
+        'started_at',
+        'completed_at',
+        'requested_time',
+        'requested_date',
+        'rejection_reason',
+        'proof_description',
         'proof_image_path',
         'kode_tiket',
+        'requester_name', // <-- PERBAIKAN 3: Ditambahkan
     ];
 
-    public function user() {
-        return $this->belongsTo(User::class);
+    public function user()
+    {
+        // PERBAIKAN 2: Foreign key dibuat eksplisit
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function creator()
     {
-        // Pastikan parameter kedua 'creator_id' ada
         return $this->belongsTo(User::class, 'creator_id');
     }
 
@@ -43,5 +45,12 @@ class Ticket extends Model
             return Storage::disk('public')->url($this->proof_image_path);
         }
         return null;
+    }
+
+    public function tools()
+    {
+        return $this->belongsToMany(Tool::class)
+            ->withPivot('quantity_used', 'quantity_lost', 'status', 'keterangan')
+            ->withTimestamps();
     }
 }

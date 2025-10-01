@@ -10,6 +10,7 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Api\OtpController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Api\ToolController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,7 +38,7 @@ Route::middleware('jwt')->group(function () {
 
     // --- Rute Autentikasi Pengguna ---
     Route::get('/user', [AuthController::class, 'getUser']);
-    Route::put('/user', [AuthController::class, 'updateUser']); 
+    Route::put('/user', [AuthController::class, 'updateUser']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/admins', [UserController::class, 'getAdmins']);
 
@@ -78,4 +79,13 @@ Route::middleware('jwt')->group(function () {
     Route::get('/tickets/download-export', [TicketController::class, 'downloadExport']);
 
     Route::get('/locations', [LocationController::class, 'index']);
+
+    // --- Rute untuk Manajemen Gudang (Tools) ---
+    Route::get('/tools/lost-items', [ToolController::class, 'getLostItems']);
+    Route::post('/tools/{tool}/recover', [ToolController::class, 'recoverStock']);
+    Route::post('/tools/{tool}', [ToolController::class, 'update']); // Untuk update
+    Route::apiResource('tools', ToolController::class)->except(['update']);
+
+    // --- Rute untuk Proses Tiket ---
+    Route::post('/tickets/{ticket}/process-return', [TicketController::class, 'processReturn']);
 });

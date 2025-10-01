@@ -8676,11 +8676,11 @@ body.dark-mode .dashboard-card h4 {
 
 }
 
-.nav-card{
+.nav-card {
   padding: 1.5rem;
   border-radius: 12px;
   border: 1px solid var(--border-color);
-  cursor: pointer; 
+  cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
   box-shadow: 0 4px 12px var(--shadow-color);
@@ -9513,7 +9513,7 @@ body.dark-mode .summary-cards .card h3 {
 
 .filter-group {
   display: flex;
-  gap: 1rem; 
+  gap: 1rem;
   align-items: center;
 }
 
@@ -9525,15 +9525,16 @@ body.dark-mode .summary-cards .card h3 {
   -moz-appearance: none;
 
   /* 2. Ukuran dan Spasi */
-  padding: 0.5rem 2.5rem 0.5rem 0.75rem; 
-  font-size: 1rem; 
+  padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+  font-size: 1rem;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: var(--text-primary);
-  
+
   /* 3. Border dan Latar Belakang */
   background-color: var(--bg-color);
   border: 1px solid #ced4da;
-  border-radius: 0.5rem; /* 8px */
+  border-radius: 0.5rem;
+  /* 8px */
   cursor: pointer;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
@@ -9558,6 +9559,227 @@ body.dark-mode .summary-cards .card h3 {
 .dark-mode .month-input:focus {
   box-shadow: 0 0 0 3px rgba(108, 136, 255, 0.2);
 }
+
 .dark-mode .month-input {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d1d5db' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+}
+
+
+.btn-recover-small{
+  background-color: #d1e7dd;
+  /* [DIUBAH] Warna dari JobList */
+  color: #0f5132;
+  border-color: #badbcc;
+  box-shadow: 0 4px 12px rgba(15, 81, 50, 0.35);
+  /* hijau muda */
+  border-radius: 25px;
+  font-size: 12px;
+}
+
+.btn-recover-small:hover {
+  background-color: #a8d5b7;
+  /* [DIUBAH] Warna dari JobList */
+  border-color: #a8d5b7;
+  transform: translateY(-1px);
+  /* Efek hover tetap dipertahankan */
+}
+
+/* [DIUBAH] Dark Mode untuk Tombol Edit (Solid) */
+body.dark-mode .btn-recover-small {
+  background-color: #22C55E;
+  color: #ffffff;
+  border-color: #38a169;
+}
+
+body.dark-mode .btn-recover-small:hover {
+  background-color: #2f855a;
+  border-color: #2f855a;
+}
+
+/* //===================
+ReturnItemsModal
+======================// */
+
+.form-group-inline2 {
+  display: flex;
+  /* PERBAIKAN: Pusatkan grup input secara horizontal */
+  justify-content: center;
+  gap: 30px;
+  /* Beri jarak lebih antar grup */
+  margin-top: 10px;
+  width: 100%;
+}
+
+.input-group2 {
+  display: flex;
+  /* PERBAIKAN: Sejajarkan label dan input dalam satu baris */
+  align-items: center;
+  gap: 10px;
+  /* Jarak antara label dan input */
+}
+
+.input-group2 label {
+  font-size: 0.9em;
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+  /* Mencegah label turun baris */
+}
+
+.dark-mode .input-group2 label {
+  color: #a0aec0;
+}
+
+.input-group2 input {
+  width: 80px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1.1em;
+  /* Sedikit perbesar angka di dalam */
+  font-weight: bold;
+  background-color: #f8f9fa;
+  color: #333;
+  /* PERBAIKAN: Pastikan text-align ada di sini */
+  text-align: center;
+}
+
+.dark-mode .input-group2 input {
+  background-color: #1a202c;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+
+/* --- Style untuk Textarea Keterangan (form-group2) --- */
+
+.form-group2 {
+  margin-top: 20px;
+}
+
+.form-group2 label {
+  display: block;
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 0.9em;
+  font-weight: 500;
+  color: #555;
+}
+
+.dark-mode .form-group2 label {
+  color: #a0aec0;
+}
+
+.form-group2 textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1em;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.dark-mode .form-group2 textarea {
+  background-color: #1a202c;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+/* --- Tampilan Kartu Alat untuk Mobile --- */
+.tool-list-mobile {
+  display: none; /* Sembunyikan di desktop */
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.tool-card-mobile {
+  background-color: var(--content-bg-light);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color-light);
+}
+
+.dark-mode .tool-card-mobile {
+  background-color: var(--content-bg-dark);
+  border-color: var(--border-color-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.tool-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color-light);
+  margin-bottom: 10px;
+}
+.dark-mode .tool-card-header {
+  border-bottom-color: var(--border-color-dark);
+}
+
+.tool-name {
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+.tool-stock {
+  font-size: 0.9em;
+  font-weight: 500;
+  background-color: rgba(0, 123, 255, 0.1);
+  color: #007bff;
+  padding: 4px 8px;
+  border-radius: 20px;
+}
+.dark-mode .tool-stock {
+  background-color: rgba(66, 153, 225, 0.2);
+  color: #63b3ed;
+}
+
+.tool-info-section {
+  margin-bottom: 15px;
+}
+
+.tool-info-section .label {
+  display: block;
+  font-size: 0.8em;
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+.dark-mode .tool-info-section .label {
+  color: #a0aec0;
+}
+
+.tool-info-section .value {
+  font-size: 0.95em;
+}
+
+.tool-card-footer {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color-light);
+}
+.dark-mode .tool-card-footer {
+  border-top-color: var(--border-color-dark);
+}
+
+
+/* --- Media Query untuk Responsif --- */
+/* Gunakan breakpoint yang sesuai dengan aplikasi Anda, contoh: 768px */
+@media (max-width: 1290px) {
+  /* Sembunyikan tabel di mobile */
+  .job-list-table {
+    display: none;
+  }
+  /* Tampilkan daftar kartu di mobile */
+  .tool-list-mobile {
+    display: block;
+  }
 }
