@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Models\Workshop;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -89,7 +90,7 @@ class TicketController extends Controller
     {
         $user = auth()->user();
         $perPage = $request->query('per_page', 10);
-        $query = Ticket::with(['user', 'creator']);
+        $query = Ticket::with(['user', 'creator', 'workshop']);
 
         // Jika user biasa → hanya tiket miliknya
         if ($user->role !== 'admin') {
@@ -109,7 +110,7 @@ class TicketController extends Controller
     public function allTickets()
     {
         $user = auth()->user();
-        $query = Ticket::with(['user', 'creator']);
+        $query = Ticket::with(['user', 'creator', 'workshop']);
 
         if ($user->role !== 'admin') {
             $query->where('user_id', $user->id);
@@ -122,24 +123,15 @@ class TicketController extends Controller
     /**
      * Generate kode tiket.
      */
-    private function generateKodeTiket($workshopName)
+    private function generateKodeTiket($workshopId)
     {
-        $workshopMap = [
-            'Canden' => 'CN',
-            'Nobo' => 'NB',
-            'Bener' => 'BN',
-            'Nusa Persada' => 'NP',
-            'Pelita' => 'PL',
-            'Muhasa' => 'MH'
-        ];
-        $workshopCode = $workshopMap[$workshopName] ?? 'XX';
+        $workshop = Workshop::find($workshopId);
+        $workshopCode = $workshop ? $workshop->code : 'XX';
 
         $now = now();
         $day = $now->format('d');
         $month = $now->format('n');
-
         $sequence = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
-
         return strtoupper($workshopCode . $day . $month . $sequence);
     }
 
@@ -150,17 +142,17 @@ class TicketController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'workshop' => 'required|string',
+            'workshop_id' => 'required|exists:workshops,id',
             'requested_time' => 'nullable|date_format:H:i',
             'requested_date' => 'nullable|date',
         ]);
 
-        $kodeTiket = $this->generateKodeTiket($validated['workshop']);
+        $kodeTiket = $this->generateKodeTiket($validated['workshop_id']);
 
         $ticket = Ticket::create([
             'kode_tiket' => $kodeTiket,
             'title' => $validated['title'],
-            'workshop' => $validated['workshop'],
+            'workshop_id' => $validated['workshop_id'],
             'requested_time' => $validated['requested_time'] ?? null,
             'requested_date' => $validated['requested_date'] ?? null,
             'creator_id' => auth()->id(),
@@ -178,10 +170,14 @@ class TicketController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'workshop' => 'required|string',
+            'workshop_name' => 'required|string|exists:workshops,name',
             'sender_phone' => 'required|string',
             'sender_name' => 'required|string',
         ]);
+        $workshop = Workshop::where('name', $validated['workshop_name'])->first();
+        if (!$workshop) {
+            return response()->json(['error' => 'Workshop tidak valid.'], 422);
+        }
 
         $phoneParts = preg_split('/[,\s]+/', $validated['sender_phone']);
         $firstPhoneNumber = $phoneParts[0];
@@ -213,12 +209,12 @@ class TicketController extends Controller
             return response()->json(['error' => 'Gagal memproses user: ' . $e->getMessage()], 500);
         }
 
-        $kodeTiket = $this->generateKodeTiket($validated['workshop']);
+        $kodeTiket = $this->generateKodeTiket($workshop->id);
 
         $ticket = Ticket::create([
             'kode_tiket' => $kodeTiket,
             'title' => $validated['title'],
-            'workshop' => $validated['workshop'],
+            'workshop_id' => $workshop->id,
             'requester_name' => $validated['sender_name'],
             'creator_id' => $user->id,
             'status' => 'Belum Dikerjakan',
@@ -340,7 +336,7 @@ class TicketController extends Controller
         )->first();
 
         // Clone query dasar untuk data paginasi, lalu terapkan filter status
-        $paginatedQuery = $baseQuery->with(['user', 'creator']);
+        $paginatedQuery = $baseQuery->with(['user', 'creator', 'workshop']);
 
         if ($request->has('status') && $request->query('status') !== 'all') {
             $status = $request->query('status');
@@ -440,7 +436,7 @@ class TicketController extends Controller
      */
     public function createdTickets(Request $request)
     {
-        $tickets = Ticket::with(['user', 'creator'])
+        $tickets = Ticket::with(['user', 'creator', 'workshop'])
             ->where('creator_id', auth()->id())
             ->latest()
             ->paginate(5);

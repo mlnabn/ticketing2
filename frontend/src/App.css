@@ -551,7 +551,8 @@ body.dark-mode .hamburger-menu-button span {
   .hamburger-menu-button,
   .content-overlay,
   .job-list-mobile,
-  .user-list-mobile {
+  .user-list-mobile,
+  .workshop-list-mobile {
     display: none !important;
   }
 
@@ -700,12 +701,14 @@ body.dark-mode .hamburger-menu-button span {
   }
 
   .job-table,
-  .user-list-table {
+  .user-list-table,
+  .workshop-list-table {
     display: none;
   }
 
   .job-list-mobile,
-  .user-list-mobile {
+  .user-list-mobile,
+  .workshop-list-mobile {
     display: block;
   }
 
@@ -719,6 +722,88 @@ body.dark-mode .hamburger-menu-button span {
     margin-bottom: 15px;
     display: flex;
     flex-direction: column;
+    gap: 12px;
+  }
+
+  .main-header .user-info {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* Jarak antara tombol dan nama */
+  }
+
+  .user-card-body {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .info-row {
+    display: flex;
+    align-items: baseline; /* Agar teks label dan value sejajar rapi */
+    text-align: left;
+  }
+
+  .info-label {
+      color: #6b7280; /* Abu-abu untuk light mode */
+      font-weight: 600;
+      margin-right: 8px;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+  }
+
+  /* BARU: Style untuk value (misal: "Bener") */
+  .info-value {
+      color: #111827; /* Hitam untuk light mode */
+      font-weight: 500;
+      font-size: 0.95rem;
+      word-break: break-all;
+  }
+
+  /* Aturan warna untuk Dark Mode */
+  body.dark-mode .info-label {
+      color: #9ca3af; /* Abu-abu terang untuk dark mode */
+  }
+
+  body.dark-mode .info-value {
+      color: #e5e7eb; /* Putih untuk dark mode */
+  }
+
+  /* BARU: Aturan untuk menata info (Nama/Email/Kode) secara vertikal */
+  /* .user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; 
+  } */
+
+  /* BARU: Style untuk teks nama agar lebih menonjol */
+  .user-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-color-primary);
+  }
+
+  /* BARU: Style untuk teks email/kode agar lebih subtil */
+  .user-email {
+    font-size: 0.85rem;
+    color: #555;
+    word-break: break-all;
+  }
+  
+  /* BARU: Aturan untuk grup tombol agar memiliki jarak */
+  .action-buttons-group {
+    display: flex;
+    gap: 8px; /* Jarak antara tombol Edit dan Hapus */
+    flex-shrink: 0; /* Mencegah tombol mengecil */
+  }
+
+  body.dark-mode .ticket-card-mobile,
+  body.dark-mode .user-card-mobile {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    background-color: #1f1f1f;
+    border: 1px solid #333;
+  }
+
+  body.dark-mode .user-email {
+    color: #aaa;
   }
 
   .ticket-card-mobile {
@@ -916,16 +1001,6 @@ body.dark-mode .hamburger-menu-button span {
     align-self: flex-end;
   }
 }
-
-/* @media (min-width: 665px) {
-  .user-list-mobile {
-    display: none;
-  }
-
-  .user-list-table {
-    display: block;
-  }
-} */
 
 @media (max-width: 480px) {
 

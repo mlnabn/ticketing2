@@ -229,7 +229,7 @@ export default function UserDashboard() {
                           createdTicketsOnPage.map(ticket => (
                             <tr key={ticket.id}>
                               <td data-label="Deskripsi">{ticket.title}</td>
-                              <td data-label="Workshop">{ticket.workshop}</td>
+                              <td data-label="Workshop">{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
                               <td data-label="Tanggal Dibuat">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
                               <td data-label="Waktu Pengerjaan">
                                 {(() => {

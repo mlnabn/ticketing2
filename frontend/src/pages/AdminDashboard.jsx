@@ -25,6 +25,7 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import UserFormModal from '../components/UserFormModal';
 import TicketReportAdminList from '../components/TicketReportAdminList';
 import TicketReportDetail from '../components/TicketReportDetail';
+import WorkshopManagement from '../components/WorkshopManagement';
 
 // Assets
 import yourLogok from '../Image/DTECH-Logo.png';
@@ -405,40 +406,63 @@ export default function AdminDashboard() {
     localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);
 
+  // useEffect(() => {
+  //   if (!isAdmin) return;
+
+  //   if (currentPage === 'Welcome' || currentPage === 'Tickets') {
+  //     fetchDashboardData();
+  //   }
+
+  //   // Dipanggil terpisah karena untuk UI yang berbeda (form notifikasi)
+  //   fetchAllUsers();
+  //   fetchNotifications();
+
+  //   let intervalId = null;
+  //   if (currentPage === 'Tickets' && !searchQuery && !statusFilter && !adminIdFilter && !dateFilter && !ticketIdFilter) {
+  //     intervalId = setInterval(() => {
+  //       fetchDashboardData();
+  //     }, 60000);
+  //   }
+
+  //   return () => {
+  //     if (intervalId) {
+  //       clearInterval(intervalId);
+  //     }
+  //   };
+  // }, [
+  //   isAdmin,
+  //   currentPage,
+  //   fetchDashboardData,
+  //   fetchAllUsers,
+  //   fetchNotifications,
+  //   searchQuery,
+  //   statusFilter,
+  //   adminIdFilter,
+  //   dateFilter,
+  //   ticketIdFilter
+  // ]);
+
   useEffect(() => {
-    if (!isAdmin) return;
-
-    if (currentPage === 'Welcome' || currentPage === 'Tickets') {
-      fetchDashboardData();
-    }
-
-    // Dipanggil terpisah karena untuk UI yang berbeda (form notifikasi)
-    fetchAllUsers();
-    fetchNotifications();
-
-    let intervalId = null;
-    if (currentPage === 'Tickets' && !searchQuery && !statusFilter && !adminIdFilter && !dateFilter && !ticketIdFilter) {
-      intervalId = setInterval(() => {
+      // Hanya panggil data dashboard jika di halaman yang tepat
+      if (isAdmin && (currentPage === 'Welcome' || currentPage === 'Tickets')) {
         fetchDashboardData();
-      }, 60000);
-    }
 
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
+        // Logika auto-refresh juga pindah ke sini
+        const canRefresh = !searchQuery && !statusFilter && !adminIdFilter && !dateFilter && !ticketIdFilter;
+        if (canRefresh) {
+          const intervalId = setInterval(fetchDashboardData, 60000);
+          return () => clearInterval(intervalId); // Cleanup interval
+        }
       }
-    };
-  }, [
-    isAdmin,
-    currentPage,
-    fetchDashboardData,
-    fetchAllUsers,
-    fetchNotifications,
-    searchQuery,
-    statusFilter,
-    adminIdFilter,
-    dateFilter,
-    ticketIdFilter
+    }, [
+      isAdmin,
+      currentPage,
+      fetchDashboardData,
+      searchQuery,
+      statusFilter,
+      adminIdFilter,
+      dateFilter,
+      ticketIdFilter
   ]);
 
   useEffect(() => {
@@ -488,8 +512,12 @@ export default function AdminDashboard() {
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('MyTickets')} className={`sidebar-button ${currentPage === 'MyTickets' ? 'active' : ''}`}><i className="fas fa-user-tag"></i><span>Tiket Saya</span></button></li>
               <li className="sidebar-nav-item"><button onClick={() => setCurrentPage('userManagement')} className={`sidebar-button ${currentPage === 'userManagement' ? 'active' : ''}`}><i className="fas fa-user-plus"></i><span>Pengguna</span></button></li>
               <li className="sidebar-nav-item">
-                <button onClick={() => setCurrentPage('ticketReport')}
-                  className={`sidebar-button ${currentPage === 'ticketReport' ? 'active' : ''}`}>
+                <button onClick={() => setCurrentPage('workshopManagement')} className={`sidebar-button ${currentPage === 'workshopManagement' ? 'active' : ''}`}>
+                  <i className="fas fa-cogs"></i><span>Workshop</span>
+                </button>
+              </li>
+              <li className="sidebar-nav-item">
+                <button onClick={() => setCurrentPage('ticketReport')} className={`sidebar-button ${currentPage === 'ticketReport' ? 'active' : ''}`}>
                   <i className="fas fa-file-alt"></i><span>Laporan Tiket</span>
                 </button>
               </li>
@@ -660,6 +688,10 @@ export default function AdminDashboard() {
               <UserManagement userData={userData} onDeleteClick={handleUserDeleteClick} onAddClick={handleAddUserClick} onEditClick={handleUserEditClick} onPageChange={handleUserPageChange} onSearch={handleUserSearch} />
             )}
 
+            {currentPage === 'workshopManagement' && (
+              <WorkshopManagement showToast={showToast} />
+            )}
+
             {currentPage === 'ticketReport' && (
               selectedAdminWithFilters ? (
                 <TicketReportDetail
@@ -677,7 +709,7 @@ export default function AdminDashboard() {
             )}
 
             {currentPage === 'Notifications' && (
-              <NotificationForm users={users} globalNotifications={notifications.filter(n => n.user_id === null)} refreshNotifications={fetchNotifications} showToast={showToast} />
+              <NotificationForm showToast={showToast} />
             )}
           </div>
         </main>

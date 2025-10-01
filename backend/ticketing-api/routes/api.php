@@ -10,6 +10,7 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Api\OtpController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Api\WorkshopController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +43,7 @@ Route::middleware('jwt')->group(function () {
     Route::get('/admins', [UserController::class, 'getAdmins']);
 
     // --- Rute untuk Tiket ---
+    Route::apiResource('workshops', WorkshopController::class);
     Route::get('/tickets/stats', [TicketController::class, 'stats']);
     Route::patch('/tickets/{ticket}/reject', [TicketController::class, 'reject']);
     Route::get('/tickets/created-by-me', [TicketController::class, 'createdTickets']);

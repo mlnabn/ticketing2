@@ -15,7 +15,7 @@ class Ticket extends Model
         'title', 
         'status', 
         'user_id', 
-        'workshop', 
+        'workshop_id', 
         'creator_id', 
         'started_at', 
         'completed_at', 
@@ -29,6 +29,11 @@ class Ticket extends Model
 
     public function user() {
         return $this->belongsTo(User::class);
+    }
+
+    public function workshop()
+    {
+        return $this->belongsTo(Workshop::class);
     }
 
     public function creator()
