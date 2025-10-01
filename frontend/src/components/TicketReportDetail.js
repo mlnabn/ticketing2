@@ -146,7 +146,7 @@ export default function TicketReportDetail({ admin, onBack, filters }) {
                         <td>{t.kode_tiket || '-'}</td>
                         <td>{t.title}</td>
                         <td>{t.status}</td>
-                        <td>{t.workshop || '-'}</td>
+                        <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
                         <td>{t.creator?.name ?? '-'}</td>
                         <td>{formatDate(t.created_at)}</td>
                         <td>{formatDate(t.started_at)}</td>
