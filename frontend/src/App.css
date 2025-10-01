@@ -483,6 +483,24 @@ body.dark-mode .dashboard-container {
   color: var(--sidebar-text-dark);
 }
 
+.sidebar-divider {
+  margin-top: 1rem; /* Memberi jarak atas dari grup sebelumnya */
+  padding: 0 0.75rem 0.5rem 0.75rem; /* Padding samping dan bawah */
+}
+
+.sidebar-divider .nav-text {
+  font-size: 0.7rem; /* Ukuran font lebih kecil */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em; /* Jarak antar huruf */
+  color: #64748B; /* Warna abu-abu yang tidak terlalu menonjol */
+}
+
+/* Penyesuaian untuk Dark Mode */
+body.dark-mode .sidebar-divider .nav-text {
+  color: #4A5568; /* Warna abu-abu yang lebih gelap untuk kontras */
+}
+
 .sidebar.open {
   transform: translateX(0);
 }
