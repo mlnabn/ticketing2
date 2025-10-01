@@ -454,46 +454,11 @@ export default function AdminDashboard() {
     localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);
 
-  // useEffect(() => {
-  //   if (!isAdmin) return;
-
-  //   if (currentPage === 'Welcome' || currentPage === 'Tickets') {
-  //     fetchDashboardData();
-  //   }
-
-  //   // Dipanggil terpisah karena untuk UI yang berbeda (form notifikasi)
-  //   fetchAllUsers();
-  //   fetchNotifications();
-
-  //   let intervalId = null;
-  //   if (currentPage === 'Tickets' && !searchQuery && !statusFilter && !adminIdFilter && !dateFilter && !ticketIdFilter) {
-  //     intervalId = setInterval(() => {
-  //       fetchDashboardData();
-  //     }, 60000);
-  //   }
-
-  //   return () => {
-  //     if (intervalId) {
-  //       clearInterval(intervalId);
-  //     }
-  //   };
-  // }, [
-  //   isAdmin,
-  //   currentPage,
-  //   fetchDashboardData,
-  //   fetchAllUsers,
-  //   fetchNotifications,
-  //   searchQuery,
-  //   statusFilter,
-  //   adminIdFilter,
-  //   dateFilter,
-  //   ticketIdFilter
-  // ]);
-
   useEffect(() => {
       // Hanya panggil data dashboard jika di halaman yang tepat
       if (isAdmin && (currentPage === 'Welcome' || currentPage === 'Tickets')) {
         fetchDashboardData();
+        fetchTools();
 
         // Logika auto-refresh juga pindah ke sini
         const canRefresh = !searchQuery && !statusFilter && !adminIdFilter && !dateFilter && !ticketIdFilter;
@@ -507,7 +472,7 @@ export default function AdminDashboard() {
       currentPage,
       fetchDashboardData,
       fetchTools,
-    searchQuery,
+      searchQuery,
       statusFilter,
       adminIdFilter,
       dateFilter,
@@ -517,6 +482,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (isAdmin && currentPage === 'MyTickets') {
       fetchMyTickets(myTicketsPage);
+      fetchTools(); 
     }
   }, [isAdmin, currentPage, myTicketsPage, fetchMyTickets]);
 
@@ -564,7 +530,7 @@ export default function AdminDashboard() {
                 <button
                   onClick={() => setCurrentPage('toolManagement')}
                   className={`sidebar-button ${currentPage === 'toolManagement' ? 'active' : ''}`}>
-                  <i className="fas fa-tools"></i><span>Manajemen Gudang</span>
+                  <i className="fas fa-tools"></i><span>Tools</span>
                 </button>
               </li>
               <li className="sidebar-nav-item">
