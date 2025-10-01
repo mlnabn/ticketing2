@@ -73,26 +73,34 @@ const UserManagement = ({ userData, onAddClick, onEditClick, onDeleteClick, onPa
 
                     {/* Tampilan Kartu untuk Mobile */}
                     <div className="user-list-mobile">
-                        {users.map((user, index) => (
-                            <div key={user.id} className="user-card-mobile">
-                                <div className="user-card-header">
-                                  <span className="user-number">{userData.from + index}</span>
-                                  <span className="user-role">{user.role}</span>
+                        {users.map((user) => (
+                            <div key={user.id} className="ticket-card-mobile">
+                                <div className="card-row">
+                                    <div className="data-group">
+                                        <span className="label">NAMA</span>
+                                        <span className="value">{user.name}</span>
+                                    </div>
+                                    <div className="data-group">
+                                        <span className="label">EMAIL</span>
+                                        <span className="value">{user.email}</span>
+                                    </div>
                                 </div>
-                                <div className="user-card-body">
-                                  <div className="user-info">
-                                    <span className="user-name">{user.name}</span>
-                                    <span className="user-email">{user.email}</span>
-                                  </div>
-                                  <div className="action-buttons-group">
-                                      <button onClick={() => onEditClick(user)} className="btn-edit">Edit</button>
-                                      <button onClick={() => onDeleteClick(user)} className="btn-delete">Hapus</button>
-                                  </div>
+                                <div className="card-row">
+                                    <div className="data-group single">
+                                        <span className="label">PERAN</span>
+                                        <span className="value" style={{ textTransform: 'capitalize' }}>{user.role}</span>
+                                    </div>
+                                </div>
+                                <div className="action-row">
+                                <div className="action-buttons-group">
+                                    <button onClick={() => onEditClick(user)} className="btn-edit">Edit</button>
+                                    <button onClick={() => onDeleteClick(user)} className="btn-delete">Hapus</button>
+                                </div>
                                 </div>
                             </div>
                         ))}
                     </div>
-                    
+                                        
                     {/* Tampilkan Pagination hanya jika ada data */}
                     {userData.last_page > 1 && (
                         <Pagination

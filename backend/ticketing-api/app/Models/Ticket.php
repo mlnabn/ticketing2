@@ -15,7 +15,7 @@ class Ticket extends Model
         'title',
         'status',
         'user_id',
-        'workshop',
+        'workshop_id',
         'creator_id',
         'started_at',
         'completed_at',
@@ -32,6 +32,11 @@ class Ticket extends Model
     {
         // PERBAIKAN 2: Foreign key dibuat eksplisit
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function workshop()
+    {
+        return $this->belongsTo(Workshop::class);
     }
 
     public function creator()

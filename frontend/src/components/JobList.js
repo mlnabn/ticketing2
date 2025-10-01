@@ -120,7 +120,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                                 {isAdmin && (<td><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>)}
                                 <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
                                 <td>{ticket.user ? ticket.user.name : '-'}</td>
-                                <td>{ticket.workshop}</td>
+                                <td>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
                                 <td>{ticket.title}</td>
                                 <td>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
                                 <td>{formatWorkTime(ticket)}</td>
@@ -156,7 +156,7 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                             <div className="card-row">
                                 <div className="data-group single">
                                     <span className="label">Workshop</span>
-                                    <span className="value">{ticket.workshop}</span>
+                                    <span className="value">{ticket.workshop ? ticket.workshop.name : 'N/A'}</span>
                                 </div>
                             </div>
 

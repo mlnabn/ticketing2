@@ -183,7 +183,7 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
                         <td>{t.kode_tiket || '-'}</td>
                         <td>{t.title}</td>
                         <td>{t.status}</td>
-                        <td>{t.workshop || '-'}</td>
+                        <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
                         <td>{t.user?.name ?? 'N/A'}</td>
                         <td>{t.creator?.name ?? 'N/A'}</td>
                         <td>{formatDate(t.created_at)}</td>

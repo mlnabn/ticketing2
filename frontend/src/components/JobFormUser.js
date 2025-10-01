@@ -1,16 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
+import api from '../services/api';
 
 // Terima prop 'addTicket'
-function JobFormUser({ users, addTicket, userRole }) {
-  const [title, setTitle] = useState(''); // Untuk Deskripsi
-  // const [userId, setUserId] = useState(''); // Untuk Nama Pekerja
-  const [workshop, setWorkshop] = useState(''); // Untuk Workshop
-  // const [status, setStatus] = useState('Belum Dikerjakan'); // Default status
+function JobFormUser({ addTicket }) {
+  const [title, setTitle] = useState('');
+  const [workshopId, setWorkshopId] = useState('');
+  const [workshopOptions, setWorkshopOptions] = useState([]);
   const [requestedTime, setRequestedTime] = useState('');
   const [requestedDate, setRequestedDate] = useState('');
   const [isFlexible, setIsFlexible] = useState(false);
+  const [isLoadingWorkshops, setIsLoadingWorkshops] = useState(true);
 
+  useEffect(() => {
+    const fetchWorkshops = async () => {
+      try {
+        const response = await api.get('/workshops');
+        // Ubah format data agar sesuai dengan react-select: { value, label }
+        const options = response.data.data || response.data.map(ws => ({
+          value: ws.id,
+          label: ws.name,
+        }));
+        setWorkshopOptions(options);
+      } catch (error) {
+        console.error("Gagal mengambil daftar workshop:", error);
+      } finally {
+        setIsLoadingWorkshops(false);
+      }
+    };
+    fetchWorkshops();
+  }, []);
 
   const handleFlexibleChange = (e) => {
     const checked = e.target.checked;
@@ -24,7 +43,7 @@ function JobFormUser({ users, addTicket, userRole }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Validasi: title dan workshop selalu wajib
-    if (!title || !workshop) {
+    if (!title || !workshopId) {
       alert("Mohon lengkapi Workshop dan Deskripsi.");
       return;
     }
@@ -36,39 +55,25 @@ function JobFormUser({ users, addTicket, userRole }) {
 
     addTicket({
       title,
-      workshop,
+      workshop_id : workshopId,
       requested_time: isFlexible ? null : requestedTime,
       requested_date: isFlexible ? null : requestedDate
     });
 
     // Reset form
     setTitle('');
-    setWorkshop('');
+    setWorkshopId('');
     setRequestedTime('');
     setRequestedDate('');
     setIsFlexible(false);
   };
 
-  // Opsi untuk dropdown Workshop
-  const workshopOptions = [
-    { value: 'Nobo', label: 'Nobo' },
-    { value: 'Canden', label: 'Canden' },
-    { value: 'Bener', label: 'Bener' },
-    { value: 'Nusa Persada', label: 'Nusa Persada' },
-    { value: 'Pelita', label: 'Pelita' },
-    { value: 'Muhasa', label: 'Muhasa' },
-  ];
+  const selectedWorkshop = workshopOptions.find(option => option.value === workshopId);
 
-  // Temukan user yang dipilih untuk ditampilkan di Select
-  // const selectedUser = userOptions.find(option => option.value === userId);
-  const selectedWorkshop = workshopOptions.find(option => option.value === workshop);
-
-
-  // Styling untuk komponen React-Select
   const selectStyles = {
     control: (provided) => ({
       ...provided,
-      backgroundColor: "#565659", // biru gelap sesuai tema utama
+      backgroundColor: "#565659", 
       borderRadius: "10px",
       borderColor: "#949494ff",
       minHeight: "45px",
@@ -139,10 +144,11 @@ function JobFormUser({ users, addTicket, userRole }) {
       <div className="row-input">
         <Select
           options={workshopOptions}
-          onChange={(selected) => setWorkshop(selected ? selected.value : '')}
+          onChange={(selected) => setWorkshopId(selected ? selected.value : '')}
           value={selectedWorkshop}
           placeholder="Workshop"
           isSearchable
+          isLoading={isLoadingWorkshops}
           styles={selectStyles}
           classNamePrefix="react-selectuser"
           required
@@ -154,11 +160,8 @@ function JobFormUser({ users, addTicket, userRole }) {
             id="flexible-schedule"
             checked={isFlexible}
             onChange={handleFlexibleChange}
-
           />
-          
           <input
-
             type="time"
             value={requestedTime}
             onChange={(e) => setRequestedTime(e.target.value)}
@@ -175,25 +178,10 @@ function JobFormUser({ users, addTicket, userRole }) {
             className="input-dateuser"
           />
 
-
         </div>
 
       </div>
 
-
-      {/* Select untuk Nama Pekerja */}
-      {/* <Select
-        options={userOptions}
-        onChange={(selected) => setUserId(selected ? selected.value : '')}
-        value={selectedUser}
-        placeholder="Nama Pekerja"
-        isSearchable
-        styles={selectStyles}
-        classNamePrefix="react-selectuser"
-        required
-      /> */}
-
-      {/* Input untuk Deskripsi */}
       <input
         type="text"
         placeholder="Description"
