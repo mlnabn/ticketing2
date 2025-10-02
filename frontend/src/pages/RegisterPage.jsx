@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import api from '../services/api'; // Gunakan instance api terpusat
@@ -6,7 +6,7 @@ import Register from '../components/Register';
 import loginBackground from '../Image/LoginBg.jpg';
 
 export default function RegisterPage() {
-  const { setAccessToken, setUser, loggedIn } = useAuth();
+  const { login, loggedIn, user } = useAuth();
   const navigate = useNavigate();
 
   // --- State Management ---
@@ -61,8 +61,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const response = await api.post('/otp/verify', { phone: form.phone, otp: otp });
-      const { access_token, user } = response.data;
-      handleRegisterSuccess(access_token, user);
+      login(response.data);
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Verifikasi gagal.';
       setError(errorMessage);
@@ -71,20 +70,17 @@ export default function RegisterPage() {
     }
   };
 
-  // Handler setelah registrasi berhasil (sama seperti di LoginPage)
-  const handleRegisterSuccess = useCallback((newAccessToken, newUser) => {
-    if (newAccessToken && newUser) {
-      setAccessToken(newAccessToken);
-      setUser(newUser);
-    }
-  }, [setAccessToken, setUser]);
-
   // useEffect untuk navigasi setelah login berhasil
   useEffect(() => {
-    if (loggedIn) {
-      navigate('/dashboard', { replace: true });
+    if (loggedIn && user) {
+      // Arahkan berdasarkan role setelah login berhasil
+      if (user.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate('/user', { replace: true });
+      }
     }
-  }, [loggedIn, navigate]);
+  }, [loggedIn, user, navigate]);
 
   return (
     <div className="auth-page-container">
