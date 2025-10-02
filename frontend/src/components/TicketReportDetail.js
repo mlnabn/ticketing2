@@ -119,11 +119,11 @@ export default function TicketReportDetail({ admin, onBack, filters }) {
           </div>
 
           {/* --- Desktop Table --- */}
-          <div className="report-detail-table-wrapper">
+          <div className="job-list-container">
             {loading ? <p>Memuat tabel...</p> : ticketsOnPage.length === 0 ? (
               <p>Tidak ada tiket yang sesuai dengan filter ini.</p>
             ) : (
-              <table className="report-table">
+              <table className="job-table">
                 <thead>
                   <tr>
                     <th>Kode Tiket</th><th>Judul</th><th>Status</th><th>Workshop</th><th>Pembuat</th>
