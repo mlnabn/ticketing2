@@ -5,7 +5,6 @@ import api from '../services/api';
 import Pagination from './Pagination';
 import { saveAs } from 'file-saver';
 
-// Helper di luar komponen agar lebih rapi
 const formatDate = (dateString) => {
   if (!dateString) return '-';
   return new Date(dateString).toLocaleDateString('id-ID', {
@@ -25,7 +24,6 @@ const calculateDuration = (startedAt, completedAt) => {
   return `${hours}j ${minutes}m`;
 };
 
-// (DIUBAH) Menerima prop 'filters'
 export default function TicketReportDetail({ admin, onBack, filters }) {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,16 +35,11 @@ export default function TicketReportDetail({ admin, onBack, filters }) {
     setLoading(true);
     try {
       const params = { page };
-      if (statusFilter !== 'all') {
-        params.status = statusFilter;
-      }
-
-      // (BARU) Tambahkan filter tanggal dari props 'filters' saat mengambil data
+      if (statusFilter !== 'all') params.status = statusFilter;
       if (filters) {
         if (filters.year) params.year = filters.year;
         if (filters.month) params.month = filters.month;
       }
-
       const res = await api.get(`/tickets/admin-report/${admin.id}`, { params });
       setReportData(res.data);
     } catch (err) {
@@ -54,7 +47,7 @@ export default function TicketReportDetail({ admin, onBack, filters }) {
     } finally {
       setLoading(false);
     }
-  }, [admin, filters]); // (DIUBAH) Tambahkan 'filters' sebagai dependency
+  }, [admin, filters]);
 
   useEffect(() => {
     fetchAdminReport(currentPage, filter);
@@ -67,12 +60,7 @@ export default function TicketReportDetail({ admin, onBack, filters }) {
 
   const handleDownload = async (type) => {
     const params = new URLSearchParams({ type, admin_id: admin.id });
-
-    if (filter !== 'all') {
-      params.append('status', filter);
-    }
-
-    // (BARU) Tambahkan filter tanggal ke parameter download
+    if (filter !== 'all') params.append('status', filter);
     if (filters) {
       if (filters.year) params.append('year', filters.year);
       if (filters.month) params.append('month', filters.month);
@@ -106,7 +94,6 @@ export default function TicketReportDetail({ admin, onBack, filters }) {
       <button className="back-btn" onClick={onBack}>Kembali</button>
       <h2>Laporan Penyelesaian - {admin.name}</h2>
 
-      {/* (BARU) Menampilkan info filter yang aktif untuk UX yang lebih baik */}
       <p className="report-filter-info">
         Menampilkan data untuk: <strong>
           {filters?.month ? new Date(0, filters.month - 1).toLocaleString('id-ID', { month: 'long' }) : 'Semua Bulan'} {filters?.year}
@@ -131,41 +118,105 @@ export default function TicketReportDetail({ admin, onBack, filters }) {
             </button>
           </div>
 
-          {loading ? <p>Memuat tabel...</p> : ticketsOnPage.length === 0 ? (<p>Tidak ada tiket yang sesuai dengan filter ini.</p>) : (
-            <>
-              <div className="report-detail-table-wrapper">
-                <table className="report-table">
-                  <thead>
-                    <tr>
-                      <th>Kode Tiket</th><th>Judul</th><th>Status</th><th>Workshop</th><th>Pembuat</th><th>Tgl Dibuat</th><th>Tgl Mulai</th><th>Tgl Selesai</th><th>Durasi</th>
+          {/* --- Desktop Table --- */}
+          <div className="report-detail-table-wrapper">
+            {loading ? <p>Memuat tabel...</p> : ticketsOnPage.length === 0 ? (
+              <p>Tidak ada tiket yang sesuai dengan filter ini.</p>
+            ) : (
+              <table className="report-table">
+                <thead>
+                  <tr>
+                    <th>Kode Tiket</th><th>Judul</th><th>Status</th><th>Workshop</th><th>Pembuat</th>
+                    <th>Tgl Dibuat</th><th>Tgl Mulai</th><th>Tgl Selesai</th><th>Durasi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ticketsOnPage.map(t => (
+                    <tr key={t.id}>
+                      <td>{t.kode_tiket || '-'}</td>
+                      <td>{t.title}</td>
+                      <td>{t.status}</td>
+                      <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
+                      <td>{t.creator?.name ?? '-'}</td>
+                      <td>{formatDate(t.created_at)}</td>
+                      <td>{formatDate(t.started_at)}</td>
+                      <td>{formatDate(t.completed_at)}</td>
+                      <td>{calculateDuration(t.started_at, t.completed_at)}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {ticketsOnPage.map(t => (
-                      <tr key={t.id}>
-                        <td>{t.kode_tiket || '-'}</td>
-                        <td>{t.title}</td>
-                        <td>{t.status}</td>
-                        <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
-                        <td>{t.creator?.name ?? '-'}</td>
-                        <td>{formatDate(t.created_at)}</td>
-                        <td>{formatDate(t.started_at)}</td>
-                        <td>{formatDate(t.completed_at)}</td>
-                        <td>{calculateDuration(t.started_at, t.completed_at)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
 
-              {ticketsData && ticketsData.last_page > 1 && (
-                <Pagination
-                  currentPage={ticketsData.current_page}
-                  lastPage={ticketsData.last_page}
-                  onPageChange={setCurrentPage}
-                />
-              )}
-            </>
+          {/* --- Mobile Card View --- */}
+          <div className="job-list-mobile">
+            {loading ? (
+              <p style={{ textAlign: 'center' }}>Memuat tiket...</p>
+            ) : ticketsOnPage.length > 0 ? ticketsOnPage.map((t) => (
+              <div key={t.id} className="ticket-card-mobile">
+                <div className="card-row">
+                  <div className="data-group">
+                    <span className="label">Kode Tiket</span>
+                    <span className="value">{t.kode_tiket || '-'}</span>
+                  </div>
+                  <div className="data-group">
+                    <span className="label">Judul</span>
+                    <span className="value">{t.title}</span>
+                  </div>
+                </div>
+
+                <div className="card-row">
+                  <div className="data-group">
+                    <span className="label">Status</span>
+                    <span className="value">{t.status}</span>
+                  </div>
+                  <div className="data-group">
+                    <span className="label">Workshop</span>
+                    <span className="value">{t.workshop ? t.workshop.name : 'N/A'}</span>
+                  </div>
+                </div>
+
+                <div className="card-row">
+                  <div className="data-group">
+                    <span className="label">Pembuat</span>
+                    <span className="value">{t.creator?.name ?? '-'}</span>
+                  </div>
+                  <div className="data-group">
+                    <span className="label">Tgl Dibuat</span>
+                    <span className="value">{formatDate(t.created_at)}</span>
+                  </div>
+                </div>
+
+                <div className="card-row">
+                  <div className="data-group">
+                    <span className="label">Mulai</span>
+                    <span className="value">{formatDate(t.started_at)}</span>
+                  </div>
+                  <div className="data-group">
+                    <span className="label">Selesai</span>
+                    <span className="value">{formatDate(t.completed_at)}</span>
+                  </div>
+                </div>
+
+                <div className="card-row">
+                  <div className="data-group single">
+                    <span className="label">Durasi</span>
+                    <span className="value">{calculateDuration(t.started_at, t.completed_at)}</span>
+                  </div>
+                </div>
+              </div>
+            )) : (
+              <p style={{ textAlign: 'center' }}>Tidak ada tiket yang sesuai.</p>
+            )}
+          </div>
+
+          {ticketsData && ticketsData.last_page > 1 && (
+            <Pagination
+              currentPage={ticketsData.current_page}
+              lastPage={ticketsData.last_page}
+              onPageChange={setCurrentPage}
+            />
           )}
         </>
       )}
