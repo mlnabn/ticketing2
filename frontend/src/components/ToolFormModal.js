@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 const initialFormState = {
   name: '',
-  stock: 0,
-  description: ''
+  stock: 0
 };
+
 function ToolFormModal({ isOpen, onClose, onSave, toolToEdit, showToast }) {
   const [formData, setFormData] = useState(initialFormState);
 
@@ -13,8 +13,7 @@ function ToolFormModal({ isOpen, onClose, onSave, toolToEdit, showToast }) {
     if (toolToEdit) {
       setFormData({
         name: toolToEdit.name || '',
-        stock: toolToEdit.stock || 0,
-        description: toolToEdit.description || ''
+        stock: toolToEdit.stock || 0
       });
     } else {
       setFormData(initialFormState);
@@ -46,37 +45,29 @@ function ToolFormModal({ isOpen, onClose, onSave, toolToEdit, showToast }) {
       <div className="modal-content user-form-modal">
         <h3>{isEditMode ? 'Edit Alat' : 'Tambah Alat Baru'}</h3>
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="name">Nama Alat</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="stock">Stok</label>
-            <input
-              type="number"
-              id="stock"
-              name="stock"
-              value={formData.stock}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="description">Deskripsi</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows="3"
-            ></textarea>
+          <div className="form-row">
+            <div className="form-group half1">
+              <label htmlFor="name">Nama Alat</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group half">
+              <label htmlFor="stock">Stok Alat</label>
+              <input
+                type="number"
+                id="stock"
+                name="stock"
+                value={formData.stock}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
           <div className="confirmation-modal-actions">
             <button type="button" onClick={onClose} className="btn-cancel">Batal</button>

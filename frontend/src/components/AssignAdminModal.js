@@ -3,10 +3,6 @@ import Select from 'react-select';
 
 function AssignAdminModal({ ticket, admins, tools, onAssign, onClose, showToast }) {
   const [selectedAdminId, setSelectedAdminId] = useState(null);
-
-  // PERBAIKAN: Hapus state 'selectedTools' dan 'setSelectedTools' yang tidak digunakan
-  // const [selectedTools, setSelectedTools] = useState([]); 
-
   const [itemsToAssign, setItemsToAssign] = useState([]);
 
   const adminOptions = admins.map(admin => ({
@@ -35,19 +31,35 @@ function AssignAdminModal({ ticket, admins, tools, onAssign, onClose, showToast 
   };
 
   const handleQuantityChange = (toolId, newQuantity) => {
-    const quantity = parseInt(newQuantity, 10);
     setItemsToAssign(prevItems =>
       prevItems.map(item => {
         if (item.id === toolId) {
-          const newQty = isNaN(quantity) ? 1 : quantity;
-          if (newQty > item.maxStock) {
+          if (newQuantity === '') {
+            return { ...item, quantity: '' };
+          }
+          const quantity = parseInt(newQuantity, 10);
+          if (isNaN(quantity)) {
+            return item;
+          }
+          if (quantity > item.maxStock) {
             showToast(`Stok ${item.name} tidak mencukupi (maks: ${item.maxStock})`, 'error');
             return { ...item, quantity: item.maxStock };
           }
-          if (newQty < 1) {
+          return { ...item, quantity: quantity };
+        }
+        return item;
+      })
+    );
+  };
+
+  const handleQuantityBlur = (toolId, currentQuantity) => {
+    const quantity = parseInt(currentQuantity, 10);
+    setItemsToAssign(prevItems =>
+      prevItems.map(item => {
+        if (item.id === toolId) {
+          if (isNaN(quantity) || quantity < 1) {
             return { ...item, quantity: 1 };
           }
-          return { ...item, quantity: newQty };
         }
         return item;
       })
@@ -55,126 +67,113 @@ function AssignAdminModal({ ticket, admins, tools, onAssign, onClose, showToast 
   };
 
   const handleSubmit = () => {
-    if (selectedAdminId) {
-      const toolsPayload = itemsToAssign.map(item => ({
+    if (!selectedAdminId) {
+      showToast('Pilih salah satu admin.', 'info');
+      return;
+    }
+    const toolsPayload = itemsToAssign
+      .filter(item => item.quantity > 0)
+      .map(item => ({
         id: item.id,
         quantity: item.quantity
       }));
-      onAssign(ticket.id, selectedAdminId, toolsPayload);
-    } else {
-      showToast('Pilih salah satu admin.', 'info');
-    }
+    onAssign(ticket.id, selectedAdminId, toolsPayload);
   };
 
-  // Deteksi status mode gelap saat ini
+  // [DILENGKAPI] Logika styling untuk React Select (termasuk Dark Mode)
   const isDarkMode = document.body.classList.contains('dark-mode');
 
-  // Tentukan variabel CSS berdasarkan mode saat ini
-  const inputBg = isDarkMode ? "var(--input-bg-dark)" : "var(--input-bg-light)";
-  const borderColor = isDarkMode ? "var(--border-color-dark)" : "var(--border-color-light)";
-  const textColor = isDarkMode ? "var(--text-color-dark)" : "var(--text-color-light)";
-  const placeholderColor = isDarkMode ? "var(--placeholder-color-dark)" : "var(--placeholder-color-light)";
-  const formInputShadow = isDarkMode ? "var(--form-input-shadow-dark)" : "var(--form-input-shadow-light)";
-  const menuBg = isDarkMode ? "var(--content-bg-dark)" : "var(--content-bg-light)";
-  const menuBorder = isDarkMode ? "var(--border-color-dark)" : "var(--border-color-light)";
-  const optionHoverBg = isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 123, 255, 0.1)"; // Warna hover opsi
-  const optionActiveBg = isDarkMode ? "#007bff" : "#007bff"; // Warna saat diklik
-
   const selectStyles = {
-    control: (provided) => ({
+    control: (provided, state) => ({
       ...provided,
-      backgroundColor: inputBg,
+      backgroundColor: isDarkMode ? 'rgba(26, 32, 44, 0.7)' : '#fff',
+      borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : '#ccc',
       borderRadius: "10px",
-      borderColor: borderColor,
       minHeight: "45px",
-      fontWeight: 500,
-      boxShadow: formInputShadow,
-      color: textColor,
+      boxShadow: state.isFocused ? (isDarkMode ? '0 0 0 1px #3b82f6' : '0 0 0 1px #2563eb') : 'none',
+      '&:hover': {
+        borderColor: isDarkMode ? '#3b82f6' : '#2563eb',
+      }
     }),
-    input: (provided) => ({
-      ...provided,
-      color: textColor,
-    }),
-    placeholder: (provided) => ({
-      ...provided,
-      color: placeholderColor,
-      fontWeight: 500,
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: textColor,
-      fontWeight: 500,
-    }),
+    input: (provided) => ({ ...provided, color: isDarkMode ? '#e2e8f0' : '#333' }),
+    placeholder: (provided) => ({ ...provided, color: isDarkMode ? '#a0aec0' : '#aaa' }),
+    singleValue: (provided) => ({ ...provided, color: isDarkMode ? '#e2e8f0' : '#333' }),
     menu: (provided) => ({
       ...provided,
-      backgroundColor: menuBg,
-      borderColor: menuBorder,
-      boxShadow:
-        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+      backgroundColor: isDarkMode ? '#2d3748' : '#fff',
+      border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #ccc',
+      borderRadius: "10px",
     }),
     option: (provided, state) => ({
       ...provided,
-      color: textColor,
-      backgroundColor: state.isFocused ? optionHoverBg : "transparent",
-      cursor: "pointer",
-      "&:hover": {
-        backgroundColor: optionHoverBg,
-        color: textColor,
-      },
-      "&:active": {
-        backgroundColor: optionActiveBg,
-        color: "white",
+      color: isDarkMode ? '#e2e8f0' : '#333',
+      backgroundColor: state.isFocused ? (isDarkMode ? 'rgba(59, 130, 246, 0.5)' : '#e9f2ff') : 'transparent',
+      '&:active': {
+        backgroundColor: isDarkMode ? '#3b82f6' : '#2563eb',
+        color: '#fff'
       },
     }),
-    indicatorSeparator: (provided) => ({
+    multiValue: (provided) => ({
       ...provided,
-      backgroundColor: borderColor,
+      backgroundColor: isDarkMode ? 'rgba(59, 130, 246, 0.7)' : 'rgba(37, 99, 235, 0.1)',
     }),
-    dropdownIndicator: (provided) => ({
+    multiValueLabel: (provided) => ({
       ...provided,
-      color: placeholderColor,
-      "&:hover": {
-        color: textColor,
+      color: isDarkMode ? '#fff' : '#1e40af',
+      fontWeight: '500'
+    }),
+    multiValueRemove: (provided) => ({
+      ...provided,
+      color: isDarkMode ? '#e2e8f0' : '#1e40af',
+      ':hover': {
+        backgroundColor: isDarkMode ? '#ef4444' : '#fee2e2',
+        color: isDarkMode ? '#fff' : '#991b1b',
       },
     }),
+    indicatorSeparator: () => ({ display: 'none' }),
   };
 
   return (
     <div className="confirmation-modal-backdrop">
       <div className="confirmation-modal-content">
         <h3>Ticket "{ticket.title}"</h3>
-        <p>Dikerjakan Oleh :</p>
-        <Select
-          options={adminOptions}
-          onChange={(option) => setSelectedAdminId(option.value)}
-          placeholder="Pilih Admin..."
-          styles={selectStyles}
-          className="admin-select"
-        />
+        <div className="form-group-AssignAdmin">
+          <label className="modal-label">Dikerjakan Oleh</label>
+          <Select
+            options={adminOptions}
+            onChange={(option) => setSelectedAdminId(option.value)}
+            placeholder="Pilih Admin..."
+            styles={selectStyles}
+            className="admin-select"
+          />
+        </div>
 
-        <p style={{ marginTop: '15px' }}>Barang yang Dibawa :</p>
-        <Select
-          isMulti
-          options={toolOptions}
-          value={toolOptions.filter(option => itemsToAssign.some(item => item.id === option.value))}
-          onChange={handleToolSelectionChange}
-          placeholder="Pilih Alat/Barang..."
-          styles={selectStyles}
-          className="admin-select"
-          closeMenuOnSelect={false}
-        />
-        <div className="assigned-items-list" style={{ marginTop: '15px' }}>
-          {itemsToAssign.map(item => (
-            <div key={item.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px', justifyContent: 'space-between' }}>
-              <span style={{ flexGrow: 1 }}>{item.name}</span>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <label htmlFor={`quantity-${item.id}`} style={{ marginRight: '10px', fontSize: '0.9em' }}>Jml:</label>
+        <div className="form-group-AssignAdmin">
+          <label className="modal-label">Barang yang Dibawa</label>
+          <Select
+            isMulti
+            options={toolOptions}
+            value={toolOptions.filter(option => itemsToAssign.some(item => item.id === option.value))}
+            onChange={handleToolSelectionChange}
+            placeholder="Pilih Alat/Barang..."
+            styles={selectStyles}
+            className="admin-select"
+            closeMenuOnSelect={false}
+          />
+        </div>
+
+        <div className="assigned-items-list">
+          {itemsToAssign.map((item, index) => (
+            <div key={`${item.id}-${index}`} className="assigned-item-row">
+              <span className="item-name">{item.name}</span>
+              <div className="item-quantity-group">
+                <label htmlFor={`quantity-${item.id}`}>Jml:</label>
                 <input
                   id={`quantity-${item.id}`}
                   type="number"
                   value={item.quantity}
                   onChange={(e) => handleQuantityChange(item.id, e.target.value)}
-                  style={{ width: '60px', padding: '5px', textAlign: 'center', borderRadius: '5px', border: '1px solid #ccc' }}
+                  onBlur={(e) => handleQuantityBlur(item.id, e.target.value)}
                   min="1"
                   max={item.maxStock}
                 />
@@ -182,6 +181,7 @@ function AssignAdminModal({ ticket, admins, tools, onAssign, onClose, showToast 
             </div>
           ))}
         </div>
+
         <div className="confirmation-modal-actions">
           <button onClick={onClose} className="btn-cancel">Batal</button>
           <button onClick={handleSubmit} className="btn-confirm">Kerjakan</button>

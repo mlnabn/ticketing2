@@ -83,6 +83,9 @@ Route::middleware('jwt')->group(function () {
     Route::get('/locations', [LocationController::class, 'index']);
 
     // --- Rute untuk Manajemen Gudang (Tools) ---
+    Route::get('/tools/lost-items-report', [ToolController::class, 'getLostItemsReport']);
+    Route::get('/tools/report', [ToolController::class, 'getToolReport']);           // <-- RUTE BARU
+    Route::get('/tools/recent-activity', [ToolController::class, 'getRecentActivity']); // <-- RUTE BARU
     Route::get('/tools/lost-items', [ToolController::class, 'getLostItems']);
     Route::post('/tools/{tool}/recover', [ToolController::class, 'recoverStock']);
     Route::post('/tools/{tool}', [ToolController::class, 'update']); // Untuk update

@@ -55,7 +55,7 @@ class Ticket extends Model
     public function tools()
     {
         return $this->belongsToMany(Tool::class)
-            ->withPivot('quantity_used', 'quantity_lost', 'status', 'keterangan')
+            ->withPivot('quantity_used', 'quantity_lost', 'quantity_recovered', 'status', 'keterangan')
             ->withTimestamps();
     }
 }

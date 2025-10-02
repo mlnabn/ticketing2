@@ -7,55 +7,121 @@ use App\Models\Tool;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class ToolController extends Controller
 {
     /**
-     * Menampilkan semua alat, dimuat bersama tiket terkait untuk info barang hilang.
+     * Menampilkan semua alat.
      */
     public function index()
     {
-        // Muat relasi 'tickets' beserta data pivot-nya untuk setiap alat
-        return Tool::with('tickets')->latest()->get();
+        return Tool::latest()->get();
     }
-    
+
     /**
-     * Mengambil daftar alat yang statusnya hilang atau kembali sebagian dari semua tiket.
+     * Mengambil aktivitas peminjaman terakhir.
+     */
+    public function getRecentActivity()
+    {
+        $activity = DB::table('ticket_tool')
+            ->join('tools', 'ticket_tool.tool_id', '=', 'tools.id')
+            ->join('tickets', 'ticket_tool.ticket_id', '=', 'tickets.id')
+            ->leftJoin('users', 'tickets.user_id', '=', 'users.id')
+            ->select(
+                'tools.name as tool_name',
+                'users.name as admin_name',
+                'tickets.title as ticket_title',
+                'ticket_tool.quantity_used',
+                'ticket_tool.status as loan_status',
+                'ticket_tool.created_at as activity_time'
+            )
+            ->orderBy('ticket_tool.created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        return response()->json($activity);
+    }
+
+    /**
+     * Mengambil laporan barang hilang dengan perhitungan Stok Awal yang akurat.
+     */
+    public function getLostItemsReport()
+    {
+        $netLosses = DB::table('ticket_tool')
+            ->select(
+                'tool_id',
+                DB::raw('SUM(quantity_lost - quantity_recovered) as total_net_lost')
+            )
+            ->groupBy('tool_id');
+
+        $report = DB::table('ticket_tool')
+            ->join('tickets', 'ticket_tool.ticket_id', '=', 'tickets.id')
+            ->join('tools', 'ticket_tool.tool_id', '=', 'tools.id')
+            ->leftJoin('users', 'tickets.user_id', '=', 'users.id')
+            ->leftJoinSub($netLosses, 'losses', function ($join) {
+                $join->on('ticket_tool.tool_id', '=', 'losses.tool_id');
+            })
+            ->where('ticket_tool.quantity_lost', '>', 0)
+            ->select(
+                'tools.name as tool_name',
+                'users.name as admin_name',
+                'tickets.title as ticket_title',
+                'ticket_tool.created_at as borrowed_at',
+                'tickets.completed_at as returned_at',
+                DB::raw('COALESCE(tools.stock + losses.total_net_lost, tools.stock) as stock_awal'),
+                'ticket_tool.quantity_used as dipinjam', 
+                'ticket_tool.quantity_lost',
+                'ticket_tool.quantity_recovered', 
+                'tools.stock as stock_akhir',
+                'ticket_tool.status as loan_status',
+                'ticket_tool.keterangan',
+                'ticket_tool.ticket_id', 
+                'ticket_tool.tool_id'   
+            )
+            ->orderBy('ticket_tool.created_at', 'desc')
+            ->get();
+
+        return response()->json($report);
+    }
+
+    /**
+     * Mengambil daftar alat yang statusnya hilang untuk proses pemulihan.
      */
     public function getLostItems()
     {
-        // 1. Cari semua alat yang memiliki tiket dengan status 'hilang' atau 'kembali sebagian'
         $lostTools = Tool::whereHas('tickets', function ($query) {
-            $query->whereIn('ticket_tool.status', ['hilang', 'kembali sebagian']);
+            $query->whereIn('ticket_tool.status', ['hilang', 'kembali sebagian', 'dipulihkan sebagian']);
         })
-        ->with(['tickets' => function ($query) {
-            // 2. Muat HANYA tiket yang relevan
-            $query->whereIn('ticket_tool.status', ['hilang', 'kembali sebagian']);
-        }])
-        ->get();
+            ->with(['tickets' => function ($query) {
+                $query->whereIn('ticket_tool.status', ['hilang', 'kembali sebagian', 'dipulihkan sebagian']);
+            }])
+            ->get();
 
-        // 3. Ubah struktur data agar sesuai dengan yang diharapkan frontend
         $response = $lostTools->map(function ($tool) {
             return [
                 'id' => $tool->id,
                 'name' => $tool->name,
-                'lost_in_tickets' => $tool->tickets->map(function ($ticket) {
+                'lost_in_tickets' => $tool->tickets->filter(function ($ticket) {
+                    return $ticket->pivot->quantity_lost > $ticket->pivot->quantity_recovered;
+                })->map(function ($ticket) {
                     return [
                         'ticket_id' => $ticket->id,
                         'ticket_title' => $ticket->title,
                         'status' => $ticket->pivot->status,
                         'keterangan' => $ticket->pivot->keterangan,
                         'quantity_lost' => $ticket->pivot->quantity_lost,
+                        'quantity_recovered' => $ticket->pivot->quantity_recovered,
                     ];
-                }),
+                })->values(),
             ];
         });
 
         return response()->json($response);
     }
-    
+
     /**
-     * Memulihkan stok alat yang sebelumnya hilang.
+     * Memulihkan stok alat yang hilang dan melacak jumlahnya.
      */
     public function recoverStock(Request $request, Tool $tool)
     {
@@ -74,30 +140,39 @@ class ToolController extends Controller
         if (!$pivot) {
             return response()->json(['message' => 'Alat ini tidak tercatat pada tiket tersebut.'], 404);
         }
-        
-        DB::transaction(function () use ($tool, $ticket, $validated, $pivot) {
-            // 1. Tambah stok alat
-            $tool->increment('stock', $validated['quantity_recovered']);
 
-            // 2. Update status & keterangan di pivot table
-            // Kita gabungkan keterangan lama dengan keterangan pemulihan
-            $newKeterangan = $pivot->keterangan . "\n\n[DIPULIHKAN]: " . $validated['keterangan'];
-            
+        $qtyToRecover = $validated['quantity_recovered'];
+        // Pastikan kolom quantity_recovered ada sebelum digunakan
+        $alreadyRecovered = $pivot->quantity_recovered ?? 0;
+        $remainingLost = $pivot->quantity_lost - $alreadyRecovered;
+
+        if ($qtyToRecover > $remainingLost) {
+            return response()->json(['message' => "Anda hanya bisa memulihkan maksimal {$remainingLost} item lagi."], 422);
+        }
+
+        DB::transaction(function () use ($tool, $ticket, $validated, $pivot, $qtyToRecover, $alreadyRecovered) {
+            $tool->increment('stock', $qtyToRecover);
+            $newlyRecovered = $alreadyRecovered + $qtyToRecover;
+            $newStatus = ($newlyRecovered >= $pivot->quantity_lost) ? 'dipulihkan' : 'dipulihkan sebagian';
+            $newKeterangan = $pivot->keterangan . "\n\n[DIPULIHKAN " . $qtyToRecover . " item]: " . $validated['keterangan'];
+
             $ticket->tools()->updateExistingPivot($tool->id, [
-                'status' => 'dipulihkan',
+                'status' => $newStatus,
                 'keterangan' => $newKeterangan,
+                'quantity_recovered' => $newlyRecovered,
             ]);
         });
 
         return response()->json($tool->fresh(), 200);
     }
 
-    // --- Fungsi CRUD Standar (Tidak Berubah) ---
-
+    /**
+     * Fungsi CRUD Standar
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:tools,name',
             'description' => 'nullable|string',
             'stock' => 'required|integer|min:0',
         ]);
@@ -108,7 +183,7 @@ class ToolController extends Controller
     public function update(Request $request, Tool $tool)
     {
         $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
+            'name' => 'sometimes|required|string|max:255|unique:tools,name,' . $tool->id,
             'description' => 'nullable|string',
             'stock' => 'sometimes|required|integer|min:0',
         ]);
@@ -118,6 +193,9 @@ class ToolController extends Controller
 
     public function destroy(Tool $tool)
     {
+        if ($tool->tickets()->where('quantity_lost', '>', 0)->exists()) {
+            return response()->json(['message' => 'Alat tidak bisa dihapus karena memiliki riwayat barang hilang.'], 422);
+        }
         $tool->delete();
         return response()->json(null, 204);
     }

@@ -44,7 +44,7 @@ function RecoverStockModal({ tool, ticket, onClose, onSave, showToast }) {
       <div className="modal-content user-form-modal">
         <h3>Pulihkan Stok: {tool.name}</h3>
         <p>Dari Tiket: "{ticket.ticket_title}"</p>
-        <div className="form-group">
+        <div className="form-group-recover">
           <label>Jumlah Dipulihkan (Maks: {ticket.quantity_lost})</label>
           <input
             type="number"
@@ -54,7 +54,7 @@ function RecoverStockModal({ tool, ticket, onClose, onSave, showToast }) {
             max={ticket.quantity_lost}
           />
         </div>
-        <div className="form-group">
+        <div className="form-group-recover">
           <label>Keterangan Pemulihan</label>
           <textarea
             value={keterangan}

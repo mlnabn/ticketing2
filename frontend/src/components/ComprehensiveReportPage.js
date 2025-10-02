@@ -196,6 +196,67 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
                 </table>
               </div>
 
+              {/* Card View untuk Mobile */}
+
+                {tickets.map(t => (
+                  <div key={t.id} className="ticket-card-mobile">
+                    <div className="card-row">
+                      <div className="data-group">
+                        <span className="label">Kode Tiket</span>
+                        <span className="value">{t.kode_tiket || '-'}</span>
+                      </div>
+                      <div className="data-group">
+                        <span className="label">Judul</span>
+                        <span className="value">{t.title}</span>
+                      </div>
+                    </div>
+
+                    <div className="card-row">
+                      <div className="data-group">
+                        <span className="label">Status</span>
+                        <span className={`value status-${t.status}`}>{t.status}</span>
+                      </div>
+                      <div className="data-group">
+                        <span className="label">Workshop</span>
+                        <span className="value">{t.workshop ? t.workshop.name : 'N/A'}</span>
+                      </div>
+                    </div>
+
+                    <div className="card-row">
+                      <div className="data-group">
+                        <span className="label">Admin</span>
+                        <span className="value">{t.user?.name ?? 'N/A'}</span>
+                      </div>
+                      <div className="data-group">
+                        <span className="label">Pembuat</span>
+                        <span className="value">{t.creator?.name ?? 'N/A'}</span>
+                      </div>
+                    </div>
+
+                    <div className="card-row">
+                      <div className="data-group">
+                        <span className="label">Dibuat</span>
+                        <span className="value">{formatDate(t.created_at)}</span>
+                      </div>
+                      <div className="data-group">
+                        <span className="label">Mulai</span>
+                        <span className="value">{formatDate(t.started_at)}</span>
+                      </div>
+                    </div>
+
+                    <div className="card-row">
+                      <div className="data-group">
+                        <span className="label">Selesai</span>
+                        <span className="value">{formatDate(t.completed_at)}</span>
+                      </div>
+                      <div className="data-group">
+                        <span className="label">Durasi</span>
+                        <span className="value">{calculateDuration(t.started_at, t.completed_at)}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
               {tableData && tableData.last_page > 1 && (
                 <Pagination
                   currentPage={tableData.current_page}

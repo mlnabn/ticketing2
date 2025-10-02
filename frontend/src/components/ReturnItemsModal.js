@@ -93,8 +93,8 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
 
     return (
         // PERBAIKAN: Menggunakan className yang lebih umum
-        <div className="modal-backdrop">
-            <div className="modal-content">
+        <div className="modal-backdrop-centered">
+            <div className="modal-content-large">
                 <h3>Form Pengembalian & Penyelesaian</h3>
                 <p>Tiket: "{ticket.title}"</p>
 
@@ -144,8 +144,8 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
                 </div>
 
                 <div className="modal-actions">
-                    <button onClick={onClose} className="btn-cancel">Batal</button>
-                    <button onClick={handleSubmit} className="btn-confirm">Selesaikan Tiket</button>
+                    <button onClick={onClose} className="btn-cancel-centered">Batal</button>
+                    <button onClick={handleSubmit} className="btn-confirm-centered">Selesaikan Tiket</button>
                 </div>
             </div>
         </div>

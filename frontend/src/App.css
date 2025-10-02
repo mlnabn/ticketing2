@@ -728,7 +728,8 @@ body.dark-mode .hamburger-menu-button span {
   .main-header .user-info {
     display: flex;
     align-items: center;
-    gap: 16px; /* Jarak antara tombol dan nama */
+    gap: 16px;
+    /* Jarak antara tombol dan nama */
   }
 
   .user-card-body {
@@ -738,33 +739,38 @@ body.dark-mode .hamburger-menu-button span {
 
   .info-row {
     display: flex;
-    align-items: baseline; /* Agar teks label dan value sejajar rapi */
+    align-items: baseline;
+    /* Agar teks label dan value sejajar rapi */
     text-align: left;
   }
 
   .info-label {
-      color: #6b7280; /* Abu-abu untuk light mode */
-      font-weight: 600;
-      margin-right: 8px;
-      font-size: 0.85rem;
-      flex-shrink: 0;
+    color: #6b7280;
+    /* Abu-abu untuk light mode */
+    font-weight: 600;
+    margin-right: 8px;
+    font-size: 0.85rem;
+    flex-shrink: 0;
   }
 
   /* BARU: Style untuk value (misal: "Bener") */
   .info-value {
-      color: #111827; /* Hitam untuk light mode */
-      font-weight: 500;
-      font-size: 0.95rem;
-      word-break: break-all;
+    color: #111827;
+    /* Hitam untuk light mode */
+    font-weight: 500;
+    font-size: 0.95rem;
+    word-break: break-all;
   }
 
   /* Aturan warna untuk Dark Mode */
   body.dark-mode .info-label {
-      color: #9ca3af; /* Abu-abu terang untuk dark mode */
+    color: #9ca3af;
+    /* Abu-abu terang untuk dark mode */
   }
 
   body.dark-mode .info-value {
-      color: #e5e7eb; /* Putih untuk dark mode */
+    color: #e5e7eb;
+    /* Putih untuk dark mode */
   }
 
   /* BARU: Aturan untuk menata info (Nama/Email/Kode) secara vertikal */
@@ -787,12 +793,14 @@ body.dark-mode .hamburger-menu-button span {
     color: #555;
     word-break: break-all;
   }
-  
+
   /* BARU: Aturan untuk grup tombol agar memiliki jarak */
   .action-buttons-group {
     display: flex;
-    gap: 8px; /* Jarak antara tombol Edit dan Hapus */
-    flex-shrink: 0; /* Mencegah tombol mengecil */
+    gap: 8px;
+    /* Jarak antara tombol Edit dan Hapus */
+    flex-shrink: 0;
+    /* Mencegah tombol mengecil */
   }
 
   body.dark-mode .ticket-card-mobile,
@@ -4119,6 +4127,15 @@ body.dark-mode .password-toggle-btn:hover {
 .dark-mode .confirmation-modal-content {
   background: var(--modal-bg-dark);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --input-bg: rgba(26, 32, 44, 0.7);
+  --input-border: rgba(255, 255, 255, 0.2);
+}
+
+
+.dark-mode .assigned-item-row input {
+  background: rgba(26, 32, 44, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
 }
 
 /* --- Styling Teks di dalam Modal --- */
@@ -4218,6 +4235,51 @@ body.dark-mode .password-toggle-btn:hover {
 
 .dark-mode .confirmation-modal-content-user p {
   color: var(--secondary-text-color-dark);
+}
+
+/* ===== Assign Admin Section ===== */
+.form-group-AssignAdmin {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.modal-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.modal-subtitle {
+  margin-top: 16px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.assigned-items-list {
+  margin-top: 16px;
+  text-align: left;
+}
+
+.assigned-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  background: var(--input-bg, #f9fafb);
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+
+.assigned-item-row .item-name {
+  font-weight: 500;
+}
+
+.item-quantity-group input {
+  width: 70px;
+  padding: 4px 6px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
 }
 
 /* ===== Proof Description Box ===== */
@@ -4441,6 +4503,7 @@ body.dark-mode .rejection-reason-display p {
   align-items: center;
   justify-content: center;
   z-index: 2000;
+  padding: 16px;
   animation: fadeBackdrop 0.35s ease;
 }
 
@@ -4472,7 +4535,7 @@ body.dark-mode .rejection-reason-display p {
   transition: all 0.3s ease;
 
 
-  width: 500px;
+  max-width: 500px;
 
   max-height: 80vh;
   overflow-y: auto;
@@ -9555,7 +9618,7 @@ body.dark-mode .summary-cards .card h3 {
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1290px) {
 
   /* Membuat daftar admin menjadi satu kolom agar tidak sempit */
   .admin-list-grid {
@@ -9576,8 +9639,10 @@ body.dark-mode .summary-cards .card h3 {
   }
 
   .back-btn {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.8rem;
+    font-size: 12px;
+    padding: 6px 12px;
+    width: 100%;
+    display: block;
   }
 }
 
@@ -9640,132 +9705,65 @@ body.dark-mode .summary-cards .card h3 {
 }
 
 
-.btn-recover-small{
-  background-color: #d1e7dd;
-  /* [DIUBAH] Warna dari JobList */
-  color: #0f5132;
-  border-color: #badbcc;
-  box-shadow: 0 4px 12px rgba(15, 81, 50, 0.35);
-  /* hijau muda */
-  border-radius: 25px;
+.btn-recover-small {
+  /* Properti dasar & tipografi */
+  display: inline-flex;
+  /* Agar padding dan alignment bekerja baik */
+  align-items: center;
   font-size: 12px;
+  font-weight: 600;
+  /* Dibuat sedikit tebal agar mudah dibaca */
+  cursor: pointer;
+
+  /* Jarak & Bentuk */
+  padding: 4px 12px;
+  /* [BARU] Menambah ruang di dalam tombol */
+  border-radius: 20px;
+  /* Sedikit dikurangi agar tidak terlalu bulat */
+  border: 1px solid #badbcc;
+
+  /* Warna & Efek */
+  background-color: #d1e7dd;
+  color: #0f5132;
+  box-shadow: 0 2px 5px rgba(15, 81, 50, 0.15);
+  /* Shadow diperhalus */
+
+  /* Transisi & Animasi */
+  transition: all 0.2s ease-in-out;
+  /* [BARU] Efek transisi halus untuk semua properti */
 }
 
 .btn-recover-small:hover {
-  background-color: #a8d5b7;
-  /* [DIUBAH] Warna dari JobList */
+  background-color: #bce3c9;
   border-color: #a8d5b7;
-  transform: translateY(-1px);
-  /* Efek hover tetap dipertahankan */
+  transform: translateY(-2px);
+  /* Efek mengangkat sedikit lebih terasa */
+  box-shadow: 0 4px 8px rgba(15, 81, 50, 0.2);
+  /* Shadow lebih jelas saat di-hover */
 }
 
-/* [DIUBAH] Dark Mode untuk Tombol Edit (Solid) */
+/* -- Versi Dark Mode -- */
+
 body.dark-mode .btn-recover-small {
-  background-color: #22C55E;
+  background-color: #22c55e;
+  /* Warna hijau lebih cerah untuk kontras */
   color: #ffffff;
-  border-color: #38a169;
+  border-color: transparent;
+  /* Border dihilangkan agar menyatu dengan background */
+  box-shadow: 0 2px 6px rgba(34, 197, 94, 0.25);
 }
 
 body.dark-mode .btn-recover-small:hover {
-  background-color: #2f855a;
-  border-color: #2f855a;
-}
-
-/* //===================
-ReturnItemsModal
-======================// */
-
-.form-group-inline2 {
-  display: flex;
-  /* PERBAIKAN: Pusatkan grup input secara horizontal */
-  justify-content: center;
-  gap: 30px;
-  /* Beri jarak lebih antar grup */
-  margin-top: 10px;
-  width: 100%;
-}
-
-.input-group2 {
-  display: flex;
-  /* PERBAIKAN: Sejajarkan label dan input dalam satu baris */
-  align-items: center;
-  gap: 10px;
-  /* Jarak antara label dan input */
-}
-
-.input-group2 label {
-  font-size: 0.9em;
-  font-weight: 500;
-  color: #555;
-  white-space: nowrap;
-  /* Mencegah label turun baris */
-}
-
-.dark-mode .input-group2 label {
-  color: #a0aec0;
-}
-
-.input-group2 input {
-  width: 80px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1.1em;
-  /* Sedikit perbesar angka di dalam */
-  font-weight: bold;
-  background-color: #f8f9fa;
-  color: #333;
-  /* PERBAIKAN: Pastikan text-align ada di sini */
-  text-align: center;
-}
-
-.dark-mode .input-group2 input {
-  background-color: #1a202c;
-  border-color: #4a5568;
-  color: #e2e8f0;
-}
-
-
-/* --- Style untuk Textarea Keterangan (form-group2) --- */
-
-.form-group2 {
-  margin-top: 20px;
-}
-
-.form-group2 label {
-  display: block;
-  text-align: center;
-  margin-bottom: 8px;
-  font-size: 0.9em;
-  font-weight: 500;
-  color: #555;
-}
-
-.dark-mode .form-group2 label {
-  color: #a0aec0;
-}
-
-.form-group2 textarea {
-  width: 100%;
-  box-sizing: border-box;
-  resize: vertical;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1em;
-  background-color: #f8f9fa;
-  color: #333;
-}
-
-.dark-mode .form-group2 textarea {
-  background-color: #1a202c;
-  border-color: #4a5568;
-  color: #e2e8f0;
+  background-color: #16a34a;
+  /* Warna hover yang lebih gelap */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
 }
 
 /* --- Tampilan Kartu Alat untuk Mobile --- */
 .tool-list-mobile {
-  display: none; /* Sembunyikan di desktop */
+  display: none;
+  /* Sembunyikan di desktop */
   width: 100%;
   padding: 10px;
   box-sizing: border-box;
@@ -9794,6 +9792,7 @@ ReturnItemsModal
   border-bottom: 1px solid var(--border-color-light);
   margin-bottom: 10px;
 }
+
 .dark-mode .tool-card-header {
   border-bottom-color: var(--border-color-dark);
 }
@@ -9811,6 +9810,7 @@ ReturnItemsModal
   padding: 4px 8px;
   border-radius: 20px;
 }
+
 .dark-mode .tool-stock {
   background-color: rgba(66, 153, 225, 0.2);
   color: #63b3ed;
@@ -9828,6 +9828,7 @@ ReturnItemsModal
   margin-bottom: 5px;
   text-transform: uppercase;
 }
+
 .dark-mode .tool-info-section .label {
   color: #a0aec0;
 }
@@ -9841,6 +9842,7 @@ ReturnItemsModal
   padding-top: 15px;
   border-top: 1px solid var(--border-color-light);
 }
+
 .dark-mode .tool-card-footer {
   border-top-color: var(--border-color-dark);
 }
@@ -9849,12 +9851,357 @@ ReturnItemsModal
 /* --- Media Query untuk Responsif --- */
 /* Gunakan breakpoint yang sesuai dengan aplikasi Anda, contoh: 768px */
 @media (max-width: 1290px) {
+
   /* Sembunyikan tabel di mobile */
   .job-list-table {
     display: none;
   }
+
   /* Tampilkan daftar kartu di mobile */
   .tool-list-mobile {
     display: block;
   }
+
+
+}
+
+
+/* ================================================= */
+/* == GAYA BARU UNTUK SEMUA MODAL (Glassmorphism) == */
+/* ================================================= */
+
+/* --- Latar Belakang & Animasi --- */
+
+@keyframes fadeBackdrop {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-backdrop-centered {
+  position: fixed;
+  inset: 0;
+  /* shorthand untuk top, right, bottom, left */
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 16px;
+  animation: fadeBackdrop 0.35s ease;
+}
+
+/* --- Konten Modal (Efek Kaca Buram) --- */
+
+.modal-content-large {
+  /* Efek Kaca Buram (Glassmorphism) */
+  background: rgba(255, 255, 255, 0.92);
+  /* Latar belakang semi-transparan */
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+
+  /* Bentuk & Bayangan */
+  border-radius: 18px;
+  padding: 28px 32px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+
+  /* Layout & Animasi */
+  animation: scaleIn 0.35s ease-out;
+  text-align: center;
+  transition: all 0.3s ease;
+
+  /* Ukuran */
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  /* Sedikit lebih tinggi untuk mengakomodasi konten */
+  overflow-y: auto;
+}
+
+.modal-content-large h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.6rem;
+  color: #1a202c;
+  font-weight: 700;
+}
+
+.modal-content-large p {
+  margin-top: 0;
+  color: #4a5568;
+}
+
+/* --- Grup Form & Input --- */
+
+.items-to-return-list {
+  text-align: left;
+  /* Kembalikan perataan teks untuk list */
+  margin: 24px 0;
+}
+
+.return-item-row {
+  background-color: rgba(248, 249, 250, 0.85);
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.input-group2 label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #495057;
+}
+
+.input-group2 input,
+.form-group2 textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  background-color: #fff;
+  color: #212529;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* --- Tombol Aksi --- */
+
+.btn-confirm-centered,
+.btn-cancel-centered {
+  flex: 1;
+  /* Membuat kedua tombol memiliki lebar yang sama */
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+
+.btn-cancel-centered {
+  background-color: #ef4444;
+  /* Merah */
+}
+
+.btn-confirm-centered {
+  background-color: #3b82f6;
+  /* Biru */
+}
+
+.btn-cancel-centered:hover,
+.btn-confirm-centered:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.btn-cancel-centered:hover {
+  background-color: #dc2626;
+}
+
+.btn-confirm-centered:hover {
+  background-color: #2563eb;
+}
+
+
+/* --- Logika Responsif (Desktop) --- */
+
+@media (max-width: 1290px) {
+  .form-group-inline2 {
+    flex-direction: row;
+    justify-content: center;
+    gap: 30px;
+  }
+
+  .input-group2 {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: auto;
+  }
+
+  .input-group2 label {
+    margin-bottom: 0;
+    white-space: nowrap;
+  }
+
+  .input-group2 input {
+    width: 80px;
+  }
+
+  .user-management-container h1 {
+    font-size: 20px;
+    text-align: center;
+    /* opsional, biar rapi tengah */
+  }
+
+  .tool-section-title {
+    font-size: 18px !important;
+    text-align: center;
+  }
+
+  .add-btn {
+    width: 100%;
+    display: block;
+    margin: 10px 0;
+    font-size: 13px;
+    padding: 10px;
+  }
+}
+
+.add-btn {
+  background-color: #2ecc71;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 10px;
+  transition: background 0.3s ease;
+}
+
+.add-btn:hover {
+  background-color: #27ae60;
+}
+
+.tool-section-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 20px 0 10px;
+}
+
+/* --- Varian Dark Mode --- */
+
+body.dark-mode .modal-content-large {
+  background: #111111;
+  /* Latar belakang gelap semi-transparan */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-mode .modal-content-large h3,
+body.dark-mode .modal-content-large p {
+  color: #e2e8f0;
+}
+
+body.dark-mode .return-item-row {
+  background-color: rgba(26, 32, 44, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .input-group2 label {
+  color: #a0aec0;
+}
+
+body.dark-mode .input-group2 input,
+body.dark-mode .form-group2 textarea {
+  background-color: #1a202c;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+.form-group.half1 {
+  flex: 1 1 70%;
+  /* fleksibel, min 50% */
+  min-width: 120px;
+  /* biar input ga kependekan */
+}
+
+.form-group.half1 input {
+  width: 100%;
+  /* biar full di dalam colom */
+}
+
+.form-group.half {
+  flex: 1 1 30%;
+  /* fleksibel, min 50% */
+  min-width: 120px;
+  /* biar input ga kependekan */
+}
+
+.form-group.half input {
+  width: 100%;
+  /* biar full di dalam colom */
+}
+
+/* Responsif: di layar kecil, paksa turun ke bawah */
+@media (max-width: 1290px) {
+  .form-group.half {
+    flex: 1 1 30%;
+  }
+
+  .form-group.half1 {
+    flex: 1 1 70%;
+  }
+}
+
+/* Container setiap form group */
+.form-group-recover {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Label */
+.form-group-recover label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #fff;
+}
+
+/* Input number */
+.form-group-recover input[type="number"] {
+  width: 100px; /* kecil supaya tidak melebar */
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #2c2f36;
+  color: #fff;
+  text-align: center;
+}
+
+/* Textarea */
+.form-group-recover textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #2c2f36;
+  color: #fff;
+  resize: vertical;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Hover & focus state */
+.form-group-recover input[type="number"]:focus,
+.form-group-recover textarea:focus {
+  outline: none;
+  border-color: #007bff; /* biru saat fokus */
 }
