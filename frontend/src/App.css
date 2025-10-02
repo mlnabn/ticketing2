@@ -483,6 +483,24 @@ body.dark-mode .dashboard-container {
   color: var(--sidebar-text-dark);
 }
 
+.sidebar-divider {
+  margin-top: 1rem; /* Memberi jarak atas dari grup sebelumnya */
+  padding: 0 0.75rem 0.5rem 0.75rem; /* Padding samping dan bawah */
+}
+
+.sidebar-divider .nav-text {
+  font-size: 0.7rem; /* Ukuran font lebih kecil */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em; /* Jarak antar huruf */
+  color: #64748B; /* Warna abu-abu yang tidak terlalu menonjol */
+}
+
+/* Penyesuaian untuk Dark Mode */
+body.dark-mode .sidebar-divider .nav-text {
+  color: #4A5568; /* Warna abu-abu yang lebih gelap untuk kontras */
+}
+
 .sidebar.open {
   transform: translateX(0);
 }
@@ -547,6 +565,10 @@ body.dark-mode .hamburger-menu-button span {
 
 /* Desktop Styles */
 @media (min-width: 1290px) {
+
+  .notification-template-list-mobile {
+    display: none;
+  }
 
   .hamburger-menu-button,
   .content-overlay,
@@ -708,7 +730,8 @@ body.dark-mode .hamburger-menu-button span {
 
   .job-list-mobile,
   .user-list-mobile,
-  .workshop-list-mobile {
+  .workshop-list-mobile,
+  .notification-template-list-mobile {
     display: block;
   }
 
@@ -753,7 +776,6 @@ body.dark-mode .hamburger-menu-button span {
     flex-shrink: 0;
   }
 
-  /* BARU: Style untuk value (misal: "Bener") */
   .info-value {
     color: #111827;
     /* Hitam untuk light mode */
@@ -773,28 +795,18 @@ body.dark-mode .hamburger-menu-button span {
     /* Putih untuk dark mode */
   }
 
-  /* BARU: Aturan untuk menata info (Nama/Email/Kode) secara vertikal */
-  /* .user-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px; 
-  } */
-
-  /* BARU: Style untuk teks nama agar lebih menonjol */
   .user-name {
     font-weight: 600;
     font-size: 1rem;
     color: var(--text-color-primary);
   }
 
-  /* BARU: Style untuk teks email/kode agar lebih subtil */
   .user-email {
     font-size: 0.85rem;
     color: #555;
     word-break: break-all;
   }
-
-  /* BARU: Aturan untuk grup tombol agar memiliki jarak */
+  
   .action-buttons-group {
     display: flex;
     gap: 8px;
@@ -4923,9 +4935,11 @@ body.dark-mode .notification-form-container label {
 
 .form-group input,
 .form-group select,
+.form-group textarea,
 .form-group2 input,
 .form-group2 select,
 .form-group2 textarea {
+  width: 100%;
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 0.95rem;
@@ -8072,7 +8086,7 @@ body.dark-mode .dashboard-card h4 {
 .modal-body {
   flex-grow: 1;
   overflow-y: auto;
-  padding-right: 15px;
+  /* padding-right: 15px; */
   margin-bottom: 25px;
   display: flex;
   flex-direction: column;

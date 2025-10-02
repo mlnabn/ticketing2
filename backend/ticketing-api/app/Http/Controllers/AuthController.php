@@ -68,7 +68,7 @@ class AuthController extends Controller
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
-        return $this->respondWithToken($access_token);
+        return $this->respondWithToken($access_token, auth('api')->user());
     }
 
     /**
@@ -85,7 +85,7 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(auth('api')->refresh());
+        return $this->respondWithToken(auth('api')->refresh(), auth('api')->user());
     }
 
     // ... (fungsi getUser, updateUser, dan Google tidak berubah) ...
@@ -198,9 +198,9 @@ class AuthController extends Controller
      * Fungsi helper untuk membuat format respons token yang konsisten.
      * (Fungsi ini sudah benar)
      */
-    protected function respondWithToken($access_token)
+    public function respondWithToken($access_token, $user)
     {
-        $user = auth('api')->user();
+        // $user = auth('api')->user();
         return response()->json([
             'access_token' => $access_token,
             'token_type'   => 'bearer',
