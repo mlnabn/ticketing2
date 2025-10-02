@@ -5,16 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-// HAPUS: use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\Facades\JWTAuth;
-// HAPUS: use Tymon\JWTAuth\Exceptions\JWTException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
@@ -22,39 +21,74 @@ class AuthController extends Controller
     // ... (fungsi register tidak berubah) ...
     public function register(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            // Pastikan email unik hanya jika akun sudah terverifikasi
+            'email' => [
+                'required', 'string', 'email', 'max:255',
+                Rule::unique('users')->where(fn ($query) => $query->whereNotNull('phone_verified_at'))
+            ],
             'password' => 'required|string|min:6|confirmed',
-            'phone' => 'required|string|min:10|unique:users',
+            // Pastikan nomor telepon unik hanya jika akun sudah terverifikasi
+            'phone' => [
+                'required', 'string', 'min:10',
+                Rule::unique('users')->where(fn ($query) => $query->whereNotNull('phone_verified_at'))
+            ],
         ]);
 
-        $otpCode = rand(100000, 999999);
+        $otpCode = (string) rand(100000, 999999);
         $otpExpiresAt = Carbon::now()->addMinutes(5);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'phone' => $request->phone,
-            'role' => 'user',
+        $registrationData = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']), // Hash password sebelum disimpan
+            'phone' => $validated['phone'],
             'otp_code' => $otpCode,
             'otp_expires_at' => $otpExpiresAt,
-        ]);
+        ];
+
+        Cache::put('registration_data_' . $validated['phone'], $registrationData, now()->addMinutes(10));
 
         $n8nWebhookUrl = 'http://localhost:5678/webhook/whatsapp-otp';
-
         try {
-            Http::get($n8nWebhookUrl, ['phone' => $user->phone, 'otp' => $otpCode]);
+            Http::get($n8nWebhookUrl, ['phone' => $validated['phone'], 'otp' => $otpCode]);
         } catch (\Exception $e) {
-            $user->delete();
+            // Jika gagal kirim OTP, hapus cache agar tidak ada data menggantung
+            Cache::forget('registration_data_' . $validated['phone']);
             return response()->json(['message' => 'Gagal mengirim OTP. Silakan coba lagi.'], 503);
         }
 
+        // 5. Beri respons bahwa OTP telah dikirim
         return response()->json([
-            'message' => 'Registrasi berhasil. Silakan cek WhatsApp Anda untuk kode verifikasi.',
-            'phone' => $user->phone
-        ], 201);
+            'message' => 'Kode verifikasi telah dikirim. Silakan cek WhatsApp Anda.',
+            'phone' => $validated['phone']
+        ], 200);
+    }
+
+    public function resendOtp(Request $request)
+    {
+        $validated = $request->validate(['phone' => 'required|string']);
+        $phone = $validated['phone'];
+        $cacheKey = 'registration_data_' . $phone;
+
+        if (!Cache::has($cacheKey)) {
+            return response()->json(['message' => 'Sesi registrasi tidak ditemukan atau telah kedaluwarsa. Silakan mulai dari awal.'], 404);
+        }
+
+        $registrationData = Cache::get($cacheKey);
+        $registrationData['otp_code'] = (string) rand(100000, 999999); 
+        $registrationData['otp_expires_at'] = Carbon::now()->addMinutes(5);
+        Cache::put($cacheKey, $registrationData, now()->addMinutes(10));
+
+        $n8nWebhookUrl = 'http://localhost:5678/webhook/whatsapp-otp';
+        try {
+            Http::get($n8nWebhookUrl, ['phone' => $phone, 'otp' => $registrationData['otp_code']]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Gagal mengirim OTP. Silakan coba lagi nanti.'], 503);
+        }
+
+        return response()->json(['message' => 'Kode OTP baru telah dikirim ke nomor Anda.']);
     }
 
     /**
