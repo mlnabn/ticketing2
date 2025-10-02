@@ -22,7 +22,12 @@ function ToolFormModal({ isOpen, onClose, onSave, toolToEdit, showToast }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === "stock") {
+      const normalized = value.replace(/^0+(?=\d)/, '');
+      setFormData(prev => ({ ...prev, stock: normalized }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -31,7 +36,12 @@ function ToolFormModal({ isOpen, onClose, onSave, toolToEdit, showToast }) {
       showToast('Nama alat tidak boleh kosong.', 'error');
       return;
     }
-    onSave(formData);
+
+    const payload = {
+      ...formData,
+      stock: parseInt(formData.stock, 10) || 0, // pastikan integer
+    };
+    onSave(payload);
   };
 
   if (!isOpen) {
