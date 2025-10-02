@@ -1,7 +1,15 @@
-// src/components/ToolListView.jsx
-import React from 'react';
+import { useState } from 'react';
+import ConfirmationModal from './ConfirmationModal';
 
 function ToolListView({ tools, lostItems, loading, onBack, onAdd, onEdit, onDelete, onRecover }) {
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [templateToDelete, setTemplateToDelete] = useState(null);
+
+    const handleDeleteClick = (template) => {
+    setTemplateToDelete(template);
+    setShowConfirmModal(true);
+  };
+
     return (
         <>
             <div className="user-management-container">
@@ -49,7 +57,7 @@ function ToolListView({ tools, lostItems, loading, onBack, onAdd, onEdit, onDele
                                         <td>
                                             <div className="action-buttons-group">
                                                 <button className="btn-user-action btn-edit" onClick={() => onEdit(tool)}>Edit</button>
-                                                <button className="btn-user-action btn-delete" onClick={() => onDelete(tool.id)}>Hapus</button>
+                                                <button className="btn-user-action btn-delete" onClick={() => handleDeleteClick(tool)}>Hapus</button>
                                             </div>
                                         </td>
                                     </tr>
@@ -98,7 +106,7 @@ function ToolListView({ tools, lostItems, loading, onBack, onAdd, onEdit, onDele
                                 <div className="action-row">
                                     <div className="action-buttons-group">
                                         <button onClick={() => onEdit(tool)} className="btn-edit">Edit</button>
-                                        <button onClick={() => onDelete(tool.id)} className="btn-delete">Hapus</button>
+                                        <button onClick={() => handleDeleteClick(tool)} className="btn-delete">Hapus</button>
                                     </div>
                                 </div>
                             </div>
@@ -107,6 +115,18 @@ function ToolListView({ tools, lostItems, loading, onBack, onAdd, onEdit, onDele
                         )}
                     </div>
                 </>
+            )}
+
+            {showConfirmModal && (
+                <ConfirmationModal
+                    message={`Anda yakin ingin menghapus alat "${templateToDelete?.name}"?`}
+                    onConfirm={() => {
+                        onDelete(templateToDelete.id);
+                        setShowConfirmModal(false);
+                        setTemplateToDelete(null);
+                    }}
+                    onCancel={() => setShowConfirmModal(false)}
+                />
             )}
         </>
     );

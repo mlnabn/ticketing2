@@ -751,7 +751,7 @@ export default function AdminDashboard() {
             )}
 
             {currentPage === 'toolManagement' && (
-              <ToolManagement />
+              <ToolManagement showToast={showToast} />
             )}
 
             {currentPage === 'ticketReport' && (

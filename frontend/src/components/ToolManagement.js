@@ -6,7 +6,7 @@ import RecoverStockModal from './RecoverStockModal';
 import ToolListView from './ToolListView';
 import ToolReportView from './ToolReportView';
 
-function ToolManagement() {
+function ToolManagement({ showToast }) {
     const [view, setView] = useState('main');
 
     // State global yang dipakai anak (list, report)
@@ -22,10 +22,6 @@ function ToolManagement() {
     const [isRecoverModalOpen, setIsRecoverModalOpen] = useState(false);
     const [toolToRecover, setToolToRecover] = useState(null);
     const [ticketForRecover, setTicketForRecover] = useState(null);
-
-    const showToast = useCallback((message, type = 'success') => {
-        alert(`${type.toUpperCase()}: ${message}`);
-    }, []);
 
     // Fetcher
     const fetchListData = useCallback(async () => {
