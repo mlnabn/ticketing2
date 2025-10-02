@@ -154,8 +154,8 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
           ) : (
             <>
               {/* --- Desktop Table --- */}
-              <div className="report-detail-table-wrapper">
-                <table className="report-table">
+              <div className="job-list-container">
+                <table className="job-table">
                   <thead>
                     <tr>
                       <th>Kode Tiket</th><th>Judul</th><th>Status</th><th>Workshop</th>
