@@ -15,7 +15,7 @@ export default function NotificationTemplateManagement({ showToast }) {
     setLoading(true);
     try {
       const response = await api.get('/notification-templates');
-      setTemplates(response.data.data || response.data); 
+      setTemplates(response.data.data || response.data);
     } catch (error) {
       console.error("Gagal mengambil data template:", error);
       showToast('Gagal memuat data template.', 'error');
@@ -78,8 +78,12 @@ export default function NotificationTemplateManagement({ showToast }) {
       <button onClick={handleAddClick} className="btn-primary">
         Tambah Template Baru
       </button>
-      
-      {loading ? <p>Memuat data...</p> : (
+
+      {loading ? (
+        <p>Memuat data...</p>
+      ) : templates.length === 0 ? (
+        <p>Tidak ada data template.</p>
+      ) : (
         <>
           <div className="job-list-table" style={{ marginTop: '20px' }}>
             <table className='job-table'>
