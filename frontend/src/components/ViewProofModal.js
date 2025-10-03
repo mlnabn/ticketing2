@@ -7,7 +7,7 @@ function ViewProofModal({ ticket, onClose, onDelete }) {
     <div className="modal-backdrop-user">
       <div className="modal-content-user">
         <h2>Bukti Pekerjaan</h2>
-        <p><strong>Workshop:</strong> {ticket.workshop}</p>
+        <p><strong>Workshop:</strong> {ticket.workshop ? ticket.workshop.name : 'N/A'}</p>
         <p><strong>Dekripsi Pekerjaan:</strong> {ticket.title}</p>
         <hr style={{ margin: '15px 0' }} />
 

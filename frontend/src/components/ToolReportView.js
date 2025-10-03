@@ -34,7 +34,7 @@ function ToolReportView({ reportData, loading, onBack }) {
                             <tr key={`${item.ticket_id}-${item.tool_id}`}>
                                 <td>{item.tool_name}</td>
                                 <td>{item.admin_name || '-'}</td>
-                                <td>{item.ticket_title}</td>
+                                <td><span className="description-cell">{item.ticket_title}</span></td>
                                 <td>{new Date(item.borrowed_at).toLocaleDateString('id-ID')}</td>
                                 <td>{item.returned_at ? new Date(item.returned_at).toLocaleDateString('id-ID') : 'Proses'}</td>
                                 <td>{item.stock_awal}</td>
@@ -71,7 +71,9 @@ function ToolReportView({ reportData, loading, onBack }) {
                         <div className="card-row">
                             <div className="data-group">
                                 <span className="label">Tiket</span>
-                                <span className="value">{item.ticket_title}</span>
+                                <span className="value">
+                                    <span className="description-cell">{item.ticket_title}</span>
+                                </span>
                             </div>
                             <div className="data-group">
                                 <span className="label">Pinjam</span>

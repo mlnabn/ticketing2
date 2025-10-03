@@ -17,7 +17,7 @@ const generateYearOptions = () => {
 };
 
 // (DIUBAH) Hapus prop onSelectAdmin karena tidak dibutuhkan lagi
-export default function TicketReportAdminList() {
+export default function TicketReportAdminList({ onTicketClick }) {
   const [view, setView] = useState('main');
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(null);
@@ -142,15 +142,16 @@ export default function TicketReportAdminList() {
     const filters = { year: selectedYear, month: selectedMonth };
     switch (view) {
       case 'all_report':
-        return <ComprehensiveReportPage title="Laporan Seluruh Pekerjaan Admin" filterType="all" onBack={() => setView('main')} dateFilters={filters} />;
+        return <ComprehensiveReportPage title="Laporan Seluruh Pekerjaan Admin" filterType="all" onBack={() => setView('main')} dateFilters={filters} onTicketClick={onTicketClick} />;
       case 'worked_on_report':
-        return <ComprehensiveReportPage title="Laporan yang Dikerjakan Seluruh Admin" filterType="handled" onBack={() => setView('main')} dateFilters={filters} />;
+        return <ComprehensiveReportPage title="Laporan yang Dikerjakan Seluruh Admin" filterType="handled" onBack={() => setView('main')} dateFilters={filters} onTicketClick={onTicketClick} />;
       // (BARU) Tambahkan case untuk menampilkan TicketReportDetail
       case 'admin_detail':
         return <TicketReportDetail
           admin={selectedAdminData.admin}
           filters={selectedAdminData.filters}
           onBack={() => setView('main')}
+          onTicketClick={onTicketClick}
         />;
       default:
         return renderMainView();

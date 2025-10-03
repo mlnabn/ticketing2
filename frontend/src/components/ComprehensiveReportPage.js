@@ -24,7 +24,7 @@ const calculateDuration = (startedAt, completedAt) => {
   return `${hours}j ${minutes}m`;
 };
 
-export default function ComprehensiveReportPage({ title, onBack, filterType = 'all', dateFilters }) {
+export default function ComprehensiveReportPage({ title, onBack, filterType = 'all', dateFilters, onTicketClick }) {
   const [tableData, setTableData] = useState(null);
   const [stats, setStats] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -106,6 +106,14 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
     }
   };
 
+
+  const handleRowClick = (e, ticket) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('a')) {
+      return;
+    }
+    onTicketClick(ticket);
+  };
+
   const tickets = tableData ? tableData.data : [];
 
   return (
@@ -165,9 +173,11 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
                   </thead>
                   <tbody>
                     {tickets.map(t => (
-                      <tr key={t.id}>
+                      <tr key={t.id} className="clickable-row" onClick={(e) => handleRowClick(e, t)}>
                         <td>{t.kode_tiket || '-'}</td>
-                        <td>{t.title}</td>
+                        <td>
+                          <span className="description-cell">{t.title}</span>
+                        </td>
                         <td>{t.status}</td>
                         <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
                         <td>{t.user?.name ?? 'N/A'}</td>
@@ -185,7 +195,7 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
               {/* --- Mobile Card View --- */}
               <div className="job-list-mobile">
                 {tickets.map(t => (
-                  <div key={t.id} className="ticket-card-mobile">
+                  <div key={t.id} className="ticket-card-mobile clickable-row" onClick={(e) => handleRowClick(e, t)}>
                     <div className="card-row">
                       <div className="data-group">
                         <span className="label">Kode Tiket</span>
@@ -193,7 +203,9 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
                       </div>
                       <div className="data-group">
                         <span className="label">Judul</span>
-                        <span className="value">{t.title}</span>
+                        <span className="value">
+                          <span className="description-cell">{t.title}</span>
+                        </span>
                       </div>
                     </div>
 

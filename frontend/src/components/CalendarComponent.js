@@ -143,7 +143,7 @@ function CalendarComponent({ tickets = [], onTicketClick }) {
                 >
                   <p><b>Pengirim:</b> {ticket.creator?.name}</p>
                   <p><b>Workshop:</b> {ticket.workshop?.name}</p>
-                  <p><b>Deskripsi:</b> {ticket.title}</p>
+                  <p className="description-cell"><b>Deskripsi:</b> {ticket.title}</p>
                   <p><b>Status:</b> {ticket.status}</p>
                 </div>
               ))}

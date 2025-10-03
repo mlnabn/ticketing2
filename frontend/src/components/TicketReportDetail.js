@@ -24,7 +24,7 @@ const calculateDuration = (startedAt, completedAt) => {
   return `${hours}j ${minutes}m`;
 };
 
-export default function TicketReportDetail({ admin, onBack, filters }) {
+export default function TicketReportDetail({ admin, onBack, filters, onTicketClick }) {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -80,6 +80,12 @@ export default function TicketReportDetail({ admin, onBack, filters }) {
       alert('Gagal mengunduh file. Mohon coba lagi.');
     }
   };
+  const handleRowClick = (e, ticket) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('a')) {
+      return;
+    }
+    onTicketClick(ticket);
+  };
 
   if (loading && !reportData) {
     return <p>Memuat data...</p>;
@@ -132,9 +138,11 @@ export default function TicketReportDetail({ admin, onBack, filters }) {
                 </thead>
                 <tbody>
                   {ticketsOnPage.map(t => (
-                    <tr key={t.id}>
+                    <tr key={t.id} className="clickable-row" onClick={(e) => handleRowClick(e, t)}>
                       <td>{t.kode_tiket || '-'}</td>
-                      <td>{t.title}</td>
+                      <td>
+                        <span className="description-cell">{t.title}</span>
+                      </td>
                       <td>{t.status}</td>
                       <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
                       <td>{t.creator?.name ?? '-'}</td>
@@ -154,7 +162,7 @@ export default function TicketReportDetail({ admin, onBack, filters }) {
             {loading ? (
               <p style={{ textAlign: 'center' }}>Memuat tiket...</p>
             ) : ticketsOnPage.length > 0 ? ticketsOnPage.map((t) => (
-              <div key={t.id} className="ticket-card-mobile">
+              <div key={t.id} className="ticket-card-mobile clickable-row" onClick={(e) => handleRowClick(e, t)}>
                 <div className="card-row">
                   <div className="data-group">
                     <span className="label">Kode Tiket</span>
@@ -162,7 +170,9 @@ export default function TicketReportDetail({ admin, onBack, filters }) {
                   </div>
                   <div className="data-group">
                     <span className="label">Judul</span>
-                    <span className="value">{t.title}</span>
+                    <span className="value">
+                      <span className="description-cell">{t.title}</span>
+                    </span>
                   </div>
                 </div>
 

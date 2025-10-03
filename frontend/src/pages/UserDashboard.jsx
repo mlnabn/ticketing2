@@ -11,6 +11,7 @@ import RejectionInfoModal from '../components/RejectionInfoModal';
 import ViewProofModal from '../components/ViewProofModal';
 import PaginationUser from '../components/PaginationUser';
 import ProfileModal from '../components/ProfileModal';
+import TicketDetailModalUser from '../components/TicketDetailModalUser';
 
 // Import aset gambar
 import bgImage from '../Image/homeBg.jpg';
@@ -41,12 +42,28 @@ export default function UserDashboard() {
   const [showViewProofModal, setShowViewProofModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
 
+  const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
+
   // --- State Turunan (Derived State) ---
   const createdTicketsOnPage = useMemo(() => (createdTicketsData ? createdTicketsData.data : []), [createdTicketsData]);
 
   // -----------------------------------------------------------------
   // #2. DATA FETCHING & HANDLERS
   // -----------------------------------------------------------------
+
+  const handleViewTicketDetail = (ticket) => {
+    setSelectedTicketForDetail(ticket);
+  };
+  const handleCloseDetailModal = () => {
+    setSelectedTicketForDetail(null);
+  };
+
+  const handleRowClick = (e, ticket) => {
+    if (e.target.closest('button')) {
+      return;
+    }
+    handleViewTicketDetail(ticket);
+  };
 
   const handleLogout = useCallback(() => {
     logout();
@@ -62,15 +79,15 @@ export default function UserDashboard() {
       if (error.response?.status === 401) handleLogout();
     }
   }, [handleLogout]);
-  
+
   const fetchAllUsers = useCallback(async () => {
     try {
-        const response = await api.get('/users/all');
-        if(Array.isArray(response.data)) {
-            setUsers(response.data);
-        }
+      const response = await api.get('/users/all');
+      if (Array.isArray(response.data)) {
+        setUsers(response.data);
+      }
     } catch (error) {
-        console.error("Gagal mengambil daftar pengguna:", error);
+      console.error("Gagal mengambil daftar pengguna:", error);
     }
   }, []);
 
@@ -130,18 +147,18 @@ export default function UserDashboard() {
     localStorage.setItem('notifications_last_cleared', new Date().toISOString());
     api.post('/notifications/mark-all-read');
   };
-  
+
   const handleDeleteNotification = async (notificationId) => {
-      try {
-          await api.delete(`/notifications/${notificationId}`);
-          fetchNotifications();
-      } catch (error) {
-          console.error("Gagal menghapus notifikasi:", error);
-      }
+    try {
+      await api.delete(`/notifications/${notificationId}`);
+      fetchNotifications();
+    } catch (error) {
+      console.error("Gagal menghapus notifikasi:", error);
+    }
   };
-  
+
   const handleOpenProfileModal = () => setShowProfileModal(true);
-  
+
   const handleProfileSaved = (updatedUser) => {
     // Panggil setUser dari context dengan data pengguna yang baru
     setUser(updatedUser);
@@ -227,8 +244,14 @@ export default function UserDashboard() {
                           <tr><td colSpan="6">Memuat riwayat tiket...</td></tr>
                         ) : createdTicketsOnPage.length > 0 ? (
                           createdTicketsOnPage.map(ticket => (
-                            <tr key={ticket.id}>
-                              <td data-label="Deskripsi">{ticket.title}</td>
+                            <tr
+                              key={ticket.id}
+                              className="clickable-row"
+                              onClick={(e) => handleRowClick(e, ticket)}
+                            >
+                              <td data-label="Deskripsi">
+                                <span className="description-cell">{ticket.title}</span>
+                              </td>
                               <td data-label="Workshop">{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
                               <td data-label="Tanggal Dibuat">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
                               <td data-label="Waktu Pengerjaan">
@@ -248,9 +271,9 @@ export default function UserDashboard() {
                               </td>
                               <td data-label="Aksi">
                                 {ticket.status === 'Selesai' && ticket.proof_description ? (
-                                  <button onClick={() => {setTicketToShowProof(ticket); setShowViewProofModal(true);}} className="btn-action btn-start">Lihat Bukti</button>
+                                  <button onClick={() => { setTicketToShowProof(ticket); setShowViewProofModal(true); }} className="btn-action btn-start">Lihat Bukti</button>
                                 ) : ticket.status === 'Ditolak' ? (
-                                  <button onClick={() => {setTicketToShowReason(ticket); setShowRejectionInfoModal(true);}} className="btn-action btn-start">Alasan</button>
+                                  <button onClick={() => { setTicketToShowReason(ticket); setShowRejectionInfoModal(true); }} className="btn-action btn-start">Alasan</button>
                                 ) : (
                                   <button onClick={() => handleDeleteClick(ticket)} className="btn-action btn-delete-small">Hapus</button>
                                 )}
@@ -287,6 +310,12 @@ export default function UserDashboard() {
       )}
       {showConfirmModal && ticketToDelete && (
         <ConfirmationModalUser message={`Yakin ingin menghapus tiket "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={cancelDelete} />
+      )}
+      {selectedTicketForDetail && (
+        <TicketDetailModalUser
+          ticket={selectedTicketForDetail}
+          onClose={handleCloseDetailModal}
+        />
       )}
     </div>
   );

@@ -160,7 +160,9 @@ function ToolManagement({ showToast }) {
                                 <td>{act.quantity_used}</td>
                                 <td>{act.admin_name || '-'}</td>
                                 <td><span className={`status-${act.loan_status}`}>{act.loan_status}</span></td>
-                                <td>{act.ticket_title}</td>
+                                <td>
+                                    <span className="description-cell">{act.ticket_title}</span>
+                                </td>
                             </tr>
                         )) : (
                             <tr><td colSpan="6" style={{ textAlign: 'center' }}>Belum ada aktivitas.</td></tr>
@@ -201,7 +203,9 @@ function ToolManagement({ showToast }) {
                             </div>
                             <div className="data-group">
                                 <span className="label">Untuk Tiket</span>
-                                <span className="value">{act.ticket_title}</span>
+                                <span className="value">
+                                    <span className="description-cell">{act.ticket_title}</span>
+                                </span>
                             </div>
                         </div>
                     </div>

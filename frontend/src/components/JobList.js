@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 
-function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelectionChange, onAssignClick, onRejectClick, onProofClick, showToast }) {
-    const [selectedIds, setSelectedIds] = useState([]);
+function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelectionChange, onAssignClick, onRejectClick, onProofClick, showToast, onTicketClick }) {
     const isAdmin = userRole && userRole.toLowerCase() === 'admin';
-
+    const [selectedIds, setSelectedIds] = useState([]);
     useEffect(() => {
         setSelectedIds([]);
         if (onSelectionChange) {
@@ -20,6 +19,24 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
         if (onSelectionChange) {
             onSelectionChange(newSelectedIds);
         }
+    };
+
+    // [BARU] Fungsi untuk memotong teks
+    const truncateText = (text, maxLength) => {
+        if (!text) return '';
+        if (text.length <= maxLength) {
+            return text;
+        }
+        return text.substring(0, maxLength) + '...';
+    };
+
+    // [BARU] Handler untuk klik pada baris, agar tidak bentrok dengan klik pada checkbox atau tombol
+    const handleRowClick = (e, ticket) => {
+        // Cek apakah yang diklik adalah input, button, atau bagian dari grup tombol
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('.action-buttons-group')) {
+            return; // Jangan lakukan apa-apa jika klik pada elemen interaktif
+        }
+        onTicketClick(ticket); // Panggil fungsi untuk membuka modal
     };
 
     const handleSelectAll = (e) => {
@@ -116,12 +133,18 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                 <tbody>
                     {tickets && tickets.length > 0 ? (
                         tickets.map(ticket => (
-                            <tr key={ticket.id} className={selectedIds.includes(ticket.id) ? 'selected-row' : ''}>
+                            <tr
+                                key={ticket.id}
+                                className={`${selectedIds.includes(ticket.id) ? 'selected-row' : ''} clickable-row`}
+                                onClick={(e) => handleRowClick(e, ticket)}
+                            >
                                 {isAdmin && (<td><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>)}
                                 <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
                                 <td>{ticket.user ? ticket.user.name : '-'}</td>
                                 <td>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
-                                <td>{ticket.title}</td>
+                                <td>
+                                    <span className="description-cell">{ticket.title}</span>
+                                </td>
                                 <td>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
                                 <td>{formatWorkTime(ticket)}</td>
                                 <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></td>
@@ -140,7 +163,11 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
             <div className="job-list-mobile">
                 {tickets && tickets.length > 0 ? (
                     tickets.map(ticket => (
-                        <div key={ticket.id} className="ticket-card-mobile">
+                        <div
+                            key={ticket.id}
+                            className="ticket-card-mobile clickable-row"
+                            onClick={(e) => handleRowClick(e, ticket)} // Gunakan handler baru juga di sini
+                        >
 
                             <div className="card-row">
                                 <div className="data-group">
@@ -163,7 +190,9 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
                             <div className="card-row">
                                 <div className="data-group single">
                                     <span className="label">Deskripsi</span>
-                                    <span className="value description">{ticket.title}</span>
+                                    <span className="value description">
+                                        <span className="description-cell">{ticket.title}</span>
+                                    </span>
                                 </div>
                             </div>
 

@@ -29,6 +29,7 @@ import TicketReportDetail from '../components/TicketReportDetail';
 import WorkshopManagement from '../components/WorkshopManagement';
 import ToolManagement from '../components/ToolManagement';
 import ReturnItemsModal from '../components/ReturnItemsModal'
+import TicketDetailModal from '../components/TicketDetailModal';
 
 // Assets
 import yourLogok from '../Image/DTECH-Logo.png';
@@ -84,6 +85,7 @@ export default function AdminDashboard() {
   const ticketsOnPage = useMemo(() => (ticketData ? ticketData.data : []), [ticketData]);
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [ticketToReturn, setTicketToReturn] = useState(null);
+  const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
 
   // Utilities
   const showToast = useCallback((message, type = 'success') => {
@@ -190,6 +192,13 @@ export default function AdminDashboard() {
   // =================================================================
   // Handlers
   // =================================================================
+
+  const handleViewTicketDetail = (ticket) => {
+    setSelectedTicketForDetail(ticket);
+  };
+  const handleCloseDetailModal = () => {
+    setSelectedTicketForDetail(null);
+  };
   const handleChartFilter = useCallback((filters) => {
     setDataPage(1);
     setSearchQuery('');
@@ -456,34 +465,34 @@ export default function AdminDashboard() {
   }, [darkMode]);
 
   useEffect(() => {
-      // Hanya panggil data dashboard jika di halaman yang tepat
-      if (isAdmin && (currentPage === 'Welcome' || currentPage === 'Tickets')) {
-        fetchDashboardData();
-        fetchTools();
+    // Hanya panggil data dashboard jika di halaman yang tepat
+    if (isAdmin && (currentPage === 'Welcome' || currentPage === 'Tickets')) {
+      fetchDashboardData();
+      fetchTools();
 
-        // Logika auto-refresh juga pindah ke sini
-        const canRefresh = !searchQuery && !statusFilter && !adminIdFilter && !dateFilter && !ticketIdFilter;
-        if (canRefresh) {
-          const intervalId = setInterval(fetchDashboardData, 60000);
-          return () => clearInterval(intervalId); // Cleanup interval
-        }
+      // Logika auto-refresh juga pindah ke sini
+      const canRefresh = !searchQuery && !statusFilter && !adminIdFilter && !dateFilter && !ticketIdFilter;
+      if (canRefresh) {
+        const intervalId = setInterval(fetchDashboardData, 60000);
+        return () => clearInterval(intervalId); // Cleanup interval
       }
-    }, [
-      isAdmin,
-      currentPage,
-      fetchDashboardData,
-      fetchTools,
-      searchQuery,
-      statusFilter,
-      adminIdFilter,
-      dateFilter,
-      ticketIdFilter
+    }
+  }, [
+    isAdmin,
+    currentPage,
+    fetchDashboardData,
+    fetchTools,
+    searchQuery,
+    statusFilter,
+    adminIdFilter,
+    dateFilter,
+    ticketIdFilter
   ]);
 
   useEffect(() => {
     if (isAdmin && currentPage === 'MyTickets') {
       fetchMyTickets(myTicketsPage);
-      fetchTools(); 
+      fetchTools();
     }
   }, [isAdmin, currentPage, myTicketsPage, fetchMyTickets]);
 
@@ -721,7 +730,18 @@ export default function AdminDashboard() {
                     <button onClick={handleBulkDelete} className="btn-delete">Hapus {selectedTicketIds.length} Tiket yang Dipilih</button>
                   </div>
                 )}
-                <JobList tickets={ticketsOnPage} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} userRole={userRole} onSelectionChange={handleSelectionChange} onAssignClick={handleAssignClick} onRejectClick={handleRejectClick} onProofClick={handleProofClick} showToast={showToast} />
+                <JobList
+                  tickets={ticketsOnPage}
+                  updateTicketStatus={updateTicketStatus}
+                  deleteTicket={handleDeleteClick}
+                  userRole={userRole}
+                  onSelectionChange={handleSelectionChange}
+                  onAssignClick={handleAssignClick}
+                  onRejectClick={handleRejectClick}
+                  onProofClick={handleProofClick}
+                  showToast={showToast}
+                  onTicketClick={handleViewTicketDetail}
+                />
                 <Pagination currentPage={dataPage} lastPage={ticketData ? ticketData.last_page : 1} onPageChange={handlePageChange} />
               </>
             )}
@@ -731,7 +751,18 @@ export default function AdminDashboard() {
                 <h2 className="page-title">Tiket yang Saya Kerjakan</h2>
                 {myTicketsData && myTicketsData.data && myTicketsData.data.length > 0 ? (
                   <>
-                    <JobList tickets={myTicketsData.data} updateTicketStatus={updateTicketStatus} deleteTicket={handleDeleteClick} userRole={userRole} onSelectionChange={handleSelectionChange} onAssignClick={handleAssignClick} onRejectClick={handleRejectClick} onProofClick={handleProofClick} showToast={showToast} />
+                    <JobList
+                      tickets={myTicketsData.data}
+                      updateTicketStatus={updateTicketStatus}
+                      deleteTicket={handleDeleteClick}
+                      userRole={userRole}
+                      onSelectionChange={handleSelectionChange}
+                      onAssignClick={handleAssignClick}
+                      onRejectClick={handleRejectClick}
+                      onProofClick={handleProofClick}
+                      showToast={showToast}
+                      onTicketClick={handleViewTicketDetail}
+                    />
                     <Pagination currentPage={myTicketsPage} lastPage={myTicketsData.last_page} onPageChange={(page) => setMyTicketsPage(page)} />
                   </>
                 ) : (
@@ -755,19 +786,9 @@ export default function AdminDashboard() {
             )}
 
             {currentPage === 'ticketReport' && (
-              selectedAdminWithFilters ? (
-                <TicketReportDetail
-                  admin={selectedAdminWithFilters.admin}
-                  filters={selectedAdminWithFilters.filters} // (DIUBAH) Pastikan prop 'filters' dikirim
-                  onBack={() => setSelectedAdminWithFilters(null)}
-                />
-              ) : (
-                <TicketReportAdminList
-                  onSelectAdmin={(admin, filters) => { // Pastikan callback ini menerima filters
-                    setSelectedAdminWithFilters({ admin, filters });
-                  }}
-                />
-              )
+              <TicketReportAdminList
+                onTicketClick={handleViewTicketDetail}
+              />
             )}
 
             {currentPage === 'Notifications' && (
@@ -804,6 +825,12 @@ export default function AdminDashboard() {
             onSave={handleConfirmReturn}
             onClose={() => setShowReturnModal(false)}
             showToast={showToast}
+          />
+        )}
+        {selectedTicketForDetail && (
+          <TicketDetailModal
+            ticket={selectedTicketForDetail}
+            onClose={handleCloseDetailModal}
           />
         )}
       </div>
