@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class OtpController extends Controller
@@ -23,23 +24,37 @@ class OtpController extends Controller
      */
     public function verifyOtp(Request $request)
     {
-        $request->validate([
-            'phone' => 'required|string|exists:users,phone',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|min:6',
+            'phone' => 'required|string|min:10',
             'otp' => 'required|string|digits:6',
         ]);
 
-        $user = User::where('phone', $request->phone)->first();
+        $cacheKey = 'registration_data_' . $validated['phone'];
+        $registrationData = Cache::get($cacheKey);
 
-        if (!$user || $user->otp_code !== $request->otp || Carbon::now()->gt($user->otp_expires_at)) {
+        if (
+            !$registrationData ||
+            $registrationData['otp_code'] !== $validated['otp'] || 
+            Carbon::now()->gt($registrationData['otp_expires_at']) 
+        ) {
             return response()->json(['message' => 'Kode OTP tidak valid atau telah kedaluwarsa.'], 400);
         }
 
-        $user->phone_verified_at = Carbon::now();
-        $user->otp_code = null;
-        $user->otp_expires_at = null;
-        $user->save();
-        $token = JWTAuth::fromUser($user);
+        $user = User::create([
+            'name' => $registrationData['name'],
+            'email' => $registrationData['email'],
+            'password' => $registrationData['password'], 
+            'phone' => $registrationData['phone'],
+            'role' => 'user',
+            'phone_verified_at' => Carbon::now(), 
+        ]);
 
+        Cache::forget($cacheKey);
+
+        $token = JWTAuth::fromUser($user);
         return $this->authController->respondWithToken($token, $user);
     }
 }

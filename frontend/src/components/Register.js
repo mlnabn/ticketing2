@@ -8,13 +8,21 @@ function Register({
   otp,
   loading,
   error,
+  cooldown,
   onFormChange,
   onOtpChange,
   onRegisterSubmit,
   onOtpSubmit,
+  onResendOtp,
   onShowLogin,
   onBackToLanding,
 }) {
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
 
   // Fungsi submit sekarang hanya memanggil prop dari parent
   const handleRegister = (e) => {
@@ -56,17 +64,31 @@ function Register({
               <input type="password" name="password_confirmation" value={form.password_confirmation} placeholder="Konfirmasi Password" onChange={onFormChange} required />
             </div>
             <button type="submit" className="register-btn" disabled={loading}>
-              {loading ? 'Memproses...' : 'Register & Send OTP'}
+              {loading ? 'Menngirim OTP...' : 'Send OTP'}
             </button>
           </form>
         ) : (
           <form onSubmit={handleOtp}>
             <h2>Verify Your Number</h2>
-            <p className="form-description">Masukkan 6 digit kode yang dikirim ke nomor {form.phone}.</p>
+            <p className="form-description">Masukkan 6 digit kode yang dikirim ke nomor <strong>{form.phone}</strong>.</p>
             <div className="input-group">
               <span className="input-icon"></span>
               <input type="text" value={otp} onChange={onOtpChange} placeholder="6-Digit OTP" maxLength="6" required />
             </div>
+            <p className="auth-toggle">
+              Tidak menerima kode?{" "}
+              <button
+                type="button"
+                onClick={onResendOtp}
+                className="resend-otp-link"
+                disabled={loading || cooldown > 0} 
+              >
+                {cooldown > 0
+                  ? `Kirim ulang dalam (${formatTime(cooldown)})`
+                  : 'Kirim ulang OTP?'
+                }
+              </button>
+            </p>
             <button type="submit" className="register-btn" disabled={loading}>
               {loading ? 'Memverifikasi...' : 'Verify & Complete Registration'}
             </button>

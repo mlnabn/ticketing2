@@ -21,6 +21,7 @@ export default function RegisterPage() {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [cooldown, setCooldown] = useState(0);
 
   // Atur background saat komponen dimuat
   useEffect(() => {
@@ -29,6 +30,19 @@ export default function RegisterPage() {
       document.documentElement.style.removeProperty('--auth-background-image-light');
     };
   }, []);
+
+  useEffect(() => {
+    let timer;
+    if (cooldown > 0) {
+      timer = setInterval(() => {
+        setCooldown((prevCooldown) => prevCooldown - 1);
+      }, 1000);
+    }
+    // Cleanup function untuk membersihkan interval saat komponen unmount atau cooldown selesai
+    return () => {
+      clearInterval(timer);
+    };
+  }, [cooldown]);
   
   // Handler untuk perubahan form
   const handleFormChange = (e) => {
@@ -44,12 +58,18 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
-      const response = await api.post('/register', form);
+      const response = await api.post('/register', form); 
       alert(response.data.message);
-      setStep(2); // Pindah ke langkah OTP
+      setStep(2);
+      setCooldown(300);
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Registrasi gagal. Cek kembali data Anda.';
-      setError(errorMessage);
+      const errorData = err.response?.data;
+      if (errorData && errorData.errors) {
+        const firstError = Object.values(errorData.errors)[0][0];
+        setError(firstError);
+      } else {
+        setError(errorData?.message || 'Registrasi gagal. Cek kembali data Anda.');
+      }
     } finally {
       setLoading(false);
     }
@@ -60,7 +80,14 @@ export default function RegisterPage() {
     setError('');
     setLoading(true);
     try {
-      const response = await api.post('/otp/verify', { phone: form.phone, otp: otp });
+      const payload = {
+        ...form, 
+        otp: otp
+      };
+      delete payload.password_confirmation; 
+
+      const response = await api.post('/otp/verify', payload);
+      
       login(response.data);
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Verifikasi gagal.';
@@ -70,10 +97,24 @@ export default function RegisterPage() {
     }
   };
 
-  // useEffect untuk navigasi setelah login berhasil
+  const handleResendOtp = async () => {
+    setError('');
+    setLoading(true); // Tampilkan loading spinner saat mengirim
+    try {
+      // Panggil endpoint baru yang sudah kita buat
+      const response = await api.post('/otp/resend', { phone: form.phone });
+      alert(response.data.message);
+      setCooldown(300);
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || 'Gagal mengirim ulang OTP.';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (loggedIn && user) {
-      // Arahkan berdasarkan role setelah login berhasil
       if (user.role === 'admin') {
         navigate('/admin', { replace: true });
       } else {
@@ -90,10 +131,12 @@ export default function RegisterPage() {
         otp={otp}
         loading={loading}
         error={error}
+        cooldown={cooldown} 
         onFormChange={handleFormChange}
         onOtpChange={(e) => setOtp(e.target.value)}
         onRegisterSubmit={handleRegisterSubmit}
         onOtpSubmit={handleOtpSubmit}
+        onResendOtp={handleResendOtp}
         onShowLogin={() => navigate('/login')}
         onBackToLanding={() => navigate('/')}
       />
