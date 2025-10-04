@@ -1,17 +1,17 @@
-// src/components/ReturnItemsModal.jsx
-
 import React, { useState, useEffect } from 'react';
 
 function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
     const [items, setItems] = useState([]);
 
     useEffect(() => {
-        if (ticket && ticket.tools) {
-            const initialItems = ticket.tools.map(tool => ({
-                tool_id: tool.id,
-                name: tool.name,
-                quantity_borrowed: tool.pivot.quantity_used || 0,
-                quantity_returned: tool.pivot.quantity_used || 0,
+        if (ticket && ticket.masterBarangs) {
+            const initialItems = ticket.masterBarangs.map(barang => ({
+                // Menggunakan ID dan nama dari masterBarang
+                tool_id: barang.id_m_barang, 
+                name: barang.nama_barang,
+                // Data pivot tetap sama
+                quantity_borrowed: barang.pivot.quantity_used || 0,
+                quantity_returned: barang.pivot.quantity_used || 0,
                 quantity_lost: 0,
                 keterangan: '',
             }));
@@ -42,17 +42,14 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
                     }
 
                     const numValue = parseInt(value, 10);
-
-                    if (isNaN(numValue) || numValue < 0) {
-                        return item;
-                    }
-
+                    if (isNaN(numValue) || numValue < 0) return item;
+                    
                     const newQuantity = Math.min(numValue, borrowed);
 
                     if (field === 'quantity_returned') {
                         updatedItem.quantity_returned = newQuantity;
                         updatedItem.quantity_lost = borrowed - newQuantity;
-                    } else { // field === 'quantity_lost'
+                    } else {
                         updatedItem.quantity_lost = newQuantity;
                         updatedItem.quantity_returned = borrowed - newQuantity;
                     }
@@ -72,7 +69,6 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
                 showToast(`Harap alokasikan semua item untuk "${item.name}" (kembali atau hilang).`, 'warning');
                 return;
             }
-
             if (lost > 0 && !item.keterangan) {
                 showToast(`Keterangan untuk "${item.name}" yang hilang wajib diisi.`, 'warning');
                 return;
@@ -92,7 +88,6 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
     if (!ticket) return null;
 
     return (
-        // PERBAIKAN: Menggunakan className yang lebih umum
         <div className="modal-backdrop-centered">
             <div className="modal-content-large">
                 <h3>Form Pengembalian & Penyelesaian</h3>

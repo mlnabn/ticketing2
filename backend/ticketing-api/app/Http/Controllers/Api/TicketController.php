@@ -93,7 +93,7 @@ class TicketController extends Controller
         $user = auth()->user();
         $perPage = $request->query('per_page', 10);
 
-        $query = Ticket::with(['user', 'creator', 'tools', 'workshop']);
+        $query = Ticket::with(['user', 'creator', 'masterBarangs', 'workshop']);
 
         // Jika user biasa → hanya tiket miliknya
         if ($user->role !== 'admin') {
@@ -377,7 +377,7 @@ class TicketController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'tools' => 'nullable|array',
-            'tools.*.id' => 'required|exists:master_barangs,id_m_barang', // VALIDASI KE TABEL BARU
+            'tools.*.id' => 'required|exists:master_barangs,id_m_barang',
             'tools.*.quantity' => 'required|integer|min:1',
         ]);
 
@@ -388,7 +388,6 @@ class TicketController extends Controller
 
         try {
             DB::transaction(function () use ($ticket, $validated) {
-                // Update status tiket
                 $ticket->update([
                     'user_id' => $validated['user_id'],
                     'status' => 'Sedang Dikerjakan',
@@ -396,43 +395,33 @@ class TicketController extends Controller
                 ]);
 
                 if (!empty($validated['tools'])) {
-                    $toolsToSync = [];
+                    $barangsToSync = [];
                     foreach ($validated['tools'] as $toolData) {
-                        // AMBIL DATA DARI MASTER_BARANG
                         $item = MasterBarang::find($toolData['id']);
 
-                        // Cek ketersediaan stok di tabel baru
                         if ($item->stok < $toolData['quantity']) {
                             throw ValidationException::withMessages([
                                 'tools' => "Stok untuk '{$item->nama_barang}' tidak mencukupi. Sisa: {$item->stok}."
                             ]);
                         }
 
-                        // Kurangi stok di tabel baru
                         $item->decrement('stok', $toolData['quantity']);
 
-                        // --- JEMBATAN KE SISTEM LAMA ---
-                        // Cari atau buat entri di tabel `tools` lama berdasarkan nama barang
-                        $legacyTool = Tool::firstOrCreate(
-                            ['name' => $item->nama_barang],
-                            ['stok' => 0] // Stok di tabel lama tidak kita pakai lagi, tapi kolomnya harus ada
-                        );
-                        // --------------------------------
-
-                        // Siapkan data untuk disinkronkan ke pivot table `ticket_tool`
-                        // Gunakan ID dari tabel `tools` lama
-                        $toolsToSync[$legacyTool->id] = ['quantity_used' => $toolData['quantity'], 'status' => 'dipinjam'];
+                        // Langsung siapkan data untuk sync ke pivot table baru
+                        $barangsToSync[$item->id_m_barang] = [
+                            'quantity_used' => $toolData['quantity'],
+                            'status' => 'dipinjam'
+                        ];
                     }
-
-                    // Sinkronkan ke pivot table dengan kuantitas
-                    $ticket->tools()->sync($toolsToSync);
+                    // Sync langsung ke relasi baru
+                    $ticket->masterBarangs()->syncWithoutDetaching($barangsToSync);
                 }
             });
         } catch (ValidationException $e) {
             return response()->json(['message' => $e->getMessage(), 'errors' => $e->errors()], 422);
         }
 
-        return response()->json($ticket->load(['user', 'creator', 'tools']));
+        return response()->json($ticket->load(['user', 'creator', 'masterBarangs']));
     }
 
 
@@ -530,9 +519,6 @@ class TicketController extends Controller
     /**
      * Update status tiket.
      */
-    /**
-     * Update status tiket.
-     */
     public function updateStatus(Request $request, Ticket $ticket)
     {
         $user = auth()->user();
@@ -541,59 +527,28 @@ class TicketController extends Controller
             return response()->json(['error' => 'Hanya admin yang bisa mengubah status.'], 403);
         }
 
-        // Jika tiket sudah ada penanggung jawabnya, pastikan hanya dia yang bisa mengubah.
         if ($ticket->user_id && $ticket->user_id !== $user->id) {
             return response()->json(['error' => 'Anda tidak berhak mengubah status tiket yang sedang dikerjakan oleh admin lain.'], 403);
         }
-        // --- Akhir Logika yang Sudah Ada ---
 
         $validated = $request->validate(['status' => 'required|string']);
         $newStatus = $validated['status'];
         $updateData = ['status' => $newStatus];
 
-        // --- BAGIAN BARU: LOGIKA PENGEMBALIAN BARANG ---
-        // Tentukan apakah status baru adalah status penyelesaian (selesai/ditolak)
-        $isCompleting = in_array($newStatus, ['Selesai', 'Ditolak']);
-
-        // Jalankan logika ini HANYA jika status tiket benar-benar berubah menjadi status penyelesaian
-        if ($isCompleting && $ticket->status !== $newStatus) {
-            DB::transaction(function () use ($ticket) {
-                // Ambil semua alat yang terhubung dengan tiket ini beserta jumlah yang digunakan
-                $attachedTools = $ticket->tools()->withPivot('quantity_used')->get();
-
-                foreach ($attachedTools as $attachedTool) {
-                    // Temukan record master dari alat
-                    $tool = Tool::find($attachedTool->id);
-                    if ($tool) {
-                        // Tambahkan kembali stoknya
-                        $tool->increment('stok', $attachedTool->pivot->quantity_used);
-                    }
-                }
-
-                // Setelah stok dikembalikan, lepaskan semua relasi alat dari tiket ini.
-                // Ini penting agar stok tidak dikembalikan dua kali jika status diubah lagi.
-                $ticket->tools()->detach();
-            });
-        }
-        // --- AKHIR BAGIAN BARU ---
-
-        // --- LOGIKA YANG SUDAH ADA (TIDAK DIHAPUS) ---
         if ($newStatus === 'Sedang Dikerjakan' && is_null($ticket->started_at)) {
             $updateData['started_at'] = now();
-            // Jika tiket belum ada penanggung jawab, otomatis tugaskan ke admin yang menekan tombol.
             if (is_null($ticket->user_id)) {
                 $updateData['user_id'] = $user->id;
             }
-        } elseif ($newStatus === 'Selesai') {
-            $updateData['completed_at'] = now();
-        } elseif ($newStatus === 'Ditolak') {
+        } elseif ($newStatus === 'Selesai' || $newStatus === 'Ditolak') {
             $updateData['completed_at'] = now();
         }
 
         $ticket->update($updateData);
-        // Load relasi 'tools' juga untuk memastikan data ter-update jika diperlukan
-        return response()->json($ticket->load(['user', 'creator', 'tools']));
+        
+        return response()->json($ticket->load(['user', 'creator', 'masterBarangs']));
     }
+
 
     /**
      * Statistik tiket.
@@ -751,59 +706,48 @@ class TicketController extends Controller
     // app/Http/Controllers/Api/TicketController.php
 
 public function processReturn(Request $request, Ticket $ticket)
-{
-    $validated = $request->validate([
-        'items' => 'present|array',
-        'items.*.tool_id' => 'required|exists:tools,id',
-        'items.*.quantity_returned' => 'required|integer|min:0',
-        'items.*.quantity_lost' => 'required|integer|min:0',
-        'items.*.keterangan' => 'nullable|string|max:1000',
-    ]);
+    {
+        $validated = $request->validate([
+            'items' => 'present|array',
+            'items.*.tool_id' => 'required|exists:master_barangs,id_m_barang', // Validasi ke master barang
+            'items.*.quantity_returned' => 'required|integer|min:0',
+            'items.*.quantity_lost' => 'required|integer|min:0',
+            'items.*.keterangan' => 'nullable|string|max:1000',
+        ]);
 
-    DB::transaction(function () use ($ticket, $validated) {
-        $borrowedTools = $ticket->tools()->withPivot('quantity_used')->get()->keyBy('id');
+        DB::transaction(function () use ($ticket, $validated) {
+            // Mengambil barang yang dipinjam dari relasi baru
+            $borrowedItems = $ticket->masterBarangs()->withPivot('quantity_used')->get()->keyBy('id_m_barang');
 
-        foreach ($validated['items'] as $item) {
-            $tool = Tool::find($item['tool_id']);
-            if (!$tool) continue;
-            
-            $borrowedQty = $borrowedTools[$item['tool_id']]->pivot->quantity_used ?? 0;
-            $returnedQty = $item['quantity_returned'];
-            $lostQty = $item['quantity_lost'];
+            foreach ($validated['items'] as $itemData) {
+                $masterBarang = MasterBarang::find($itemData['tool_id']);
+                if (!$masterBarang) continue;
 
-            if ($returnedQty > 0) {
-                $masterBarang = MasterBarang::where('nama_barang', $tool->name)->first();
-                if ($masterBarang) {
-                    // PERBAIKAN: Hapus baris update() yang berlebih.
-                    // Cukup gunakan increment() dengan jumlah yang benar.
+                $borrowedQty = $borrowedItems[$itemData['tool_id']]->pivot->quantity_used ?? 0;
+                $returnedQty = $itemData['quantity_returned'];
+                $lostQty = $itemData['quantity_lost'];
+
+                if ($returnedQty > 0) {
                     $masterBarang->increment('stok', $returnedQty);
                 }
-            }
 
-            // Update status di pivot table
-            if (($returnedQty + $lostQty) == $borrowedQty) {
-                $newStatus = 'dikembalikan';
-                if ($lostQty > 0 && $returnedQty > 0) {
-                    $newStatus = 'kembali sebagian';
-                } elseif ($lostQty > 0 && $returnedQty == 0) {
-                    $newStatus = 'hilang';
+                if (($returnedQty + $lostQty) >= $borrowedQty) {
+                    $newStatus = 'dikembalikan';
+                    if ($lostQty > 0 && $returnedQty > 0) $newStatus = 'kembali sebagian';
+                    elseif ($lostQty > 0 && $returnedQty == 0) $newStatus = 'hilang';
+                    
+                    $ticket->masterBarangs()->updateExistingPivot($itemData['tool_id'], [
+                        'status' => $newStatus,
+                        'keterangan' => $itemData['keterangan'] ?? null,
+                        'quantity_lost' => $lostQty,
+                    ]);
                 }
-                
-                $ticket->tools()->updateExistingPivot($item['tool_id'], [
-                    'status' => $newStatus,
-                    'keterangan' => $item['keterangan'] ?? null,
-                    'quantity_lost' => $lostQty,
-                ]);
             }
-        }
 
-        $ticket->update([
-            'status' => 'Selesai',
-            'completed_at' => now(),
-        ]);
-    });
+            $ticket->update(['status' => 'Selesai', 'completed_at' => now()]);
+        });
 
-    return response()->json($ticket->load(['user', 'creator', 'tools']));
-}
+        return response()->json($ticket->load(['user', 'creator', 'masterBarangs']));
+    }
 
 }

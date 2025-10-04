@@ -51,8 +51,10 @@ class MasterBarang extends Model
     /**
      * Relasi ke Tool.
      */
-    public function tool()
+    public function tickets()
     {
-        return $this->hasOne(Tool::class, 'name', 'nama_barang');
+        return $this->belongsToMany(Ticket::class, 'ticket_master_barang', 'master_barang_id', 'ticket_id')
+            ->withPivot('quantity_used', 'status', 'keterangan', 'quantity_lost', 'quantity_recovered')
+            ->withTimestamps();
     }
 }

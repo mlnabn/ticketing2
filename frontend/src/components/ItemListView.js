@@ -89,7 +89,7 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
                                 <td><span className={`status-${item.status_barang.toLowerCase()}`}>{item.status_barang}</span></td>
                                 <td className="action-buttons-group">
                                     <button onClick={() => onEdit(item)} className="btn-user-action btn-edit">Edit</button>
-                                    <button onClick={() => onDelete(item.id_m_barang)} className="btn-user-action btn-delete">Hapus</button>
+                                    <button onClick={() => onDelete(item)} className="btn-user-action btn-delete">Hapus</button>
                                 </td>
                             </tr>
                         )) : (

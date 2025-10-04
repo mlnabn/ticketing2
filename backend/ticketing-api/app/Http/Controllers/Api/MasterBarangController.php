@@ -153,7 +153,18 @@ class MasterBarangController extends Controller
 
     public function destroy(MasterBarang $masterBarang)
     {
-        $masterBarang->delete();
-        return response()->json(null, 204);
+        if ($masterBarang->tickets()->exists()) {
+            return response()->json([
+                'message' => 'Barang tidak dapat dihapus karena memiliki riwayat peminjaman.'
+            ], 422); 
+        }
+
+        $deleted = $masterBarang->delete();
+
+        if ($deleted) {
+            return response()->json(['message' => 'Barang berhasil dihapus.'], 200);
+        }
+
+        return response()->json(['message' => 'Gagal menghapus barang dari database.'], 500);
     }
 }

@@ -370,14 +370,13 @@ export default function AdminDashboard() {
       return;
     }
 
-    if (newStatus === 'Selesai' && ticket.tools && ticket.tools.length > 0) {
+    if (newStatus === 'Selesai' && ticket.masterBarangs && ticket.masterBarangs.length > 0) {
       setTicketToReturn(ticket);
       setShowReturnModal(true);
     } else {
       try {
         await api.patch(`/tickets/${ticket.id}/status`, { status: newStatus });
         showToast('Status tiket berhasil diupdate.', 'success');
-        // Muat ulang kedua sumber data agar konsisten
         fetchDashboardData(); 
         fetchMyTickets(myTicketsPage);
       } catch (e) {
@@ -591,7 +590,7 @@ export default function AdminDashboard() {
                 <button
                   onClick={() => setCurrentPage('toolManagement')}
                   className={`sidebar-button ${currentPage === 'toolManagement' ? 'active' : ''}`}>
-                  <i className="fas fa-tools"></i><span className="nav-text">Tools</span>
+                  <i className="fas fa-warehouse"></i><span className="nav-text">Inventory</span>
                 </button>
               </li>
               <li className="sidebar-nav-item">

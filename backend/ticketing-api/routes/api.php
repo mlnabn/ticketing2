@@ -88,27 +88,19 @@ Route::middleware('jwt')->group(function () {
 
     Route::get('/locations', [LocationController::class, 'index']);
 
-    // --- Rute untuk Manajemen Gudang (Tools) ---
-    Route::get('/tools/lost-items-report', [ToolController::class, 'getLostItemsReport']);
-    Route::get('/tools/report', [ToolController::class, 'getToolReport']);           // <-- RUTE BARU
-    Route::get('/tools/recent-activity', [ToolController::class, 'getRecentActivity']); // <-- RUTE BARU
-    Route::get('/tools/lost-items', [ToolController::class, 'getLostItems']);
-    Route::post('/tools/{tool}/recover', [ToolController::class, 'recoverStock']);
-    Route::post('/tools/{tool}', [ToolController::class, 'update']); // Untuk update
-    Route::apiResource('tools', ToolController::class)->except(['update']);
-
     // --- Rute untuk Proses Tiket ---
     Route::post('/tickets/{ticket}/process-return', [TicketController::class, 'processReturn']);
 
     // --- Rute untuk Manajemen Inventaris ---
     Route::apiResource('inventory/categories', MasterKategoriController::class);
     Route::apiResource('inventory/sub-categories', SubKategoriController::class);
-    Route::apiResource('inventory/items', MasterBarangController::class);
+    Route::post('/inventory/items/{masterBarang}', [MasterBarangController::class, 'update']);
+    Route::apiResource('inventory/items', MasterBarangController::class)->parameters([
+        'items' => 'masterBarang'
+    ]);
+    Route::get('/inventory/items/search/{query}', [MasterBarangController::class, 'searchByName']);
+    Route::get('/inventory/items/code/{kode_barang}', [MasterBarangController::class, 'showByCode']);
+    Route::get('/inventory/items/category/{categoryId}', [MasterBarangController::class, 'filterByCategory']);
+    Route::get('/inventory/items/sub-category/{subCategoryId}', [MasterBarangController::class, 'filterBySubCategory']);
 
-    Route::get('/tools/recent-activity', [ToolController::class, 'getRecentActivity']);
-    Route::get('/tools/lost-items-report', [ToolController::class, 'getLostItemsReport']);
-    Route::get('/tools/lost-items', [ToolController::class, 'getLostItems']);
-    // PERBAIKAN: Gunakan 'master_barang' sebagai parameter untuk recoverStock agar sesuai dengan MasterBarang
-    Route::post('/inventory/items/{masterBarang}/recover', [ToolController::class, 'recoverStock']);
-    
 });

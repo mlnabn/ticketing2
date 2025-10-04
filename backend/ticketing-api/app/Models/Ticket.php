@@ -52,10 +52,10 @@ class Ticket extends Model
         return null;
     }
 
-    public function tools()
+    public function masterBarangs()
     {
-        return $this->belongsToMany(Tool::class)
-            ->withPivot('quantity_used', 'quantity_lost', 'quantity_recovered', 'status', 'keterangan')
+        return $this->belongsToMany(MasterBarang::class, 'ticket_master_barang', 'ticket_id', 'master_barang_id')
+            ->withPivot('quantity_used', 'status', 'keterangan', 'quantity_lost', 'quantity_recovered')
             ->withTimestamps();
     }
 }
