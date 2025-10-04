@@ -25,7 +25,7 @@ import RejectTicketModal from '../components/RejectTicketModal';
 import ConfirmationModal from '../components/ConfirmationModal';
 import UserFormModal from '../components/UserFormModal';
 import TicketReportAdminList from '../components/TicketReportAdminList';
-import TicketReportDetail from '../components/TicketReportDetail';
+// import TicketReportDetail from '../components/TicketReportDetail';
 import WorkshopManagement from '../components/WorkshopManagement';
 import ToolManagement from '../components/ToolManagement';
 import ReturnItemsModal from '../components/ReturnItemsModal'
@@ -49,7 +49,7 @@ export default function AdminDashboard() {
   const [darkMode, setDarkMode] = useState(false);
   const [isAdminDropdownOpen, setIsAdminDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState('Welcome');
-  const [users, setUsers] = useState([]);
+  // const [users, setUsers] = useState([]);
   const [adminList, setAdminList] = useState([]);
   const [userData, setUserData] = useState(null);
   const [stats, setStats] = useState(null);
@@ -57,7 +57,7 @@ export default function AdminDashboard() {
   const [locationsData, setLocationsData] = useState([]); // Note: This is not part of bootstrap yet
   const [adminPerformanceData, setAdminPerformanceData] = useState([]);
   const [allTickets, setAllTickets] = useState([]);
-  const [notifications, setNotifications] = useState([]);
+  // const [notifications, setNotifications] = useState([]);
   const [myTicketsData, setMyTicketsData] = useState(null);
   const [myTicketsPage, setMyTicketsPage] = useState(1);
   const [ticketToDelete, setTicketToDelete] = useState(null);
@@ -77,15 +77,17 @@ export default function AdminDashboard() {
   const [userToDelete, setUserToDelete] = useState(null);
   const [showUserFormModal, setShowUserFormModal] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
-  const [selectedAdminWithFilters, setSelectedAdminWithFilters] = useState(null);
+  // const [selectedAdminWithFilters, setSelectedAdminWithFilters] = useState(null);
   const [adminIdFilter, setAdminIdFilter] = useState(null);
   const [dateFilter, setDateFilter] = useState(null);
   const [ticketIdFilter, setTicketIdFilter] = useState(null);
-  const [toolList, setToolList] = useState([]);
+  // const [toolList, setToolList] = useState([]);
   const ticketsOnPage = useMemo(() => (ticketData ? ticketData.data : []), [ticketData]);
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [ticketToReturn, setTicketToReturn] = useState(null);
   const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
+
+  const [itemList, setItemList] = useState([]);
 
   // Utilities
   const showToast = useCallback((message, type = 'success') => {
@@ -160,34 +162,40 @@ export default function AdminDashboard() {
     }
   }, [handleLogout]);
 
-  const fetchNotifications = useCallback(async () => {
-    try {
-      const response = await api.get('/notifications');
-      setNotifications(response.data);
-    } catch (e) {
-      console.error('Gagal mengambil notifikasi:', e);
-      if (e.response?.status === 401) handleLogout();
-    }
-  }, [handleLogout]);
+  // const fetchNotifications = useCallback(async () => {
+  //   try {
+  //     const response = await api.get('/notifications');
+  //     setNotifications(response.data);
+  //   } catch (e) {
+  //     console.error('Gagal mengambil notifikasi:', e);
+  //     if (e.response?.status === 401) handleLogout();
+  //   }
+  // }, [handleLogout]);
 
-  const fetchAllUsers = useCallback(async () => {
-    try {
-      const response = await api.get('/users/all');
-      if (Array.isArray(response.data)) setUsers(response.data);
-    } catch (e) {
-      console.error('Gagal mengambil daftar semua pengguna:', e);
-      if (e.response?.status === 401) handleLogout();
-    }
-  }, [handleLogout]);
+  // const fetchAllUsers = useCallback(async () => {
+  //   try {
+  //     const response = await api.get('/users/all');
+  //     if (Array.isArray(response.data)) setUsers(response.data);
+  //   } catch (e) {
+  //     console.error('Gagal mengambil daftar semua pengguna:', e);
+  //     if (e.response?.status === 401) handleLogout();
+  //   }
+  // }, [handleLogout]);
 
-  const fetchTools = useCallback(async () => {
+  const fetchItemsForAssign = useCallback(async () => {
     try {
-      const response = await api.get('/tools');
-      if (Array.isArray(response.data)) setToolList(response.data);
+      // Mengambil semua data barang tanpa paginasi untuk dropdown
+      const response = await api.get('/inventory/items?all=true');
+      const itemsData = Array.isArray(response.data) ? response.data : response.data.data;
+
+      if (Array.isArray(itemsData)) {
+        setItemList(itemsData);
+      }
     } catch (e) {
-      console.error('Gagal mengambil daftar alat:', e);
+      console.error('Gagal mengambil daftar barang inventaris:', e);
+      showToast('Gagal memuat daftar barang untuk peminjaman.', 'error');
     }
-  }, []);
+  }, [showToast]);
 
   // =================================================================
   // Handlers
@@ -243,11 +251,11 @@ export default function AdminDashboard() {
       handleCloseAssignModal();
       fetchDashboardData();
       fetchMyTickets(myTicketsPage);
-      fetchTools();
+      fetchItemsForAssign(); // Refresh stok barang setelah ditugaskan
       showToast('Tiket berhasil ditugaskan.', 'success');
     } catch (e) {
       console.error('Gagal menugaskan tiket:', e);
-      const errorMsg = e.response?.data?.errors?.tools || 'Gagal menugaskan tiket.';
+      const errorMsg = e.response?.data?.errors?.tools || e.response?.data?.message || 'Gagal menugaskan tiket.';
       showToast(errorMsg, 'error');
     }
   };
@@ -439,7 +447,7 @@ export default function AdminDashboard() {
       setTicketToReturn(null);
       fetchDashboardData();
       fetchMyTickets(myTicketsPage);
-      fetchTools(); // PENTING: Refresh stok alat di UI
+      fetchItemsForAssign(); // PENTING: Refresh stok alat di UI
     } catch (e) {
       console.error('Gagal memproses pengembalian:', e);
       showToast(e.response?.data?.message || 'Gagal memproses pengembalian.', 'error');
@@ -465,10 +473,9 @@ export default function AdminDashboard() {
   }, [darkMode]);
 
   useEffect(() => {
-    // Hanya panggil data dashboard jika di halaman yang tepat
     if (isAdmin && (currentPage === 'Welcome' || currentPage === 'Tickets')) {
       fetchDashboardData();
-      fetchTools();
+      fetchItemsForAssign();
 
       // Logika auto-refresh juga pindah ke sini
       const canRefresh = !searchQuery && !statusFilter && !adminIdFilter && !dateFilter && !ticketIdFilter;
@@ -481,7 +488,7 @@ export default function AdminDashboard() {
     isAdmin,
     currentPage,
     fetchDashboardData,
-    fetchTools,
+    fetchItemsForAssign,
     searchQuery,
     statusFilter,
     adminIdFilter,
@@ -492,9 +499,9 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (isAdmin && currentPage === 'MyTickets') {
       fetchMyTickets(myTicketsPage);
-      fetchTools();
+      fetchItemsForAssign();
     }
-  }, [isAdmin, currentPage, myTicketsPage, fetchMyTickets]);
+  }, [isAdmin, currentPage, myTicketsPage, fetchMyTickets, fetchItemsForAssign]);
 
   useEffect(() => {
     if (currentPage === 'userManagement') {
@@ -805,7 +812,7 @@ export default function AdminDashboard() {
           <ProofModal ticket={ticketForProof} onSave={handleSaveProof} onClose={handleCloseProofModal} />
         )}
         {showAssignModal && ticketToAssign && (
-          <AssignAdminModal ticket={ticketToAssign} admins={adminList} tools={toolList} onAssign={handleConfirmAssign} onClose={handleCloseAssignModal} showToast={showToast} />
+          <AssignAdminModal ticket={ticketToAssign} admins={adminList} items={itemList} onAssign={handleConfirmAssign} onClose={handleCloseAssignModal} showToast={showToast} />
         )}
         {showRejectModal && ticketToReject && (
           <RejectTicketModal ticket={ticketToReject} onReject={handleConfirmReject} onClose={handleCloseRejectModal} showToast={showToast} />

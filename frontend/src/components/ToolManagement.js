@@ -1,53 +1,56 @@
 // src/components/ToolManagement.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
-import ToolFormModal from './ToolFormModal';
-import RecoverStockModal from './RecoverStockModal';
-import ToolListView from './ToolListView';
+
+// Komponen BARU untuk sistem inventaris
+import ItemListView from './ItemListView';
+import ItemFormModal from './ItemFormModal';
+
+// Komponen lama yang masih relevan untuk laporan
 import ToolReportView from './ToolReportView';
+import RecoverStockModal from './RecoverStockModal';
+
 
 function ToolManagement({ showToast }) {
+    // 'main', 'itemList', 'report'
     const [view, setView] = useState('main');
 
-    // State global yang dipakai anak (list, report)
-    const [tools, setTools] = useState([]);
-    const [lostItems, setLostItems] = useState([]);
+    // --- STATE UNTUK SISTEM INVENTARIS BARU ---
+    const [items, setItems] = useState([]);
+    const [itemsPagination, setItemsPagination] = useState(null);
+    const [itemToEdit, setItemToEdit] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // --- STATE UNTUK FITUR LAPORAN (YANG SUDAH ADA) ---
     const [recentActivity, setRecentActivity] = useState([]);
     const [reportData, setReportData] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    // State modal
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [toolToEdit, setToolToEdit] = useState(null);
     const [isRecoverModalOpen, setIsRecoverModalOpen] = useState(false);
     const [toolToRecover, setToolToRecover] = useState(null);
     const [ticketForRecover, setTicketForRecover] = useState(null);
 
-    // Fetcher
-    const fetchListData = useCallback(async () => {
+    // --- STATE UMUM ---
+    const [loading, setLoading] = useState(true);
+
+    // --- FETCHER BARU: Mengambil data dari master_barang ---
+    const fetchItems = useCallback(async (page = 1, filters = {}) => {
+        setLoading(true);
         try {
-            setLoading(true);
-            const [toolsResponse, lostItemsResponse] = await Promise.all([
-                api.get('/tools'),
-                api.get('/tools/lost-items')
-            ]);
-            setTools(toolsResponse.data);
-            const lostItemsMap = lostItemsResponse.data.reduce((acc, item) => {
-                acc[item.id] = item.lost_in_tickets;
-                return acc;
-            }, {});
-            setLostItems(lostItemsMap);
+            const params = { page, ...filters, _t: new Date().getTime() };
+            const response = await api.get('/inventory/items', { params });
+            setItems(response.data.data);
+            setItemsPagination(response.data);
         } catch (error) {
-            console.error("Gagal mengambil data daftar barang:", error);
-            showToast("Gagal mengambil data daftar barang.", "error");
+            console.error("Gagal mengambil data inventaris:", error);
+            showToast("Gagal mengambil data inventaris.", "error");
         } finally {
             setLoading(false);
         }
     }, [showToast]);
 
+    // --- FETCHER LAMA (MASIH RELEVAN) ---
     const fetchMainData = useCallback(async () => {
+        setLoading(true);
         try {
-            setLoading(true);
             const response = await api.get('/tools/recent-activity');
             setRecentActivity(response.data);
         } catch (error) {
@@ -59,8 +62,8 @@ function ToolManagement({ showToast }) {
     }, [showToast]);
 
     const fetchReportData = useCallback(async () => {
+        setLoading(true);
         try {
-            setLoading(true);
             const response = await api.get('/tools/lost-items-report');
             setReportData(response.data);
         } catch (error) {
@@ -71,73 +74,128 @@ function ToolManagement({ showToast }) {
         }
     }, [showToast]);
 
-    // Auto-fetch sesuai halaman
+    // --- EFEK UNTUK MEMUAT DATA SESUAI VIEW ---
     useEffect(() => {
         if (view === 'main') fetchMainData();
-        if (view === 'list') fetchListData();
+        if (view === 'itemList') fetchItems();
         if (view === 'report') fetchReportData();
-    }, [view, fetchMainData, fetchListData, fetchReportData]);
+    }, [view, fetchMainData, fetchItems, fetchReportData]);
 
-    // Handler modal
-    const handleOpenAddModal = () => { setToolToEdit(null); setIsModalOpen(true); };
-    const handleOpenEditModal = (tool) => { setToolToEdit(tool); setIsModalOpen(true); };
-    const handleCloseModal = () => { setIsModalOpen(false); setToolToEdit(null); };
-    const handleSaveTool = async (formData) => {
-        const isEditMode = Boolean(toolToEdit);
-        const url = isEditMode ? `/tools/${toolToEdit.id}` : '/tools';
+    // --- HANDLER UNTUK MODAL INVENTARIS ---
+    const handleOpenAddModal = () => { setItemToEdit(null); setIsModalOpen(true); };
+    const handleOpenEditModal = (item) => { setItemToEdit(item); setIsModalOpen(true); };
+    const handleCloseModal = () => { setIsModalOpen(false); setItemToEdit(null); };
+
+    const handleSaveItem = async (formData, itemId) => {
+        const isEditMode = Boolean(itemId);
+        // Tentukan URL tujuan
+        const url = isEditMode ? `/inventory/items/${itemId}` : '/inventory/items';
+
+        if (isEditMode) {
+            formData.append('_method', 'PUT');
+        }
+
         try {
-            await api.post(url, formData);
-            showToast(isEditMode ? 'Data alat berhasil diubah.' : 'Alat baru berhasil ditambahkan.');
+            // Kirim request sebagai POST
+            await api.post(url, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            showToast(isEditMode ? 'Data barang berhasil diubah.' : 'Barang baru berhasil ditambahkan.');
             handleCloseModal();
-            fetchListData();
+            // Refresh data di halaman yang sedang aktif
+            fetchItems(itemsPagination?.current_page || 1);
         } catch (e) {
-            console.error('Gagal menyimpan alat:', e);
-            showToast(e.response?.data?.message || 'Gagal menyimpan data alat.');
+            console.error('Gagal menyimpan barang:', e);
+            const errorMsg = e.response?.data?.message || 'Gagal menyimpan data barang.';
+            showToast(errorMsg, 'error');
         }
     };
-    const handleDelete = async (toolId) => {
-        if (window.confirm("Anda yakin ingin menghapus alat ini?")) {
+
+    const handleDeleteItem = useCallback(async (itemId) => {
+        if (window.confirm("Anda yakin ingin menghapus barang ini dari inventaris?")) {
             try {
-                await api.delete(`/tools/${toolId}`);
-                showToast("Alat berhasil dihapus.");
-                fetchListData();
+                const res = await api.delete(`/inventory/items/${itemId}`);
+
+                if (res.status === 204) {
+                    showToast("Barang berhasil dihapus.");
+
+                    const currentPage = itemsPagination?.current_page || 1;
+                    const totalOnPage = items.length;
+
+                    if (totalOnPage === 1 && currentPage > 1) {
+                        fetchItems(currentPage - 1);
+                    } else {
+                        fetchItems(currentPage);
+                    }
+                } else {
+                    showToast(res.data?.message || "Gagal menghapus barang.", "error");
+                }
+
             } catch (error) {
-                console.error("Gagal menghapus alat:", error);
-                showToast("Gagal menghapus alat.");
+                console.error("Gagal menghapus barang:", error);
+                showToast(error.response?.data?.message || "Gagal menghapus barang.", "error");
             }
         }
+    }, [items, itemsPagination, fetchItems, showToast]);
+
+
+    // --- HANDLER UNTUK MODAL RECOVER (TIDAK BERUBAH) ---
+    const handleOpenRecoverModal = (item) => {
+        // 'item' adalah satu baris data dari laporan kehilangan
+        setToolToRecover({ id: item.tool_id, name: item.tool_name });
+
+        const remainingLost = item.quantity_lost - item.quantity_recovered;
+        setTicketForRecover({
+            ticket_id: item.ticket_id,
+            ticket_title: item.ticket_title,
+            quantity_lost: remainingLost, // Kirim sisa yang hilang
+        });
+
+        setIsRecoverModalOpen(true);
     };
-    const handleOpenRecoverModal = (tool, ticket) => { setToolToRecover(tool); setTicketForRecover(ticket); setIsRecoverModalOpen(true); };
-    const handleCloseRecoverModal = () => { setIsRecoverModalOpen(false); setToolToRecover(null); setTicketForRecover(null); };
+
+    const handleCloseRecoverModal = () => {
+        setIsRecoverModalOpen(false);
+        setToolToRecover(null);
+        setTicketForRecover(null);
+    };
+
     const handleSaveRecover = async (toolId, ticketId, quantity, keterangan) => {
         try {
-            await api.post(`/tools/${toolId}/recover`, { ticket_id: ticketId, quantity_recovered: quantity, keterangan });
-            showToast('Stok berhasil dipulihkan.', 'success');
+            await api.post(`/tools/${toolId}/recover`, {
+                ticket_id: ticketId,
+                quantity_recovered: quantity,
+                keterangan: keterangan,
+            });
+            showToast('Stok berhasil dipulihkan!');
             handleCloseRecoverModal();
-            fetchListData();
-        } catch (e) {
-            console.error('Gagal memulihkan stok:', e);
-            showToast(e.response?.data?.message || 'Gagal memulihkan stok.', 'error');
+            fetchReportData(); // Refresh data laporan setelah berhasil
+        } catch (error) {
+            console.error("Gagal memulihkan stok:", error);
+            showToast(error.response?.data?.message || "Gagal memulihkan stok.", "error");
         }
     };
 
-    // --- Render Halaman Utama ---
+    // --- RENDER ---
     const renderMainView = () => (
         <>
             <div className="report-navigation-cards">
-                <div className="nav-card" onClick={() => setView('list')}>
+                <div className="nav-card" onClick={() => setView('itemList')}>
                     <h3>Daftar Barang</h3>
                     <p>Kelola semua barang dan stok yang tersedia di gudang.</p>
                 </div>
                 <div className="nav-card" onClick={() => setView('report')}>
-                    <h3>Laporan Barang</h3>
-                    <p>Lihat riwayat peminjaman dan pengembalian barang oleh admin.</p>
+                    <h3>Laporan Kehilangan</h3>
+                    <p>Lihat riwayat barang yang hilang dan proses pemulihan stok.</p>
                 </div>
             </div>
-
             <hr className="report-divider" />
-
             <h2 className="tool-section-title">Aktivitas Peminjaman Terakhir</h2>
+
+            {/* --- BAGIAN YANG DILENGKAPI --- */}
             <div className="job-list-table">
                 <table className="job-table">
                     <thead>
@@ -155,7 +213,7 @@ function ToolManagement({ showToast }) {
                             <tr><td colSpan="6" style={{ textAlign: 'center' }}>Memuat aktivitas...</td></tr>
                         ) : recentActivity.length > 0 ? recentActivity.map((act, index) => (
                             <tr key={index}>
-                                <td>{new Date(act.activity_time).toLocaleString()}</td>
+                                <td>{new Date(act.activity_time).toLocaleString('id-ID')}</td>
                                 <td>{act.tool_name}</td>
                                 <td>{act.quantity_used}</td>
                                 <td>{act.admin_name || '-'}</td>
@@ -170,7 +228,6 @@ function ToolManagement({ showToast }) {
                     </tbody>
                 </table>
             </div>
-
             <div className="job-list-mobile">
                 {loading ? (
                     <p style={{ textAlign: 'center' }}>Memuat aktivitas...</p>
@@ -179,7 +236,7 @@ function ToolManagement({ showToast }) {
                         <div className="card-row">
                             <div className="data-group">
                                 <span className="label">Waktu</span>
-                                <span className="value">{new Date(act.activity_time).toLocaleString()}</span>
+                                <span className="value">{new Date(act.activity_time).toLocaleString('id-ID')}</span>
                             </div>
                             <div className="data-group">
                                 <span className="label">Nama Barang</span>
@@ -213,6 +270,7 @@ function ToolManagement({ showToast }) {
                     <p style={{ textAlign: 'center' }}>Belum ada aktivitas.</p>
                 )}
             </div>
+            {/* --- AKHIR BAGIAN YANG DILENGKAPI --- */}
         </>
     );
 
@@ -223,33 +281,38 @@ function ToolManagement({ showToast }) {
             </div>
 
             {view === 'main' && renderMainView()}
-            {view === 'list' && (
-                <ToolListView
-                    tools={tools}
-                    lostItems={lostItems}
+
+            {view === 'itemList' && (
+                <ItemListView
+                    items={items}
+                    pagination={itemsPagination}
                     loading={loading}
                     onBack={() => setView('main')}
                     onAdd={handleOpenAddModal}
                     onEdit={handleOpenEditModal}
-                    onDelete={handleDelete}
-                    onRecover={handleOpenRecoverModal}
+                    onDelete={handleDeleteItem}
+                    onPageChange={fetchItems}
+                    onFilterChange={fetchItems}
                 />
             )}
+
             {view === 'report' && (
                 <ToolReportView
                     reportData={reportData}
                     loading={loading}
                     onBack={() => setView('main')}
+                    onRecoverClick={handleOpenRecoverModal}
                 />
             )}
 
-            <ToolFormModal
+            <ItemFormModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
-                onSave={handleSaveTool}
-                toolToEdit={toolToEdit}
+                onSave={handleSaveItem}
+                itemToEdit={itemToEdit}
                 showToast={showToast}
             />
+
             {isRecoverModalOpen && (
                 <RecoverStockModal
                     onClose={handleCloseRecoverModal}

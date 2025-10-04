@@ -344,15 +344,16 @@ body.dark-mode .dashboard-container {
 }
 
 .form-description {
-  color: #333; 
-  margin-bottom: 1.5rem; 
+  color: #333;
+  margin-bottom: 1.5rem;
   line-height: 1.5;
 }
 
 .resend-otp-link {
   background: none;
   border: none;
-  color: #4da6ff; /* Warna biru yang sama dengan .login-link */
+  color: #4da6ff;
+  /* Warna biru yang sama dengan .login-link */
   font-weight: bold;
   cursor: pointer;
   text-decoration: underline;
@@ -4254,7 +4255,7 @@ body.dark-mode .password-toggle-btn:hover {
 
 /* --- Styling Konten Modal --- */
 .confirmation-modal-content-user {
-  
+
   backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 30px;
@@ -4264,7 +4265,7 @@ body.dark-mode .password-toggle-btn:hover {
   animation: slideUp 0.4s ease;
   text-align: center;
   transition: all 0.3s ease;
-    background: #374151 !important;
+  background: #374151 !important;
   color: #f3f4f6 !important;
   border: 1px solid #4b5563;
 }
@@ -10090,11 +10091,17 @@ body.dark-mode .form-group2 textarea {
   color: #e2e8f0;
 }
 
+.modal-content .user-form-modal.large h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
 .form-group.half1 {
-  flex: 1 1 70%;
-  /* fleksibel, min 50% */
+  flex: 1 1 50%;
   min-width: 120px;
-  /* biar input ga kependekan */
+  margin-bottom: auto;
 }
 
 .form-group.half1 input {
@@ -10103,7 +10110,7 @@ body.dark-mode .form-group2 textarea {
 }
 
 .form-group.half {
-  flex: 1 1 30%;
+  flex: 1 1 50%;
   /* fleksibel, min 50% */
   min-width: 120px;
   /* biar input ga kependekan */
@@ -10113,6 +10120,8 @@ body.dark-mode .form-group2 textarea {
   width: 100%;
   /* biar full di dalam colom */
 }
+
+
 
 /* Responsif: di layar kecil, paksa turun ke bawah */
 @media (max-width: 1290px) {
@@ -10230,50 +10239,75 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* --- Wadah Utama Modal (Glassmorphism) --- */
 .modal-backdrop-detail {
-  position: fixed; inset: 0;
+  position: fixed;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 2000; padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
 }
 
 .modal-content-detail {
-  background: rgba(255, 255, 255, 0.92); /* Latar terang */
+  background: rgba(255, 255, 255, 0.92);
+  /* Latar terang */
   backdrop-filter: blur(10px);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.5);
-  width: 100%; max-width: 600px; max-height: 90vh;
-  border-radius: 16px; padding: 1.5rem;
-  display: flex; flex-direction: column; overflow-y: auto;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .dark-mode .modal-content-detail {
-  background: #111111; /* Latar gelap */
+  background: #111111;
+  /* Latar gelap */
   border: 1px solid rgba(148, 163, 184, 0.25);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
 }
 
 /* --- Header --- */
 .modal-header-detail {
-  display: flex; justify-content: space-between; align-items: center;
-  padding-bottom: 1rem; margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
   border-bottom: 1px solid var(--border-color);
 }
+
 .modal-header-detail h3 {
-  font-size: 1.25rem; font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 600;
   color: var(--text-color-primary);
 }
+
 .modal-close-button-detail {
-  background: none; border: none; font-size: 1.5rem;
-  color: var(--text-color-secondary); cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-color-secondary);
+  cursor: pointer;
 }
 
 /* --- Body & Layout Grid --- */
 .modal-body-detail {
-  display: flex; flex-direction: column; gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
+
 .detail-grid-section {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
 
 /* --- Styling 'Pill' Item Data (dengan warna Anda) --- */
@@ -10289,15 +10323,21 @@ body.dark-mode .form-group-recover textarea:focus {
   background-color: rgba(168, 162, 158, 0.15);
   box-shadow: 0 4px 12px rgba(87, 83, 78, 0.15);
 }
+
 .detail-item-full .label {
   color: #6B7280;
-  font-size: 0.75rem; font-weight: 500;
-  text-transform: uppercase; margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
 }
+
 .detail-item-full .value {
   color: #1F2937;
-  font-size: 1rem; font-weight: 600;
-  white-space: pre-wrap; word-break: break-word;
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 /* WARNA UNTUK MODE GELAP (Ungu/Violet) */
@@ -10305,21 +10345,47 @@ body.dark-mode .form-group-recover textarea:focus {
   background-color: rgba(167, 139, 250, 0.15);
   box-shadow: 0 4px 12px rgba(100, 28, 114, 0.25);
 }
+
 .dark-mode .detail-item-full .label {
   color: #A78BFA;
   opacity: 0.7;
 }
+
 .dark-mode .detail-item-full .value {
   color: #A78BFA;
 }
 
 /* --- Styling untuk Konten Spesifik di dalam 'Pill' --- */
-.proof-image-container { margin-top: 1rem; }
-.proof-image-container img { max-width: 100%; border-radius: 8px; }
-.borrowed-items-list { list-style: none; padding: 0; margin-top: 0.5rem; }
-.borrowed-items-list li { display: flex; justify-content: space-between; padding: 0.25rem 0; }
-.dark-mode .tool-quantity { color: #A78BFA; opacity: 0.7; }
-.modal-footer { margin-top: 1.5rem; }
+.proof-image-container {
+  margin-top: 1rem;
+}
+
+.proof-image-container img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.borrowed-items-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+
+.borrowed-items-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+}
+
+.dark-mode .tool-quantity {
+  color: #A78BFA;
+  opacity: 0.7;
+}
+
+.modal-footer {
+  margin-top: 1.5rem;
+}
+
 /* ============================================= */
 /* === STYLE UNTUK MEMBATASI TEKS 2 BARIS === */
 /* ============================================= */
@@ -10343,45 +10409,62 @@ body.dark-mode .form-group-recover textarea:focus {
 /* ======================================================= */
 
 .modal-backdrop-detail-user {
-  position: fixed; inset: 0;
+  position: fixed;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 2000; padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
 }
 
 .modal-content-detail-user {
-  background-color: rgba(26, 32, 52, 0.7); 
+  background-color: rgba(26, 32, 52, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
-  width: 100%; max-width: 600px; max-height: 90vh;
-  border-radius: 16px; padding: 1.5rem;
-  display: flex; flex-direction: column; overflow-y: auto;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .modal-header-detail-user {
-  display: flex; justify-content: space-between; align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   color: #E2E8F0;
-  padding-bottom: 1rem; margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-header-detail-user h3 {
-  font-size: 1.25rem; font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 600;
   color: #E2E8F0;
 }
 
 .modal-close-button-detail-user {
-  background: none; border: none; font-size: 1.5rem;
-  color: #A0AEC0; cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #A0AEC0;
+  cursor: pointer;
 }
 
 /* [DIUBAH] Semua seksi sekarang menggunakan flex column dan punya jarak */
 .modal-body-detail-user {
   display: flex;
   flex-direction: column;
-  gap: 1rem; /* Ini akan memberi jarak antar semua 'pill' */
+  gap: 1rem;
+  /* Ini akan memberi jarak antar semua 'pill' */
 }
 
 .detail-grid-section-user {
@@ -10399,16 +10482,20 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .detail-item-full-user .label {
-  font-size: 0.75rem; font-weight: 500; 
+  font-size: 0.75rem;
+  font-weight: 500;
   text-transform: uppercase;
   margin-bottom: 0.25rem;
-  color: #A0AEC0; /* Warna label dibuat lebih pudar */
+  color: #A0AEC0;
+  /* Warna label dibuat lebih pudar */
 }
 
 .detail-item-full-user .value {
-  font-size: 1rem; font-weight: 600;
+  font-size: 1rem;
+  font-weight: 600;
   color: #E2E8F0;
-  white-space: pre-wrap; /* Agar teks deskripsi bisa turun baris */
+  white-space: pre-wrap;
+  /* Agar teks deskripsi bisa turun baris */
   word-break: break-word;
 }
 
@@ -10416,39 +10503,152 @@ body.dark-mode .form-group-recover textarea:focus {
 .proof-image-container {
   margin-top: 1rem;
 }
+
 .proof-image-container img {
   max-width: 100%;
   border-radius: 8px;
 }
+
 .borrowed-items-list-user {
   list-style: none;
   padding: 0;
   margin-top: 0.5rem;
-  color: #E2E8F0; /* Pastikan teks di list berwarna terang */
+  color: #E2E8F0;
+  /* Pastikan teks di list berwarna terang */
 }
+
 .borrowed-items-list-user li {
   display: flex;
   justify-content: space-between;
   padding: 0.25rem 0;
 }
+
 .tool-quantity {
   color: #A0AEC0;
 }
 
 .modal-footer-user {
-  margin-top: 1.5rem; display: flex; justify-content: center;
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
 }
 
 .btn-tutup-user {
-  width: 100%; max-width: 200px;
+  width: 100%;
+  max-width: 200px;
   background-color: rgba(45, 55, 72, 0.7);
   color: #E2E8F0;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0.75rem 1rem; border-radius: 12px;
-  font-weight: 600; cursor: pointer;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .btn-tutup-user:hover {
   background-color: rgba(74, 85, 104, 0.8);
+}
+
+.user-management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   Filter Select Styling (Light & Dark Mode)
+   ========================================================================== */
+
+/* --- Base Styling (Berlaku untuk kedua mode) --- */
+.filter-select {
+  /* Box Model */
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  /* Padding kanan lebih besar untuk ikon panah */
+  border: 1px solid;
+  border-radius: 8px;
+  /* Sudut yang sedikit membulat */
+
+  /* Typography */
+  font-size: 1rem;
+  font-family: inherit;
+  /* Mengikuti font dari body */
+
+  /* Appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  /* Menghilangkan tampilan default browser */
+  cursor: pointer;
+
+  /* Custom Arrow Icon (SVG) */
+  /* Trik: `stroke='%23...'` mengatur warna panah. %23 adalah kode untuk # */
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.2em 1.2em;
+
+  /* Transitions */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* --- Light Mode (Default) --- */
+.filter-select {
+  background-color: #ffffff;
+  color: #333333;
+  border-color: #ced4da;
+  /* Warna border abu-abu terang */
+  /* Panah dropdown warna gelap untuk light mode */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* --- Dark Mode --- */
+/* Pastikan body atau container utamamu memiliki class "dark-mode" */
+.dark-mode .filter-select {
+  background-color: #2d3748;
+  /* Warna latar belakang abu-abu gelap */
+  color: #e2e8f0;
+  /* Warna teks putih keabuan */
+  border-color: #4a5568;
+  /* Warna border yang sedikit lebih terang dari background */
+  /* Panah dropdown warna terang untuk dark mode */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23e2e8f0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* --- Interaction States --- */
+
+/* State ketika kursor di atas (hover) */
+.filter-select:hover {
+  border-color: #3b82f6;
+  /* Warna biru untuk highlight */
+}
+
+/* State ketika di-klik/dipilih (focus) */
+.filter-select:focus {
+  outline: none;
+  /* Hilangkan outline default */
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+  /* Efek glow biru */
+}
+
+/* State ketika disabled (untuk Sub-Kategori) */
+.filter-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.dark-mode .filter-select:disabled {
+  background-color: #2a313d;
+}
+
+/* Pastikan state disabled tidak mendapat highlight saat hover */
+.filter-select:disabled:hover {
+  border-color: #ced4da;
+  /* Kembali ke warna border default light */
+}
+
+.dark-mode .filter-select:disabled:hover {
+  border-color: #4a5568;
+  /* Kembali ke warna border default dark */
 }

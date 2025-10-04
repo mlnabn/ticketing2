@@ -13,6 +13,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Api\WorkshopController;
 use App\Http\Controllers\Api\ToolController;
 use App\Http\Controllers\Api\NotificationTemplateController;
+use App\Http\Controllers\Api\MasterKategoriController;
+use App\Http\Controllers\Api\SubKategoriController;
+use App\Http\Controllers\Api\MasterBarangController;
 
 /*
 |--------------------------------------------------------------------------
@@ -96,4 +99,16 @@ Route::middleware('jwt')->group(function () {
 
     // --- Rute untuk Proses Tiket ---
     Route::post('/tickets/{ticket}/process-return', [TicketController::class, 'processReturn']);
+
+    // --- Rute untuk Manajemen Inventaris ---
+    Route::apiResource('inventory/categories', MasterKategoriController::class);
+    Route::apiResource('inventory/sub-categories', SubKategoriController::class);
+    Route::apiResource('inventory/items', MasterBarangController::class);
+
+    Route::get('/tools/recent-activity', [ToolController::class, 'getRecentActivity']);
+    Route::get('/tools/lost-items-report', [ToolController::class, 'getLostItemsReport']);
+    Route::get('/tools/lost-items', [ToolController::class, 'getLostItems']);
+    // PERBAIKAN: Gunakan 'master_barang' sebagai parameter untuk recoverStock agar sesuai dengan MasterBarang
+    Route::post('/inventory/items/{masterBarang}/recover', [ToolController::class, 'recoverStock']);
+    
 });

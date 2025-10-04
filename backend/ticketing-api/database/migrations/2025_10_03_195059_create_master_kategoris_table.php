@@ -8,16 +8,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('sub_kategoris', function (Blueprint $table) {
-            $table->id('id_sub_kategori');
-            $table->foreignId('id_kategori')->constrained('master_kategoris', 'id_kategori')->onDelete('cascade');
-            $table->string('nama_sub');
+        Schema::create('master_kategoris', function (Blueprint $table) {
+            $table->id('id_kategori');
+            $table->string('kode_kategori', 10)->unique();
+            $table->string('nama_kategori')->unique();
             $table->timestamps(); // Ini akan membuat created_at (date_add) dan updated_at
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('sub_kategoris');
+        Schema::dropIfExists('master_kategoris');
     }
 };

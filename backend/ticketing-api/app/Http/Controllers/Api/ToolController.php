@@ -8,6 +8,7 @@ use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use App\Models\MasterBarang;
 
 class ToolController extends Controller
 {
@@ -58,6 +59,7 @@ class ToolController extends Controller
         $report = DB::table('ticket_tool')
             ->join('tickets', 'ticket_tool.ticket_id', '=', 'tickets.id')
             ->join('tools', 'ticket_tool.tool_id', '=', 'tools.id')
+            ->leftJoin('master_barangs', 'tools.name', '=', 'master_barangs.nama_barang')
             ->leftJoin('users', 'tickets.user_id', '=', 'users.id')
             ->leftJoinSub($netLosses, 'losses', function ($join) {
                 $join->on('ticket_tool.tool_id', '=', 'losses.tool_id');
@@ -69,15 +71,15 @@ class ToolController extends Controller
                 'tickets.title as ticket_title',
                 'ticket_tool.created_at as borrowed_at',
                 'tickets.completed_at as returned_at',
-                DB::raw('COALESCE(tools.stock + losses.total_net_lost, tools.stock) as stock_awal'),
-                'ticket_tool.quantity_used as dipinjam', 
+                DB::raw('COALESCE(master_barangs.stok + losses.total_net_lost, master_barangs.stok) as stock_awal'),
+                'ticket_tool.quantity_used as dipinjam',
                 'ticket_tool.quantity_lost',
-                'ticket_tool.quantity_recovered', 
-                'tools.stock as stock_akhir',
+                'ticket_tool.quantity_recovered',
+                'master_barangs.stok as stock_akhir',
                 'ticket_tool.status as loan_status',
                 'ticket_tool.keterangan',
-                'ticket_tool.ticket_id', 
-                'ticket_tool.tool_id'   
+                'ticket_tool.ticket_id',
+                'ticket_tool.tool_id'
             )
             ->orderBy('ticket_tool.created_at', 'desc')
             ->get();
@@ -151,7 +153,10 @@ class ToolController extends Controller
         }
 
         DB::transaction(function () use ($tool, $ticket, $validated, $pivot, $qtyToRecover, $alreadyRecovered) {
-            $tool->increment('stock', $qtyToRecover);
+            $masterBarang = MasterBarang::where('nama_barang', $tool->name)->first();
+            if ($masterBarang) {
+                $masterBarang->increment('stok', $qtyToRecover);
+            }
             $newlyRecovered = $alreadyRecovered + $qtyToRecover;
             $newStatus = ($newlyRecovered >= $pivot->quantity_lost) ? 'dipulihkan' : 'dipulihkan sebagian';
             $newKeterangan = $pivot->keterangan . "\n\n[DIPULIHKAN " . $qtyToRecover . " item]: " . $validated['keterangan'];
@@ -163,7 +168,7 @@ class ToolController extends Controller
             ]);
         });
 
-        return response()->json($tool->fresh(), 200);
+        return response()->json(['message' => 'Stok berhasil dipulihkan.']);
     }
 
     /**
@@ -174,7 +179,7 @@ class ToolController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:tools,name',
             'description' => 'nullable|string',
-            'stock' => 'required|integer|min:0',
+            // 'stock' => 'required|integer|min:0',
         ]);
         $tool = Tool::create($validated);
         return response()->json($tool, 201);
@@ -185,7 +190,7 @@ class ToolController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255|unique:tools,name,' . $tool->id,
             'description' => 'nullable|string',
-            'stock' => 'sometimes|required|integer|min:0',
+            // 'stock' => 'sometimes|required|integer|min:0',
         ]);
         $tool->update($validated);
         return response()->json($tool);

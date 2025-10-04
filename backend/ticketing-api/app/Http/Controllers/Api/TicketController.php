@@ -19,6 +19,7 @@ use PDF;
 use App\Exports\TicketsExport;
 use App\Models\Tool;
 use Illuminate\Validation\ValidationException;
+use App\Models\MasterBarang;
 
 
 class TicketController extends Controller
@@ -377,7 +378,7 @@ class TicketController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'tools' => 'nullable|array',
-            'tools.*.id' => 'required|exists:tools,id',
+            'tools.*.id' => 'required|exists:master_barangs,id_m_barang', // VALIDASI KE TABEL BARU
             'tools.*.quantity' => 'required|integer|min:1',
         ]);
 
@@ -387,7 +388,6 @@ class TicketController extends Controller
         }
 
         try {
-            // 5. GUNAKAN DB TRANSACTION
             DB::transaction(function () use ($ticket, $validated) {
                 // Update status tiket
                 $ticket->update([
@@ -399,21 +399,30 @@ class TicketController extends Controller
                 if (!empty($validated['tools'])) {
                     $toolsToSync = [];
                     foreach ($validated['tools'] as $toolData) {
-                        $tool = Tool::find($toolData['id']);
+                        // AMBIL DATA DARI MASTER_BARANG
+                        $item = MasterBarang::find($toolData['id']);
 
-                        // Cek ketersediaan stok
-                        if ($tool->stock < $toolData['quantity']) {
-                            // Hentikan transaksi jika stok tidak cukup
+                        // Cek ketersediaan stok di tabel baru
+                        if ($item->stok < $toolData['quantity']) {
                             throw ValidationException::withMessages([
-                                'tools' => "Stok untuk '{$tool->name}' tidak mencukupi. Sisa: {$tool->stock}."
+                                'tools' => "Stok untuk '{$item->nama_barang}' tidak mencukupi. Sisa: {$item->stok}."
                             ]);
                         }
 
-                        // Kurangi stok
-                        $tool->decrement('stock', $toolData['quantity']);
+                        // Kurangi stok di tabel baru
+                        $item->decrement('stok', $toolData['quantity']);
 
-                        // Siapkan data untuk disinkronkan ke pivot table
-                        $toolsToSync[$toolData['id']] = ['quantity_used' => $toolData['quantity'], 'status' => 'dipinjam'];
+                        // --- JEMBATAN KE SISTEM LAMA ---
+                        // Cari atau buat entri di tabel `tools` lama berdasarkan nama barang
+                        $legacyTool = Tool::firstOrCreate(
+                            ['name' => $item->nama_barang],
+                            ['stok' => 0] // Stok di tabel lama tidak kita pakai lagi, tapi kolomnya harus ada
+                        );
+                        // --------------------------------
+
+                        // Siapkan data untuk disinkronkan ke pivot table `ticket_tool`
+                        // Gunakan ID dari tabel `tools` lama
+                        $toolsToSync[$legacyTool->id] = ['quantity_used' => $toolData['quantity'], 'status' => 'dipinjam'];
                     }
 
                     // Sinkronkan ke pivot table dengan kuantitas
@@ -426,6 +435,7 @@ class TicketController extends Controller
 
         return response()->json($ticket->load(['user', 'creator', 'tools']));
     }
+
 
     /**
      * Menampilkan tiket milik admin yang login.
@@ -557,7 +567,7 @@ class TicketController extends Controller
                     $tool = Tool::find($attachedTool->id);
                     if ($tool) {
                         // Tambahkan kembali stoknya
-                        $tool->increment('stock', $attachedTool->pivot->quantity_used);
+                        $tool->increment('stok', $attachedTool->pivot->quantity_used);
                     }
                 }
 
@@ -739,61 +749,62 @@ class TicketController extends Controller
 
     // File: app/Http/Controllers/Api/TicketController.php
 
-    public function processReturn(Request $request, Ticket $ticket)
-    {
-        // ... (kode otorisasi dan validasi tidak berubah) ...
+    // app/Http/Controllers/Api/TicketController.php
 
-        $validated = $request->validate([
-            'items' => 'present|array',
-            'items.*.tool_id' => 'required|exists:tools,id',
-            'items.*.quantity_returned' => 'required|integer|min:0',
-            'items.*.quantity_lost' => 'required|integer|min:0',
-            'items.*.keterangan' => 'nullable|string|max:1000',
-        ]);
+public function processReturn(Request $request, Ticket $ticket)
+{
+    $validated = $request->validate([
+        'items' => 'present|array',
+        'items.*.tool_id' => 'required|exists:tools,id',
+        'items.*.quantity_returned' => 'required|integer|min:0',
+        'items.*.quantity_lost' => 'required|integer|min:0',
+        'items.*.keterangan' => 'nullable|string|max:1000',
+    ]);
 
-        DB::transaction(function () use ($ticket, $validated) {
-            $borrowedTools = $ticket->tools()->withPivot('quantity_used')->get()->keyBy('id');
+    DB::transaction(function () use ($ticket, $validated) {
+        $borrowedTools = $ticket->tools()->withPivot('quantity_used')->get()->keyBy('id');
 
-            foreach ($validated['items'] as $item) {
-                $tool = Tool::find($item['tool_id']);
-                $borrowedQty = $borrowedTools[$item['tool_id']]->pivot->quantity_used ?? 0;
-                $returnedQty = $item['quantity_returned'];
-                $lostQty = $item['quantity_lost'];
+        foreach ($validated['items'] as $item) {
+            $tool = Tool::find($item['tool_id']);
+            if (!$tool) continue;
+            
+            $borrowedQty = $borrowedTools[$item['tool_id']]->pivot->quantity_used ?? 0;
+            $returnedQty = $item['quantity_returned'];
+            $lostQty = $item['quantity_lost'];
 
-                if (($returnedQty + $lostQty) > $borrowedQty) {
-                    throw ValidationException::withMessages([
-                        'items' => "Total barang kembali & hilang untuk '{$tool->name}' melebihi jumlah yang dipinjam."
-                    ]);
-                }
-
-                // 1. Kembalikan stok untuk barang yang kembali
-                if ($tool && $returnedQty > 0) {
-                    $tool->increment('stock', $returnedQty);
-                }
-
-                // 2. Update status di pivot table (logika ini sudah benar)
-                if (($returnedQty + $lostQty) == $borrowedQty) {
-                    if ($lostQty > 0 && $returnedQty > 0) {
-                        $newStatus = 'kembali sebagian';
-                    } elseif ($lostQty > 0 && $returnedQty == 0) {
-                        $newStatus = 'hilang';
-                    } else {
-                        $newStatus = 'dikembalikan';
-                    }
-                    $ticket->tools()->updateExistingPivot($item['tool_id'], [
-                        'status' => $newStatus,
-                        'keterangan' => $item['keterangan'] ?? null,
-                        'quantity_lost' => $lostQty,
-                    ]);
+            if ($returnedQty > 0) {
+                $masterBarang = MasterBarang::where('nama_barang', $tool->name)->first();
+                if ($masterBarang) {
+                    // PERBAIKAN: Hapus baris update() yang berlebih.
+                    // Cukup gunakan increment() dengan jumlah yang benar.
+                    $masterBarang->increment('stok', $returnedQty);
                 }
             }
 
-            $ticket->update([
-                'status' => 'Selesai',
-                'completed_at' => now(),
-            ]);
-        });
+            // Update status di pivot table
+            if (($returnedQty + $lostQty) == $borrowedQty) {
+                $newStatus = 'dikembalikan';
+                if ($lostQty > 0 && $returnedQty > 0) {
+                    $newStatus = 'kembali sebagian';
+                } elseif ($lostQty > 0 && $returnedQty == 0) {
+                    $newStatus = 'hilang';
+                }
+                
+                $ticket->tools()->updateExistingPivot($item['tool_id'], [
+                    'status' => $newStatus,
+                    'keterangan' => $item['keterangan'] ?? null,
+                    'quantity_lost' => $lostQty,
+                ]);
+            }
+        }
 
-        return response()->json($ticket->load(['user', 'creator', 'tools']));
-    }
+        $ticket->update([
+            'status' => 'Selesai',
+            'completed_at' => now(),
+        ]);
+    });
+
+    return response()->json($ticket->load(['user', 'creator', 'tools']));
+}
+
 }

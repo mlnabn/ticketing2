@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 
-function AssignAdminModal({ ticket, admins, tools, onAssign, onClose, showToast }) {
+function AssignAdminModal({ ticket, admins, items, onAssign, onClose, showToast }) {
   const [selectedAdminId, setSelectedAdminId] = useState(null);
   const [itemsToAssign, setItemsToAssign] = useState([]);
 
@@ -10,11 +10,11 @@ function AssignAdminModal({ ticket, admins, tools, onAssign, onClose, showToast 
     label: admin.name
   }));
 
-  const toolOptions = tools.map(tool => ({
-    value: tool.id,
-    label: `${tool.name} (Stok: ${tool.stock})`,
-    stock: tool.stock,
-    name: tool.name
+  const itemOptions = items.map(item => ({
+    value: item.id_m_barang, // Gunakan id_m_barang
+    label: `${item.nama_barang} (Stok: ${item.stok})`,
+    stock: item.stok,
+    name: item.nama_barang // Gunakan nama_barang
   }));
 
   const handleToolSelectionChange = (selectedOptions) => {
@@ -152,8 +152,8 @@ function AssignAdminModal({ ticket, admins, tools, onAssign, onClose, showToast 
           <label className="modal-label">Barang yang Dibawa</label>
           <Select
             isMulti
-            options={toolOptions}
-            value={toolOptions.filter(option => itemsToAssign.some(item => item.id === option.value))}
+            options={itemOptions}
+            value={itemOptions.filter(option => itemsToAssign.some(item => item.id === option.value))}
             onChange={handleToolSelectionChange}
             placeholder="Pilih Alat/Barang..."
             styles={selectStyles}

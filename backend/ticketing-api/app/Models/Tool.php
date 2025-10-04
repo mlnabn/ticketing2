@@ -9,12 +9,13 @@ class Tool extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'stock'];
+    protected $fillable = ['name', 'description'];
 
     public function tickets()
     {
-        return $this->belongsToMany(Ticket::class)
-            ->withPivot('quantity_used', 'quantity_lost', 'quantity_recovered', 'status', 'keterangan')
+        // Menghubungkan ke tabel pivot 'ticket_tool'
+        return $this->belongsToMany(Ticket::class, 'ticket_tool')
+            ->withPivot('quantity_used', 'status', 'keterangan', 'quantity_lost', 'quantity_recovered')
             ->withTimestamps();
     }
 }
