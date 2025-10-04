@@ -356,19 +356,20 @@ export default function AdminDashboard() {
   };
 
   const updateTicketStatus = async (ticketIdentifier, newStatus) => {
-    // Langkah 1: Cari tiket lengkap berdasarkan identifier (bisa berupa ID atau objek)
+    const sourceTicketList = currentPage === 'MyTickets' 
+    ? (myTicketsData?.data || []) 
+    : ticketsOnPage;
+
     const ticket = typeof ticketIdentifier === 'object'
       ? ticketIdentifier
-      : ticketsOnPage.find(t => t.id === ticketIdentifier);
+      : sourceTicketList.find(t => t.id === ticketIdentifier);
 
-    // Langkah 2: Lakukan pengecekan jika tiket tidak ditemukan
     if (!ticket) {
-      console.error("Tiket tidak ditemukan dengan identifier:", ticketIdentifier);
+      console.error("Tiket tidak ditemukan dengan identifier:", ticketIdentifier, "di halaman:", currentPage);
       showToast("Gagal memperbarui status: Tiket tidak ditemukan.", "error");
       return;
     }
 
-    // Langkah 3: Sisa logika berjalan seperti semula menggunakan objek 'ticket' yang sudah ditemukan
     if (newStatus === 'Selesai' && ticket.tools && ticket.tools.length > 0) {
       setTicketToReturn(ticket);
       setShowReturnModal(true);
@@ -376,7 +377,8 @@ export default function AdminDashboard() {
       try {
         await api.patch(`/tickets/${ticket.id}/status`, { status: newStatus });
         showToast('Status tiket berhasil diupdate.', 'success');
-        fetchDashboardData();
+        // Muat ulang kedua sumber data agar konsisten
+        fetchDashboardData(); 
         fetchMyTickets(myTicketsPage);
       } catch (e) {
         console.error('Gagal update status:', e);
