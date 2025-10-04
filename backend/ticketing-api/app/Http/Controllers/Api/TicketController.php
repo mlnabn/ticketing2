@@ -43,25 +43,21 @@ class TicketController extends Controller
         if ($handledStatus === 'handled') {
             $query->whereNotNull('user_id');
         }
-        if ($statusFilter) {
-            // Peta status untuk menangani SEMUA jenis filter
+        if (is_array($statusFilter)) {
+            $query->whereIn('status', $statusFilter);
+        } else {
+            // 2. Jika bukan array, jalankan logika lama yang sudah ada
             $statusMap = [
-                // Filter gabungan
                 'Belum Selesai'     => ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'],
                 'Sedang Dikerjakan' => ['Sedang Dikerjakan', 'Ditunda'],
-
-                // Alias dari Halaman Laporan
                 'in_progress'       => ['Sedang Dikerjakan', 'Ditunda'],
                 'completed'         => ['Selesai'],
                 'rejected'          => ['Ditolak'],
             ];
 
             if (isset($statusMap[$statusFilter])) {
-                // Gunakan peta jika status adalah alias (misal: 'in_progress')
                 $query->whereIn('status', $statusMap[$statusFilter]);
             } else {
-                // Jika bukan alias, asumsikan itu adalah nama status asli
-                // (misal: "Selesai", "Ditolak" dari pie chart)
                 $query->where('status', $statusFilter);
             }
         }
