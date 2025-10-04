@@ -40,28 +40,31 @@ class TicketController extends Controller
                 $q->where('name', 'like', '%' . $search . '%');
             });
         }
+
         if ($handledStatus === 'handled') {
             $query->whereNotNull('user_id');
         }
-        if (is_array($statusFilter)) {
-            $query->whereIn('status', $statusFilter);
-        } else {
-            // 2. Jika bukan array, jalankan logika lama yang sudah ada
-            $statusMap = [
-                'Belum Selesai'     => ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'],
-                'Sedang Dikerjakan' => ['Sedang Dikerjakan', 'Ditunda'],
-                'in_progress'       => ['Sedang Dikerjakan', 'Ditunda'],
-                'completed'         => ['Selesai'],
-                'rejected'          => ['Ditolak'],
-            ];
 
-            if (isset($statusMap[$statusFilter])) {
-                $query->whereIn('status', $statusMap[$statusFilter]);
+        if ($statusFilter) {
+            if (is_array($statusFilter)) {
+                $query->whereIn('status', $statusFilter);
             } else {
-                $query->where('status', $statusFilter);
+                $statusMap = [
+                    'Belum Selesai'     => ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'],
+                    'Sedang Dikerjakan' => ['Sedang Dikerjakan', 'Ditunda'],
+                    'in_progress'       => ['Sedang Dikerjakan', 'Ditunda'],
+                    'completed'         => ['Selesai'],
+                    'rejected'          => ['Ditolak'],
+                ];
+
+                if (isset($statusMap[$statusFilter])) {
+                    $query->whereIn('status', $statusMap[$statusFilter]);
+                } else {
+                    $query->where('status', $statusFilter);
+                }
             }
         }
-
+        
         if ($adminId) {
             $query->where('user_id', $adminId);
         }
