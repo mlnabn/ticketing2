@@ -438,7 +438,7 @@ class TicketController extends Controller
 
         $perPage = $request->query('per_page', 10);
 
-        $ticketsData = Ticket::with(['user', 'creator'])
+        $ticketsData = Ticket::with(['user', 'creator', 'workshop'])
             ->where('user_id', $user->id)
             ->latest()
             ->paginate($perPage);

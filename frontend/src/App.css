@@ -10340,19 +10340,27 @@ body.dark-mode .form-group-recover textarea:focus {
   word-break: break-word;
 }
 
-/* WARNA UNTUK MODE GELAP (Ungu/Violet) */
+/* --- WARNA UNTUK MODE GELAP (Gaya Biru Sederhana) --- */
 .dark-mode .detail-item-full {
-  background-color: rgba(167, 139, 250, 0.15);
-  box-shadow: 0 4px 12px rgba(100, 28, 114, 0.25);
+  background-color: rgba(71, 85, 105, 0.25);
+  box-shadow: none;
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .dark-mode .detail-item-full .label {
-  color: #A78BFA;
-  opacity: 0.7;
+  color: #94a3b8;
+  opacity: 1;
 }
 
 .dark-mode .detail-item-full .value {
-  color: #A78BFA;
+  color: #e2e8f0;
+}
+
+/* Style khusus untuk badge status agar menonjol */
+.dark-mode .detail-item-full .status-badge {
+  background-color: none;
+  box-shadow: none;
+  color: #ffffff;
 }
 
 /* --- Styling untuk Konten Spesifik di dalam 'Pill' --- */

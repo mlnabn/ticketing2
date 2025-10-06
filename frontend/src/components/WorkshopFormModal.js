@@ -2,18 +2,16 @@ import React, { useState, useEffect } from 'react';
 
 export default function WorkshopFormModal({ workshopToEdit, onClose, onSave }) {
   const [name, setName] = useState('');
-  const [code, setCode] = useState('');
 
   useEffect(() => {
     if (workshopToEdit) {
       setName(workshopToEdit.name || '');
-      setCode(workshopToEdit.code || '');
     }
   }, [workshopToEdit]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({ name, code });
+    onSave({ name });
   };
 
   const isEditMode = Boolean(workshopToEdit);
@@ -29,10 +27,6 @@ export default function WorkshopFormModal({ workshopToEdit, onClose, onSave }) {
             <div className="form-group">
               <label htmlFor="name">Nama Workshop</label>
               <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} required />
-            </div>
-            <div className="form-group">
-              <label htmlFor="code">Kode Tiket (2 Huruf)</label>
-              <input type="text" id="code" value={code} onChange={e => setCode(e.target.value)} required maxLength="2" />
             </div>
           </div>
           <div className="confirmation-modal-actions">
