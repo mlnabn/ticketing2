@@ -1,0 +1,200 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import api from '../services/api';
+import Pagination from './Pagination';
+import ItemDetailModal from './ItemDetailModal'; // Anda perlu membuat komponen modal ini
+import { QRCodeSVG as QRCode } from 'qrcode.react';
+import EditStokBarangModal from './EditStokBarangModal';
+import { set } from 'date-fns';
+
+function StokBarangView({ showToast }) {
+    // State utama
+    const [items, setItems] = useState([]);
+    const [pagination, setPagination] = useState(null);
+    const [loading, setLoading] = useState(true);
+    
+    // State untuk filter
+    const [categories, setCategories] = useState([]);
+    const [subCategories, setSubCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedSubCategory, setSelectedSubCategory] = useState('');
+
+    // State untuk modal
+    const [detailItem, setDetailItem] = useState(null);
+    const [editItem, setEditItem] = useState(null);
+    const [qrModalItem, setQrModalItem] = useState(null);
+
+    // Fungsi untuk mengambil data dari backend
+    const fetchData = useCallback(async (page = 1, filters = {}) => {
+        setLoading(true);
+        try {
+            const params = { page, ...filters };
+            const res = await api.get('/inventory/stock-items', { params });
+            setItems(res.data.data);
+            setPagination(res.data);
+        } catch (error) {
+            showToast('Gagal memuat data stok.', 'error');
+            console.error("Fetch Stok Error:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [showToast]);
+
+    // Fetch master data untuk filter
+    useEffect(() => {
+        api.get('/inventory/categories').then(res => setCategories(res.data));
+    }, []);
+
+    useEffect(() => {
+        if (selectedCategory) {
+            api.get(`/inventory/sub-categories?id_kategori=${selectedCategory}`).then(res => setSubCategories(res.data));
+        } else {
+            setSubCategories([]);
+        }
+        setSelectedSubCategory('');
+    }, [selectedCategory]);
+
+    // Fetch data utama saat komponen dimuat atau filter berubah
+    useEffect(() => {
+        const filters = {
+            id_kategori: selectedCategory,
+            id_sub_kategori: selectedSubCategory
+        };
+        fetchData(1, filters);
+    }, [selectedCategory, selectedSubCategory, fetchData]);
+
+    // Fungsi untuk mencari via scanner/input
+    const handleScanSearch = useCallback(async (serial) => {
+        showToast(`Mencari: ${serial}`, 'info');
+        try {
+            const res = await api.get(`/inventory/stock-items/by-serial/${serial}`);
+            setDetailItem(res.data);
+        } catch (error) {
+            showToast(`Serial Number "${serial}" tidak ditemukan.`, 'error');
+        }
+    }, [showToast]);
+
+    // Listener global untuk scanner
+    useEffect(() => {
+        let barcode = '';
+        let interval;
+        const handleKeyDown = (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            if (interval) clearInterval(interval);
+            if (e.code === 'Enter' || e.key === 'Enter') {
+                if (barcode) {
+                    handleScanSearch(barcode.trim());
+                }
+                barcode = '';
+                return;
+            }
+            if (e.key.length === 1) { 
+                barcode += e.key;
+            }
+            interval = setInterval(() => barcode = '', 50);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [handleScanSearch]);
+
+    return (
+        <>
+            <div className="user-management-container" style={{ marginBottom: '20px' }}>
+                <h1>Daftar Stok Unit Barang</h1>
+            </div>
+            
+            {/* --- Filter Section --- */}
+            <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)} className="filter-select">
+                    <option value="">Semua Kategori</option>
+                    {categories.map(cat => (
+                        <option key={cat.id_kategori} value={cat.id_kategori}>{cat.nama_kategori}</option>
+                    ))}
+                </select>
+                <select value={selectedSubCategory} onChange={e => setSelectedSubCategory(e.target.value)} disabled={!selectedCategory || subCategories.length === 0} className="filter-select">
+                    <option value="">Semua Sub-Kategori</option>
+                    {subCategories.map(sub => (
+                        <option key={sub.id_sub_kategori} value={sub.id_sub_kategori}>{sub.nama_sub}</option>
+                    ))}
+                </select>
+            </div>
+            
+            <div className="job-list-table">
+                <table className="job-table">
+                    <thead>
+                        <tr>
+                            <th>Kode Unik</th>
+                            <th>S/N</th>
+                            <th>Nama Barang</th>
+                            <th>Kondisi</th>
+                            <th>Harga Beli</th>
+                            <th>Tgl Beli</th>
+                            <th>Tgl Masuk</th>
+                            <th>Status Stok</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {loading ? ( <tr><td colSpan="9" style={{ textAlign: 'center' }}>Memuat data stok...</td></tr> ) 
+                        : items.map(item => (
+                            <tr key={item.id}>
+                                <td>{item.kode_unik}</td>
+                                <td>{item.serial_number || '-'}</td>
+                                <td>{item.master_barang?.nama_barang}</td>
+                                <td>{item.kondisi}</td>
+                                <td>Rp {Number(item.harga_beli).toLocaleString('id-ID')}</td>
+                                <td>{item.tanggal_pembelian ? new Date(item.tanggal_pembelian).toLocaleDateString('id-ID') : '-'}</td>
+                                <td>{new Date(item.tanggal_masuk).toLocaleDateString('id-ID')}</td>
+                                <td><span className={`status-${item.status.toLowerCase()}`}>{item.status}</span></td>
+                                <td className="action-buttons-group">
+                                    <button onClick={() => setDetailItem(item)} className="btn-user-action btn-view">Detail</button>
+                                    <button onClick={() => setEditItem(item)} className="btn-user-action btn-edit">Edit</button>
+                                    <button onClick={() => setQrModalItem(item)} className="btn-user-action btn-edit">QR</button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            {pagination && pagination.last_page > 1 && (
+                <Pagination 
+                    currentPage={pagination.current_page}
+                    lastPage={pagination.last_page}
+                    onPageChange={(page) => fetchData(page, { id_kategori: selectedCategory, id_sub_kategori: selectedSubCategory })}
+                />
+            )}
+
+            {detailItem && (
+                <ItemDetailModal item={detailItem} onClose={() => setDetailItem(null)} />
+            )}
+
+            {editItem && (
+                <EditStokBarangModal
+                    isOpen={!!editItem}
+                    onClose={() => setEditItem(null)}
+                    item={editItem}
+                    showToast={showToast}
+                    onSaveSuccess={() => fetchData(pagination?.current_page || 1, { 
+                        id_kategori: selectedCategory, 
+                        id_sub_kategori: selectedSubCategory 
+                    })}
+                />
+            )}
+            
+            {qrModalItem && (
+                <div className="modal-backdrop" onClick={() => setQrModalItem(null)}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()} style={{textAlign: 'center'}}>
+                        <h3>QR Code untuk {qrModalItem.kode_unik}</h3>
+                        <div style={{ padding: '20px' }}>
+                            <QRCode value={qrModalItem.kode_unik} size={256} level="H" />
+                            <p style={{ marginTop: '15px', fontWeight: 'bold' }}>{qrModalItem.master_barang?.nama_barang}</p>
+                            <p>S/N: {qrModalItem.serial_number || 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
+    );
+}
+
+export default StokBarangView;

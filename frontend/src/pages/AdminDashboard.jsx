@@ -25,11 +25,11 @@ import RejectTicketModal from '../components/RejectTicketModal';
 import ConfirmationModal from '../components/ConfirmationModal';
 import UserFormModal from '../components/UserFormModal';
 import TicketReportAdminList from '../components/TicketReportAdminList';
-// import TicketReportDetail from '../components/TicketReportDetail';
 import WorkshopManagement from '../components/WorkshopManagement';
 import ToolManagement from '../components/ToolManagement';
 import ReturnItemsModal from '../components/ReturnItemsModal'
 import TicketDetailModal from '../components/TicketDetailModal';
+import StokBarangView from '../components/StokBarangView';
 
 // Assets
 import yourLogok from '../Image/DTECH-Logo.png';
@@ -594,6 +594,11 @@ export default function AdminDashboard() {
                 </button>
               </li>
               <li className="sidebar-nav-item">
+                <button onClick={() => setCurrentPage('stokBarang')} className={`sidebar-button ${currentPage === 'stokBarang' ? 'active' : ''}`}>
+                    <i className="fas fa-boxes"></i><span className="nav-text">Stok Barang</span>
+                </button>
+              </li>
+              <li className="sidebar-nav-item">
                 <button onClick={() => setCurrentPage('workshopManagement')} className={`sidebar-button ${currentPage === 'workshopManagement' ? 'active' : ''}`}>
                   <i className="fas fa-cogs"></i><span className="nav-text">Workshop</span>
                 </button>
@@ -791,6 +796,10 @@ export default function AdminDashboard() {
 
             {currentPage === 'toolManagement' && (
               <ToolManagement showToast={showToast} />
+            )}
+
+            {currentPage === 'stokBarang' && (
+              <StokBarangView showToast={showToast} />
             )}
 
             {currentPage === 'ticketReport' && (

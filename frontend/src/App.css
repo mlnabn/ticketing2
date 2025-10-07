@@ -9828,6 +9828,48 @@ body.dark-mode .btn-recover-small:hover {
 
 }
 
+.item-detail-container {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem;
+}
+.item-detail-qr {
+  text-align: center;
+  padding: 1rem;
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.dark-mode .item-detail-qr {
+  border-right: 1px solid #444;
+}
+.item-detail-info {
+  flex-grow: 1;
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.dark-mode .info-row {
+  border-bottom: 1px solid #333;
+}
+.info-row:last-child {
+  border-bottom: none;
+}
+.info-label {
+  font-weight: 600;
+  color: #555;
+}
+.dark-mode .info-label {
+  color: #aaa;
+}
+.info-value {
+  text-align: right;
+}
 
 /* ================================================= */
 /* == GAYA BARU UNTUK SEMUA MODAL (Glassmorphism) == */

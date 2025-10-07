@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\UserController;
@@ -11,7 +10,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Api\OtpController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Api\WorkshopController;
-use App\Http\Controllers\Api\ToolController;
+use App\Http\Controllers\Api\StokBarangController;
 use App\Http\Controllers\Api\NotificationTemplateController;
 use App\Http\Controllers\Api\MasterKategoriController;
 use App\Http\Controllers\Api\SubKategoriController;
@@ -90,6 +89,10 @@ Route::middleware('jwt')->group(function () {
 
     // --- Rute untuk Proses Tiket ---
     Route::post('/tickets/{ticket}/process-return', [TicketController::class, 'processReturn']);
+
+    Route::get('/inventory/stock-items', [StokBarangController::class, 'index']);
+    Route::get('/inventory/stock-items/by-serial/{serial}', [StokBarangController::class, 'showBySerial']);
+    Route::post('/inventory/stock-items/{stokBarang}', [StokBarangController::class, 'update']);
 
     // --- Rute untuk Manajemen Inventaris ---
     Route::apiResource('inventory/categories', MasterKategoriController::class);

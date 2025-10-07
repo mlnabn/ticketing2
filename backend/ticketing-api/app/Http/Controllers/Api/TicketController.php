@@ -395,28 +395,37 @@ class TicketController extends Controller
                 ]);
 
                 if (!empty($validated['tools'])) {
-                    $barangsToSync = [];
                     foreach ($validated['tools'] as $toolData) {
-                        $item = MasterBarang::find($toolData['id']);
-
-                        if ($item->stok < $toolData['quantity']) {
+                        $masterBarang = MasterBarang::find($toolData['id']);
+                        if ($masterBarang->stok_tersedia < $toolData['quantity']) {
                             throw ValidationException::withMessages([
-                                'tools' => "Stok untuk '{$item->nama_barang}' tidak mencukupi. Sisa: {$item->stok}."
+                                'tools' => "Stok untuk '{$masterBarang->nama_barang}' tidak mencukupi. Sisa: {$masterBarang->stok_tersedia}."
                             ]);
                         }
 
-                        $item->decrement('stok', $toolData['quantity']);
+                        // PERBAIKAN: Gunakan nama relasi yang benar -> stokBarangs()
+                        $itemsToAssign = $masterBarang->stokBarangs() 
+                            ->where('status', 'Tersedia')
+                            ->take($toolData['quantity'])
+                            ->get();
+                        
+                        if ($itemsToAssign->count() < $toolData['quantity']) {
+                            throw ValidationException::withMessages([
+                                'tools' => "Stok unit tersedia untuk '{$masterBarang->nama_barang}' tidak cukup."
+                            ]);
+                        }
+                        
+                        foreach($itemsToAssign as $item) {
+                            $item->update(['status' => 'Dipinjam']);
+                        }
 
-                        // Langsung siapkan data untuk sync ke pivot table baru
-                        $barangsToSync[$item->id_m_barang] = [
-                            'quantity_used' => $toolData['quantity'],
-                            'status' => 'dipinjam'
-                        ];
+                        $ticket->masterBarangs()->syncWithoutDetaching([
+                            $masterBarang->id_m_barang => ['quantity_used' => $toolData['quantity'], 'status' => 'dipinjam']
+                        ]);
                     }
-                    // Sync langsung ke relasi baru
-                    $ticket->masterBarangs()->syncWithoutDetaching($barangsToSync);
                 }
             });
+            
         } catch (ValidationException $e) {
             return response()->json(['message' => $e->getMessage(), 'errors' => $e->errors()], 422);
         }

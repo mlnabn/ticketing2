@@ -1,11 +1,9 @@
-// src/components/ToolManagement.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
-
-// Komponen BARU untuk sistem inventaris
 import ItemListView from './ItemListView';
 import ItemFormModal from './ItemFormModal';
 import ConfirmationModal from './ConfirmationModal';
+import EditNamaBarangModal from './EditNamaBarangModal';
 
 function ToolManagement({ showToast }) {
     const [items, setItems] = useState([]);
@@ -15,6 +13,7 @@ function ToolManagement({ showToast }) {
     const [itemToDelete, setItemToDelete] = useState(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [itemToEditName, setItemToEditName] = useState(null);
 
     const fetchItems = useCallback(async (page = 1, filters = {}) => {
         setLoading(true);
@@ -36,8 +35,10 @@ function ToolManagement({ showToast }) {
     }, [fetchItems]);
 
     const handleOpenAddModal = () => { setItemToEdit(null); setIsItemModalOpen(true); };
-    const handleOpenEditModal = (item) => { setItemToEdit(item); setIsItemModalOpen(true); };
     const handleCloseItemModal = () => { setIsItemModalOpen(false); setItemToEdit(null); };
+    const handleOpenEditNameModal = (item) => setItemToEditName(item);
+    const handleCloseEditNameModal = () => setItemToEditName(null);
+
 
     const handleSaveItem = async (formData) => {
         // Logika save yang sudah disederhanakan
@@ -107,7 +108,7 @@ function ToolManagement({ showToast }) {
                 pagination={pagination}
                 loading={loading}
                 onAdd={handleOpenAddModal}
-                onEdit={handleOpenEditModal}
+                onEdit={handleOpenEditNameModal}
                 onDelete={handleDeleteClick}
                 onPageChange={fetchItems}
                 onFilterChange={fetchItems}
@@ -120,6 +121,14 @@ function ToolManagement({ showToast }) {
                 onSave={handleSaveItem}
                 itemToEdit={itemToEdit}
                 showToast={showToast}
+            />
+
+            <EditNamaBarangModal
+                isOpen={!!itemToEditName}
+                onClose={handleCloseEditNameModal}
+                item={itemToEditName}
+                showToast={showToast}
+                onSaveSuccess={() => fetchItems(pagination?.current_page || 1)}
             />
 
             {/* Modal Konfirmasi Hapus */}

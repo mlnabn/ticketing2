@@ -3,17 +3,12 @@ import api from '../services/api';
 import CreatableSelect from 'react-select/creatable';
 
 const initialFormState = {
-    id_kategori: '',
-    id_sub_kategori: '',
-    nama_barang: '',
-    merk: '',
-    model_barang: '',
-    tanggal_pembelian: '',
-    tanggal_masuk: '',
-    digunakan_untuk: '',
-    stok: 0,
-    harga_barang: '',
+    id_kategori: '', id_sub_kategori: '', nama_barang: '', 
+    kondisi: 'Baru',
+    jumlah: 1, 
+    harga_beli: '',
     warna: '',
+    tanggal_pembelian: '', serial_numbers: [''],
 };
 
 function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
@@ -34,19 +29,11 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
         if (isOpen) {
             fetchCategories();
             if (itemToEdit) {
-                // Jika edit, pre-fill data
                 setFormData({
-                    id_kategori: itemToEdit.id_kategori || '',
-                    id_sub_kategori: itemToEdit.id_sub_kategori || '',
-                    nama_barang: itemToEdit.nama_barang || '',
-                    merk: itemToEdit.merk || '',
-                    model_barang: itemToEdit.model_barang || '',
-                    tanggal_pembelian: itemToEdit.tanggal_pembelian || '',
-                    tanggal_masuk: itemToEdit.tanggal_masuk || '',
-                    digunakan_untuk: itemToEdit.digunakan_untuk || '',
-                    stok: itemToEdit.stok || 0,
-                    harga_barang: itemToEdit.harga_barang || '',
-                    warna: itemToEdit.warna || '',
+                    ...initialFormState,
+                    ...itemToEdit,
+                    jumlah: itemToEdit.stok_tersedia || 0,
+                    serial_numbers: [], // Pastikan serial_numbers adalah array kosong dalam mode edit
                 });
             } else {
                 setFormData(initialFormState);
@@ -65,6 +52,24 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
             setSubCategories([]);
         }
     }, [formData.id_kategori]);
+
+    useEffect(() => {
+        const count = parseInt(formData.jumlah, 10) || 0;
+        const existingSerials = formData.serial_numbers || [];
+        const newSerials = Array(count).fill('');
+
+        for (let i = 0; i < Math.min(count, existingSerials.length); i++) {
+            newSerials[i] = existingSerials[i];
+        }
+        
+        setFormData(prev => ({ ...prev, serial_numbers: newSerials }));
+    }, [formData.jumlah]);
+
+    const handleSerialChange = (index, value) => {
+        const newSerials = [...formData.serial_numbers];
+        newSerials[index] = value;
+        setFormData(prev => ({ ...prev, serial_numbers: newSerials }));
+    };
 
     const handleCreateOption = async (inputValue, type) => {
         setIsLoading(true);
@@ -102,8 +107,9 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!formData.nama_barang || !formData.id_kategori || !formData.id_sub_kategori) {
-            showToast('Nama Barang, Kategori, dan Sub-Kategori wajib diisi.', 'warning');
+        const filledSerials = formData.serial_numbers.filter(sn => sn !== '');
+        if (new Set(filledSerials).size !== filledSerials.length) {
+            showToast('Serial number yang diinput tidak boleh ada yang sama.', 'warning');
             return;
         }
         onSave(formData);
@@ -148,26 +154,46 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
                             />
                         </div>
                     </div>
-                    {/* Baris 2: Nama & Merk */}
                     <div className="form-row2">
                         <div className="form-group half1">
                             <label>Nama Barang</label>
                             <input name="nama_barang" value={formData.nama_barang} onChange={handleChange} required />
                         </div>
-                        <div className="form-group half">
-                            <label>Merk</label>
-                            <input name="merk" value={formData.merk} onChange={handleChange} />
-                        </div>
                     </div>
-                    {/* Baris 3: Stok & Harga */}
+                    <div className="form-group">
+                        <label>Kondisi Barang</label> {/* Ubah label */}
+                        <select name="kondisi" value={formData.kondisi} onChange={handleChange}> {/* Ubah name */}
+                            <option value="Baru">Baru</option>
+                            <option value="Bekas">Bekas</option>
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Warna (Opsional)</label>
+                        <input type="text" name="warna" value={formData.warna} onChange={handleChange} />
+                    </div>
                     <div className="form-row">
                         <div className="form-group half1">
-                            <label>Stok</label>
-                            <input type="number" name="stok" value={formData.stok} onChange={handleChange} required />
+                            <label>Jumlah Ditambahkan</label>
+                            <input type="number" name="jumlah" value={formData.jumlah} onChange={handleChange} required />
                         </div>
                         <div className="form-group half">
-                            <label>Harga Barang (Rp)</label>
-                            <input type="number" name="harga_barang" value={formData.harga_barang} onChange={handleChange} />
+                            <label>Harga Beli (Rp)</label> {/* Ubah label */}
+                            <input type="number" name="harga_beli" value={formData.harga_beli} onChange={handleChange} required /> {/* Ubah name */}
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <label>Serial Number (Opsional)</label>
+                        <div className="serial-number-container">
+                            {formData.serial_numbers.map((sn, index) => (
+                                <input
+                                    key={index}
+                                    type="text"
+                                    placeholder={`Serial Number #${index + 1}`}
+                                    value={sn}
+                                    onChange={(e) => handleSerialChange(index, e.target.value)}
+                                    className="serial-number-input"
+                                />
+                            ))}
                         </div>
                     </div>
                     {/* ... tambahkan input lain sesuai kebutuhan (tanggal, warna, dll) ... */}

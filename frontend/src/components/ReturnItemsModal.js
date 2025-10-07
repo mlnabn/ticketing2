@@ -7,7 +7,7 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
         if (ticket && ticket.masterBarangs) {
             const initialItems = ticket.masterBarangs.map(barang => ({
                 // Menggunakan ID dan nama dari masterBarang
-                tool_id: barang.id_m_barang, 
+                master_barang_id: barang.id_m_barang, 
                 name: barang.nama_barang,
                 // Data pivot tetap sama
                 quantity_borrowed: barang.pivot.quantity_used || 0,
@@ -19,18 +19,18 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
         }
     }, [ticket]);
 
-    const handleKeteranganChange = (toolId, value) => {
+    const handleKeteranganChange = (itemId, value) => {
         setItems(prevItems =>
             prevItems.map(item =>
-                item.tool_id === toolId ? { ...item, keterangan: value } : item
+                item.master_barang_id === itemId ? { ...item, keterangan: value } : item
             )
         );
     };
 
-    const handleQuantityChange = (toolId, field, value) => {
+    const handleQuantityChange = (itemId, field, value) => {
         setItems(prevItems =>
             prevItems.map(item => {
-                if (item.tool_id === toolId) {
+                if (item.master_barang_id === itemId) {
                     const updatedItem = { ...item };
                     const borrowed = item.quantity_borrowed;
 
@@ -76,7 +76,7 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
         }
 
         const itemsToSave = items.map(item => ({
-            tool_id: item.tool_id,
+            master_barang_id: item.master_barang_id,
             quantity_returned: parseInt(item.quantity_returned, 10) || 0,
             quantity_lost: parseInt(item.quantity_lost, 10) || 0,
             keterangan: item.keterangan,
@@ -95,7 +95,7 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
 
                 <div className="items-to-return-list">
                     {items.map(item => (
-                        <div key={item.tool_id} className="return-item-row">
+                        <div key={item.master_barang_id} className="return-item-row">
                             <div style={{ marginBottom: '5px' }}>
                                 <strong>{item.name}</strong> (Dipinjam: {item.quantity_borrowed})
                             </div>
@@ -106,7 +106,7 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
                                     <input
                                         type="number"
                                         value={item.quantity_returned}
-                                        onChange={(e) => handleQuantityChange(item.tool_id, 'quantity_returned', e.target.value)}
+                                        onChange={(e) => handleQuantityChange(item.master_barang_id, 'quantity_returned', e.target.value)}
                                         min="0"
                                         max={item.quantity_borrowed}
                                     />
@@ -116,7 +116,7 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
                                     <input
                                         type="number"
                                         value={item.quantity_lost}
-                                        onChange={(e) => handleQuantityChange(item.tool_id, 'quantity_lost', e.target.value)}
+                                        onChange={(e) => handleQuantityChange(item.master_barang_id, 'quantity_lost', e.target.value)}
                                         min="0"
                                         max={item.quantity_borrowed}
                                     />
@@ -128,7 +128,7 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
                                     <label>Keterangan Hilang:</label>
                                     <textarea
                                         value={item.keterangan}
-                                        onChange={(e) => handleKeteranganChange(item.tool_id, e.target.value)}
+                                        onChange={(e) => handleKeteranganChange(item.master_barang_id, e.target.value)}
                                         placeholder={`Cth: Terjatuh di lokasi, rusak, dll.`}
                                         rows="2"
                                     ></textarea>
