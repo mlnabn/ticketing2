@@ -68,6 +68,7 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
                             <th>Nama Barang</th>
                             <th>Kategori</th>
                             <th>Sub-Kategori</th>
+                            <th>Didaftarkan Oleh</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -80,6 +81,7 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
                                 <td>{item.nama_barang}</td>
                                 <td>{item.master_kategori?.nama_kategori || '-'}</td>
                                 <td>{item.sub_kategori?.nama_sub || '-'}</td>
+                                 <td>{item.created_by?.name || 'N/A'}</td>
                                 <td className="action-buttons-group">
                                     <button onClick={() => onEdit(item)} className="btn-user-action btn-edit">Edit</button>
                                     <button onClick={() => onDelete(item)} className="btn-user-action btn-delete">Hapus</button>

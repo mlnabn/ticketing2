@@ -11,7 +11,7 @@ function StokBarangView({ showToast }) {
     const [items, setItems] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
-    
+
     // State untuk filter
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
@@ -89,7 +89,7 @@ function StokBarangView({ showToast }) {
                 barcode = '';
                 return;
             }
-            if (e.key.length === 1) { 
+            if (e.key.length === 1) {
                 barcode += e.key;
             }
             interval = setInterval(() => barcode = '', 50);
@@ -104,7 +104,7 @@ function StokBarangView({ showToast }) {
                 <h1>Daftar Stok Unit Barang</h1>
                 <button className="add-btn" onClick={() => setIsAddStockOpen(true)}>Tambah Stok</button>
             </div>
-            
+
             {/* --- Filter Section --- */}
             <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                 <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)} className="filter-select">
@@ -120,7 +120,7 @@ function StokBarangView({ showToast }) {
                     ))}
                 </select>
             </div>
-            
+
             <div className="job-list-table">
                 <table className="job-table">
                     <thead>
@@ -129,37 +129,59 @@ function StokBarangView({ showToast }) {
                             <th>S/N</th>
                             <th>Nama Barang</th>
                             <th>Kondisi</th>
+                            <th>Stok</th>
+                            <th>Warna</th>
                             <th>Harga Beli</th>
                             <th>Tgl Beli</th>
                             <th>Tgl Masuk</th>
+                            <th>Ditambahkan Oleh</th>
                             <th>Status Stok</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? ( <tr><td colSpan="9" style={{ textAlign: 'center' }}>Memuat data stok...</td></tr> ) 
-                        : items.map(item => (
-                            <tr key={item.id}>
-                                <td>{item.kode_unik}</td>
-                                <td>{item.serial_number || '-'}</td>
-                                <td>{item.master_barang?.nama_barang}</td>
-                                <td>{item.kondisi}</td>
-                                <td>Rp {Number(item.harga_beli).toLocaleString('id-ID')}</td>
-                                <td>{item.tanggal_pembelian ? new Date(item.tanggal_pembelian).toLocaleDateString('id-ID') : '-'}</td>
-                                <td>{new Date(item.tanggal_masuk).toLocaleDateString('id-ID')}</td>
-                                <td><span className={`status-${item.status.toLowerCase()}`}>{item.status}</span></td>
-                                <td className="action-buttons-group">
-                                    <button onClick={() => setDetailItem(item)} className="btn-user-action btn-view">Detail</button>
-                                    <button onClick={() => setEditItem(item)} className="btn-user-action btn-edit">Edit</button>
-                                    <button onClick={() => setQrModalItem(item)} className="btn-user-action btn-edit">QR</button>
-                                </td>
-                            </tr>
-                        ))}
+                        {loading ? (<tr><td colSpan="9" style={{ textAlign: 'center' }}>Memuat data stok...</td></tr>)
+                            : items.map(item => (
+                                <tr key={item.id}>
+                                    <td>{item.kode_unik}</td>
+                                    <td>{item.serial_number || '-'}</td>
+                                    <td>{item.master_barang?.nama_barang}</td>
+                                    <td>{item.kondisi}</td>
+                                    <td>{item.master_barang?.stok_barangs_count || 'N/A'}</td>
+                                    <td>
+                                        {item.warna ? (
+                                            <span
+                                                title={item.warna} 
+                                                style={{
+                                                    display: 'inline-block',
+                                                    width: '20px',
+                                                    height: '20px',
+                                                    backgroundColor: item.warna,
+                                                    border: '1px solid #ccc',
+                                                    borderRadius: '4px'
+                                                }}
+                                            ></span>
+                                        ) : (
+                                            '-' 
+                                        )}
+                                    </td>
+                                    <td>Rp {Number(item.harga_beli).toLocaleString('id-ID')}</td>
+                                    <td>{item.tanggal_pembelian ? new Date(item.tanggal_pembelian).toLocaleDateString('id-ID') : '-'}</td>
+                                    <td>{new Date(item.tanggal_masuk).toLocaleDateString('id-ID')}</td>
+                                    <td>{item.created_by?.name || 'N/A'}</td>
+                                    <td><span className={`status-${item.status.toLowerCase()}`}>{item.status}</span></td>
+                                    <td className="action-buttons-group">
+                                        <button onClick={() => setDetailItem(item)} className="btn-user-action btn-view">Detail</button>
+                                        <button onClick={() => setEditItem(item)} className="btn-user-action btn-edit">Edit</button>
+                                        <button onClick={() => setQrModalItem(item)} className="btn-user-action btn-edit">QR</button>
+                                    </td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>
             {pagination && pagination.last_page > 1 && (
-                <Pagination 
+                <Pagination
                     currentPage={pagination.current_page}
                     lastPage={pagination.last_page}
                     onPageChange={(page) => fetchData(page, { id_kategori: selectedCategory, id_sub_kategori: selectedSubCategory })}
@@ -176,16 +198,16 @@ function StokBarangView({ showToast }) {
                     onClose={() => setEditItem(null)}
                     item={editItem}
                     showToast={showToast}
-                    onSaveSuccess={() => fetchData(pagination?.current_page || 1, { 
-                        id_kategori: selectedCategory, 
-                        id_sub_kategori: selectedSubCategory 
+                    onSaveSuccess={() => fetchData(pagination?.current_page || 1, {
+                        id_kategori: selectedCategory,
+                        id_sub_kategori: selectedSubCategory
                     })}
                 />
             )}
-            
+
             {qrModalItem && (
                 <div className="modal-backdrop" onClick={() => setQrModalItem(null)}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()} style={{textAlign: 'center'}}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()} style={{ textAlign: 'center' }}>
                         <h3>QR Code untuk {qrModalItem.kode_unik}</h3>
                         <div style={{ padding: '20px' }}>
                             <QRCode value={qrModalItem.kode_unik} size={256} level="H" />

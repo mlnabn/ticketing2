@@ -3,26 +3,36 @@ import api from '../services/api';
 import CreatableSelect from 'react-select/creatable';
 import { useDebounce } from 'use-debounce';
 
+// Helper functions (letakkan di luar komponen)
+const formatRupiah = (angka) => {
+    if (angka === null || angka === undefined || angka === '') return '';
+    return new Intl.NumberFormat('id-ID').format(angka);
+};
+
+const parseRupiah = (rupiah) => {
+    if (typeof rupiah !== 'string') return rupiah;
+    return parseInt(rupiah.replace(/\./g, ''), 10) || 0;
+};
+
 const initialFormState = {
     id_kategori: '',
     id_sub_kategori: '',
     nama_barang: '',
-    harga_barang: '', // Harga standar/awal untuk master barang
+    harga_barang: '', // Hanya menggunakan harga_barang
 };
 
 function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
     const [formData, setFormData] = useState(initialFormState);
+    // HANYA state display untuk harga_barang
+    const [displayHargaBarang, setDisplayHargaBarang] = useState('');
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isExisting, setIsExisting] = useState(false);
 
-    // Debounce a pengecekan untuk menghindari panggilan API berlebihan
     const [debouncedNama] = useDebounce(formData.nama_barang, 500);
     const [debouncedSubKategori] = useDebounce(formData.id_sub_kategori, 500);
 
-
-    // Fetch master data untuk dropdown
     const fetchCategories = useCallback(() => {
         api.get('/inventory/categories').then(res => {
             const options = res.data.map(c => ({ value: c.id_kategori, label: c.nama_kategori }));
@@ -37,16 +47,18 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
                 setFormData({
                     ...initialFormState,
                     ...itemToEdit,
-                    jumlah: itemToEdit.stok_tersedia || 0,
-                    serial_numbers: [], // Pastikan serial_numbers adalah array kosong dalam mode edit
                 });
+                // Sesuaikan untuk mengisi displayHargaBarang dari itemToEdit
+                setDisplayHargaBarang(formatRupiah(itemToEdit.harga_barang));
             } else {
+                // Reset semua state saat form tambah baru
                 setFormData(initialFormState);
+                setDisplayHargaBarang('');
+                setIsExisting(false);
             }
         }
     }, [itemToEdit, isOpen, fetchCategories]);
 
-    // Fetch sub-kategori ketika kategori berubah
     useEffect(() => {
         if (formData.id_kategori) {
             api.get(`/inventory/sub-categories?id_kategori=${formData.id_kategori}`).then(res => {
@@ -59,6 +71,9 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
     }, [formData.id_kategori]);
 
     useEffect(() => {
+        // Jangan cek jika sedang mode edit
+        if (itemToEdit) return;
+
         if (debouncedNama && debouncedSubKategori) {
             api.post('/inventory/items/check-exists', {
                 nama_barang: debouncedNama,
@@ -72,25 +87,14 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
         } else {
             setIsExisting(false);
         }
-    }, [debouncedNama, debouncedSubKategori, showToast]);
-
-    useEffect(() => {
-        const count = parseInt(formData.jumlah, 10) || 0;
-        const existingSerials = formData.serial_numbers || [];
-        const newSerials = Array(count).fill('');
-
-        for (let i = 0; i < Math.min(count, existingSerials.length); i++) {
-            newSerials[i] = existingSerials[i];
-        }
-        
-        setFormData(prev => ({ ...prev, serial_numbers: newSerials }));
-    }, [formData.jumlah]);
+    }, [debouncedNama, debouncedSubKategori, showToast, itemToEdit]);
 
     const handleCreateOption = async (inputValue, type) => {
+        // ... (Fungsi ini tidak perlu diubah)
         setIsLoading(true);
         try {
             if (type === 'category') {
-                const res = await api.post('/inventory/categories', { nama_kategori: inputValue, kode_kategori: inputValue.substring(0, 3).toUpperCase() });
+                const res = await api.post('/inventory/categories', { nama_kategori: inputValue });
                 const newOption = { value: res.data.id_kategori, label: res.data.nama_kategori };
                 setCategories(prev => [...prev, newOption]);
                 setFormData(prev => ({ ...prev, id_kategori: res.data.id_kategori }));
@@ -112,7 +116,15 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
     };
 
     const handleChange = (e) => {
-        setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value } = e.target;
+        // Logika disederhanakan hanya untuk harga_barang
+        if (name === 'harga_barang') {
+            const numericValue = parseRupiah(value);
+            setFormData(prev => ({ ...prev, harga_barang: numericValue }));
+            setDisplayHargaBarang(formatRupiah(numericValue));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     const handleSelectChange = (newValue, actionMeta) => {
@@ -124,20 +136,19 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
         onSave(formData);
     };
 
-
     if (!isOpen) return null;
 
     return (
         <div className="modal-backdrop">
             <div className="modal-content user-form-modal">
-                <h3>Daftarkan Tipe Barang Baru</h3>
+                <h3>{itemToEdit ? 'Edit Tipe Barang' : 'Daftarkan Tipe Barang Baru'}</h3>
                 <form onSubmit={handleSubmit}>
-
+                    {/* ... (Input Kategori & Sub-Kategori tetap sama) ... */}
                     <div className="form-row2">
                         <div className="form-group half">
                             <label>Kategori</label>
                             <CreatableSelect
-                                classNamePrefix="creatable-select" // <-- TAMBAHKAN INI
+                                classNamePrefix="creatable-select"
                                 isClearable
                                 isDisabled={isLoading}
                                 isLoading={isLoading}
@@ -148,10 +159,10 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
                                 name="id_kategori"
                                 placeholder="Pilih atau ketik kategori baru..."
                             />
-                        
+
                             <label>Sub-Kategori</label>
                             <CreatableSelect
-                                classNamePrefix="creatable-select" // <-- TAMBAHKAN INI JUGA
+                                classNamePrefix="creatable-select"
                                 isClearable
                                 isDisabled={isLoading || !formData.id_kategori}
                                 isLoading={isLoading}
@@ -166,27 +177,32 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
                     </div>
                     <div className="form-group">
                         <label>Nama Barang</label>
-                        <input name="nama_barang" value={formData.nama_barang} onChange={handleChange} required />
+                        <input name="nama_barang" value={formData.nama_barang} onChange={handleChange} required disabled={!!itemToEdit} />
                     </div>
 
-                    {isExisting && (
+                    {isExisting && !itemToEdit && (
                         <div className="info-box warning">
-                            Barang ini sudah terdaftar. Anda tidak bisa mendaftarkannya lagi. 
-                            Untuk menambah jumlahnya, gunakan fitur "Tambah Stok" di halaman Stok Barang.
+                            Barang ini sudah terdaftar. Anda tidak bisa mendaftarkannya lagi. Tambahkan di Menu Stok Barang.
                         </div>
                     )}
 
                     <div className="form-group">
                         <label>Harga Standar/Awal (Rp)</label>
-                        <input type="number" name="harga_barang" value={formData.harga_barang} onChange={handleChange} 
-                               disabled={isExisting} // <-- Dinonaktifkan jika sudah ada
-                               required />
+                        <input
+                            type="text"
+                            name="harga_barang"
+                            value={displayHargaBarang}
+                            onChange={handleChange}
+                            disabled={isExisting}
+                            required
+                            placeholder="Contoh: 2500000"
+                        />
                     </div>
 
                     <div className="confirmation-modal-actions">
                         <button type="button" onClick={onClose} className="btn-cancel">Batal</button>
-                        <button type="submit" className="btn-confirm" disabled={isLoading || isExisting}>
-                            {isExisting ? 'Sudah Terdaftar' : 'Simpan'}
+                        <button type="submit" className="btn-confirm" disabled={isLoading || (isExisting && !itemToEdit)}>
+                            {isExisting && !itemToEdit ? 'Sudah Terdaftar' : 'Simpan'}
                         </button>
                     </div>
                 </form>

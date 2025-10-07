@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import Select from 'react-select'; // Gunakan react-select standar untuk ini
 
+const formatRupiah = (angka) => {
+    if (angka === null || angka === undefined || angka === '') return '';
+    return new Intl.NumberFormat('id-ID').format(angka);
+};
+
+const parseRupiah = (rupiah) => {
+    if (typeof rupiah !== 'string') return rupiah;
+    return parseInt(rupiah.replace(/\./g, ''), 10) || 0;
+};
+
 const initialFormState = {
     master_barang_id: null,
     jumlah: 1,
@@ -9,11 +19,13 @@ const initialFormState = {
     kondisi: 'Baru',
     warna: '',
     tanggal_pembelian: '',
+    tanggal_masuk: '',
     serial_numbers: [''],
 };
 
 function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
     const [formData, setFormData] = useState(initialFormState);
+    const [displayHarga, setDisplayHarga] = useState('');
     const [masterBarangOptions, setMasterBarangOptions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -27,6 +39,7 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                 }));
                 setMasterBarangOptions(options);
             });
+            setDisplayHarga('');
         }
     }, [isOpen]);
 
@@ -41,7 +54,14 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
     }, [formData.jumlah]);
 
     const handleChange = (e) => {
-        setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value } = e.target;
+        if (name === 'harga_beli') {
+            const numericValue = parseRupiah(value);
+            setFormData(prev => ({ ...prev, harga_beli: numericValue }));
+            setDisplayHarga(formatRupiah(numericValue));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     const handleSelectChange = (selectedOption) => {
@@ -68,7 +88,7 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
             setIsLoading(false);
         }
     };
-    
+
     if (!isOpen) return null;
 
     return (
@@ -89,29 +109,43 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                     <div className="form-row">
                         <div className="form-group half1">
                             <label>Jumlah</label>
-                            <input type="number" name="jumlah" value={formData.jumlah} onChange={handleChange} min="1" required/>
+                            <input type="number" name="jumlah" value={formData.jumlah} onChange={handleChange} min="1" required />
                         </div>
                         <div className="form-group half">
-                             <label>Harga Beli Satuan (Rp)</label>
-                             <input type="number" name="harga_beli" value={formData.harga_beli} onChange={handleChange} required />
+                            <label>Harga Beli Satuan (Rp)</label>
+                            {/* 5. UBAH INPUT HARGA BELI */}
+                            <input
+                                type="text"
+                                name="harga_beli"
+                                value={displayHarga}
+                                onChange={handleChange}
+                                placeholder="Contoh: 1500000"
+                                required
+                            />
                         </div>
                     </div>
                     <div className="form-row">
-                         <div className="form-group half1">
+                        <div className="form-group half1">
                             <label>Kondisi</label>
                             <select name="kondisi" value={formData.kondisi} onChange={handleChange}>
                                 <option value="Baru">Baru</option>
                                 <option value="Bekas">Bekas</option>
                             </select>
                         </div>
-                         <div className="form-group half">
+                        <div className="form-group half">
                             <label>Warna</label>
                             <input type="text" name="warna" value={formData.warna} onChange={handleChange} />
                         </div>
                     </div>
-                     <div className="form-group">
-                        <label>Tanggal Pembelian</label>
-                        <input type="date" name="tanggal_pembelian" value={formData.tanggal_pembelian} onChange={handleChange} />
+                    <div className="form-row">
+                        <div className="form-group half1">
+                            <label>Tanggal Pembelian</label>
+                            <input type="date" name="tanggal_pembelian" value={formData.tanggal_pembelian} onChange={handleChange} />
+                        </div>
+                        <div className="form-group half">
+                            <label>Tanggal Masuk</label>
+                            <input type="date" name="tanggal_masuk" value={formData.tanggal_masuk} onChange={handleChange} required />
+                        </div>
                     </div>
                     <div className="form-group">
                         <label>Serial Number (Opsional)</label>
