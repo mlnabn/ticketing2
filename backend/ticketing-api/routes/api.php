@@ -90,6 +90,7 @@ Route::middleware('jwt')->group(function () {
     // --- Rute untuk Proses Tiket ---
     Route::post('/tickets/{ticket}/process-return', [TicketController::class, 'processReturn']);
 
+    Route::post('/inventory/stock-items', [StokBarangController::class, 'store']);
     Route::get('/inventory/stock-items', [StokBarangController::class, 'index']);
     Route::get('/inventory/stock-items/by-serial/{serial}', [StokBarangController::class, 'showBySerial']);
     Route::post('/inventory/stock-items/{stokBarang}', [StokBarangController::class, 'update']);
@@ -97,10 +98,10 @@ Route::middleware('jwt')->group(function () {
     // --- Rute untuk Manajemen Inventaris ---
     Route::apiResource('inventory/categories', MasterKategoriController::class);
     Route::apiResource('inventory/sub-categories', SubKategoriController::class);
+
+    Route::apiResource('inventory/items', MasterBarangController::class)->parameters(['items' => 'masterBarang']);
+    Route::post('/inventory/items/check-exists', [MasterBarangController::class, 'checkIfExists']);
     Route::post('/inventory/items/{masterBarang}', [MasterBarangController::class, 'update']);
-    Route::apiResource('inventory/items', MasterBarangController::class)->parameters([
-        'items' => 'masterBarang'
-    ]);
     Route::get('/inventory/items/search/{query}', [MasterBarangController::class, 'searchByName']);
     Route::get('/inventory/items/code/{kode_barang}', [MasterBarangController::class, 'showByCode']);
     Route::get('/inventory/items/category/{categoryId}', [MasterBarangController::class, 'filterByCategory']);

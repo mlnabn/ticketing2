@@ -32,8 +32,7 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
     return (
         <>
             <div className="user-management-header">
-                <button className="back-btn" onClick={onBack}>Kembali</button>
-                <button className="add-btn" onClick={onAdd}>Tambah Barang</button>
+                <button className="add-btn" onClick={onAdd}>Daftarkan Barang Baru</button>
             </div>
 
             {/* --- Filter Section --- */}
@@ -69,7 +68,6 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
                             <th>Nama Barang</th>
                             <th>Kategori</th>
                             <th>Sub-Kategori</th>
-                            <th>Stok Tersedia</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -82,14 +80,13 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
                                 <td>{item.nama_barang}</td>
                                 <td>{item.master_kategori?.nama_kategori || '-'}</td>
                                 <td>{item.sub_kategori?.nama_sub || '-'}</td>
-                                <td>{item.stok_tersedia}</td>
                                 <td className="action-buttons-group">
                                     <button onClick={() => onEdit(item)} className="btn-user-action btn-edit">Edit</button>
                                     <button onClick={() => onDelete(item)} className="btn-user-action btn-delete">Hapus</button>
                                 </td>
                             </tr>
                         )) : (
-                            <tr><td colSpan="8" style={{ textAlign: 'center' }}>Tidak ada barang ditemukan.</td></tr>
+                            <tr><td colSpan="5" style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</td></tr>
                         )}
                     </tbody>
                 </table>

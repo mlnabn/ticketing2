@@ -41,23 +41,17 @@ function ToolManagement({ showToast }) {
 
 
     const handleSaveItem = async (formData) => {
-        // Logika save yang sudah disederhanakan
-        const isEditMode = Boolean(itemToEdit);
-        const url = isEditMode ? `/inventory/items/${itemToEdit.id_m_barang}` : '/inventory/items';
-        // Backend sudah diatur untuk menerima POST untuk update
-        const method = 'post';
-
-        try {
-            await api[method](url, formData);
-            showToast(isEditMode ? 'Data barang berhasil diubah.' : 'Barang baru berhasil ditambahkan.');
-            handleCloseItemModal();
-            fetchItems(pagination?.current_page || 1);
-        } catch (e) {
-            console.error('Gagal menyimpan barang:', e);
-            const errorMsg = e.response?.data?.message || 'Gagal menyimpan data barang.';
-            showToast(errorMsg, 'error');
-        }
-    };
+    try {
+        await api.post('/inventory/items', formData);
+        showToast('Tipe barang baru berhasil didaftarkan.');
+        handleCloseItemModal();
+        fetchItems(pagination?.current_page || 1);
+    } catch (e) {
+        console.error('Gagal menyimpan barang:', e);
+        const errorMsg = e.response?.data?.message || 'Gagal menyimpan data barang.';
+        showToast(errorMsg, 'error');
+    }
+};
 
     const handleDeleteClick = (item) => {
         if (!item || !item.id_m_barang) {

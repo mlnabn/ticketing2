@@ -23,6 +23,21 @@ class MasterBarangController extends Controller
         return $query->latest()->paginate(10);
     }
 
+    // Untuk mengecek apakah master barang sudah ada
+    public function checkIfExists(Request $request)
+    {
+        $validated = $request->validate([
+            'nama_barang' => 'required|string',
+            'id_sub_kategori' => 'required|integer',
+        ]);
+
+        $exists = MasterBarang::where('nama_barang', $validated['nama_barang'])
+                              ->where('id_sub_kategori', $validated['id_sub_kategori'])
+                              ->exists();
+        
+        return response()->json(['exists' => $exists]);
+    }
+
     /**
      * Menyimpan tipe barang baru (MasterBarang) dan membuat item fisiknya (InventoryItem).
      * Jika nama barang sudah ada, hanya akan menambah stok item fisiknya.
@@ -31,50 +46,22 @@ class MasterBarangController extends Controller
         $validated = $request->validate([
             'id_kategori' => 'required|exists:master_kategoris,id_kategori',
             'id_sub_kategori' => 'required|exists:sub_kategoris,id_sub_kategori',
-            'nama_barang' => 'required|string|max:255',
-            'kondisi' => 'required|in:Baru,Bekas',
-            'harga_beli' => 'required|numeric|min:0',
-            'jumlah' => 'required|integer|min:1',
-            'tanggal_pembelian' => 'nullable|date',
-            'warna' => 'nullable|string|max:255',
-            'serial_numbers' => 'nullable|array',
-            'serial_numbers.*' => 'nullable|string|unique:stok_barangs,serial_number',
+            'nama_barang' => [
+                'required', 'string', 'max:255',
+                // Pastikan kombinasi nama & sub-kategori unik
+                Rule::unique('master_barangs')->where(function ($query) use ($request) {
+                    return $query->where('id_sub_kategori', $request->id_sub_kategori);
+                }),
+            ],
+            'harga_barang' => 'required|numeric|min:0', // Ini menjadi harga standar/awal
         ]);
 
-        $masterBarang = null;
-        DB::transaction(function () use ($validated, &$masterBarang) {
-            $masterBarang = MasterBarang::firstOrCreate(
-                [
-                    'nama_barang' => $validated['nama_barang'],
-                    'id_sub_kategori' => $validated['id_sub_kategori'],
-                ],
-                [ 
-                    'id_kategori' => $validated['id_kategori'],
-                    'harga_barang' => $validated['harga_beli'],
-                ]
-            );
+        $kategori = MasterKategori::find($validated['id_kategori']);
+        $kodeSub = str_pad($validated['id_sub_kategori'], 2, '0', STR_PAD_LEFT);
+        $validated['kode_barang'] = $kategori->kode_kategori . $kodeSub;
 
-            if ($masterBarang->wasRecentlyCreated) {
-                $kategori = MasterKategori::find($validated['id_kategori']);
-                $kodeSub = str_pad($validated['id_sub_kategori'], 2, '0', STR_PAD_LEFT);
-                $masterBarang->kode_barang = $kategori->kode_kategori . $kodeSub;
-                $masterBarang->save();
-            }
-
-            for ($i = 0; $i < $validated['jumlah']; $i++) {
-                StokBarang::create([
-                    'master_barang_id' => $masterBarang->id_m_barang,
-                    'kode_unik' => $this->generateUniqueStokCode($masterBarang),
-                    'serial_number' => $validated['serial_numbers'][$i] ?? null,
-                    'harga_beli' => $validated['harga_beli'],
-                    'warna' => $validated['warna'] ?? null,
-                    'kondisi' => $validated['kondisi'],
-                    'status' => 'Tersedia',
-                    'tanggal_pembelian' => $validated['tanggal_pembelian'] ?? now(),
-                    'tanggal_masuk' => now(),
-                ]);
-            }
-        });
+        $masterBarang = MasterBarang::create($validated);
+        
         return response()->json($masterBarang->load(['masterKategori', 'subKategori']), 201);
     }
 

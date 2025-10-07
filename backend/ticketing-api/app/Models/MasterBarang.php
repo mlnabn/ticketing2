@@ -8,12 +8,9 @@ class MasterBarang extends Model {
     protected $primaryKey = 'id_m_barang';
 
     protected $fillable = [
-        'id_kategori', 'id_sub_kategori', 'kode_barang', 'nama_barang', 'status',
-        'model_barang', 'status_barang', 'tanggal_pembelian', 'tanggal_masuk',
-        'digunakan_untuk', 'harga_barang', 'warna',
+        'id_kategori', 'id_sub_kategori', 'kode_barang', 'nama_barang',
+        'model_barang', 'harga_barang',
     ];
-    
-    protected $appends = ['stok_tersedia'];
 
     public function masterKategori() {
         return $this->belongsTo(MasterKategori::class, 'id_kategori', 'id_kategori');
@@ -24,10 +21,6 @@ class MasterBarang extends Model {
     
     public function stokBarangs() {
         return $this->hasMany(StokBarang::class, 'master_barang_id');
-    }
-    
-    public function getStokTersediaAttribute() {
-        return $this->stokBarangs()->where('status', 'Tersedia')->count();
     }
     
     public function tickets() {

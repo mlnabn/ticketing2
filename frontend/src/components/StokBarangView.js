@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import Pagination from './Pagination';
-import ItemDetailModal from './ItemDetailModal'; // Anda perlu membuat komponen modal ini
+import ItemDetailModal from './ItemDetailModal';
 import { QRCodeSVG as QRCode } from 'qrcode.react';
 import EditStokBarangModal from './EditStokBarangModal';
-import { set } from 'date-fns';
+import AddStockModal from './AddStockModal';
 
 function StokBarangView({ showToast }) {
     // State utama
@@ -22,6 +22,7 @@ function StokBarangView({ showToast }) {
     const [detailItem, setDetailItem] = useState(null);
     const [editItem, setEditItem] = useState(null);
     const [qrModalItem, setQrModalItem] = useState(null);
+    const [isAddStockOpen, setIsAddStockOpen] = useState(false);
 
     // Fungsi untuk mengambil data dari backend
     const fetchData = useCallback(async (page = 1, filters = {}) => {
@@ -101,6 +102,7 @@ function StokBarangView({ showToast }) {
         <>
             <div className="user-management-container" style={{ marginBottom: '20px' }}>
                 <h1>Daftar Stok Unit Barang</h1>
+                <button className="add-btn" onClick={() => setIsAddStockOpen(true)}>Tambah Stok</button>
             </div>
             
             {/* --- Filter Section --- */}
@@ -193,6 +195,12 @@ function StokBarangView({ showToast }) {
                     </div>
                 </div>
             )}
+            <AddStockModal
+                isOpen={isAddStockOpen}
+                onClose={() => setIsAddStockOpen(false)}
+                onSaveSuccess={() => fetchData(1)} // Refresh halaman pertama setelah simpan
+                showToast={showToast}
+            />
         </>
     );
 }

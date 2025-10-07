@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import CreatableSelect from 'react-select/creatable';
+import { useDebounce } from 'use-debounce';
 
 const initialFormState = {
-    id_kategori: '', id_sub_kategori: '', nama_barang: '', 
-    kondisi: 'Baru',
-    jumlah: 1, 
-    harga_beli: '',
-    warna: '',
-    tanggal_pembelian: '', serial_numbers: [''],
+    id_kategori: '',
+    id_sub_kategori: '',
+    nama_barang: '',
+    harga_barang: '', // Harga standar/awal untuk master barang
 };
 
 function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
@@ -16,6 +15,12 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isExisting, setIsExisting] = useState(false);
+
+    // Debounce a pengecekan untuk menghindari panggilan API berlebihan
+    const [debouncedNama] = useDebounce(formData.nama_barang, 500);
+    const [debouncedSubKategori] = useDebounce(formData.id_sub_kategori, 500);
+
 
     // Fetch master data untuk dropdown
     const fetchCategories = useCallback(() => {
@@ -54,6 +59,22 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
     }, [formData.id_kategori]);
 
     useEffect(() => {
+        if (debouncedNama && debouncedSubKategori) {
+            api.post('/inventory/items/check-exists', {
+                nama_barang: debouncedNama,
+                id_sub_kategori: debouncedSubKategori,
+            }).then(res => {
+                setIsExisting(res.data.exists);
+                if (res.data.exists) {
+                    showToast('Tipe barang ini sudah terdaftar.', 'info');
+                }
+            });
+        } else {
+            setIsExisting(false);
+        }
+    }, [debouncedNama, debouncedSubKategori, showToast]);
+
+    useEffect(() => {
         const count = parseInt(formData.jumlah, 10) || 0;
         const existingSerials = formData.serial_numbers || [];
         const newSerials = Array(count).fill('');
@@ -64,12 +85,6 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
         
         setFormData(prev => ({ ...prev, serial_numbers: newSerials }));
     }, [formData.jumlah]);
-
-    const handleSerialChange = (index, value) => {
-        const newSerials = [...formData.serial_numbers];
-        newSerials[index] = value;
-        setFormData(prev => ({ ...prev, serial_numbers: newSerials }));
-    };
 
     const handleCreateOption = async (inputValue, type) => {
         setIsLoading(true);
@@ -97,8 +112,7 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
     const handleSelectChange = (newValue, actionMeta) => {
@@ -107,20 +121,16 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const filledSerials = formData.serial_numbers.filter(sn => sn !== '');
-        if (new Set(filledSerials).size !== filledSerials.length) {
-            showToast('Serial number yang diinput tidak boleh ada yang sama.', 'warning');
-            return;
-        }
         onSave(formData);
     };
+
 
     if (!isOpen) return null;
 
     return (
         <div className="modal-backdrop">
-            <div className="modal-content user-form-modal large">
-                <h3>{itemToEdit ? 'Edit Barang' : 'Tambah Barang Baru'}</h3>
+            <div className="modal-content user-form-modal">
+                <h3>Daftarkan Tipe Barang Baru</h3>
                 <form onSubmit={handleSubmit}>
 
                     <div className="form-row2">
@@ -154,52 +164,30 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
                             />
                         </div>
                     </div>
-                    <div className="form-row2">
-                        <div className="form-group half1">
-                            <label>Nama Barang</label>
-                            <input name="nama_barang" value={formData.nama_barang} onChange={handleChange} required />
-                        </div>
-                    </div>
                     <div className="form-group">
-                        <label>Kondisi Barang</label> {/* Ubah label */}
-                        <select name="kondisi" value={formData.kondisi} onChange={handleChange}> {/* Ubah name */}
-                            <option value="Baru">Baru</option>
-                            <option value="Bekas">Bekas</option>
-                        </select>
+                        <label>Nama Barang</label>
+                        <input name="nama_barang" value={formData.nama_barang} onChange={handleChange} required />
                     </div>
+
+                    {isExisting && (
+                        <div className="info-box warning">
+                            Barang ini sudah terdaftar. Anda tidak bisa mendaftarkannya lagi. 
+                            Untuk menambah jumlahnya, gunakan fitur "Tambah Stok" di halaman Stok Barang.
+                        </div>
+                    )}
+
                     <div className="form-group">
-                        <label>Warna (Opsional)</label>
-                        <input type="text" name="warna" value={formData.warna} onChange={handleChange} />
+                        <label>Harga Standar/Awal (Rp)</label>
+                        <input type="number" name="harga_barang" value={formData.harga_barang} onChange={handleChange} 
+                               disabled={isExisting} // <-- Dinonaktifkan jika sudah ada
+                               required />
                     </div>
-                    <div className="form-row">
-                        <div className="form-group half1">
-                            <label>Jumlah Ditambahkan</label>
-                            <input type="number" name="jumlah" value={formData.jumlah} onChange={handleChange} required />
-                        </div>
-                        <div className="form-group half">
-                            <label>Harga Beli (Rp)</label> {/* Ubah label */}
-                            <input type="number" name="harga_beli" value={formData.harga_beli} onChange={handleChange} required /> {/* Ubah name */}
-                        </div>
-                    </div>
-                    <div className="form-group">
-                        <label>Serial Number (Opsional)</label>
-                        <div className="serial-number-container">
-                            {formData.serial_numbers.map((sn, index) => (
-                                <input
-                                    key={index}
-                                    type="text"
-                                    placeholder={`Serial Number #${index + 1}`}
-                                    value={sn}
-                                    onChange={(e) => handleSerialChange(index, e.target.value)}
-                                    className="serial-number-input"
-                                />
-                            ))}
-                        </div>
-                    </div>
-                    {/* ... tambahkan input lain sesuai kebutuhan (tanggal, warna, dll) ... */}
+
                     <div className="confirmation-modal-actions">
                         <button type="button" onClick={onClose} className="btn-cancel">Batal</button>
-                        <button type="submit" className="btn-confirm" disabled={isLoading}>Simpan</button>
+                        <button type="submit" className="btn-confirm" disabled={isLoading || isExisting}>
+                            {isExisting ? 'Sudah Terdaftar' : 'Simpan'}
+                        </button>
                     </div>
                 </form>
             </div>
