@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Illuminate\Support\Str;
 
 class TicketsExport implements FromCollection, WithHeadings, WithMapping
 {
@@ -40,7 +41,7 @@ class TicketsExport implements FromCollection, WithHeadings, WithMapping
             'Tanggal Dibuat',
             'Tanggal Mulai',
             'Tanggal Selesai',
-            'Durasi Pengerjaan', // <- Judul diubah di sini
+            'Durasi Pengerjaan', 
         ];
     }
 
@@ -75,7 +76,7 @@ class TicketsExport implements FromCollection, WithHeadings, WithMapping
 
         return [
             $ticket->kode_tiket ?? '-',
-            $ticket->title,
+            Str::limit($ticket->title, 50, '...'),
             $ticket->status,
             $ticket->workshop ?? '-',
             $ticket->user->name ?? 'N/A',

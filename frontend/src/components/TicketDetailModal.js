@@ -108,8 +108,8 @@ function TicketDetailModal({ ticket, onClose }) {
                     </div>
 
                 </div>
-                <div className="modal-footer">
-                    <button onClick={onClose} className="btn-cancel">Tutup</button>
+                <div className="modal-footer-user">
+                    <button onClick={onClose} className="btn-tutup-user">Tutup</button>
                 </div>
             </div>
         </div>
