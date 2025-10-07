@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import api from '../services/api';
 import Select from 'react-select'; // Gunakan react-select standar untuk ini
 
@@ -23,34 +23,109 @@ const initialFormState = {
     serial_numbers: [''],
 };
 
+const useScannerListener = (onScan, isOpen) => {
+    useEffect(() => {
+        if (!isOpen) return;
+
+        let barcode = '';
+        let interval;
+
+        const handleKeyDown = (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                if (e.key === 'Enter' && e.target.closest('.creatable-select')) {
+                    return;
+                }
+            }
+
+            if (interval) clearInterval(interval);
+            if (e.key === 'Enter') {
+                if (barcode.length > 3) { // Asumsi S/N lebih dari 3 karakter
+                    onScan(barcode.trim());
+                }
+                barcode = '';
+                return;
+            }
+            if (e.key.length === 1) {
+                barcode += e.key;
+            }
+            interval = setInterval(() => barcode = '', 50);
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        // Cleanup listener saat komponen di-unmount atau modal tertutup
+        return () => window.removeEventListener('keydown', handleKeyDown);
+
+    }, [onScan, isOpen]); // Tambahkan isOpen sebagai dependency
+};
+
+
 function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
     const [formData, setFormData] = useState(initialFormState);
     const [displayHarga, setDisplayHarga] = useState('');
     const [masterBarangOptions, setMasterBarangOptions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
+    const [activeSerialIndex, setActiveSerialIndex] = useState(0);
+    const serialInputRefs = useRef([]);
+
+    const handleScan = useCallback((scannedSerial) => {
+        if (activeSerialIndex < formData.serial_numbers.length) {
+            
+            if (formData.serial_numbers.includes(scannedSerial)) {
+                showToast(`Serial number "${scannedSerial}" sudah di-scan.`, 'warning');
+                return;
+            }
+
+            const newSerials = [...formData.serial_numbers];
+            newSerials[activeSerialIndex] = scannedSerial;
+            setFormData(prev => ({ ...prev, serial_numbers: newSerials }));
+            
+            const nextIndex = activeSerialIndex + 1;
+            if (nextIndex < formData.serial_numbers.length) {
+                setActiveSerialIndex(nextIndex);
+            }
+        } else {
+            showToast('Semua kolom serial number sudah terisi.', 'info');
+        }
+    }, [activeSerialIndex, formData.serial_numbers, showToast]);
+
+    useScannerListener(handleScan, isOpen);
+    
+    useEffect(() => {
+        if (isOpen && serialInputRefs.current[activeSerialIndex]) {
+            serialInputRefs.current[activeSerialIndex].focus();
+        }
+    }, [isOpen, activeSerialIndex]);
+
     useEffect(() => {
         if (isOpen) {
-            // Ambil semua master barang untuk dropdown
-            api.get('/inventory/items?all=true').then(res => { // Tambahkan param `all=true` di backend jika perlu
-                const options = res.data.data.map(item => ({
+            api.get('/inventory/items?all=true').then(res => {
+                const options = (res.data.data || res.data).map(item => ({
                     value: item.id_m_barang,
                     label: `${item.nama_barang} (${item.kode_barang})`
                 }));
                 setMasterBarangOptions(options);
             });
             setDisplayHarga('');
+            setFormData(initialFormState);
+            setActiveSerialIndex(0);
         }
     }, [isOpen]);
 
     useEffect(() => {
         const count = parseInt(formData.jumlah, 10) || 0;
-        const existingSerials = formData.serial_numbers || [];
         const newSerials = Array(count).fill('');
-        for (let i = 0; i < Math.min(count, existingSerials.length); i++) {
-            newSerials[i] = existingSerials[i];
+        
+        for (let i = 0; i < Math.min(count, formData.serial_numbers.length); i++) {
+            newSerials[i] = formData.serial_numbers[i];
         }
+        
         setFormData(prev => ({ ...prev, serial_numbers: newSerials }));
+        
+        if (activeSerialIndex >= count) {
+            setActiveSerialIndex(Math.max(0, count - 1));
+        }
+
     }, [formData.jumlah]);
 
     const handleChange = (e) => {
@@ -99,13 +174,13 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                     <div className="form-group">
                         <label>Pilih Barang (SKU)</label>
                         <Select
+                            classNamePrefix="creatable-select"
                             options={masterBarangOptions}
                             onChange={handleSelectChange}
                             placeholder="Cari nama atau kode barang..."
                             isClearable
                         />
                     </div>
-                    {/* Sisanya adalah form detail seperti di ItemFormModal */}
                     <div className="form-row">
                         <div className="form-group half1">
                             <label>Jumlah</label>
@@ -148,10 +223,19 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                         </div>
                     </div>
                     <div className="form-group">
-                        <label>Serial Number (Opsional)</label>
+                        <label>Serial Number (Bisa di-scan)</label>
                         <div className="serial-number-container">
                             {formData.serial_numbers.map((sn, index) => (
-                                <input key={index} type="text" placeholder={`S/N #${index + 1}`} value={sn} onChange={(e) => handleSerialChange(index, e.target.value)} className="serial-number-input" />
+                                <input 
+                                    key={index}
+                                    ref={el => serialInputRefs.current[index] = el} 
+                                    type="text" 
+                                    placeholder={`S/N #${index + 1}`} 
+                                    value={sn} 
+                                    onChange={(e) => handleSerialChange(index, e.target.value)}
+                                    onClick={() => setActiveSerialIndex(index)} // Update fokus saat di-klik manual
+                                    className={`serial-number-input ${index === activeSerialIndex ? 'active-scan' : ''}`} // Tambahkan class untuk visual
+                                />
                             ))}
                         </div>
                     </div>

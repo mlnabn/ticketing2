@@ -10035,6 +10035,11 @@ body.dark-mode .btn-recover-small:hover {
   background-color: #2563eb;
 }
 
+.serial-number-input.active-scan {
+    border-color: #4A90E2; /* Warna biru untuk menandakan fokus */
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+}
+
 
 /* --- Logika Responsif (Desktop) --- */
 
