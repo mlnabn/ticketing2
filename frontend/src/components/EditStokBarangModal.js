@@ -3,23 +3,35 @@ import api from '../services/api';
 
 function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }) {
     const [formData, setFormData] = useState({
-        serial_number: '', status: 'Tersedia', tanggal_pembelian: '',
-        harga_beli: 0, kondisi: 'Baru', warna: '' 
+        serial_number: '', 
+        status_id: 'Tersedia', 
+        tanggal_pembelian: '',
+        harga_beli: 0, 
+        kondisi: 'Baru',
+        warna: '' 
     });
     const [isLoading, setIsLoading] = useState(false);
+
+    const [statusOptions, setStatusOptions] = useState([]);
+
+    useEffect(() => {
+        if (isOpen) {
+            api.get('/statuses').then(res => setStatusOptions(res.data));
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         if (item) {
             setFormData({
                 serial_number: item.serial_number || '',
-                status: item.status || 'Tersedia',
+                status_id: item.status_id || 'Tersedia',
                 tanggal_pembelian: item.tanggal_pembelian ? item.tanggal_pembelian.split('T')[0] : '',
                 harga_beli: item.harga_beli || 0,
                 kondisi: item.kondisi || 'Baru',
                 warna: item.warna || '' 
             });
         }
-    }, [item]);
+    }, [item, isOpen]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -71,12 +83,11 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
                     </div>
                     <div className="form-group">
                         <label>Status Stok</label>
-                        <select name="status" value={formData.status} onChange={handleChange}>
-                            <option value="Tersedia">Tersedia</option>
-                            <option value="Dipinjam">Dipinjam</option>
-                            <option value="Perbaikan">Perbaikan</option>
-                            <option value="Rusak">Rusak</option>
-                            <option value="Hilang">Hilang</option>
+                        <select name="status_id" value={formData.status_id} onChange={handleChange}>
+                            <option value="">Pilih Status</option>
+                            {statusOptions.map(opt => (
+                                <option key={opt.id} value={opt.id}>{opt.nama_status}</option>
+                            ))}
                         </select>
                     </div>
                     <div className="form-group">

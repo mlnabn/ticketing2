@@ -17,6 +17,8 @@ function StokBarangView({ showToast }) {
     const [subCategories, setSubCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedSubCategory, setSelectedSubCategory] = useState('');
+    const [statusOptions, setStatusOptions] = useState([]); 
+    const [selectedStatus, setSelectedStatus] = useState(''); 
 
     // State untuk modal
     const [detailItem, setDetailItem] = useState(null);
@@ -54,23 +56,34 @@ function StokBarangView({ showToast }) {
         setSelectedSubCategory('');
     }, [selectedCategory]);
 
+    useEffect(() => {
+        api.get('/statuses').then(res => setStatusOptions(res.data));
+    }, []);
+
     // Fetch data utama saat komponen dimuat atau filter berubah
     useEffect(() => {
         const filters = {
             id_kategori: selectedCategory,
-            id_sub_kategori: selectedSubCategory
+            id_sub_kategori: selectedSubCategory,
+            status_id: selectedStatus,
         };
         fetchData(1, filters);
-    }, [selectedCategory, selectedSubCategory, fetchData]);
+    }, [selectedCategory, selectedSubCategory, selectedStatus, fetchData]);
 
     // Fungsi untuk mencari via scanner/input
     const handleScanSearch = useCallback(async (serial) => {
+        if (!serial) return;
         showToast(`Mencari: ${serial}`, 'info');
         try {
             const res = await api.get(`/inventory/stock-items/by-serial/${serial}`);
             setDetailItem(res.data);
         } catch (error) {
-            showToast(`Serial Number "${serial}" tidak ditemukan.`, 'error');
+            try {
+                const res = await api.get(`/inventory/stock-items/${serial}`); 
+                setDetailItem(res.data);
+            } catch (finalError) {
+                showToast(`Kode "${serial}" tidak ditemukan.`, 'error');
+            }
         }
     }, [showToast]);
 
@@ -107,6 +120,12 @@ function StokBarangView({ showToast }) {
             
             {/* --- Filter Section --- */}
             <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                <select value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)} className="filter-select">
+                    <option value="">Semua Status</option>
+                    {statusOptions.map(status => (
+                        <option key={status.id} value={status.id}>{status.nama_status}</option>
+                    ))}
+                </select>
                 <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)} className="filter-select">
                     <option value="">Semua Kategori</option>
                     {categories.map(cat => (
@@ -119,6 +138,7 @@ function StokBarangView({ showToast }) {
                         <option key={sub.id_sub_kategori} value={sub.id_sub_kategori}>{sub.nama_sub}</option>
                     ))}
                 </select>
+                
             </div>
             
             <div className="job-list-table">
@@ -147,7 +167,7 @@ function StokBarangView({ showToast }) {
                                 <td>Rp {Number(item.harga_beli).toLocaleString('id-ID')}</td>
                                 <td>{item.tanggal_pembelian ? new Date(item.tanggal_pembelian).toLocaleDateString('id-ID') : '-'}</td>
                                 <td>{new Date(item.tanggal_masuk).toLocaleDateString('id-ID')}</td>
-                                <td><span className={`status-${item.status.toLowerCase()}`}>{item.status}</span></td>
+                                <td><span className={`status-${item.status_detail?.nama_status.toLowerCase().replace(/\s+/g, '-')}`}>{item.status_detail?.nama_status}</span></td>
                                 <td className="action-buttons-group">
                                     <button onClick={() => setDetailItem(item)} className="btn-user-action btn-view">Detail</button>
                                     <button onClick={() => setEditItem(item)} className="btn-user-action btn-edit">Edit</button>
@@ -167,7 +187,15 @@ function StokBarangView({ showToast }) {
             )}
 
             {detailItem && (
-                <ItemDetailModal item={detailItem} onClose={() => setDetailItem(null)} />
+                <ItemDetailModal 
+                    item={detailItem} 
+                    onClose={() => setDetailItem(null)}
+                    showToast={showToast} // <-- Prop diteruskan
+                    onSaveSuccess={() => fetchData(pagination?.current_page || 1, { 
+                        id_kategori: selectedCategory, 
+                        id_sub_kategori: selectedSubCategory 
+                    })}
+                />
             )}
 
             {editItem && (
@@ -198,7 +226,7 @@ function StokBarangView({ showToast }) {
             <AddStockModal
                 isOpen={isAddStockOpen}
                 onClose={() => setIsAddStockOpen(false)}
-                onSaveSuccess={() => fetchData(1)} // Refresh halaman pertama setelah simpan
+                onSaveSuccess={() => fetchData(1)} 
                 showToast={showToast}
             />
         </>

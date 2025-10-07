@@ -10,7 +10,13 @@ use Illuminate\Support\Facades\DB;
 
 class StokBarangController extends Controller {
     public function index(Request $request) {
-        $query = StokBarang::with(['masterBarang.masterKategori', 'masterBarang.subKategori']);
+        $query = StokBarang::with([
+            'masterBarang.masterKategori', 
+            'masterBarang.subKategori',
+            'userPeminjam',
+            'workshop',
+            'statusDetail'
+        ]);
 
         if ($request->filled('id_kategori')) {
             $query->whereHas('masterBarang', fn($q) => $q->where('id_kategori', $request->id_kategori));
@@ -18,8 +24,23 @@ class StokBarangController extends Controller {
         if ($request->filled('id_sub_kategori')) {
             $query->whereHas('masterBarang', fn($q) => $q->where('id_sub_kategori', $request->id_sub_kategori));
         }
+        if ($request->filled('status_id')) {
+            $query->where('status_id', $request->status_id);
+        }
 
         return $query->latest()->paginate(25); // Tampilkan lebih banyak per halaman
+    }
+
+    public function show(StokBarang $stokBarang)
+    {
+        // Muat semua relasi yang diperlukan oleh frontend
+        return response()->json($stokBarang->load([
+            'masterBarang.masterKategori', 
+            'masterBarang.subKategori', 
+            'userPeminjam', 
+            'workshop',
+            'statusDetail'
+        ]));
     }
 
     public function update(Request $request, StokBarang $stokBarang)
@@ -31,7 +52,7 @@ class StokBarangController extends Controller {
                 'max:255',
                 Rule::unique('stok_barangs')->ignore($stokBarang->id),
             ],
-            'status' => 'required|in:Tersedia,Dipinjam,Perbaikan,Rusak,Hilang',
+            'status_id' => 'required|exists:status_barang,id',
             'tanggal_pembelian' => 'nullable|date',
             'harga_beli' => 'required|numeric|min:0',
             'kondisi' => 'required|in:Baru,Bekas',
@@ -45,7 +66,14 @@ class StokBarangController extends Controller {
     }
     
     public function showBySerial($serial) {
-        $item = StokBarang::with(['masterBarang.masterKategori', 'masterBarang.subKategori'])
+        // PERBAIKAN: Tambahkan with() untuk memuat relasi saat mencari via serial number
+        $item = StokBarang::with([
+            'masterBarang.masterKategori', 
+            'masterBarang.subKategori',
+            'userPeminjam', 
+            'workshop',
+            'statusDetail'
+        ])
             ->where('serial_number', $serial)
             ->firstOrFail();
             
@@ -68,6 +96,7 @@ class StokBarangController extends Controller {
         $masterBarang = MasterBarang::find($validated['master_barang_id']);
         
         DB::transaction(function () use ($validated, $masterBarang) {
+            $statusTersediaId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
             for ($i = 0; $i < $validated['jumlah']; $i++) {
                 StokBarang::create([
                     'master_barang_id' => $masterBarang->id_m_barang,
@@ -76,7 +105,7 @@ class StokBarangController extends Controller {
                     'harga_beli' => $validated['harga_beli'],
                     'warna' => $validated['warna'] ?? null,
                     'kondisi' => $validated['kondisi'],
-                    'status' => 'Tersedia', // Status ketersediaan
+                    'status_id' => $statusTersediaId,
                     'tanggal_pembelian' => $validated['tanggal_pembelian'] ?? now(),
                     'tanggal_masuk' => now(),
                 ]);
@@ -99,5 +128,37 @@ class StokBarangController extends Controller {
         }
         $sequencePart = str_pad($sequence, 3, '0', STR_PAD_LEFT);
         return $baseCode . $sequencePart;
+    }
+
+    public function checkout(Request $request, StokBarang $stokBarang)
+    {
+        $validated = $request->validate([
+            'status_id' => 'required|exists:status_barang,id',
+            'user_peminjam_id' => 'required_if:status,Digunakan|nullable|exists:users,id',
+            'workshop_id' => 'required_if:status,Digunakan|nullable|exists:workshops,id',
+        ]);
+
+        $stokBarang->status = $validated['status'];
+
+        if ($validated['status_id'] == 2) { // Asumsi ID 'Digunakan' adalah 2
+            $stokBarang->user_peminjam_id = $validated['user_peminjam_id'];
+            $stokBarang->workshop_id = $validated['workshop_id'];
+            $stokBarang->tanggal_keluar = now();
+        } else {
+            // Jika status diubah kembali ke 'Tersedia' atau lainnya, hapus data peminjam
+            $stokBarang->user_peminjam_id = null;
+            $stokBarang->workshop_id = null;
+            $stokBarang->tanggal_keluar = null;
+        }
+
+        $stokBarang->save();
+        
+        // Muat semua relasi yang mungkin ditampilkan di frontend
+        return response()->json($stokBarang->load([
+            'masterBarang.masterKategori', 
+            'masterBarang.subKategori', 
+            'userPeminjam', // Relasi baru
+            'workshop'      // Relasi baru
+        ]));
     }
 }
