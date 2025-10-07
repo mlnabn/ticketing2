@@ -14,15 +14,11 @@ const parseRupiah = (rupiah) => {
 function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }) {
     const [formData, setFormData] = useState({
         serial_number: '', 
-       
         status_id: 'Tersedia', 
-       
         tanggal_pembelian: '',
         tanggal_masuk: '',
         harga_beli: 0, 
-       
         kondisi: 'Baru',
-       
         warna: ''
     });
     const [displayHarga, setDisplayHarga] = useState('');

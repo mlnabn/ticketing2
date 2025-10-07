@@ -189,7 +189,11 @@ function StokBarangView({ showToast }) {
                                     <td>{item.tanggal_pembelian ? new Date(item.tanggal_pembelian).toLocaleDateString('id-ID') : '-'}</td>
                                     <td>{new Date(item.tanggal_masuk).toLocaleDateString('id-ID')}</td>
                                     <td>{item.created_by?.name || 'N/A'}</td>
-                                    <td><span className={`status-${item.status.toLowerCase()}`}>{item.status}</span></td>
+                                    <td>
+                                        <span className={`status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
+                                            {item.status_detail?.nama_status || 'Tanpa Status'}
+                                        </span>
+                                    </td>
                                     <td className="action-buttons-group">
                                         <button onClick={() => setDetailItem(item)} className="btn-user-action btn-view">Detail</button>
                                         <button onClick={() => setEditItem(item)} className="btn-user-action btn-edit">Edit</button>

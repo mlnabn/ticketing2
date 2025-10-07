@@ -20,12 +20,10 @@ class StokBarangController extends Controller
                 $query->withCount('stokBarangs');
             },
             'masterBarang.masterKategori', 
-           
             'masterBarang.subKategori',
             'userPeminjam',
             'workshop',
-            'statusDetail'
-        ,
+            'statusDetail',
             'createdBy',
             'updatedBy'
         ]);
@@ -41,18 +39,6 @@ class StokBarangController extends Controller
         }
 
         return $query->latest()->paginate(25);
-    }
-
-    public function show(StokBarang $stokBarang)
-    {
-        // Muat semua relasi yang diperlukan oleh frontend
-        return response()->json($stokBarang->load([
-            'masterBarang.masterKategori', 
-            'masterBarang.subKategori', 
-            'userPeminjam', 
-            'workshop',
-            'statusDetail'
-        ]));
     }
 
     public function show(StokBarang $stokBarang)
