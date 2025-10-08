@@ -55,7 +55,7 @@ class Ticket extends Model
     public function masterBarangs()
     {
         return $this->belongsToMany(MasterBarang::class, 'ticket_master_barang', 'ticket_id', 'master_barang_id')
-            ->withPivot('quantity_used', 'status', 'keterangan', 'quantity_lost', 'quantity_recovered')
+            ->withPivot('quantity_used', 'status', 'keterangan', 'quantity_lost', 'quantity_returned')
             ->withTimestamps();
     }
 }

@@ -26,7 +26,16 @@ class MasterBarangController extends Controller
         if ($request->filled('id_sub_kategori')) {
             $query->where('id_sub_kategori', $request->id_sub_kategori);
         }
-        return $query->latest()->paginate(10);
+        if ($request->has('with_stock')) {
+        $query->withCount(['stokBarangs as stok_tersedia' => function ($q) {
+            $q->where('status_id', 1); 
+        }]);
+    }
+        $query->latest();
+        if ($request->has('all')) {
+            return $query->get();
+        }
+        return $query->paginate(10);
     }
 
     // Untuk mengecek apakah master barang sudah ada

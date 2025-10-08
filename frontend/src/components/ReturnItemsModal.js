@@ -4,12 +4,10 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
     const [items, setItems] = useState([]);
 
     useEffect(() => {
-        if (ticket && ticket.masterBarangs) {
-            const initialItems = ticket.masterBarangs.map(barang => ({
-                // Menggunakan ID dan nama dari masterBarang
+        if (ticket && ticket.master_barangs) {
+            const initialItems = ticket.master_barangs.map(barang => ({
                 master_barang_id: barang.id_m_barang, 
                 name: barang.nama_barang,
-                // Data pivot tetap sama
                 quantity_borrowed: barang.pivot.quantity_used || 0,
                 quantity_returned: barang.pivot.quantity_used || 0,
                 quantity_lost: 0,

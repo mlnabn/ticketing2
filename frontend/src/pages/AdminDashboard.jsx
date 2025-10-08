@@ -185,8 +185,8 @@ export default function AdminDashboard() {
   const fetchItemsForAssign = useCallback(async () => {
     try {
       // Mengambil semua data barang tanpa paginasi untuk dropdown
-      const response = await api.get('/inventory/items?all=true');
-      const itemsData = Array.isArray(response.data) ? response.data : response.data.data;
+      const response = await api.get('/inventory/items?all=true&with_stock=true');
+      const itemsData = Array.isArray(response.data) ? response.data : (response.data.data || []);
 
       if (Array.isArray(itemsData)) {
         setItemList(itemsData);
@@ -370,7 +370,7 @@ export default function AdminDashboard() {
       return;
     }
 
-    if (newStatus === 'Selesai' && ticket.masterBarangs && ticket.masterBarangs.length > 0) {
+    if (newStatus === 'Selesai' && ticket.master_barangs && ticket.master_barangs.length > 0) {
       setTicketToReturn(ticket);
       setShowReturnModal(true);
     } else {
