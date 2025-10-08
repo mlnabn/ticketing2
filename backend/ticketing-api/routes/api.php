@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\MasterKategoriController;
 use App\Http\Controllers\Api\SubKategoriController;
 use App\Http\Controllers\Api\MasterBarangController;
 use App\Http\Controllers\Api\StatusController;
+use App\Http\Controllers\Api\ColorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -111,5 +112,7 @@ Route::middleware('jwt')->group(function () {
     Route::get('/inventory/items/sub-category/{subCategoryId}', [MasterBarangController::class, 'filterBySubCategory']);
 
     Route::get('/statuses', [StatusController::class, 'index']);
+
+    Route::apiResource('colors', ColorController::class);
 
 });

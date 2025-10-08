@@ -160,7 +160,7 @@ function StokBarangView({ showToast }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (<tr><td colSpan="9" style={{ textAlign: 'center' }}>Memuat data stok...</td></tr>)
+                        {loading ? (<tr><td colSpan="12" style={{ textAlign: 'center' }}>Memuat data stok...</td></tr>)
                             : items.map(item => (
                                 <tr key={item.id}>
                                     <td>{item.kode_unik}</td>
@@ -169,25 +169,25 @@ function StokBarangView({ showToast }) {
                                     <td>{item.kondisi}</td>
                                     <td>{item.master_barang?.stok_barangs_count || 'N/A'}</td>
                                     <td>
-                                        {item.warna ? (
+                                        {item.color ? (
                                             <span
-                                                title={item.warna} 
+                                                title={item.color.nama_warna}
                                                 style={{
                                                     display: 'inline-block',
                                                     width: '20px',
                                                     height: '20px',
-                                                    backgroundColor: item.warna,
+                                                    backgroundColor: item.color.kode_hex,
                                                     border: '1px solid #ccc',
                                                     borderRadius: '4px'
                                                 }}
                                             ></span>
                                         ) : (
-                                            '-' 
+                                            '-'
                                         )}
                                     </td>
                                     <td>Rp {Number(item.harga_beli).toLocaleString('id-ID')}</td>
                                     <td>{item.tanggal_pembelian ? new Date(item.tanggal_pembelian).toLocaleDateString('id-ID') : '-'}</td>
-                                    <td>{new Date(item.tanggal_masuk).toLocaleDateString('id-ID')}</td>
+                                    <td>{item.tanggal_masuk ? new Date(item.tanggal_masuk).toLocaleDateString('id-ID') : '-'}</td>
                                     <td>{item.created_by?.name || 'N/A'}</td>
                                     <td>
                                         <span className={`status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>

@@ -17,7 +17,7 @@ class StokBarang extends Model
         'tanggal_masuk',
         'tanggal_keluar',
         'harga_beli',
-        'warna',
+        'id_warna',
         'kondisi',
         'user_peminjam_id',
         'workshop_id',
@@ -47,5 +47,9 @@ class StokBarang extends Model
     public function masterBarang()
     {
         return $this->belongsTo(MasterBarang::class, 'master_barang_id');
+    }
+    public function color()
+    {
+        return $this->belongsTo(Color::class, 'id_warna');
     }
 }
