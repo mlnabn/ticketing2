@@ -37,7 +37,8 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
             setFormData({
                 serial_number: item.serial_number || '',
                 status_id: item.status_id || 'Tersedia',
-                tanggal_pembelian: item.tanggal_pembelian ? item.tanggal_pembelian.split('T')[0] : '',
+                tanggal_pembelian: item.tanggal_pembelian ? item.tanggal_pembelian.split(' ')[0] : '',
+                tanggal_masuk: item.tanggal_masuk ? item.tanggal_masuk.split(' ')[0] : '',
                 harga_beli: item.harga_beli || 0,
                 kondisi: item.kondisi || 'Baru',
                 warna: item.warna || ''
