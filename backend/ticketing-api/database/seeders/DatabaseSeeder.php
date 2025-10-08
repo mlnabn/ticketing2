@@ -28,5 +28,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ColorSeeder::class,
         ]);
+
+        $this->call([
+            StatusSeeder::class, 
+        ]);
     }
 }

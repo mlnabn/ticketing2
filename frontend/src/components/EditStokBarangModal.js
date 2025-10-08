@@ -42,16 +42,24 @@ const parseRupiah = (rupiah) => {
 
 function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }) {
     const [formData, setFormData] = useState({
-        serial_number: '',
-        status: 'Tersedia',
+        serial_number: '', 
+        status_id: 'Tersedia', 
         tanggal_pembelian: '',
         tanggal_masuk: '',
-        harga_beli: 0,
+        harga_beli: 0, 
         kondisi: 'Baru',
         id_warna: null
     });
     const [displayHarga, setDisplayHarga] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+
+    const [statusOptions, setStatusOptions] = useState([]);
+
+    useEffect(() => {
+        if (isOpen) {
+            api.get('/statuses').then(res => setStatusOptions(res.data));
+        }
+    }, [isOpen]);
     const [colorOptions, setColorOptions] = useState([]);
 
     useEffect(() => {
@@ -80,7 +88,7 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
             });
             setDisplayHarga(formatRupiah(item.harga_beli));
         }
-    }, [item]);
+    }, [item, isOpen]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -187,12 +195,11 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
                     </div>
                     <div className="form-group">
                         <label>Status Stok</label>
-                        <select name="status" value={formData.status} onChange={handleChange}>
-                            <option value="Tersedia">Tersedia</option>
-                            <option value="Dipinjam">Dipinjam</option>
-                            <option value="Perbaikan">Perbaikan</option>
-                            <option value="Rusak">Rusak</option>
-                            <option value="Hilang">Hilang</option>
+                        <select name="status_id" value={formData.status_id} onChange={handleChange}>
+                            <option value="">Pilih Status</option>
+                            {statusOptions.map(opt => (
+                                <option key={opt.id} value={opt.id}>{opt.nama_status}</option>
+                            ))}
                         </select>
                     </div>
                     <div className="form-row">

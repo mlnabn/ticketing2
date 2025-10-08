@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\NotificationTemplateController;
 use App\Http\Controllers\Api\MasterKategoriController;
 use App\Http\Controllers\Api\SubKategoriController;
 use App\Http\Controllers\Api\MasterBarangController;
+use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\ColorController;
 
 /*
@@ -93,8 +94,10 @@ Route::middleware('jwt')->group(function () {
 
     Route::post('/inventory/stock-items', [StokBarangController::class, 'store']);
     Route::get('/inventory/stock-items', [StokBarangController::class, 'index']);
+    Route::get('/inventory/stock-items/{stokBarang}', [StokBarangController::class, 'show']);
     Route::get('/inventory/stock-items/by-serial/{serial}', [StokBarangController::class, 'showBySerial']);
     Route::post('/inventory/stock-items/{stokBarang}', [StokBarangController::class, 'update']);
+    Route::post('/inventory/stock-items/{stokBarang}/checkout', [StokBarangController::class, 'checkout']);
 
     // --- Rute untuk Manajemen Inventaris ---
     Route::apiResource('inventory/categories', MasterKategoriController::class);
@@ -107,6 +110,8 @@ Route::middleware('jwt')->group(function () {
     Route::get('/inventory/items/code/{kode_barang}', [MasterBarangController::class, 'showByCode']);
     Route::get('/inventory/items/category/{categoryId}', [MasterBarangController::class, 'filterByCategory']);
     Route::get('/inventory/items/sub-category/{subCategoryId}', [MasterBarangController::class, 'filterBySubCategory']);
+
+    Route::get('/statuses', [StatusController::class, 'index']);
 
     Route::apiResource('colors', ColorController::class);
 
