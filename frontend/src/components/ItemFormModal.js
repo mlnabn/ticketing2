@@ -3,28 +3,14 @@ import api from '../services/api';
 import CreatableSelect from 'react-select/creatable';
 import { useDebounce } from 'use-debounce';
 
-// Helper functions (letakkan di luar komponen)
-const formatRupiah = (angka) => {
-    if (angka === null || angka === undefined || angka === '') return '';
-    return new Intl.NumberFormat('id-ID').format(angka);
-};
-
-const parseRupiah = (rupiah) => {
-    if (typeof rupiah !== 'string') return rupiah;
-    return parseInt(rupiah.replace(/\./g, ''), 10) || 0;
-};
-
 const initialFormState = {
     id_kategori: '',
     id_sub_kategori: '',
     nama_barang: '',
-    harga_barang: '', // Hanya menggunakan harga_barang
 };
 
 function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
     const [formData, setFormData] = useState(initialFormState);
-    // HANYA state display untuk harga_barang
-    const [displayHargaBarang, setDisplayHargaBarang] = useState('');
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -48,12 +34,8 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
                     ...initialFormState,
                     ...itemToEdit,
                 });
-                // Sesuaikan untuk mengisi displayHargaBarang dari itemToEdit
-                setDisplayHargaBarang(formatRupiah(itemToEdit.harga_barang));
             } else {
-                // Reset semua state saat form tambah baru
                 setFormData(initialFormState);
-                setDisplayHargaBarang('');
                 setIsExisting(false);
             }
         }
@@ -90,7 +72,6 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
     }, [debouncedNama, debouncedSubKategori, showToast, itemToEdit]);
 
     const handleCreateOption = async (inputValue, type) => {
-        // ... (Fungsi ini tidak perlu diubah)
         setIsLoading(true);
         try {
             if (type === 'category') {
@@ -117,14 +98,7 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        // Logika disederhanakan hanya untuk harga_barang
-        if (name === 'harga_barang') {
-            const numericValue = parseRupiah(value);
-            setFormData(prev => ({ ...prev, harga_barang: numericValue }));
-            setDisplayHargaBarang(formatRupiah(numericValue));
-        } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
-        }
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSelectChange = (newValue, actionMeta) => {
@@ -185,19 +159,6 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
                             Barang ini sudah terdaftar. Anda tidak bisa mendaftarkannya lagi. Tambahkan di Menu Stok Barang.
                         </div>
                     )}
-
-                    <div className="form-group">
-                        <label>Harga Standar/Awal (Rp)</label>
-                        <input
-                            type="text"
-                            name="harga_barang"
-                            value={displayHargaBarang}
-                            onChange={handleChange}
-                            disabled={isExisting}
-                            required
-                            placeholder="Contoh: 2500000"
-                        />
-                    </div>
 
                     <div className="confirmation-modal-actions">
                         <button type="button" onClick={onClose} className="btn-cancel">Batal</button>

@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\NotificationTemplateController;
 use App\Http\Controllers\Api\MasterKategoriController;
 use App\Http\Controllers\Api\SubKategoriController;
 use App\Http\Controllers\Api\MasterBarangController;
+use App\Http\Controllers\Api\ColorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -106,5 +107,7 @@ Route::middleware('jwt')->group(function () {
     Route::get('/inventory/items/code/{kode_barang}', [MasterBarangController::class, 'showByCode']);
     Route::get('/inventory/items/category/{categoryId}', [MasterBarangController::class, 'filterByCategory']);
     Route::get('/inventory/items/sub-category/{subCategoryId}', [MasterBarangController::class, 'filterBySubCategory']);
+
+    Route::apiResource('colors', ColorController::class);
 
 });

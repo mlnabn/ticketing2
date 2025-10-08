@@ -61,7 +61,6 @@ class MasterBarangController extends Controller
                     return $query->where('id_sub_kategori', $request->id_sub_kategori);
                 }),
             ],
-            'harga_barang' => 'required|numeric|min:0', // Ini menjadi harga standar/awal
         ]);
 
         $kategori = MasterKategori::find($validated['id_kategori']);

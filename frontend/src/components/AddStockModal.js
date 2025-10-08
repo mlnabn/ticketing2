@@ -1,7 +1,55 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import api from '../services/api';
-import Select from 'react-select'; // Gunakan react-select standar untuk ini
 
+/* ===========================================================
+   Custom Components for Color Select
+=========================================================== */
+const ColorOption = (props) => (
+    <div
+        {...props.innerProps}
+        style={{
+            display: 'flex',
+            alignItems: 'center',
+            padding: '5px 10px',
+            cursor: 'pointer',
+            backgroundColor: props.isFocused ? '#f0f0f0' : 'white',
+        }}
+    >
+        <span
+            style={{
+                width: '20px',
+                height: '20px',
+                backgroundColor: props.data.hex,
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                marginRight: '10px',
+            }}
+        ></span>
+        {props.data.label}
+    </div>
+);
+
+const ColorSingleValue = (props) => (
+    <div {...props.innerProps} style={{ display: 'flex', alignItems: 'center' }}>
+        <span
+            style={{
+                width: '20px',
+                height: '20px',
+                backgroundColor: props.data.hex,
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                marginRight: '10px',
+            }}
+        ></span>
+        {props.data.label}
+    </div>
+);
+
+/* ===========================================================
+   Utility Functions
+=========================================================== */
 const formatRupiah = (angka) => {
     if (angka === null || angka === undefined || angka === '') return '';
     return new Intl.NumberFormat('id-ID').format(angka);
@@ -12,17 +60,25 @@ const parseRupiah = (rupiah) => {
     return parseInt(rupiah.replace(/\./g, ''), 10) || 0;
 };
 
+/* ===========================================================
+   Initial State
+=========================================================== */
+const today = new Date().toISOString().split('T')[0];
+
 const initialFormState = {
     master_barang_id: null,
     jumlah: 1,
     harga_beli: '',
     kondisi: 'Baru',
-    warna: '',
-    tanggal_pembelian: '',
-    tanggal_masuk: '',
+    id_warna: null,
+    tanggal_pembelian: today,
+    tanggal_masuk: today,
     serial_numbers: [''],
 };
 
+/* ===========================================================
+   Barcode Scanner Hook
+=========================================================== */
 const useScannerListener = (onScan, isOpen) => {
     useEffect(() => {
         if (!isOpen) return;
@@ -31,127 +87,211 @@ const useScannerListener = (onScan, isOpen) => {
         let interval;
 
         const handleKeyDown = (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
-                if (e.key === 'Enter' && e.target.closest('.creatable-select')) {
-                    return;
-                }
+            if (
+                e.target.tagName === 'INPUT' ||
+                e.target.tagName === 'TEXTAREA' ||
+                e.target.tagName === 'SELECT'
+            ) {
+                if (e.key === 'Enter' && e.target.closest('.creatable-select')) return;
             }
 
             if (interval) clearInterval(interval);
+
             if (e.key === 'Enter') {
-                if (barcode.length > 3) { // Asumsi S/N lebih dari 3 karakter
+                if (barcode.length > 3) {
                     onScan(barcode.trim());
                 }
                 barcode = '';
                 return;
             }
-            if (e.key.length === 1) {
-                barcode += e.key;
-            }
-            interval = setInterval(() => barcode = '', 50);
+
+            if (e.key.length === 1) barcode += e.key;
+            interval = setInterval(() => (barcode = ''), 50);
         };
 
         window.addEventListener('keydown', handleKeyDown);
-        // Cleanup listener saat komponen di-unmount atau modal tertutup
         return () => window.removeEventListener('keydown', handleKeyDown);
-
-    }, [onScan, isOpen]); // Tambahkan isOpen sebagai dependency
+    }, [onScan, isOpen]);
 };
 
-
+/* ===========================================================
+   Main Component
+=========================================================== */
 function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
     const [formData, setFormData] = useState(initialFormState);
     const [displayHarga, setDisplayHarga] = useState('');
     const [masterBarangOptions, setMasterBarangOptions] = useState([]);
+    const [colorOptions, setColorOptions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
     const [activeSerialIndex, setActiveSerialIndex] = useState(0);
     const serialInputRefs = useRef([]);
 
-    const handleScan = useCallback((scannedSerial) => {
-        if (activeSerialIndex < formData.serial_numbers.length) {
-            
-            if (formData.serial_numbers.includes(scannedSerial)) {
-                showToast(`Serial number "${scannedSerial}" sudah di-scan.`, 'warning');
-                return;
-            }
+    /* ---------------- Barcode Scanner ---------------- */
+    const handleScan = useCallback(
+        (scannedSerial) => {
+            if (activeSerialIndex < formData.serial_numbers.length) {
+                if (formData.serial_numbers.includes(scannedSerial)) {
+                    showToast(`Serial number "${scannedSerial}" sudah di-scan.`, 'warning');
+                    return;
+                }
 
-            const newSerials = [...formData.serial_numbers];
-            newSerials[activeSerialIndex] = scannedSerial;
-            setFormData(prev => ({ ...prev, serial_numbers: newSerials }));
-            
-            const nextIndex = activeSerialIndex + 1;
-            if (nextIndex < formData.serial_numbers.length) {
-                setActiveSerialIndex(nextIndex);
+                const newSerials = [...formData.serial_numbers];
+                newSerials[activeSerialIndex] = scannedSerial;
+                setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
+
+                const nextIndex = activeSerialIndex + 1;
+                if (nextIndex < formData.serial_numbers.length) {
+                    setActiveSerialIndex(nextIndex);
+                }
+            } else {
+                showToast('Semua kolom serial number sudah terisi.', 'info');
             }
-        } else {
-            showToast('Semua kolom serial number sudah terisi.', 'info');
-        }
-    }, [activeSerialIndex, formData.serial_numbers, showToast]);
+        },
+        [activeSerialIndex, formData.serial_numbers, showToast]
+    );
 
     useScannerListener(handleScan, isOpen);
-    
+
+    /* ---------------- Focus Handler ---------------- */
     useEffect(() => {
         if (isOpen && serialInputRefs.current[activeSerialIndex]) {
             serialInputRefs.current[activeSerialIndex].focus();
         }
     }, [isOpen, activeSerialIndex]);
 
+    /* ---------------- Load Data ---------------- */
     useEffect(() => {
-        if (isOpen) {
-            api.get('/inventory/items?all=true').then(res => {
-                const options = (res.data.data || res.data).map(item => ({
-                    value: item.id_m_barang,
-                    label: `${item.nama_barang} (${item.kode_barang})`
-                }));
-                setMasterBarangOptions(options);
-            });
-            setDisplayHarga('');
-            setFormData(initialFormState);
-            setActiveSerialIndex(0);
-        }
+        if (!isOpen) return;
+
+        // Ambil daftar barang
+        api.get('/inventory/items?all=true').then((res) => {
+            const data = res.data.data || res.data;
+            const options = data.map((item) => ({
+                value: item.id_m_barang,
+                label: `${item.nama_barang} (${item.kode_barang})`,
+            }));
+            setMasterBarangOptions(options);
+        });
+
+        // Ambil daftar warna
+        api.get('/colors').then((res) => {
+            const options = res.data.map((color) => ({
+                value: color.id_warna,
+                label: color.nama_warna,
+                hex: color.kode_hex,
+            }));
+            setColorOptions(options);
+        });
+
+        // Reset form setiap kali modal dibuka
+        setDisplayHarga('');
+        setFormData(initialFormState);
+        setActiveSerialIndex(0);
     }, [isOpen]);
+
+    /* ---------------- Update Serial Inputs ---------------- */
+    // useEffect(() => {
+    //     const count = parseInt(formData.jumlah, 10) || 0;
+    //     const newSerials = Array(count).fill('');
+
+    //     for (let i = 0; i < Math.min(count, formData.serial_numbers.length); i++) {
+    //         newSerials[i] = formData.serial_numbers[i];
+    //     }
+
+    //     setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
+
+    //     if (activeSerialIndex >= count) {
+    //         setActiveSerialIndex(Math.max(0, count - 1));
+    //     }
+    // }, [formData.jumlah, formData.serial_numbers, activeSerialIndex]);
 
     useEffect(() => {
         const count = parseInt(formData.jumlah, 10) || 0;
-        const newSerials = Array(count).fill('');
-        
-        for (let i = 0; i < Math.min(count, formData.serial_numbers.length); i++) {
-            newSerials[i] = formData.serial_numbers[i];
-        }
-        
-        setFormData(prev => ({ ...prev, serial_numbers: newSerials }));
-        
-        if (activeSerialIndex >= count) {
-            setActiveSerialIndex(Math.max(0, count - 1));
-        }
 
-    }, [formData.jumlah]);
+        // Hanya berjalan jika panjang array tidak sesuai dengan jumlah
+        if (formData.serial_numbers.length !== count) {
+            const newSerials = Array(count).fill('');
+            const limit = Math.min(count, formData.serial_numbers.length);
+            for (let i = 0; i < limit; i++) {
+                newSerials[i] = formData.serial_numbers[i];
+            }
+            setFormData(prev => ({ ...prev, serial_numbers: newSerials }));
+        }
+    }, [formData.jumlah, formData.serial_numbers]); // Dependensi yang lebih aman
 
+
+    // useEffect 2: HANYA untuk mengatur ulang index aktif jika keluar batas
+    useEffect(() => {
+        const count = parseInt(formData.jumlah, 10) || 0;
+        if (activeSerialIndex >= count && count > 0) {
+            setActiveSerialIndex(count - 1);
+        } else if (count === 0 && activeSerialIndex !== 0) {
+            setActiveSerialIndex(0);
+        }
+    }, [formData.jumlah, activeSerialIndex]);
+
+    /* ---------------- Input Handlers ---------------- */
     const handleChange = (e) => {
         const { name, value } = e.target;
         if (name === 'harga_beli') {
             const numericValue = parseRupiah(value);
-            setFormData(prev => ({ ...prev, harga_beli: numericValue }));
+            setFormData((prev) => ({ ...prev, harga_beli: numericValue }));
             setDisplayHarga(formatRupiah(numericValue));
         } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
+            setFormData((prev) => ({ ...prev, [name]: value }));
         }
     };
 
     const handleSelectChange = (selectedOption) => {
-        setFormData(prev => ({ ...prev, master_barang_id: selectedOption ? selectedOption.value : null }));
+        setFormData((prev) => ({
+            ...prev,
+            master_barang_id: selectedOption ? selectedOption.value : null,
+        }));
     };
 
     const handleSerialChange = (index, value) => {
         const newSerials = [...formData.serial_numbers];
         newSerials[index] = value;
-        setFormData(prev => ({ ...prev, serial_numbers: newSerials }));
+        setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
     };
 
+    const handleColorChange = (selectedOption) => {
+        setFormData((prev) => ({
+            ...prev,
+            id_warna: selectedOption ? selectedOption.value : null,
+        }));
+    };
+
+    /* ---------------- Warna Baru ---------------- */
+    const handleCreateColor = async (inputValue) => {
+        showToast(`Membuat warna baru: "${inputValue}"...`, 'info');
+        setIsLoading(true);
+        try {
+            // Sekarang kita hanya kirim nama_warna, backend akan mencari kode_hex nya
+            const res = await api.post('/colors', { nama_warna: inputValue });
+
+            const newOption = {
+                value: res.data.id_warna,
+                label: res.data.nama_warna,
+                hex: res.data.kode_hex
+            };
+            setColorOptions(prev => [...prev, newOption]);
+            setFormData(prev => ({ ...prev, id_warna: res.data.id_warna }));
+            showToast(`Warna "${res.data.nama_warna}" berhasil dibuat.`, 'success');
+
+        } catch (error) {
+            showToast(error.response?.data?.message || 'Gagal membuat warna baru.', 'error');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    /* ---------------- Submit ---------------- */
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
+
         try {
             await api.post('/inventory/stock-items', formData);
             showToast('Stok baru berhasil ditambahkan.', 'success');
@@ -164,88 +304,134 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
         }
     };
 
+    /* ---------------- Render ---------------- */
     if (!isOpen) return null;
 
     return (
-        <div className="modal-backdrop">
-            <div className="modal-content user-form-modal large">
-                <h3>Tambah Stok Barang</h3>
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label>Pilih Barang (SKU)</label>
-                        <Select
-                            classNamePrefix="creatable-select"
-                            options={masterBarangOptions}
-                            onChange={handleSelectChange}
-                            placeholder="Cari nama atau kode barang..."
-                            isClearable
-                        />
-                    </div>
-                    <div className="form-row">
-                        <div className="form-group half1">
-                            <label>Jumlah</label>
-                            <input type="number" name="jumlah" value={formData.jumlah} onChange={handleChange} min="1" required />
-                        </div>
-                        <div className="form-group half">
-                            <label>Harga Beli Satuan (Rp)</label>
-                            {/* 5. UBAH INPUT HARGA BELI */}
-                            <input
-                                type="text"
-                                name="harga_beli"
-                                value={displayHarga}
-                                onChange={handleChange}
-                                placeholder="Contoh: 1500000"
-                                required
+        <>
+            <div className="modal-backdrop">
+                <div className="modal-content user-form-modal large">
+                    <h3>Tambah Stok Barang</h3>
+                    <form onSubmit={handleSubmit}>
+                        {/* Pilih Barang */}
+                        <div className="form-group">
+                            <label>Pilih Barang (SKU)</label>
+                            <Select
+                                classNamePrefix="creatable-select"
+                                options={masterBarangOptions}
+                                onChange={handleSelectChange}
+                                placeholder="Cari nama atau kode barang..."
+                                isClearable
                             />
                         </div>
-                    </div>
-                    <div className="form-row">
-                        <div className="form-group half1">
-                            <label>Kondisi</label>
-                            <select name="kondisi" value={formData.kondisi} onChange={handleChange}>
-                                <option value="Baru">Baru</option>
-                                <option value="Bekas">Bekas</option>
-                            </select>
-                        </div>
-                        <div className="form-group half">
-                            <label>Warna</label>
-                            <input type="text" name="warna" value={formData.warna} onChange={handleChange} />
-                        </div>
-                    </div>
-                    <div className="form-row">
-                        <div className="form-group half1">
-                            <label>Tanggal Pembelian</label>
-                            <input type="date" name="tanggal_pembelian" value={formData.tanggal_pembelian} onChange={handleChange} />
-                        </div>
-                        <div className="form-group half">
-                            <label>Tanggal Masuk</label>
-                            <input type="date" name="tanggal_masuk" value={formData.tanggal_masuk} onChange={handleChange} required />
-                        </div>
-                    </div>
-                    <div className="form-group">
-                        <label>Serial Number (Bisa di-scan)</label>
-                        <div className="serial-number-container">
-                            {formData.serial_numbers.map((sn, index) => (
-                                <input 
-                                    key={index}
-                                    ref={el => serialInputRefs.current[index] = el} 
-                                    type="text" 
-                                    placeholder={`S/N #${index + 1}`} 
-                                    value={sn} 
-                                    onChange={(e) => handleSerialChange(index, e.target.value)}
-                                    onClick={() => setActiveSerialIndex(index)} // Update fokus saat di-klik manual
-                                    className={`serial-number-input ${index === activeSerialIndex ? 'active-scan' : ''}`} // Tambahkan class untuk visual
+
+                        {/* Jumlah & Harga */}
+                        <div className="form-row">
+                            <div className="form-group half1">
+                                <label>Jumlah</label>
+                                <input
+                                    type="number"
+                                    name="jumlah"
+                                    value={formData.jumlah}
+                                    onChange={handleChange}
+                                    min="1"
+                                    required
                                 />
-                            ))}
+                            </div>
+                            <div className="form-group half">
+                                <label>Harga Beli Satuan (Rp)</label>
+                                <input
+                                    type="text"
+                                    name="harga_beli"
+                                    value={displayHarga}
+                                    onChange={handleChange}
+                                    placeholder="Contoh: 1500000"
+                                    required
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div className="confirmation-modal-actions">
-                        <button type="button" onClick={onClose} className="btn-cancel">Batal</button>
-                        <button type="submit" className="btn-confirm" disabled={isLoading}>Simpan</button>
-                    </div>
-                </form>
+
+                        {/* Kondisi & Warna */}
+                        <div className="form-row">
+                            <div className="form-group half1">
+                                <label>Kondisi</label>
+                                <select name="kondisi" value={formData.kondisi} onChange={handleChange}>
+                                    <option value="Baru">Baru</option>
+                                    <option value="Bekas">Bekas</option>
+                                </select>
+                            </div>
+                            <div className="form-group half">
+                                <label>Warna</label>
+                                <CreatableSelect
+                                    classNamePrefix="creatable-select"
+                                    options={colorOptions}
+                                    value={colorOptions.find((opt) => opt.value === formData.id_warna)}
+                                    onChange={handleColorChange}
+                                    onCreateOption={handleCreateColor}
+                                    placeholder="Pilih atau ketik warna baru..."
+                                    isClearable
+                                    formatCreateLabel={(input) => `Buat warna baru: "${input}"`}
+                                    components={{ Option: ColorOption, SingleValue: ColorSingleValue }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Tanggal */}
+                        <div className="form-row">
+                            <div className="form-group half1">
+                                <label>Tanggal Pembelian</label>
+                                <input
+                                    type="date"
+                                    name="tanggal_pembelian"
+                                    value={formData.tanggal_pembelian}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group half">
+                                <label>Tanggal Masuk</label>
+                                <input
+                                    type="date"
+                                    name="tanggal_masuk"
+                                    value={formData.tanggal_masuk}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        {/* Serial Numbers */}
+                        <div className="form-group">
+                            <label>Serial Number (Bisa di-scan)</label>
+                            <div className="serial-number-container">
+                                {formData.serial_numbers.map((sn, index) => (
+                                    <input
+                                        key={index}
+                                        ref={(el) => (serialInputRefs.current[index] = el)}
+                                        type="text"
+                                        placeholder={`S/N #${index + 1}`}
+                                        value={sn}
+                                        onChange={(e) => handleSerialChange(index, e.target.value)}
+                                        onClick={() => setActiveSerialIndex(index)}
+                                        className={`serial-number-input ${index === activeSerialIndex ? 'active-scan' : ''
+                                            }`}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Tombol Aksi */}
+                        <div className="confirmation-modal-actions">
+                            <button type="button" onClick={onClose} className="btn-cancel">
+                                Batal
+                            </button>
+                            <button type="submit" className="btn-confirm" disabled={isLoading}>
+                                Simpan
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 

@@ -1,5 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import CreatableSelect from 'react-select/creatable';
+
+const ColorOption = (props) => (
+    <div {...props.innerProps} style={{ display: 'flex', alignItems: 'center', padding: '5px 10px', cursor: 'pointer', backgroundColor: props.isFocused ? '#f0f0f0' : 'white' }}>
+        <span style={{
+            width: '20px',
+            height: '20px',
+            backgroundColor: props.data.hex,
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            marginRight: '10px'
+        }}></span>
+        {props.data.label}
+    </div>
+);
+
+const ColorSingleValue = (props) => (
+    <div {...props.innerProps} style={{ display: 'flex', alignItems: 'center' }}>
+        <span style={{
+            width: '20px',
+            height: '20px',
+            backgroundColor: props.data.hex,
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            marginRight: '10px'
+        }}></span>
+        {props.data.label}
+    </div>
+);
 
 const formatRupiah = (angka) => {
     if (angka === null || angka === undefined || angka === '') return '';
@@ -19,10 +48,24 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
         tanggal_masuk: '',
         harga_beli: 0,
         kondisi: 'Baru',
-        warna: ''
+        id_warna: null
     });
     const [displayHarga, setDisplayHarga] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [colorOptions, setColorOptions] = useState([]);
+
+    useEffect(() => {
+        if (isOpen) {
+            api.get('/colors').then(res => {
+                const options = res.data.map(color => ({
+                    value: color.id_warna,
+                    label: color.nama_warna,
+                    hex: color.kode_hex
+                }));
+                setColorOptions(options);
+            });
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         if (item) {
@@ -30,9 +73,10 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
                 serial_number: item.serial_number || '',
                 status: item.status || 'Tersedia',
                 tanggal_pembelian: item.tanggal_pembelian ? item.tanggal_pembelian.split('T')[0] : '',
+                tanggal_masuk: item.tanggal_masuk ? item.tanggal_masuk.split('T')[0] : '',
                 harga_beli: item.harga_beli || 0,
                 kondisi: item.kondisi || 'Baru',
-                warna: item.warna || ''
+                id_warna: item.id_warna || null
             });
             setDisplayHarga(formatRupiah(item.harga_beli));
         }
@@ -65,6 +109,36 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
         }
     };
 
+    const handleColorChange = (selectedOption) => {
+        setFormData(prev => ({ ...prev, id_warna: selectedOption ? selectedOption.value : null }));
+    };
+
+    const handleCreateColor = async (inputValue) => {
+        showToast(`Membuat warna baru: "${inputValue}"...`, 'info');
+        setIsLoading(true);
+        try {
+            // Kirim nama warna baru ke backend
+            const res = await api.post('/colors', { nama_warna: inputValue });
+
+            // Backend akan membalas dengan data warna lengkap (termasuk kode_hex)
+            const newOption = {
+                value: res.data.id_warna,
+                label: res.data.nama_warna,
+                hex: res.data.kode_hex
+            };
+
+            // Tambahkan opsi baru ke daftar dan langsung pilih
+            setColorOptions(prev => [...prev, newOption]);
+            setFormData(prev => ({ ...prev, id_warna: res.data.id_warna }));
+            showToast(`Warna "${res.data.nama_warna}" berhasil dibuat.`, 'success');
+
+        } catch (error) {
+            showToast(error.response?.data?.message || 'Gagal membuat warna baru.', 'error');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -91,7 +165,18 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
                     </div>
                     <div className="form-group">
                         <label>Warna</label>
-                        <input type="text" name="warna" value={formData.warna} onChange={handleChange} />
+                        <CreatableSelect
+                            classNamePrefix="creatable-select"
+                            options={colorOptions}
+                            value={colorOptions.find(option => option.value === formData.id_warna)}
+                            onChange={handleColorChange}
+                            onCreateOption={handleCreateColor} // <-- TAMBAHKAN INI
+                            placeholder="Pilih atau ketik warna baru..."
+                            isClearable
+                            formatCreateLabel={inputValue => `Buat warna baru: "${inputValue}"`} // <-- TAMBAHKAN INI
+                            components={{ Option: ColorOption, SingleValue: ColorSingleValue }}
+                            isDisabled={isLoading} // <-- TAMBAHKAN INI agar tidak bisa diubah saat proses
+                        />
                     </div>
                     <div className="form-group">
                         <label>Kondisi Barang</label>

@@ -16,7 +16,6 @@ class MasterBarang extends Model
         'kode_barang',
         'nama_barang',
         'model_barang',
-        'harga_barang',
         'created_by',
     ];
 

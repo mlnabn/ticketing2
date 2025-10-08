@@ -17,7 +17,7 @@ class StokBarang extends Model
         'tanggal_masuk',
         'tanggal_keluar',
         'harga_beli',
-        'warna',
+        'id_warna',
         'kondisi',
         'created_by',
         'updated_by'
@@ -34,5 +34,9 @@ class StokBarang extends Model
     public function updatedBy()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+    public function color()
+    {
+        return $this->belongsTo(Color::class, 'id_warna');
     }
 }

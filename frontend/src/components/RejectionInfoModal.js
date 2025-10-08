@@ -15,7 +15,6 @@ function RejectionInfoModal({ ticket, onClose, onDelete }) {
           {/* Tombol Hapus sekarang ada di sini */}
           <button onClick={onClose} className="btn-canceluser">Tutup</button>
           <button onClick={() => onDelete(ticket)} className="btn-confirmuser">Hapus Tiket</button>
-          
         </div>
       </div>
     </div>

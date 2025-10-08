@@ -21,7 +21,8 @@ class StokBarangController extends Controller
             'masterBarang.masterKategori',
             'masterBarang.subKategori',
             'createdBy',
-            'updatedBy'
+            'updatedBy',
+            'color'
         ]);
 
         if ($request->filled('id_kategori')) {
@@ -48,7 +49,7 @@ class StokBarangController extends Controller
             'tanggal_masuk' => 'nullable|date',
             'harga_beli' => 'required|numeric|min:0',
             'kondisi' => 'required|in:Baru,Bekas',
-            'warna' => 'nullable|string|max:255'
+            'id_warna' => 'nullable|exists:colors,id_warna', 
         ]);
 
         // PERBAIKAN 2: Tambahkan ID admin yang melakukan update
@@ -75,7 +76,7 @@ class StokBarangController extends Controller
             'jumlah' => 'required|integer|min:1',
             'harga_beli' => 'required|numeric|min:0',
             'kondisi' => 'required|in:Baru,Bekas',
-            'warna' => 'nullable|string|max:255',
+            'id_warna' => 'nullable|exists:colors,id_warna',
             'tanggal_pembelian' => 'nullable|date',
             'tanggal_masuk' => 'required|date',
             'serial_numbers' => 'nullable|array',
@@ -91,7 +92,7 @@ class StokBarangController extends Controller
                     'kode_unik' => $this->generateUniqueStokCode($masterBarang),
                     'serial_number' => $validated['serial_numbers'][$i] ?? null,
                     'harga_beli' => $validated['harga_beli'],
-                    'warna' => $validated['warna'] ?? null,
+                    'id_warna' => $validated['id_warna'] ?? null,
                     'kondisi' => $validated['kondisi'],
                     'status' => 'Tersedia',
                     'tanggal_pembelian' => $validated['tanggal_pembelian'] ?? now(),

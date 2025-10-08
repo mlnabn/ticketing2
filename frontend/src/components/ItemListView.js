@@ -74,7 +74,7 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan="8" style={{ textAlign: 'center' }}>Memuat data barang...</td></tr>
+                            <tr><td colSpan="6" style={{ textAlign: 'center' }}>Memuat data barang...</td></tr>
                         ) : items.length > 0 ? items.map(item => (
                             <tr key={item.id_m_barang}>
                                 <td>{item.kode_barang}</td>
@@ -88,7 +88,7 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
                                 </td>
                             </tr>
                         )) : (
-                            <tr><td colSpan="5" style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</td></tr>
+                            <tr><td colSpan="6" style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</td></tr>
                         )}
                     </tbody>
                 </table>
