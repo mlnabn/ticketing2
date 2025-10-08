@@ -48,14 +48,6 @@ class StokBarang extends Model
     {
         return $this->belongsTo(MasterBarang::class, 'master_barang_id');
     }
-    public function createdBy()
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-    public function updatedBy()
-    {
-        return $this->belongsTo(User::class, 'updated_by');
-    }
     public function color()
     {
         return $this->belongsTo(Color::class, 'id_warna');
