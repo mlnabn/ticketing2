@@ -9,12 +9,16 @@ class StokBarang extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'master_barang_id', 'kode_unik', 'serial_number', 'status_id',
+        'master_barang_id', 'kode_unik', 'serial_number', 'status_id', 'ticket_id',
         'tanggal_pembelian', 'tanggal_masuk', 'tanggal_keluar',
         'harga_beli', 'id_warna', 'kondisi', 'user_peminjam_id', 'workshop_id', 'created_by',
         'deskripsi', 'teknisi_perbaikan_id', 'tanggal_mulai_perbaikan', 'tanggal_selesai_perbaikan',
         'user_perusak_id', 'tanggal_rusak', 'user_penghilang_id', 'tanggal_hilang', 'tanggal_ketemu',
     ];
+
+    public function ticket() {
+        return $this->belongsTo(Ticket::class, 'ticket_id');
+    }
 
     public function statusDetail() {
         return $this->belongsTo(Status::class, 'status_id');

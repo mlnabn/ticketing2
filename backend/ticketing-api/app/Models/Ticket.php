@@ -58,4 +58,8 @@ class Ticket extends Model
             ->withPivot('quantity_used', 'status', 'keterangan', 'quantity_lost', 'quantity_returned')
             ->withTimestamps();
     }
+
+    public function stokBarangs() {
+        return $this->hasMany(StokBarang::class, 'ticket_id');
+    }
 }

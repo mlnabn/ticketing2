@@ -8,24 +8,26 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
 
     // Ambil data barang spesifik yang dipinjam & daftar status dari API
     useEffect(() => {
-        if (ticket) {
+        if (ticket && ticket.master_barangs) {
             setIsLoading(true);
             Promise.all([
                 // Endpoint baru yang sudah kita buat sebelumnya
                 api.get(`/tickets/${ticket.id}/borrowed-items`),
                 api.get('/statuses')
             ]).then(([itemsRes, statusesRes]) => {
+
+                const tersediaStatus = statusesRes.data.find(s => s.nama_status === 'Tersedia');
+                const tersediaStatusId = tersediaStatus ? tersediaStatus.id : '';
                 
                 const initialItems = itemsRes.data.map(item => ({
                     stok_barang_id: item.id,
                     name: item.master_barang.nama_barang,
                     kode_unik: item.kode_unik,
-                    status_id: item.status_id, // Status awal adalah 'Dipinjam'
+                    status_id: tersediaStatusId,
                     keterangan: ''
                 }));
                 setItems(initialItems);
 
-                // Filter status yang relevan untuk proses pengembalian
                 setStatusOptions(statusesRes.data.filter(s => 
                     ['Tersedia', 'Digunakan', 'Rusak', 'Hilang'].includes(s.nama_status)
                 ));
@@ -37,7 +39,7 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
                 setIsLoading(false);
             });
         }
-    }, [ticket]);
+    }, [ticket, showToast]);
 
     // Handler untuk mengubah state item saat dropdown atau textarea diubah
     const handleItemChange = (stokId, field, value) => {

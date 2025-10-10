@@ -20,7 +20,7 @@ use App\Exports\TicketsExport;
 use Illuminate\Validation\ValidationException;
 use App\Models\MasterBarang;
 use App\Models\StokBarang;
-
+use Illuminate\Support\Facades\Log;
 
 class TicketController extends Controller
 {
@@ -423,7 +423,8 @@ class TicketController extends Controller
                                 'status_id' => $statusDipinjamId, // <-- Ganti ke ID Dipinjam
                                 'user_peminjam_id' => $assignee->id,
                                 'tanggal_keluar' => now(),
-                                'workshop_id' => $ticket->workshop_id, 
+                                'workshop_id' => $ticket->workshop_id,
+                                'ticket_id' => $ticket->id,
                             ]);
                         }
 
@@ -721,25 +722,17 @@ class TicketController extends Controller
 
     public function getBorrowedItems(Ticket $ticket)
     {
-        // Pastikan hanya user yang ditugaskan yang bisa melihat ini
-        if (Auth::id() !== $ticket->user_id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $statusDipinjamId = DB::table('status_barang')->where('nama_status', 'Dipinjam')->value('id');
-
         $borrowedItems = StokBarang::with('masterBarang')
-            ->where('user_peminjam_id', $ticket->user_id)
-            ->where('status_id', $statusDipinjamId)
-            // Filter tambahan untuk memastikan barang ini terkait dengan pivot tiket (opsional tapi lebih aman)
-            ->whereIn('master_barang_id', $ticket->masterBarangs()->pluck('master_barangs.id_m_barang'))
+            ->where('ticket_id', $ticket->id)
             ->get();
-            
+                
         return response()->json($borrowedItems);
     }
 
     public function processReturn(Request $request, Ticket $ticket)
     {
+        Log::info('===== Memulai Proses Return untuk Tiket ID: ' . $ticket->id . ' =====');
+
         $validated = $request->validate([
             'items' => 'present|array',
             'items.*.stok_barang_id' => 'required|exists:stok_barangs,id',
@@ -747,34 +740,44 @@ class TicketController extends Controller
             'items.*.keterangan' => 'nullable|string|max:1000',
         ]);
 
+        Log::info('Data dari Frontend (Payload):', $validated['items']);
+
         DB::transaction(function () use ($ticket, $validated) {
             $statusTersediaId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
 
             foreach ($validated['items'] as $itemData) {
                 $stokBarang = StokBarang::find($itemData['stok_barang_id']);
                 
-                // Keamanan: Pastikan barang ini memang sedang dipinjam oleh user tiket ini
-                if ($stokBarang && $stokBarang->user_peminjam_id === $ticket->user_id) {
+                Log::info('--- Memproses Stok Barang ID: ' . $stokBarang->id . ' ---');
+                Log::info('Ticket ID di Stok Barang (dari DB): ' . $stokBarang->ticket_id);
+                Log::info('Ticket ID yang sedang diproses: ' . $ticket->id);
+                
+                if ($stokBarang && $stokBarang->ticket_id === $ticket->id) {
+                    Log::info('Kondisi IF terpenuhi. Melakukan update status...');
                     
                     $stokBarang->status_id = $itemData['status_id'];
                     $stokBarang->deskripsi = $itemData['keterangan'] ?: $stokBarang->deskripsi;
 
-                    // Jika statusnya dikembalikan menjadi "Tersedia", bersihkan data peminjam
                     if ($stokBarang->status_id == $statusTersediaId) {
                         $stokBarang->user_peminjam_id = null;
                         $stokBarang->workshop_id = null;
                         $stokBarang->tanggal_keluar = null;
+                        $stokBarang->ticket_id = null; 
                     }
                     
                     $stokBarang->save();
+                    Log::info('Update BERHASIL.');
+                } else {
+                    Log::warning('Kondisi IF GAGAL. Update status dilewati.');
                 }
             }
             
-            // Terakhir, update status tiket menjadi Selesai
             $ticket->update(['status' => 'Selesai', 'completed_at' => now()]);
+            Log::info('Status tiket telah diubah menjadi Selesai.');
         });
+
+        Log::info('===== Proses Return Selesai =====');
 
         return response()->json($ticket->load(['user', 'creator', 'masterBarangs']));
     }
-
 }
