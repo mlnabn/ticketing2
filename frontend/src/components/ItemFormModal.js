@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import CreatableSelect from 'react-select/creatable';
 import { useDebounce } from 'use-debounce';
+import '../styles/ItemFormModal.css';
 
 const initialFormState = {
     id_kategori: '',
@@ -113,8 +114,8 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
     if (!isOpen) return null;
 
     return (
-        <div className="modal-backdrop">
-            <div className="modal-content user-form-modal">
+        <div className="modal-backdrop-centered">
+            <div className="modal-content-large">
                 <h3>{itemToEdit ? 'Edit Tipe Barang' : 'Daftarkan Tipe Barang Baru'}</h3>
                 <form onSubmit={handleSubmit}>
                     {/* ... (Input Kategori & Sub-Kategori tetap sama) ... */}

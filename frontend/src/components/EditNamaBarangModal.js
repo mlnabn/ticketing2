@@ -34,8 +34,8 @@ function EditNamaBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
     if (!isOpen) return null;
 
     return (
-        <div className="modal-backdrop">
-            <div className="modal-content user-form-modal">
+        <div className="modal-backdrop-centered">
+            <div className="modal-content-large">
                 <h3>Edit Nama Barang</h3>
                 <form onSubmit={handleSave}>
                     <div className="form-group">

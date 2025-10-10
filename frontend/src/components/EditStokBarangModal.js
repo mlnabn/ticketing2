@@ -150,8 +150,8 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
     if (!isOpen) return null;
 
     return (
-        <div className="modal-backdrop">
-            <div className="modal-content user-form-modal">
+        <div className="modal-backdrop-centered">
+            <div className="modal-content-large">
                 <h3>Edit Detail Stok: {item.kode_unik}</h3>
                 <p>{item.master_barang?.nama_barang}</p>
                 <form onSubmit={handleSave}>

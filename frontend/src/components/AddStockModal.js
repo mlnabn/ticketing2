@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import api from '../services/api';
+import '../styles/AddStockModal.css';
 
 /* ===========================================================
    Custom Components for Color Select
@@ -309,12 +310,12 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
 
     return (
         <>
-            <div className="modal-backdrop">
-                <div className="modal-content user-form-modal large">
+            <div className="modal-backdrop-stockmodal">
+                <div className="modal-content-stockmodal">
                     <h3>Tambah Stok Barang</h3>
                     <form onSubmit={handleSubmit}>
                         {/* Pilih Barang */}
-                        <div className="form-group">
+                        <div className="form-group-stock">
                             <label>Pilih Barang (SKU)</label>
                             <Select
                                 classNamePrefix="creatable-select"
@@ -326,8 +327,8 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                         </div>
 
                         {/* Jumlah & Harga */}
-                        <div className="form-row">
-                            <div className="form-group half1">
+                        <div className="form-row-stock">
+                            <div className="form-group-stock half">
                                 <label>Jumlah</label>
                                 <input
                                     type="number"
@@ -338,7 +339,7 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                                     required
                                 />
                             </div>
-                            <div className="form-group half">
+                            <div className="form-group-stock half">
                                 <label>Harga Beli Satuan (Rp)</label>
                                 <input
                                     type="text"
@@ -352,15 +353,15 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                         </div>
 
                         {/* Kondisi & Warna */}
-                        <div className="form-row">
-                            <div className="form-group half1">
+                        <div className="form-row-stock">
+                            <div className="form-group-stock half1">
                                 <label>Kondisi</label>
                                 <select name="kondisi" value={formData.kondisi} onChange={handleChange}>
                                     <option value="Baru">Baru</option>
                                     <option value="Bekas">Bekas</option>
                                 </select>
                             </div>
-                            <div className="form-group half">
+                            <div className="form-group-stock half">
                                 <label>Warna</label>
                                 <CreatableSelect
                                     classNamePrefix="creatable-select"
@@ -377,8 +378,8 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                         </div>
 
                         {/* Tanggal */}
-                        <div className="form-row">
-                            <div className="form-group half1">
+                        <div className="form-row-stock">
+                            <div className="form-group-stock half1">
                                 <label>Tanggal Pembelian</label>
                                 <input
                                     type="date"
@@ -387,7 +388,7 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                                     onChange={handleChange}
                                 />
                             </div>
-                            <div className="form-group half">
+                            <div className="form-group-stock half">
                                 <label>Tanggal Masuk</label>
                                 <input
                                     type="date"
@@ -400,7 +401,7 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                         </div>
 
                         {/* Serial Numbers */}
-                        <div className="form-group">
+                        <div className="form-group-stock">
                             <label>Serial Number (Bisa di-scan)</label>
                             <div className="serial-number-container">
                                 {formData.serial_numbers.map((sn, index) => (

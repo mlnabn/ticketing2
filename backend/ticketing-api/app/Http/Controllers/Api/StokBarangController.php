@@ -15,11 +15,11 @@ class StokBarangController extends Controller
     public function index(Request $request)
     {
         $query = StokBarang::with([
-            
+
             'masterBarang' => function ($query) {
                 $query->withCount('stokBarangs');
             },
-            'masterBarang.masterKategori', 
+            'masterBarang.masterKategori',
             'masterBarang.subKategori',
             'userPeminjam',
             'workshop',
@@ -46,9 +46,9 @@ class StokBarangController extends Controller
     {
         // Muat semua relasi yang diperlukan oleh frontend
         return response()->json($stokBarang->load([
-            'masterBarang.masterKategori', 
-            'masterBarang.subKategori', 
-            'userPeminjam', 
+            'masterBarang.masterKategori',
+            'masterBarang.subKategori',
+            'userPeminjam',
             'workshop',
             'statusDetail'
         ]));
@@ -68,7 +68,7 @@ class StokBarangController extends Controller
             'tanggal_masuk' => 'nullable|date',
             'harga_beli' => 'required|numeric|min:0',
             'kondisi' => 'required|in:Baru,Bekas',
-            'id_warna' => 'nullable|exists:colors,id_warna', 
+            'id_warna' => 'nullable|exists:colors,id_warna',
         ]);
 
         // PERBAIKAN 2: Tambahkan ID admin yang melakukan update
@@ -78,13 +78,14 @@ class StokBarangController extends Controller
 
         return response()->json($stokBarang->load(['masterBarang.masterKategori', 'masterBarang.subKategori']));
     }
-    
-    public function showBySerial($serial) {
+
+    public function showBySerial($serial)
+    {
         // PERBAIKAN: Tambahkan with() untuk memuat relasi saat mencari via serial number
         $item = StokBarang::with([
-            'masterBarang.masterKategori', 
+            'masterBarang.masterKategori',
             'masterBarang.subKategori',
-            'userPeminjam', 
+            'userPeminjam',
             'workshop',
             'statusDetail'
         ])
@@ -133,18 +134,29 @@ class StokBarangController extends Controller
 
     private function generateUniqueStokCode(MasterBarang $masterBarang): string
     {
+        // --- LOGIKA BARU DIMULAI DI SINI ---
+
+        // 1. Ambil kode dasar dari master barang, contoh: "RUZT"
         $baseCode = $masterBarang->kode_barang;
+
+        // 2. Cari stok terakhir dengan awalan kode yang sama untuk mendapatkan urutan
         $latestItem = StokBarang::where('kode_unik', 'LIKE', $baseCode . '%')
             ->orderBy('kode_unik', 'desc')
             ->first();
 
         $sequence = 1;
         if ($latestItem) {
-            $lastSequence = (int) substr($latestItem->kode_unik, -3);
+            // Ekstrak angka dari kode unik terakhir (misal: dari RUZT0001 -> 1)
+            $lastSequence = (int) substr($latestItem->kode_unik, strlen($baseCode));
             $sequence = $lastSequence + 1;
         }
-        $sequencePart = str_pad($sequence, 3, '0', STR_PAD_LEFT);
-        return $baseCode . $sequencePart;
+
+        // 3. Tentukan jumlah digit (padding) berdasarkan urutan
+        $padding = ($sequence >= 10000) ? 5 : 4;
+        $sequencePart = str_pad($sequence, $padding, '0', STR_PAD_LEFT); // Contoh: 0001 atau 00001
+
+        // 4. Gabungkan menjadi kode unik final
+        return $baseCode . $sequencePart; // Contoh: "RUZT0001"
     }
 
     public function checkout(Request $request, StokBarang $stokBarang)
@@ -169,11 +181,11 @@ class StokBarangController extends Controller
         }
 
         $stokBarang->save();
-        
+
         // Muat semua relasi yang mungkin ditampilkan di frontend
         return response()->json($stokBarang->load([
-            'masterBarang.masterKategori', 
-            'masterBarang.subKategori', 
+            'masterBarang.masterKategori',
+            'masterBarang.subKategori',
             'userPeminjam', // Relasi baru
             'workshop'      // Relasi baru
         ]));

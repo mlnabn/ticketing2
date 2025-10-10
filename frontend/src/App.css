@@ -9833,6 +9833,7 @@ body.dark-mode .btn-recover-small:hover {
   gap: 2rem;
   padding: 1rem;
 }
+
 .item-detail-qr {
   text-align: center;
   padding: 1rem;
@@ -9842,31 +9843,39 @@ body.dark-mode .btn-recover-small:hover {
   align-items: center;
   gap: 1rem;
 }
+
 .dark-mode .item-detail-qr {
   border-right: 1px solid #444;
 }
+
 .item-detail-info {
   flex-grow: 1;
 }
+
 .info-row {
   display: flex;
   justify-content: space-between;
   padding: 0.5rem 0;
   border-bottom: 1px solid #f0f0f0;
 }
+
 .dark-mode .info-row {
   border-bottom: 1px solid #333;
 }
+
 .info-row:last-child {
   border-bottom: none;
 }
+
 .info-label {
   font-weight: 600;
   color: #555;
 }
+
 .dark-mode .info-label {
   color: #aaa;
 }
+
 .info-value {
   text-align: right;
 }
@@ -9899,6 +9908,15 @@ body.dark-mode .btn-recover-small:hover {
   }
 }
 
+.form-row2 {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+
+
 .modal-backdrop-centered {
   position: fixed;
   inset: 0;
@@ -9918,25 +9936,17 @@ body.dark-mode .btn-recover-small:hover {
 .modal-content-large {
   /* Efek Kaca Buram (Glassmorphism) */
   background: rgba(255, 255, 255, 0.92);
-  /* Latar belakang semi-transparan */
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.5);
-
-  /* Bentuk & Bayangan */
   border-radius: 18px;
   padding: 28px 32px;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
-
-  /* Layout & Animasi */
   animation: scaleIn 0.35s ease-out;
   text-align: center;
   transition: all 0.3s ease;
-
-  /* Ukuran */
   max-width: 500px;
   width: 100%;
   max-height: 90vh;
-  /* Sedikit lebih tinggi untuk mengakomodasi konten */
   overflow-y: auto;
 }
 
@@ -10036,8 +10046,9 @@ body.dark-mode .btn-recover-small:hover {
 }
 
 .serial-number-input.active-scan {
-    border-color: #4A90E2; /* Warna biru untuk menandakan fokus */
-    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+  border-color: #4A90E2;
+  /* Warna biru untuk menandakan fokus */
+  box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
 }
 
 
