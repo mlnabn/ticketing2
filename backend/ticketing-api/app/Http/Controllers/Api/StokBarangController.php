@@ -14,10 +14,15 @@ class StokBarangController extends Controller
 {
     public function index(Request $request)
     {
+        $excludedStatuses = DB::table('status_barang')
+            ->whereIn('nama_status', ['Hilang', 'Rusak', 'Digunakan'])
+            ->pluck('id');
+        
         $query = StokBarang::with([
-            
-            'masterBarang' => function ($query) {
-                $query->withCount('stokBarangs');
+            'masterBarang' => function ($query) use ($excludedStatuses) {
+                    $query->withCount(['stokBarangs' => function ($q) use ($excludedStatuses) {
+                    $q->whereNotIn('status_id', $excludedStatuses);
+                }]);
             },
             'masterBarang.masterKategori', 
             'masterBarang.subKategori',
