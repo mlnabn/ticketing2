@@ -27,7 +27,16 @@ class MasterBarangController extends Controller
         if ($request->filled('id_sub_kategori')) {
             $query->where('id_sub_kategori', $request->id_sub_kategori);
         }
-        return $query->latest()->paginate(10);
+        if ($request->has('with_stock')) {
+        $query->withCount(['stokBarangs as stok_tersedia' => function ($q) {
+            $q->where('status_id', 1); 
+        }]);
+    }
+        $query->latest();
+        if ($request->has('all')) {
+            return $query->get();
+        }
+        return $query->paginate(10);
     }
 
     // Untuk mengecek apakah master barang sudah ada
@@ -90,6 +99,44 @@ class MasterBarangController extends Controller
         $masterBarang = MasterBarang::create($dataToCreate);
 
         return response()->json($masterBarang->load(['masterKategori', 'subKategori']), 201);
+    }
+
+    /**
+     * Generator kode unik sesuai dengan aturan yang kompleks.
+     */
+    private function generateUniqueStokCode(MasterBarang $masterBarang): string
+    {
+        $baseCode = $masterBarang->kode_barang;
+        $latestItem = StokBarang::where('kode_unik', 'LIKE', $baseCode . '%')
+            ->orderBy('kode_unik', 'desc')
+            ->first();
+
+        $sequence = 1;
+        if ($latestItem) {
+            $lastSequence = (int) substr($latestItem->kode_unik, -3);
+            $sequence = $lastSequence + 1;
+        }
+        $sequencePart = str_pad($sequence, 3, '0', STR_PAD_LEFT);
+        return $baseCode . $sequencePart;
+    }
+
+    /**
+     * Menampilkan satu tipe barang (MasterBarang) spesifik.
+     */
+    public function show(MasterBarang $masterBarang)
+    {
+        return $masterBarang->load(['masterKategori', 'subKategori']);
+    }
+
+    public function getStockByColor(MasterBarang $masterBarang)
+    {
+        $stockDetails = $masterBarang->stokBarangs()
+            ->join('colors', 'stok_barangs.id_warna', '=', 'colors.id_warna')
+            ->select('colors.nama_warna', DB::raw('count(*) as total'))
+            ->groupBy('colors.nama_warna')
+            ->get();
+            
+        return response()->json($stockDetails);
     }
 
     /**

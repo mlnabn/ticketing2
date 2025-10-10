@@ -26,7 +26,10 @@ class StokBarangController extends Controller
             'statusDetail',
             'createdBy',
             'updatedBy',
-            'color'
+            'color',
+            'teknisiPerbaikan',
+            'userPerusak',
+            'userPenghilang'
         ]);
 
         if ($request->filled('id_kategori')) {
@@ -37,6 +40,9 @@ class StokBarangController extends Controller
         }
         if ($request->filled('status_id')) {
             $query->where('status_id', $request->status_id);
+        }
+        if ($request->filled('id_warna')) {
+            $query->where('id_warna', $request->id_warna);
         }
 
         return $query->latest()->paginate(25);
@@ -159,35 +165,96 @@ class StokBarangController extends Controller
         return $baseCode . $sequencePart; // Contoh: "RUZT0001"
     }
 
-    public function checkout(Request $request, StokBarang $stokBarang)
+    public function updateStatus(Request $request, StokBarang $stokBarang)
     {
         $validated = $request->validate([
             'status_id' => 'required|exists:status_barang,id',
-            'user_peminjam_id' => 'required_if:status,Digunakan|nullable|exists:users,id',
-            'workshop_id' => 'required_if:status,Digunakan|nullable|exists:workshops,id',
+            'deskripsi' => 'nullable|string',
+
+            // Validasi untuk status 'Digunakan' & 'Dipinjam'
+            'user_peminjam_id' => 'required_if_status:Digunakan,Dipinjam|nullable|exists:users,id',
+            'workshop_id' => 'required_if_status:Digunakan,Dipinjam|nullable|exists:workshops,id',
+            
+            // Validasi untuk 'Perbaikan'
+            'teknisi_perbaikan_id' => 'required_if_status:Perbaikan|nullable|exists:users,id',
+            'tanggal_mulai_perbaikan' => 'required_if_status:Perbaikan|nullable|date',
+            'tanggal_selesai_perbaikan' => 'nullable|date|after_or_equal:tanggal_mulai_perbaikan',
+
+            // Validasi untuk 'Rusak'
+            'user_perusak_id' => 'required_if_status:Rusak|nullable|exists:users,id',
+            'tanggal_rusak' => 'required_if_status:Rusak|nullable|date',
+
+            // Validasi untuk 'Hilang'
+            'user_penghilang_id' => 'required_if_status:Hilang|nullable|exists:users,id',
+            'tanggal_hilang' => 'required_if_status:Hilang|nullable|date',
+            'tanggal_ketemu' => 'nullable|date|after_or_equal:tanggal_hilang',
         ]);
 
-        $stokBarang->status = $validated['status'];
-
-        if ($validated['status_id'] == 2) { // Asumsi ID 'Digunakan' adalah 2
-            $stokBarang->user_peminjam_id = $validated['user_peminjam_id'];
-            $stokBarang->workshop_id = $validated['workshop_id'];
-            $stokBarang->tanggal_keluar = now();
-        } else {
-            // Jika status diubah kembali ke 'Tersedia' atau lainnya, hapus data peminjam
-            $stokBarang->user_peminjam_id = null;
-            $stokBarang->workshop_id = null;
-            $stokBarang->tanggal_keluar = null;
+        // Ambil nama status untuk logika switch
+        $status = \App\Models\Status::find($validated['status_id']);
+        
+        // Siapkan data update dasar
+        $updateData = [
+            'status_id' => $validated['status_id'],
+            'deskripsi' => $validated['deskripsi'] ?? $stokBarang->deskripsi,
+        ];
+        
+        // Logika untuk membersihkan data lama saat status berubah
+        $allTrackingColumns = [
+            'user_peminjam_id', 'workshop_id', 'tanggal_keluar',
+            'teknisi_perbaikan_id', 'tanggal_mulai_perbaikan', 'tanggal_selesai_perbaikan',
+            'user_perusak_id', 'tanggal_rusak',
+            'user_penghilang_id', 'tanggal_hilang', 'tanggal_ketemu',
+        ];
+        foreach ($allTrackingColumns as $col) {
+            $updateData[$col] = null;
         }
 
-        $stokBarang->save();
+        // Isi data baru berdasarkan status yang dipilih
+        switch ($status->nama_status) {
+            case 'Digunakan':
+            case 'Dipinjam':
+                $updateData['user_peminjam_id'] = $validated['user_peminjam_id'];
+                $updateData['workshop_id'] = $validated['workshop_id'];
+                $updateData['tanggal_keluar'] = now();
+                break;
+            case 'Perbaikan':
+                $updateData['teknisi_perbaikan_id'] = $validated['teknisi_perbaikan_id'];
+                $updateData['tanggal_mulai_perbaikan'] = $validated['tanggal_mulai_perbaikan'];
+                $updateData['tanggal_selesai_perbaikan'] = $validated['tanggal_selesai_perbaikan'] ?? null;
+                break;
+            case 'Rusak':
+                $updateData['user_perusak_id'] = $validated['user_perusak_id'];
+                $updateData['tanggal_rusak'] = $validated['tanggal_rusak'];
+                break;
+            case 'Hilang':
+                $updateData['user_penghilang_id'] = $validated['user_penghilang_id'];
+                $updateData['tanggal_hilang'] = $validated['tanggal_hilang'];
+                $updateData['tanggal_ketemu'] = $validated['tanggal_ketemu'] ?? null;
+                break;
+        }
 
-        // Muat semua relasi yang mungkin ditampilkan di frontend
+        $stokBarang->update($updateData);
+        
+        // Muat semua relasi baru untuk dikirim kembali ke frontend
         return response()->json($stokBarang->load([
-            'masterBarang.masterKategori',
-            'masterBarang.subKategori',
-            'userPeminjam', // Relasi baru
-            'workshop'      // Relasi baru
+            'masterBarang', 'userPeminjam', 'workshop', 'statusDetail',
+            'teknisiPerbaikan', 'userPerusak', 'userPenghilang'
         ]));
+    }
+
+    // Helper untuk validasi custom (tambahkan ini di file yang sama)
+    public function __construct()
+    {
+        \Illuminate\Support\Facades\Validator::extend('required_if_status', function ($attribute, $value, $parameters, $validator) {
+            $statusId = $validator->getData()['status_id'] ?? null;
+            if (!$statusId) return true; // Lewati jika tidak ada status_id
+
+            $status = \App\Models\Status::find($statusId);
+            if ($status && in_array($status->nama_status, $parameters)) {
+                return !empty($value);
+            }
+            return true;
+        });
     }
 }

@@ -64,15 +64,13 @@ function JobList({ tickets, updateTicketStatus, deleteTicket, userRole, onSelect
             case 'Sedang Dikerjakan':
                 return (
                     <>
-                        {/* HAPUS showToast dari sini */}
-                        <button onClick={() => updateTicketStatus(ticket.id, 'Selesai')} className="btn-action btn-finish">Selesaikan</button>
-                        {/* HAPUS showToast dari sini */}
-                        <button onClick={() => updateTicketStatus(ticket.id, 'Ditunda')} className="btn-action btn-pause">Tunda</button>
+                        <button onClick={() => updateTicketStatus(ticket, 'Selesai')} className="btn-action btn-finish">Selesaikan</button>
+                        <button onClick={() => updateTicketStatus(ticket, 'Ditunda')} className="btn-action btn-pause">Tunda</button>
                     </>
                 );
             case 'Ditunda':
                 // HAPUS showToast dari sini
-                return <button onClick={() => updateTicketStatus(ticket.id, 'Sedang Dikerjakan')} className="btn-action btn-start">Lanjutkan</button>;
+                return <button onClick={() => updateTicketStatus(ticket, 'Sedang Dikerjakan')} className="btn-action btn-start">Lanjutkan</button>;
             case 'Selesai':
                 return (
                     <>

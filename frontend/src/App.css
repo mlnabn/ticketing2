@@ -10004,6 +10004,32 @@ body.dark-mode .btn-recover-small:hover {
   box-sizing: border-box;
 }
 
+/* Styling untuk form di dalam ItemDetailModal */
+.detail-edit-select,
+.detail-edit-input,
+.detail-edit-textarea {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 14px;
+}
+.dark-mode .detail-edit-select,
+.dark-mode .detail-edit-input,
+.dark-mode .detail-edit-textarea {
+    background-color: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+}
+.info-row.full-width {
+    flex-direction: column;
+    align-items: flex-start;
+}
+.info-row.full-width .info-label {
+    margin-bottom: 5px;
+}
+
 /* --- Tombol Aksi --- */
 
 .btn-confirm-centered,

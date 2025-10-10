@@ -12,8 +12,8 @@ function AssignAdminModal({ ticket, admins, items, onAssign, onClose, showToast 
 
   const itemOptions = items.map(item => ({
     value: item.id_m_barang, // Gunakan id_m_barang
-    label: `${item.nama_barang} (Stok: ${item.stok})`,
-    stock: item.stok,
+    label: `${item.nama_barang} (Stok: ${item.stok_tersedia})`,
+    stock: item.stok_tersedia,
     name: item.nama_barang // Gunakan nama_barang
   }));
 

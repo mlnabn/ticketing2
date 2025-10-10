@@ -17,14 +17,13 @@ class DashboardController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // Ambil dari controller lain jika logikanya kompleks, atau tulis ulang di sini
         $ticketController = new \App\Http\Controllers\Api\TicketController();
         $analyticsController = new AnalyticsController();
         $userController = new \App\Http\Controllers\Api\UserController();
         $locationController = new LocationController();
-        
-        // Panggil semua data dalam satu fungsi
         $ticketsResponse = $ticketController->index($request);
+        
+        // Panggil data lainnya
         $statsResponse = $ticketController->stats();
         $analyticsResponse = $analyticsController->getTicketAnalytics();
         $adminPerformanceResponse = $analyticsController->getAdminPerformance();

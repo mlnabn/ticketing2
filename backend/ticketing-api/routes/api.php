@@ -90,6 +90,7 @@ Route::middleware('jwt')->group(function () {
     Route::get('/locations', [LocationController::class, 'index']);
 
     // --- Rute untuk Proses Tiket ---
+    Route::get('/tickets/{ticket}/borrowed-items', [TicketController::class, 'getBorrowedItems']);
     Route::post('/tickets/{ticket}/process-return', [TicketController::class, 'processReturn']);
 
     Route::post('/inventory/stock-items', [StokBarangController::class, 'store']);
@@ -97,7 +98,7 @@ Route::middleware('jwt')->group(function () {
     Route::get('/inventory/stock-items/{stokBarang}', [StokBarangController::class, 'show']);
     Route::get('/inventory/stock-items/by-serial/{serial}', [StokBarangController::class, 'showBySerial']);
     Route::post('/inventory/stock-items/{stokBarang}', [StokBarangController::class, 'update']);
-    Route::post('/inventory/stock-items/{stokBarang}/checkout', [StokBarangController::class, 'checkout']);
+    Route::post('/inventory/stock-items/{stokBarang}/update-status', [StokBarangController::class, 'updateStatus']);
 
     // --- Rute untuk Manajemen Inventaris ---
     Route::apiResource('inventory/categories', MasterKategoriController::class);
@@ -110,9 +111,11 @@ Route::middleware('jwt')->group(function () {
     Route::get('/inventory/items/code/{kode_barang}', [MasterBarangController::class, 'showByCode']);
     Route::get('/inventory/items/category/{categoryId}', [MasterBarangController::class, 'filterByCategory']);
     Route::get('/inventory/items/sub-category/{subCategoryId}', [MasterBarangController::class, 'filterBySubCategory']);
+    Route::get('/inventory/items/{masterBarang}/stock-by-color', [MasterBarangController::class, 'getStockByColor']);
 
     Route::get('/statuses', [StatusController::class, 'index']);
 
     Route::apiResource('colors', ColorController::class);
+    Route::get('/colors', [ColorController::class, 'index']);
 
 });

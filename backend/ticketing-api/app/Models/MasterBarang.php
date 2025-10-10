@@ -35,7 +35,6 @@ class MasterBarang extends Model
 
     public function tickets()
     {
-        // Relasi ini mungkin perlu disesuaikan nanti, untuk saat ini biarkan
         return $this->belongsToMany(Ticket::class, 'ticket_master_barang', 'master_barang_id', 'ticket_id')
             ->withPivot('quantity_used', 'status', 'keterangan', 'quantity_lost', 'quantity_recovered')
             ->withTimestamps();
@@ -43,5 +42,10 @@ class MasterBarang extends Model
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function getStokTersediaAttribute()
+    {
+        return $this->stokBarangs()->where('status_id', 1)->count(); 
     }
 }
