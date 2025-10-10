@@ -396,7 +396,7 @@ class TicketController extends Controller
 
                 if (!empty($validated['tools'])) {
                     $statusTersediaId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
-                    $statusDigunakanId = DB::table('status_barang')->where('nama_status', 'Digunakan')->value('id');
+                    $statusDipinjamId = DB::table('status_barang')->where('nama_status', 'Dipinjam')->value('id');
 
                     foreach ($validated['tools'] as $toolData) {
                         $masterBarang = MasterBarang::find($toolData['id']);
@@ -420,9 +420,10 @@ class TicketController extends Controller
                         
                         foreach($itemsToAssign as $item) {
                             $item->update([
-                                'status_id' => $statusDigunakanId,
-                                'user_peminjam_id' => $assignee->id, // Catat siapa yang meminjam
+                                'status_id' => $statusDipinjamId, // <-- Ganti ke ID Dipinjam
+                                'user_peminjam_id' => $assignee->id,
                                 'tanggal_keluar' => now(),
+                                'workshop_id' => $ticket->workshop_id, 
                             ]);
                         }
 
@@ -718,64 +719,57 @@ class TicketController extends Controller
         }
     }
 
+    public function getBorrowedItems(Ticket $ticket)
+    {
+        // Pastikan hanya user yang ditugaskan yang bisa melihat ini
+        if (Auth::id() !== $ticket->user_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $statusDipinjamId = DB::table('status_barang')->where('nama_status', 'Dipinjam')->value('id');
+
+        $borrowedItems = StokBarang::with('masterBarang')
+            ->where('user_peminjam_id', $ticket->user_id)
+            ->where('status_id', $statusDipinjamId)
+            // Filter tambahan untuk memastikan barang ini terkait dengan pivot tiket (opsional tapi lebih aman)
+            ->whereIn('master_barang_id', $ticket->masterBarangs()->pluck('master_barangs.id_m_barang'))
+            ->get();
+            
+        return response()->json($borrowedItems);
+    }
+
     public function processReturn(Request $request, Ticket $ticket)
     {
         $validated = $request->validate([
             'items' => 'present|array',
-            'items.*.master_barang_id' => 'required|exists:master_barangs,id_m_barang',
-            'items.*.quantity_returned' => 'required|integer|min:0',
-            'items.*.quantity_lost' => 'required|integer|min:0',
+            'items.*.stok_barang_id' => 'required|exists:stok_barangs,id',
+            'items.*.status_id' => 'required|exists:status_barang,id',
             'items.*.keterangan' => 'nullable|string|max:1000',
         ]);
 
         DB::transaction(function () use ($ticket, $validated) {
-            // Ambil ID status dari database agar dinamis
             $statusTersediaId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
-            $statusHilangId = DB::table('status_barang')->where('nama_status', 'Hilang')->value('id');
-            $statusDigunakanId = DB::table('status_barang')->where('nama_status', 'Digunakan')->value('id');
 
             foreach ($validated['items'] as $itemData) {
-                $returnedQty = $itemData['quantity_returned'];
-                $lostQty = $itemData['quantity_lost'];
-
-                // Kembalikan status untuk barang yang DIKEMBALIKAN
-                if ($returnedQty > 0) {
-                    // Cari unit barang spesifik yang sedang 'Digunakan' oleh user tiket ini
-                    $itemsToReturn = StokBarang::where('master_barang_id', $itemData['master_barang_id'])
-                        ->where('user_peminjam_id', $ticket->user_id) // Kunci pencarian penting
-                        ->where('status_id', $statusDigunakanId)
-                        ->take($returnedQty)
-                        ->get();
+                $stokBarang = StokBarang::find($itemData['stok_barang_id']);
+                
+                // Keamanan: Pastikan barang ini memang sedang dipinjam oleh user tiket ini
+                if ($stokBarang && $stokBarang->user_peminjam_id === $ticket->user_id) {
                     
-                    // Update statusnya satu per satu untuk membersihkan data peminjam
-                    foreach ($itemsToReturn as $item) {
-                        $item->update([
-                            'status_id' => $statusTersediaId, 
-                            'user_peminjam_id' => null, 
-                            'workshop_id' => null, 
-                            'tanggal_keluar' => null
-                        ]);
+                    $stokBarang->status_id = $itemData['status_id'];
+                    $stokBarang->deskripsi = $itemData['keterangan'] ?: $stokBarang->deskripsi;
+
+                    // Jika statusnya dikembalikan menjadi "Tersedia", bersihkan data peminjam
+                    if ($stokBarang->status_id == $statusTersediaId) {
+                        $stokBarang->user_peminjam_id = null;
+                        $stokBarang->workshop_id = null;
+                        $stokBarang->tanggal_keluar = null;
                     }
+                    
+                    $stokBarang->save();
                 }
-
-                // Ubah status untuk barang yang HILANG
-                if ($lostQty > 0) {
-                    $itemsToMarkLost = StokBarang::where('master_barang_id', $itemData['master_barang_id'])
-                        ->where('user_peminjam_id', $ticket->user_id) // Kunci pencarian penting
-                        ->where('status_id', $statusDigunakanId)
-                        ->take($lostQty)
-                        ->update(['status_id' => $statusHilangId]); // Status diubah jadi Hilang, tapi data peminjam tetap ada untuk audit
-                }
-
-                // Update data pivot di ticket_master_barang untuk laporan
-                $ticket->masterBarangs()->updateExistingPivot($itemData['master_barang_id'], [
-                    'status' => 'dikembalikan',
-                    'keterangan' => $itemData['keterangan'] ?? null,
-                    'quantity_lost' => $lostQty,
-                    'quantity_returned' => $returnedQty,
-                ]);
             }
-
+            
             // Terakhir, update status tiket menjadi Selesai
             $ticket->update(['status' => 'Selesai', 'completed_at' => now()]);
         });

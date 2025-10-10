@@ -1,86 +1,64 @@
 import React, { useState, useEffect } from 'react';
+import api from '../services/api';
 
 function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
     const [items, setItems] = useState([]);
+    const [statusOptions, setStatusOptions] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
+    // Ambil data barang spesifik yang dipinjam & daftar status dari API
     useEffect(() => {
-        if (ticket && ticket.master_barangs) {
-            const initialItems = ticket.master_barangs.map(barang => ({
-                master_barang_id: barang.id_m_barang, 
-                name: barang.nama_barang,
-                quantity_borrowed: barang.pivot.quantity_used || 0,
-                quantity_returned: barang.pivot.quantity_used || 0,
-                quantity_lost: 0,
-                keterangan: '',
-            }));
-            setItems(initialItems);
+        if (ticket) {
+            setIsLoading(true);
+            Promise.all([
+                // Endpoint baru yang sudah kita buat sebelumnya
+                api.get(`/tickets/${ticket.id}/borrowed-items`),
+                api.get('/statuses')
+            ]).then(([itemsRes, statusesRes]) => {
+                
+                const initialItems = itemsRes.data.map(item => ({
+                    stok_barang_id: item.id,
+                    name: item.master_barang.nama_barang,
+                    kode_unik: item.kode_unik,
+                    status_id: item.status_id, // Status awal adalah 'Dipinjam'
+                    keterangan: ''
+                }));
+                setItems(initialItems);
+
+                // Filter status yang relevan untuk proses pengembalian
+                setStatusOptions(statusesRes.data.filter(s => 
+                    ['Tersedia', 'Digunakan', 'Rusak', 'Hilang'].includes(s.nama_status)
+                ));
+
+            }).catch(err => {
+                console.error("Gagal memuat data pengembalian", err);
+                showToast("Gagal memuat data barang yang dipinjam.", "error");
+            }).finally(() => {
+                setIsLoading(false);
+            });
         }
     }, [ticket]);
 
-    const handleKeteranganChange = (itemId, value) => {
+    // Handler untuk mengubah state item saat dropdown atau textarea diubah
+    const handleItemChange = (stokId, field, value) => {
         setItems(prevItems =>
             prevItems.map(item =>
-                item.master_barang_id === itemId ? { ...item, keterangan: value } : item
+                item.stok_barang_id === stokId ? { ...item, [field]: value } : item
             )
         );
     };
 
-    const handleQuantityChange = (itemId, field, value) => {
-        setItems(prevItems =>
-            prevItems.map(item => {
-                if (item.master_barang_id === itemId) {
-                    const updatedItem = { ...item };
-                    const borrowed = item.quantity_borrowed;
-
-                    if (value === "") {
-                        updatedItem[field] = "";
-                        const otherField = field === 'quantity_returned' ? 'quantity_lost' : 'quantity_returned';
-                        updatedItem[otherField] = borrowed;
-                        return updatedItem;
-                    }
-
-                    const numValue = parseInt(value, 10);
-                    if (isNaN(numValue) || numValue < 0) return item;
-                    
-                    const newQuantity = Math.min(numValue, borrowed);
-
-                    if (field === 'quantity_returned') {
-                        updatedItem.quantity_returned = newQuantity;
-                        updatedItem.quantity_lost = borrowed - newQuantity;
-                    } else {
-                        updatedItem.quantity_lost = newQuantity;
-                        updatedItem.quantity_returned = borrowed - newQuantity;
-                    }
-                    return updatedItem;
-                }
-                return item;
-            })
-        );
-    };
-
     const handleSubmit = () => {
-        for (const item of items) {
-            const returned = parseInt(item.quantity_returned, 10) || 0;
-            const lost = parseInt(item.quantity_lost, 10) || 0;
-
-            if (returned + lost !== item.quantity_borrowed) {
-                showToast(`Harap alokasikan semua item untuk "${item.name}" (kembali atau hilang).`, 'warning');
-                return;
-            }
-            if (lost > 0 && !item.keterangan) {
-                showToast(`Keterangan untuk "${item.name}" yang hilang wajib diisi.`, 'warning');
-                return;
-            }
-        }
-
-        const itemsToSave = items.map(item => ({
-            master_barang_id: item.master_barang_id,
-            quantity_returned: parseInt(item.quantity_returned, 10) || 0,
-            quantity_lost: parseInt(item.quantity_lost, 10) || 0,
-            keterangan: item.keterangan,
-        }));
-
-        onSave(ticket.id, itemsToSave);
+        // Buat payload sesuai yang diharapkan backend
+        const payload = {
+            items: items.map(item => ({
+                stok_barang_id: item.stok_barang_id,
+                status_id: item.status_id,
+                keterangan: item.keterangan,
+            }))
+        };
+        // Panggil fungsi onSave dari AdminDashboard
+        onSave(ticket.id, payload.items);
     };
 
     if (!ticket) return null;
@@ -91,54 +69,48 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
                 <h3>Form Pengembalian & Penyelesaian</h3>
                 <p>Tiket: "{ticket.title}"</p>
 
-                <div className="items-to-return-list">
-                    {items.map(item => (
-                        <div key={item.master_barang_id} className="return-item-row">
-                            <div style={{ marginBottom: '5px' }}>
-                                <strong>{item.name}</strong> (Dipinjam: {item.quantity_borrowed})
+                {isLoading ? <p>Memuat barang yang dipinjam...</p> : (
+                    <div className="items-to-return-list">
+                        {items.length > 0 ? items.map(item => (
+                            <div key={item.stok_barang_id} className="return-item-row">
+                                <div className="item-info">
+                                    <strong>{item.name}</strong>
+                                    <small>({item.kode_unik})</small>
+                                </div>
+                                
+                                <div className="item-controls">
+                                    <div className="form-group-inline2">
+                                        <label>Status Akhir:</label>
+                                        <select
+                                            value={item.status_id}
+                                            onChange={(e) => handleItemChange(item.stok_barang_id, 'status_id', e.target.value)}
+                                        >
+                                            {statusOptions.map(opt => (
+                                                <option key={opt.id} value={opt.id}>{opt.nama_status}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    
+                                    <div className="form-group2">
+                                        <label>Keterangan (jika perlu):</label>
+                                        <textarea
+                                            value={item.keterangan}
+                                            onChange={(e) => handleItemChange(item.stok_barang_id, 'keterangan', e.target.value)}
+                                            rows="2"
+                                            placeholder="Cth: Dipasang di workshop, hilang, dll."
+                                        ></textarea>
+                                    </div>
+                                </div>
                             </div>
-                            
-                            <div className="form-group-inline2">
-                                <div className="input-group2">
-                                    <label>Jml Kembali:</label>
-                                    <input
-                                        type="number"
-                                        value={item.quantity_returned}
-                                        onChange={(e) => handleQuantityChange(item.master_barang_id, 'quantity_returned', e.target.value)}
-                                        min="0"
-                                        max={item.quantity_borrowed}
-                                    />
-                                </div>
-                                <div className="input-group2">
-                                    <label>Jml Hilang:</label>
-                                    <input
-                                        type="number"
-                                        value={item.quantity_lost}
-                                        onChange={(e) => handleQuantityChange(item.master_barang_id, 'quantity_lost', e.target.value)}
-                                        min="0"
-                                        max={item.quantity_borrowed}
-                                    />
-                                </div>
-                            </div>
-                            
-                            {item.quantity_lost > 0 && (
-                                <div className="form-group2">
-                                    <label>Keterangan Hilang:</label>
-                                    <textarea
-                                        value={item.keterangan}
-                                        onChange={(e) => handleKeteranganChange(item.master_barang_id, e.target.value)}
-                                        placeholder={`Cth: Terjatuh di lokasi, rusak, dll.`}
-                                        rows="2"
-                                    ></textarea>
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
+                        )) : <p>Tidak ada barang yang tercatat dipinjam untuk tiket ini.</p>}
+                    </div>
+                )}
 
                 <div className="modal-actions">
                     <button onClick={onClose} className="btn-cancel-centered">Batal</button>
-                    <button onClick={handleSubmit} className="btn-confirm-centered">Selesaikan Tiket</button>
+                    <button onClick={handleSubmit} className="btn-confirm-centered" disabled={isLoading}>
+                        Selesaikan Tiket
+                    </button>
                 </div>
             </div>
         </div>

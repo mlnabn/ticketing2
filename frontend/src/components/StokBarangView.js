@@ -19,6 +19,8 @@ function StokBarangView({ showToast }) {
     const [selectedSubCategory, setSelectedSubCategory] = useState('');
     const [statusOptions, setStatusOptions] = useState([]); 
     const [selectedStatus, setSelectedStatus] = useState(''); 
+    const [colorOptions, setColorOptions] = useState([]);
+    const [selectedColor, setSelectedColor] = useState('');
 
     // State untuk modal
     const [detailItem, setDetailItem] = useState(null);
@@ -45,6 +47,8 @@ function StokBarangView({ showToast }) {
     // Fetch master data untuk filter
     useEffect(() => {
         api.get('/inventory/categories').then(res => setCategories(res.data));
+        api.get('/statuses').then(res => setStatusOptions(res.data));
+        api.get('/colors').then(res => setColorOptions(res.data));
     }, []);
 
     useEffect(() => {
@@ -56,19 +60,21 @@ function StokBarangView({ showToast }) {
         setSelectedSubCategory('');
     }, [selectedCategory]);
 
-    useEffect(() => {
-        api.get('/statuses').then(res => setStatusOptions(res.data));
-    }, []);
-
     // Fetch data utama saat komponen dimuat atau filter berubah
     useEffect(() => {
         const filters = {
             id_kategori: selectedCategory,
             id_sub_kategori: selectedSubCategory,
             status_id: selectedStatus,
+            id_warna: selectedColor
         };
         fetchData(1, filters);
-    }, [selectedCategory, selectedSubCategory, selectedStatus, fetchData]);
+    }, [selectedCategory, selectedSubCategory, selectedStatus, selectedColor, fetchData]);
+
+    const handleOpenEditModal = (itemToEdit) => {
+        setDetailItem(null); 
+        setEditItem(itemToEdit);
+    };
 
     // Fungsi untuk mencari via scanner/input
     const handleScanSearch = useCallback(async (serial) => {
@@ -138,7 +144,12 @@ function StokBarangView({ showToast }) {
                         <option key={sub.id_sub_kategori} value={sub.id_sub_kategori}>{sub.nama_sub}</option>
                     ))}
                 </select>
-                
+                <select value={selectedColor} onChange={e => setSelectedColor(e.target.value)} className="filter-select">
+                    <option value="">Semua Warna</option>
+                    {colorOptions.map(color => (
+                        <option key={color.id_warna} value={color.id_warna}>{color.nama_warna}</option>
+                    ))}
+                </select>             
             </div>
 
             <div className="job-list-table">
@@ -196,7 +207,7 @@ function StokBarangView({ showToast }) {
                                     </td>
                                     <td className="action-buttons-group">
                                         <button onClick={() => setDetailItem(item)} className="btn-user-action btn-view">Detail</button>
-                                        <button onClick={() => setEditItem(item)} className="btn-user-action btn-edit">Edit</button>
+                                        {/* <button onClick={() => setEditItem(item)} className="btn-user-action btn-edit">Edit</button> */}
                                         <button onClick={() => setQrModalItem(item)} className="btn-user-action btn-edit">QR</button>
                                     </td>
                                 </tr>
@@ -216,11 +227,9 @@ function StokBarangView({ showToast }) {
                 <ItemDetailModal 
                     item={detailItem} 
                     onClose={() => setDetailItem(null)}
-                    showToast={showToast} // <-- Prop diteruskan
-                    onSaveSuccess={() => fetchData(pagination?.current_page || 1, { 
-                        id_kategori: selectedCategory, 
-                        id_sub_kategori: selectedSubCategory 
-                    })}
+                    onEditClick={handleOpenEditModal} // BARU: Prop untuk memicu edit
+                    showToast={showToast}
+                    onSaveSuccess={() => fetchData(pagination?.current_page || 1)}
                 />
             )}
 
@@ -230,10 +239,7 @@ function StokBarangView({ showToast }) {
                     onClose={() => setEditItem(null)}
                     item={editItem}
                     showToast={showToast}
-                    onSaveSuccess={() => fetchData(pagination?.current_page || 1, {
-                        id_kategori: selectedCategory,
-                        id_sub_kategori: selectedSubCategory
-                    })}
+                    onSaveSuccess={() => fetchData(pagination?.current_page || 1)}
                 />
             )}
 

@@ -112,6 +112,17 @@ class MasterBarangController extends Controller
         return $masterBarang->load(['masterKategori', 'subKategori']);
     }
 
+    public function getStockByColor(MasterBarang $masterBarang)
+    {
+        $stockDetails = $masterBarang->stokBarangs()
+            ->join('colors', 'stok_barangs.id_warna', '=', 'colors.id_warna')
+            ->select('colors.nama_warna', DB::raw('count(*) as total'))
+            ->groupBy('colors.nama_warna')
+            ->get();
+            
+        return response()->json($stockDetails);
+    }
+
     /**
      * Memperbarui data dari sebuah tipe barang (MasterBarang).
      * Tidak mempengaruhi item individual yang sudah ada.

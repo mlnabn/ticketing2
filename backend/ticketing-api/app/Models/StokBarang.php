@@ -9,19 +9,11 @@ class StokBarang extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'master_barang_id',
-        'kode_unik',
-        'serial_number',
-        'status_id',
-        'tanggal_pembelian',
-        'tanggal_masuk',
-        'tanggal_keluar',
-        'harga_beli',
-        'id_warna',
-        'kondisi',
-        'user_peminjam_id',
-        'workshop_id',
-        'created_by',
+        'master_barang_id', 'kode_unik', 'serial_number', 'status_id',
+        'tanggal_pembelian', 'tanggal_masuk', 'tanggal_keluar',
+        'harga_beli', 'id_warna', 'kondisi', 'user_peminjam_id', 'workshop_id', 'created_by',
+        'deskripsi', 'teknisi_perbaikan_id', 'tanggal_mulai_perbaikan', 'tanggal_selesai_perbaikan',
+        'user_perusak_id', 'tanggal_rusak', 'user_penghilang_id', 'tanggal_hilang', 'tanggal_ketemu',
     ];
 
     public function statusDetail() {
@@ -51,5 +43,18 @@ class StokBarang extends Model
     public function color()
     {
         return $this->belongsTo(Color::class, 'id_warna');
+    }
+    public function teknisiPerbaikan()
+    {
+        return $this->belongsTo(User::class, 'teknisi_perbaikan_id');
+    }
+
+    public function userPerusak()
+    {
+        return $this->belongsTo(User::class, 'user_perusak_id');
+    }
+    public function userPenghilang()
+    {
+        return $this->belongsTo(User::class, 'user_penghilang_id');
     }
 }
