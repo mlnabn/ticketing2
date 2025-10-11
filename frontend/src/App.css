@@ -124,19 +124,6 @@
   --button-cancel-bg-light: #dc3545;
   --button-cancel-hover-light: #c82333;
 
-  /* --text-color-dark: #f0f0f0;
-  --secondary-text-color-dark: #b0b0b0;
-  --input-bg-dark: #444;
-  --border-color-dark: #555;
-  --placeholder-color-dark: #888;
-  --form-input-shadow-dark: 0 2px 5px rgba(0, 0, 0, 0.4);
-  --content-bg-dark: #2d2d2d;
-
-  --button-confirm-bg-dark: #4a90e2;
-  --button-confirm-hover-dark: #3a7ed9;
-  --button-cancel-bg-dark: #e25c5c;
-  --button-cancel-hover-dark: #c84d4d; */
-
   /* Palet Warna - Light Mode */
   --primary-color: #3f51b5;
   --primary-color-light: #e8eaf6;
@@ -798,7 +785,6 @@ body.dark-mode .hamburger-menu-button span {
   .info-row {
     display: flex;
     align-items: baseline;
-    /* Agar teks label dan value sejajar rapi */
     text-align: left;
   }
 
@@ -813,16 +799,13 @@ body.dark-mode .hamburger-menu-button span {
 
   .info-value {
     color: #111827;
-    /* Hitam untuk light mode */
     font-weight: 500;
     font-size: 0.95rem;
     word-break: break-all;
   }
 
-  /* Aturan warna untuk Dark Mode */
   body.dark-mode .info-label {
     color: #9ca3af;
-    /* Abu-abu terang untuk dark mode */
   }
 
   body.dark-mode .info-value {
@@ -2383,7 +2366,6 @@ button.btn-pause {
   border-radius: 12px;
   overflow: hidden;
   margin-top: 1.5rem;
-
 }
 
 /* [DIUBAH] Gaya dasar tabel untuk dark mode */
@@ -2402,23 +2384,20 @@ body.dark-mode .job-table {
 /* --- Gaya Sel Umum (th & td) --- */
 .job-table th,
 .job-table td {
-  padding: 1rem;
+  padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #e2e8f0;
-  /* Garis bawah untuk light mode */
   color: #1e293b;
-  /* Warna teks untuk light mode */
   transition: all 0.3s ease;
+  font-size: 15px;
+  vertical-align: middle;
 }
 
 body.dark-mode .job-table td {
-  padding: 16px 16px;
   border-bottom: 1px solid var(--border-color-dark, #2D3748);
   border-right: 1px solid var(--border-color-dark, #2D3748);
   color: #E0E1E2;
   vertical-align: middle;
-  /* Penting: Rata tengah vertikal */
-  font-size: 1rem;
   background-color: transparent;
 }
 
@@ -2436,12 +2415,6 @@ body.dark-mode .job-table td {
 body.dark-mode .job-table th {
   background-color: transparent;
   color: #8A919E;
-  padding: 12px 16px;
-  font-size: 1rem;
-  font-weight: 600;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   border-bottom: 1px solid var(--border-color-dark, #2D3748);
   border-right: 1px solid var(--border-color-dark, #2D3748);
 
@@ -3379,34 +3352,29 @@ body.dark-mode .content-area h3 {
 
 /* --- [BARU] Class Dasar untuk Tombol Edit & Hapus --- */
 .btn-user-action {
-  padding: 8px 15px;
+  padding: 13px 21px;
   border: 1px solid transparent;
-  /* [DIUBAH] Menggunakan border, bukan shadow */
   border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  /* [DIUBAH] Transisi untuk semua properti */
 }
 
 /* --- Tema Tombol Edit (Hijau) --- */
 .btn-edit {
   background-color: #d1e7dd;
-  /* [DIUBAH] Warna dari JobList */
   color: #0f5132;
   border-color: #badbcc;
   box-shadow: 0 4px 12px rgba(15, 81, 50, 0.35);
-  /* hijau muda */
+
 
 }
 
 .btn-edit:hover {
   background-color: #a8d5b7;
-  /* [DIUBAH] Warna dari JobList */
   border-color: #a8d5b7;
   transform: translateY(-1px);
-  /* Efek hover tetap dipertahankan */
 }
 
 /* [DIUBAH] Dark Mode untuk Tombol Edit (Solid) */
@@ -9818,6 +9786,8 @@ body.dark-mode .btn-recover-small:hover {
   /* Sembunyikan tabel di mobile */
   .job-list-table {
     display: none !important;
+    width: 100%;
+    overflow-x: auto;
   }
 
   /* Tampilkan daftar kartu di mobile */
@@ -9826,26 +9796,6 @@ body.dark-mode .btn-recover-small:hover {
   }
 
 
-}
-
-.item-detail-container {
-  display: flex;
-  gap: 2rem;
-  padding: 1rem;
-}
-
-.item-detail-qr {
-  text-align: center;
-  padding: 1rem;
-  border-right: 1px solid #eee;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-
-.dark-mode .item-detail-qr {
-  border-right: 1px solid #444;
 }
 
 .item-detail-info {
@@ -9876,347 +9826,35 @@ body.dark-mode .btn-recover-small:hover {
   color: #aaa;
 }
 
-.info-value {
-  text-align: right;
-}
-
-/* ================================================= */
-/* == GAYA BARU UNTUK SEMUA MODAL (Glassmorphism) == */
-/* ================================================= */
-
-/* --- Latar Belakang & Animasi --- */
-
-@keyframes fadeBackdrop {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.form-row2 {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-
-
-.modal-backdrop-centered {
-  position: fixed;
-  inset: 0;
-  /* shorthand untuk top, right, bottom, left */
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  padding: 16px;
-  animation: fadeBackdrop 0.35s ease;
-}
-
-/* --- Konten Modal (Efek Kaca Buram) --- */
-
-.modal-content-large {
-  /* Efek Kaca Buram (Glassmorphism) */
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 18px;
-  padding: 28px 32px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
-  animation: scaleIn 0.35s ease-out;
-  text-align: center;
-  transition: all 0.3s ease;
-  max-width: 500px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-content-large h3 {
-  margin-top: 0;
-  margin-bottom: 8px;
-  font-size: 1.6rem;
-  color: #1a202c;
-  font-weight: 700;
-}
-
-.modal-content-large p {
-  margin-top: 0;
-  color: #4a5568;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  word-break: break-all;
-  white-space: normal;
-  margin-bottom: 20px;
-}
-
-/* --- Grup Form & Input --- */
-
-.items-to-return-list {
-  text-align: left;
-  /* Kembalikan perataan teks untuk list */
-  margin: 24px 0;
-}
-
-.return-item-row {
-  background-color: rgba(248, 249, 250, 0.85);
-  border: 1px solid #e9ecef;
-  border-radius: 10px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.input-group2 label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #495057;
-}
-
-.input-group2 input,
-.form-group2 textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ced4da;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  background-color: #fff;
-  color: #212529;
-  text-align: center;
-  box-sizing: border-box;
-}
-
 /* Styling untuk form di dalam ItemDetailModal */
 .detail-edit-select,
 .detail-edit-input,
 .detail-edit-textarea {
-    width: 100%;
-    padding: 6px 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #fff;
-    font-size: 14px;
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 14px;
 }
+
 .dark-mode .detail-edit-select,
 .dark-mode .detail-edit-input,
 .dark-mode .detail-edit-textarea {
-    background-color: #2d3748;
-    border-color: #4a5568;
-    color: #e2e8f0;
-}
-.info-row.full-width {
-    flex-direction: column;
-    align-items: flex-start;
-}
-.info-row.full-width .info-label {
-    margin-bottom: 5px;
-}
-
-/* --- Tombol Aksi --- */
-
-.btn-confirm-centered,
-.btn-cancel-centered {
-  flex: 1;
-  /* Membuat kedua tombol memiliki lebar yang sama */
-  padding: 12px 24px;
-  border: none;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  color: white;
-}
-
-.btn-cancel-centered {
-  background-color: #ef4444;
-  /* Merah */
-}
-
-.btn-confirm-centered {
-  background-color: #3b82f6;
-  /* Biru */
-}
-
-.btn-cancel-centered:hover,
-.btn-confirm-centered:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
-
-.btn-cancel-centered:hover {
-  background-color: #dc2626;
-}
-
-.btn-confirm-centered:hover {
-  background-color: #2563eb;
-}
-
-.serial-number-input.active-scan {
-  border-color: #4A90E2;
-  /* Warna biru untuk menandakan fokus */
-  box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
-}
-
-
-/* --- Logika Responsif (Desktop) --- */
-
-@media (max-width: 1290px) {
-  .form-group-inline2 {
-    flex-direction: row;
-    justify-content: center;
-    gap: 30px;
-  }
-
-  .input-group2 {
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    width: auto;
-  }
-
-  .input-group2 label {
-    margin-bottom: 0;
-    white-space: nowrap;
-  }
-
-  .input-group2 input {
-    width: 80px;
-  }
-
-  .user-management-container h1 {
-    font-size: 20px;
-    text-align: center;
-    /* opsional, biar rapi tengah */
-  }
-
-  .tool-section-title {
-    font-size: 18px !important;
-    text-align: center;
-  }
-
-  .add-btn {
-    width: 100%;
-    display: block;
-    margin: 10px 0;
-    font-size: 13px;
-    padding: 10px;
-  }
-}
-
-.add-btn {
-  background-color: #2ecc71;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  margin-left: 10px;
-  transition: background 0.3s ease;
-}
-
-.add-btn:hover {
-  background-color: #27ae60;
-}
-
-.tool-section-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin: 20px 0 10px;
-}
-
-/* --- Varian Dark Mode --- */
-
-body.dark-mode .modal-content-large {
-  background: #111111;
-  /* Latar belakang gelap semi-transparan */
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
-}
-
-body.dark-mode .modal-content-large h3,
-body.dark-mode .modal-content-large p {
-  color: #e2e8f0;
-}
-
-body.dark-mode .return-item-row {
-  background-color: rgba(26, 32, 44, 0.7);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-body.dark-mode .input-group2 label {
-  color: #a0aec0;
-}
-
-body.dark-mode .input-group2 input,
-body.dark-mode .form-group2 textarea {
-  background-color: #1a202c;
+  background-color: #2d3748;
   border-color: #4a5568;
   color: #e2e8f0;
 }
 
-.modal-content .user-form-modal.large h3 {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 24px;
-  text-align: center;
+.info-row.full-width {
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.form-group.half1 {
-  flex: 1 1 50%;
-  min-width: 120px;
-  margin-bottom: auto;
+.info-row.full-width .info-label {
+  margin-bottom: 5px;
 }
 
-.form-group.half1 input {
-  width: 100%;
-  /* biar full di dalam colom */
-}
-
-.form-group.half {
-  flex: 1 1 50%;
-  /* fleksibel, min 50% */
-  min-width: 120px;
-  /* biar input ga kependekan */
-}
-
-.form-group.half input {
-  width: 100%;
-  /* biar full di dalam colom */
-}
-
-
-
-/* Responsif: di layar kecil, paksa turun ke bawah */
-@media (max-width: 1290px) {
-  .form-group.half {
-    flex: 1 1 30%;
-  }
-
-  .form-group.half1 {
-    flex: 1 1 70%;
-  }
-}
 
 /* Konten modal */
 .modal-content.user-form-modal {
@@ -10653,75 +10291,45 @@ body.dark-mode .form-group-recover textarea:focus {
    Filter Select Styling (Light & Dark Mode)
    ========================================================================== */
 
-/* --- Base Styling (Berlaku untuk kedua mode) --- */
 .filter-select {
-  /* Box Model */
   padding: 0.75rem 2.5rem 0.75rem 1rem;
-  /* Padding kanan lebih besar untuk ikon panah */
   border: 1px solid;
   border-radius: 8px;
-  /* Sudut yang sedikit membulat */
-
-  /* Typography */
   font-size: 1rem;
   font-family: inherit;
-  /* Mengikuti font dari body */
-
-  /* Appearance */
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  /* Menghilangkan tampilan default browser */
   cursor: pointer;
-
-  /* Custom Arrow Icon (SVG) */
-  /* Trik: `stroke='%23...'` mengatur warna panah. %23 adalah kode untuk # */
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   background-size: 1.2em 1.2em;
-
-  /* Transitions */
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* --- Light Mode (Default) --- */
 .filter-select {
-  background-color: #ffffff;
-  color: #333333;
-  border-color: #ced4da;
-  /* Warna border abu-abu terang */
-  /* Panah dropdown warna gelap untuk light mode */
+  background-color: var(--input-bg, #FFFFFF);
+  color: var(--text-primary, #212529);
+  border: 1px solid var(--input-border, #ced4da);
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
 }
 
 /* --- Dark Mode --- */
-/* Pastikan body atau container utamamu memiliki class "dark-mode" */
 .dark-mode .filter-select {
   background-color: #2d3748;
-  /* Warna latar belakang abu-abu gelap */
   color: #e2e8f0;
-  /* Warna teks putih keabuan */
   border-color: #4a5568;
-  /* Warna border yang sedikit lebih terang dari background */
-  /* Panah dropdown warna terang untuk dark mode */
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23e2e8f0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
 }
 
-/* --- Interaction States --- */
-
-/* State ketika kursor di atas (hover) */
 .filter-select:hover {
   border-color: #3b82f6;
-  /* Warna biru untuk highlight */
 }
 
-/* State ketika di-klik/dipilih (focus) */
 .filter-select:focus {
   outline: none;
-  /* Hilangkan outline default */
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
-  /* Efek glow biru */
 }
 
 /* State ketika disabled (untuk Sub-Kategori) */
@@ -10734,13 +10342,630 @@ body.dark-mode .form-group-recover textarea:focus {
   background-color: #2a313d;
 }
 
-/* Pastikan state disabled tidak mendapat highlight saat hover */
 .filter-select:disabled:hover {
   border-color: #ced4da;
-  /* Kembali ke warna border default light */
 }
 
 .dark-mode .filter-select:disabled:hover {
   border-color: #4a5568;
-  /* Kembali ke warna border default dark */
+}
+
+/* ============================================= */
+/* STYLING UNTUK FILTER INVENTARIS                 */
+/* ============================================= */
+
+/* --- Gaya dasar untuk setiap dropdown filter --- */
+.filter-select-invent {
+  /* Reset tampilan default browser */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* Ukuran dan Jarak */
+  height: 44px;
+  padding: 0.5rem 2.5rem 0.5rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  width: 200px;
+
+  /* Tampilan Kotak */
+  border-radius: 8px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+
+  /* Panah Kustom (Custom Arrow) */
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1em;
+}
+
+/* --- Gaya saat dropdown difokuskan --- */
+.filter-select-invent:focus {
+  outline: none;
+}
+
+/* ============================================= */
+/* WARNA UNTUK LIGHT & DARK MODE                   */
+/* ============================================= */
+
+/* --- Light Mode --- */
+.filter-select-invent {
+  background-color: var(--input-bg, #FFFFFF);
+  color: var(--text-primary, #212529);
+  border: 1px solid var(--input-border, #ced4da);
+  /* Panah untuk background terang */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+.filter-select-invent:focus {
+  border-color: var(--input-focus-border, #86b7fe);
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+.filter-select-invent:disabled {
+  background-color: var(--input-disabled-bg, #e9ecef);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* --- Dark Mode --- */
+.dark-mode .filter-select-invent {
+  background-color: var(--input-bg, #3a3f44);
+  color: var(--text-primary, #FFFFFF);
+  border: 1px solid var(--input-border, #495057);
+  /* Panah untuk background gelap */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+.dark-mode .filter-select-invent:focus {
+  border-color: var(--input-focus-border, #0d6efd);
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+.dark-mode .filter-select-invent:disabled {
+  background-color: var(--input-disabled-bg, #343a40);
+}
+
+
+
+/* ========================================================== */
+/* 1. STRUKTUR & LAYOUT DASAR (SAMA UNTUK KEDUA TEMA)          */
+/* ========================================================== */
+
+.modal-backdrop-centered {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content-large {
+  position: relative;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 650px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-content-large h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* --- Layout Form --- */
+.form-group,
+.form-group-half,
+.form-group.full {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+label {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+}
+
+input:disabled {
+  cursor: not-allowed;
+}
+
+/* --- Layout Tombol --- */
+.confirmation-modal-actions,
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+}
+
+/* --- Layout Khusus Komponen --- */
+.serial-number-container {
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.item-detail-container {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  padding: 1rem;
+}
+
+.item-detail-qr-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 0;
+  width: 100%;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 1.5rem;
+}
+
+/* TAMBAHKAN INI untuk styling teks kode unik */
+.item-detail-qr-top strong {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--text-secondary, #6c757d);
+}
+
+.dark-mode .item-detail-qr-top strong {
+  color: var(--text-secondary, #adb5bd);
+}
+
+.status-display-qr {
+  margin-top: 1rem;
+  width: 100%;
+  text-align: center;
+}
+
+.status-display-qr .info-label {
+  margin: 0 auto 0.25rem;
+}
+
+.item-detail-qr {
+  flex: 0 0 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  font-weight: bold;
+  padding: 1rem;
+  border-right: 1px solid #eee;
+}
+
+.item-detail-info {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  align-content: flex-start;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  border-radius: 6px;
+}
+
+.detail-edit-select,
+.detail-edit-input,
+.detail-edit-textarea {
+  width: 100%;
+}
+
+.stock-color-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.item-detail-bottom-section .form-row2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  width: 100%;
+  align-items: start;
+}
+
+.stock-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-size: 0.9rem;
+  padding: 0.35rem 0;
+  gap: 1rem;
+}
+
+.dark-mode .stock-item {
+  border-bottom: 1px dashed #495057;
+}
+
+.stock-color-name {
+  font-weight: 500;
+}
+
+.stock-color-qty {
+  font-weight: bold;
+}
+
+.info-value-info {
+  font-weight: 600;
+  margin-top: 0.25rem;
+  text-align: right;
+}
+
+
+/* ========================================================== */
+/* 2. LIGHT MODE STYLES                                       */
+/* ========================================================== */
+
+.modal-backdrop-centered {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content-large {
+  background-color: #FFFFFF;
+  color: #212529;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content-large h3 {
+  border-bottom: 1px solid #E0E0E0;
+}
+
+label {
+  color: #6c757d;
+}
+
+input,
+select,
+textarea {
+  background-color: #FFFFFF;
+  color: #212529;
+  border: 1px solid #ced4da;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #6c757d;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+input:disabled {
+  background-color: #e9ecef;
+}
+
+.info-box.warning {
+  background-color: rgba(255, 193, 7, 0.1);
+  border: 1px solid #ffc107;
+  color: #664d03;
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.info-row {
+  background-color: #e9ecef;
+}
+
+.item-detail-qr
+ {
+  color: #6c757d;
+}
+
+/* --- React-Select Light Mode --- */
+.creatable-select__control {
+  background-color: #FFFFFF !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 48px !important;
+}
+
+.creatable-select__control--is-focused {
+  border-color: #86b7fe !important;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25) !important;
+}
+
+.creatable-select__value-container {
+  padding: 2px 12px !important;
+}
+
+.creatable-select__menu {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E0E0E0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.creatable-select__option {
+  color: #212529 !important;
+}
+
+.creatable-select__option--is-focused {
+  background-color: rgba(13, 110, 253, 0.15) !important;
+}
+
+.creatable-select__option--is-selected {
+  background-color: #0d6efd !important;
+  color: #FFFFFF !important;
+}
+
+.creatable-select__placeholder {
+  color: #6c757d !important;
+  /* KUNCI KESEIMBANGAN: Samakan ukuran font */
+  font-size: 1rem !important;
+}
+
+.creatable-select__input-container,
+/* .creatable-select__placeholder, */
+.creatable-select__single-value {
+  color: #212529 !important;
+}
+
+/* ========================================================== */
+/* 3. DARK MODE OVERRIDES                                     */
+/* ========================================================== */
+
+.dark-mode .modal-backdrop-centered {
+  background-color: rgba(10, 10, 10, 0.7);
+}
+
+.dark-mode .modal-content-large {
+  background-color: #111111;
+  color: #FFFFFF;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .modal-content-large h3 {
+  border-bottom: 1px solid #495057;
+}
+
+.dark-mode label {
+  color: #adb5bd;
+}
+
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+  background-color: #3a3f44;
+  color: #FFFFFF;
+  border: 1px solid #495057;
+}
+
+.dark-mode input::placeholder,
+.dark-mode textarea::placeholder {
+  color: #868e96;
+}
+
+.dark-mode input:focus,
+.dark-mode select:focus,
+.dark-mode textarea:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+.dark-mode input:disabled {
+  background-color: #343a40;
+}
+
+.dark-mode .info-box.warning {
+  background-color: rgba(255, 193, 7, 0.15);
+  border: 1px solid #ffc107;
+  color: #ffca2c;
+}
+
+.dark-mode .info-row {
+  background-color: #3a3f44;
+}
+
+.dark-mode .item-detail-qr{
+  color: #adb5bd;
+}
+
+/* --- React-Select Dark Mode --- */
+.dark-mode .creatable-select__control {
+  background-color: #3a3f44 !important;
+  border: 1px solid #495057 !important;
+}
+
+.dark-mode .creatable-select__control--is-focused {
+  border-color: #0d6efd !important;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25) !important;
+}
+
+.dark-mode .creatable-select__menu {
+  background-color: #2c2f33 !important;
+  border: 1px solid #495057 !important;
+}
+
+.dark-mode .creatable-select__option {
+  color: #FFFFFF !important;
+}
+
+.dark-mode .creatable-select__option--is-focused {
+  background-color: rgba(13, 110, 253, 0.15) !important;
+}
+
+.dark-mode .creatable-select__option--is-selected {
+  background-color: #0d6efd !important;
+  color: #FFFFFF !important;
+}
+
+.dark-mode .creatable-select__input-container,
+.dark-mode .creatable-select__placeholder,
+.dark-mode .creatable-select__single-value {
+  color: #FFFFFF !important;
+}
+
+/* ============================================= */
+/* STYLING UNTUK TOMBOL CLOSE MODAL              */
+/* ============================================= */
+
+.modal-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  background: transparent;
+  border: none;
+  font-size: 2.2rem;
+  line-height: 1;
+  font-weight: 300;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+/* --- Warna Tombol (Light & Dark Mode) --- */
+
+.modal-close-btn {
+  color: #adb5bd;
+  /* Warna abu-abu netral */
+}
+
+.modal-close-btn:hover {
+  color: #212529;
+}
+
+.dark-mode .modal-close-btn:hover {
+  color: #FFFFFF;
+}
+
+/* Mengatur font dasar untuk tampilan yang lebih modern */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* ======================================================= */
+/* === STYLE UNTUK MODAL QR CODE INVENTARIS BARANG     === */
+/* ======================================================= */
+.modal-content-qr {
+  background-color: white;
+  padding: 28px 32px;
+  border-radius: 16px; 
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 500px; 
+  width: 90%; 
+  text-align: center; 
+  transform: scale(0.95); 
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.dark-mode .modal-content-qr {
+  background-color: #111111; 
+  color: #f1f5f9; 
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Animasi sederhana saat modal muncul */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Judul Modal (misal: "QR Code untuk ...") */
+.modal-content-qr h3 {
+  margin-top: 0;
+  margin-bottom: 35px;
+  font-size: 23px;
+  font-weight: 600; 
+  color: #1e293b; 
+}
+
+/* Kontainer untuk gambar QR dan teks di bawahnya */
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Gambar QR Code */
+.qr-container img {
+  max-width: 100%; 
+  height: auto;
+  border-radius: 12px; 
+  margin-bottom: 40px;
+}
+
+/* Nama Barang (misal: "XIXIxiomi") */
+.item-name {
+  margin: 0;
+  margin-top: 15px;
+  font-size: 20px;
+  font-weight: 700; 
+  color: #0f172a; 
+}
+
+/* Nomor Seri (misal: "S/N: N/A") */
+.item-serial {
+  font-size: 5px;
+  color: #64748b; 
 }

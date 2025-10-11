@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import Pagination from './Pagination'; // Asumsi Anda punya komponen ini
+import Pagination from './Pagination';
 
 function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDelete, onPageChange, onFilterChange }) {
     const [categories, setCategories] = useState([]);
@@ -32,7 +32,7 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
     return (
         <>
             <div className="user-management-header">
-                <button className="add-btn" onClick={onAdd}>Daftarkan Barang Baru</button>
+                <button className="btn-primary" onClick={onAdd}>Daftarkan Barang Baru</button>
             </div>
 
             {/* --- Filter Section --- */}
@@ -40,7 +40,7 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
                 <select
                     value={selectedCategory}
                     onChange={e => setSelectedCategory(e.target.value)}
-                    className="filter-select"
+                    className="filter-select-invent"
                 >
                     <option value="">Semua Kategori</option>
                     {categories.map(cat => (
@@ -51,7 +51,7 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
                     value={selectedSubCategory}
                     onChange={e => setSelectedSubCategory(e.target.value)}
                     disabled={!selectedCategory || subCategories.length === 0}
-                    className="filter-select"
+                    className="filter-select-invent"
                 >
                     <option value="">Semua Sub-Kategori</option>
                     {subCategories.map(sub => (

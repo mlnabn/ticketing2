@@ -174,7 +174,7 @@ class StokBarangController extends Controller
             // Validasi untuk status 'Digunakan' & 'Dipinjam'
             'user_peminjam_id' => 'required_if_status:Digunakan,Dipinjam|nullable|exists:users,id',
             'workshop_id' => 'required_if_status:Digunakan,Dipinjam|nullable|exists:workshops,id',
-            
+
             // Validasi untuk 'Perbaikan'
             'teknisi_perbaikan_id' => 'required_if_status:Perbaikan|nullable|exists:users,id',
             'tanggal_mulai_perbaikan' => 'required_if_status:Perbaikan|nullable|date',
@@ -192,19 +192,26 @@ class StokBarangController extends Controller
 
         // Ambil nama status untuk logika switch
         $status = \App\Models\Status::find($validated['status_id']);
-        
+
         // Siapkan data update dasar
         $updateData = [
             'status_id' => $validated['status_id'],
             'deskripsi' => $validated['deskripsi'] ?? $stokBarang->deskripsi,
         ];
-        
+
         // Logika untuk membersihkan data lama saat status berubah
         $allTrackingColumns = [
-            'user_peminjam_id', 'workshop_id', 'tanggal_keluar',
-            'teknisi_perbaikan_id', 'tanggal_mulai_perbaikan', 'tanggal_selesai_perbaikan',
-            'user_perusak_id', 'tanggal_rusak',
-            'user_penghilang_id', 'tanggal_hilang', 'tanggal_ketemu',
+            'user_peminjam_id',
+            'workshop_id',
+            'tanggal_keluar',
+            'teknisi_perbaikan_id',
+            'tanggal_mulai_perbaikan',
+            'tanggal_selesai_perbaikan',
+            'user_perusak_id',
+            'tanggal_rusak',
+            'user_penghilang_id',
+            'tanggal_hilang',
+            'tanggal_ketemu',
         ];
         foreach ($allTrackingColumns as $col) {
             $updateData[$col] = null;
@@ -235,11 +242,16 @@ class StokBarangController extends Controller
         }
 
         $stokBarang->update($updateData);
-        
+
         // Muat semua relasi baru untuk dikirim kembali ke frontend
         return response()->json($stokBarang->load([
-            'masterBarang', 'userPeminjam', 'workshop', 'statusDetail',
-            'teknisiPerbaikan', 'userPerusak', 'userPenghilang'
+            'masterBarang',
+            'userPeminjam',
+            'workshop',
+            'statusDetail',
+            'teknisiPerbaikan',
+            'userPerusak',
+            'userPenghilang'
         ]));
     }
 

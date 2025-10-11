@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import CreatableSelect from 'react-select/creatable';
 import { useDebounce } from 'use-debounce';
-import '../styles/ItemFormModal.css';
 
 const initialFormState = {
     id_kategori: '',

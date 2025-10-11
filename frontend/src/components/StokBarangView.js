@@ -17,8 +17,8 @@ function StokBarangView({ showToast }) {
     const [subCategories, setSubCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedSubCategory, setSelectedSubCategory] = useState('');
-    const [statusOptions, setStatusOptions] = useState([]); 
-    const [selectedStatus, setSelectedStatus] = useState(''); 
+    const [statusOptions, setStatusOptions] = useState([]);
+    const [selectedStatus, setSelectedStatus] = useState('');
     const [colorOptions, setColorOptions] = useState([]);
     const [selectedColor, setSelectedColor] = useState('');
 
@@ -72,7 +72,7 @@ function StokBarangView({ showToast }) {
     }, [selectedCategory, selectedSubCategory, selectedStatus, selectedColor, fetchData]);
 
     const handleOpenEditModal = (itemToEdit) => {
-        setDetailItem(null); 
+        setDetailItem(null);
         setEditItem(itemToEdit);
     };
 
@@ -85,7 +85,7 @@ function StokBarangView({ showToast }) {
             setDetailItem(res.data);
         } catch (error) {
             try {
-                const res = await api.get(`/inventory/stock-items/${serial}`); 
+                const res = await api.get(`/inventory/stock-items/${serial}`);
                 setDetailItem(res.data);
             } catch (finalError) {
                 showToast(`Kode "${serial}" tidak ditemukan.`, 'error');
@@ -121,7 +121,7 @@ function StokBarangView({ showToast }) {
         <>
             <div className="user-management-container" style={{ marginBottom: '20px' }}>
                 <h1>Daftar Stok Unit Barang</h1>
-                <button className="add-btn" onClick={() => setIsAddStockOpen(true)}>Tambah Stok</button>
+                <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>Tambah Stok</button>
             </div>
 
             {/* --- Filter Section --- */}
@@ -149,7 +149,7 @@ function StokBarangView({ showToast }) {
                     {colorOptions.map(color => (
                         <option key={color.id_warna} value={color.id_warna}>{color.nama_warna}</option>
                     ))}
-                </select>             
+                </select>
             </div>
 
             <div className="job-list-table">
@@ -171,8 +171,17 @@ function StokBarangView({ showToast }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (<tr><td colSpan="12" style={{ textAlign: 'center' }}>Memuat data stok...</td></tr>)
-                            : items.map(item => (
+                        {loading ? (
+                            // Tetap tampilkan pesan "memuat" saat loading
+                            <tr><td colSpan="12" style={{ textAlign: 'center' }}>Memuat data stok...</td></tr>
+                        ) : items.length === 0 ? (
+                            // BARU: Tampilkan pesan ini jika loading selesai DAN tidak ada data
+                            <tr><td colSpan="12" style={{ textAlign: 'center', padding: '20px' }}>
+                                Belum ada barang yang didaftarkan dalam stok.
+                            </td></tr>
+                        ) : (
+                            // Jika ada data, tampilkan seperti biasa
+                            items.map(item => (
                                 <tr key={item.id}>
                                     <td>{item.kode_unik}</td>
                                     <td>{item.serial_number || '-'}</td>
@@ -206,12 +215,13 @@ function StokBarangView({ showToast }) {
                                         </span>
                                     </td>
                                     <td className="action-buttons-group">
-                                        <button onClick={() => setDetailItem(item)} className="btn-user-action btn-view">Detail</button>
+                                        <button onClick={() => setDetailItem(item)} className="btn-user-action btn-start">Detail</button>
                                         {/* <button onClick={() => setEditItem(item)} className="btn-user-action btn-edit">Edit</button> */}
                                         <button onClick={() => setQrModalItem(item)} className="btn-user-action btn-edit">QR</button>
                                     </td>
                                 </tr>
-                            ))}
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>
@@ -224,8 +234,8 @@ function StokBarangView({ showToast }) {
             )}
 
             {detailItem && (
-                <ItemDetailModal 
-                    item={detailItem} 
+                <ItemDetailModal
+                    item={detailItem}
                     onClose={() => setDetailItem(null)}
                     onEditClick={handleOpenEditModal} // BARU: Prop untuk memicu edit
                     showToast={showToast}
@@ -245,20 +255,22 @@ function StokBarangView({ showToast }) {
 
             {qrModalItem && (
                 <div className="modal-backdrop" onClick={() => setQrModalItem(null)}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()} style={{ textAlign: 'center' }}>
+                    <div className="modal-content-qr" onClick={e => e.stopPropagation()}>
                         <h3>QR Code untuk {qrModalItem.kode_unik}</h3>
-                        <div style={{ padding: '20px' }}>
+
+                        <div className="qr-container">
                             <QRCode value={qrModalItem.kode_unik} size={256} level="H" />
-                            <p style={{ marginTop: '15px', fontWeight: 'bold' }}>{qrModalItem.master_barang?.nama_barang}</p>
-                            <p>S/N: {qrModalItem.serial_number || 'N/A'}</p>
+                            <p className="item-name">{qrModalItem.master_barang?.nama_barang}</p>
+                            <p className="item-serial">S/N: {qrModalItem.serial_number || 'N/A'}</p>
                         </div>
+
                     </div>
                 </div>
             )}
             <AddStockModal
                 isOpen={isAddStockOpen}
                 onClose={() => setIsAddStockOpen(false)}
-                onSaveSuccess={() => fetchData(1)} 
+                onSaveSuccess={() => fetchData(1)}
                 showToast={showToast}
             />
         </>
