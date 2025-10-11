@@ -245,13 +245,12 @@ export default function AdminDashboard() {
     setTicketToAssign(null);
     setShowAssignModal(false);
   };
-  const handleConfirmAssign = async (ticketId, adminId, tools) => {
+  const handleConfirmAssign = async (ticketId, adminId, stokIds) => {
     try {
-      await api.patch(`/tickets/${ticketId}/assign`, { user_id: adminId, tools: tools });
+      await api.patch(`/tickets/${ticketId}/assign`, { user_id: adminId, stok_barang_ids: stokIds });
       handleCloseAssignModal();
       fetchDashboardData();
       fetchMyTickets(myTicketsPage);
-      fetchItemsForAssign(); // Refresh stok barang setelah ditugaskan
       showToast('Tiket berhasil ditugaskan.', 'success');
     } catch (e) {
       console.error('Gagal menugaskan tiket:', e);

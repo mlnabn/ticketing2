@@ -250,4 +250,23 @@ class StokBarangController extends Controller
             return true;
         });
     }
+
+    public function findAvailableByCode($code)
+    {
+        $statusTersediaId = \App\Models\Status::where('nama_status', 'Tersedia')->value('id');
+
+        $item = StokBarang::with('masterBarang')
+            ->where(function ($query) use ($code) {
+                $query->where('kode_unik', $code)
+                      ->orWhere('serial_number', $code);
+            })
+            ->where('status_id', $statusTersediaId)
+            ->first();
+
+        if (!$item) {
+            return response()->json(['message' => 'Barang tidak ditemukan atau tidak tersedia.'], 404);
+        }
+
+        return response()->json($item);
+    }
 }

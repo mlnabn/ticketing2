@@ -376,9 +376,8 @@ class TicketController extends Controller
 
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'tools' => 'nullable|array',
-            'tools.*.id' => 'required|exists:master_barangs,id_m_barang',
-            'tools.*.quantity' => 'required|integer|min:1',
+            'stok_barang_ids' => 'nullable|array',
+            'stok_barang_ids.*' => 'required|exists:stok_barangs,id',
         ]);
 
         $assignee = User::find($validated['user_id']);
@@ -394,50 +393,37 @@ class TicketController extends Controller
                     'started_at' => now(),
                 ]);
 
-                if (!empty($validated['tools'])) {
-                    $statusTersediaId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
+                if (!empty($validated['stok_barang_ids'])) {
                     $statusDipinjamId = DB::table('status_barang')->where('nama_status', 'Dipinjam')->value('id');
+                    
+                    // Ambil semua item stok yang valid
+                    $itemsToAssign = StokBarang::whereIn('id', $validated['stok_barang_ids'])->get();
 
-                    foreach ($validated['tools'] as $toolData) {
-                        $masterBarang = MasterBarang::find($toolData['id']);
-                        // Cek stok tersedia dari accessor (sudah benar)
-                        if ($masterBarang->stok_tersedia < $toolData['quantity']) {
-                            throw ValidationException::withMessages([
-                                'tools' => "Stok untuk '{$masterBarang->nama_barang}' tidak mencukupi. Sisa: {$masterBarang->stok_tersedia}."
-                            ]);
-                        }
+                    foreach($itemsToAssign as $item) {
+                        $item->update([
+                            'status_id' => $statusDipinjamId,
+                            'user_peminjam_id' => $assignee->id,
+                            'tanggal_keluar' => now(),
+                            'workshop_id' => $ticket->workshop_id,
+                            'ticket_id' => $ticket->id,
+                        ]);
+                    }
 
-                        $itemsToAssign = $masterBarang->stokBarangs()
-                            ->where('status_id', $statusTersediaId)
-                            ->take($toolData['quantity'])
-                            ->get();
-                        
-                        if ($itemsToAssign->count() < $toolData['quantity']) {
-                            throw ValidationException::withMessages([
-                                'tools' => "Unit tersedia untuk '{$masterBarang->nama_barang}' tidak cukup."
-                            ]);
-                        }
-                        
-                        foreach($itemsToAssign as $item) {
-                            $item->update([
-                                'status_id' => $statusDipinjamId, // <-- Ganti ke ID Dipinjam
-                                'user_peminjam_id' => $assignee->id,
-                                'tanggal_keluar' => now(),
-                                'workshop_id' => $ticket->workshop_id,
-                                'ticket_id' => $ticket->id,
-                            ]);
-                        }
+                    // Update tabel pivot untuk rekap (berdasarkan master barang)
+                    $masterBarangSummary = $itemsToAssign->groupBy('master_barang_id')
+                                                        ->map->count();
 
-                        $ticket->masterBarangs()->attach($masterBarang->id_m_barang, [
-                            'quantity_used' => $toolData['quantity'],
-                            'status' => 'dipinjam' // Status di tabel pivot
+                    foreach ($masterBarangSummary as $masterId => $quantity) {
+                        $ticket->masterBarangs()->attach($masterId, [
+                            'quantity_used' => $quantity,
+                            'status' => 'dipinjam'
                         ]);
                     }
                 }
             });
             
-        } catch (ValidationException $e) {
-            return response()->json(['message' => $e->getMessage(), 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) { // Tangkap semua jenis exception
+            return response()->json(['message' => 'Terjadi kesalahan saat menugaskan tiket: ' . $e->getMessage()], 500);
         }
 
         return response()->json($ticket->load(['user', 'creator', 'masterBarangs']));
