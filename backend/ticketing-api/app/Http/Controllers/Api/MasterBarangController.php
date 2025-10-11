@@ -130,7 +130,12 @@ class MasterBarangController extends Controller
 
     public function getStockByColor(MasterBarang $masterBarang)
     {
+        $excludedStatuses = DB::table('status_barang')
+            ->whereIn('nama_status', ['Hilang', 'Rusak', 'Digunakan'])
+            ->pluck('id');
+
         $stockDetails = $masterBarang->stokBarangs()
+            ->whereNotIn('stok_barangs.status_id', $excludedStatuses)
             ->join('colors', 'stok_barangs.id_warna', '=', 'colors.id_warna')
             ->select('colors.nama_warna', DB::raw('count(*) as total'))
             ->groupBy('colors.nama_warna')

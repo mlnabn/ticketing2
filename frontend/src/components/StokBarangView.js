@@ -160,13 +160,13 @@ function StokBarangView({ showToast }) {
                             <th>S/N</th>
                             <th>Nama Barang</th>
                             <th>Kondisi</th>
-                            <th>Stok</th>
+                            <th>Status Stok</th>
+                            <th>Jumlah Stok</th>
                             <th>Warna</th>
                             <th>Harga Beli</th>
                             <th>Tgl Beli</th>
                             <th>Tgl Masuk</th>
                             <th>Ditambahkan Oleh</th>
-                            <th>Status Stok</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -187,6 +187,11 @@ function StokBarangView({ showToast }) {
                                     <td>{item.serial_number || '-'}</td>
                                     <td>{item.master_barang?.nama_barang}</td>
                                     <td>{item.kondisi}</td>
+                                    <td>
+                                        <span className={`status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
+                                            {item.status_detail?.nama_status || 'Tanpa Status'}
+                                        </span>
+                                    </td>
                                     <td>{item.master_barang?.stok_barangs_count || 'N/A'}</td>
                                     <td>
                                         {item.color ? (
@@ -209,11 +214,6 @@ function StokBarangView({ showToast }) {
                                     <td>{item.tanggal_pembelian ? new Date(item.tanggal_pembelian).toLocaleDateString('id-ID') : '-'}</td>
                                     <td>{item.tanggal_masuk ? new Date(item.tanggal_masuk).toLocaleDateString('id-ID') : '-'}</td>
                                     <td>{item.created_by?.name || 'N/A'}</td>
-                                    <td>
-                                        <span className={`status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
-                                            {item.status_detail?.nama_status || 'Tanpa Status'}
-                                        </span>
-                                    </td>
                                     <td className="action-buttons-group">
                                         <button onClick={() => setDetailItem(item)} className="btn-user-action btn-start">Detail</button>
                                         {/* <button onClick={() => setEditItem(item)} className="btn-user-action btn-edit">Edit</button> */}

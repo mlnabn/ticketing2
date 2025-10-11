@@ -1,194 +1,163 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Select from 'react-select';
+import api from '../services/api';
 
-function AssignAdminModal({ ticket, admins, items, onAssign, onClose, showToast }) {
-  const [selectedAdminId, setSelectedAdminId] = useState(null);
-  const [itemsToAssign, setItemsToAssign] = useState([]);
+// Custom hook untuk listener scanner
+const useScannerListener = (onScan, isOpen) => {
+    useEffect(() => {
+        if (!isOpen) return;
+        let barcode = '';
+        let interval;
+        const handleKeyDown = (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+            if (interval) clearInterval(interval);
+            if (e.key === 'Enter') {
+                if (barcode.length > 2) onScan(barcode.trim());
+                barcode = '';
+                return;
+            }
+            if (e.key.length === 1) barcode += e.key;
+            interval = setInterval(() => barcode = '', 50);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onScan, isOpen]);
+};
 
-  const adminOptions = admins.map(admin => ({
-    value: admin.id,
-    label: admin.name
-  }));
+function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast }) {
+    const [selectedAdminId, setSelectedAdminId] = useState(null);
+    const [itemsToAssign, setItemsToAssign] = useState([]);
+    const [searchCode, setSearchCode] = useState('');
+    const [isSearching, setIsSearching] = useState(false);
+    const searchInputRef = useRef(null);
 
-  const itemOptions = items.map(item => ({
-    value: item.id_m_barang, // Gunakan id_m_barang
-    label: `${item.nama_barang} (Stok: ${item.stok_tersedia})`,
-    stock: item.stok_tersedia,
-    name: item.nama_barang // Gunakan nama_barang
-  }));
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const selectStyles = {
+        control: (provided, state) => ({
+            ...provided,
+            backgroundColor: isDarkMode ? 'rgba(26, 32, 44, 0.7)' : '#fff',
+            borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : '#ccc',
+            borderRadius: "10px",
+            minHeight: "45px",
+            boxShadow: state.isFocused ? (isDarkMode ? '0 0 0 1px #3b82f6' : '0 0 0 1px #2563eb') : 'none',
+            '&:hover': {
+                borderColor: isDarkMode ? '#3b82f6' : '#2563eb',
+            }
+        }),
+        input: (provided) => ({ ...provided, color: isDarkMode ? '#e2e8f0' : '#333' }),
+        placeholder: (provided) => ({ ...provided, color: isDarkMode ? '#a0aec0' : '#aaa' }),
+        singleValue: (provided) => ({ ...provided, color: isDarkMode ? '#e2e8f0' : '#333' }),
+        menu: (provided) => ({
+            ...provided,
+            backgroundColor: isDarkMode ? '#2d3748' : '#fff',
+            border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #ccc',
+            borderRadius: "10px",
+        }),
+        option: (provided, state) => ({
+            ...provided,
+            color: isDarkMode ? '#e2e8f0' : '#333',
+            backgroundColor: state.isFocused ? (isDarkMode ? 'rgba(59, 130, 246, 0.5)' : '#e9f2ff') : 'transparent',
+            '&:active': {
+                backgroundColor: isDarkMode ? '#3b82f6' : '#2563eb',
+                color: '#fff'
+            },
+        }),
+        indicatorSeparator: () => ({ display: 'none' }),
+    };
 
-  const handleToolSelectionChange = (selectedOptions) => {
-    const newItems = selectedOptions.map(option => {
-      const existingItem = itemsToAssign.find(item => item.id === option.value);
-      return {
-        id: option.value,
-        name: option.name,
-        maxStock: option.stock,
-        quantity: existingItem ? existingItem.quantity : 1,
-      };
-    });
-    setItemsToAssign(newItems);
-  };
-
-  const handleQuantityChange = (toolId, newQuantity) => {
-    setItemsToAssign(prevItems =>
-      prevItems.map(item => {
-        if (item.id === toolId) {
-          if (newQuantity === '') {
-            return { ...item, quantity: '' };
-          }
-          const quantity = parseInt(newQuantity, 10);
-          if (isNaN(quantity)) {
-            return item;
-          }
-          if (quantity > item.maxStock) {
-            showToast(`Stok ${item.name} tidak mencukupi (maks: ${item.maxStock})`, 'error');
-            return { ...item, quantity: item.maxStock };
-          }
-          return { ...item, quantity: quantity };
+    // Fungsi untuk menambah item ke daftar
+    const addItemToList = useCallback((item) => {
+        // Cek duplikat
+        if (itemsToAssign.some(existing => existing.id === item.id)) {
+            showToast(`Barang "${item.kode_unik}" sudah ada dalam daftar.`, 'warning');
+            return;
         }
-        return item;
-      })
-    );
-  };
+        setItemsToAssign(prev => [...prev, item]);
+        setSearchCode(''); // Kosongkan input setelah berhasil
+    }, [itemsToAssign, showToast]);
 
-  const handleQuantityBlur = (toolId, currentQuantity) => {
-    const quantity = parseInt(currentQuantity, 10);
-    setItemsToAssign(prevItems =>
-      prevItems.map(item => {
-        if (item.id === toolId) {
-          if (isNaN(quantity) || quantity < 1) {
-            return { ...item, quantity: 1 };
-          }
+    // Fungsi yang menangani pencarian via scan atau ketik manual
+    const findItem = useCallback(async (code) => {
+        if (!code) return;
+        setIsSearching(true);
+        try {
+            const res = await api.get(`/inventory/stock-items/find-available/${code}`);
+            addItemToList(res.data);
+        } catch (error) {
+            showToast(error.response?.data?.message || `Kode "${code}" tidak ditemukan.`, 'error');
+        } finally {
+            setIsSearching(false);
+            searchInputRef.current?.focus();
         }
-        return item;
-      })
-    );
-  };
+    }, [addItemToList, showToast]);
+    
+    // Aktifkan listener scanner
+    useScannerListener(findItem, !!ticket);
 
-  const handleSubmit = () => {
-    if (!selectedAdminId) {
-      showToast('Pilih salah satu admin.', 'info');
-      return;
-    }
-    const toolsPayload = itemsToAssign
-      .filter(item => item.quantity > 0)
-      .map(item => ({
-        id: item.id,
-        quantity: item.quantity
-      }));
-    onAssign(ticket.id, selectedAdminId, toolsPayload);
-  };
+    const handleRemoveItem = (itemId) => {
+        setItemsToAssign(prev => prev.filter(item => item.id !== itemId));
+    };
 
-  // [DILENGKAPI] Logika styling untuk React Select (termasuk Dark Mode)
-  const isDarkMode = document.body.classList.contains('dark-mode');
+    const handleSubmit = () => {
+        if (!selectedAdminId) {
+            showToast('Pilih salah satu admin.', 'info');
+            return;
+        }
+        const stokIds = itemsToAssign.map(item => item.id);
+        onAssign(ticket.id, selectedAdminId, stokIds);
+    };
+    
+    const adminOptions = admins.map(admin => ({ value: admin.id, label: admin.name }));
 
-  const selectStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      backgroundColor: isDarkMode ? 'rgba(26, 32, 44, 0.7)' : '#fff',
-      borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : '#ccc',
-      borderRadius: "10px",
-      minHeight: "45px",
-      boxShadow: state.isFocused ? (isDarkMode ? '0 0 0 1px #3b82f6' : '0 0 0 1px #2563eb') : 'none',
-      '&:hover': {
-        borderColor: isDarkMode ? '#3b82f6' : '#2563eb',
-      }
-    }),
-    input: (provided) => ({ ...provided, color: isDarkMode ? '#e2e8f0' : '#333' }),
-    placeholder: (provided) => ({ ...provided, color: isDarkMode ? '#a0aec0' : '#aaa' }),
-    singleValue: (provided) => ({ ...provided, color: isDarkMode ? '#e2e8f0' : '#333' }),
-    menu: (provided) => ({
-      ...provided,
-      backgroundColor: isDarkMode ? '#2d3748' : '#fff',
-      border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #ccc',
-      borderRadius: "10px",
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      color: isDarkMode ? '#e2e8f0' : '#333',
-      backgroundColor: state.isFocused ? (isDarkMode ? 'rgba(59, 130, 246, 0.5)' : '#e9f2ff') : 'transparent',
-      '&:active': {
-        backgroundColor: isDarkMode ? '#3b82f6' : '#2563eb',
-        color: '#fff'
-      },
-    }),
-    multiValue: (provided) => ({
-      ...provided,
-      backgroundColor: isDarkMode ? 'rgba(59, 130, 246, 0.7)' : 'rgba(37, 99, 235, 0.1)',
-    }),
-    multiValueLabel: (provided) => ({
-      ...provided,
-      color: isDarkMode ? '#fff' : '#1e40af',
-      fontWeight: '500'
-    }),
-    multiValueRemove: (provided) => ({
-      ...provided,
-      color: isDarkMode ? '#e2e8f0' : '#1e40af',
-      ':hover': {
-        backgroundColor: isDarkMode ? '#ef4444' : '#fee2e2',
-        color: isDarkMode ? '#fff' : '#991b1b',
-      },
-    }),
-    indicatorSeparator: () => ({ display: 'none' }),
-  };
+    return (
+        <div className="confirmation-modal-backdrop">
+            <div className="confirmation-modal-content">
+                <h3>Ticket "{ticket.title}"</h3>
+                <div className="form-group-AssignAdmin">
+                    <label className="modal-label">Dikerjakan Oleh</label>
+                    <Select
+                        options={adminOptions}
+                        onChange={(opt) => setSelectedAdminId(opt.value)}
+                        placeholder="Pilih Admin..."
+                        styles={selectStyles}
+                        className="admin-select"
+                    />
+                </div>
 
-  return (
-    <div className="confirmation-modal-backdrop">
-      <div className="confirmation-modal-content">
-        <h3>Ticket "{ticket.title}"</h3>
-        <div className="form-group-AssignAdmin">
-          <label className="modal-label">Dikerjakan Oleh</label>
-          <Select
-            options={adminOptions}
-            onChange={(option) => setSelectedAdminId(option.value)}
-            placeholder="Pilih Admin..."
-            styles={selectStyles}
-            className="admin-select"
-          />
-        </div>
+                <div className="form-group-AssignAdmin">
+                    <label className="modal-label">Barang yang Dibawa (Scan atau Ketik Kode)</label>
+                    <div className="scan-input-group">
+                        <input
+                            ref={searchInputRef}
+                            type="text"
+                            placeholder="Scan QR atau ketik kode unik/S-N..."
+                            value={searchCode}
+                            onChange={(e) => setSearchCode(e.target.value)}
+                            onKeyDown={(e) => { if(e.key === 'Enter') { e.preventDefault(); findItem(searchCode); }}}
+                        />
+                        <button onClick={() => findItem(searchCode)} disabled={isSearching}>
+                            {isSearching ? '...' : 'Tambah'}
+                        </button>
+                    </div>
+                </div>
 
-        <div className="form-group-AssignAdmin">
-          <label className="modal-label">Barang yang Dibawa</label>
-          <Select
-            isMulti
-            options={itemOptions}
-            value={itemOptions.filter(option => itemsToAssign.some(item => item.id === option.value))}
-            onChange={handleToolSelectionChange}
-            placeholder="Pilih Alat/Barang..."
-            styles={selectStyles}
-            className="admin-select"
-            closeMenuOnSelect={false}
-          />
-        </div>
+                <div className="assigned-items-list-scan">
+                    {itemsToAssign.length === 0 && <p className="empty-list-text">Belum ada barang yang ditambahkan.</p>}
+                    {itemsToAssign.map(item => (
+                        <div key={item.id} className="assigned-item-row-scan">
+                            <span>{item.master_barang.nama_barang} ({item.kode_unik})</span>
+                            <button onClick={() => handleRemoveItem(item.id)} className="btn-remove-item">&times;</button>
+                        </div>
+                    ))}
+                </div>
 
-        <div className="assigned-items-list">
-          {itemsToAssign.map((item, index) => (
-            <div key={`${item.id}-${index}`} className="assigned-item-row">
-              <span className="item-name">{item.name}</span>
-              <div className="item-quantity-group">
-                <label htmlFor={`quantity-${item.id}`}>Jml:</label>
-                <input
-                  id={`quantity-${item.id}`}
-                  type="number"
-                  value={item.quantity}
-                  onChange={(e) => handleQuantityChange(item.id, e.target.value)}
-                  onBlur={(e) => handleQuantityBlur(item.id, e.target.value)}
-                  min="1"
-                  max={item.maxStock}
-                />
-              </div>
+                <div className="confirmation-modal-actions">
+                    <button onClick={onClose} className="btn-cancel">Batal</button>
+                    <button onClick={handleSubmit} className="btn-confirm">Kerjakan</button>
+                </div>
             </div>
-          ))}
         </div>
-
-        <div className="confirmation-modal-actions">
-          <button onClick={onClose} className="btn-cancel">Batal</button>
-          <button onClick={handleSubmit} className="btn-confirm">Kerjakan</button>
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default AssignAdminModal;

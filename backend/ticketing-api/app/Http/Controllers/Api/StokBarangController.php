@@ -14,10 +14,15 @@ class StokBarangController extends Controller
 {
     public function index(Request $request)
     {
+        $excludedStatuses = DB::table('status_barang')
+            ->whereIn('nama_status', ['Hilang', 'Rusak', 'Digunakan'])
+            ->pluck('id');
+        
         $query = StokBarang::with([
-
-            'masterBarang' => function ($query) {
-                $query->withCount('stokBarangs');
+            'masterBarang' => function ($query) use ($excludedStatuses) {
+                    $query->withCount(['stokBarangs' => function ($q) use ($excludedStatuses) {
+                    $q->whereNotIn('status_id', $excludedStatuses);
+                }]);
             },
             'masterBarang.masterKategori',
             'masterBarang.subKategori',
@@ -268,5 +273,24 @@ class StokBarangController extends Controller
             }
             return true;
         });
+    }
+
+    public function findAvailableByCode($code)
+    {
+        $statusTersediaId = \App\Models\Status::where('nama_status', 'Tersedia')->value('id');
+
+        $item = StokBarang::with('masterBarang')
+            ->where(function ($query) use ($code) {
+                $query->where('kode_unik', $code)
+                      ->orWhere('serial_number', $code);
+            })
+            ->where('status_id', $statusTersediaId)
+            ->first();
+
+        if (!$item) {
+            return response()->json(['message' => 'Barang tidak ditemukan atau tidak tersedia.'], 404);
+        }
+
+        return response()->json($item);
     }
 }
