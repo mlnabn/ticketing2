@@ -10969,3 +10969,14 @@ body {
   font-size: 5px;
   color: #64748b; 
 }
+
+.btn-remove-item{
+  color: #111827;
+  border: none;
+  font-size: 20px;
+  transition: background-color 0.2s ease;
+}
+
+.dark-mode .btn-remove-item{
+  color: #f1f5f9;
+}

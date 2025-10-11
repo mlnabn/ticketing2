@@ -109,8 +109,8 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
                 )}
 
                 <div className="modal-actions">
-                    <button onClick={onClose} className="btn-cancel-centered">Batal</button>
-                    <button onClick={handleSubmit} className="btn-confirm-centered" disabled={isLoading}>
+                    <button onClick={onClose} className="btn-cancel">Batal</button>
+                    <button onClick={handleSubmit} className="btn-confirm" disabled={isLoading}>
                         Selesaikan Tiket
                     </button>
                 </div>

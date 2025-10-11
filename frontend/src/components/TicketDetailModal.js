@@ -93,12 +93,12 @@ function TicketDetailModal({ ticket, onClose }) {
 
                     <div className="detail-item-full" data-span="2">
                         <span className="label">Barang yang Dipinjam</span>
-                        {ticket.tools && ticket.tools.length > 0 ? (
+                       {ticket.masterBarangs && ticket.masterBarangs.length > 0 ? (
                             <ul className="borrowed-items-list">
-                                {ticket.tools.map(tool => (
-                                    <li key={tool.id}>
-                                        <span className="tool-name">{tool.name}</span>
-                                        <span className="tool-quantity">Jumlah: {tool.pivot.quantity_used}</span>
+                                {ticket.masterBarangs.map(barang => (
+                                    <li key={barang.id_m_barang}>
+                                        <span className="tool-name">{barang.nama_barang}</span>
+                                        <span className="tool-quantity">Jumlah: {barang.pivot.quantity_used}</span>
                                     </li>
                                 ))}
                             </ul>
