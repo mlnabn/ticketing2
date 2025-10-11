@@ -717,7 +717,6 @@ class TicketController extends Controller
 
     public function processReturn(Request $request, Ticket $ticket)
     {
-        Log::info('===== Memulai Proses Return untuk Tiket ID: ' . $ticket->id . ' =====');
 
         $validated = $request->validate([
             'items' => 'present|array',
@@ -726,43 +725,49 @@ class TicketController extends Controller
             'items.*.keterangan' => 'nullable|string|max:1000',
         ]);
 
-        Log::info('Data dari Frontend (Payload):', $validated['items']);
-
         DB::transaction(function () use ($ticket, $validated) {
-            $statusTersediaId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
+            // BARU: Ambil ID untuk semua status relevan
+            $statusIds = DB::table('status_barang')
+                ->whereIn('nama_status', ['Tersedia', 'Rusak', 'Hilang'])
+                ->pluck('id', 'nama_status');
+
+            $adminId = Auth::id(); // Ambil ID admin yang sedang login
 
             foreach ($validated['items'] as $itemData) {
                 $stokBarang = StokBarang::find($itemData['stok_barang_id']);
                 
-                Log::info('--- Memproses Stok Barang ID: ' . $stokBarang->id . ' ---');
-                Log::info('Ticket ID di Stok Barang (dari DB): ' . $stokBarang->ticket_id);
-                Log::info('Ticket ID yang sedang diproses: ' . $ticket->id);
-                
                 if ($stokBarang && $stokBarang->ticket_id === $ticket->id) {
-                    Log::info('Kondisi IF terpenuhi. Melakukan update status...');
                     
                     $stokBarang->status_id = $itemData['status_id'];
                     $stokBarang->deskripsi = $itemData['keterangan'] ?: $stokBarang->deskripsi;
 
-                    if ($stokBarang->status_id == $statusTersediaId) {
+                    // --- LOGIKA BARU BERDASARKAN STATUS ---
+
+                    // Jika status diubah menjadi "Rusak"
+                    if ($stokBarang->status_id == $statusIds['Rusak']) {
+                        $stokBarang->user_perusak_id = $adminId;
+                        $stokBarang->tanggal_rusak = now();
+                    } 
+                    // Jika status diubah menjadi "Hilang"
+                    else if ($stokBarang->status_id == $statusIds['Hilang']) {
+                        $stokBarang->user_penghilang_id = $adminId;
+                        $stokBarang->tanggal_hilang = now();
+                    }
+                    // Jika status kembali ke "Tersedia"
+                    else if ($stokBarang->status_id == $statusIds['Tersedia']) {
+                        // Bersihkan semua data peminjaman
                         $stokBarang->user_peminjam_id = null;
                         $stokBarang->workshop_id = null;
                         $stokBarang->tanggal_keluar = null;
-                        $stokBarang->ticket_id = null; 
+                        $stokBarang->ticket_id = null;
                     }
                     
                     $stokBarang->save();
-                    Log::info('Update BERHASIL.');
-                } else {
-                    Log::warning('Kondisi IF GAGAL. Update status dilewati.');
                 }
             }
             
             $ticket->update(['status' => 'Selesai', 'completed_at' => now()]);
-            Log::info('Status tiket telah diubah menjadi Selesai.');
         });
-
-        Log::info('===== Proses Return Selesai =====');
 
         return response()->json($ticket->load(['user', 'creator', 'masterBarangs']));
     }
