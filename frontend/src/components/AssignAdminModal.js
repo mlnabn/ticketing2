@@ -10,6 +10,7 @@ const useScannerListener = (onScan, isOpen) => {
         let interval;
         const handleKeyDown = (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+            if (typeof e.key !== 'string') return;
             if (interval) clearInterval(interval);
             if (e.key === 'Enter') {
                 if (barcode.length > 2) onScan(barcode.trim());
