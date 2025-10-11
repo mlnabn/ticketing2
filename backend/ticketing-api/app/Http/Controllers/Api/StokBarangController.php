@@ -24,7 +24,7 @@ class StokBarangController extends Controller
                     $q->whereNotIn('status_id', $excludedStatuses);
                 }]);
             },
-            'masterBarang.masterKategori', 
+            'masterBarang.masterKategori',
             'masterBarang.subKategori',
             'userPeminjam',
             'workshop',
@@ -57,9 +57,9 @@ class StokBarangController extends Controller
     {
         // Muat semua relasi yang diperlukan oleh frontend
         return response()->json($stokBarang->load([
-            'masterBarang.masterKategori', 
-            'masterBarang.subKategori', 
-            'userPeminjam', 
+            'masterBarang.masterKategori',
+            'masterBarang.subKategori',
+            'userPeminjam',
             'workshop',
             'statusDetail'
         ]));
@@ -79,7 +79,7 @@ class StokBarangController extends Controller
             'tanggal_masuk' => 'nullable|date',
             'harga_beli' => 'required|numeric|min:0',
             'kondisi' => 'required|in:Baru,Bekas',
-            'id_warna' => 'nullable|exists:colors,id_warna', 
+            'id_warna' => 'nullable|exists:colors,id_warna',
         ]);
 
         // PERBAIKAN 2: Tambahkan ID admin yang melakukan update
@@ -89,13 +89,14 @@ class StokBarangController extends Controller
 
         return response()->json($stokBarang->load(['masterBarang.masterKategori', 'masterBarang.subKategori']));
     }
-    
-    public function showBySerial($serial) {
+
+    public function showBySerial($serial)
+    {
         // PERBAIKAN: Tambahkan with() untuk memuat relasi saat mencari via serial number
         $item = StokBarang::with([
-            'masterBarang.masterKategori', 
+            'masterBarang.masterKategori',
             'masterBarang.subKategori',
-            'userPeminjam', 
+            'userPeminjam',
             'workshop',
             'statusDetail'
         ])
@@ -144,18 +145,29 @@ class StokBarangController extends Controller
 
     private function generateUniqueStokCode(MasterBarang $masterBarang): string
     {
+        // --- LOGIKA BARU DIMULAI DI SINI ---
+
+        // 1. Ambil kode dasar dari master barang, contoh: "RUZT"
         $baseCode = $masterBarang->kode_barang;
+
+        // 2. Cari stok terakhir dengan awalan kode yang sama untuk mendapatkan urutan
         $latestItem = StokBarang::where('kode_unik', 'LIKE', $baseCode . '%')
             ->orderBy('kode_unik', 'desc')
             ->first();
 
         $sequence = 1;
         if ($latestItem) {
-            $lastSequence = (int) substr($latestItem->kode_unik, -3);
+            // Ekstrak angka dari kode unik terakhir (misal: dari RUZT0001 -> 1)
+            $lastSequence = (int) substr($latestItem->kode_unik, strlen($baseCode));
             $sequence = $lastSequence + 1;
         }
-        $sequencePart = str_pad($sequence, 3, '0', STR_PAD_LEFT);
-        return $baseCode . $sequencePart;
+
+        // 3. Tentukan jumlah digit (padding) berdasarkan urutan
+        $padding = ($sequence >= 10000) ? 5 : 4;
+        $sequencePart = str_pad($sequence, $padding, '0', STR_PAD_LEFT); // Contoh: 0001 atau 00001
+
+        // 4. Gabungkan menjadi kode unik final
+        return $baseCode . $sequencePart; // Contoh: "RUZT0001"
     }
 
     public function updateStatus(Request $request, StokBarang $stokBarang)
@@ -167,7 +179,7 @@ class StokBarangController extends Controller
             // Validasi untuk status 'Digunakan' & 'Dipinjam'
             'user_peminjam_id' => 'required_if_status:Digunakan,Dipinjam|nullable|exists:users,id',
             'workshop_id' => 'required_if_status:Digunakan,Dipinjam|nullable|exists:workshops,id',
-            
+
             // Validasi untuk 'Perbaikan'
             'teknisi_perbaikan_id' => 'required_if_status:Perbaikan|nullable|exists:users,id',
             'tanggal_mulai_perbaikan' => 'required_if_status:Perbaikan|nullable|date',
@@ -185,19 +197,26 @@ class StokBarangController extends Controller
 
         // Ambil nama status untuk logika switch
         $status = \App\Models\Status::find($validated['status_id']);
-        
+
         // Siapkan data update dasar
         $updateData = [
             'status_id' => $validated['status_id'],
             'deskripsi' => $validated['deskripsi'] ?? $stokBarang->deskripsi,
         ];
-        
+
         // Logika untuk membersihkan data lama saat status berubah
         $allTrackingColumns = [
-            'user_peminjam_id', 'workshop_id', 'tanggal_keluar',
-            'teknisi_perbaikan_id', 'tanggal_mulai_perbaikan', 'tanggal_selesai_perbaikan',
-            'user_perusak_id', 'tanggal_rusak',
-            'user_penghilang_id', 'tanggal_hilang', 'tanggal_ketemu',
+            'user_peminjam_id',
+            'workshop_id',
+            'tanggal_keluar',
+            'teknisi_perbaikan_id',
+            'tanggal_mulai_perbaikan',
+            'tanggal_selesai_perbaikan',
+            'user_perusak_id',
+            'tanggal_rusak',
+            'user_penghilang_id',
+            'tanggal_hilang',
+            'tanggal_ketemu',
         ];
         foreach ($allTrackingColumns as $col) {
             $updateData[$col] = null;
@@ -228,11 +247,16 @@ class StokBarangController extends Controller
         }
 
         $stokBarang->update($updateData);
-        
+
         // Muat semua relasi baru untuk dikirim kembali ke frontend
         return response()->json($stokBarang->load([
-            'masterBarang', 'userPeminjam', 'workshop', 'statusDetail',
-            'teknisiPerbaikan', 'userPerusak', 'userPenghilang'
+            'masterBarang',
+            'userPeminjam',
+            'workshop',
+            'statusDetail',
+            'teknisiPerbaikan',
+            'userPerusak',
+            'userPenghilang'
         ]));
     }
 

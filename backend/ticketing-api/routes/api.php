@@ -97,7 +97,7 @@ Route::middleware('jwt')->group(function () {
     Route::get('/inventory/stock-items', [StokBarangController::class, 'index']);
     Route::get('/inventory/stock-items/{stokBarang}', [StokBarangController::class, 'show']);
     Route::get('/inventory/stock-items/by-serial/{serial}', [StokBarangController::class, 'showBySerial']);
-    Route::post('/inventory/stock-items/{stokBarang}', [StokBarangController::class, 'update']);
+    Route::put('/inventory/stock-items/{stokBarang}', [StokBarangController::class, 'update']);
     Route::post('/inventory/stock-items/{stokBarang}/update-status', [StokBarangController::class, 'updateStatus']);
 
     // --- Rute untuk Manajemen Inventaris ---

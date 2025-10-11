@@ -33,7 +33,7 @@ class SubKategoriController extends Controller
             'id_kategori' => 'required|exists:master_kategoris,id_kategori',
             'nama_sub' => 'required|string|max:255',
         ]);
-
+        $validated['kode_sub_kategori'] = $this->generateSubKategoriCode($validated['nama_sub']);
         $subKategori = SubKategori::create($validated);
 
         return response()->json($subKategori->load('masterKategori'), 201);
@@ -78,5 +78,22 @@ class SubKategoriController extends Controller
         $subKategori->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function generateSubKategoriCode(string $name): string
+    {
+        $words = explode(' ', $name);
+        $cleanedName = preg_replace('/[^a-zA-Z]/', '', $name);
+
+        if (count($words) >= 2) {
+            return strtoupper($words[0][0] . $words[1][0]);
+        }
+        if (strlen($cleanedName) >= 3) {
+            return strtoupper($cleanedName[0] . $cleanedName[2]);
+        }
+        if (strlen($cleanedName) >= 2) {
+            return strtoupper(substr($cleanedName, 0, 2));
+        }
+        return strtoupper(str_pad(substr($cleanedName, 0, 2), 2, 'X'));
     }
 }

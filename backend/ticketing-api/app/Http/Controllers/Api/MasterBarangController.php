@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MasterBarang;
 use App\Models\StokBarang;
 use App\Models\MasterKategori;
+use App\Models\SubKategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -66,19 +67,34 @@ class MasterBarangController extends Controller
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('master_barangs')->where(function ($query) use ($request) {
-                    return $query->where('id_sub_kategori', $request->id_sub_kategori);
-                }),
+                Rule::unique('master_barangs')->where(
+                    fn($query) =>
+                    $query->where('id_sub_kategori', $request->id_sub_kategori)
+                ),
             ],
         ]);
 
+        // --- LOGIKA BARU YANG LEBIH SEDERHANA ---
+
+        // 1. Ambil model Kategori dan Sub-Kategori
         $kategori = MasterKategori::find($validated['id_kategori']);
-        $kodeSub = str_pad($validated['id_sub_kategori'], 2, '0', STR_PAD_LEFT);
+        $subKategori = SubKategori::find($validated['id_sub_kategori']);
+
+        // 2. Pastikan kode sub-kategori ada, jika tidak, buat sekarang
+        if (empty($subKategori->kode_sub_kategori)) {
+            // Memanggil fungsi publik dari SubKategoriController
+            $subKategori->kode_sub_kategori = (new SubKategoriController)->generateSubKategoriCode($subKategori->nama_sub);
+            $subKategori->save();
+        }
+
+        // 3. Gabungkan kode awalan SAJA (tanpa nomor urut)
+        $baseCode = $kategori->kode_kategori . $subKategori->kode_sub_kategori; // Hasilnya: "RUZT"
+
+        // 4. Simpan MasterBarang baru dengan kode dasar tersebut
         $dataToCreate = array_merge($validated, [
-            'kode_barang' => $kategori->kode_kategori . $kodeSub,
+            'kode_barang' => $baseCode, // <-- Hanya menyimpan kode dasar
             'created_by' => Auth::id(),
         ]);
-
 
         $masterBarang = MasterBarang::create($dataToCreate);
 

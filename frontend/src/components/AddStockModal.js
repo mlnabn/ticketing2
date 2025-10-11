@@ -4,46 +4,49 @@ import CreatableSelect from 'react-select/creatable';
 import api from '../services/api';
 
 /* ===========================================================
-   Custom Components for Color Select
+   Custom Components for Color Select (MODIFIED)
 =========================================================== */
 const ColorOption = (props) => (
     <div
         {...props.innerProps}
+        className={`color-select__option ${props.isFocused ? 'color-select__option--is-focused' : ''} ${props.isSelected ? 'color-select__option--is-selected' : ''}`}
         style={{
             display: 'flex',
-            alignItems: 'center',
-            padding: '5px 10px',
+            flexDirection: 'column', // Tampilan vertikal
+            alignItems: 'flex-start', // Rata kiri
+            padding: '8px 12px',
             cursor: 'pointer',
-            backgroundColor: props.isFocused ? '#f0f0f0' : 'white',
+            // background & color akan ditangani oleh CSS global
         }}
     >
         <span
+            className="color-select__swatch"
             style={{
-                width: '20px',
-                height: '20px',
+                width: '100%',
+                height: '10px', // Kotak warna lebih tipis
                 backgroundColor: props.data.hex,
                 border: '1px solid #ccc',
                 borderRadius: '4px',
-                marginRight: '10px',
+                marginBottom: '5px',
             }}
         ></span>
-        {props.data.label}
+        <span className="color-select__label">{props.data.label}</span>
     </div>
 );
 
 const ColorSingleValue = (props) => (
-    <div {...props.innerProps} style={{ display: 'flex', alignItems: 'center' }}>
+    <div {...props.innerProps} className="color-select__single-value">
         <span
+            className="color-select__swatch"
             style={{
-                width: '20px',
-                height: '20px',
+                width: '100%', // Untuk mengisi lebar yang tersedia
+                height: '5px', // Kotak warna lebih tipis
                 backgroundColor: props.data.hex,
-                border: '1px solid #ccc',
                 borderRadius: '4px',
-                marginRight: '10px',
+                marginBottom: '2px', // Jarak ke label teks
             }}
         ></span>
-        {props.data.label}
+        <span className="color-select__label">{props.data.label}</span>
     </div>
 );
 
@@ -256,6 +259,27 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
         setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
     };
 
+    const handleIsValidNewOption = (inputValue, selectValue, selectOptions) => {
+        // 1. Jangan tampilkan opsi "create" jika tidak ada input
+        if (!inputValue) {
+            return false;
+        }
+        // 2. Jangan tampilkan opsi "create" jika input sudah ada di daftar (case-insensitive)
+        const isOptionExisting = selectOptions.some(
+            (option) => option.label.toLowerCase() === inputValue.toLowerCase()
+        );
+        if (isOptionExisting) {
+            return false;
+        }
+        // 3. Jika sudah ada warna yang terpilih, jangan izinkan membuat opsi baru
+        // Ini berarti pengguna harus mengklik silang dulu
+        if (formData.id_warna) {
+            return false;
+        }
+        // 4. Jika lolos semua kondisi, tampilkan opsi "create"
+        return true;
+    };
+
     const handleColorChange = (selectedOption) => {
         setFormData((prev) => ({
             ...prev,
@@ -309,12 +333,11 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
 
     return (
         <>
-            <div className="modal-backdrop">
-                <div className="modal-content user-form-modal large">
+            <div className="modal-backdrop-centered">
+                <div className="modal-content-large">
                     <h3>Tambah Stok Barang</h3>
                     <form onSubmit={handleSubmit}>
-                        {/* Pilih Barang */}
-                        <div className="form-group">
+                        <div className="form-group-half">
                             <label>Pilih Barang (SKU)</label>
                             <Select
                                 classNamePrefix="creatable-select"
@@ -326,8 +349,8 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                         </div>
 
                         {/* Jumlah & Harga */}
-                        <div className="form-row">
-                            <div className="form-group half1">
+                        <div className="form-row2">
+                            <div className="form-group-half">
                                 <label>Jumlah</label>
                                 <input
                                     type="number"
@@ -338,7 +361,7 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                                     required
                                 />
                             </div>
-                            <div className="form-group half">
+                            <div className="form-group-half">
                                 <label>Harga Beli Satuan (Rp)</label>
                                 <input
                                     type="text"
@@ -352,15 +375,15 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                         </div>
 
                         {/* Kondisi & Warna */}
-                        <div className="form-row">
-                            <div className="form-group half1">
+                        <div className="form-row2">
+                            <div className="form-group-half">
                                 <label>Kondisi</label>
                                 <select name="kondisi" value={formData.kondisi} onChange={handleChange}>
                                     <option value="Baru">Baru</option>
                                     <option value="Bekas">Bekas</option>
                                 </select>
                             </div>
-                            <div className="form-group half">
+                            <div className="form-group-half">
                                 <label>Warna</label>
                                 <CreatableSelect
                                     classNamePrefix="creatable-select"
@@ -368,17 +391,23 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                                     value={colorOptions.find((opt) => opt.value === formData.id_warna)}
                                     onChange={handleColorChange}
                                     onCreateOption={handleCreateColor}
-                                    placeholder="Pilih atau ketik warna baru..."
-                                    isClearable
+                                    placeholder={formData.id_warna ? "" : "Pilih atau ketik warna baru..."} // Kosongkan placeholder jika sudah ada warna
+                                    isClearable // Agar tombol silang tetap ada
                                     formatCreateLabel={(input) => `Buat warna baru: "${input}"`}
+
+                                    // PROPERTI KONTROL BEHAVIOR BARU
+                                    isSearchable={!formData.id_warna} // Hanya bisa diketik jika belum ada warna dipilih
+                                    inputValue={formData.id_warna ? '' : undefined} // Paksa input kosong jika ada warna
+                                    isValidNewOption={handleIsValidNewOption} // Kontrol kapan "Create" muncul
+
                                     components={{ Option: ColorOption, SingleValue: ColorSingleValue }}
                                 />
                             </div>
                         </div>
 
                         {/* Tanggal */}
-                        <div className="form-row">
-                            <div className="form-group half1">
+                        <div className="form-row2">
+                            <div className="form-group-half">
                                 <label>Tanggal Pembelian</label>
                                 <input
                                     type="date"
@@ -387,7 +416,7 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                                     onChange={handleChange}
                                 />
                             </div>
-                            <div className="form-group half">
+                            <div className="form-group-half">
                                 <label>Tanggal Masuk</label>
                                 <input
                                     type="date"
@@ -400,7 +429,7 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                         </div>
 
                         {/* Serial Numbers */}
-                        <div className="form-group">
+                        <div className="form-group full">
                             <label>Serial Number (Bisa di-scan)</label>
                             <div className="serial-number-container">
                                 {formData.serial_numbers.map((sn, index) => (

@@ -14,6 +14,7 @@ class SubKategori extends Model
     protected $fillable = [
         'id_kategori',
         'nama_sub',
+        'kode_sub_kategori',
     ];
 
     public function masterKategori()
