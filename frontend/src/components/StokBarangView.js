@@ -99,7 +99,7 @@ function StokBarangView({ showToast }) {
         let interval;
         const handleKeyDown = (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
+            if (typeof e.key !== 'string') return;
             if (interval) clearInterval(interval);
             if (e.code === 'Enter' || e.key === 'Enter') {
                 if (barcode) {

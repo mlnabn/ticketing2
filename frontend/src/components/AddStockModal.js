@@ -98,6 +98,8 @@ const useScannerListener = (onScan, isOpen) => {
                 if (e.key === 'Enter' && e.target.closest('.creatable-select')) return;
             }
 
+            if (typeof e.key !== 'string') return;
+
             if (interval) clearInterval(interval);
 
             if (e.key === 'Enter') {
