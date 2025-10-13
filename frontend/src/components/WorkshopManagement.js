@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useOutletContext } from 'react-router-dom'; 
 import api from '../services/api';
 import WorkshopFormModal from './WorkshopFormModal';
 import ConfirmationModal from './ConfirmationModal';
 
-export default function WorkshopManagement({ showToast }) {
+export default function WorkshopManagement() {
+  const { showToast } = useOutletContext();
+
   const [workshops, setWorkshops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showFormModal, setShowFormModal] = useState(false);
@@ -15,7 +18,7 @@ export default function WorkshopManagement({ showToast }) {
     setLoading(true);
     try {
       const response = await api.get('/workshops');
-      setWorkshops(response.data.data || response.data); 
+      setWorkshops(response.data.data || response.data);
     } catch (error) {
       console.error("Gagal mengambil data workshop:", error);
       showToast('Gagal memuat data workshop.', 'error');
@@ -52,7 +55,7 @@ export default function WorkshopManagement({ showToast }) {
       await api[method](url, formData);
       showToast(`Workshop berhasil ${isEditMode ? 'diperbarui' : 'ditambahkan'}.`, 'success');
       setShowFormModal(false);
-      fetchWorkshops(); // Muat ulang data
+      fetchWorkshops();
     } catch (error) {
       console.error("Gagal menyimpan workshop:", error);
       showToast('Gagal menyimpan workshop.', 'error');
@@ -65,7 +68,7 @@ export default function WorkshopManagement({ showToast }) {
       await api.delete(`/workshops/${workshopToDelete.id}`);
       showToast('Workshop berhasil dihapus.', 'success');
       setShowConfirmModal(false);
-      fetchWorkshops(); // Muat ulang data
+      fetchWorkshops();
     } catch (error) {
       console.error("Gagal menghapus workshop:", error);
       showToast('Gagal menghapus workshop. Pastikan tidak ada tiket yang terkait.', 'error');
@@ -79,10 +82,12 @@ export default function WorkshopManagement({ showToast }) {
         Tambah Workshop Baru
       </button>
       
-      {loading ? <p>Memuat data...</p> : (
-        // BARU: Gunakan React Fragment (<>) untuk membungkus kedua tampilan
+      {loading ? <p>Memuat data...</p> : workshops.length === 0 ? (
+        <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
+            <p>Belum ada workshop yang ditambahkan.</p>
+        </div>
+      ) : (
         <>
-          {/* Tampilan Tabel untuk Desktop (TETAP SAMA) */}
           <div className="job-list-table">
             <table className='job-table'>
               <thead>
@@ -109,7 +114,6 @@ export default function WorkshopManagement({ showToast }) {
             </table>
           </div>
 
-          {/* BARU: Tampilan Kartu untuk Mobile */}
           <div className="workshop-list-mobile">
             {workshops.map((ws) => (
               <div key={ws.id} className="ticket-card-mobile">

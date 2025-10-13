@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useOutletContext } from 'react-router-dom'; 
 import api from '../services/api';
 import NotificationTemplateFormModal from './NotificationTemplateFormModal';
 import ConfirmationModal from './ConfirmationModal';
 
-export default function NotificationTemplateManagement({ showToast }) {
+export default function NotificationTemplateManagement() {
+  const { showToast } = useOutletContext();
+
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showFormModal, setShowFormModal] = useState(false);
@@ -82,7 +85,9 @@ export default function NotificationTemplateManagement({ showToast }) {
       {loading ? (
         <p>Memuat data...</p>
       ) : templates.length === 0 ? (
-        <p>Tidak ada data template.</p>
+        <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
+            <p>Belum ada template yang dibuat.</p>
+        </div>
       ) : (
         <>
           <div className="job-list-table" style={{ marginTop: '20px' }}>
