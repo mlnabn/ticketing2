@@ -1,15 +1,14 @@
-// file: src/components/ComprehensiveReportPage.js
-
 import React, { useState, useEffect, useCallback } from 'react';
+// BARU: Impor hooks dari React Router
+import { useLocation, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import Pagination from './Pagination';
+import TicketDetailModal from './TicketDetailModal'; // BARU: Impor modal
 import { saveAs } from 'file-saver';
 
 const formatDate = (dateString) => {
   if (!dateString) return '-';
-  return new Date(dateString).toLocaleDateString('id-ID', {
-    day: '2-digit', month: 'short', year: 'numeric'
-  });
+  return new Date(dateString).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 };
 
 const calculateDuration = (startedAt, completedAt) => {
@@ -24,21 +23,38 @@ const calculateDuration = (startedAt, completedAt) => {
   return `${hours}j ${minutes}m`;
 };
 
-export default function ComprehensiveReportPage({ title, onBack, filterType = 'all', dateFilters, onTicketClick }) {
+// DIHAPUS: Props lama seperti `title`, `onBack`, `filterType`, `dateFilters`
+export default function ComprehensiveReportPage() {
+  // BARU: Gunakan hooks untuk mendapatkan info dari URL dan untuk navigasi
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  // BARU: Tentukan tipe filter dan judul berdasarkan path URL
+  const filterType = location.pathname.includes('/handled') ? 'handled' : 'all';
+  const title = filterType === 'handled' ? 'Laporan Tiket yang Dikerjakan' : 'Laporan Seluruh Tiket';
+
+  // BARU: Ambil filter tanggal dari URL
+  const dateFilters = {
+    year: searchParams.get('year'),
+    month: searchParams.get('month'),
+  };
+
   const [tableData, setTableData] = useState(null);
   const [stats, setStats] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState(filterType);
   const [loading, setLoading] = useState(true);
+  
+  // BARU: State untuk modal detail tiket, sekarang dikelola di sini
+  const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
 
   const fetchTableData = useCallback(async (page, currentFilter) => {
     setLoading(true);
     try {
       const params = { page, per_page: 10 };
-      if (dateFilters) {
-        if (dateFilters.year) params.year = dateFilters.year;
-        if (dateFilters.month) params.month = dateFilters.month;
-      }
+      if (dateFilters.year) params.year = dateFilters.year;
+      if (dateFilters.month) params.month = dateFilters.month;
+      
       if (currentFilter === 'handled') {
         params.handled_status = 'handled';
       } else if (currentFilter !== 'all') {
@@ -51,19 +67,16 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
     } finally {
       setLoading(false);
     }
-  }, [dateFilters]);
+  }, [dateFilters.year, dateFilters.month]);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const params = {};
-        if (dateFilters) {
-          if (dateFilters.year) params.year = dateFilters.year;
-          if (dateFilters.month) params.month = dateFilters.month;
-        }
-        if (filterType === 'handled') {
-          params.handled_status = 'true';
-        }
+        if (dateFilters.year) params.year = dateFilters.year;
+        if (dateFilters.month) params.month = dateFilters.month;
+        if (filterType === 'handled') params.handled_status = 'true';
+        
         const res = await api.get('/tickets/report-stats', { params });
         setStats(res.data);
       } catch (err) {
@@ -71,7 +84,7 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
       }
     };
     fetchStats();
-  }, [dateFilters, filterType]);
+  }, [dateFilters.year, dateFilters.month, filterType]);
 
   useEffect(() => {
     fetchTableData(currentPage, filter);
@@ -107,18 +120,19 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
   };
 
 
+  const handleTicketClick = (ticket) => {
+    setSelectedTicketForDetail(ticket);
+  };
+
   const handleRowClick = (e, ticket) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('a')) {
-      return;
-    }
-    onTicketClick(ticket);
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('a')) return;
+    handleTicketClick(ticket);
   };
 
   const tickets = tableData ? tableData.data : [];
 
   return (
     <div className="report-container">
-      <button className="back-btn" onClick={onBack}>Kembali</button>
       <h2>{title}</h2>
 
       <p className="report-filter-info">
@@ -266,6 +280,12 @@ export default function ComprehensiveReportPage({ title, onBack, filterType = 'a
             </>
           )}
         </>
+      )}
+      {selectedTicketForDetail && (
+        <TicketDetailModal
+          ticket={selectedTicketForDetail}
+          onClose={() => setSelectedTicketForDetail(null)}
+        />
       )}
     </div>
   );

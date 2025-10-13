@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom'; // BARU: Gunakan Link untuk navigasi
 import api from '../services/api';
 import ReportLineChart from './ReportLineChart';
-import ComprehensiveReportPage from './ComprehensiveReportPage';
-import TicketReportDetail from './TicketReportDetail';
-import TicketDetailModal from './TicketDetailModal';
 
 const generateYearOptions = () => {
   const currentYear = new Date().getFullYear();
@@ -13,15 +11,14 @@ const generateYearOptions = () => {
 };
 
 export default function TicketReportAdminList() {
-  const [view, setView] = useState('main');
+  // DIHAPUS: State `view` dan `selectedAdminData` karena navigasi ditangani oleh router
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [admins, setAdmins] = useState([]);
   const [loadingAdmins, setLoadingAdmins] = useState(false);
   const [chartData, setChartData] = useState([]);
   const [loadingChart, setLoadingChart] = useState(false);
-  const [selectedAdminData, setSelectedAdminData] = useState(null);
-  const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
+  // DIHAPUS: State `selectedTicketForDetail` karena modal akan ditangani oleh halaman anak
 
   const fetchAdmins = useCallback(async () => {
     setLoadingAdmins(true);
@@ -40,9 +37,7 @@ export default function TicketReportAdminList() {
     setLoadingChart(true);
     try {
       const params = { year };
-      if (month) {
-        params.month = month;
-      }
+      if (month) params.month = month;
       const res = await api.get('/tickets/report-analytics', { params });
       setChartData(res.data);
     } catch (err) {
@@ -62,99 +57,58 @@ export default function TicketReportAdminList() {
 
   const yearOptions = generateYearOptions();
   const monthOptions = [
-    { value: 1, label: 'Januari' }, { value: 2, label: 'Februari' },
-    { value: 3, label: 'Maret' }, { value: 4, label: 'April' },
-    { value: 5, label: 'Mei' }, { value: 6, label: 'Juni' },
-    { value: 7, label: 'Juli' }, { value: 8, label: 'Agustus' },
-    { value: 9, label: 'September' }, { value: 10, label: 'Oktober' },
-    { value: 11, label: 'November' }, { value: 12, label: 'Desember' },
+    { value: 1, label: 'Januari' }, { value: 2, label: 'Februari' }, { value: 3, label: 'Maret' },
+    { value: 4, label: 'April' }, { value: 5, label: 'Mei' }, { value: 6, label: 'Juni' },
+    { value: 7, label: 'Juli' }, { value: 8, label: 'Agustus' }, { value: 9, label: 'September' },
+    { value: 10, label: 'Oktober' }, { value: 11, label: 'November' }, { value: 12, label: 'Desember' }
   ];
 
-  const handleAdminSelect = (admin) => {
-    setSelectedAdminData({
-      admin: admin,
-      filters: {
-        year: selectedYear,
-        month: selectedMonth
-      }
-    });
-    setView('admin_detail');
-  };
-
-  const handleTicketClick = (ticket) => {
-    setSelectedTicketForDetail(ticket);
-  };
-  
-  const handleCloseDetailModal = () => {
-    setSelectedTicketForDetail(null);
-  };
-
-  const renderCurrentView = () => {
-    const filters = { year: selectedYear, month: selectedMonth };
-    switch (view) {
-      case 'all_report':
-        return <ComprehensiveReportPage title="Laporan Seluruh Pekerjaan Admin" filterType="all" onBack={() => setView('main')} dateFilters={filters} onTicketClick={handleTicketClick} />;
-      case 'worked_on_report':
-        return <ComprehensiveReportPage title="Laporan yang Dikerjakan Seluruh Admin" filterType="handled" onBack={() => setView('main')} dateFilters={filters} onTicketClick={handleTicketClick} />;
-      case 'admin_detail':
-        return <TicketReportDetail
-          admin={selectedAdminData.admin}
-          filters={selectedAdminData.filters}
-          onBack={() => setView('main')}
-          onTicketClick={handleTicketClick}
-        />;
-      default:
-        return (
-            <>
-              <div className="dashboard-card" style={{ marginBottom: '2rem' }}>
-                <div className="report-header">
-                  <h2>Laporan Tiket</h2>
-                  <div className="report-filters">
-                    <div className="filter-group">
-                      <select id="month-selector" value={selectedMonth || ''} onChange={(e) => setSelectedMonth(e.target.value ? parseInt(e.target.value) : null)} className="month-input">
-                        <option value="">Semua Bulan</option>
-                        {monthOptions.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-                      </select>
-                      <select id="year-selector" value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="month-input">
-                        {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                {loadingChart ? <p>Memuat data chart...</p> : <ReportLineChart data={chartData} />}
-              </div>
-              <div className="report-navigation-cards">
-                <div className="nav-card" onClick={() => setView('all_report')}><h3>Laporan Seluruh Tiket</h3><p>Lihat semua tiket sesuai filter di atas.</p></div>
-                <div className="nav-card" onClick={() => setView('worked_on_report')}><h3>Laporan Tiket yang Dikerjakan</h3><p>Hanya tiket yang ditangani admin (sesuai filter).</p></div>
-              </div>
-              <hr className="report-divider" />
-              <div className="adminselect-card" style={{ marginBottom: '2rem' }}>
-                <h2 className="page-title">Pilih Admin Untuk Laporan Detail</h2>
-                {loadingAdmins ? <p>Memuat data admin...</p> : (
-                  <div className="admin-list-grid">
-                    {admins.map(admin => (
-                      <div key={admin.id} className="admin-card" onClick={() => handleAdminSelect(admin)}>
-                        <div className="avatar">{admin.name.charAt(0)}</div>
-                        <div className="info"><h3>{admin.name}</h3><p>{admin.email}</p></div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </>
-        );
-    }
-  };
+  // BARU: Buat query string untuk dioper ke Link
+  const filterQueryString = `?year=${selectedYear}${selectedMonth ? `&month=${selectedMonth}` : ''}`;
 
   return (
     <>
-        {renderCurrentView()}
-        {selectedTicketForDetail && (
-            <TicketDetailModal
-                ticket={selectedTicketForDetail}
-                onClose={handleCloseDetailModal}
-            />
+      <div className="dashboard-card" style={{ marginBottom: '2rem' }}>
+        <div className="report-header">
+          <h2>Laporan Tiket</h2>
+          <div className="report-filters">
+            <div className="filter-group">
+              <select id="month-selector" value={selectedMonth || ''} onChange={(e) => setSelectedMonth(e.target.value ? parseInt(e.target.value) : null)} className="month-input">
+                <option value="">Semua Bulan</option>
+                {monthOptions.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+              </select>
+              <select id="year-selector" value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="month-input">
+                {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </div>
+          </div>
+        </div>
+        {loadingChart ? <p>Memuat data chart...</p> : <ReportLineChart data={chartData} />}
+      </div>
+      <div className="report-navigation-cards">
+        {/* DIUBAH: Gunakan Link dengan query string */}
+        <Link to={`/admin/reports/all${filterQueryString}`} className="nav-card">
+          <h3>Laporan Seluruh Tiket</h3><p>Lihat semua tiket sesuai filter di atas.</p>
+        </Link>
+        <Link to={`/admin/reports/handled${filterQueryString}`} className="nav-card">
+          <h3>Laporan Tiket yang Dikerjakan</h3><p>Hanya tiket yang ditangani admin (sesuai filter).</p>
+        </Link>
+      </div>
+      <hr className="report-divider" />
+      <div className="adminselect-card" style={{ marginBottom: '2rem' }}>
+        <h2 className="page-title">Pilih Admin Untuk Laporan Detail</h2>
+        {loadingAdmins ? <p>Memuat data admin...</p> : (
+          <div className="admin-list-grid">
+            {admins.map(admin => (
+              // DIUBAH: Gunakan Link untuk setiap admin
+              <Link to={`/admin/reports/admin/${admin.id}${filterQueryString}`} key={admin.id} className="admin-card">
+                <div className="avatar">{admin.name.charAt(0)}</div>
+                <div className="info"><h3>{admin.name}</h3><p>{admin.email}</p></div>
+              </Link>
+            ))}
+          </div>
         )}
+      </div>
     </>
   );
 }

@@ -1,8 +1,8 @@
-// file: src/components/TicketReportDetail.js
-
 import React, { useEffect, useState, useCallback } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import Pagination from './Pagination';
+import TicketDetailModal from './TicketDetailModal';
 import { saveAs } from 'file-saver';
 
 const formatDate = (dateString) => {
@@ -24,30 +24,59 @@ const calculateDuration = (startedAt, completedAt) => {
   return `${hours}j ${minutes}m`;
 };
 
-export default function TicketReportDetail({ admin, onBack, filters, onTicketClick }) {
+export default function TicketReportDetail() {
+  // BARU: Gunakan hooks
+  const { adminId } = useParams();
+  const [searchParams] = useSearchParams();
+
+  // BARU: Ambil filter tanggal dari URL
+  const filters = {
+    year: searchParams.get('year'),
+    month: searchParams.get('month'),
+  };
+  
+  // BARU: State untuk data admin, diambil secara lokal
+  const [admin, setAdmin] = useState(null); 
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  
+  // BARU: State untuk modal, dikelola lokal
+  const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
+  
+  // BARU: Effect untuk mengambil data admin berdasarkan ID dari URL
+  useEffect(() => {
+    const fetchAdminDetails = async () => {
+        if(!adminId) return;
+        try {
+            const res = await api.get(`/users/${adminId}`);
+            setAdmin(res.data);
+        } catch (err) {
+            console.error('Gagal mengambil detail admin:', err);
+            // Mungkin arahkan ke halaman error atau kembali
+        }
+    };
+    fetchAdminDetails();
+  }, [adminId]);
 
   const fetchAdminReport = useCallback(async (page, statusFilter) => {
-    if (!admin || !admin.id) return;
+    if (!adminId) return;
     setLoading(true);
     try {
       const params = { page };
       if (statusFilter !== 'all') params.status = statusFilter;
-      if (filters) {
-        if (filters.year) params.year = filters.year;
-        if (filters.month) params.month = filters.month;
-      }
-      const res = await api.get(`/tickets/admin-report/${admin.id}`, { params });
+      if (filters.year) params.year = filters.year;
+      if (filters.month) params.month = filters.month;
+
+      const res = await api.get(`/tickets/admin-report/${adminId}`, { params });
       setReportData(res.data);
     } catch (err) {
       console.error('Gagal mengambil laporan tiket:', err);
     } finally {
       setLoading(false);
     }
-  }, [admin, filters]);
+  }, [adminId, filters.year, filters.month]);
 
   useEffect(() => {
     fetchAdminReport(currentPage, filter);
@@ -80,12 +109,19 @@ export default function TicketReportDetail({ admin, onBack, filters, onTicketCli
       alert('Gagal mengunduh file. Mohon coba lagi.');
     }
   };
-  const handleRowClick = (e, ticket) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('a')) {
-      return;
-    }
-    onTicketClick(ticket);
+
+  const handleTicketClick = (ticket) => {
+    setSelectedTicketForDetail(ticket);
   };
+
+  const handleRowClick = (e, ticket) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('a')) return;
+    handleTicketClick(ticket);
+  };
+
+  if (!admin) {
+    return <p>Memuat data admin...</p>;
+  }
 
   if (loading && !reportData) {
     return <p>Memuat data...</p>;
@@ -97,7 +133,6 @@ export default function TicketReportDetail({ admin, onBack, filters, onTicketCli
 
   return (
     <div className="report-container">
-      <button className="back-btn" onClick={onBack}>Kembali</button>
       <h2>Laporan Penyelesaian - {admin.name}</h2>
 
       <p className="report-filter-info">
@@ -229,6 +264,12 @@ export default function TicketReportDetail({ admin, onBack, filters, onTicketCli
             />
           )}
         </>
+      )}
+      {selectedTicketForDetail && (
+        <TicketDetailModal
+          ticket={selectedTicketForDetail}
+          onClose={() => setSelectedTicketForDetail(null)}
+        />
       )}
     </div>
   );

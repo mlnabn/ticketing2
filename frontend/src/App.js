@@ -26,6 +26,8 @@ import ToolManagement from './components/ToolManagement';
 import StokBarangView from './components/StokBarangView';
 import WorkshopManagement from './components/WorkshopManagement';
 import TicketReportAdminList from './components/TicketReportAdminList';
+import ComprehensiveReportPage from './components/ComprehensiveReportPage';
+import TicketReportDetail from './components/TicketReportDetail';
 import NotificationForm from './components/NotificationForm';
 import NotificationTemplateManagement from './components/NotificationTemplateManagement';
 
@@ -78,7 +80,12 @@ export default function RootApp() {
             <Route path="my-tickets" element={<JobList />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="notifications" element={<NotificationForm />} />
-            <Route path="reports" element={<TicketReportAdminList />} />
+            <Route path="reports">
+              <Route index element={<TicketReportAdminList />} /> 
+              <Route path="all" element={<ComprehensiveReportPage />} />
+              <Route path="handled" element={<ComprehensiveReportPage />} />
+              <Route path="admin/:adminId" element={<TicketReportDetail />} />
+            </Route>
             <Route path="templates" element={<NotificationTemplateManagement />} />
             <Route path="inventory" element={<ToolManagement />} />
             <Route path="stock" element={<StokBarangView />} />
