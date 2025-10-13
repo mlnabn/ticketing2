@@ -407,6 +407,13 @@ class TicketController extends Controller
                             'workshop_id' => $ticket->workshop_id,
                             'ticket_id' => $ticket->id,
                         ]);
+                        $item->histories()->create([
+                            'status_id' => $statusDipinjamId,
+                            'deskripsi' => 'Dipinjam untuk tiket: ' . $ticket->kode_tiket,
+                            'triggered_by_user_id' => Auth::id(), // Admin yang menugaskan
+                            'related_user_id' => $assignee->id,    // Admin yang mengerjakan
+                            'workshop_id' => $ticket->workshop_id, // Lokasi workshop dari tiket
+                        ]);
                     }
 
                     // Update tabel pivot untuk rekap (berdasarkan master barang)
@@ -414,9 +421,11 @@ class TicketController extends Controller
                                                         ->map->count();
 
                     foreach ($masterBarangSummary as $masterId => $quantity) {
-                        $ticket->masterBarangs()->attach($masterId, [
-                            'quantity_used' => $quantity,
-                            'status' => 'dipinjam'
+                        $ticket->masterBarangs()->syncWithoutDetaching([
+                            $masterId => [
+                                'quantity_used' => $quantity,
+                                'status' => 'dipinjam'
+                            ]
                         ]);
                     }
                 }

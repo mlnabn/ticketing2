@@ -113,6 +113,7 @@ Route::middleware('jwt')->group(function () {
     Route::get('/inventory/items/sub-category/{subCategoryId}', [MasterBarangController::class, 'filterBySubCategory']);
     Route::get('/inventory/items/{masterBarang}/stock-by-color', [MasterBarangController::class, 'getStockByColor']);
     Route::get('/inventory/stock-items/find-available/{code}', [StokBarangController::class, 'findAvailableByCode']);
+    Route::get('/inventory/stock-items/{stokBarang}/history', [StokBarangController::class, 'getHistory']);
 
     Route::get('/statuses', [StatusController::class, 'index']);
 

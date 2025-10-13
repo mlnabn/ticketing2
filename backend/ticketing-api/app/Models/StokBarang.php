@@ -61,4 +61,8 @@ class StokBarang extends Model
     {
         return $this->belongsTo(User::class, 'user_penghilang_id');
     }
+    public function histories()
+    {
+        return $this->hasMany(StokBarangHistory::class, 'stok_barang_id')->latest();
+    }
 }
