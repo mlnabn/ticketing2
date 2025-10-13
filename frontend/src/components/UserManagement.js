@@ -1,21 +1,95 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useOutletContext } from 'react-router-dom'; 
+import api from '../services/api';
+import { useAuth } from '../AuthContext';
+
 import Pagination from './Pagination';
+import UserFormModal from './UserFormModal';
+import ConfirmationModal from './ConfirmationModal';
 
-const UserManagement = ({ userData, onAddClick, onEditClick, onDeleteClick, onPageChange, onSearch }) => {
+export default function UserManagement() {
+    const { showToast } = useOutletContext();
+    const { logout } = useAuth();
+    const [userData, setUserData] = useState(null);
+    const [userPage, setUserPage] = useState(1);
+    const [userSearchQuery, setUserSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState('');
+    const [showUserConfirmModal, setShowUserConfirmModal] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
+    const [showUserFormModal, setShowUserFormModal] = useState(false);
+    const [userToEdit, setUserToEdit] = useState(null);
 
+    const fetchUsers = useCallback(async (page, search) => {
+        try {
+            const response = await api.get('/users', { params: { page, search } });
+            setUserData(response.data);
+        } catch (e) {
+            console.error('Gagal mengambil data pengguna:', e);
+            if (e.response?.status === 401) logout();
+        }
+    }, [logout]);
+
+    useEffect(() => {
+        fetchUsers(userPage, userSearchQuery);
+    }, [userPage, userSearchQuery, fetchUsers]);
+    
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        onSearch(searchInput);
+        setUserPage(1);
+        setUserSearchQuery(searchInput);
     };
 
-    // Definisikan 'users' di atas agar bisa diakses di kondisi render
+    const handleUserDeleteClick = (user) => {
+        setUserToDelete(user);
+        setShowUserConfirmModal(true);
+    };
+
+    const confirmUserDelete = async () => {
+        if (!userToDelete) return;
+        try {
+            await api.delete(`/users/${userToDelete.id}`);
+            showToast(`User "${userToDelete.name}" berhasil dihapus.`, 'success');
+            fetchUsers(userPage, userSearchQuery); 
+        } catch (e) {
+            showToast('Gagal menghapus pengguna.', 'error');
+        } finally {
+            setShowUserConfirmModal(false);
+            setUserToDelete(null);
+        }
+    };
+    
+    const handleAddUserClick = () => {
+        setUserToEdit(null);
+        setShowUserFormModal(true);
+    };
+
+    const handleUserEditClick = (user) => {
+        setUserToEdit(user);
+        setShowUserFormModal(true);
+    };
+    
+    const handleSaveUser = async (formData) => {
+        const isEditMode = Boolean(userToEdit);
+        const url = isEditMode ? `/users/${userToEdit.id}` : '/users';
+        try {
+          const res = await api.post(url, formData);
+          showToast(isEditMode ? `User "${res.data.name}" berhasil di-edit.` : 'User baru berhasil dibuat.', 'success');
+          fetchUsers(userPage, userSearchQuery); 
+          setShowUserFormModal(false);
+          setUserToEdit(null);
+        } catch (e) {
+          console.error('Gagal menyimpan pengguna:', e);
+          const msgs = e.response?.data?.errors ? Object.values(e.response.data.errors).flat().join('\n') : 'Gagal menyimpan pengguna.';
+          showToast(msgs, 'error');
+        }
+    };
+
     const users = userData ? userData.data : [];
 
     return (
         <div className="user-management-container">
             <h1>Manajemen Pengguna</h1>
-            <button onClick={onAddClick} className="btn-primary">
+            <button onClick={handleAddUserClick} className="btn-primary">
                 Tambah Pengguna Baru
             </button>
             <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
@@ -29,9 +103,6 @@ const UserManagement = ({ userData, onAddClick, onEditClick, onDeleteClick, onPa
                 <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
             </form>
 
-            {/* ======================================================= */}
-            {/* ===         LOGIKA KONDISIONAL UNTUK LOADING        === */}
-            {/* ======================================================= */}
             {!userData ? (
                 <p>Memuat data pengguna...</p>
             ) : users.length === 0 ? (
@@ -40,7 +111,6 @@ const UserManagement = ({ userData, onAddClick, onEditClick, onDeleteClick, onPa
                 </div>
             ) : (
                 <>
-                    {/* Tampilan Tabel untuk Desktop */}
                     <div className="job-list-table">
                         <table className='job-table'>
                             <thead>
@@ -61,8 +131,8 @@ const UserManagement = ({ userData, onAddClick, onEditClick, onDeleteClick, onPa
                                         <td>{user.role}</td>
                                         <td>
                                             <div className="action-buttons-group">
-                                                <button onClick={() => onEditClick(user)} className="btn-user-action btn-edit">Edit</button>
-                                                <button onClick={() => onDeleteClick(user)} className="btn-user-action btn-delete">Hapus</button>
+                                                <button onClick={() => handleUserEditClick(user)} className="btn-user-action btn-edit">Edit</button>
+                                                <button onClick={() => handleUserDeleteClick(user)} className="btn-user-action btn-delete">Hapus</button>
                                             </div>
                                         </td>
                                     </tr>
@@ -71,10 +141,9 @@ const UserManagement = ({ userData, onAddClick, onEditClick, onDeleteClick, onPa
                         </table>
                     </div>
 
-                    {/* Tampilan Kartu untuk Mobile */}
                     <div className="user-list-mobile">
                         {users.map((user) => (
-                            <div key={user.id} className="ticket-card-mobile">
+                           <div key={user.id} className="ticket-card-mobile">
                                 <div className="card-row">
                                     <div className="data-group">
                                         <span className="label">NAMA</span>
@@ -93,26 +162,30 @@ const UserManagement = ({ userData, onAddClick, onEditClick, onDeleteClick, onPa
                                 </div>
                                 <div className="action-row">
                                 <div className="action-buttons-group">
-                                    <button onClick={() => onEditClick(user)} className="btn-edit">Edit</button>
-                                    <button onClick={() => onDeleteClick(user)} className="btn-delete">Hapus</button>
+                                    <button onClick={() => handleUserEditClick(user)} className="btn-edit">Edit</button>
+                                    <button onClick={() => handleUserDeleteClick(user)} className="btn-delete">Hapus</button>
                                 </div>
                                 </div>
                             </div>
                         ))}
                     </div>
-                                        
-                    {/* Tampilkan Pagination hanya jika ada data */}
+
                     {userData.last_page > 1 && (
                         <Pagination
                             currentPage={userData.current_page}
                             lastPage={userData.last_page}
-                            onPageChange={onPageChange}
+                            onPageChange={setUserPage}
                         />
                     )}
                 </>
             )}
+            
+            {showUserFormModal && (
+              <UserFormModal userToEdit={userToEdit} onClose={() => { setShowUserFormModal(false); setUserToEdit(null); }} onSave={handleSaveUser} />
+            )}
+            {showUserConfirmModal && (
+              <ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete?.name}"?`} onConfirm={confirmUserDelete} onCancel={() => setShowUserConfirmModal(false)} />
+            )}
         </div>
     );
 };
-
-export default UserManagement;

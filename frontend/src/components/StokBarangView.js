@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useOutletContext } from 'react-router-dom'; 
 import api from '../services/api';
 import Pagination from './Pagination';
 import ItemDetailModal from './ItemDetailModal';
@@ -6,7 +7,9 @@ import { QRCodeSVG as QRCode } from 'qrcode.react';
 import EditStokBarangModal from './EditStokBarangModal';
 import AddStockModal from './AddStockModal';
 
-function StokBarangView({ showToast }) {
+function StokBarangView() {
+    const { showToast } = useOutletContext();
+
     // State utama
     const [items, setItems] = useState([]);
     const [pagination, setPagination] = useState(null);
@@ -28,7 +31,6 @@ function StokBarangView({ showToast }) {
     const [qrModalItem, setQrModalItem] = useState(null);
     const [isAddStockOpen, setIsAddStockOpen] = useState(false);
 
-    // Fungsi untuk mengambil data dari backend
     const fetchData = useCallback(async (page = 1, filters = {}) => {
         setLoading(true);
         try {
@@ -44,7 +46,6 @@ function StokBarangView({ showToast }) {
         }
     }, [showToast]);
 
-    // Fetch master data untuk filter
     useEffect(() => {
         api.get('/inventory/categories').then(res => setCategories(res.data));
         api.get('/statuses').then(res => setStatusOptions(res.data));
@@ -60,7 +61,6 @@ function StokBarangView({ showToast }) {
         setSelectedSubCategory('');
     }, [selectedCategory]);
 
-    // Fetch data utama saat komponen dimuat atau filter berubah
     useEffect(() => {
         const filters = {
             id_kategori: selectedCategory,
@@ -76,7 +76,6 @@ function StokBarangView({ showToast }) {
         setEditItem(itemToEdit);
     };
 
-    // Fungsi untuk mencari via scanner/input
     const handleScanSearch = useCallback(async (serial) => {
         if (!serial) return;
         showToast(`Mencari: ${serial}`, 'info');
@@ -93,7 +92,6 @@ function StokBarangView({ showToast }) {
         }
     }, [showToast]);
 
-    // Listener global untuk scanner
     useEffect(() => {
         let barcode = '';
         let interval;
@@ -102,15 +100,11 @@ function StokBarangView({ showToast }) {
             if (typeof e.key !== 'string') return;
             if (interval) clearInterval(interval);
             if (e.code === 'Enter' || e.key === 'Enter') {
-                if (barcode) {
-                    handleScanSearch(barcode.trim());
-                }
+                if (barcode) handleScanSearch(barcode.trim());
                 barcode = '';
                 return;
             }
-            if (e.key.length === 1) {
-                barcode += e.key;
-            }
+            if (e.key.length === 1) barcode += e.key;
             interval = setInterval(() => barcode = '', 50);
         };
         window.addEventListener('keydown', handleKeyDown);
@@ -124,8 +118,7 @@ function StokBarangView({ showToast }) {
                 <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>Tambah Stok</button>
             </div>
 
-            {/* --- Filter Section --- */}
-            <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+            <div className="filters-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
                 <select value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)} className="filter-select">
                     <option value="">Semua Status</option>
                     {statusOptions.map(status => (
@@ -174,15 +167,12 @@ function StokBarangView({ showToast }) {
                     </thead>
                     <tbody>
                         {loading ? (
-                            // Tetap tampilkan pesan "memuat" saat loading
                             <tr><td colSpan="12" style={{ textAlign: 'center' }}>Memuat data stok...</td></tr>
                         ) : items.length === 0 ? (
-                            // BARU: Tampilkan pesan ini jika loading selesai DAN tidak ada data
                             <tr><td colSpan="12" style={{ textAlign: 'center', padding: '20px' }}>
                                 Belum ada barang yang didaftarkan dalam stok.
                             </td></tr>
                         ) : (
-                            // Jika ada data, tampilkan seperti biasa
                             items.map(item => (
                                 <tr key={item.id}>
                                     <td>{item.kode_unik}</td>
@@ -316,7 +306,12 @@ function StokBarangView({ showToast }) {
                 <Pagination
                     currentPage={pagination.current_page}
                     lastPage={pagination.last_page}
-                    onPageChange={(page) => fetchData(page, { id_kategori: selectedCategory, id_sub_kategori: selectedSubCategory })}
+                    onPageChange={(page) => fetchData(page, { 
+                        id_kategori: selectedCategory, 
+                        id_sub_kategori: selectedSubCategory, 
+                        status_id: selectedStatus, 
+                        id_warna: selectedColor 
+                    })}
                 />
             )}
 
@@ -324,7 +319,7 @@ function StokBarangView({ showToast }) {
                 <ItemDetailModal
                     item={detailItem}
                     onClose={() => setDetailItem(null)}
-                    onEditClick={handleOpenEditModal} // BARU: Prop untuk memicu edit
+                    onEditClick={handleOpenEditModal}
                     showToast={showToast}
                     onSaveSuccess={() => fetchData(pagination?.current_page || 1)}
                 />
