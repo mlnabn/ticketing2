@@ -253,7 +253,8 @@ export default function JobList() {
   };
     return (
     <>
-      <h2 className="page-title">{isMyTicketsPage ? 'Tiket yang Saya Kerjakan' : 'Daftar Semua Tiket'}</h2>
+    <div className="user-management-container">
+      <h1 className="page-title">{isMyTicketsPage ? 'Tiket yang Saya Kerjakan' : 'Daftar Semua Tiket'}</h1>
 
       {!isMyTicketsPage && isAdmin && (
         <>
@@ -339,6 +340,7 @@ export default function JobList() {
       {ticketToDelete && <ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={() => setTicketToDelete(null)} />}
       {selectedTicketForDetail && <TicketDetailModal ticket={selectedTicketForDetail} onClose={() => setSelectedTicketForDetail(null)} />}
       {ticketToReturn && <ReturnItemsModal ticket={ticketToReturn} onSave={handleConfirmReturn} onClose={() => setTicketToReturn(null)} showToast={showToast} />}
+    </div>
     </>
   );
 }

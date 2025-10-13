@@ -60,7 +60,10 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
                 </select>
             </div>
 
-            <div className="job-list-table">
+            <div className="job-list-container">
+                {/* ======================================================= */}
+                {/* ===    TAMPILAN TABEL UNTUK DESKTOP (TETAP SAMA)    === */}
+                {/* ======================================================= */}
                 <table className="job-table">
                     <thead>
                         <tr>
@@ -81,7 +84,7 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
                                 <td>{item.nama_barang}</td>
                                 <td>{item.master_kategori?.nama_kategori || '-'}</td>
                                 <td>{item.sub_kategori?.nama_sub || '-'}</td>
-                                 <td>{item.created_by?.name || 'N/A'}</td>
+                                <td>{item.created_by?.name || 'N/A'}</td>
                                 <td className="action-buttons-group">
                                     <button onClick={() => onEdit(item)} className="btn-user-action btn-edit">Edit</button>
                                     <button onClick={() => onDelete(item)} className="btn-user-action btn-delete">Hapus</button>
@@ -92,6 +95,45 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
                         )}
                     </tbody>
                 </table>
+
+                {/* ======================================================= */}
+                {/* === TAMPILAN KARTU UNTUK MOBILE (TETAP SAMA) === */}
+                {/* ======================================================= */}
+                <div className="job-list-mobile">
+                    {loading ? (
+                        <p style={{ textAlign: 'center' }}>Memuat data barang...</p>
+                    ) : items.length > 0 ? items.map(item => (
+                        <div key={item.id_m_barang} className="ticket-card-mobile clickable-row">
+                            <div className="card-header">
+                                <h4>{item.nama_barang}</h4>
+                                <small>Kode: {item.kode_barang}</small>
+                            </div>
+                            <div className="card-body">
+                                <div className="card-item-row">
+                                    <span className="label">Kategori:</span>
+                                    <span className="value">{item.master_kategori?.nama_kategori || '-'}</span>
+                                 </div>
+                                 <div className="card-separator"></div>
+                                <div className="card-item-row">
+                                    <span className="label">Sub-Kategori:</span>
+                                    <span className="value">{item.sub_kategori?.nama_sub || '-'}</span>
+                                </div>
+                                <div className="card-separator"></div>
+                                <div className="card-item-row">
+                                    <span className="label">Didaftarkan Oleh:</span>
+                                    <span className="value">{item.created_by?.name || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <div className="card-separator"></div>
+                            <div className="card-row action-row">
+                                <button onClick={() => onEdit(item)} className="action-buttons-group btn-edit">Edit</button>
+                                <button onClick={() => onDelete(item)} className="action-buttons-group btn-delete">Hapus</button>
+                            </div>
+                        </div>
+                    )) : (
+                        <p style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</p>
+                    )}
+                </div>
             </div>
             {pagination && <Pagination
                 currentPage={pagination.current_page}

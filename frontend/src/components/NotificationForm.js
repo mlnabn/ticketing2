@@ -35,51 +35,51 @@ export default function NotificationForm() {
         }
     }, [showToast]);
 
-    const fetchTemplates = useCallback(async () => {
-        try {
-            const response = await api.get('/notification-templates');
-            setTemplates(response.data.data || response.data);
-        } catch (e) {
-            console.error('Gagal mengambil template:', e);
-            showToast('Gagal memuat template notifikasi.', 'error');
-        }
-    }, [showToast]);
+  const fetchTemplates = useCallback(async () => {
+    try {
+      const response = await api.get('/notification-templates');
+      setTemplates(response.data.data || response.data);
+    } catch (e) {
+      console.error('Gagal mengambil template:', e);
+      showToast('Gagal memuat template notifikasi.', 'error');
+    }
+  }, [showToast]);
 
-    useEffect(() => {
-        fetchAllUsers();
-        fetchNotifications();
-        fetchTemplates();
-    }, [fetchAllUsers, fetchNotifications, fetchTemplates]);
+  useEffect(() => {
+    fetchAllUsers();
+    fetchNotifications();
+    fetchTemplates();
+  }, [fetchAllUsers, fetchNotifications, fetchTemplates]);
 
-    const handleDelete = async (id) => {
-        if (!window.confirm('Anda yakin ingin menghapus pengumuman ini secara permanen?')) {
-            return;
-        }
-        try {
-            await api.delete(`/notifications/${id}`);
-            fetchNotifications(); // Panggil ulang untuk refresh
-            showToast('Notifikasi berhasil dihapus.', 'success');
-        } catch (error) {
-            console.error('Gagal menghapus notifikasi:', error);
-            showToast('Gagal menghapus notifikasi.', 'error');
-        }
-    };
+  const handleDelete = async (id) => {
+    if (!window.confirm('Anda yakin ingin menghapus pengumuman ini secara permanen?')) {
+      return;
+    }
+    try {
+      await api.delete(`/notifications/${id}`);
+      fetchNotifications(); // Panggil ulang untuk refresh
+      showToast('Notifikasi berhasil dihapus.', 'success');
+    } catch (error) {
+      console.error('Gagal menghapus notifikasi:', error);
+      showToast('Gagal menghapus notifikasi.', 'error');
+    }
+  };
 
-    const handleTemplateClick = (template) => {
-        setTitle(template.title);
-        setMessage(template.message);
-    };
+  const handleTemplateClick = (template) => {
+    setTitle(template.title);
+    setMessage(template.message);
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
-        try {
-            const payload = { title, message, target_user_id: target === 'all' ? null : target };
-            await api.post('/notifications', payload);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const payload = { title, message, target_user_id: target === 'all' ? null : target };
+      await api.post('/notifications', payload);
 
-            setTitle('');
-            setMessage('');
-            setTarget('all');
+      setTitle('');
+      setMessage('');
+      setTarget('all');
 
             if (payload.target_user_id === null) {
                 fetchNotifications(); 

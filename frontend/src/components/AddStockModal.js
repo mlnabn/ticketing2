@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Select from 'react-select';
-import CreatableSelect from 'react-select/creatable';
 import api from '../services/api';
 
 /* ===========================================================
@@ -12,22 +11,20 @@ const ColorOption = (props) => (
         className={`color-select__option ${props.isFocused ? 'color-select__option--is-focused' : ''} ${props.isSelected ? 'color-select__option--is-selected' : ''}`}
         style={{
             display: 'flex',
-            flexDirection: 'column', // Tampilan vertikal
-            alignItems: 'flex-start', // Rata kiri
+            alignItems: 'center',
             padding: '8px 12px',
             cursor: 'pointer',
-            // background & color akan ditangani oleh CSS global
         }}
     >
         <span
             className="color-select__swatch"
             style={{
-                width: '100%',
-                height: '10px', // Kotak warna lebih tipis
+                width: '20px',
+                height: '20px',
                 backgroundColor: props.data.hex,
                 border: '1px solid #ccc',
                 borderRadius: '4px',
-                marginBottom: '5px',
+                marginRight: '10px',
             }}
         ></span>
         <span className="color-select__label">{props.data.label}</span>
@@ -35,15 +32,20 @@ const ColorOption = (props) => (
 );
 
 const ColorSingleValue = (props) => (
-    <div {...props.innerProps} className="color-select__single-value">
+    <div
+        {...props.innerProps}
+        className="color-select__single-value"
+        style={{ display: 'flex', alignItems: 'center' }}
+    >
         <span
             className="color-select__swatch"
             style={{
-                width: '100%', // Untuk mengisi lebar yang tersedia
-                height: '5px', // Kotak warna lebih tipis
+                width: '18px',
+                height: '18px',
                 backgroundColor: props.data.hex,
+                border: '1px solid #ccc',
                 borderRadius: '4px',
-                marginBottom: '2px', // Jarak ke label teks
+                marginRight: '8px',
             }}
         ></span>
         <span className="color-select__label">{props.data.label}</span>
@@ -168,8 +170,6 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
     /* ---------------- Load Data ---------------- */
     useEffect(() => {
         if (!isOpen) return;
-
-        // Ambil daftar barang
         api.get('/inventory/items?all=true').then((res) => {
             const data = res.data.data || res.data;
             const options = data.map((item) => ({
@@ -178,8 +178,6 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
             }));
             setMasterBarangOptions(options);
         });
-
-        // Ambil daftar warna
         api.get('/colors').then((res) => {
             const options = res.data.map((color) => ({
                 value: color.id_warna,
@@ -188,8 +186,6 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
             }));
             setColorOptions(options);
         });
-
-        // Reset form setiap kali modal dibuka
         setDisplayHarga('');
         setFormData(initialFormState);
         setActiveSerialIndex(0);
@@ -223,7 +219,7 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
             }
             setFormData(prev => ({ ...prev, serial_numbers: newSerials }));
         }
-    }, [formData.jumlah, formData.serial_numbers]); // Dependensi yang lebih aman
+    }, [formData.jumlah, formData.serial_numbers]);
 
 
     // useEffect 2: HANYA untuk mengatur ulang index aktif jika keluar batas
@@ -261,56 +257,11 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
         setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
     };
 
-    const handleIsValidNewOption = (inputValue, selectValue, selectOptions) => {
-        // 1. Jangan tampilkan opsi "create" jika tidak ada input
-        if (!inputValue) {
-            return false;
-        }
-        // 2. Jangan tampilkan opsi "create" jika input sudah ada di daftar (case-insensitive)
-        const isOptionExisting = selectOptions.some(
-            (option) => option.label.toLowerCase() === inputValue.toLowerCase()
-        );
-        if (isOptionExisting) {
-            return false;
-        }
-        // 3. Jika sudah ada warna yang terpilih, jangan izinkan membuat opsi baru
-        // Ini berarti pengguna harus mengklik silang dulu
-        if (formData.id_warna) {
-            return false;
-        }
-        // 4. Jika lolos semua kondisi, tampilkan opsi "create"
-        return true;
-    };
-
     const handleColorChange = (selectedOption) => {
         setFormData((prev) => ({
             ...prev,
             id_warna: selectedOption ? selectedOption.value : null,
         }));
-    };
-
-    /* ---------------- Warna Baru ---------------- */
-    const handleCreateColor = async (inputValue) => {
-        showToast(`Membuat warna baru: "${inputValue}"...`, 'info');
-        setIsLoading(true);
-        try {
-            // Sekarang kita hanya kirim nama_warna, backend akan mencari kode_hex nya
-            const res = await api.post('/colors', { nama_warna: inputValue });
-
-            const newOption = {
-                value: res.data.id_warna,
-                label: res.data.nama_warna,
-                hex: res.data.kode_hex
-            };
-            setColorOptions(prev => [...prev, newOption]);
-            setFormData(prev => ({ ...prev, id_warna: res.data.id_warna }));
-            showToast(`Warna "${res.data.nama_warna}" berhasil dibuat.`, 'success');
-
-        } catch (error) {
-            showToast(error.response?.data?.message || 'Gagal membuat warna baru.', 'error');
-        } finally {
-            setIsLoading(false);
-        }
     };
 
     /* ---------------- Submit ---------------- */
@@ -387,21 +338,15 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
                             </div>
                             <div className="form-group-half">
                                 <label>Warna</label>
-                                <CreatableSelect
+                                {/* UBAH: Ganti CreatableSelect menjadi Select biasa */}
+                                <Select
                                     classNamePrefix="creatable-select"
                                     options={colorOptions}
                                     value={colorOptions.find((opt) => opt.value === formData.id_warna)}
                                     onChange={handleColorChange}
-                                    onCreateOption={handleCreateColor}
-                                    placeholder={formData.id_warna ? "" : "Pilih atau ketik warna baru..."} // Kosongkan placeholder jika sudah ada warna
-                                    isClearable // Agar tombol silang tetap ada
-                                    formatCreateLabel={(input) => `Buat warna baru: "${input}"`}
-
-                                    // PROPERTI KONTROL BEHAVIOR BARU
-                                    isSearchable={!formData.id_warna} // Hanya bisa diketik jika belum ada warna dipilih
-                                    inputValue={formData.id_warna ? '' : undefined} // Paksa input kosong jika ada warna
-                                    isValidNewOption={handleIsValidNewOption} // Kontrol kapan "Create" muncul
-
+                                    placeholder="Cari warna..."
+                                    isClearable
+                                    isSearchable
                                     components={{ Option: ColorOption, SingleValue: ColorSingleValue }}
                                 />
                             </div>
