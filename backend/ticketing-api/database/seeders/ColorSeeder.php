@@ -2,24 +2,51 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Color;
+use Illuminate\Support\Facades\Schema; // <-- TAMBAHKAN INI
 
 class ColorSeeder extends Seeder
 {
+    /**
+     * Menjalankan proses seeding database.
+     *
+     * @return void
+     */
     public function run(): void
     {
-        $colors = [
-            ['nama_warna' => 'Hitam', 'kode_hex' => '#000000'],
-            ['nama_warna' => 'Putih', 'kode_hex' => '#FFFFFF'],
-            ['nama_warna' => 'Merah', 'kode_hex' => '#FF0000'],
-            ['nama_warna' => 'Hijau', 'kode_hex' => '#008000'],
-            ['nama_warna' => 'Biru', 'kode_hex' => '#0000FF'],
-            ['nama_warna' => 'Kuning', 'kode_hex' => '#FFFF00'],
-            ['nama_warna' => 'Abu-abu', 'kode_hex' => '#808080'],
-            ['nama_warna' => 'Silver', 'kode_hex' => '#C0C0C0'],
-        ];
-        Color::insert($colors);
+        // TAMBAHKAN: Menonaktifkan pengecekan foreign key
+        Schema::disableForeignKeyConstraints();
+
+        // Kosongkan tabel. Sekarang ini tidak akan error.
+        Color::truncate();
+
+        // TAMBAHKAN: Mengaktifkan kembali pengecekan foreign key
+        Schema::enableForeignKeyConstraints();
+
+        $mappings = getColorMappings();
+        $allColors = array_merge(
+            $mappings['customColorMap'],
+            $mappings['cssColorHexMap']
+        );
+
+        $colorsToSeed = [];
+        $seenNames = [];
+
+        foreach ($allColors as $name => $hex) {
+            $formattedName = ucfirst(str_replace('-', ' ', $name));
+            if (in_array(strtolower($formattedName), $seenNames)) {
+                continue;
+            }
+            $colorsToSeed[] = [
+                'nama_warna' => $formattedName,
+                'kode_hex'   => strtolower($hex),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+            $seenNames[] = strtolower($formattedName);
+        }
+
+        Color::insert($colorsToSeed);
     }
 }

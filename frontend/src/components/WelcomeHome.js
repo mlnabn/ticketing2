@@ -7,15 +7,6 @@ const WelcomeHome = ({ userRole, userName, onExploreClick }) => {
     <div 
     >
       <h1 className="welcome-title">Selamat Datang, {userName}!</h1>
-
-
-
-      {/* <button 
-        className="welcome-button"
-        onClick={onExploreClick}
-      >
-        Mulai Jelajahi
-      </button> */}
     </div>
   );
 };

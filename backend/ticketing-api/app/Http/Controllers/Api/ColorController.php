@@ -20,25 +20,25 @@ class ColorController extends Controller
     /**
      * Menyimpan warna baru.
      */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'nama_warna' => 'required|string|unique:colors,nama_warna',
-        ]);
+    // public function store(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'nama_warna' => 'required|string|unique:colors,nama_warna',
+    //     ]);
 
-        $kode_hex = getColorFromName($validated['nama_warna']);
+    //     $kode_hex = getColorFromName($validated['nama_warna']);
 
-        if ($kode_hex === 'transparent') {
-            $kode_hex = '#CCCCCC'; 
-        }
+    //     if ($kode_hex === 'transparent') {
+    //         $kode_hex = '#CCCCCC'; 
+    //     }
 
-        $color = Color::create([
-            'nama_warna' => $validated['nama_warna'],
-            'kode_hex' => $kode_hex,
-        ]);
+    //     $color = Color::create([
+    //         'nama_warna' => $validated['nama_warna'],
+    //         'kode_hex' => $kode_hex,
+    //     ]);
 
-        return response()->json($color, 201);
-    }
+    //     return response()->json($color, 201);
+    // }
 
     /**
      * BARU: Menampilkan satu warna spesifik.

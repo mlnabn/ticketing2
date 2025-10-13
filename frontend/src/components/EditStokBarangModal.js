@@ -1,32 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import CreatableSelect from 'react-select/creatable';
+import Select from 'react-select';
 import api from '../services/api';
 
-// PERBAIKAN 1: Pindahkan komponen kustom dan utility function ke luar dari main component
-// Ini adalah praktik terbaik di React untuk mencegah re-render yang tidak perlu.
-
 /* ===========================================================
-   Custom Components for Color Select
+   Custom Components for Color Select (BAGIAN YANG DIPERBAIKI)
 =========================================================== */
 const ColorOption = (props) => (
     <div
         {...props.innerProps}
-        className={`color-select__option ${props.isFocused ? 'color-select__option--is-focused' : ''}`}
+        className={`color-select__option ${props.isFocused ? 'color-select__option--is-focused' : ''} ${props.isSelected ? 'color-select__option--is-selected' : ''}`}
+        style={{
+            display: 'flex',
+            alignItems: 'center', 
+            padding: '8px 12px',
+            cursor: 'pointer',
+        }}
     >
-        <span className="color-select__swatch" style={{ backgroundColor: props.data.hex }}></span>
+        <span
+            className="color-select__swatch"
+            style={{
+                width: '20px',
+                height: '20px',
+                backgroundColor: props.data.hex,
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                marginRight: '10px', 
+            }}
+        ></span>
         <span className="color-select__label">{props.data.label}</span>
     </div>
 );
 
 const ColorSingleValue = (props) => (
-    <div {...props.innerProps} className="color-select__single-value">
-        <span className="color-select__swatch" style={{ backgroundColor: props.data.hex }}></span>
+    <div
+        {...props.innerProps}
+        className="color-select__single-value"
+        style={{ display: 'flex', alignItems: 'center' }}
+    >
+        <span
+            className="color-select__swatch"
+            style={{
+                width: '18px',
+                height: '18px',
+                backgroundColor: props.data.hex,
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                marginRight: '8px',
+            }}
+        ></span>
         <span className="color-select__label">{props.data.label}</span>
     </div>
 );
 
 /* ===========================================================
-   Utility Functions
+   RUPIAH Formatting 
 =========================================================== */
 const formatRupiah = (angka) => {
     if (angka === null || angka === undefined || angka === '') return '';
@@ -39,7 +66,7 @@ const parseRupiah = (rupiah) => {
 };
 
 /* ===========================================================
-   Main Component
+   Komponen Utama
 =========================================================== */
 function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }) {
     const [formData, setFormData] = useState({
@@ -76,7 +103,6 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
         if (item) {
             setFormData({
                 serial_number: item.serial_number || '',
-                // PERBAIKAN 2: Gunakan status_id, bukan status
                 status_id: item.status_id || '',
                 tanggal_pembelian: item.tanggal_pembelian ? item.tanggal_pembelian.split('T')[0] : '',
                 tanggal_masuk: item.tanggal_masuk ? item.tanggal_masuk.split('T')[0] : '',
@@ -104,7 +130,6 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
         setFormData(prev => ({ ...prev, id_warna: selectedOption ? selectedOption.value : null }));
     };
 
-    // PERBAIKAN 3: Gunakan api.put() untuk update
     const handleSave = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -124,7 +149,6 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
     if (!isOpen) return null;
 
     return (
-        // PERBAIKAN 4: Standarisasi wrapper modal
         <div className="modal-backdrop-centered">
             <div className="modal-content-large">
                 <h3>Edit Detail Stok: {item?.kode_unik}</h3>
@@ -132,7 +156,6 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
                     {item?.master_barang?.nama_barang}
                 </p>
                 <form onSubmit={handleSave}>
-                    {/* PERBAIKAN 5: Gunakan layout 2 kolom (form-row2) */}
                     <div className="form-row2">
                         <div className="form-group-half">
                             <label>Serial Number</label>
@@ -161,14 +184,15 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
                         </div>
                         <div className="form-group-half">
                             <label>Warna</label>
-                            {/* PERBAIKAN 6: Sempurnakan CreatableSelect Warna */}
-                            <CreatableSelect
+                            {/* UBAH: Ganti CreatableSelect dengan Select */}
+                            <Select
                                 classNamePrefix="creatable-select"
                                 options={colorOptions}
                                 value={colorOptions.find((opt) => opt.value === formData.id_warna)}
                                 onChange={handleColorChange}
-                                placeholder="Pilih warna..."
+                                placeholder="Pilih atau cari warna..." // Placeholder disesuaikan
                                 isClearable
+                                isSearchable // Pastikan bisa dicari
                                 components={{ Option: ColorOption, SingleValue: ColorSingleValue }}
                                 styles={{
                                     control: (base) => ({ ...base, minHeight: '44px' }),

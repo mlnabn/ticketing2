@@ -355,9 +355,9 @@ export default function AdminDashboard() {
   };
 
   const updateTicketStatus = async (ticketIdentifier, newStatus) => {
-    const sourceTicketList = currentPage === 'MyTickets' 
-    ? (myTicketsData?.data || []) 
-    : ticketsOnPage;
+    const sourceTicketList = currentPage === 'MyTickets'
+      ? (myTicketsData?.data || [])
+      : ticketsOnPage;
 
     const ticket = typeof ticketIdentifier === 'object'
       ? ticketIdentifier
@@ -376,7 +376,7 @@ export default function AdminDashboard() {
       try {
         await api.patch(`/tickets/${ticket.id}/status`, { status: newStatus });
         showToast('Status tiket berhasil diupdate.', 'success');
-        fetchDashboardData(); 
+        fetchDashboardData();
         fetchMyTickets(myTicketsPage);
       } catch (e) {
         console.error('Gagal update status:', e);
@@ -594,7 +594,7 @@ export default function AdminDashboard() {
               </li>
               <li className="sidebar-nav-item">
                 <button onClick={() => setCurrentPage('stokBarang')} className={`sidebar-button ${currentPage === 'stokBarang' ? 'active' : ''}`}>
-                    <i className="fas fa-boxes"></i><span className="nav-text">Stok Barang</span>
+                  <i className="fas fa-boxes"></i><span className="nav-text">Stok Barang</span>
                 </button>
               </li>
               <li className="sidebar-nav-item">
@@ -760,28 +760,30 @@ export default function AdminDashboard() {
 
             {currentPage === 'MyTickets' && (
               <>
-                <h2 className="page-title">Tiket yang Saya Kerjakan</h2>
-                {myTicketsData && myTicketsData.data && myTicketsData.data.length > 0 ? (
-                  <>
-                    <JobList
-                      tickets={myTicketsData.data}
-                      updateTicketStatus={updateTicketStatus}
-                      deleteTicket={handleDeleteClick}
-                      userRole={userRole}
-                      onSelectionChange={handleSelectionChange}
-                      onAssignClick={handleAssignClick}
-                      onRejectClick={handleRejectClick}
-                      onProofClick={handleProofClick}
-                      showToast={showToast}
-                      onTicketClick={handleViewTicketDetail}
-                    />
-                    <Pagination currentPage={myTicketsPage} lastPage={myTicketsData.last_page} onPageChange={(page) => setMyTicketsPage(page)} />
-                  </>
-                ) : (
-                  <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
-                    <p>Anda belum bertugas untuk mengerjakan tiket apa pun.</p>
-                  </div>
-                )}
+                <div className='user-management-container'>
+                  <h1 className="page-title">Tiket yang Saya Kerjakan</h1>
+                  {myTicketsData && myTicketsData.data && myTicketsData.data.length > 0 ? (
+                    <>
+                      <JobList
+                        tickets={myTicketsData.data}
+                        updateTicketStatus={updateTicketStatus}
+                        deleteTicket={handleDeleteClick}
+                        userRole={userRole}
+                        onSelectionChange={handleSelectionChange}
+                        onAssignClick={handleAssignClick}
+                        onRejectClick={handleRejectClick}
+                        onProofClick={handleProofClick}
+                        showToast={showToast}
+                        onTicketClick={handleViewTicketDetail}
+                      />
+                      <Pagination currentPage={myTicketsPage} lastPage={myTicketsData.last_page} onPageChange={(page) => setMyTicketsPage(page)} />
+                    </>
+                  ) : (
+                    <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
+                      <p>Anda belum bertugas untuk mengerjakan tiket apa pun.</p>
+                    </div>
+                  )}
+                </div>
               </>
             )}
 
