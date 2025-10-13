@@ -56,10 +56,10 @@ export default function WelcomeHome() {
 
   return (
     <>
-      <div className="welcome-header">
+      {/* <div className="welcome-header">
         <h1>Selamat Datang, {user?.name || 'Admin'}!</h1>
         <p>Berikut adalah ringkasan aktivitas sistem saat ini.</p>
-      </div>
+      </div> */}
 
       {/* Kartu Statistik */}
       <div className="info-cards-grid">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useOutletContext } from 'react-router-dom'; 
+import { useOutletContext } from 'react-router-dom';
 import api from '../services/api';
 import Pagination from './Pagination';
 import ItemDetailModal from './ItemDetailModal';
@@ -118,7 +118,8 @@ function StokBarangView() {
                 <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>Tambah Stok</button>
             </div>
 
-            <div className="filters-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
+            {/* --- Filter Section --- */}
+            <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                 <select value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)} className="filter-select">
                     <option value="">Semua Status</option>
                     {statusOptions.map(status => (
@@ -306,11 +307,11 @@ function StokBarangView() {
                 <Pagination
                     currentPage={pagination.current_page}
                     lastPage={pagination.last_page}
-                    onPageChange={(page) => fetchData(page, { 
-                        id_kategori: selectedCategory, 
-                        id_sub_kategori: selectedSubCategory, 
-                        status_id: selectedStatus, 
-                        id_warna: selectedColor 
+                    onPageChange={(page) => fetchData(page, {
+                        id_kategori: selectedCategory,
+                        id_sub_kategori: selectedSubCategory,
+                        status_id: selectedStatus,
+                        id_warna: selectedColor
                     })}
                 />
             )}
