@@ -120,4 +120,8 @@ Route::middleware('jwt')->group(function () {
     Route::apiResource('colors', ColorController::class);
     Route::get('/colors', [ColorController::class, 'index']);
 
+    // --- Rute untuk Laporan Keuangan Inventaris ---
+    Route::get('/financial-report/inventory', [App\Http\Controllers\Api\FinancialReportController::class, 'getInventoryReport']);
+    Route::get('/financial-report/inventory/details', [App\Http\Controllers\Api\FinancialReportController::class, 'getDetailedTransactions']);
+    Route::get('/financial-report/export', [App\Http\Controllers\Api\FinancialReportController::class, 'exportReport']);
 });

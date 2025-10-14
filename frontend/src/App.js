@@ -25,6 +25,7 @@ import UserManagement from './components/UserManagement';
 import ToolManagement from './components/ToolManagement';
 import StokBarangView from './components/StokBarangView';
 import WorkshopManagement from './components/WorkshopManagement';
+import FinancialReportPage from './pages/FinancialReportPage';
 import TicketReportAdminList from './components/TicketReportAdminList';
 import ComprehensiveReportPage from './components/ComprehensiveReportPage';
 import TicketReportDetail from './components/TicketReportDetail';
@@ -90,6 +91,7 @@ export default function RootApp() {
             <Route path="inventory" element={<ToolManagement />} />
             <Route path="stock" element={<StokBarangView />} />
             <Route path="workshops" element={<WorkshopManagement />} />
+            <Route path="financial-report" element={<FinancialReportPage />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

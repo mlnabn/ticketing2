@@ -10364,6 +10364,33 @@ body.dark-mode .form-group-recover textarea:focus {
   outline: none;
 }
 
+/* tabel report financial */
+.report-table .table-section-header th {
+    background-color: var(--sidebar-bg-color);
+    color: var(--text-color);
+    padding: 0.75rem;
+    text-align: left;
+    font-size: 1rem;
+}
+
+.report-table .table-subtotal td {
+    background-color: var(--hover-bg-color);
+    border-top: 2px solid var(--border-color);
+}
+
+.report-table-container {
+  max-height: 500px; /* Perkiraan tinggi untuk sekitar 10 baris data */
+  overflow-y: auto; /* Tampilkan scrollbar vertikal HANYA jika kontennya lebih tinggi */
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-top: 1.5rem; /* Beri jarak antar tabel */
+}
+
+/* Pastikan tabel di dalamnya menggunakan lebar penuh */
+.report-table-container table {
+  width: 100%;
+}
+
 /* ============================================= */
 /* WARNA UNTUK LIGHT & DARK MODE                   */
 /* ============================================= */

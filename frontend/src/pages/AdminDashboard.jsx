@@ -95,6 +95,11 @@ export default function AdminDashboard() {
                 <i className="fas fa-boxes"></i><span className="nav-text">Stok Barang</span>
               </NavLink>
             </li>
+            <li className="sidebar-nav-item">
+              <NavLink to="/admin/financial-report" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
+                <i className="fas fa-file-invoice-dollar"></i><span className="nav-text">Laporan Keuangan</span>
+              </NavLink>
+            </li>
             <li className="sidebar-divider"><span className="nav-text">Settings</span></li>
             <li className="sidebar-nav-item">
               <NavLink to="/admin/templates" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
