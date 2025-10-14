@@ -6,6 +6,7 @@ import ItemDetailModal from './ItemDetailModal';
 import { QRCodeSVG as QRCode } from 'qrcode.react';
 import EditStokBarangModal from './EditStokBarangModal';
 import AddStockModal from './AddStockModal';
+import QrScannerModal from './QrScannerModal';
 
 function StokBarangView() {
     const { showToast } = useOutletContext();
@@ -30,6 +31,7 @@ function StokBarangView() {
     const [editItem, setEditItem] = useState(null);
     const [qrModalItem, setQrModalItem] = useState(null);
     const [isAddStockOpen, setIsAddStockOpen] = useState(false);
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
 
     const fetchData = useCallback(async (page = 1, filters = {}) => {
         setLoading(true);
@@ -76,21 +78,21 @@ function StokBarangView() {
         setEditItem(itemToEdit);
     };
 
-    const handleScanSearch = useCallback(async (serial) => {
-        if (!serial) return;
-        showToast(`Mencari: ${serial}`, 'info');
+    const handleScanSearch = useCallback(async (code) => {
+        if (!code) return;
+        showToast(`Mencari: ${code}`, 'info');
         try {
-            const res = await api.get(`/inventory/stock-items/by-serial/${serial}`);
+            const res = await api.get(`/inventory/stock-items/by-serial/${code}`);
             setDetailItem(res.data);
         } catch (error) {
-            try {
-                const res = await api.get(`/inventory/stock-items/${serial}`);
-                setDetailItem(res.data);
-            } catch (finalError) {
-                showToast(`Kode "${serial}" tidak ditemukan.`, 'error');
-            }
+            showToast(`Kode "${code}" tidak ditemukan.`, 'error');
         }
     }, [showToast]);
+
+    const handleScanSuccess = (decodedText) => {
+        setIsScannerOpen(false); 
+        handleScanSearch(decodedText);
+    };
 
     useEffect(() => {
         let barcode = '';
@@ -116,6 +118,10 @@ function StokBarangView() {
             <div className="user-management-container" style={{ marginBottom: '20px' }}>
                 <h1>Daftar Stok Unit Barang</h1>
                 <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>Tambah Stok</button>
+                <button className="btn-secondary" onClick={() => setIsScannerOpen(true)}>
+                        <i className="fas fa-qrcode" style={{marginRight: '8px'}}></i>
+                        Scan QR
+                    </button>
             </div>
 
             {/* --- Filter Section --- */}
@@ -349,6 +355,12 @@ function StokBarangView() {
 
                     </div>
                 </div>
+            )}
+            {isScannerOpen && (
+                <QrScannerModal
+                    onClose={() => setIsScannerOpen(false)}
+                    onScanSuccess={handleScanSuccess}
+                />
             )}
             <AddStockModal
                 isOpen={isAddStockOpen}
