@@ -8,7 +8,7 @@ use App\Models\StokBarang;
 use Illuminate\Support\Facades\DB;
 use App\Exports\FinancialReportExport; 
 use Maatwebsite\Excel\Facades\Excel; 
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class FinancialReportController extends Controller
 {
