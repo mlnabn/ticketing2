@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { QRCodeSVG as QRCode } from 'qrcode.react';
 import api from '../services/api';
 import EditStokBarangModal from './EditStokBarangModal';
+import HistoryModal from './HistoryModal';
 
 // --- State Awal (Tidak Berubah) ---
 const initialFormData = {
@@ -31,6 +32,7 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
     const [isLoading, setIsLoading] = useState(false);
     const [editItem, setEditItem] = useState(null);
     const [stockByColor, setStockByColor] = useState([]);
+    const [showHistory, setShowHistory] = useState(false);
 
     const getTodayDate = () => new Date().toISOString().split('T')[0];
 
@@ -304,6 +306,13 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                 </div>
 
                 <div className="modal-actions">
+                    <button
+                        onClick={() => setShowHistory(true)}
+                        className="btn-secondary" /* Sesuaikan class jika perlu */
+                        style={{ marginRight: 'auto' }}
+                    >
+                        Riwayat Barang
+                    </button>
                     {isEditing ? (
                         <>
                             <button onClick={() => setIsEditing(false)} className="btn-cancel">Batal</button>
@@ -333,6 +342,14 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                             id_sub_kategori: selectedSubCategory
                         });
                     }}
+                />
+            )}
+
+            {showHistory && (
+                <HistoryModal
+                    item={item}
+                    onClose={() => setShowHistory(false)}
+                    showToast={showToast}
                 />
             )}
         </div>

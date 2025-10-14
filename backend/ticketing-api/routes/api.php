@@ -114,12 +114,17 @@ Route::middleware('jwt')->group(function () {
     Route::get('/inventory/items/sub-category/{subCategoryId}', [MasterBarangController::class, 'filterBySubCategory']);
     Route::get('/inventory/items/{masterBarang}/stock-by-color', [MasterBarangController::class, 'getStockByColor']);
     Route::get('/inventory/stock-items/find-available/{code}', [StokBarangController::class, 'findAvailableByCode']);
+    Route::get('/inventory/stock-items/{stokBarang}/history', [StokBarangController::class, 'getHistory']);
 
     Route::get('/statuses', [StatusController::class, 'index']);
 
     Route::apiResource('colors', ColorController::class);
     Route::get('/colors', [ColorController::class, 'index']);
 
+    // --- Rute untuk Laporan Keuangan Inventaris ---
+    Route::get('/financial-report/inventory', [App\Http\Controllers\Api\FinancialReportController::class, 'getInventoryReport']);
+    Route::get('/financial-report/inventory/details', [App\Http\Controllers\Api\FinancialReportController::class, 'getDetailedTransactions']);
+    Route::get('/financial-report/export', [App\Http\Controllers\Api\FinancialReportController::class, 'exportReport']);
     Route::prefix('reports/inventory')->name('reports.inventory.')->group(function () {
         Route::get('/stats', [InventoryReportController::class, 'getStats'])->name('stats');
         Route::get('/monthly-movement', [InventoryReportController::class, 'getMonthlyMovement'])->name('movement');

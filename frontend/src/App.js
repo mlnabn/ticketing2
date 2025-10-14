@@ -27,6 +27,7 @@ import StokBarangView from './components/StokBarangView';
 import InventoryReportPage from './pages/InventoryReportPage';
 import DetailedReportPage from './components/DetailedReportPage';
 import WorkshopManagement from './components/WorkshopManagement';
+import FinancialReportPage from './pages/FinancialReportPage';
 import TicketReportAdminList from './components/TicketReportAdminList';
 import ComprehensiveReportPage from './components/ComprehensiveReportPage';
 import TicketReportDetail from './components/TicketReportDetail';
@@ -95,6 +96,7 @@ export default function RootApp() {
             <Route path="inventory-reports/incoming" element={<DetailedReportPage type="in" title="Laporan Barang Masuk" />} />
             <Route path="inventory-reports/outgoing" element={<DetailedReportPage type="out" title="Laporan Barang Keluar" />} />
             <Route path="workshops" element={<WorkshopManagement />} />
+            <Route path="financial-report" element={<FinancialReportPage />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

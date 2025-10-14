@@ -198,55 +198,83 @@ class StokBarangController extends Controller
         // Ambil nama status untuk logika switch
         $status = \App\Models\Status::find($validated['status_id']);
 
-        // Siapkan data update dasar
-        $updateData = [
-            'status_id' => $validated['status_id'],
-            'deskripsi' => $validated['deskripsi'] ?? $stokBarang->deskripsi,
-        ];
+        DB::transaction(function () use ($stokBarang, $validated, $status) {
+            // Siapkan data update dasar
+            $updateData = [
+                'status_id' => $validated['status_id'],
+                'deskripsi' => $validated['deskripsi'] ?? $stokBarang->deskripsi,
+            ];
 
-        // Logika untuk membersihkan data lama saat status berubah
-        $allTrackingColumns = [
-            'user_peminjam_id',
-            'workshop_id',
-            'tanggal_keluar',
-            'teknisi_perbaikan_id',
-            'tanggal_mulai_perbaikan',
-            'tanggal_selesai_perbaikan',
-            'user_perusak_id',
-            'tanggal_rusak',
-            'user_penghilang_id',
-            'tanggal_hilang',
-            'tanggal_ketemu',
-        ];
-        foreach ($allTrackingColumns as $col) {
-            $updateData[$col] = null;
-        }
+            // Logika untuk membersihkan data lama saat status berubah
+            $allTrackingColumns = [
+                'user_peminjam_id',
+                'workshop_id',
+                'tanggal_keluar',
+                'teknisi_perbaikan_id',
+                'tanggal_mulai_perbaikan',
+                'tanggal_selesai_perbaikan',
+                'user_perusak_id',
+                'tanggal_rusak',
+                'user_penghilang_id',
+                'tanggal_hilang',
+                'tanggal_ketemu',
+            ];
+            foreach ($allTrackingColumns as $col) {
+                $updateData[$col] = null;
+            }
 
-        // Isi data baru berdasarkan status yang dipilih
-        switch ($status->nama_status) {
-            case 'Digunakan':
-            case 'Dipinjam':
-                $updateData['user_peminjam_id'] = $validated['user_peminjam_id'];
-                $updateData['workshop_id'] = $validated['workshop_id'];
-                $updateData['tanggal_keluar'] = now();
-                break;
-            case 'Perbaikan':
-                $updateData['teknisi_perbaikan_id'] = $validated['teknisi_perbaikan_id'];
-                $updateData['tanggal_mulai_perbaikan'] = $validated['tanggal_mulai_perbaikan'];
-                $updateData['tanggal_selesai_perbaikan'] = $validated['tanggal_selesai_perbaikan'] ?? null;
-                break;
-            case 'Rusak':
-                $updateData['user_perusak_id'] = $validated['user_perusak_id'];
-                $updateData['tanggal_rusak'] = $validated['tanggal_rusak'];
-                break;
-            case 'Hilang':
-                $updateData['user_penghilang_id'] = $validated['user_penghilang_id'];
-                $updateData['tanggal_hilang'] = $validated['tanggal_hilang'];
-                $updateData['tanggal_ketemu'] = $validated['tanggal_ketemu'] ?? null;
-                break;
-        }
+            // Isi data baru berdasarkan status yang dipilih
+            switch ($status->nama_status) {
+                case 'Digunakan':
+                case 'Dipinjam':
+                    $updateData['user_peminjam_id'] = $validated['user_peminjam_id'];
+                    $updateData['workshop_id'] = $validated['workshop_id'];
+                    $updateData['tanggal_keluar'] = now();
+                    break;
+                case 'Perbaikan':
+                    $updateData['teknisi_perbaikan_id'] = $validated['teknisi_perbaikan_id'];
+                    $updateData['tanggal_mulai_perbaikan'] = $validated['tanggal_mulai_perbaikan'];
+                    $updateData['tanggal_selesai_perbaikan'] = $validated['tanggal_selesai_perbaikan'] ?? null;
+                    break;
+                case 'Rusak':
+                    $updateData['user_perusak_id'] = $validated['user_perusak_id'];
+                    $updateData['tanggal_rusak'] = $validated['tanggal_rusak'];
+                    break;
+                case 'Hilang':
+                    $updateData['user_penghilang_id'] = $validated['user_penghilang_id'];
+                    $updateData['tanggal_hilang'] = $validated['tanggal_hilang'];
+                    $updateData['tanggal_ketemu'] = $validated['tanggal_ketemu'] ?? null;
+                    break;
+            }
 
-        $stokBarang->update($updateData);
+            $stokBarang->update($updateData);
+
+            $relatedUserId = null;
+            switch ($status->nama_status) {
+                case 'Digunakan':
+                case 'Dipinjam':
+                    $relatedUserId = $validated['user_peminjam_id'] ?? null;
+                    break;
+                case 'Perbaikan':
+                    $relatedUserId = $validated['teknisi_perbaikan_id'] ?? null;
+                    break;
+                case 'Rusak':
+                    $relatedUserId = $validated['user_perusak_id'] ?? null;
+                    break;
+                case 'Hilang':
+                    $relatedUserId = $validated['user_penghilang_id'] ?? null;
+                    break;
+            }
+
+            $stokBarang->histories()->create([
+                'status_id' => $validated['status_id'],
+                'deskripsi' => $validated['deskripsi'] ?? null,
+                'triggered_by_user_id' => Auth::id(), // Admin yang mengubah status
+                'related_user_id' => $relatedUserId,  // Peminjam, teknisi, dll.
+                'workshop_id' => $validated['workshop_id'] ?? null,
+            ]);
+
+        });
 
         // Muat semua relasi baru untuk dikirim kembali ke frontend
         return response()->json($stokBarang->load([
@@ -258,6 +286,18 @@ class StokBarangController extends Controller
             'userPerusak',
             'userPenghilang'
         ]));
+    }
+
+    public function getHistory(StokBarang $stokBarang)
+    {
+        $history = $stokBarang->histories()->with([
+            'statusDetail',
+            'triggeredByUser:id,name', 
+            'relatedUser:id,name',
+            'workshop:id,name'
+        ])->get();
+
+        return response()->json($history);
     }
 
     // Helper untuk validasi custom (tambahkan ini di file yang sama)
