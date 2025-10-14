@@ -1835,10 +1835,26 @@ body.dark-mode .blue-card {
   color: #1e40af;
 }
 
+.purple-card {
+  background-color: #f3e5f5;
+  border-color: #ce93d8;
+}
 
-/* Dark Mode: Warna Teks & Ikon Berubah */
-body.dark-mode .info-card {
-  color: #F7FAFC;
+.card-icon.purple-icon {
+  background-color: #a78bfa;
+  color: #7e22ce;
+}
+
+body.dark-mode .purple-card .card-value,
+body.dark-mode .purple-card .card-change,
+body.dark-mode .purple-card .card-period,
+body.dark-mode .purple-card .card-label {
+  color: #f7ebf9;
+}
+
+body.dark-mode .red-card .card-icon {
+  background-color: #DC2626;
+  color: #FEE2E2;
 }
 
 body.dark-mode .card-label,
@@ -5606,11 +5622,12 @@ body.dark-mode .btn-pause:hover {
   background: var(--auth-bg-light);
 
 }
+
 .dark-mode .welcome-header h1 {
   background: var(--auth-bg-dark);
 }
 
-.welcome-header p{
+.welcome-header p {
   font-size: 1.1rem;
   color: #4a5568;
   margin-bottom: 2rem;
@@ -8202,7 +8219,7 @@ body.dark-mode .dashboard-card h4 {
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin-top: -10px;
+  margin-top: 5px;
   flex-wrap: wrap;
 }
 
@@ -11115,10 +11132,15 @@ body.dark-mode .btn-detail:hover {
 
 
 @media (max-width: 1200px) {
+
+  .user-management-header-report h1 {
+    font-size: 1.5rem;
+  }
+
   .welcome-header h1 {
     font-size: 1.5rem;
   }
-  
+
   .welcome-header p {
     font-size: 1rem;
   }
@@ -11126,6 +11148,7 @@ body.dark-mode .btn-detail:hover {
   .adminselect-card h1 {
     font-size: 1.5rem;
   }
+
   .user-management-container h1 {
     font-size: 1.5rem;
   }
@@ -11144,4 +11167,224 @@ body.dark-mode .btn-detail:hover {
     width: 100%;
   }
 
+}
+
+.report-page-container {
+  padding: 1rem;
+}
+
+.user-management-header-report h1 {
+  text-align: center;
+}
+
+.navigation-cards-grid-report {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/* Style untuk setiap kartu navigasi (Laporan Masuk & Laporan Keluar) */
+.nav-card-report {
+  background-color: var(--background-color-light);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color, #e0e0e0);
+  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+/* Efek hover untuk kartu navigasi */
+.nav-card-report:hover {
+  background-color: var(--hover-color, #f9f9f9);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Style untuk ikon di dalam kartu navigasi */
+.nav-card-report-icon {
+  font-size: 2.5rem;
+  color: var(--primary-color-dark, #0056b3);
+  /* Menggunakan variabel warna jika ada */
+  width: 60px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Kontainer untuk teks (judul dan deskripsi) */
+.nav-card-report-content h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  color: var(--text-color-primary);
+}
+
+.nav-card-report-content p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+  line-height: 1.5;
+}
+
+/* Penyesuaian untuk Dark Mode */
+.dark-mode .nav-card-report {
+  background-color: var(--background-color-dark-accent, #2c2c2c);
+  border-color: var(--border-color-dark, #444);
+}
+
+.dark-mode .nav-card-report:hover {
+  background-color: var(--hover-color-dark, #383838);
+}
+
+/* Indikator Tren pada Info Card */
+.card-trend {
+  font-size: 0.8rem;
+  margin-top: 5px;
+  font-weight: 500;
+}
+
+.card-trend .fas {
+  margin-right: 4px;
+}
+
+.trend-up {
+  color: #4CAF50;
+}
+
+/* Hijau */
+.trend-down {
+  color: #F44336;
+}
+
+/* Merah */
+.trend-stable {
+  color: var(--text-color-secondary);
+}
+
+
+/* Header untuk Chart (Judul + Filter Tahun) */
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.chart-header h4 {
+  margin: 0;
+}
+
+.year-filter {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #ccc);
+  background-color: var(--background-color-light);
+  color: var(--text-color-primary);
+  cursor: pointer;
+  width: 100px;
+}
+
+.dark-mode .year-filter {
+  background-color: var(--background-color-dark-accent);
+  border-color: #555;
+}
+
+/* Widget untuk Barang Paling Aktif */
+.most-active-widget {
+  margin-top: 2rem;
+}
+
+
+.active-items-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.active-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color, #eee);
+}
+
+.active-items-list li:last-child .active-item {
+  border-bottom: none;
+}
+
+.item-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.item-rank {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--text-color-secondary);
+  width: 20px;
+  text-align: center;
+}
+
+.active-items-list .item-name {
+  font-weight: 500;
+  color: var(--text-color-primary);
+}
+
+.item-count {
+  font-weight: bold;
+  font-size: 1.1rem;
+  background-color: var(--hover-color);
+  padding: 4px 10px;
+  border-radius: 15px;
+}
+
+.dark-mode .active-item {
+  border-color: #444;
+}
+
+.dark-mode .item-count {
+  background-color: #383838;
+}
+
+/* ============================================= */
+/* Styling untuk Fitur Baru di Halaman Laporan Detail */
+/* ============================================= */
+
+
+.filters-container.report-filters {
+  display: flex;
+  flex-wrap: wrap;
+  /* Agar responsif di layar kecil */
+  gap: 1rem;
+  align-items: center;
+}
+
+.filter-search-input {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 6px;
+  min-width: 250px;
+  flex-grow: 1;
+  /* Agar memenuhi sisa ruang */
+}
+
+/* Kontainer untuk Paginasi dan Ringkasan */
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.pagination-summary {
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
 }

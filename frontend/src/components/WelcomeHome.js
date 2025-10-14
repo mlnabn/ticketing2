@@ -11,7 +11,7 @@ import MapComponent from './MapComponent';
 import CalendarComponent from './CalendarComponent';
 
 export default function WelcomeHome() {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const { showToast } = useOutletContext();
   const navigate = useNavigate(); 
 

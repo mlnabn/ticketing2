@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\SubKategoriController;
 use App\Http\Controllers\Api\MasterBarangController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\ColorController;
+use App\Http\Controllers\Api\InventoryReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -124,4 +125,11 @@ Route::middleware('jwt')->group(function () {
     Route::get('/financial-report/inventory', [App\Http\Controllers\Api\FinancialReportController::class, 'getInventoryReport']);
     Route::get('/financial-report/inventory/details', [App\Http\Controllers\Api\FinancialReportController::class, 'getDetailedTransactions']);
     Route::get('/financial-report/export', [App\Http\Controllers\Api\FinancialReportController::class, 'exportReport']);
+    Route::prefix('reports/inventory')->name('reports.inventory.')->group(function () {
+        Route::get('/stats', [InventoryReportController::class, 'getStats'])->name('stats');
+        Route::get('/monthly-movement', [InventoryReportController::class, 'getMonthlyMovement'])->name('movement');
+        Route::get('/detailed', [InventoryReportController::class, 'getDetailedReport'])->name('detailed');
+        Route::get('/dashboard', [InventoryReportController::class, 'getDashboardData'])->name('dashboard');
+        Route::get('/export', [InventoryReportController::class, 'exportReport'])->name('export');
+    });
 });
