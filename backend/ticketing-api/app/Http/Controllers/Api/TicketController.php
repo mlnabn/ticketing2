@@ -15,12 +15,13 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Maatwebsite\Excel\Facades\Excel;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\TicketsExport;
 use Illuminate\Validation\ValidationException;
 use App\Models\MasterBarang;
 use App\Models\StokBarang;
 use Illuminate\Support\Facades\Log;
+
 
 class TicketController extends Controller
 {

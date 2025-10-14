@@ -95,6 +95,11 @@ export default function AdminDashboard() {
                 <i className="fas fa-boxes"></i><span className="nav-text">Stok Barang</span>
               </NavLink>
             </li>
+            <li className="sidebar-nav-item">
+              <NavLink to="/admin/inventory-reports" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
+                <i className="fas fa-chart-line"></i><span className="nav-text">Laporan Inventory</span>
+              </NavLink>
+            </li>
             <li className="sidebar-divider"><span className="nav-text">Settings</span></li>
             <li className="sidebar-nav-item">
               <NavLink to="/admin/templates" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
@@ -114,27 +119,27 @@ export default function AdminDashboard() {
 
       <main className="main-content">
         <header className="main-header">
-            <div className="header-left-group">
-              <button className="hamburger-menu-button" onClick={toggleSidebar}><span /><span /><span /></button>
-              <h1 className="dashboard-header-title">Admin Dashboard</h1>
-            </div>
-            <div className="admin-user-info-container">
-              <div className="user-info">
-                <button onClick={toggleDarkMode} className="theme-toggle-button" aria-label="Toggle Dark Mode">
-                  {darkMode ? <i className="fas fa-sun"></i> : <i className="fas fa-moon"></i>}
-                </button>
-                <div className="user-profile-clickable" onClick={() => setIsAdminDropdownOpen(!isAdminDropdownOpen)}>
-                  <div className="user-avatar"><FaUser /></div>
-                  <span><strong>{userName || "User"}</strong></span>
-                </div>
+          <div className="header-left-group">
+            <button className="hamburger-menu-button" onClick={toggleSidebar}><span /><span /><span /></button>
+            <h1 className="dashboard-header-title">Admin Dashboard</h1>
+          </div>
+          <div className="admin-user-info-container">
+            <div className="user-info">
+              <button onClick={toggleDarkMode} className="theme-toggle-button" aria-label="Toggle Dark Mode">
+                {darkMode ? <i className="fas fa-sun"></i> : <i className="fas fa-moon"></i>}
+              </button>
+              <div className="user-profile-clickable" onClick={() => setIsAdminDropdownOpen(!isAdminDropdownOpen)}>
+                <div className="user-avatar"><FaUser /></div>
+                <span><strong>{userName || "User"}</strong></span>
               </div>
-              {isAdminDropdownOpen && (
-                <>
-                  <div className="dropdown-overlay" onClick={() => setIsAdminDropdownOpen(false)}></div>
-                  <div className="admin-dropdown"><button onClick={handleLogout}><i className="fas fa-sign-out-alt"></i><span>Logout</span></button></div>
-                </>
-              )}
             </div>
+            {isAdminDropdownOpen && (
+              <>
+                <div className="dropdown-overlay" onClick={() => setIsAdminDropdownOpen(false)}></div>
+                <div className="admin-dropdown"><button onClick={handleLogout}><i className="fas fa-sign-out-alt"></i><span>Logout</span></button></div>
+              </>
+            )}
+          </div>
         </header>
         <div className="content-area">
           <Outlet context={{ showToast }} />

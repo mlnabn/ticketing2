@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\SubKategoriController;
 use App\Http\Controllers\Api\MasterBarangController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\ColorController;
+use App\Http\Controllers\Api\InventoryReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -119,4 +120,11 @@ Route::middleware('jwt')->group(function () {
     Route::apiResource('colors', ColorController::class);
     Route::get('/colors', [ColorController::class, 'index']);
 
+    Route::prefix('reports/inventory')->name('reports.inventory.')->group(function () {
+        Route::get('/stats', [InventoryReportController::class, 'getStats'])->name('stats');
+        Route::get('/monthly-movement', [InventoryReportController::class, 'getMonthlyMovement'])->name('movement');
+        Route::get('/detailed', [InventoryReportController::class, 'getDetailedReport'])->name('detailed');
+        Route::get('/dashboard', [InventoryReportController::class, 'getDashboardData'])->name('dashboard');
+        Route::get('/export', [InventoryReportController::class, 'exportReport'])->name('export');
+    });
 });
