@@ -17,20 +17,27 @@ function QrScannerModal({ onClose, onScanSuccess }) {
         );
 
         const handleSuccess = (decodedText, decodedResult) => {
-            scanner.clear(); 
+            scanner.clear().catch(err => {
+                console.error("Gagal membersihkan scanner setelah sukses scan:", err);
+            });
+            
+            // 2. Lanjutkan untuk menampilkan hasil scan.
             onScanSuccess(decodedText);
         };
 
         const handleError = (error) => {
+            if (error.includes("NotFoundException")) {
+                return;
+            }
             showToast(`Error scanning QR Code: ${error}`, 'error');
         };
 
         scanner.render(handleSuccess, handleError);
 
         return () => {
-            if (scanner && scanner.getState() !== 1) { 
-                 scanner.clear().catch(err => console.error("Gagal membersihkan scanner", err));
-            }
+            scanner.clear().catch(err => {
+                console.error("Gagal membersihkan scanner saat unmount:", err);
+            });
         };
     }, [onScanSuccess, showToast]);
 

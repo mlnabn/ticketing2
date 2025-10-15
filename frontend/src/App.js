@@ -18,13 +18,16 @@ import AboutPage from './components/AboutUsPage';
 import FeaturesPage from './components/FeaturesPage';
 import FAQPage from './components/FAQPage';
 
+
 // Komponen Halaman di dalam AdminDashboard
+import FinancialReportPage from './pages/FinancialReportPage';
+import InventoryReportPage from './pages/InventoryReportPage';
+
 import WelcomeHome from './components/WelcomeHome';
 import JobList from './components/JobList';
 import UserManagement from './components/UserManagement';
 import ToolManagement from './components/ToolManagement';
 import StokBarangView from './components/StokBarangView';
-import InventoryReportPage from './pages/InventoryReportPage';
 import DetailedReportPage from './components/DetailedReportPage';
 import WorkshopManagement from './components/WorkshopManagement';
 
@@ -34,7 +37,6 @@ import TicketReportDetail from './components/TicketReportDetail';
 import NotificationForm from './components/NotificationForm';
 import NotificationTemplateManagement from './components/NotificationTemplateManagement';
 
-import FinancialReportPage from './components/FinancialReportPage';
 import NewAcquisitionsReport from './components/NewAcquisitionsReport';
 import ProblematicAssetsReport from './components/ProblematicAssetsReport';
 

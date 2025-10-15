@@ -1,5 +1,5 @@
 // import { Link } from 'react-router-dom';
-import { useFinancialReport } from '../pages/useFinancialReport'; // Import custom hook
+import { useFinancialReport } from './useFinancialReport'; // Import custom hook
 
 export default function NewAcquisitionsReport() {
     // Gunakan hook untuk mendapatkan semua state dan logika

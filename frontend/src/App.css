@@ -10198,6 +10198,25 @@ body.dark-mode .form-group-recover textarea:focus {
   margin-top: 1.5rem;
 }
 
+.btn-whatsapp {
+    background-color: #25D366; /* Warna hijau khas WhatsApp */
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-whatsapp:hover {
+    background-color: #1EBE57; /* Warna hijau sedikit lebih gelap saat hover */
+    transform: translateY(-2px);
+}
+
 /* ============================================= */
 /* === STYLE UNTUK MEMBATASI TEKS 2 BARIS === */
 /* ============================================= */
