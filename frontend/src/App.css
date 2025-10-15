@@ -490,7 +490,7 @@ body.dark-mode .dashboard-container {
   display: flex;
   flex-direction: column;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
+  /* overflow-y: auto; */
   /* Scroll jika konten melebihi tinggi */
 }
 
@@ -1200,12 +1200,40 @@ body.dark-mode .sidebar-header {
 .sidebar-nav {
   flex: 1 1 0%;
   padding: 1rem;
+  overflow-y: auto; 
   white-space: nowrap;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .sidebar-nav-item {
   margin-bottom: 0.5rem;
+}
+
+/* === GLOBAL MODERN SCROLLBAR STYLE === */
+
+::-webkit-scrollbar {
+  width: 8px; 
+  height: 8px; 
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #4A5568; 
+  border-radius: 10px; 
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #64748B; 
+}
+
+* {
+  scrollbar-width: thin; 
+  scrollbar-color: #4A5568 transparent; 
 }
 
 .sidebar-button {
