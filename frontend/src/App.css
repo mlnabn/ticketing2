@@ -10389,6 +10389,62 @@ body.dark-mode .form-group-recover textarea:focus {
     color: var(--text-color-secondary) !important;
 }
 
+/* 1. Sembunyikan area cetak dari tampilan normal */
+#print-area {
+    display: none;
+}
+
+/* 2. Aturan yang HANYA berlaku saat mencetak */
+@media print {
+    /* Sembunyikan HANYA root aplikasi utama */
+    body > #root {
+        display: none;
+    }
+
+    /* Tampilkan area cetak dan atur posisinya */
+    #print-area {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+    /* Styling untuk item di lembar cetak (TIDAK BERUBAH) */
+    .print-sheet {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10mm;
+    }
+
+    .qr-print-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #ccc;
+        padding: 5px;
+        border-radius: 4px;
+        width: calc(50% - 5px);
+        box-sizing: border-box;
+    }
+
+    .qr-print-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .item-name {
+        font-weight: bold;
+        font-size: 10pt;
+    }
+
+    .item-code {
+        font-size: 8pt;
+        color: #555;
+    }
+}
+
 /* --- Gaya saat dropdown difokuskan --- */
 .filter-select-invent:focus {
   outline: none;

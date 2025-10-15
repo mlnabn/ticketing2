@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Select from 'react-select';
 import api from '../services/api';
+import QrPrintSheet from './QrPrintSheet';
 
 /* ===========================================================
    Custom Components for Color Select (MODIFIED)
@@ -125,6 +127,9 @@ const useScannerListener = (onScan, isOpen) => {
    Main Component
 =========================================================== */
 function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
+    const [view, setView] = useState('form');
+    const [newlyCreatedItems, setNewlyCreatedItems] = useState([]);
+    const printRef = useRef();
     const [formData, setFormData] = useState(initialFormState);
     const [displayHarga, setDisplayHarga] = useState('');
     const [masterBarangOptions, setMasterBarangOptions] = useState([]);
@@ -191,21 +196,17 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
         setActiveSerialIndex(0);
     }, [isOpen]);
 
-    /* ---------------- Update Serial Inputs ---------------- */
-    // useEffect(() => {
-    //     const count = parseInt(formData.jumlah, 10) || 0;
-    //     const newSerials = Array(count).fill('');
-
-    //     for (let i = 0; i < Math.min(count, formData.serial_numbers.length); i++) {
-    //         newSerials[i] = formData.serial_numbers[i];
-    //     }
-
-    //     setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
-
-    //     if (activeSerialIndex >= count) {
-    //         setActiveSerialIndex(Math.max(0, count - 1));
-    //     }
-    // }, [formData.jumlah, formData.serial_numbers, activeSerialIndex]);
+    const handleCloseAndReset = () => {
+        onClose();
+        // Reset state setelah modal tertutup untuk menghindari flicker
+        setTimeout(() => {
+            setView('form');
+            setFormData(initialFormState);
+            setDisplayHarga('');
+            setNewlyCreatedItems([]);
+            setActiveSerialIndex(0);
+        }, 300); // 300ms = durasi animasi fade-out
+    };
 
     useEffect(() => {
         const count = parseInt(formData.jumlah, 10) || 0;
@@ -264,16 +265,20 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
         }));
     };
 
+    const handlePrint = () => {
+        window.print();
+    };
+
     /* ---------------- Submit ---------------- */
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-
         try {
-            await api.post('/inventory/stock-items', formData);
+            const response = await api.post('/inventory/stock-items', formData);
+            setNewlyCreatedItems(response.data);
+            setView('success');
             showToast('Stok baru berhasil ditambahkan.', 'success');
-            onSaveSuccess();
-            onClose();
+            onSaveSuccess(); 
         } catch (error) {
             showToast(error.response?.data?.message || 'Gagal menambah stok.', 'error');
         } finally {
@@ -286,127 +291,125 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
 
     return (
         <>
-            <div className="modal-backdrop-centered">
-                <div className="modal-content-large">
-                    <h3>Tambah Stok Barang</h3>
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group-half">
-                            <label>Pilih Barang (SKU)</label>
-                            <Select
-                                classNamePrefix="creatable-select"
-                                options={masterBarangOptions}
-                                onChange={handleSelectChange}
-                                placeholder="Cari nama atau kode barang..."
-                                isClearable
-                            />
-                        </div>
-
-                        {/* Jumlah & Harga */}
-                        <div className="form-row2">
-                            <div className="form-group-half">
-                                <label>Jumlah</label>
-                                <input
-                                    type="number"
-                                    name="jumlah"
-                                    value={formData.jumlah}
-                                    onChange={handleChange}
-                                    min="1"
-                                    required
-                                />
-                            </div>
-                            <div className="form-group-half">
-                                <label>Harga Beli Satuan (Rp)</label>
-                                <input
-                                    type="text"
-                                    name="harga_beli"
-                                    value={displayHarga}
-                                    onChange={handleChange}
-                                    placeholder="Contoh: 1500000"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        {/* Kondisi & Warna */}
-                        <div className="form-row2">
-                            <div className="form-group-half">
-                                <label>Kondisi</label>
-                                <select name="kondisi" value={formData.kondisi} onChange={handleChange}>
-                                    <option value="Baru">Baru</option>
-                                    <option value="Bekas">Bekas</option>
-                                </select>
-                            </div>
-                            <div className="form-group-half">
-                                <label>Warna</label>
-                                {/* UBAH: Ganti CreatableSelect menjadi Select biasa */}
-                                <Select
-                                    classNamePrefix="creatable-select"
-                                    options={colorOptions}
-                                    value={colorOptions.find((opt) => opt.value === formData.id_warna)}
-                                    onChange={handleColorChange}
-                                    placeholder="Cari warna..."
-                                    isClearable
-                                    isSearchable
-                                    components={{ Option: ColorOption, SingleValue: ColorSingleValue }}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Tanggal */}
-                        <div className="form-row2">
-                            <div className="form-group-half">
-                                <label>Tanggal Pembelian</label>
-                                <input
-                                    type="date"
-                                    name="tanggal_pembelian"
-                                    value={formData.tanggal_pembelian}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="form-group-half">
-                                <label>Tanggal Masuk</label>
-                                <input
-                                    type="date"
-                                    name="tanggal_masuk"
-                                    value={formData.tanggal_masuk}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        {/* Serial Numbers */}
-                        <div className="form-group full">
-                            <label>Serial Number (Bisa di-scan)</label>
-                            <div className="serial-number-container">
-                                {formData.serial_numbers.map((sn, index) => (
-                                    <input
-                                        key={index}
-                                        ref={(el) => (serialInputRefs.current[index] = el)}
-                                        type="text"
-                                        placeholder={`S/N #${index + 1}`}
-                                        value={sn}
-                                        onChange={(e) => handleSerialChange(index, e.target.value)}
-                                        onClick={() => setActiveSerialIndex(index)}
-                                        className={`serial-number-input ${index === activeSerialIndex ? 'active-scan' : ''
-                                            }`}
+            <div className="modal-backdrop-centered" onClick={handleCloseAndReset}>
+                <div className="modal-content-large" onClick={e => e.stopPropagation()}>
+                    {view === 'form' && (
+                        <>
+                            <h3>Tambah Stok Barang</h3>
+                            <form onSubmit={handleSubmit}>
+                                <div className="form-group-half">
+                                    <label>Pilih Barang (SKU)</label>
+                                    <Select classNamePrefix="creatable-select" 
+                                    options={masterBarangOptions} 
+                                    onChange={handleSelectChange} 
+                                    placeholder="Cari nama atau kode barang..." 
+                                    isClearable 
                                     />
-                                ))}
+                                </div>
+                                <div className="form-row2">
+                                    <div className="form-group-half"> 
+                                        <label>Jumlah</label> 
+                                        <input type="number" name="jumlah" 
+                                            value={formData.jumlah} 
+                                            onChange={handleChange} 
+                                            min="1" 
+                                            required 
+                                        /> 
+                                    </div>
+                                    <div className="form-group-half"> 
+                                        <label>Harga Beli Satuan (Rp)</label> 
+                                        <input type="text" name="harga_beli" 
+                                            value={displayHarga} 
+                                            onChange={handleChange} 
+                                            placeholder="Contoh: 1500000" 
+                                            required 
+                                        /> 
+                                    </div>
+                                </div>
+                                <div className="form-row2">
+                                    <div className="form-group-half"> 
+                                        <label>Kondisi</label> 
+                                        <select name="kondisi" value={formData.kondisi} onChange={handleChange}> 
+                                            <option value="Baru">Baru</option> <option value="Bekas">Bekas</option> 
+                                        </select> 
+                                    </div>
+                                    <div className="form-group-half"> 
+                                        <label>Warna</label> 
+                                        <Select classNamePrefix="creatable-select" 
+                                            options={colorOptions} 
+                                            value={colorOptions.find((opt) => opt.value === formData.id_warna)} 
+                                            onChange={handleColorChange} 
+                                            placeholder="Cari warna..." 
+                                            isClearable 
+                                            isSearchable 
+                                            components={{ Option: ColorOption, SingleValue: ColorSingleValue }}
+                                         /> 
+                                    </div>
+                                </div>
+                                <div className="form-row2">
+                                    <div className="form-group-half"> 
+                                        <label>Tanggal Pembelian</label> 
+                                        <input type="date" name="tanggal_pembelian" 
+                                            value={formData.tanggal_pembelian} 
+                                            onChange={handleChange} 
+                                        /> 
+                                    </div>
+                                    <div className="form-group-half"> 
+                                        <label>Tanggal Masuk</label> 
+                                        <input type="date" name="tanggal_masuk" 
+                                            value={formData.tanggal_masuk} 
+                                            onChange={handleChange} 
+                                            required 
+                                        /> 
+                                    </div>
+                                </div>
+                                <div className="form-group full">
+                                    <label>Serial Number (Bisa di-scan)</label>
+                                    <div className="serial-number-container">
+                                        {formData.serial_numbers.map((sn, index) => ( 
+                                            <input key={index} ref={(el) => (serialInputRefs.current[index] = el)} 
+                                                type="text" placeholder={`S/N #${index + 1}`} 
+                                                value={sn} 
+                                                onChange={(e) => handleSerialChange(index, e.target.value)} 
+                                                onClick={() => setActiveSerialIndex(index)} 
+                                                className={`serial-number-input ${index === activeSerialIndex ? 'active-scan' : ''}`} 
+                                            /> 
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="confirmation-modal-actions">
+                                    <button type="button" onClick={handleCloseAndReset} className="btn-cancel">Batal</button>
+                                    <button type="submit" className="btn-confirm" disabled={isLoading}>Simpan</button>
+                                </div>
+                            </form>
+                        </>
+                    )}
+
+                    {view === 'success' && (
+                        <div className="success-view" style={{ textAlign: 'center', padding: '20px' }}>
+                            <h3>Stok Berhasil Ditambahkan!</h3>
+                            <p>{newlyCreatedItems.length} unit barang baru telah ditambahkan ke inventaris.</p>
+                            <p style={{ marginTop: '20px' }}>Anda bisa langsung mencetak label QR Code untuk ditempelkan pada unit barang.</p>
+                            
+                            <div className="confirmation-modal-actions" style={{ marginTop: '30px' }}>
+                                <button onClick={handleCloseAndReset} className="btn-cancel">Tutup</button>
+                                <button onClick={handlePrint} className="btn-confirm">
+                                    <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
+                                    Print QR Codes
+                                </button>
                             </div>
                         </div>
-
-                        {/* Tombol Aksi */}
-                        <div className="confirmation-modal-actions">
-                            <button type="button" onClick={onClose} className="btn-cancel">
-                                Batal
-                            </button>
-                            <button type="submit" className="btn-confirm" disabled={isLoading}>
-                                Simpan
-                            </button>
-                        </div>
-                    </form>
+                    )}
                 </div>
             </div>
+
+            {createPortal(
+                <QrPrintSheet ref={printRef} items={newlyCreatedItems} />,
+                document.getElementById('print-portal')
+            )}
+
+            {/* --- KOMPONEN PRINT DITEMPATKAN DI SINI (TIDAK TERLIHAT DI LAYAR) --- */}
+            <QrPrintSheet ref={printRef} items={newlyCreatedItems} />
         </>
     );
 }

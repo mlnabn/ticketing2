@@ -123,10 +123,12 @@ class StokBarangController extends Controller
 
         $masterBarang = MasterBarang::find($validated['master_barang_id']);
 
-        DB::transaction(function () use ($validated, $masterBarang) {
+        $createdItems = [];
+
+        DB::transaction(function () use ($validated, $masterBarang, &$createdItems) {
             $statusTersediaId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
             for ($i = 0; $i < $validated['jumlah']; $i++) {
-                StokBarang::create([
+                $newItem = StokBarang::create([
                     'master_barang_id' => $masterBarang->id_m_barang,
                     'kode_unik' => $this->generateUniqueStokCode($masterBarang),
                     'serial_number' => $validated['serial_numbers'][$i] ?? null,
@@ -138,10 +140,12 @@ class StokBarangController extends Controller
                     'tanggal_masuk' => $validated['tanggal_masuk'] ?? now(),
                     'created_by' => auth()->id()
                 ]);
+                
+                $createdItems[] = $newItem->load('masterBarang');
             }
         });
 
-        return response()->json(['message' => 'Stok berhasil ditambahkan.'], 201);
+        return response()->json($createdItems, 201);
     }
 
     private function generateUniqueStokCode(MasterBarang $masterBarang): string
