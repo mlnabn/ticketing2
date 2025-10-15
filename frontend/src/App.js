@@ -27,12 +27,16 @@ import StokBarangView from './components/StokBarangView';
 import InventoryReportPage from './pages/InventoryReportPage';
 import DetailedReportPage from './components/DetailedReportPage';
 import WorkshopManagement from './components/WorkshopManagement';
-import FinancialReportPage from './pages/FinancialReportPage';
+
 import TicketReportAdminList from './components/TicketReportAdminList';
 import ComprehensiveReportPage from './components/ComprehensiveReportPage';
 import TicketReportDetail from './components/TicketReportDetail';
 import NotificationForm from './components/NotificationForm';
 import NotificationTemplateManagement from './components/NotificationTemplateManagement';
+
+import FinancialReportPage from './components/FinancialReportPage';
+import NewAcquisitionsReport from './components/NewAcquisitionsReport';
+import ProblematicAssetsReport from './components/ProblematicAssetsReport';
 
 // Route Guards
 import RequireAuth from './routes/RequireAuth';
@@ -99,6 +103,8 @@ export default function RootApp() {
             <Route path="inventory-reports/accountability" element={<DetailedReportPage type="accountability" title="Laporan Barang Hilang & Rusak" />} />
             <Route path="workshops" element={<WorkshopManagement />} />
             <Route path="financial-report" element={<FinancialReportPage />} />
+            <Route path="financial-report/new-acquisitions" element={<NewAcquisitionsReport />} />
+            <Route path="financial-report/problematic-assets" element={<ProblematicAssetsReport />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
