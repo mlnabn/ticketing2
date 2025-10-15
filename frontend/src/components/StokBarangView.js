@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import Pagination from './Pagination';
 import ItemDetailModal from './ItemDetailModal';
@@ -15,6 +16,8 @@ function StokBarangView() {
     const [items, setItems] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
 
     // State untuk filter
     const [categories, setCategories] = useState([]);
@@ -68,10 +71,11 @@ function StokBarangView() {
             id_kategori: selectedCategory,
             id_sub_kategori: selectedSubCategory,
             status_id: selectedStatus,
-            id_warna: selectedColor
+            id_warna: selectedColor,
+            search: debouncedSearchTerm,
         };
         fetchData(1, filters);
-    }, [selectedCategory, selectedSubCategory, selectedStatus, selectedColor, fetchData]);
+    }, [selectedCategory, selectedSubCategory, selectedStatus, selectedColor, debouncedSearchTerm, fetchData]);
 
     const handleOpenEditModal = (itemToEdit) => {
         setDetailItem(null);
@@ -150,6 +154,13 @@ function StokBarangView() {
                         <option key={color.id_warna} value={color.id_warna}>{color.nama_warna}</option>
                     ))}
                 </select>
+                <input
+                    type="text"
+                    placeholder="Cari apa saja..."
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    className="filter-search-input"
+                />
             </div>
             <div className="job-list-container">
                 {/* ======================================================= */}

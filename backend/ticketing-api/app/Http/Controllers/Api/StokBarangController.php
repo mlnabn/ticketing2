@@ -49,6 +49,25 @@ class StokBarangController extends Controller
         if ($request->filled('id_warna')) {
             $query->where('id_warna', $request->id_warna);
         }
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                // Cari di kolom tabel stok_barangs
+                $q->where('kode_unik', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('serial_number', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('kondisi', 'LIKE', "%{$searchTerm}%");
+
+                // Cari di relasi masterBarang (untuk nama barang)
+                $q->orWhereHas('masterBarang', function ($q2) use ($searchTerm) {
+                    $q2->where('nama_barang', 'LIKE', "%{$searchTerm}%");
+                });
+
+                // Cari di relasi createdBy (untuk nama admin)
+                $q->orWhereHas('createdBy', function ($q3) use ($searchTerm) {
+                    $q3->where('name', 'LIKE', "%{$searchTerm}%");
+                });
+            });
+        }
 
         return $query->latest()->paginate(25);
     }
