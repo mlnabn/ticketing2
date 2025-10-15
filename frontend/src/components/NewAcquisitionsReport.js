@@ -46,9 +46,9 @@ export default function NewAcquisitionsReport() {
                 )}
                 {filterType === 'date_range' && (
                     <>
-                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select" />
+                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" />
                         <span style={{ alignSelf: 'center' }}>-</span>
-                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select" />
+                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
                     </>
                 )}
             </div>

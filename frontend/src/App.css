@@ -1200,7 +1200,7 @@ body.dark-mode .sidebar-header {
 .sidebar-nav {
   flex: 1 1 0%;
   padding: 1rem;
-  overflow-y: auto; 
+  overflow-y: auto;
   white-space: nowrap;
   overflow-x: hidden;
 }
@@ -1212,8 +1212,8 @@ body.dark-mode .sidebar-header {
 /* === GLOBAL MODERN SCROLLBAR STYLE === */
 
 ::-webkit-scrollbar {
-  width: 8px; 
-  height: 8px; 
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -1221,19 +1221,19 @@ body.dark-mode .sidebar-header {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #4A5568; 
-  border-radius: 10px; 
+  background-color: #4A5568;
+  border-radius: 10px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #64748B; 
+  background-color: #64748B;
 }
 
 * {
-  scrollbar-width: thin; 
-  scrollbar-color: #4A5568 transparent; 
+  scrollbar-width: thin;
+  scrollbar-color: #4A5568 transparent;
 }
 
 .sidebar-button {
@@ -4381,6 +4381,7 @@ body.dark-mode .password-toggle-btn:hover {
   transform: scale(1.02);
 }
 
+.btn-history,
 .btn-confirm,
 .btn-cancel {
   flex: 1;
@@ -5042,6 +5043,42 @@ body.dark-mode .notification-form-container label {
   cursor: not-allowed;
 }
 
+.btn-scan {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background-color: #d1e7dd;
+  color: #0f5132;
+  margin-left: 8px;
+}
+
+.btn-scan:hover {
+  background-color: #bce3c9;
+  transform: scale(1);
+}
+
+.btn-scan:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+body.dark-mode .btn-scan {
+  background-color: #22c55e;
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(34, 197, 94, 0.25);
+}
+
+body.dark-mode .btn-scan:hover {
+  background-color: #16a34a;
+  /* Warna hover yang lebih gelap */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
+}
+
 /* ===== Feedback Message ===== */
 .feedback-message {
   margin-top: 12px;
@@ -5050,6 +5087,17 @@ body.dark-mode .notification-form-container label {
   color: #10b981;
   /* hijau sukses */
 }
+
+.btn-history {
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+.btn-hover {
+  background-color: #059669;
+  color: #ffffff;
+}
+
 
 /* =========================
    LIGHT THEME (default)
@@ -8972,7 +9020,6 @@ body.dark-mode .dashboard-card h4 {
   width: 50px;
   height: 50px;
   min-width: 50px;
-  /* Agar tidak gepeng saat nama panjang */
   border-radius: 50%;
   background-color: var(--primary-color-light);
   color: var(--primary-color);
@@ -8987,6 +9034,10 @@ body.dark-mode .dashboard-card h4 {
   color: #f0f0f0;
 }
 
+.admin-card .info {
+  flex: 1;
+  overflow: hidden;
+}
 .admin-card .info h3 {
   font-size: 1.1rem;
   color: var(--text-primary);
@@ -8998,6 +9049,10 @@ body.dark-mode .dashboard-card h4 {
   font-size: 0.85rem;
   color: var(--text-secondary);
   margin: 0.1rem 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
 /* ======================================================= */
@@ -10439,58 +10494,59 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* 1. Sembunyikan area cetak dari tampilan normal */
 #print-area {
-    display: none;
+  display: none;
 }
 
 /* 2. Aturan yang HANYA berlaku saat mencetak */
 @media print {
-    /* Sembunyikan HANYA root aplikasi utama */
-    body > #root {
-        display: none;
-    }
 
-    /* Tampilkan area cetak dan atur posisinya */
-    #print-area {
-        display: block;
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-    }
+  /* Sembunyikan HANYA root aplikasi utama */
+  body>#root {
+    display: none;
+  }
 
-    /* Styling untuk item di lembar cetak (TIDAK BERUBAH) */
-    .print-sheet {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        padding: 10mm;
-    }
+  /* Tampilkan area cetak dan atur posisinya */
+  #print-area {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
 
-    .qr-print-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        border: 1px solid #ccc;
-        padding: 5px;
-        border-radius: 4px;
-        width: calc(50% - 5px);
-        box-sizing: border-box;
-    }
+  /* Styling untuk item di lembar cetak (TIDAK BERUBAH) */
+  .print-sheet {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10mm;
+  }
 
-    .qr-print-details {
-        display: flex;
-        flex-direction: column;
-    }
+  .qr-print-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 4px;
+    width: calc(50% - 5px);
+    box-sizing: border-box;
+  }
 
-    .item-name {
-        font-weight: bold;
-        font-size: 10pt;
-    }
+  .qr-print-details {
+    display: flex;
+    flex-direction: column;
+  }
 
-    .item-code {
-        font-size: 8pt;
-        color: #555;
-    }
+  .item-name {
+    font-weight: bold;
+    font-size: 10pt;
+  }
+
+  .item-code {
+    font-size: 8pt;
+    color: #555;
+  }
 }
 
 /* --- Gaya saat dropdown difokuskan --- */
@@ -11589,6 +11645,117 @@ body.dark-mode .btn-detail:hover {
   background-color: #e9ecef !important;
 }
 
+/* ========================================================= */
+/* GAYA UNTUK INPUT TANGGAL FILTER (.filter-select-date) */
+/* ========================================================= */
+
+/* --- 1. Gaya Dasar untuk Kotak Input --- */
+.filter-select-date {
+  /* Menghilangkan tampilan default browser */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* Dimensi dan Teks */
+  position: relative;
+  height: 44px;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  font-family: inherit;
+  /* Pastikan font konsisten */
+  border-radius: 8px;
+
+  /* Transisi dan Kursor */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: text;
+  /* Kursor teks, bukan pointer */
+}
+
+.filter-select-date::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+
+  /* [PERBAIKAN UTAMA] Gunakan SVG Mask */
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #6c757d;
+  /* Warna ikon default (abu-abu gelap) */
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-calendar-event' viewBox='0 0 16 16'%3E%3Cpath d='M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z'/%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-1h12a1 1 0 0 1 1 1v1H0V4a1 1 0 0 1 1-1z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: background-color 0.2s;
+}
+
+.filter-select-date::-webkit-calendar-picker-indicator:hover {
+  background-color: #343a40;
+  /* Warna ikon saat hover */
+}
+
+/* --- 3. Menghilangkan elemen yang tidak perlu (misal: panah spinner) --- */
+.filter-select-date::-webkit-inner-spin-button,
+.filter-select-date::-webkit-clear-button {
+  display: none;
+}
+
+
+
+/* ============================================= */
+/* --- 4. THEMING (WARNA LIGHT & DARK MODE) --- */
+/* ============================================= */
+
+/* --- Default (Light Mode) --- */
+.filter-select-date {
+  background-color: var(--input-bg, #FFFFFF);
+  color: var(--text-primary, #212529);
+  border: 1px solid var(--input-border, #ced4da);
+}
+
+.filter-select-date:focus {
+  outline: none;
+  border-color: var(--input-focus-border, #86b7fe);
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+.filter-select-date:disabled {
+  background-color: var(--input-disabled-bg, #e9ecef);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* --- Overrides untuk Dark Mode --- */
+.dark-mode .filter-select-date {
+  background-color: #111111 !important;
+  color: var(--text-primary, #FFFFFF);
+  border: 1px solid var(--input-border, #495057);
+  color-scheme: dark;
+}
+
+.dark-mode .filter-select-date:focus {
+  border-color: var(--input-focus-border, #0d6efd);
+}
+
+.dark-mode .filter-select-date:disabled {
+  background-color: var(--input-disabled-bg, #343a40);
+}
+
+/* [PERBAIKAN UTAMA] Cukup ubah warna latar belakang ikon di dark mode */
+.dark-mode .filter-select-date::-webkit-calendar-picker-indicator {
+  background-color: #adb5bd !important;
+
+}
+
+.dark-mode .filter-select-date::-webkit-calendar-picker-indicator:hover {
+  background-color: #e9ecef !important;
+}
+
+
 
 
 /* ============================================= */
@@ -11598,6 +11765,7 @@ body.dark-mode .btn-detail:hover {
   margin-top: 2rem;
   width: 100%;
 }
+
 .dashboard-row-financial {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -11638,6 +11806,7 @@ body.dark-mode .btn-detail:hover {
   color: var(--text-color-light);
   font-style: italic;
 }
+
 .komposisi-card .chart-canvas-container {
   display: flex;
   align-items: center;

@@ -308,7 +308,7 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                 <div className="modal-actions">
                     <button
                         onClick={() => setShowHistory(true)}
-                        className="btn-secondary" /* Sesuaikan class jika perlu */
+                        className="btn-history" /* Sesuaikan class jika perlu */
                         style={{ marginRight: 'auto' }}
                     >
                         Riwayat Barang
