@@ -10378,7 +10378,16 @@ body.dark-mode .form-group-recover textarea:focus {
   background-size: 1em;
 }
 
+.qr-scanner-modal #qr-reader {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden; /* Agar video kamera tidak keluar dari border-radius */
+}
 
+/* Mengubah warna teks "scan region" agar terlihat di dark mode */
+.qr-scanner-modal #qr-reader span {
+    color: var(--text-color-secondary) !important;
+}
 
 /* --- Gaya saat dropdown difokuskan --- */
 .filter-select-invent:focus {

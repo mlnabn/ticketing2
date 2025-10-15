@@ -90,7 +90,7 @@ class StokBarangController extends Controller
         return response()->json($stokBarang->load(['masterBarang.masterKategori', 'masterBarang.subKategori']));
     }
 
-    public function showBySerial($serial)
+    public function showBySerial($code)
     {
         // PERBAIKAN: Tambahkan with() untuk memuat relasi saat mencari via serial number
         $item = StokBarang::with([
@@ -100,7 +100,8 @@ class StokBarangController extends Controller
             'workshop',
             'statusDetail'
         ])
-            ->where('serial_number', $serial)
+            ->where('kode_unik', $code)
+            ->orWhere('serial_number', $code)
             ->firstOrFail();
 
         return response()->json($item);
