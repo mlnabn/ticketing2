@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import { format } from 'date-fns';
 
@@ -26,8 +27,8 @@ export default function JobList() {
   // State untuk data dan UI
   const [ticketData, setTicketData] = useState(null);
   const [page, setPage] = useState(1);
-  const [searchInput, setSearchInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
   const [selectedIds, setSelectedIds] = useState([]);
   
   // State untuk data pendukung modal
@@ -50,7 +51,7 @@ export default function JobList() {
     
     const params = {
       page,
-      search: searchQuery,
+      search: debouncedSearchTerm,
       status: searchParams.get('status'),
       admin_id: searchParams.get('adminId'),
       date: searchParams.get('date'),
@@ -65,7 +66,7 @@ export default function JobList() {
       showToast('Gagal memuat data tiket.', 'error');
       if (e.response?.status === 401) logout();
     }
-  }, [isMyTicketsPage, page, searchQuery, logout, showToast, searchParams]);
+  }, [isMyTicketsPage, page, debouncedSearchTerm, logout, showToast, searchParams]);
 
   const fetchPrerequisites = useCallback(async () => {
     try {
@@ -95,11 +96,6 @@ export default function JobList() {
   useEffect(() => {
     setSelectedIds([]);
   }, [ticketsOnPage]);
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    setPage(1);
-    setSearchQuery(searchInput);
-  };
   
   const updateTicketStatus = async (ticket, newStatus) => {
     if (newStatus === 'Selesai' && ticket.master_barangs && ticket.master_barangs.length > 0) {
@@ -257,17 +253,21 @@ export default function JobList() {
       <h1 className="page-title">{isMyTicketsPage ? 'Tiket yang Saya Kerjakan' : 'Daftar Semua Tiket'}</h1>
 
       {!isMyTicketsPage && isAdmin && (
-        <>
-          <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
-            <input type="text" placeholder="Cari berdasarkan nama pekerja..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} style={{ flexGrow: 1, padding: '8px' }} />
-            <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
-          </form>
-          {selectedIds.length > 0 && (
-            <div className="bulk-action-bar" style={{ margin: '20px 0' }}>
-              <button onClick={handleBulkDelete} className="btn-delete">Hapus {selectedIds.length} Tiket yang Dipilih</button>
-            </div>
-          )}
-        </>
+        <div className="filters-container report-filters" style={{ margin: '20px 0' }}>
+          <input
+            type="text"
+            placeholder="Cari tiket, deskripsi, nama, workshop..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="filter-search-input"
+          />
+        </div>
+      )}
+                
+      {selectedIds.length > 0 && (
+        <div className="bulk-action-bar" style={{ margin: '20px 0' }}>
+          <button onClick={handleBulkDelete} className="btn-delete">Hapus {selectedIds.length} Tiket yang Dipilih</button>
+        </div>
       )}
 
       {!ticketData ? (

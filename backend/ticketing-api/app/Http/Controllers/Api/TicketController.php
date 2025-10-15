@@ -38,8 +38,25 @@ class TicketController extends Controller
         $month = $request->query('month');
 
         if ($search) {
-            $query->whereHas('user', function ($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%');
+            $query->where(function (Builder $q) use ($search) {
+                // Cari di dalam tabel 'tickets'
+                $q->where('kode_tiket', 'like', '%' . $search . '%')
+                ->orWhere('title', 'like', '%' . $search . '%');
+
+                // Cari di relasi 'user' (admin yang mengerjakan)
+                $q->orWhereHas('user', function (Builder $userQuery) use ($search) {
+                    $userQuery->where('name', 'like', '%' . $search . '%');
+                });
+
+                // Cari di relasi 'creator' (user yang membuat tiket)
+                $q->orWhereHas('creator', function (Builder $creatorQuery) use ($search) {
+                    $creatorQuery->where('name', 'like', '%' . $search . '%');
+                });
+                
+                // Cari di relasi 'workshop'
+                $q->orWhereHas('workshop', function (Builder $workshopQuery) use ($search) {
+                    $workshopQuery->where('name', 'like', '%' . $search . '%');
+                });
             });
         }
 
