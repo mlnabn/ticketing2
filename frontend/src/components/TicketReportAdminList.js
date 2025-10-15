@@ -100,10 +100,12 @@ export default function TicketReportAdminList() {
         {loadingAdmins ? <p>Memuat data admin...</p> : (
           <div className="admin-list-grid">
             {admins.map(admin => (
-              // DIUBAH: Gunakan Link untuk setiap admin
               <Link to={`/admin/reports/admin/${admin.id}${filterQueryString}`} key={admin.id} className="admin-card">
                 <div className="avatar">{admin.name.charAt(0)}</div>
-                <div className="info"><h3>{admin.name}</h3><p>{admin.email}</p></div>
+                <div className="info">
+                  <h3>{admin.name}</h3>
+                  <p title={admin.email}>{admin.email}</p>
+                </div>
               </Link>
             ))}
           </div>

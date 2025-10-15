@@ -90,7 +90,7 @@ function StokBarangView() {
     }, [showToast]);
 
     const handleScanSuccess = (decodedText) => {
-        setIsScannerOpen(false); 
+        setIsScannerOpen(false);
         handleScanSearch(decodedText);
     };
 
@@ -118,10 +118,13 @@ function StokBarangView() {
             <div className="user-management-container" style={{ marginBottom: '20px' }}>
                 <h1>Daftar Stok Unit Barang</h1>
                 <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>Tambah Stok</button>
-                <button className="btn-secondary" onClick={() => setIsScannerOpen(true)}>
-                        <i className="fas fa-qrcode" style={{marginRight: '8px'}}></i>
-                        Scan QR
-                    </button>
+                <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
+                    <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
+                        <i className="fas fa-qrcode fa-stack-2x"></i>
+                        <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
+                    </span>                        
+                    Scan QR
+                </button>
             </div>
 
             {/* --- Filter Section --- */}
