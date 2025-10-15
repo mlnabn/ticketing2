@@ -125,6 +125,10 @@ Route::middleware('jwt')->group(function () {
     Route::get('/financial-report/inventory', [App\Http\Controllers\Api\FinancialReportController::class, 'getInventoryReport']);
     Route::get('/financial-report/inventory/details', [App\Http\Controllers\Api\FinancialReportController::class, 'getDetailedTransactions']);
     Route::get('/financial-report/export', [App\Http\Controllers\Api\FinancialReportController::class, 'exportReport']);
+    Route::get('/financial-report/chart-data', [App\Http\Controllers\Api\FinancialReportController::class, 'getFinancialChartData']);
+    Route::get('/financial-report/asset-composition', [App\Http\Controllers\Api\FinancialReportController::class, 'getAssetComposition']);
+    Route::get('/financial-report/value-by-category', [App\Http\Controllers\Api\FinancialReportController::class, 'getValueByCategory']);
+    Route::get('/financial-report/top-purchases', [App\Http\Controllers\Api\FinancialReportController::class, 'getTopPurchasesByValue']);
     Route::prefix('reports/inventory')->name('reports.inventory.')->group(function () {
         Route::get('/stats', [InventoryReportController::class, 'getStats'])->name('stats');
         Route::get('/monthly-movement', [InventoryReportController::class, 'getMonthlyMovement'])->name('movement');

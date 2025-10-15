@@ -10407,14 +10407,15 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .qr-scanner-modal #qr-reader {
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    overflow: hidden; /* Agar video kamera tidak keluar dari border-radius */
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  /* Agar video kamera tidak keluar dari border-radius */
 }
 
 /* Mengubah warna teks "scan region" agar terlihat di dark mode */
 .qr-scanner-modal #qr-reader span {
-    color: var(--text-color-secondary) !important;
+  color: var(--text-color-secondary) !important;
 }
 
 /* 1. Sembunyikan area cetak dari tampilan normal */
@@ -10476,36 +10477,6 @@ body.dark-mode .form-group-recover textarea:focus {
 /* --- Gaya saat dropdown difokuskan --- */
 .filter-select-invent:focus {
   outline: none;
-}
-
-/* tabel report financial */
-.report-table .table-section-header th {
-  background-color: var(--sidebar-bg-color);
-  color: var(--text-color);
-  padding: 0.75rem;
-  text-align: left;
-  font-size: 1rem;
-}
-
-.report-table .table-subtotal td {
-  background-color: var(--hover-bg-color);
-  border-top: 2px solid var(--border-color);
-}
-
-.report-table-container {
-  max-height: 500px;
-  /* Perkiraan tinggi untuk sekitar 10 baris data */
-  overflow-y: auto;
-  /* Tampilkan scrollbar vertikal HANYA jika kontennya lebih tinggi */
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  margin-top: 1.5rem;
-  /* Beri jarak antar tabel */
-}
-
-/* Pastikan tabel di dalamnya menggunakan lebar penuh */
-.report-table-container table {
-  width: 100%;
 }
 
 /* ============================================= */
@@ -11597,4 +11568,59 @@ body.dark-mode .btn-detail:hover {
 
 .dark-mode .filter-select-cal::-webkit-calendar-picker-indicator:hover {
   background-color: #e9ecef !important;
+}
+
+
+
+/* ============================================= */
+/* ==   CSS UNTUK LAYOUT & CHART DASHBOARD    == */
+/* ============================================= */
+.dashboard-container-financial {
+  margin-top: 2rem;
+  width: 100%;
+}
+.dashboard-row-financial {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.nilai-card {
+  background-color: var(--bg-color-light);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.nilai-card h4 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color-dark);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+  flex-shrink: 0;
+}
+
+.chart-canvas-container {
+  position: relative;
+  width: 100%;
+  flex-grow: 1;
+}
+
+.loading-text {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-color-light);
+  font-style: italic;
+}
+.komposisi-card .chart-canvas-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
