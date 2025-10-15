@@ -71,27 +71,37 @@ class InventoryReportController extends Controller
     public function getDashboardData(Request $request)
     {
         $statusIds = DB::table('status_barang')
-            ->whereIn('nama_status', ['Tersedia', 'Dipinjam', 'Digunakan', 'Hilang', 'Rusak'])
+            ->whereIn('nama_status', ['Tersedia', 'Dipinjam', 'Digunakan', 'Hilang', 'Rusak', 'Perbaikan'])
             ->pluck('id', 'nama_status');
 
+        // === KALKULASI UNTUK 4 KARTU UTAMA ===
+
+        // 1. Total Unit Barang
         $totalUnitBarang = StokBarang::count();
+
+        // 2. Stok Tersedia
         $stokTersedia = StokBarang::where('status_id', $statusIds['Tersedia'] ?? 0)->count();
-        $activeSkuCount = MasterBarang::whereHas('stokBarangs')->count();
-        $masukLast30Days = StokBarang::whereBetween('tanggal_masuk', [Carbon::now()->subDays(30), Carbon::now()])->count();
-        $keluarLast30Days = StokBarang::whereIn('status_id', $this->getKeluarStatusIds($statusIds))
-            ->whereBetween('tanggal_keluar', [Carbon::now()->subDays(30), Carbon::now()])
-            ->count();
 
-        $keluarPrevious30Days = StokBarang::whereIn('status_id', $this->getKeluarStatusIds($statusIds))
-            ->whereBetween('tanggal_keluar', [Carbon::now()->subDays(60), Carbon::now()->subDays(31)])
-            ->count();
+        // 3. Rusak & Hilang
+        $rusakHilangStatusIds = array_filter([$statusIds['Rusak'] ?? null, $statusIds['Hilang'] ?? null]);
+        $rusakHilangTotal = StokBarang::whereIn('status_id', $rusakHilangStatusIds)->count();
 
-        $trendDifference = $keluarLast30Days - $keluarPrevious30Days;
+        // 4. Barang Keluar (Operasional: Dipinjam, Digunakan, Perbaikan)
+        $keluarOperasionalStatusIds = array_filter([
+            $statusIds['Dipinjam'] ?? null,
+            $statusIds['Digunakan'] ?? null,
+            $statusIds['Perbaikan'] ?? null,
+        ]);
+        $barangKeluarOperasional = StokBarang::whereIn('status_id', $keluarOperasionalStatusIds)->count();
+
+        // === KALKULASI DATA PENDUKUNG (Chart, Widget, dll) ===
         $year = $request->input('year', Carbon::now()->year);
-        $chartData = $this->getMonthlyMovementData($year);
+        $keluarSemuaStatusIds = $this->getKeluarStatusIds($statusIds); // Untuk chart, kita hitung semua yang keluar
+        $chartData = $this->getMonthlyMovementData($year, $keluarSemuaStatusIds);
+
         $mostActiveItems = StokBarang::select('master_barang_id', DB::raw('count(*) as total_keluar'))
             ->with('masterBarang:id_m_barang,nama_barang')
-            ->whereIn('status_id', $this->getKeluarStatusIds($statusIds))
+            ->whereIn('status_id', $keluarSemuaStatusIds)
             ->whereNotNull('tanggal_keluar')
             ->whereYear('tanggal_keluar', Carbon::now()->year)
             ->groupBy('master_barang_id')
@@ -104,19 +114,14 @@ class InventoryReportController extends Controller
             ->orderBy('year', 'desc')
             ->pluck('year');
 
+        // === RESPONSE JSON ===
         return response()->json([
             'stats' => [
-                'total_sku' => MasterBarang::count(),
-                'active_sku' => $activeSkuCount,
-                'barang_masuk_30_hari' => $masukLast30Days,
                 'total_unit_barang' => $totalUnitBarang,
                 'stok_tersedia' => $stokTersedia,
-                'barang_keluar_30_hari' => $keluarLast30Days,
                 'persentase_stok_tersedia' => $totalUnitBarang > 0 ? round(($stokTersedia / $totalUnitBarang) * 100) : 0,
-                'trend' => [
-                    'direction' => $trendDifference > 0 ? 'up' : ($trendDifference < 0 ? 'down' : 'stable'),
-                    'difference' => abs($trendDifference),
-                ]
+                'rusak_hilang_total' => $rusakHilangTotal,
+                'barang_keluar' => $barangKeluarOperasional, // Data baru untuk kartu "Barang Keluar"
             ],
             'chartData' => $chartData,
             'mostActiveItems' => $mostActiveItems,
@@ -127,13 +132,14 @@ class InventoryReportController extends Controller
     public function getDetailedReport(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:in,out',
+            'type' => 'required|in:in,out,available,accountability',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'search' => 'nullable|string|max:255',
         ]);
 
-        $query = StokBarang::with(['masterBarang.masterKategori', 'userPeminjam', 'workshop', 'statusDetail', 'createdBy', 'userPerusak', 'userPenghilang']);
+        $query = StokBarang::with(['masterBarang.masterKategori', 'userPeminjam', 'workshop', 'statusDetail', 'createdBy', 'userPerusak', 'userPenghilang', 'teknisiPerbaikan']);
+
         $query->when($request->filled('search'), function ($q) use ($request) {
             $searchTerm = '%' . $request->search . '%';
             $q->where(function ($subQuery) use ($searchTerm) {
@@ -143,17 +149,38 @@ class InventoryReportController extends Controller
                     });
             });
         });
+
+        // [LOGIKA DIPERBARUI]
         if ($request->type === 'in') {
-            $query->whereNotNull('tanggal_masuk');
+            // Laporan Masuk: Menampilkan SEMUA barang kecuali yang statusnya 'Hilang'.
+            $statusHilangId = DB::table('status_barang')->where('nama_status', 'Hilang')->value('id');
+            $query->where('status_id', '!=', $statusHilangId);
+
+            // Filter tanggal tetap berlaku pada tanggal masuk barang (pendaftaran awal)
             $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_masuk', '>=', $request->start_date));
             $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_masuk', '<=', $request->end_date));
+
+            // Urutkan berdasarkan yang paling baru ditambahkan
             $query->orderBy('tanggal_masuk', 'desc');
         } elseif ($request->type === 'out') {
-            $statusKeluarIds = DB::table('status_barang')->whereIn('nama_status', ['Dipinjam', 'Digunakan', 'Hilang', 'Rusak'])->pluck('id');
-            $query->whereIn('status_id', $statusKeluarIds)->whereNotNull('tanggal_keluar');
+            // Laporan Keluar: HANYA menampilkan status 'Dipinjam' dan 'Digunakan'
+            $statusKeluarIds = DB::table('status_barang')->whereIn('nama_status', ['Dipinjam', 'Digunakan'])->pluck('id');
+            $query->whereIn('status_id', $statusKeluarIds);
+
             $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_keluar', '>=', $request->start_date));
             $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_keluar', '<=', $request->end_date));
+
             $query->orderBy('tanggal_keluar', 'desc');
+        } elseif ($request->type === 'available') {
+            // Laporan Tersedia: Tidak berubah
+            $statusTersediaId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
+            $query->where('status_id', $statusTersediaId);
+            $query->orderBy('created_at', 'desc');
+        } elseif ($request->type === 'accountability') {
+            // Laporan Hilang/Rusak: Sekarang hanya berisi 'Hilang' dan 'Rusak' dan 'Perbaikan'
+            $statusIds = DB::table('status_barang')->whereIn('nama_status', ['Hilang', 'Rusak', 'Perbaikan'])->pluck('id');
+            $query->whereIn('status_id', $statusIds);
+            $query->orderBy('updated_at', 'desc');
         }
 
         return $query->paginate($request->input('per_page', 15));

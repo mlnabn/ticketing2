@@ -86,7 +86,7 @@ export default function FinancialReportPage() {
         } else if (filterType === 'date_range') {
             params = { ...params, start_date: filters.start_date, end_date: filters.end_date };
         }
-        
+
         try {
             const response = await api.get('/financial-report/export', {
                 params,
@@ -159,18 +159,18 @@ export default function FinancialReportPage() {
                 />
             </div>
 
-            <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-                <select value={filterType} onChange={handleFilterTypeChange}>
+            <div className="filters-container"style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
                     <option value="month">Filter per Bulan</option>
                     <option value="date_range">Filter per Tanggal</option>
                 </select>
                 {filterType === 'month' && (
                     <>
-                        <select name="month" value={filters.month} onChange={handleFilterChange}>
+                        <select name="month" value={filters.month} onChange={handleFilterChange} className="filter-select">
                             <option value="">Semua Bulan</option>
                             {months.map(m => <option key={m.value} value={m.value}>{m.name}</option>)}
                         </select>
-                        <select name="year" value={filters.year} onChange={handleFilterChange}>
+                        <select name="year" value={filters.year} onChange={handleFilterChange} className="filter-select">
                             <option value="">Semua Tahun</option>
                             {years.map(y => <option key={y} value={y}>{y}</option>)}
                         </select>
@@ -178,9 +178,9 @@ export default function FinancialReportPage() {
                 )}
                 {filterType === 'date_range' && (
                     <>
-                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} />
-                        <span style={{alignSelf: 'center'}}>s/d</span>
-                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} />
+                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select" />
+                        <span style={{ alignSelf: 'center' }}>-</span>
+                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select" />
                     </>
                 )}
             </div>
@@ -196,11 +196,14 @@ export default function FinancialReportPage() {
 
             {/* Tabel 1: Pembelian Baru */}
             <div className="report-table-container">
+                <tr className="table-section-header"><th colSpan="4">Pembelian Baru (Aset Masuk)</th></tr>
                 <table className="job-table report-table">
                     <thead>
-                        <tr className="table-section-header"><th colSpan="4">Pembelian Baru (Aset Masuk)</th></tr>
                         <tr>
-                            <th>Tanggal</th><th>Kode Unik</th><th>Nama Barang</th><th style={{ textAlign: 'right' }}>Nilai</th>
+                            <th>Tanggal</th>
+                            <th>Kode Unik</th>
+                            <th>Nama Barang</th>
+                            <th style={{ textAlign: 'right' }}>Nilai</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -269,7 +272,7 @@ export default function FinancialReportPage() {
             </div>
             {/* PERBARUI subtotal agar sesuai */}
             <div className="table-subtotal" style={{ display: 'flex', justifyContent: 'flex-end', padding: '0.75rem', fontWeight: 'bold' }}>
-                <span style={{color: 'var(--red-color)'}}>Subtotal: ({formatCurrency(problematicAssetsSubtotal)})</span>
+                <span style={{ color: 'var(--red-color)' }}>Subtotal: ({formatCurrency(problematicAssetsSubtotal)})</span>
             </div>
         </div>
     );

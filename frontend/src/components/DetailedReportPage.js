@@ -102,9 +102,9 @@ export default function DetailedReportPage({ type, title }) {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleApplyFilterAndSearch()}
                 />
-                <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-invent" />
+                <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-cal" />
                 <span>-</span>
-                <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-invent" />
+                <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-cal" />
                 {/* <button onClick={handleApplyFilterAndSearch} className="btn-primary">Terapkan</button> */}
                 <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
                     <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>

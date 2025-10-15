@@ -13,18 +13,18 @@ const NavigationCard = ({ title, description, linkTo, icon }) => (
     </Link>
 );
 
-const TrendIndicator = ({ trend }) => {
-    if (!trend) return <p className="card-trend trend-stable">...</p>;
-    const isStable = trend.direction === 'stable';
-    const trendIcon = isStable ? 'fa-minus' : `fa-arrow-${trend.direction}`;
-    const trendClass = `trend-${trend.direction}`;
-    return (
-        <p className={`card-trend ${trendClass}`}>
-            <i className={`fas ${trendIcon}`}></i>
-            {isStable ? 'Stabil' : `${trend.difference} dari 30 hari lalu`}
-        </p>
-    );
-};
+// const TrendIndicator = ({ trend }) => {
+//     if (!trend) return <p className="card-trend trend-stable">...</p>;
+//     const isStable = trend.direction === 'stable';
+//     const trendIcon = isStable ? 'fa-minus' : `fa-arrow-${trend.direction}`;
+//     const trendClass = `trend-${trend.direction}`;
+//     return (
+//         <p className={`card-trend ${trendClass}`}>
+//             <i className={`fas ${trendIcon}`}></i>
+//             {isStable ? 'Stabil' : `${trend.difference} dari 30 hari lalu`}
+//         </p>
+//     );
+// };
 
 export default function InventoryReportPage() {
     const [dashboardData, setDashboardData] = useState(null);
@@ -53,16 +53,12 @@ export default function InventoryReportPage() {
         setSelectedYear(e.target.value);
     };
 
-    // Gunakan data kosong sementara saat loading
     const stats = dashboardData?.stats || {
-        total_sku: '...',
-        active_sku: '...',
+        total_unit_barang: '...',
         stok_tersedia: '...',
         persentase_stok_tersedia: '...',
-        total_unit_barang: '...',
-        barang_masuk_30_hari: '...',
-        barang_keluar_30_hari: '...',
-        trend: null,
+        rusak_hilang_total: '...',
+        barang_keluar: '...',
     };
 
     const chartData = dashboardData?.chartData || [];
@@ -75,13 +71,12 @@ export default function InventoryReportPage() {
 
             {/* Kartu Statistik */}
             <div className="info-cards-grid">
-                <div className="info-card blue-card">
+                <div className="info-card yellow-card">
                     <div className="card-header">
-                        <p className="card-label">Total SKU</p>
-                        <div className="card-icon blue-icon"><i className="fas fa-tags"></i></div>
+                        <p className="card-label">Total Unit Barang</p>
+                        <div className="card-icon yellow-icon"><i className="fas fa-box-open"></i></div>
                     </div>
-                    <h3 className="card-value">{stats.total_sku}</h3>
-                    <p className="card-subtext">{stats.active_sku !== '...' ? `${stats.active_sku} SKU Aktif` : '...'}</p>
+                    <h3 className="card-value">{stats.total_unit_barang}</h3>
                 </div>
 
                 <div className="info-card green-card">
@@ -89,35 +84,23 @@ export default function InventoryReportPage() {
                         <p className="card-label">Stok Tersedia</p>
                         <div className="card-icon green-icon"><i className="fas fa-check-circle"></i></div>
                     </div>
-                    <h3 className="card-value">
-                        {stats.stok_tersedia !== '...' ? `${stats.stok_tersedia} (${stats.persentase_stok_tersedia}%)` : '...'}
-                    </h3>
+                    <h3 className="card-value">{stats.stok_tersedia}</h3>
                 </div>
 
-                <div className="info-card yellow-card">
+                <div className="info-card orange-card">
                     <div className="card-header">
-                        <p className="card-label">Total Unit Barang</p>
-                        <div className="card-icon yellow-icon"><i className="fas fa-box-open"></i></div>
+                        <p className="card-label">Rusak & Hilang</p>
+                        <div className="card-icon orange-icon"><i className="fas fa-exclamation-triangle"></i></div>
                     </div>
-                    <h3 className="card-value">{stats.total_unit_barang}</h3>
-                    <p className="card-subtext">{stats.barang_masuk_30_hari !== '...' ? `${stats.barang_masuk_30_hari} unit masuk (30 hari)` : '...'}</p>
+                    <h3 className="card-value">{stats.rusak_hilang_total}</h3>
                 </div>
 
                 <div className="info-card red-card">
                     <div className="card-header">
-                        <p className="card-label">Barang Keluar (30 Hari)</p>
-                        <div className="card-icon red-icon"><i className="fas fa-sign-out-alt"></i></div>
+                        <p className="card-label">Barang Keluar</p>
+                        <div className="card-icon red-icon"><i className="fas fa-shipping-fast"></i></div>
                     </div>
-                    <h3 className="card-value">{stats.barang_keluar_30_hari}</h3>
-                    <TrendIndicator trend={stats.trend} />
-                </div>
-
-                <div className="info-card purple-card">
-                    <div className="card-header">
-                        <p className="card-label">Barang Masuk (30 Hari)</p>
-                        <div className="card-icon purple-icon"><i className="fas fa-dolly"></i></div>
-                    </div>
-                    <h3 className="card-value">{stats.barang_masuk_30_hari}</h3>
+                    <h3 className="card-value">{stats.barang_keluar}</h3>
                 </div>
             </div>
 
@@ -172,9 +155,24 @@ export default function InventoryReportPage() {
                 />
                 <NavigationCard
                     title="Laporan Barang Keluar"
-                    description="Lacak semua barang yang dipinjam, digunakan, rusak, atau hilang."
+                    description="Lacak semua barang yang dipinjam, dan digunakan."
                     linkTo="/admin/inventory-reports/outgoing"
                     icon="fa-arrow-up"
+                />
+            </div>
+
+            <div className="navigation-cards-grid-report">
+                <NavigationCard
+                    title="Laporan Barang Tersedia"
+                    description="Lihat semua unit barang yang saat ini siap digunakan."
+                    linkTo="/admin/inventory-reports/available"
+                    icon="fa-archive"
+                />
+                <NavigationCard
+                    title="Laporan Barang Hilang & Rusak"
+                    description="Lacak semua barang yang hilang atau rusak untuk audit."
+                    linkTo="/admin/inventory-reports/accountability"
+                    icon="fa-exclamation-triangle"
                 />
             </div>
         </div>

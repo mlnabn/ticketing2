@@ -95,6 +95,8 @@ export default function RootApp() {
             <Route path="inventory-reports" element={<InventoryReportPage />} />
             <Route path="inventory-reports/incoming" element={<DetailedReportPage type="in" title="Laporan Barang Masuk" />} />
             <Route path="inventory-reports/outgoing" element={<DetailedReportPage type="out" title="Laporan Barang Keluar" />} />
+            <Route path="inventory-reports/available" element={<DetailedReportPage type="available" title="Laporan Barang Tersedia" />} />
+            <Route path="inventory-reports/accountability" element={<DetailedReportPage type="accountability" title="Laporan Barang Hilang & Rusak" />} />
             <Route path="workshops" element={<WorkshopManagement />} />
             <Route path="financial-report" element={<FinancialReportPage />} />
           </Route>

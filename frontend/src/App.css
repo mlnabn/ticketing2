@@ -1835,21 +1835,21 @@ body.dark-mode .blue-card {
   color: #1e40af;
 }
 
-.purple-card {
-  background-color: #f3e5f5;
-  border-color: #ce93d8;
+.orange-card {
+  background-color: #fff3e0;
+  border-color: #ffb74d;
 }
 
-.card-icon.purple-icon {
-  background-color: #a78bfa;
-  color: #7e22ce;
+.card-icon.orange-icon {
+  background-color: #ffb74d;
+  color: #ffffff;
 }
 
-body.dark-mode .purple-card .card-value,
-body.dark-mode .purple-card .card-change,
-body.dark-mode .purple-card .card-period,
-body.dark-mode .purple-card .card-label {
-  color: #f7ebf9;
+body.dark-mode .orange-card .card-value,
+body.dark-mode .orange-card .card-change,
+body.dark-mode .orange-card .card-period,
+body.dark-mode .orange-card .card-label {
+  color: #FFEDD5;
 }
 
 body.dark-mode .red-card .card-icon {
@@ -8919,6 +8919,7 @@ body.dark-mode .dashboard-card h4 {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1.5rem;
+  margin-top: 4rem;
 }
 
 .admin-card {
@@ -9799,11 +9800,12 @@ body.dark-mode .btn-recover-small:hover {
 }
 
 .history-log-item {
-    background-color: rgba(255, 255, 255, 0.05); /* Sedikit latar belakang agar terpisah */
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+  /* Sedikit latar belakang agar terpisah */
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .dark-mode .info-row {
@@ -10376,6 +10378,8 @@ body.dark-mode .form-group-recover textarea:focus {
   background-size: 1em;
 }
 
+
+
 /* --- Gaya saat dropdown difokuskan --- */
 .filter-select-invent:focus {
   outline: none;
@@ -10383,24 +10387,27 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* tabel report financial */
 .report-table .table-section-header th {
-    background-color: var(--sidebar-bg-color);
-    color: var(--text-color);
-    padding: 0.75rem;
-    text-align: left;
-    font-size: 1rem;
+  background-color: var(--sidebar-bg-color);
+  color: var(--text-color);
+  padding: 0.75rem;
+  text-align: left;
+  font-size: 1rem;
 }
 
 .report-table .table-subtotal td {
-    background-color: var(--hover-bg-color);
-    border-top: 2px solid var(--border-color);
+  background-color: var(--hover-bg-color);
+  border-top: 2px solid var(--border-color);
 }
 
 .report-table-container {
-  max-height: 500px; /* Perkiraan tinggi untuk sekitar 10 baris data */
-  overflow-y: auto; /* Tampilkan scrollbar vertikal HANYA jika kontennya lebih tinggi */
+  max-height: 500px;
+  /* Perkiraan tinggi untuk sekitar 10 baris data */
+  overflow-y: auto;
+  /* Tampilkan scrollbar vertikal HANYA jika kontennya lebih tinggi */
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  margin-top: 1.5rem; /* Beri jarak antar tabel */
+  margin-top: 1.5rem;
+  /* Beri jarak antar tabel */
 }
 
 /* Pastikan tabel di dalamnya menggunakan lebar penuh */
@@ -11387,4 +11394,114 @@ body.dark-mode .btn-detail:hover {
 .pagination-summary {
   font-size: 0.9rem;
   color: var(--text-color-secondary);
+}
+
+/* ========================================================= */
+/* GAYA UNTUK INPUT TANGGAL FILTER (.filter-select-cal) */
+/* ========================================================= */
+
+/* --- 1. Gaya Dasar untuk Kotak Input --- */
+.filter-select-cal {
+  /* Menghilangkan tampilan default browser */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* Dimensi dan Teks */
+  position: relative;
+  height: 44px;
+  width: 170px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  font-family: inherit;
+  /* Pastikan font konsisten */
+  border-radius: 8px;
+
+  /* Transisi dan Kursor */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: text;
+  /* Kursor teks, bukan pointer */
+}
+
+.filter-select-cal::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+
+  /* [PERBAIKAN UTAMA] Gunakan SVG Mask */
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #6c757d;
+  /* Warna ikon default (abu-abu gelap) */
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-calendar-event' viewBox='0 0 16 16'%3E%3Cpath d='M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z'/%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-1h12a1 1 0 0 1 1 1v1H0V4a1 1 0 0 1 1-1z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: background-color 0.2s;
+}
+
+.filter-select-cal::-webkit-calendar-picker-indicator:hover {
+  background-color: #343a40;
+  /* Warna ikon saat hover */
+}
+
+/* --- 3. Menghilangkan elemen yang tidak perlu (misal: panah spinner) --- */
+.filter-select-cal::-webkit-inner-spin-button,
+.filter-select-cal::-webkit-clear-button {
+  display: none;
+}
+
+
+
+/* ============================================= */
+/* --- 4. THEMING (WARNA LIGHT & DARK MODE) --- */
+/* ============================================= */
+
+/* --- Default (Light Mode) --- */
+.filter-select-cal {
+  background-color: var(--input-bg, #FFFFFF);
+  color: var(--text-primary, #212529);
+  border: 1px solid var(--input-border, #ced4da);
+}
+
+.filter-select-cal:focus {
+  outline: none;
+  border-color: var(--input-focus-border, #86b7fe);
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+.filter-select-cal:disabled {
+  background-color: var(--input-disabled-bg, #e9ecef);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* --- Overrides untuk Dark Mode --- */
+.dark-mode .filter-select-cal {
+  background-color: #111111 !important;
+  color: var(--text-primary, #FFFFFF);
+  border: 1px solid var(--input-border, #495057);
+  color-scheme: dark;
+}
+
+.dark-mode .filter-select-cal:focus {
+  border-color: var(--input-focus-border, #0d6efd);
+}
+
+.dark-mode .filter-select-cal:disabled {
+  background-color: var(--input-disabled-bg, #343a40);
+}
+
+/* [PERBAIKAN UTAMA] Cukup ubah warna latar belakang ikon di dark mode */
+.dark-mode .filter-select-cal::-webkit-calendar-picker-indicator {
+  background-color: #adb5bd !important;
+
+}
+
+.dark-mode .filter-select-cal::-webkit-calendar-picker-indicator:hover {
+  background-color: #e9ecef !important;
 }
