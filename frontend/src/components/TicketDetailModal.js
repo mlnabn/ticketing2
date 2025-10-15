@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import api from '../services/api';
 
 const formatDateTime = (dateTimeString) => {
     if (!dateTimeString) return '-';
@@ -9,6 +10,26 @@ const formatDateTime = (dateTimeString) => {
 };
 
 function TicketDetailModal({ ticket, onClose }) {
+    const [borrowedItems, setBorrowedItems] = useState([]);
+    const [isLoadingItems, setIsLoadingItems] = useState(true);
+
+    useEffect(() => {
+        if (ticket?.id) {
+            setIsLoadingItems(true);
+            api.get(`/tickets/${ticket.id}/borrowed-items`)
+                .then(response => {
+                    setBorrowedItems(response.data);
+                })
+                .catch(error => {
+                    console.error("Gagal mengambil data barang pinjaman:", error);
+                    setBorrowedItems([]); // Kosongkan jika gagal
+                })
+                .finally(() => {
+                    setIsLoadingItems(false);
+                });
+        }
+    }, [ticket]);
+
     if (!ticket) return null;
 
     const formatWorkTime = (t) => {
@@ -22,6 +43,20 @@ function TicketDetailModal({ ticket, onClose }) {
             return `Diminta: ${format(new Date(t.requested_date), 'dd MMM')}, ${t.requested_time}`;
         }
         return 'Jadwal Fleksibel';
+    };
+
+    const handleWhatsAppChat = () => {
+        const phone = ticket.creator?.phone;
+        if (!phone) return;
+
+        // Format nomor: hilangkan karakter non-digit, ganti '0' di depan dengan '62'
+        let formattedPhone = phone.replace(/\D/g, '');
+        if (formattedPhone.startsWith('0')) {
+            formattedPhone = '62' + formattedPhone.substring(1);
+        }
+
+        const url = `https://wa.me/${formattedPhone}`;
+        window.open(url, '_blank', 'noopener,noreferrer');
     };
 
     return (
@@ -93,12 +128,15 @@ function TicketDetailModal({ ticket, onClose }) {
 
                     <div className="detail-item-full" data-span="2">
                         <span className="label">Barang yang Dipinjam</span>
-                       {ticket.masterBarangs && ticket.masterBarangs.length > 0 ? (
+                        {isLoadingItems ? (
+                            <p className="value">Memuat data barang...</p>
+                        ) : borrowedItems.length > 0 ? (
                             <ul className="borrowed-items-list">
-                                {ticket.masterBarangs.map(barang => (
-                                    <li key={barang.id_m_barang}>
-                                        <span className="tool-name">{barang.nama_barang}</span>
-                                        <span className="tool-quantity">Jumlah: {barang.pivot.quantity_used}</span>
+                                {borrowedItems.map(item => (
+                                    <li key={item.id}>
+                                        {/* Menampilkan detail per unit barang */}
+                                        <span className="tool-name">{item.master_barang.nama_barang}</span>
+                                        <span className="tool-quantity">({item.kode_unik})</span>
                                     </li>
                                 ))}
                             </ul>
@@ -108,8 +146,14 @@ function TicketDetailModal({ ticket, onClose }) {
                     </div>
 
                 </div>
-                <div className="modal-footer-user">
+                <div className="modal-footer-user" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                     <button onClick={onClose} className="btn-tutup-user">Tutup</button>
+                    {ticket.creator && ticket.creator.phone && (
+                        <button onClick={handleWhatsAppChat} className="btn-whatsapp">
+                            <i className="fab fa-whatsapp" style={{ marginRight: '8px' }}></i>
+                            Chat Pengirim
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

@@ -1,5 +1,5 @@
 // import { Link } from 'react-router-dom';
-import { useFinancialReport } from '../pages/useFinancialReport';
+import { useFinancialReport } from './useFinancialReport';
 
 export default function ProblematicAssetsReport() {
     const {
