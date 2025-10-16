@@ -138,50 +138,58 @@ class InventoryReportController extends Controller
             'search' => 'nullable|string|max:255',
         ]);
 
-        $query = StokBarang::with(['masterBarang.masterKategori', 'userPeminjam', 'workshop', 'statusDetail', 'createdBy', 'userPerusak', 'userPenghilang', 'teknisiPerbaikan']);
+        if ($request->type === 'in' || $request->type === 'available') {
+            
+            $query = StokBarang::with(['masterBarang', 'statusDetail', 'createdBy', 'workshop']);
+
+            if ($request->type === 'in') {
+                $query->whereNotNull('tanggal_masuk');
+                $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_masuk', '>=', $request->start_date));
+                $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_masuk', '<=', $request->end_date));
+                $query->orderBy('tanggal_masuk', 'desc');
+            } else { 
+                $statusTersediaId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
+                $query->where('status_id', $statusTersediaId);
+                $query->orderBy('created_at', 'desc');
+            }
+            
+            $query->when($request->filled('search'), function ($q) use ($request) {
+                $searchTerm = '%' . $request->search . '%';
+                $q->where(function ($subQuery) use ($searchTerm) {
+                    $subQuery->where('kode_unik', 'like', $searchTerm)
+                        ->orWhereHas('masterBarang', fn($masterQuery) => $masterQuery->where('nama_barang', 'like', $searchTerm));
+                });
+            });
+
+            return $query->paginate($request->input('per_page', 15));
+        }
+
+        $query = \App\Models\StokBarangHistory::with([
+            'stokBarang.masterBarang',
+            'statusDetail',
+            'relatedUser', 
+            'workshop'
+        ]);
+
+        $statusMap = [
+            'out' => ['Dipinjam', 'Digunakan'],
+            'accountability' => ['Hilang', 'Rusak', 'Perbaikan']
+        ];
+        $targetStatuses = $statusMap[$request->type];
+        $query->whereHas('statusDetail', fn($q) => $q->whereIn('nama_status', $targetStatuses));
+
+        $query->when($request->filled('start_date'), fn($q) => $q->whereDate('created_at', '>=', $request->start_date));
+        $query->when($request->filled('end_date'), fn($q) => $q->whereDate('created_at', '<=', $request->end_date));
 
         $query->when($request->filled('search'), function ($q) use ($request) {
             $searchTerm = '%' . $request->search . '%';
-            $q->where(function ($subQuery) use ($searchTerm) {
-                $subQuery->where('kode_unik', 'like', $searchTerm)
-                    ->orWhereHas('masterBarang', function ($masterQuery) use ($searchTerm) {
-                        $masterQuery->where('nama_barang', 'like', $searchTerm);
-                    });
+            $q->whereHas('stokBarang', function ($stokQuery) use ($searchTerm) {
+                $stokQuery->where('kode_unik', 'like', $searchTerm)
+                    ->orWhereHas('masterBarang', fn($masterQuery) => $masterQuery->where('nama_barang', 'like', $searchTerm));
             });
         });
-
-        // [LOGIKA DIPERBARUI]
-        if ($request->type === 'in') {
-            // Laporan Masuk: Menampilkan SEMUA barang kecuali yang statusnya 'Hilang'.
-            $statusHilangId = DB::table('status_barang')->where('nama_status', 'Hilang')->value('id');
-            $query->where('status_id', '!=', $statusHilangId);
-
-            // Filter tanggal tetap berlaku pada tanggal masuk barang (pendaftaran awal)
-            $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_masuk', '>=', $request->start_date));
-            $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_masuk', '<=', $request->end_date));
-
-            // Urutkan berdasarkan yang paling baru ditambahkan
-            $query->orderBy('tanggal_masuk', 'desc');
-        } elseif ($request->type === 'out') {
-            // Laporan Keluar: HANYA menampilkan status 'Dipinjam' dan 'Digunakan'
-            $statusKeluarIds = DB::table('status_barang')->whereIn('nama_status', ['Dipinjam', 'Digunakan'])->pluck('id');
-            $query->whereIn('status_id', $statusKeluarIds);
-
-            $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_keluar', '>=', $request->start_date));
-            $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_keluar', '<=', $request->end_date));
-
-            $query->orderBy('tanggal_keluar', 'desc');
-        } elseif ($request->type === 'available') {
-            // Laporan Tersedia: Tidak berubah
-            $statusTersediaId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
-            $query->where('status_id', $statusTersediaId);
-            $query->orderBy('created_at', 'desc');
-        } elseif ($request->type === 'accountability') {
-            // Laporan Hilang/Rusak: Sekarang hanya berisi 'Hilang' dan 'Rusak' dan 'Perbaikan'
-            $statusIds = DB::table('status_barang')->whereIn('nama_status', ['Hilang', 'Rusak', 'Perbaikan'])->pluck('id');
-            $query->whereIn('status_id', $statusIds);
-            $query->orderBy('updated_at', 'desc');
-        }
+        
+        $query->orderBy('created_at', 'desc');
 
         return $query->paginate($request->input('per_page', 15));
     }
