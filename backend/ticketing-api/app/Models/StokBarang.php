@@ -16,6 +16,20 @@ class StokBarang extends Model
         'user_perusak_id', 'tanggal_rusak', 'user_penghilang_id', 'tanggal_hilang', 'tanggal_ketemu',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'tanggal_pembelian' => 'date:Y-m-d',
+            'tanggal_masuk' => 'date:Y-m-d',
+            'tanggal_keluar' => 'date:Y-m-d',
+            'tanggal_mulai_perbaikan' => 'date:Y-m-d',
+            'tanggal_selesai_perbaikan' => 'date:Y-m-d',
+            'tanggal_rusak' => 'date:Y-m-d',
+            'tanggal_hilang' => 'date:Y-m-d',
+            'tanggal_ketemu' => 'date:Y-m-d',
+        ];
+    }
+
     public function ticket() {
         return $this->belongsTo(Ticket::class, 'ticket_id');
     }

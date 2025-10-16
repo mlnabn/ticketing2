@@ -14,6 +14,13 @@ class StokBarangHistory extends Model
         'event_date'
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'event_date' => 'date:Y-m-d',
+        ];
+    }
+
     public function stokBarang(){return $this->belongsTo(StokBarang::class, 'stok_barang_id');}
     public function statusDetail() { return $this->belongsTo(Status::class, 'status_id'); }
     public function triggeredByUser() { return $this->belongsTo(User::class, 'triggered_by_user_id'); }

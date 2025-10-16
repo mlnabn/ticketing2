@@ -100,7 +100,7 @@ export default function DetailedReportPage({ type, title }) {
             kode_unik: item.stok_barang?.kode_unik,
             nama_barang: item.stok_barang?.master_barang?.nama_barang,
             status: item.status_detail?.nama_status,
-            tanggal: item.created_at, // Tanggal kejadian adalah created_at dari history
+            tanggal: item.event_date, // Tanggal kejadian adalah created_at dari history
             penanggung_jawab: item.related_user?.name,
             workshop: item.workshop?.name,
         };
@@ -108,9 +108,9 @@ export default function DetailedReportPage({ type, title }) {
 
     const dateHeaders = {
         in: 'Tgl Masuk',
-        out: 'Tgl Laporan',
+        out: 'Tgl Kejadian',
         available: 'Tgl Dibuat',
-        accountability: 'Tgl Laporan',
+        accountability: 'Tgl Kejadian',
     };
 
     return (
