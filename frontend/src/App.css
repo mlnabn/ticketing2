@@ -4953,12 +4953,12 @@ body.dark-mode .notification-form-container label {
 
 /* 🌙 Dark mode */
 .dark-mode .btn-template {
-  background: #374151;
+  background: #3a3f44;
   color: #f9fafb;
 }
 
 .dark-mode .btn-template:hover {
-  background: #4b5563;
+  background: #3a3f44;
   transform: translateY(-2px);
 }
 
@@ -5068,15 +5068,10 @@ body.dark-mode .notification-form-container label {
 body.dark-mode .btn-scan {
   background-color: #22c55e;
   color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 2px 6px rgba(34, 197, 94, 0.25);
 }
 
 body.dark-mode .btn-scan:hover {
   background-color: #16a34a;
-  /* Warna hover yang lebih gelap */
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
 }
 
 /* ===== Feedback Message ===== */
@@ -5243,7 +5238,7 @@ body.dark-mode .form-group textarea,
 body.dark-mode .form-group2 input,
 body.dark-mode .form-group2 select,
 body.dark-mode .form-group2 textarea {
-  background: #374151;
+  background: #3a3f44;
   border-color: #4b5563;
   color: #f9fafb;
 }
@@ -9038,6 +9033,7 @@ body.dark-mode .dashboard-card h4 {
   flex: 1;
   overflow: hidden;
 }
+
 .admin-card .info h3 {
   font-size: 1.1rem;
   color: var(--text-primary);
@@ -10199,22 +10195,24 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .btn-whatsapp {
-    background-color: #25D366; /* Warna hijau khas WhatsApp */
-    color: white;
-    padding: 0.75rem 1rem;
-    border-radius: 12px;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background-color: #25D366;
+  /* Warna hijau khas WhatsApp */
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-whatsapp:hover {
-    background-color: #1EBE57; /* Warna hijau sedikit lebih gelap saat hover */
-    transform: translateY(-2px);
+  background-color: #1EBE57;
+  /* Warna hijau sedikit lebih gelap saat hover */
+  transform: translateY(-2px);
 }
 
 /* ============================================= */
@@ -10417,7 +10415,7 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* --- Dark Mode --- */
 .dark-mode .filter-select {
-  background-color: #111111;
+  background-color: #3a3f44;
   color: #e2e8f0;
   border-color: #4a5568;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23e2e8f0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
@@ -10495,6 +10493,38 @@ body.dark-mode .form-group-recover textarea:focus {
 /* 1. Sembunyikan area cetak dari tampilan normal */
 #print-area {
   display: none;
+}
+
+.qr-scanner-modal #qr-reader a {
+    color: var(--link-color);
+    font-weight: 500;
+}
+
+/* 2. Tombol & Dropdown Pemilihan Kamera */
+.qr-scanner-modal #qr-reader button,
+.qr-scanner-modal #qr-reader select {
+    background-color: var(--bg-modal);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px 12px;
+    max-width: 250px;
+    text-align: center;
+}
+
+.qr-scanner-modal #qr-reader select {
+    cursor: pointer;
+}
+
+/* 3. Teks Status (Scanning, Idle, dll.) */
+.qr-scanner-modal #qr-reader #html5-qrcode-status-span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* 4. Ikon Handphone (agar terlihat di dark mode) */
+[data-theme='dark'] .qr-scanner-modal #qr-reader img {
+    filter: invert(1);
 }
 
 /* 2. Aturan yang HANYA berlaku saat mencetak */
@@ -10580,7 +10610,7 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* --- Dark Mode --- */
 .dark-mode .filter-select-invent {
-  background-color: #111111;
+  background-color: #3a3f44;
   color: var(--text-primary, #FFFFFF);
   border: 1px solid var(--input-border, #495057);
   /* Panah untuk background gelap */
@@ -11503,7 +11533,7 @@ body.dark-mode .btn-detail:hover {
 /* ============================================= */
 
 
-.filters-container.report-filters {
+.filters-container .report-filters {
   display: flex;
   flex-wrap: wrap;
   /* Agar responsif di layar kecil */
@@ -11513,10 +11543,13 @@ body.dark-mode .btn-detail:hover {
 
 .filter-search-input {
   padding: 8px 12px;
-  border: 1px solid var(--border-color, #ccc);
   border-radius: 6px;
   min-width: 250px;
   flex-grow: 1;
+  margin-bottom: 18px;
+  background-color: var(--input-bg, #FFFFFF);
+  color: var(--text-primary, #212529);
+  border: 1px solid var(--input-border, #ced4da);
 }
 
 /* Kontainer untuk Paginasi dan Ringkasan */
@@ -11540,12 +11573,9 @@ body.dark-mode .btn-detail:hover {
 
 /* --- 1. Gaya Dasar untuk Kotak Input --- */
 .filter-select-cal {
-  /* Menghilangkan tampilan default browser */
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-
-  /* Dimensi dan Teks */
   position: relative;
   height: 44px;
   width: 170px;
@@ -11553,13 +11583,15 @@ body.dark-mode .btn-detail:hover {
   font-size: 0.9rem;
   line-height: 1.5;
   font-family: inherit;
-  /* Pastikan font konsisten */
   border-radius: 8px;
-
-  /* Transisi dan Kursor */
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   cursor: text;
-  /* Kursor teks, bukan pointer */
+  margin-bottom: 10px;
+}
+
+.strip {
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .filter-select-cal::-webkit-calendar-picker-indicator {
@@ -11818,7 +11850,7 @@ body.dark-mode .btn-detail:hover {
   border: 1px solid var(--input-border, #ced4da);
 }
 
-.dark-mode .search-input-cari{
+.dark-mode .search-input-cari {
   background-color: #111111;
   color: var(--text-primary, #FFFFFF);
   border: 1px solid var(--input-border, #495057);

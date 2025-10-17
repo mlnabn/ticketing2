@@ -46,7 +46,7 @@ export default function DetailedReportPage({ type, title }) {
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
-    
+
     const handleExport = async (exportType) => {
         if (exportType === 'excel') setExportingExcel(true);
         else setExportingPdf(true);
@@ -128,17 +128,18 @@ export default function DetailedReportPage({ type, title }) {
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-cal" />
-                <span>-</span>
+                <span className='strip'>-</span>
                 <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-cal" />
-                {/* <button onClick={() => fetchData(1)} className="btn-primary">Terapkan Filter</button> */}
-                <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
-                    <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
-                    {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
-                </button>
-                <button onClick={() => handleExport('pdf')} className="btn-download pdf" disabled={exportingPdf}>
-                    <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
-                    {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
-                </button>
+                <div className="download-buttons">
+                    <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
+                        <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
+                        {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
+                    </button>
+                    <button onClick={() => handleExport('pdf')} className="btn-download pdf" disabled={exportingPdf}>
+                        <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
+                        {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
+                    </button>
+                </div>
             </div>
 
             <div className="job-list-container">
