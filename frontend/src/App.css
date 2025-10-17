@@ -10417,7 +10417,7 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* --- Dark Mode --- */
 .dark-mode .filter-select {
-  background-color: #2d3748;
+  background-color: #111111;
   color: #e2e8f0;
   border-color: #4a5568;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23e2e8f0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
@@ -10580,7 +10580,7 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* --- Dark Mode --- */
 .dark-mode .filter-select-invent {
-  background-color: var(--input-bg, #3a3f44);
+  background-color: #111111;
   color: var(--text-primary, #FFFFFF);
   border: 1px solid var(--input-border, #495057);
   /* Panah untuk background gelap */
@@ -11517,7 +11517,6 @@ body.dark-mode .btn-detail:hover {
   border-radius: 6px;
   min-width: 250px;
   flex-grow: 1;
-  /* Agar memenuhi sisa ruang */
 }
 
 /* Kontainer untuk Paginasi dan Ringkasan */
@@ -11811,4 +11810,16 @@ body.dark-mode .btn-detail:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.search-input-cari {
+  background-color: var(--input-bg, #FFFFFF);
+  color: var(--text-primary, #212529);
+  border: 1px solid var(--input-border, #ced4da);
+}
+
+.dark-mode .search-input-cari{
+  background-color: #111111;
+  color: var(--text-primary, #FFFFFF);
+  border: 1px solid var(--input-border, #495057);
 }
