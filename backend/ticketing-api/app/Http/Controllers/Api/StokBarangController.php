@@ -170,29 +170,22 @@ class StokBarangController extends Controller
 
     private function generateUniqueStokCode(MasterBarang $masterBarang): string
     {
-        // --- LOGIKA BARU DIMULAI DI SINI ---
-
-        // 1. Ambil kode dasar dari master barang, contoh: "RUZT"
         $baseCode = $masterBarang->kode_barang;
 
-        // 2. Cari stok terakhir dengan awalan kode yang sama untuk mendapatkan urutan
         $latestItem = StokBarang::where('kode_unik', 'LIKE', $baseCode . '%')
             ->orderBy('kode_unik', 'desc')
             ->first();
 
         $sequence = 1;
         if ($latestItem) {
-            // Ekstrak angka dari kode unik terakhir (misal: dari RUZT0001 -> 1)
             $lastSequence = (int) substr($latestItem->kode_unik, strlen($baseCode));
             $sequence = $lastSequence + 1;
         }
 
-        // 3. Tentukan jumlah digit (padding) berdasarkan urutan
         $padding = ($sequence >= 10000) ? 5 : 4;
-        $sequencePart = str_pad($sequence, $padding, '0', STR_PAD_LEFT); // Contoh: 0001 atau 00001
+        $sequencePart = str_pad($sequence, $padding, '0', STR_PAD_LEFT);
 
-        // 4. Gabungkan menjadi kode unik final
-        return $baseCode . $sequencePart; // Contoh: "RUZT0001"
+        return $baseCode . $sequencePart; 
     }
 
     public function updateStatus(Request $request, StokBarang $stokBarang)

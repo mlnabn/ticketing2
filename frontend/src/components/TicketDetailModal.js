@@ -32,18 +32,18 @@ function TicketDetailModal({ ticket, onClose }) {
 
     if (!ticket) return null;
 
-    const formatWorkTime = (t) => {
-        if (t.started_at && t.completed_at) {
-            return `${format(new Date(t.started_at), 'HH:mm')} - ${format(new Date(t.completed_at), 'HH:mm')}`;
-        }
-        if (t.started_at) {
-            return `Mulai: ${format(new Date(t.started_at), 'HH:mm')}`;
-        }
-        if (t.requested_date && t.requested_time) {
-            return `Diminta: ${format(new Date(t.requested_date), 'dd MMM')}, ${t.requested_time}`;
-        }
-        return 'Jadwal Fleksibel';
-    };
+    // const formatWorkTime = (t) => {
+    //     if (t.started_at && t.completed_at) {
+    //         return `${format(new Date(t.started_at), 'HH:mm')} - ${format(new Date(t.completed_at), 'HH:mm')}`;
+    //     }
+    //     if (t.started_at) {
+    //         return `Mulai: ${format(new Date(t.started_at), 'HH:mm')}`;
+    //     }
+    //     if (t.requested_date && t.requested_time) {
+    //         return `Diminta: ${format(new Date(t.requested_date), 'dd MMM')}, ${t.requested_time}`;
+    //     }
+    //     return 'Jadwal Fleksibel';
+    // };
 
     const handleWhatsAppChat = () => {
         const phone = ticket.creator?.phone;
@@ -63,17 +63,12 @@ function TicketDetailModal({ ticket, onClose }) {
         <div className="modal-backdrop-detail">
             <div className="modal-content-detail">
                 <div className="modal-header-detail">
-                    <h3>Detail Tiket: {ticket.kode_tiket || 'N/A'}</h3>
+                    <h3><strong>Detail Tiket: </strong>{ticket.kode_tiket || 'N/A'}</h3>
                 </div>
 
                 <div className="modal-body-detail">
-                    {/* Deskripsi (full-width) */}
-                    <div className="detail-item-full" data-span="2">
-                        <span className="label">Deskripsi Pekerjaan</span>
-                        <span className="value">{ticket.title}</span>
-                    </div>
+                    
 
-                    {/* Grid untuk item lainnya */}
                     <div className="detail-grid-section">
                         <div className="detail-item-full">
                             <span className="label">Pengirim</span>
@@ -92,19 +87,13 @@ function TicketDetailModal({ ticket, onClose }) {
                             <span className="value">{formatDateTime(ticket.created_at)}</span>
                         </div>
                         <div className="detail-item-full">
-                            <span className="label">Waktu Pengerjaan</span>
-                            <span className="value">{formatWorkTime(ticket)}</span>
-                        </div>
-                        <div className="detail-item-full">
                             <span className="label">Mulai Dikerjakan</span>
                             <span className="value">{formatDateTime(ticket.started_at)}</span>
                         </div>
-                    </div>
-
-                    {/* Item full-width lainnya di luar grid */}
-                    <div className="detail-item-full" data-span="2">
-                        <span className="label">Selesai Dikerjakan</span>
-                        <span className="value">{formatDateTime(ticket.completed_at)}</span>
+                        <div className="detail-item-full" data-span="2">
+                            <span className="label">Selesai Dikerjakan</span>
+                            <span className="value">{formatDateTime(ticket.completed_at)}</span>
+                        </div>
                     </div>
 
                     {ticket.status === 'Selesai' && ticket.proof_description && (
@@ -124,6 +113,11 @@ function TicketDetailModal({ ticket, onClose }) {
                     <div className="detail-item-full" data-span="2">
                         <span className="label">Status</span>
                         <span className={`value status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span>
+                    </div>
+
+                    <div className="detail-item-full" data-span="2">
+                        <span className="label">Deskripsi Pekerjaan</span>
+                        <span className="value">{ticket.title}</span>
                     </div>
 
                     <div className="detail-item-full" data-span="2">
@@ -147,7 +141,7 @@ function TicketDetailModal({ ticket, onClose }) {
 
                 </div>
                 <div className="modal-footer-user" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                    <button onClick={onClose} className="btn-tutup-user">Tutup</button>
+                    <button onClick={onClose} className="btn-cancel">Tutup</button>
                     {ticket.creator && ticket.creator.phone && (
                         <button onClick={handleWhatsAppChat} className="btn-whatsapp">
                             <i className="fab fa-whatsapp" style={{ marginRight: '8px' }}></i>

@@ -48,6 +48,9 @@ export default function ComprehensiveReportPage() {
   // BARU: State untuk modal detail tiket, sekarang dikelola di sini
   const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
 
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const [exportingExcel, setExportingExcel] = useState(false);
+
   const fetchTableData = useCallback(async (page, currentFilter) => {
     setLoading(true);
     try {
@@ -96,6 +99,9 @@ export default function ComprehensiveReportPage() {
   };
 
   const handleDownload = async (type) => {
+    if (type === 'pdf') setExportingPdf(true);
+    else setExportingExcel(true);
+
     const params = new URLSearchParams({ type });
     if (filter === 'handled') {
       params.append('handled_status', 'handled');
@@ -116,6 +122,9 @@ export default function ComprehensiveReportPage() {
     } catch (err) {
       console.error('Gagal mengunduh file laporan:', err);
       alert('Gagal mengunduh file. Mohon coba lagi.');
+    } finally {
+          if (type === 'pdf') setExportingPdf(false);
+          else setExportingExcel(false);
     }
   };
 
@@ -163,12 +172,14 @@ export default function ComprehensiveReportPage() {
 
           <h3>Daftar Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</h3>
           <div className="download-buttons">
-            <button className="btn-download pdf" onClick={() => handleDownload('pdf')}>
-              <i className="fas fa-file-pdf"></i> Download PDF
-            </button>
-            <button className="btn-download excel" onClick={() => handleDownload('excel')}>
-              <i className="fas fa-file-excel"></i> Download Excel
-            </button>
+              <button className="btn-download pdf" onClick={() => handleDownload('pdf')} disabled={exportingPdf}>
+                  <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
+                  {exportingPdf ? 'Mengekspor...' : 'Download PDF'}
+              </button>
+              <button className="btn-download excel" onClick={() => handleDownload('excel')} disabled={exportingExcel}>
+                  <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
+                  {exportingExcel ? 'Mengekspor...' : 'Download Excel'}
+              </button>
           </div>
 
           {loading ? <p>Memuat data...</p> : tickets.length === 0 ? (

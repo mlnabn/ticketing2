@@ -32,7 +32,7 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
     return (
         <>
             <div className="user-management-header">
-                <button className="btn-primary" onClick={onAdd}>Daftarkan Barang Baru</button>
+                <button className="btn-primary" onClick={onAdd}><i className="fas fa-plus" style={{marginRight: '8px'}}></i>Daftarkan SKU Baru</button>
             </div>
 
             {/* --- Filter Section --- */}

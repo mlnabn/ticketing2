@@ -1,4 +1,4 @@
-// import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useFinancialReport } from './useFinancialReport';
 
 export default function ProblematicAssetsReport() {
@@ -17,7 +17,20 @@ export default function ProblematicAssetsReport() {
         months
     } = useFinancialReport();
 
+    const [exportingPdf, setExportingPdf] = useState(false);
+    const [exportingExcel, setExportingExcel] = useState(false);
+
     const problematicAssetsSubtotal = detailedData.problematic_assets.reduce((sum, item) => sum + parseFloat(item.harga_beli), 0);
+
+    const handleExportWrapper = async (type) => {
+        if (type === 'pdf') setExportingPdf(true);
+        else setExportingExcel(true);
+        
+        await handleExport(type); // Panggil fungsi asli dari hook
+        
+        if (type === 'pdf') setExportingPdf(false);
+        else setExportingExcel(false);
+    };
 
     return (
         <div className="user-management-container">
@@ -51,11 +64,13 @@ export default function ProblematicAssetsReport() {
             </div>
 
             <div className="download-buttons">
-                <button onClick={() => handleExport('excel')} disabled={isExporting} className="btn-download excel">
-                    <i className="fas fa-file-excel"></i>{isExporting ? '...' : 'Ekspor Excel'}
+                <button onClick={() => handleExportWrapper('excel')} disabled={exportingExcel} className="btn-download excel">
+                    <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
+                    {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
                 </button>
-                <button onClick={() => handleExport('pdf')} disabled={isExporting} className="btn-download pdf">
-                    <i className="fas fa-file-pdf"></i>{isExporting ? '...' : 'Ekspor PDF'}
+                <button onClick={() => handleExportWrapper('pdf')} disabled={exportingPdf} className="btn-download pdf">
+                    <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
+                    {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
                 </button>
             </div>
             <div className="job-list-container">
