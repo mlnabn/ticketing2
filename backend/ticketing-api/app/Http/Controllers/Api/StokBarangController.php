@@ -356,4 +356,26 @@ class StokBarangController extends Controller
 
         return response()->json($item);
     }
+
+    public function searchAvailable(Request $request)
+    {
+        $request->validate(['search' => 'required|string|min:2']);
+        $searchTerm = '%' . $request->search . '%';
+
+        $statusTersediaId = \App\Models\Status::where('nama_status', 'Tersedia')->value('id');
+
+        $results = StokBarang::with('masterBarang')
+            ->where('status_id', $statusTersediaId)
+            ->where(function ($query) use ($searchTerm) {
+                $query->where('kode_unik', 'like', $searchTerm)
+                      ->orWhere('serial_number', 'like', $searchTerm)
+                      ->orWhereHas('masterBarang', function ($q) use ($searchTerm) {
+                          $q->where('nama_barang', 'like', $searchTerm);
+                      });
+            })
+            ->limit(10) // Batasi hasil agar dropdown tidak terlalu panjang
+            ->get();
+
+        return response()->json($results);
+    }
 }

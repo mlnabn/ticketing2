@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
 import api from '../services/api';
 
 // Custom hook untuk listener scanner
@@ -28,9 +29,7 @@ const useScannerListener = (onScan, isOpen) => {
 function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast }) {
     const [selectedAdminId, setSelectedAdminId] = useState(null);
     const [itemsToAssign, setItemsToAssign] = useState([]);
-    const [searchCode, setSearchCode] = useState('');
-    const [isSearching, setIsSearching] = useState(false);
-    const searchInputRef = useRef(null);
+    const [selectKey, setSelectKey] = useState(Date.now());
 
     const isDarkMode = document.body.classList.contains('dark-mode');
     const selectStyles = {
@@ -74,26 +73,41 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast }) {
             return;
         }
         setItemsToAssign(prev => [...prev, item]);
-        setSearchCode(''); // Kosongkan input setelah berhasil
+        setSelectKey(Date.now());
     }, [itemsToAssign, showToast]);
 
     // Fungsi yang menangani pencarian via scan atau ketik manual
-    const findItem = useCallback(async (code) => {
+    const handleScan = useCallback(async (code) => {
         if (!code) return;
-        setIsSearching(true);
         try {
+            // Kita tetap menggunakan endpoint lama yang spesifik untuk hasil scan
             const res = await api.get(`/inventory/stock-items/find-available/${code}`);
             addItemToList(res.data);
         } catch (error) {
             showToast(error.response?.data?.message || `Kode "${code}" tidak ditemukan.`, 'error');
-        } finally {
-            setIsSearching(false);
-            searchInputRef.current?.focus();
         }
     }, [addItemToList, showToast]);
     
-    // Aktifkan listener scanner
-    useScannerListener(findItem, !!ticket);
+    useScannerListener(handleScan, !!ticket);
+
+    const loadOptions = async (inputValue) => {
+        if (inputValue.length < 2) return []; // Jangan cari jika input terlalu pendek
+
+        try {
+            const response = await api.get('/inventory/stock-items/search-available', {
+                params: { search: inputValue }
+            });
+
+            // Ubah format data agar sesuai dengan react-select
+            return response.data.map(item => ({
+                value: item, // Simpan seluruh objek item di 'value'
+                label: `${item.master_barang.nama_barang} (${item.kode_unik})`
+            }));
+        } catch (error) {
+            console.error("Gagal mencari barang:", error);
+            return [];
+        }
+    };
 
     const handleRemoveItem = (itemId) => {
         setItemsToAssign(prev => prev.filter(item => item.id !== itemId));
@@ -127,19 +141,17 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast }) {
 
                 <div className="form-group-AssignAdmin">
                     <label className="modal-label">Barang yang Dibawa (Scan atau Ketik Kode)</label>
-                    <div className="scan-input-group">
-                        <input
-                            ref={searchInputRef}
-                            type="text"
-                            placeholder="Scan QR atau ketik kode unik/S-N..."
-                            value={searchCode}
-                            onChange={(e) => setSearchCode(e.target.value)}
-                            onKeyDown={(e) => { if(e.key === 'Enter') { e.preventDefault(); findItem(searchCode); }}}
-                        />
-                        <button onClick={() => findItem(searchCode)} disabled={isSearching}>
-                            {isSearching ? '...' : 'Tambah'}
-                        </button>
-                    </div>
+                    <AsyncSelect className="scan-input-group"
+                        key={selectKey}
+                        cacheOptions
+                        loadOptions={loadOptions}
+                        defaultOptions
+                        placeholder="Ketik nama, kode unik, atau S/N..."
+                        onChange={(selectedOption) => addItemToList(selectedOption.value)}
+                        styles={selectStyles}
+                        noOptionsMessage={() => 'Ketik untuk mencari barang...'}
+                        loadingMessage={() => 'Mencari...'}
+                    />
                 </div>
 
                 <div className="assigned-items-list-scan">
