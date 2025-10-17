@@ -165,7 +165,7 @@ function StokBarangView() {
                     placeholder="Cari apa saja..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
-                    className="search-input-cari"
+                    className="filter-search-input"
                 />
             <div className="job-list-container">
                 {/* ======================================================= */}
