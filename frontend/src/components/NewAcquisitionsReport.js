@@ -61,8 +61,9 @@ export default function NewAcquisitionsReport() {
                 </button>
             </div>
             {/* Tabel Pembelian Baru */}
-            <div className="report-table-container">
-                <table className="job-table report-table">
+            <div className="job-list-container">
+                {/* Destop View*/}
+                <table className="job-table">
                     <thead>
                         <tr>
                             <th>Tanggal</th>
@@ -97,6 +98,67 @@ export default function NewAcquisitionsReport() {
                         )}
                     </tbody>
                 </table>
+                {/*Mobile View*/}
+                <div className='job-list-mobile'>
+                    {/* Tampilkan pesan loading jika data sedang dimuat */}
+                    {isLoading ? (
+                        <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
+                            <p>Memuat data...</p>
+                        </div>
+                    ) : detailedData.new_acquisitions.length > 0 ? (
+                        <>
+                            {/* Loop melalui setiap item pembelian baru dan buat card */}
+                            {detailedData.new_acquisitions.map(item => (
+                                <div key={`mobile-new-${item.kode_unik}`} className="ticket-card-mobile">
+                                    {/* Baris 1: Nama Barang */}
+                                    <div className="card-row">
+                                        <div className="data-group single">
+                                            <span className="label">Nama Barang</span>
+                                            <span className="value description">
+                                                {item.master_barang.nama_barang}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Baris 2: Kode Unik & Tanggal Beli */}
+                                    <div className="card-row">
+                                        <div className="data-group">
+                                            <span className="label">Kode Unik</span>
+                                            <span className="value">{item.kode_unik}</span>
+                                        </div>
+                                        <div className="data-group">
+                                            <span className="label">Tanggal Beli</span>
+                                            <span className="value">{formatDate(item.tanggal_pembelian)}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Baris 3: Nilai Pembelian (Paling Penting) */}
+                                    <div className="card-row value-row-financial">
+                                        <div className="data-group single" style={{ textAlign: 'right' }}>
+                                            <span className="label">Nilai Pembelian</span>
+                                            <span className="value value-acquisition">
+                                                {formatCurrency(parseFloat(item.harga_beli))}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Tampilkan Card untuk Subtotal di bagian bawah */}
+                            <div className="subtotal-card-mobile acquisition-subtotal">
+                                <span className="subtotal-label">Subtotal Pembelian</span>
+                                <span className="subtotal-value value-acquisition">
+                                    {formatCurrency(newAcquisitionsSubtotal)}
+                                </span>
+                            </div>
+                        </>
+                    ) : (
+                        // Tampilkan pesan jika tidak ada data
+                        <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
+                            <p>Tidak ada pembelian baru pada periode ini.</p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

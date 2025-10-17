@@ -96,7 +96,7 @@ export default function TicketReportAdminList() {
       </div>
       <hr className="report-divider" />
       <div className="adminselect-card" style={{ marginBottom: '2rem' }}>
-        <h2 className="page-title">Pilih Admin Untuk Laporan Detail</h2>
+        <h1 className="page-title">Pilih Admin Untuk Laporan Detail</h1>
         {loadingAdmins ? <p>Memuat data admin...</p> : (
           <div className="admin-list-grid">
             {admins.map(admin => (

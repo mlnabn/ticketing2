@@ -1,26 +1,51 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Line } from 'react-chartjs-2';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
+    ResponsiveContainer,
+    LineChart,
+    CartesianGrid,
+    XAxis,
+    YAxis,
     Tooltip,
-    Legend,
-} from 'chart.js';
+    Line
+} from 'recharts';
 
-// Registrasi komponen-komponen Chart.js
-ChartJS.register(
-    CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend
-);
+// ================================================================
+// BARU: Komponen Tooltip Kustom untuk Recharts
+// ================================================================
+const CustomTooltip = ({ active, payload, label, isDarkMode }) => {
+    if (active && payload && payload.length) {
+        const style = {
+            backgroundColor: isDarkMode ? "#2c2c2c" : "#fff",
+            border: `1px solid ${isDarkMode ? "#555" : "#ccc"}`,
+            padding: '10px',
+            borderRadius: '5px',
+            color: isDarkMode ? "#fff" : "#333",
+            boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+        };
 
-const InventoryLineChart = ({ chartData }) => {
+        return (
+            <div className="custom-tooltip" style={style}>
+                <p className="label">{`${label}`}</p>
+                {payload.map((pld, index) => (
+                    <div key={index} style={{ color: pld.color }}>
+                        {`${pld.name}: ${pld.value} unit`}
+                    </div>
+                ))}
+            </div>
+        );
+    }
+    return null;
+};
+
+// ================================================================
+// Komponen Utama Menggunakan Recharts
+// ================================================================
+const InventoryLineChartRecharts = ({ chartData }) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const chartRef = useRef(null); // Ref untuk mengakses instance chart
+    // State baru untuk mengelola visibilitas dataset/garis
+    const [hiddenDatasets, setHiddenDatasets] = useState({});
 
-    // Efek untuk mendeteksi perubahan dark mode dari localStorage
+    // Efek untuk mendeteksi perubahan dark mode (tidak berubah)
     useEffect(() => {
         const updateModeFromStorage = () => {
             const savedMode = localStorage.getItem("darkMode");
@@ -31,114 +56,104 @@ const InventoryLineChart = ({ chartData }) => {
         return () => window.removeEventListener("storage", updateModeFromStorage);
     }, []);
 
-    // Konfigurasi dinamis berdasarkan dark mode
-    const options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false, // Sembunyikan legend bawaan karena kita buat yang custom
-            },
-            title: {
-                display: false,
-            },
-            tooltip: {
-                mode: 'index',
-                intersect: false,
-                backgroundColor: isDarkMode ? "#2c2c2c" : "#fff",
-                titleColor: isDarkMode ? "#fff" : "#333",
-                bodyColor: isDarkMode ? "#fff" : "#333",
-                borderColor: isDarkMode ? "#555" : "#ccc",
-                borderWidth: 1,
-                callbacks: {
-                    label: (context) => `${context.dataset.label || ''}: ${context.parsed.y} unit`,
-                },
-            },
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    precision: 0,
-                    color: isDarkMode ? "#a0a0a0" : "#666",
-                },
-                grid: {
-                    color: isDarkMode ? "#444" : "#ddd",
-                    borderDash: [3, 3],
-                },
-            },
-            x: {
-                ticks: {
-                    color: isDarkMode ? "#a0a0a0" : "#666",
-                },
-                grid: {
-                    display: false,
-                },
-            },
-        },
-        interaction: {
-            mode: 'index',
-            intersect: false,
-        },
-        elements: {
-            line: {
-                tension: 0.4,
-            },
-        },
+    // ================================================================
+    // BARU: Transformasi data dari format Chart.js ke Recharts
+    // Recharts memerlukan array of objects, misal: [{name: 'Jan', 'Masuk': 10, 'Keluar': 5}]
+    // ================================================================
+    const transformedData = useMemo(() => {
+        if (!chartData || !chartData.labels || !chartData.datasets) {
+            return [];
+        }
+        return chartData.labels.map((label, index) => {
+            const dataPoint = { name: label };
+            chartData.datasets.forEach(dataset => {
+                dataPoint[dataset.label] = dataset.data[index];
+            });
+            return dataPoint;
+        });
+    }, [chartData]);
+
+
+    // ================================================================
+    // BARU: Logika baru untuk handle klik pada legend
+    // Kita toggle state, bukan memanipulasi instance chart secara langsung
+    // ================================================================
+    const handleLegendClick = (dataKey) => {
+        setHiddenDatasets(prev => ({ ...prev, [dataKey]: !prev[dataKey] }));
     };
 
-    // Fungsi untuk handle klik pada legend kustom
-    const handleLegendClick = (datasetIndex) => {
-        const chart = chartRef.current;
-        if (chart) {
-            const isVisible = chart.isDatasetVisible(datasetIndex);
-            chart.setDatasetVisibility(datasetIndex, !isVisible);
-            chart.update();
-        }
-    };
 
     if (!chartData || !chartData.labels || !chartData.datasets) {
         return <div style={{ height: '350px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Memuat data chart...</div>;
     }
 
-    // Menentukan warna dot untuk legend
+    // Mendefinisikan warna dinamis untuk dark/light mode
+    const tickColor = isDarkMode ? "#a0a0a0" : "#666";
+    const gridColor = isDarkMode ? "#444" : "#ddd";
+
+    // Menentukan warna dot untuk legend (tidak berubah)
     const legendColorMap = {
         'Barang Masuk': 'dot-green',
         'Barang Keluar': 'dot-red',
     };
 
     return (
-        // Menggunakan className yang sama dengan LineChartComponent
         <div className="linechart-wrapper">
             <div style={{ position: 'relative', height: '350px' }}>
-                <Line ref={chartRef} options={options} data={chartData} />
+                <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                        data={transformedData}
+                        margin={{ top: 5, right: 20, left: -10, bottom: 20 }}
+                    >
+                        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                        <XAxis dataKey="name" tick={{ fill: tickColor }} stroke={gridColor} />
+                        <YAxis tick={{ fill: tickColor }} stroke={gridColor} domain={[0, 'auto']} />
+                        <Tooltip
+                            content={<CustomTooltip isDarkMode={isDarkMode} />}
+                            cursor={{ stroke: isDarkMode ? '#555' : '#ccc', strokeWidth: 1 }}
+                        />
+                        {/* Render garis secara dinamis berdasarkan dataset */}
+                        {chartData.datasets.map((dataset) => {
+                            // Jika dataset tidak ada di state 'hidden', maka render garisnya
+                            if (!hiddenDatasets[dataset.label]) {
+                                return (
+                                    <Line
+                                        key={dataset.label}
+                                        type="monotone" // ini setara dengan 'tension' di chart.js
+                                        dataKey={dataset.label}
+                                        stroke={dataset.borderColor}
+                                        strokeWidth={2}
+                                        activeDot={{ r: 8 }}
+                                        dot={{ r: 4 }}
+                                        animationDuration={1500} // Efek animasi
+                                    />
+                                );
+                            }
+                            return null;
+                        })}
+                    </LineChart>
+                </ResponsiveContainer>
             </div>
 
-            {/* Legend custom yang meniru style dari LineChartComponent */}
+            {/* Legend kustom dengan logika baru */}
             <div className="chart-legend">
-                {chartData.datasets.map((dataset, index) => {
-                    const chart = chartRef.current;
-                    const isVisible = chart ? chart.isDatasetVisible(index) : true;
-
-                    return (
-                        <div
-                            key={dataset.label}
-                            className="legend-item2"
-                            onClick={() => handleLegendClick(index)}
-                            style={{
-                                cursor: "pointer",
-                                opacity: isVisible ? 1 : 0.4,
-                            }}
-                        >
-                            <span className={`legend-dot ${legendColorMap[dataset.label] || 'dot-blue'}`}></span>
-                            <span className="legend-text">{dataset.label}</span>
-                        </div>
-                    );
-                })}
+                {chartData.datasets.map((dataset) => (
+                    <div
+                        key={dataset.label}
+                        className="legend-item2"
+                        onClick={() => handleLegendClick(dataset.label)}
+                        style={{
+                            cursor: "pointer",
+                            opacity: hiddenDatasets[dataset.label] ? 0.4 : 1,
+                        }}
+                    >
+                        <span className={`legend-dot ${legendColorMap[dataset.label] || 'dot-blue'}`}></span>
+                        <span className="legend-text">{dataset.label}</span>
+                    </div>
+                ))}
             </div>
         </div>
     );
 };
 
-export default InventoryLineChart;
-
+export default InventoryLineChartRecharts;

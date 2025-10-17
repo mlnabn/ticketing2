@@ -115,11 +115,11 @@ export default function WelcomeHome() {
             <MapComponent data={locationsData} />
           </div>
         </div>
-        <div className="dashboard-column2">
+        
           <div className="dashboard-card calendar-card">
             <h4>Kalender Tiket</h4>
             <CalendarComponent tickets={allTickets} onTicketClick={(ticketId) => handleChartFilter({ ticketId })} />
-          </div>
+          
         </div>
       </div>
     </>

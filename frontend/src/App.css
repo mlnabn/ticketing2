@@ -585,6 +585,23 @@ body.dark-mode .hamburger-menu-button span {
   visibility: visible;
 }
 
+.subtotal-card-mobile {
+  background-color: var(--background-color-secondary);
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 3px solid var(--red-color, #e53e3e);
+}
+
+.subtotal-label {
+  font-weight: bold;
+  font-size: 1rem;
+  color: var(--text-color-primary);
+}
+
 /* Desktop Styles */
 @media (min-width: 1290px) {
 
@@ -738,7 +755,7 @@ body.dark-mode .hamburger-menu-button span {
     margin-bottom: 15px;
   }
 
-  .btn-scan{
+  .btn-scan {
     width: 100%;
     margin-bottom: 15px;
   }
@@ -1736,7 +1753,10 @@ body.dark-mode .proof-modal__group input[type="file"]::file-selector-button:hove
 /* ================================ */
 /* Value & Extra Info               */
 /* ================================ */
-
+.info-card .card-value {
+  font-size: 2.2rem;
+  word-break: break-all; /* Tetap gunakan ini sebagai pengaman */
+}
 .card-value {
   font-size: 2rem;
   font-weight: 700;
@@ -5036,11 +5056,14 @@ body.dark-mode .notification-form-container label {
   cursor: pointer;
   background: #d6eaf8;
   color: #154360;
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(21, 64, 96, 0.25);
 }
 
 .btn-primary:hover {
   background-color: #aed6f1;
-  transform: scale(1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(21, 64, 96, 0.2);
 }
 
 .btn-primary:disabled {
@@ -5057,12 +5080,15 @@ body.dark-mode .notification-form-container label {
   border: none;
   background-color: #d1e7dd;
   color: #0f5132;
-  
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(13, 110, 53, 0.25);
+
 }
 
 .btn-scan:hover {
   background-color: #bce3c9;
-  transform: scale(1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(13, 110, 53, 0.2);
 }
 
 .btn-scan:disabled {
@@ -5073,13 +5099,17 @@ body.dark-mode .notification-form-container label {
 body.dark-mode .btn-scan {
   background-color: #22c55e;
   color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(34, 197, 94, 0.25);
 }
 
 body.dark-mode .btn-scan:hover {
   background-color: #16a34a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
 }
 
-.action-buttons-stok{
+.action-buttons-stok {
   display: flex;
   gap: 10px;
   margin-top: 10px;
@@ -5108,10 +5138,6 @@ body.dark-mode .btn-scan:hover {
 /* =========================
    LIGHT THEME (default)
    ========================= */
-body {
-  background: white;
-  color: #111827;
-}
 
 
 
@@ -5143,16 +5169,14 @@ body {
 /* Input & Textarea */
 .modal-content .form-group textarea,
 .modal-content .form-group input {
-  width: 435px;
-  background: #ffffff;
-  border: 1px solid #d1d5db;
-  color: #111827;
-  outline: none;
-  padding: 8px;
-  border-radius: 6px;
-  display: block;
-  margin: 0 auto;
-  /* pastikan center */
+  width: 100%;
+  background-color: #4A4A4A;
+  color: #FFFFFF;
+  border: 1px solid #666;
+  border-radius: 8px;
+  font-size: 16px;
+  padding: 12px 15px;
+  box-sizing: border-box;
 }
 
 /* Preview gambar */
@@ -5267,10 +5291,14 @@ body.dark-mode .form-group2 textarea:focus {
 body.dark-mode .btn-primary {
   background-color: #4F46E5;
   color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
 }
 
 body.dark-mode .btn-primary:hover {
   background-color: #4338CA;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
 }
 
 body.dark-mode .feedback-message {
@@ -6488,17 +6516,29 @@ body.dark-mode .welcome-title {
   display: flex;
   flex-direction: column;
   gap: 30px;
-  /* jarak antar baris */
-  padding: 20px;
   background-color: #f9f9f9;
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  /* Hapus margin kiri */
+  margin-right: 0;
+  /* Hapus margin kanan */
+  padding-left: 0;
+  /* Hapus padding kiri jika ada */
+  padding-right: 0;
+  /* Hapus padding kanan jika ada */
+  box-sizing: border-box;
 }
 
 /* Grid untuk setiap baris */
+.dashboard-column2,
 .dashboard-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   /* 2 kolom */
   gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Card dasar */
@@ -7990,18 +8030,20 @@ body.dark-mode .dashboard-card h4 {
 }
 
 /* ========================================================= */
-/* ============== LIGHT MODE & CORE STYLES ================= */
+/* ==================== REACT CALENDAR ===================== */
 /* ========================================================= */
 
+/* --- 1. Wrapper & Core Styles --- */
 .calendar-wrapper .react-calendar {
   width: 100%;
+  background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  background: #fff;
-  color: #222;
   padding: 10px;
+  color: #222;
 }
 
+/* --- 2. Navigation (Header: Month & Year) --- */
 .react-calendar__navigation {
   display: flex;
   justify-content: space-between;
@@ -8011,13 +8053,13 @@ body.dark-mode .dashboard-card h4 {
 
 .react-calendar__navigation button {
   min-width: 40px;
+  padding: 8px;
   font-size: 16px;
   font-weight: 600;
   color: hsl(210, 10%, 25%);
   background: transparent;
   border-radius: 8px;
   cursor: pointer;
-  padding: 8px;
   transition: background-color 0.2s;
 }
 
@@ -8025,60 +8067,65 @@ body.dark-mode .dashboard-card h4 {
   background: hsl(210, 10%, 90%);
 }
 
+/* --- 3. View (Weekdays & Tiles) --- */
 .react-calendar__month-view__weekdays {
-  font-weight: bold;
   text-transform: uppercase;
+  font-weight: bold;
   font-size: 13px;
   color: hsl(210, 10%, 50%);
 }
 
 .react-calendar__tile {
+  position: relative;
   height: 50px;
+  color: hsl(210, 10%, 25%);
   border-radius: 8px;
   transition: all 0.2s;
-  color: hsl(210, 10%, 25%);
-  position: relative;
-}
-
-.react-calendar__tile--now {
-  background: hsl(214, 89%, 70%) !important;
-  color: #fff !important;
-  font-weight: 600;
-}
-
-.react-calendar__tile--now:hover {
-  background: hsl(214, 89%, 45%) !important;
-  /* biru lebih pekat */
-  color: hsl(214, 89%, 40%);
-  font-weight: 700;
-  border-radius: 6px;
-  /* opsional biar lebih lembut */
-  transition: all 0.3s ease;
-}
-
-.react-calendar__tile--active {
-  background: hsl(214, 89%, 52%);
-  color: #fff;
 }
 
 .react-calendar__tile:hover {
   background: hsl(214, 100%, 94%);
 }
 
+/* States for Tiles */
+.react-calendar__tile--active {
+  background: hsl(214, 89%, 52%);
+  color: #fff;
+}
+
+.react-calendar__tile--now {
+  background: hsl(214, 89%, 65%) !important;
+  /* Biru terang untuk hari ini */
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.react-calendar__tile--now:hover {
+  background: hsl(214, 89%, 55%) !important;
+  /* Sedikit lebih gelap saat di-hover */
+}
+
+/* --- 4. Ticket Dots & Legend --- */
 .ticket-dot-wrapper {
   display: flex;
   justify-content: center;
+  gap: 2px;
   margin-top: 3px;
   flex-wrap: wrap;
-  gap: 2px;
+}
+
+.ticket-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
 }
 
 .ticket-legend {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 8px 16px;
   margin: 12px 0;
-  justify-content: center;
   font-size: 13px;
 }
 
@@ -8106,6 +8153,111 @@ body.dark-mode .dashboard-card h4 {
   flex-shrink: 0;
 }
 
+/* --- 5. Info Text --- */
+.calendar-info {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 15px;
+  color: hsl(210, 10%, 40%);
+}
+
+.info-text {
+  text-align: center;
+  font-style: italic;
+  margin-top: 20px;
+  color: hsl(210, 10%, 50%);
+}
+
+/* --- 6. Ticket Details Modal --- */
+.modal-overlay2 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content2 {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  max-width: 550px;
+  max-height: 85vh;
+  background: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease-in-out;
+}
+
+.modal-header {
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid hsl(210, 10%, 85%);
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: hsl(210, 10%, 25%);
+}
+
+.modal-body {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ticket-modal-card {
+  padding: 20px;
+  border-left: 5px solid transparent;
+  border-radius: 10px;
+  background-color: hsl(210, 20%, 96%);
+  /* Warna lebih lembut */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ticket-modal-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.ticket-modal-card p {
+  margin: 0 0 10px 0;
+  line-height: 1.5;
+  font-size: 15px;
+  color: hsl(210, 10%, 25%);
+}
+
+.ticket-modal-card p:last-child {
+  margin-bottom: 0;
+}
+
+.ticket-modal-card p b {
+  color: hsl(210, 10%, 5%);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 20px;
+  border-top: 1px solid hsl(210, 10%, 85%);
+}
+
+/* ========================================================= */
+/* =============== KODE LAIN (TIDAK DIUBAH) ================ */
+/* ========================================================= */
+
 .dot-green {
   background: #4caf50;
 }
@@ -8126,151 +8278,24 @@ body.dark-mode .dashboard-card h4 {
   background: #f44336;
 }
 
-.dark-mode .legend-item {
-  background: hsl(210, 10%, 25%);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.dark-mode .legend-item:hover {
-  background: hsl(210, 10%, 30%);
-}
-
-.dark-mode .legend-dot {
-  border: 1px solid hsl(210, 10%, 40%);
-}
-
-.ticket-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 4px;
-}
-
-.info-text {
-  text-align: center;
-  font-style: italic;
-  margin-top: 20px;
-  color: hsl(210, 10%, 50%);
-}
-
-.calendar-info {
-  margin-top: 15px;
-  text-align: center;
-  font-size: 15px;
-  color: hsl(210, 10%, 40%);
-}
-
-/* Modal */
-.modal-overlay2 {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content2 {
-  background: #fff;
-  border-radius: 12px;
-  padding: 30px;
-  max-width: 550px;
-  width: 90%;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  max-height: 85vh;
-  display: flex;
-  flex-direction: column;
-  transition: all 0.3s ease-in-out;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid hsl(210, 10%, 85%);
-}
-
-.modal-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: hsl(210, 10%, 25%);
-  margin: 0;
-}
-
-.modal-body {
-  flex-grow: 1;
-  overflow-y: auto;
-  /* padding-right: 15px; */
-  margin-bottom: 25px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.ticket-modal-card {
-  background-color: hsl(210, 10%, 90%);
-  border-left: 5px solid transparent;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-/* Warna border sesuai status */
 .status-selesai {
   border-left-color: #4caf50;
-  /* hijau */
 }
 
 .status-ditolak {
   border-left-color: #f44336;
-  /* merah */
 }
 
 .status-sedang-dikerjakan {
   border-left-color: #ff9800;
-  /* kuning */
 }
 
 .status-ditunda {
   border-left-color: #9e9e9e;
-  /* biru */
 }
 
 .status-belum-dikerjakan {
   border-left-color: #2196f3;
-  /* abu-abu */
-}
-
-
-.ticket-modal-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-}
-
-.ticket-modal-card p {
-  margin: 0 0 10px 0;
-  line-height: 1.5;
-  font-size: 15px;
-  color: hsl(210, 10%, 25%);
-}
-
-.ticket-modal-card p b {
-  color: hsl(210, 10%, 5%);
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  border-top: 1px solid hsl(210, 10%, 85%);
-  padding-top: 20px;
 }
 
 .legend-item2 {
@@ -8286,7 +8311,6 @@ body.dark-mode .dashboard-card h4 {
 
 .legend-item2:hover {
   transform: scale(1.05);
-
 }
 
 .linechart-wrapper {
@@ -8308,72 +8332,8 @@ body.dark-mode .dashboard-card h4 {
 /* ========================================================= */
 /* ==================== DARK MODE STYLES =================== */
 /* ========================================================= */
-
-.dark-mode .calendar-wrapper .react-calendar,
-.dark-mode .modal-content2,
 .dark-mode .linechart-wrapper {
   background-color: #111111;
-}
-
-.dark-mode .react-calendar,
-.dark-mode .react-calendar__navigation button,
-.dark-mode .react-calendar__tile,
-.dark-mode .modal-content2,
-.dark-mode .modal-title,
-.dark-mode .ticket-modal-card p {
-  color: hsl(210, 36%, 96%);
-}
-
-.dark-mode .react-calendar,
-.dark-mode .modal-header,
-.dark-mode .modal-footer {
-  border-color: hsl(210, 10%, 35%);
-}
-
-.dark-mode .react-calendar__navigation button:hover,
-.dark-mode .react-calendar__tile:hover {
-  background: hsl(210, 10%, 35%) !important;
-}
-
-.dark-mode .info-text,
-.dark-mode .calendar-info {
-  color: hsl(210, 10%, 75%);
-}
-
-/* Sisa kode tanpa duplikasi yang jelas */
-.dark-mode .react-calendar__month-view__weekdays {
-  color: hsl(210, 10%, 65%);
-}
-
-.dark-mode .react-calendar__tile--now {
-  background: hsl(214, 89%, 45%);
-  color: hsl(210, 36%, 96%);
-}
-
-.dark-mode .react-calendar__tile--active {
-  background: hsl(214, 89%, 52%);
-  color: #fff;
-}
-
-.dark-mode .modal-overlay2 {
-  background-color: rgba(0, 0, 0, 0.75);
-}
-
-.dark-mode .modal-content2 {
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-}
-
-.dark-mode .ticket-modal-card {
-  background-color: hsl(210, 10%, 20%) !important;
-  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.08);
-}
-
-.dark-mode .ticket-modal-card:hover {
-  background-color: hsl(210, 10%, 30%);
-}
-
-.dark-mode .ticket-modal-card p b {
-  color: hsl(210, 36%, 99%);
 }
 
 .dark-mode .legend-item2 {
@@ -8385,36 +8345,94 @@ body.dark-mode .dashboard-card h4 {
   background: hsl(210, 10%, 30%);
 }
 
+/* --- Dark Mode Overrides for Calendar --- */
+.dark-mode .calendar-wrapper .react-calendar {
+  background: #111111;
+  /* Warna dasar lebih soft */
+  border-color: #444;
+}
+
+.dark-mode .react-calendar__navigation button,
+.dark-mode .react-calendar__tile {
+  color: #e0e0e0;
+}
+
+.dark-mode .react-calendar__navigation button:hover,
+.dark-mode .react-calendar__tile:hover {
+  background: #444 !important;
+}
+
+.dark-mode .react-calendar__month-view__weekdays {
+  color: #a0a0a0;
+}
+
+.dark-mode .react-calendar__tile--now {
+  background: hsl(214, 89%, 52%) !important;
+  /* Warna hari ini harus menonjol */
+  color: #fff !important;
+}
+
+.dark-mode .react-calendar__tile--now:hover {
+  background: hsl(214, 89%, 60%) !important;
+}
+
+.dark-mode .react-calendar__tile--active {
+  background: hsl(214, 80%, 65%);
+  color: #fff;
+}
+
+.dark-mode .legend-item {
+  background: hsl(210, 10%, 25%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .legend-item:hover {
+  background: hsl(210, 10%, 30%);
+}
+
+.dark-mode .calendar-info,
+.dark-mode .info-text {
+  color: #a0a0a0;
+}
+
+/* --- Dark Mode Overrides for Modal --- */
+.dark-mode .modal-overlay2 {
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.dark-mode .modal-content2 {
+  background-color: #2c2c2c;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  color: #e0e0e0;
+}
+
+.dark-mode .modal-header,
+.dark-mode .modal-footer {
+  border-color: #444;
+}
+
+.dark-mode .modal-title {
+  color: #f1f1f1;
+}
+
+.dark-mode .ticket-modal-card {
+  background-color: #3a3a3a !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .ticket-modal-card p {
+  color: #ccc;
+}
+
+.dark-mode .ticket-modal-card p b {
+  color: #f1f1f1;
+}
+
 /* ========================================================= */
 /* ================== RESPONSIVE STYLES ==================== */
 /* ========================================================= */
 
-@media (max-width: 1024px) {
-  .calendar-wrapper {
-    max-width: 90%;
-    padding: 24px;
-  }
-}
-
 @media (max-width: 768px) {
-  .calendar-wrapper {
-    max-width: 95%;
-    padding: 16px;
-  }
-
-  .react-calendar {
-    padding: 10px;
-  }
-
-  .react-calendar__navigation button {
-    font-size: 14px;
-    min-width: 30px;
-  }
-
-  .react-calendar__month-view__weekdays {
-    font-size: 12px;
-  }
-
   .react-calendar__tile {
     height: 45px;
     font-size: 14px;
@@ -8426,10 +8444,6 @@ body.dark-mode .dashboard-card h4 {
 }
 
 @media (max-width: 480px) {
-  .calendar-wrapper {
-    padding: 12px;
-  }
-
   .react-calendar__navigation button {
     font-size: 12px;
     min-width: 25px;
@@ -8445,7 +8459,7 @@ body.dark-mode .dashboard-card h4 {
   }
 }
 
-/* === Responsiveness === */
+/* === Responsiveness (Unchanged) === */
 @media (max-width: 768px) {
   .linechart-wrapper {
     padding: 10px;
@@ -8453,7 +8467,6 @@ body.dark-mode .dashboard-card h4 {
 
   .chart-legend {
     flex-direction: row;
-    /* Legend stack ke bawah di layar kecil */
     align-items: flex-start;
     gap: 8px;
     margin-top: -15px;
@@ -9500,22 +9513,8 @@ body.dark-mode .summary-cards .card h3 {
 
 .download-buttons {
   display: flex;
-  gap: 0.5rem;
+  gap: 10px;
   margin-bottom: 1rem;
-  /* Tambahkan baris ini */
-}
-
-.btn-download {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  cursor: pointer;
-  font-size: 0.9rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: background-color 0.2s ease;
 }
 
 .btn-download.pdf {
@@ -10397,6 +10396,8 @@ body.dark-mode .form-group-recover textarea:focus {
   margin-bottom: 20px;
 }
 
+
+
 /* ==========================================================================
    Filter Select Styling (Light & Dark Mode)
    ========================================================================== */
@@ -10507,35 +10508,35 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .qr-scanner-modal #qr-reader a {
-    color: var(--link-color);
-    font-weight: 500;
+  color: var(--link-color);
+  font-weight: 500;
 }
 
 /* 2. Tombol & Dropdown Pemilihan Kamera */
 .qr-scanner-modal #qr-reader button,
 .qr-scanner-modal #qr-reader select {
-    background-color: var(--bg-modal);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 8px 12px;
-    max-width: 250px;
-    text-align: center;
+  background-color: var(--bg-modal);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px 12px;
+  max-width: 250px;
+  text-align: center;
 }
 
 .qr-scanner-modal #qr-reader select {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 /* 3. Teks Status (Scanning, Idle, dll.) */
 .qr-scanner-modal #qr-reader #html5-qrcode-status-span {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
 }
 
 /* 4. Ikon Handphone (agar terlihat di dark mode) */
 [data-theme='dark'] .qr-scanner-modal #qr-reader img {
-    filter: invert(1);
+  filter: invert(1);
 }
 
 /* 2. Aturan yang HANYA berlaku saat mencetak */
@@ -11543,13 +11544,13 @@ body.dark-mode .btn-detail:hover {
 /* Styling untuk Fitur Baru di Halaman Laporan Detail */
 /* ============================================= */
 
-
-.filters-container .report-filters {
+.filters-container.report-filters {
   display: flex;
   flex-wrap: wrap;
-  /* Agar responsif di layar kecil */
-  gap: 1rem;
+  gap: 10px;
   align-items: center;
+  margin-bottom: 20px;
+  flex-direction: column;
 }
 
 .filter-search-input {
@@ -11561,6 +11562,14 @@ body.dark-mode .btn-detail:hover {
   background-color: var(--input-bg, #FFFFFF);
   color: var(--text-primary, #212529);
   border: 1px solid var(--input-border, #ced4da);
+  width: 100%;
+}
+
+.filter-row-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 /* Kontainer untuk Paginasi dan Ringkasan */
@@ -11574,8 +11583,16 @@ body.dark-mode .btn-detail:hover {
 }
 
 .pagination-summary {
-  font-size: 0.9rem;
   color: var(--text-color-secondary);
+  font-size: 0.9rem;
+  margin-right: auto;
+  align-self: center;
+}
+
+.pagination-summary strong {
+  color: var(--text-color-primary);
+  font-weight: 600;
+
 }
 
 /* ========================================================= */
@@ -11815,6 +11832,11 @@ body.dark-mode .btn-detail:hover {
   align-items: stretch;
 }
 
+.dark-mode .nilai-card {
+  background-color: var(--bg-color-dark-accent);
+  border: 1px solid var(--border-color-dark);
+}
+
 .nilai-card {
   background-color: var(--bg-color-light);
   border-radius: 12px;
@@ -11840,6 +11862,8 @@ body.dark-mode .btn-detail:hover {
   position: relative;
   width: 100%;
   flex-grow: 1;
+  height: 300px;
+  min-height: 250px;
 }
 
 .loading-text {
@@ -11865,4 +11889,128 @@ body.dark-mode .btn-detail:hover {
   background-color: #111111;
   color: var(--text-primary, #FFFFFF);
   border: 1px solid var(--input-border, #495057);
+}
+
+@media (max-width: 900px) {
+  .dashboard-container-financial {
+    margin-top: 30px;
+
+  }
+
+  .dashboard-row-financial {
+    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nilai-card {
+
+    width: 100%;
+    padding: 20px 15px;
+  }
+
+  .nilai-card h4 {
+    font-size: 1.1rem;
+    /* Sesuaikan ukuran judul grafik */
+  }
+
+  .chart-canvas-container {
+    /* Beri tinggi yang pas agar grafik tidak terlalu besar/kecil */
+    height: 280px;
+  }
+
+  /* --- 4. Kartu Navigasi Laporan Detail --- */
+  .navigation-section {
+    margin-top: 40px;
+  }
+
+  .report-navigation-cards {
+    /* Tumpuk kartu navigasi secara vertikal */
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+
+  .nav-card-report {
+    padding: 15px;
+    /* Jaga agar ikon dan teks tetap bersebelahan tapi lebih rapat */
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .nav-card-report-icon {
+    font-size: 1.5rem;
+    margin-right: 15px;
+    margin-bottom: 0;
+    /* Hapus margin bawah karena sekarang posisinya di samping */
+  }
+
+  .nav-card-report-content h4 {
+    font-size: 1rem;
+  }
+
+  .nav-card-report-content p {
+    font-size: 0.85rem;
+    /* Kecilkan teks deskripsi */
+  }
+
+  .btn-download {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    justify-content: center;
+  }
+
+  .btn-download.excel {
+    margin-bottom: 10px;
+  }
+
+  .btn-download.pdf {
+    margin-bottom: 10px;
+  }
+
+  .filter-select-cal {
+    width: 100%;
+  }
+
+  .filter-row-bottom {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .year-filter {
+    width: 100%;
+    padding: 0.6rem;
+  }
+
+  /* --- Penyesuaian Widget Barang Aktif --- */
+  .most-active-widget h4 {
+    font-size: 1.1rem;
+  }
+
+  .active-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .item-info .item-name {
+    font-size: 0.95rem;
+  }
+
+  .item-count {
+    font-size: 0.85rem;
+    background-color: #f0f2f5;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .info-card .card-value {
+    font-size: 1.5rem;
+  }
 }

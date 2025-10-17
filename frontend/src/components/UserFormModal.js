@@ -48,7 +48,7 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
     <>
       <div className="modal-overlay" onClick={onClose}>
         <div className="modal-content" onClick={e => e.stopPropagation()}>
-          <h2>{isEditMode ? 'Edit Pengguna' : 'Tambah Pengguna Baru'}</h2>
+          <h1>{isEditMode ? 'Edit Pengguna' : 'Tambah Pengguna Baru'}</h1>
           <form onSubmit={handleSubmit}>
             <div>
               <label htmlFor="name">Nama:</label>

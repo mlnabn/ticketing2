@@ -13,19 +13,6 @@ const NavigationCard = ({ title, description, linkTo, icon }) => (
     </Link>
 );
 
-// const TrendIndicator = ({ trend }) => {
-//     if (!trend) return <p className="card-trend trend-stable">...</p>;
-//     const isStable = trend.direction === 'stable';
-//     const trendIcon = isStable ? 'fa-minus' : `fa-arrow-${trend.direction}`;
-//     const trendClass = `trend-${trend.direction}`;
-//     return (
-//         <p className={`card-trend ${trendClass}`}>
-//             <i className={`fas ${trendIcon}`}></i>
-//             {isStable ? 'Stabil' : `${trend.difference} dari 30 hari lalu`}
-//         </p>
-//     );
-// };
-
 export default function InventoryReportPage() {
     const [dashboardData, setDashboardData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -146,7 +133,7 @@ export default function InventoryReportPage() {
             </div>
 
             {/* Navigasi laporan */}
-            <div className="navigation-cards-grid-report">
+            <div className="report-navigation-cards">
                 <NavigationCard
                     title="Laporan Barang Masuk"
                     description="Lihat riwayat detail semua barang yang masuk ke gudang."
@@ -161,7 +148,7 @@ export default function InventoryReportPage() {
                 />
             </div>
 
-            <div className="navigation-cards-grid-report">
+            <div className="report-navigation-cards">
                 <NavigationCard
                     title="Laporan Barang Tersedia"
                     description="Lihat semua unit barang yang saat ini siap digunakan."

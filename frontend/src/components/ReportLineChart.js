@@ -1,5 +1,3 @@
-// file: src/components/ReportLineChart.js
-
 import React, { useState, useEffect } from "react";
 import {
   LineChart,

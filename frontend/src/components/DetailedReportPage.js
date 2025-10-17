@@ -120,6 +120,7 @@ export default function DetailedReportPage({ type, title }) {
             </div>
 
             <div className="filters-container report-filters">
+                {/* Baris 1: Input Pencarian */}
                 <input
                     type="text"
                     placeholder="Cari Kode Unik / Nama Barang..."
@@ -127,22 +128,27 @@ export default function DetailedReportPage({ type, title }) {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-cal" />
-                <span className='strip'>-</span>
-                <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-cal" />
-                <div className="download-buttons">
-                    <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
-                        <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
-                        {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
-                    </button>
-                    <button onClick={() => handleExport('pdf')} className="btn-download pdf" disabled={exportingPdf}>
-                        <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
-                        {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
-                    </button>
+                <div className="filter-row-bottom">
+                    <div className="date-filters">
+                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-cal" />
+                        <span className='strip'>-</span>
+                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-cal" />
+                    </div>
+                    <div className="download-buttons">
+                        <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
+                            <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
+                            {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
+                        </button>
+                        <button onClick={() => handleExport('pdf')} className="btn-download pdf" disabled={exportingPdf}>
+                            <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
+                            {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <div className="job-list-container">
+                {/*Destop view*/}
                 <table className="job-table">
                     <thead>
                         <tr>
@@ -174,6 +180,66 @@ export default function DetailedReportPage({ type, title }) {
                         )}
                     </tbody>
                 </table>
+                {/* Mobile view */}
+                <div className="job-list-mobile">
+                    {/* Tampilkan pesan loading jika data sedang dimuat */}
+                    {loading ? (
+                        <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
+                            <p>Memuat data...</p>
+                        </div>
+                    ) : data.length > 0 ? data.map(item => {
+                        // Ambil data yang sudah diproses dari fungsi getItemData
+                        const itemData = getItemData(item);
+                        return (
+                            <div key={`mobile-detail-${item.id}`} className="ticket-card-mobile">
+                                {/* Baris 1: Informasi Utama (Nama Barang) */}
+                                <div className="card-row">
+                                    <div className="data-group single">
+                                        <span className="label">Nama Barang</span>
+                                        <span className="value description">{itemData.nama_barang || '-'}</span>
+                                    </div>
+                                </div>
+
+                                {/* Baris 2: Kode Unik & Status */}
+                                <div className="card-row">
+                                    <div className="data-group">
+                                        <span className="label">Kode Unik</span>
+                                        <span className="value">{itemData.kode_unik || '-'}</span>
+                                    </div>
+                                    <div className="data-group">
+                                        <span className="label">Status</span>
+                                        <span className="value">{itemData.status || '-'}</span>
+                                    </div>
+                                </div>
+
+                                {/* Baris 3: Tanggal & Penanggung Jawab */}
+                                <div className="card-row">
+                                    <div className="data-group">
+                                        <span className="label">{dateHeaders[type] || 'Tanggal'}</span>
+                                        <span className="value">{formatDate(itemData.tanggal)}</span>
+                                    </div>
+                                    <div className="data-group">
+                                        <span className="label">Penanggung Jawab</span>
+                                        <span className="value">{itemData.penanggung_jawab || '-'}</span>
+                                    </div>
+                                </div>
+
+                                {/* Baris 4: Workshop */}
+                                <div className="card-row">
+                                    <div className="data-group single">
+                                        <span className="label">Workshop</span>
+                                        <span className="value">{itemData.workshop || '-'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    }) : (
+                        // Tampilkan pesan jika tidak ada data yang ditemukan
+                        <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
+                            <p>Tidak ada data untuk ditampilkan.</p>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="pagination-container">

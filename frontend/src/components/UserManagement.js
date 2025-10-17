@@ -83,13 +83,14 @@ export default function UserManagement() {
 
     return (
         <div className="user-management-container">
-            <div className="user-management-header">
+            <div className="user-management-container">
                 <h1 className="page-title">Manajemen Pengguna</h1>
-                <button onClick={handleAddUserClick} className="btn-primary">
+                
+            </div>
+            <button onClick={handleAddUserClick} className="btn-primary">
                     <i className="fas fa-plus" style={{marginRight: '8px'}}></i>
                     Tambah Pengguna
                 </button>
-            </div>
             <div className="filters-container report-filters" style={{ margin: '20px 0' }}>
                 <input
                     type="text"
