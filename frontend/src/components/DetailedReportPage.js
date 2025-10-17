@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import Pagination from './Pagination';
-import { saveAs } from 'file-saver'; // [BARU] Import library file-saver
+import { saveAs } from 'file-saver';
 
-// Komponen kecil untuk ringkasan paginasi (tidak berubah)
 const PaginationSummary = ({ pagination }) => {
     if (!pagination || pagination.total === 0) {
         return null;
@@ -21,13 +21,14 @@ export default function DetailedReportPage({ type, title }) {
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({ start_date: '', end_date: '' });
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
     const [exportingExcel, setExportingExcel] = useState(false);
     const [exportingPdf, setExportingPdf] = useState(false);
 
     const fetchData = useCallback(async (page = 1) => {
         setLoading(true);
         try {
-            const params = { page, type, ...filters, search: searchTerm };
+            const params = { page, type, ...filters, search: debouncedSearchTerm };
             const res = await api.get('/reports/inventory/detailed', { params });
             setData(res.data.data);
             setPagination(res.data);
@@ -36,7 +37,7 @@ export default function DetailedReportPage({ type, title }) {
         } finally {
             setLoading(false);
         }
-    }, [type, filters, searchTerm]);
+    }, [type, filters, debouncedSearchTerm]);
 
     useEffect(() => {
         fetchData(1);
@@ -45,11 +46,7 @@ export default function DetailedReportPage({ type, title }) {
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
-
-    const handleApplyFilterAndSearch = () => {
-        fetchData(1);
-    };
-
+    
     const handleExport = async (exportType) => {
         if (exportType === 'excel') setExportingExcel(true);
         else setExportingPdf(true);
@@ -87,6 +84,35 @@ export default function DetailedReportPage({ type, title }) {
         });
     };
 
+    const getItemData = (item) => {
+        // Untuk laporan 'in' dan 'available', data langsung ada di item.
+        if (type === 'in' || type === 'available') {
+            return {
+                kode_unik: item.kode_unik,
+                nama_barang: item.master_barang?.nama_barang,
+                status: item.status_detail?.nama_status,
+                tanggal: item.tanggal_masuk,
+                penanggung_jawab: item.created_by?.name,
+                workshop: item.workshop?.name,
+            };
+        }
+        return {
+            kode_unik: item.stok_barang?.kode_unik,
+            nama_barang: item.stok_barang?.master_barang?.nama_barang,
+            status: item.status_detail?.nama_status,
+            tanggal: item.event_date, // Tanggal kejadian adalah created_at dari history
+            penanggung_jawab: item.related_user?.name,
+            workshop: item.workshop?.name,
+        };
+    };
+
+    const dateHeaders = {
+        in: 'Tgl Masuk',
+        out: 'Tgl Kejadian',
+        available: 'Tgl Dibuat',
+        accountability: 'Tgl Kejadian',
+    };
+
     return (
         <div className="user-management-container">
             <div className="user-management-header-report">
@@ -97,15 +123,14 @@ export default function DetailedReportPage({ type, title }) {
                 <input
                     type="text"
                     placeholder="Cari Kode Unik / Nama Barang..."
-                    className="search-form"
+                    className="filter-search-input"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleApplyFilterAndSearch()}
                 />
                 <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-cal" />
                 <span>-</span>
                 <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-cal" />
-                {/* <button onClick={handleApplyFilterAndSearch} className="btn-primary">Terapkan</button> */}
+                {/* <button onClick={() => fetchData(1)} className="btn-primary">Terapkan Filter</button> */}
                 <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
                     <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
                     {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
@@ -123,7 +148,7 @@ export default function DetailedReportPage({ type, title }) {
                             <th>Kode Unik</th>
                             <th>Nama Barang</th>
                             <th>Status</th>
-                            <th>{type === 'in' ? 'Tgl Masuk' : 'Tgl Keluar'}</th>
+                            <th>{dateHeaders[type] || 'Tanggal'}</th>
                             <th>Penanggung Jawab</th>
                             <th>Workshop</th>
                         </tr>
@@ -131,19 +156,19 @@ export default function DetailedReportPage({ type, title }) {
                     <tbody>
                         {loading ? (
                             <tr><td colSpan="6" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
-                        ) : data.length > 0 ? data.map(item => (
-                            <tr key={item.id}>
-                                <td>{item.kode_unik}</td>
-                                <td>{item.master_barang?.nama_barang || '-'}</td>
-                                <td>{item.status_detail?.nama_status || '-'}</td>
-                                <td>{formatDate(type === 'in' ? item.tanggal_masuk : item.tanggal_keluar)}</td>
-                                <td>
-                                    {type === 'in' && (item.created_by?.name || '-')}
-                                    {type === 'out' && (item.user_peminjam?.name || item.user_perusak?.name || item.user_penghilang?.name || '-')}
-                                </td>
-                                <td>{item.workshop?.name || '-'}</td>
-                            </tr>
-                        )) : (
+                        ) : data.length > 0 ? data.map(item => {
+                            const itemData = getItemData(item);
+                            return (
+                                <tr key={item.id}>
+                                    <td>{itemData.kode_unik || '-'}</td>
+                                    <td>{itemData.nama_barang || '-'}</td>
+                                    <td>{itemData.status || '-'}</td>
+                                    <td>{formatDate(itemData.tanggal)}</td>
+                                    <td>{itemData.penanggung_jawab || '-'}</td>
+                                    <td>{itemData.workshop || '-'}</td>
+                                </tr>
+                            )
+                        }) : (
                             <tr><td colSpan="6" style={{ textAlign: 'center' }}>Tidak ada data untuk ditampilkan.</td></tr>
                         )}
                     </tbody>

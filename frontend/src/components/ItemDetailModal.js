@@ -19,7 +19,6 @@ const initialFormData = {
     tanggal_hilang: '',
     tanggal_ketemu: '',
     tanggal_keluar: '',
-    tanggal_masuk_pinjam: '',
 };
 
 // --- Komponen Utama ---
@@ -33,8 +32,6 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
     const [editItem, setEditItem] = useState(null);
     const [stockByColor, setStockByColor] = useState([]);
     const [showHistory, setShowHistory] = useState(false);
-
-    const getTodayDate = () => new Date().toISOString().split('T')[0];
 
     // --- Efek untuk mengisi form & mengambil data ---
     useEffect(() => {
@@ -53,7 +50,6 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                 tanggal_hilang: item.tanggal_hilang?.split(' ')[0] || '',
                 tanggal_ketemu: item.tanggal_ketemu?.split(' ')[0] || '',
                 tanggal_keluar: item.tanggal_keluar?.split(' ')[0] || '',
-                tanggal_masuk_pinjam: item.tanggal_masuk_pinjam?.split(' ')[0] || '',
             });
         }
     }, [item, isEditing]);
@@ -117,36 +113,16 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
         const commonDescription = (label) => (
             <div className="info-row full-width">
                 <span className="info-label">{label}</span>
-                <textarea name="deskripsi" value={formData.deskripsi} onChange={handleChange} rows="2" className="detail-edit-textarea"></textarea>
+                <textarea name="deskripsi" value={formData.deskripsi || ''} onChange={handleChange} rows="2" className="detail-edit-textarea"></textarea>
             </div>
         );
 
         switch (selectedStatusName) {
             case 'Digunakan':
-                return (
-                    <div className="form-row2">
-                        <div className="info-row"><span className="info-label">Digunakan Oleh</span>
-                            <select name="user_peminjam_id" value={formData.user_peminjam_id} onChange={handleChange} className="detail-edit-select">
-                                <option value="">Pilih Pengguna</option>
-                                {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                            </select>
-                        </div>
-                        <div className="info-row"><span className="info-label">Di Workshop</span>
-                            <select name="workshop_id" value={formData.workshop_id} onChange={handleChange} className="detail-edit-select">
-                                <option value="">Pilih Workshop</option>
-                                {workshops.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
-                            </select>
-                        </div>
-                        <div className="info-row"><span className="info-label">Tanggal Keluar</span>
-                            <input type="date" name="tanggal_keluar" value={formData.tanggal_keluar || getTodayDate()} onChange={handleChange} className="detail-edit-input" />
-                        </div>
-                        {commonDescription('Deskripsi Penggunaan')}
-                    </div>
-                );
             case 'Dipinjam':
                 return (
                     <div className="form-row2">
-                        <div className="info-row"><span className="info-label">Dipinjam Oleh</span>
+                        <div className="info-row"><span className="info-label">{selectedStatusName} Oleh</span>
                             <select name="user_peminjam_id" value={formData.user_peminjam_id} onChange={handleChange} className="detail-edit-select">
                                 <option value="">Pilih Pengguna</option>
                                 {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
@@ -159,10 +135,8 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                             </select>
                         </div>
                         <div className="info-row"><span className="info-label">Tanggal Keluar</span>
-                            <input type="date" name="tanggal_keluar" value={formData.tanggal_keluar || getTodayDate()} onChange={handleChange} className="detail-edit-input" />
-                        </div>
-                        <div className="info-row"><span className="info-label">Estimasi Tanggal Masuk</span>
-                            <input type="date" name="tanggal_masuk_pinjam" value={formData.tanggal_masuk_pinjam} onChange={handleChange} className="detail-edit-input" />
+                            {/* [DIUBAH] Hapus || getTodayDate() */}
+                            <input type="date" name="tanggal_keluar" value={formData.tanggal_keluar || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong"/>
                         </div>
                         {commonDescription('Deskripsi Peminjaman')}
                     </div>
@@ -177,10 +151,11 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                             </select>
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Mulai</span>
-                            <input type="date" name="tanggal_mulai_perbaikan" value={formData.tanggal_mulai_perbaikan || getTodayDate()} onChange={handleChange} className="detail-edit-input" />
+                             {/* [DIUBAH] Hapus || getTodayDate() */}
+                            <input type="date" name="tanggal_mulai_perbaikan" value={formData.tanggal_mulai_perbaikan || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong"/>
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Selesai</span>
-                            <input type="date" name="tanggal_selesai_perbaikan" value={formData.tanggal_selesai_perbaikan} onChange={handleChange} className="detail-edit-input" />
+                            <input type="date" name="tanggal_selesai_perbaikan" value={formData.tanggal_selesai_perbaikan || ''} onChange={handleChange} className="detail-edit-input" />
                         </div>
                         {commonDescription('Deskripsi Perbaikan')}
                     </div>
@@ -195,7 +170,8 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                             </select>
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Rusak</span>
-                            <input type="date" name="tanggal_rusak" value={formData.tanggal_rusak || getTodayDate()} onChange={handleChange} className="detail-edit-input" />
+                             {/* [DIUBAH] Hapus || getTodayDate() */}
+                            <input type="date" name="tanggal_rusak" value={formData.tanggal_rusak || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong"/>
                         </div>
                         {commonDescription('Deskripsi Kerusakan')}
                     </div>
@@ -210,10 +186,11 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                             </select>
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Hilang</span>
-                            <input type="date" name="tanggal_hilang" value={formData.tanggal_hilang || getTodayDate()} onChange={handleChange} className="detail-edit-input" />
+                             {/* [DIUBAH] Hapus || getTodayDate() */}
+                            <input type="date" name="tanggal_hilang" value={formData.tanggal_hilang || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong"/>
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Ketemu</span>
-                            <input type="date" name="tanggal_ketemu" value={formData.tanggal_ketemu} onChange={handleChange} className="detail-edit-input" />
+                            <input type="date" name="tanggal_ketemu" value={formData.tanggal_ketemu || ''} onChange={handleChange} className="detail-edit-input" />
                         </div>
                         {commonDescription('Deskripsi Kehilangan')}
                     </div>
@@ -306,13 +283,7 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                 </div>
 
                 <div className="modal-actions">
-                    <button
-                        onClick={() => setShowHistory(true)}
-                        className="btn-history" /* Sesuaikan class jika perlu */
-                        style={{ marginRight: 'auto' }}
-                    >
-                        Riwayat Barang
-                    </button>
+                    <button onClick={() => setShowHistory(true)} className="btn-history" style={{ marginRight: 'auto' }}> Riwayat Barang </button>
                     {isEditing ? (
                         <>
                             <button onClick={() => setIsEditing(false)} className="btn-cancel">Batal</button>
@@ -345,13 +316,7 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                 />
             )}
 
-            {showHistory && (
-                <HistoryModal
-                    item={item}
-                    onClose={() => setShowHistory(false)}
-                    showToast={showToast}
-                />
-            )}
+            {showHistory && ( <HistoryModal item={item} onClose={() => setShowHistory(false)} showToast={showToast} /> )}
         </div>
     );
 }

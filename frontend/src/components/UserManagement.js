@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom'; 
+import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
 
@@ -12,8 +13,8 @@ export default function UserManagement() {
     const { logout } = useAuth();
     const [userData, setUserData] = useState(null);
     const [userPage, setUserPage] = useState(1);
-    const [userSearchQuery, setUserSearchQuery] = useState('');
-    const [searchInput, setSearchInput] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
     const [showUserConfirmModal, setShowUserConfirmModal] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
     const [showUserFormModal, setShowUserFormModal] = useState(false);
@@ -30,14 +31,8 @@ export default function UserManagement() {
     }, [logout]);
 
     useEffect(() => {
-        fetchUsers(userPage, userSearchQuery);
-    }, [userPage, userSearchQuery, fetchUsers]);
-    
-    const handleSearchSubmit = (e) => {
-        e.preventDefault();
-        setUserPage(1);
-        setUserSearchQuery(searchInput);
-    };
+        fetchUsers(userPage, debouncedSearchTerm);
+    }, [userPage, debouncedSearchTerm, fetchUsers]);
 
     const handleUserDeleteClick = (user) => {
         setUserToDelete(user);
@@ -49,7 +44,7 @@ export default function UserManagement() {
         try {
             await api.delete(`/users/${userToDelete.id}`);
             showToast(`User "${userToDelete.name}" berhasil dihapus.`, 'success');
-            fetchUsers(userPage, userSearchQuery); 
+            fetchUsers(userPage, debouncedSearchTerm); 
         } catch (e) {
             showToast('Gagal menghapus pengguna.', 'error');
         } finally {
@@ -74,7 +69,7 @@ export default function UserManagement() {
         try {
           const res = await api.post(url, formData);
           showToast(isEditMode ? `User "${res.data.name}" berhasil di-edit.` : 'User baru berhasil dibuat.', 'success');
-          fetchUsers(userPage, userSearchQuery); 
+          fetchUsers(userPage, debouncedSearchTerm); 
           setShowUserFormModal(false);
           setUserToEdit(null);
         } catch (e) {
@@ -88,20 +83,22 @@ export default function UserManagement() {
 
     return (
         <div className="user-management-container">
-            <h1>Manajemen Pengguna</h1>
-            <button onClick={handleAddUserClick} className="btn-primary">
-                Tambah Pengguna Baru
-            </button>
-            <form onSubmit={handleSearchSubmit} className="search-form" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
+            <div className="user-management-header">
+                <h1 className="page-title">Manajemen Pengguna</h1>
+                <button onClick={handleAddUserClick} className="btn-primary">
+                    <i className="fas fa-plus" style={{marginRight: '8px'}}></i>
+                    Tambah Pengguna
+                </button>
+            </div>
+            <div className="filters-container report-filters" style={{ margin: '20px 0' }}>
                 <input
                     type="text"
-                    placeholder="Cari berdasarkan nama..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    style={{ flexGrow: 1, padding: '8px' }}
+                    placeholder="Cari nama, email, atau peran..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="filter-search-input"
                 />
-                <button type="submit" style={{ padding: '8px 16px' }}>Cari</button>
-            </form>
+            </div>
 
             {!userData ? (
                 <p>Memuat data pengguna...</p>

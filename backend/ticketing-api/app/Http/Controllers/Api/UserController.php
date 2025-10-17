@@ -12,16 +12,16 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        // Ambil parameter dari request
         $search = $request->query('search');
-
-        // Mulai query untuk user dengan peran 'user'
         $query = User::query();
 
-        // Jika ada parameter pencarian, tambahkan filter nama
         if ($search) {
-            $query->where('name', 'like', '%' . $search . '%');
-        }
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', '%' . $search . '%')
+              ->orWhere('email', 'like', '%' . $search . '%')
+              ->orWhere('role', 'like', '%' . $search . '%');
+        });
+    }
 
         if ($request->has('all')) {
             return $query->get();

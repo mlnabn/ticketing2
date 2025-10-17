@@ -18,12 +18,21 @@ function HistoryModal({ item, onClose, showToast }) {
         }
     }, [item, showToast]);
 
-    // Helper untuk format tanggal
-    const formatDate = (dateString) => {
+    // Format untuk waktu pencatatan (dengan jam)
+    const formatLogTime = (dateString) => {
         if (!dateString) return 'N/A';
         return new Date(dateString).toLocaleString('id-ID', {
             day: '2-digit', month: 'long', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
+        });
+    };
+
+    // Format untuk tanggal kejadian (tanpa jam)
+    const formatEventDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        // Tambahkan 'timeZone: UTC' untuk mencegah pergeseran tanggal
+        return new Date(dateString).toLocaleDateString('id-ID', {
+            day: '2-digit', month: 'long', year: 'numeric'
         });
     };
 
@@ -42,13 +51,22 @@ function HistoryModal({ item, onClose, showToast }) {
                     ) : history.length > 0 ? (
                         history.map(log => (
                             <div key={log.id} className="history-log-item">
-                                <div className="info-row full-width">
-                                    <span className="info-label">{formatDate(log.created_at)}</span>
-                                    <span className="info-value-info" style={{ fontWeight: 'bold', color: '#fff' }}>
-                                        Status: {log.status_detail?.nama_status || 'N/A'}
-                                    </span>
+                                <div className="info-row full-width" style={{ marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid #4A5568' }}>
+                                    <span className="info-label" style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>Dicatat pada: {formatLogTime(log.created_at)}</span>
                                 </div>
-                                <div className="form-row2" style={{ marginTop: '10px' }}>
+
+                                {/* GRID DETAIL KEJADIAN */}
+                                <div className="form-row2">
+                                    <div className="info-row">
+                                        <span className="info-label">Status</span>
+                                        <span className="info-value-info" style={{ fontWeight: 'bold' }}>
+                                            {log.status_detail?.nama_status || 'N/A'}
+                                        </span>
+                                    </div>
+                                    <div className="info-row">
+                                        <span className="info-label">Tanggal Kejadian</span>
+                                        <span className="info-value-info">{formatEventDate(log.event_date)}</span>
+                                    </div>
                                     <div className="info-row">
                                         <span className="info-label">Aksi oleh</span>
                                         <span className="info-value-info">{log.triggered_by_user?.name || 'Sistem'}</span>
