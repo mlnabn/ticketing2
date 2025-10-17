@@ -424,13 +424,15 @@ class TicketController extends Controller
                             'tanggal_keluar' => now(),
                             'workshop_id' => $ticket->workshop_id,
                             'ticket_id' => $ticket->id,
+                            'deskripsi' => 'Dipinjam untuk tiket: ' . $ticket->kode_tiket,
                         ]);
                         $item->histories()->create([
                             'status_id' => $statusDipinjamId,
                             'deskripsi' => 'Dipinjam untuk tiket: ' . $ticket->kode_tiket,
-                            'triggered_by_user_id' => Auth::id(), // Admin yang menugaskan
-                            'related_user_id' => $assignee->id,    // Admin yang mengerjakan
-                            'workshop_id' => $ticket->workshop_id, // Lokasi workshop dari tiket
+                            'triggered_by_user_id' => Auth::id(),
+                            'related_user_id' => $assignee->id, 
+                            'workshop_id' => $ticket->workshop_id,
+                            'event_date' => now(),
                         ]);
                     }
 
