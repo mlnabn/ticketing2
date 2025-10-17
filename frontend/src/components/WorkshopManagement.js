@@ -79,6 +79,7 @@ export default function WorkshopManagement() {
     <div className="user-management-container">
       <h1>Manajemen Workshop</h1>
       <button onClick={handleAddClick} className="btn-primary">
+        <i className="fas fa-plus" style={{marginRight: '8px'}}></i>
         Tambah Workshop Baru
       </button>
       

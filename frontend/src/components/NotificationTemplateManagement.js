@@ -79,6 +79,7 @@ export default function NotificationTemplateManagement() {
     <div className="user-management-container">
       <h1>Manajemen Template Notifikasi</h1>
       <button onClick={handleAddClick} className="btn-primary">
+        <i className="fas fa-plus" style={{marginRight: '8px'}}></i>
         Tambah Template Baru
       </button>
 
