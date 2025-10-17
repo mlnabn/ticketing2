@@ -121,6 +121,7 @@ function StokBarangView() {
         <>
             <div className="user-management-container" style={{ marginBottom: '20px' }}>
                 <h1>Daftar Stok Unit Barang</h1>
+                <div className="action-buttons-stok">
                 <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>Tambah Stok</button>
                 <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
                     <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
@@ -129,6 +130,7 @@ function StokBarangView() {
                     </span>                        
                     Scan QR
                 </button>
+                </div>
             </div>
 
             {/* --- Filter Section --- */}

@@ -738,6 +738,11 @@ body.dark-mode .hamburger-menu-button span {
     margin-bottom: 15px;
   }
 
+  .btn-scan{
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
   .btn-edit,
   .btn-delete {
     padding: 6px 12px;
@@ -5052,7 +5057,7 @@ body.dark-mode .notification-form-container label {
   border: none;
   background-color: #d1e7dd;
   color: #0f5132;
-  margin-left: 8px;
+  
 }
 
 .btn-scan:hover {
@@ -5072,6 +5077,12 @@ body.dark-mode .btn-scan {
 
 body.dark-mode .btn-scan:hover {
   background-color: #16a34a;
+}
+
+.action-buttons-stok{
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 /* ===== Feedback Message ===== */
