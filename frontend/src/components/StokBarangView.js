@@ -157,14 +157,16 @@ function StokBarangView() {
                         <option key={color.id_warna} value={color.id_warna}>{color.nama_warna}</option>
                     ))}
                 </select>
-                <input
+                
+            </div>
+
+            <input
                     type="text"
                     placeholder="Cari apa saja..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
-                    className="filter-search-input"
+                    className="search-input-cari"
                 />
-            </div>
             <div className="job-list-container">
                 {/* ======================================================= */}
                 {/* ===    TAMPILAN TABEL UNTUK DESKTOP (TETAP SAMA)    === */}
