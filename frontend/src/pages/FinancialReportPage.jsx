@@ -1,73 +1,120 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../services/api';
 
 // ================================================================
-// BARU: Import komponen dari Recharts
+// Import komponen dari Recharts
 // ================================================================
 import {
-    ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-    PieChart, Pie, Cell
+    ResponsiveContainer,
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    PieChart,
+    Pie,
+    Cell
 } from 'recharts';
 
-// Komponen UI (tidak perlu diubah)
+// ================================================================
+// Komponen UI
+// ================================================================
 const NavigationCard = ({ title, description, linkTo, icon }) => (
     <Link to={linkTo} className="nav-card-report">
-        <div className="nav-card-report-icon"><i className={`fas ${icon}`}></i></div>
-        <div className="nav-card-report-content"><h4>{title}</h4><p>{description}</p></div>
+        <div className="nav-card-report-icon">
+            <i className={`fas ${icon}`}></i>
+        </div>
+        <div className="nav-card-report-content">
+            <h4>{title}</h4>
+            <p>{description}</p>
+        </div>
     </Link>
 );
+
 const KpiCard = ({ title, value, iconClass, colorClass }) => (
-    <div className={`info-card ${colorClass}`}><div className="card-header"><p className="card-label">{title}</p><div className={`card-icon ${colorClass}-icon`}><i className={iconClass}></i></div></div><h3 className="card-value">{value}</h3></div>
+    <div className={`info-card ${colorClass}`}>
+        <div className="card-header">
+            <p className="card-label">{title}</p>
+            <div className={`card-icon ${colorClass}-icon`}>
+                <i className={iconClass}></i>
+            </div>
+        </div>
+        <h3 className="card-value">{value}</h3>
+    </div>
 );
 
+// ================================================================
+// DATA MOCK: Menggantikan panggilan API yang gagal
+// ================================================================
+const mockKpiData = {
+    total_asset_value: 1250000000,
+    net_asset_value: 1100000000,
+    new_asset_value: 75000000,
+    problematic_asset_value: 15000000,
+};
+
+const mockCategoryData = {
+    labels: [
+        'Monitor', 'Peralatan Dapur', 'Otomotif', 'Anime', 'Vapors', 'Buku',
+        'Skateboard', 'Headset', 'Mouse', 'Sports', 'Music', 'Bag', 'Style'
+    ],
+    data: [
+        52000000, 25000000, 15000000, 12000000, 9000000, 8000000,
+        5000000, 4500000, 3000000, 2500000, 2000000, 1500000, 1000000
+    ],
+};
+
+const mockDoughnutData = {
+    labels: ['Aset Produktif', 'Aset Konsumtif'],
+    data: [950000000, 300000000],
+};
+
+// ================================================================
+// KOMPONEN UTAMA
+// ================================================================
 export default function FinancialReport() {
     const [reportData, setReportData] = useState(null);
-    // ================================================================
-    // BARU: State untuk menampung data mentah dari API untuk chart
-    // ================================================================
     const [chartApiData, setChartApiData] = useState({ bar: null, pie: null });
-    const [isLoading, setIsLoading] = useState(true);
 
-    const fetchData = useCallback(async () => {
-        setIsLoading(true);
-        try {
-            const [kpiRes, categoryRes, doughnutRes] = await Promise.all([
-                api.get('/financial-report/inventory'),
-                api.get('/financial-report/value-by-category'),
-                api.get('/financial-report/asset-composition')
-            ]);
-
-            setReportData(kpiRes.data);
-
-            // Simpan data mentah dari API ke state
-            setChartApiData({
-                bar: { labels: categoryRes.data.labels, data: categoryRes.data.data },
-                pie: { labels: doughnutRes.data.labels, data: doughnutRes.data.data }
-            });
-
-        } catch (error) {
-            console.error("Gagal memuat data laporan keuangan:", error);
-        } finally {
-            setIsLoading(false);
-        }
+    // Simulasi pengambilan data saat komponen dimuat
+    useEffect(() => {
+        setReportData(mockKpiData);
+        setChartApiData({
+            bar: {
+                labels: mockCategoryData.labels,
+                data: mockCategoryData.data
+            },
+            pie: {
+                labels: mockDoughnutData.labels,
+                data: mockDoughnutData.data
+            }
+        });
     }, []);
 
-    useEffect(() => { fetchData(); }, [fetchData]);
-
     // ================================================================
-    // BARU: Transformasi data ke format yang dibutuhkan Recharts
-    // Ini dilakukan dengan useMemo agar tidak dihitung ulang setiap render
+    // DIPERBARUI: Transformasi data untuk Bar Chart
     // ================================================================
     const transformedBarData = useMemo(() => {
         if (!chartApiData.bar) return [];
-        return chartApiData.bar.labels.map((label, index) => ({
+
+        // 1. Ubah data mentah menjadi format yang lebih mudah diolah
+        const initialData = chartApiData.bar.labels.map((label, index) => ({
             name: label,
-            // Pastikan nilainya dikonversi menjadi Angka
             "Total Nilai Pembelian": Number(chartApiData.bar.data[index])
         }));
+
+        // 2. Urutkan data dari nilai terbesar ke terkecil
+        const sortedData = initialData.sort(
+            (a, b) => b["Total Nilai Pembelian"] - a["Total Nilai Pembelian"]
+        );
+
+        // 3. Ambil 10 data teratas
+        return sortedData.slice(0, 10);
     }, [chartApiData.bar]);
 
+    // Transformasi data untuk Pie Chart
     const transformedPieData = useMemo(() => {
         if (!chartApiData.pie) return [];
         return chartApiData.pie.labels.map((label, index) => ({
@@ -76,57 +123,102 @@ export default function FinancialReport() {
         }));
     }, [chartApiData.pie]);
 
+    // ================================================================
     // Definisikan warna untuk Pie/Doughnut Chart
-    const PIE_COLORS = ['#4BC0C0', '#FF9F40']; // Setara dengan rgba(75, 192, 192, 0.6) dan rgba(255, 159, 64, 0.6)
+    // ================================================================
+    const PIE_COLORS = ['#4BC0C0', '#FF9F40'];
 
+    // ================================================================
+    // Formatter
+    // ================================================================
     const formatCurrency = (value) => {
         if (typeof value !== 'number' || isNaN(value)) return 'Rp 0';
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0
+        }).format(value);
     };
 
+    const yAxisFormatter = (value) => `Rp ${value / 1000000} Jt`;
+    const tooltipFormatter = (value) => `${formatCurrency(value)}`;
     const stats = reportData || {};
 
     // ================================================================
-    // BARU: Custom formatter untuk tooltip dan Y-Axis
+    // RENDER
     // ================================================================
-    const yAxisFormatter = (value) => `Rp ${value / 1000000} Jt`;
-    const tooltipFormatter = (value) => `${formatCurrency(value)}`;
-
     return (
         <div className="user-management-container">
             <h1>Laporan Keuangan Inventaris</h1>
+
+            {/* KPI Cards */}
             <div className="info-cards-grid">
-                <KpiCard title="Total Nilai Aset" value={isLoading ? '...' : formatCurrency(stats.total_asset_value)} iconClass="fas fa-landmark" colorClass="blue-card" />
-                <KpiCard title="Nilai Aset Bersih (Net)" value={isLoading ? '...' : formatCurrency(stats.net_asset_value)} iconClass="fas fa-shield-alt" colorClass="green-card" />
-                <KpiCard title="Pembelian (30 Hari)" value={isLoading ? '...' : formatCurrency(stats.new_asset_value)} iconClass="fas fa-cart-plus" colorClass="yellow-card" />
-                <KpiCard title="Kerugian (30 Hari)" value={isLoading ? '...' : formatCurrency(stats.problematic_asset_value)} iconClass="fas fa-exclamation-triangle" colorClass="red-card" />
+                <KpiCard
+                    title="Total Nilai Aset"
+                    value={!reportData ? '...' : formatCurrency(stats.total_asset_value)}
+                    iconClass="fas fa-landmark"
+                    colorClass="blue-card"
+                />
+                <KpiCard
+                    title="Nilai Aset Bersih (Net)"
+                    value={!reportData ? '...' : formatCurrency(stats.net_asset_value)}
+                    iconClass="fas fa-shield-alt"
+                    colorClass="green-card"
+                />
+                <KpiCard
+                    title="Pembelian (30 Hari)"
+                    value={!reportData ? '...' : formatCurrency(stats.new_asset_value)}
+                    iconClass="fas fa-cart-plus"
+                    colorClass="yellow-card"
+                />
+                <KpiCard
+                    title="Kerugian (30 Hari)"
+                    value={!reportData ? '...' : formatCurrency(stats.problematic_asset_value)}
+                    iconClass="fas fa-exclamation-triangle"
+                    colorClass="red-card"
+                />
             </div>
 
+            {/* Dashboard Chart Section */}
             <div className="dashboard-container-financial">
                 <div className="dashboard-row-financial">
-                    {/* --- Chart Utama: Nilai per Kategori (Recharts) --- */}
+                    {/* --- Chart Utama: Nilai per Kategori --- */}
                     <div className="nilai-card kategori-card">
-                        <h4>Total Nilai Pembelian per Kategori</h4>
+                        <h4>Top 10 Kategori Pembelian Terbesar</h4>
                         <div className="chart-canvas-container">
-                            {isLoading ? <p className="loading-text">Memuat grafik...</p> : (
+                            {!chartApiData.bar ? (
+                                <p className="loading-text">Memuat grafik...</p>
+                            ) : (
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={transformedBarData} margin={{ top: 20, right: 30, left: 30, bottom: 5 }}>
+                                    <BarChart
+                                        data={transformedBarData}
+                                        margin={{ top: 20, right: 30, left: 30, bottom: 5 }}
+                                    >
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                         <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                                         <YAxis tickFormatter={yAxisFormatter} tick={{ fontSize: 12 }} />
-                                        <Tooltip formatter={tooltipFormatter} cursor={{ fill: 'rgba(206, 206, 206, 0.2)' }} />
-                                        <Bar dataKey="Total Nilai Pembelian" fill="rgba(153, 102, 255, 0.8)" barSize={30} />
+                                        <Tooltip
+                                            formatter={tooltipFormatter}
+                                            cursor={{ fill: 'rgba(206, 206, 206, 0.2)' }}
+                                        />
+                                        <Bar
+                                            dataKey="Total Nilai Pembelian"
+                                            fill="rgba(153, 102, 255, 0.8)"
+                                            barSize={30}
+                                        />
                                     </BarChart>
                                 </ResponsiveContainer>
                             )}
                         </div>
                     </div>
 
-                    {/* --- Chart Kedua: Komposisi Aset (Recharts) --- */}
+                    {/* --- Chart Kedua: Komposisi Aset --- */}
                     <div className="nilai-card komposisi-card">
                         <h4>Komposisi Nilai Aset</h4>
                         <div className="chart-canvas-container">
-                            {isLoading ? <p className="loading-text">Memuat grafik...</p> : (
+                            {!chartApiData.pie ? (
+                                <p className="loading-text">Memuat grafik...</p>
+                            ) : (
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
@@ -141,7 +233,10 @@ export default function FinancialReport() {
                                             nameKey="name"
                                         >
                                             {transformedPieData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                                                <Cell
+                                                    key={`cell-${index}`}
+                                                    fill={PIE_COLORS[index % PIE_COLORS.length]}
+                                                />
                                             ))}
                                         </Pie>
                                         <Tooltip formatter={tooltipFormatter} />
@@ -154,11 +249,22 @@ export default function FinancialReport() {
                 </div>
             </div>
 
+            {/* Navigation Section */}
             <div className="navigation-section">
                 <h1>Lihat Laporan Detail</h1>
                 <div className="report-navigation-cards">
-                    <NavigationCard title="Pembelian Baru (Aset Masuk)" description="Lihat semua data aset yang baru dibeli berdasarkan periode." linkTo="/admin/financial-report/new-acquisitions" icon="fa-dolly-flatbed" />
-                    <NavigationCard title="Potensi Kerugian (Aset Rusak/Hilang)" description="Lacak semua aset yang berstatus rusak atau hilang." linkTo="/admin/financial-report/problematic-assets" icon="fa-heart-broken" />
+                    <NavigationCard
+                        title="Pembelian Baru (Aset Masuk)"
+                        description="Lihat semua data aset yang baru dibeli berdasarkan periode."
+                        linkTo="/admin/financial-report/new-acquisitions"
+                        icon="fa-dolly-flatbed"
+                    />
+                    <NavigationCard
+                        title="Potensi Kerugian (Aset Rusak/Hilang)"
+                        description="Lacak semua aset yang berstatus rusak atau hilang."
+                        linkTo="/admin/financial-report/problematic-assets"
+                        icon="fa-heart-broken"
+                    />
                 </div>
             </div>
         </div>

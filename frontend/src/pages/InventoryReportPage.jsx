@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import InventoryLineChart from '../components/InventoryLineChart';
+// Import InventoryLineChart tidak diperlukan lagi
+// import InventoryLineChart from '../components/InventoryLineChart';
 
 const NavigationCard = ({ title, description, linkTo, icon }) => (
     <Link to={linkTo} className="nav-card-report">
@@ -48,7 +49,8 @@ export default function InventoryReportPage() {
         barang_keluar: '...',
     };
 
-    const chartData = dashboardData?.chartData || [];
+    // HAPUS: Variabel chartData tidak diperlukan lagi
+    // const chartData = dashboardData?.chartData || [];
     const mostActiveItems = dashboardData?.mostActiveItems || [];
     const availableYears = dashboardData?.availableYears || [selectedYear];
 
@@ -91,26 +93,19 @@ export default function InventoryReportPage() {
                 </div>
             </div>
 
-            {/* Grafik */}
-            <div className="dashboard-card" style={{ marginTop: '2rem' }}>
+            {/* HAPUS: Seluruh blok div untuk grafik telah dihapus */}
+
+            {/* Barang paling aktif */}
+            <div className="dashboard-card most-active-widget" style={{ marginTop: '2rem' }}>
+                {/* BARU: Filter tahun dipindahkan ke sini */}
                 <div className="chart-header">
-                    <h4>Pergerakan Barang Masuk vs Keluar</h4>
+                    <h4>5 Barang Paling Sering Keluar</h4>
                     <select className="year-filter" value={selectedYear} onChange={handleYearChange}>
                         {availableYears.map(year => (
                             <option key={year} value={year}>{year}</option>
                         ))}
                     </select>
                 </div>
-                {loading ? (
-                    <div style={{ textAlign: 'center', padding: '3rem' }}>Memuat grafik...</div>
-                ) : (
-                    <InventoryLineChart chartData={chartData} />
-                )}
-            </div>
-
-            {/* Barang paling aktif */}
-            <div className="dashboard-card most-active-widget">
-                <h4>5 Barang Paling Sering Keluar (Tahun Ini)</h4>
                 <ul className="active-items-list">
                     {loading ? (
                         <p style={{ textAlign: 'center', padding: '1rem' }}>Memuat data...</p>

@@ -9,6 +9,23 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="custom-tooltip">
+        <p style={{ fontWeight: 600, marginBottom: 6 }}>{label}</p>
+        {payload.map((item, i) => (
+          <p key={i} style={{ margin: 0 }}>
+            <span style={{ color: item.fill, fontWeight: 'bold' }}>●</span>{' '}
+            {item.name}: {item.value}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
 const BarChartComponent = ({ data, onBarClick }) => {
   return (
     <div className="barchart-wrapper">
@@ -20,7 +37,7 @@ const BarChartComponent = ({ data, onBarClick }) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis allowDecimals={false} />
-          <Tooltip />
+           <Tooltip content={<CustomTooltip />} />
 
           {/* ✅ Tiket Selesai */}
           <Bar

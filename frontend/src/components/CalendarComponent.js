@@ -2,31 +2,27 @@ import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { format } from 'date-fns';
+import TicketModal from './TicketModal'; 
 
 function CalendarComponent({ tickets = [], onTicketClick }) {
   const [date, setDate] = useState(new Date());
   const [ticketsForDate, setTicketsForDate] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
-
   const [showModal, setShowModal] = useState(false);
   const [selectedTickets, setSelectedTickets] = useState([]);
 
-  // Sync dark mode dari localStorage
+  // Sinkronisasi mode gelap
   useEffect(() => {
     const updateModeFromStorage = () => {
       const savedMode = localStorage.getItem('darkMode');
-      if (savedMode !== null) {
-        setIsDarkMode(JSON.parse(savedMode));
-      }
+      if (savedMode !== null) setIsDarkMode(JSON.parse(savedMode));
     };
     updateModeFromStorage();
     window.addEventListener('storage', updateModeFromStorage);
-    return () => {
-      window.removeEventListener('storage', updateModeFromStorage);
-    };
+    return () => window.removeEventListener('storage', updateModeFromStorage);
   }, []);
 
-  // Update data tiket awal
+  // Update tiket sesuai tanggal
   useEffect(() => {
     if (!tickets || tickets.length === 0) {
       setTicketsForDate([]);
@@ -39,7 +35,7 @@ function CalendarComponent({ tickets = [], onTicketClick }) {
     setTicketsForDate(filtered);
   }, [tickets, date]);
 
-  // Klik tanggal
+  // Klik tanggal di kalender
   const handleDayClick = (clickedDate) => {
     const formatted = format(clickedDate, 'yyyy-MM-dd');
     const filtered = tickets.filter(
@@ -50,7 +46,6 @@ function CalendarComponent({ tickets = [], onTicketClick }) {
     setDate(clickedDate);
   };
 
-  // Render titik di kalender
   const tileContent = ({ date, view }) => {
     if (view === 'month') {
       const formattedDate = format(date, 'yyyy-MM-dd');
@@ -86,89 +81,36 @@ function CalendarComponent({ tickets = [], onTicketClick }) {
       <Calendar
         onClickDay={handleDayClick}
         value={date}
-        className={isDarkMode ? 'react-calendar--dark' : ''}
         tileContent={tileContent}
       />
-      <div className="ticket-legend" style={{ marginTop: "10px", fontSize: "13px" }}>
-        {/* Legend Warna */}
-        <div className="ticket-legend">
-          <div className="legend-item legend-green">
-            <span className="legend-dot dot-green"></span>
-            <span className="legend-text">Selesai</span>
-          </div>
-          <div className="legend-item legend-yellow">
-            <span className="legend-dot dot-yellow"></span>
-            <span className="legend-text">Sedang Dikerjakan</span>
-          </div>
-          <div className="legend-item legend-blue">
-            <span className="legend-dot dot-blue"></span>
-            <span className="legend-text">Belum Dikerjakan</span>
-          </div>
-          <div className="legend-item legend-gray">
-            <span className="legend-dot dot-gray"></span>
-            <span className="legend-text">Ditunda</span>
-          </div>
-          <div className="legend-item legend-red">
-            <span className="legend-dot dot-red"></span>
-            <span className="legend-text">Ditolak</span>
-          </div>
-        </div>
 
+      <div className="ticket-legend" style={{ marginTop: "10px", fontSize: "13px" }}>
+        <div className="legend-item legend-green"><span className="legend-dot dot-green"></span><span>Selesai</span></div>
+        <div className="legend-item legend-yellow"><span className="legend-dot dot-yellow"></span><span>Sedang Dikerjakan</span></div>
+        <div className="legend-item legend-blue"><span className="legend-dot dot-blue"></span><span>Belum Dikerjakan</span></div>
+        <div className="legend-item legend-gray"><span className="legend-dot dot-gray"></span><span>Ditunda</span></div>
+        <div className="legend-item legend-red"><span className="legend-dot dot-red"></span><span>Ditolak</span></div>
       </div>
 
       <p className="calendar-info" style={{ fontSize: "14px" }}>
         Tanggal dipilih: <b style={{ fontSize: "15px" }}>{format(date, 'dd MMM yyyy')}</b>
       </p>
 
-      {/* Modal Detail Tiket */}
-      {showModal && selectedTickets.length > 0 && (
-        <div className={`modal-overlay2 ${isDarkMode ? 'dark-mode' : ''}`}>
-          <div className={`modal-content2 ${isDarkMode ? 'dark-mode' : ''}`}>
-            <div className={`modal-header ${isDarkMode ? 'dark-mode' : ''}`}>
-              <h3 className="modal-title">
-                Tiket untuk {format(date, 'dd MMM yyyy')}
-              </h3>
-            </div>
-            <div className={`modal-body ${isDarkMode ? 'dark-mode' : ''}`}>
-              {selectedTickets.map((ticket, index) => (
-                <div
-                  key={index}
-                  className={`ticket-modal-card ${isDarkMode ? 'dark-mode' : ''} status-${ticket.status.toLowerCase().replace(/\s/g, '-')}`}
-                  onClick={() => {
-                    setShowModal(false);
-                    if (onTicketClick) {
-                      onTicketClick(ticket.id);
-                    }
-                  }}
-                >
-                  <p><b>Pengirim:</b> {ticket.creator?.name}</p>
-                  <p><b>Workshop:</b> {ticket.workshop?.name}</p>
-                  <p className="description-cell"><b>Deskripsi:</b> {ticket.title}</p>
-                  <p><b>Status:</b> {ticket.status}</p>
-                </div>
-              ))}
-            </div>
-            <div className={`modal-footer ${isDarkMode ? 'dark-mode' : ''}`}>
-              <button
-                className={`btn-canceluser ${isDarkMode ? 'dark-mode' : ''}`}
-                onClick={() => setShowModal(false)}
-              >
-                Tutup
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal terpisah */}
+      <TicketModal
+        show={showModal}
+        tickets={selectedTickets}
+        date={date}
+        isDarkMode={isDarkMode}
+        onClose={() => setShowModal(false)}
+        onTicketClick={onTicketClick}
+      />
 
       {/* Info jika kosong */}
       {(!tickets || tickets.length === 0) ? (
-        <p className="info-text">
-          <i>Memuat data tiket...</i>
-        </p>
+        <p className="info-text"><i>Memuat data tiket...</i></p>
       ) : ticketsForDate.length === 0 ? (
-        <p className="info-text">
-          <i>Tidak ada tiket pada tanggal ini</i>
-        </p>
+        <p className="info-text"><i>Tidak ada tiket pada tanggal ini</i></p>
       ) : null}
     </div>
   );
