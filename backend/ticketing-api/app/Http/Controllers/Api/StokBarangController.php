@@ -70,7 +70,7 @@ class StokBarangController extends Controller
             });
         }
 
-        return $query->latest()->paginate(10);
+        return $query->latest()->paginate(15);
     }
 
     public function show(StokBarang $stokBarang)

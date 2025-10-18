@@ -94,6 +94,7 @@ export default function DetailedReportPage({ type, title }) {
                 tanggal: item.tanggal_masuk,
                 penanggung_jawab: item.created_by?.name,
                 workshop: item.workshop?.name,
+                current_status: item.status_detail?.nama_status,
             };
         }
         return {
@@ -103,6 +104,7 @@ export default function DetailedReportPage({ type, title }) {
             tanggal: item.event_date, // Tanggal kejadian adalah created_at dari history
             penanggung_jawab: item.related_user?.name,
             workshop: item.workshop?.name,
+            current_status: item.stok_barang?.status_detail?.nama_status,
         };
     };
 
@@ -154,10 +156,11 @@ export default function DetailedReportPage({ type, title }) {
                         <tr>
                             <th>Kode Unik</th>
                             <th>Nama Barang</th>
-                            <th>Status</th>
+                            <th>Status Kejadian</th>
                             <th>{dateHeaders[type] || 'Tanggal'}</th>
                             <th>Penanggung Jawab</th>
                             <th>Workshop</th>
+                            {(type === 'out' || type === 'accountability') && <th>Status Saat Ini</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -173,6 +176,14 @@ export default function DetailedReportPage({ type, title }) {
                                     <td>{formatDate(itemData.tanggal)}</td>
                                     <td>{itemData.penanggung_jawab || '-'}</td>
                                     <td>{itemData.workshop || '-'}</td>
+                                    {(type === 'out' || type === 'accountability') && (
+                                        <td>
+                                            {/* Beri warna agar mudah dibedakan */}
+                                            <span className={`badge-status status-${itemData.current_status?.toLowerCase()}`}>
+                                                {itemData.current_status || '-'}
+                                            </span>
+                                        </td>
+                                    )}
                                 </tr>
                             )
                         }) : (
@@ -207,7 +218,7 @@ export default function DetailedReportPage({ type, title }) {
                                         <span className="value">{itemData.kode_unik || '-'}</span>
                                     </div>
                                     <div className="data-group">
-                                        <span className="label">Status</span>
+                                        <span className="label">Status Kejadian</span>
                                         <span className="value">{itemData.status || '-'}</span>
                                     </div>
                                 </div>
@@ -229,6 +240,10 @@ export default function DetailedReportPage({ type, title }) {
                                     <div className="data-group single">
                                         <span className="label">Workshop</span>
                                         <span className="value">{itemData.workshop || '-'}</span>
+                                    </div>
+                                    <div className="data-group">
+                                        <span className="label">Status Saat Ini</span>
+                                        <span className="value">{itemData.current_status || '-'}</span>
                                     </div>
                                 </div>
                             </div>

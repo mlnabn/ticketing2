@@ -135,6 +135,21 @@ export default function InventoryReportPage() {
             {/* Navigasi laporan */}
             <div className="report-navigation-cards">
                 <NavigationCard
+                    title="Laporan Peminjaman Aktif"
+                    description="Lihat semua aset yang saat ini sedang dipinjam atau digunakan."
+                    linkTo="/admin/inventory-reports/active-loans"
+                    icon="fa-user-clock"
+                />
+                <NavigationCard
+                    title="Lacak Riwayat Aset"
+                    description="Cari atau scan untuk melihat riwayat lengkap satu unit aset."
+                    linkTo="/admin/inventory-reports/history"
+                    icon="fa-history"
+                />
+            </div>
+
+            <div className="report-navigation-cards">
+                <NavigationCard
                     title="Laporan Barang Masuk"
                     description="Lihat riwayat detail semua barang yang masuk ke gudang."
                     linkTo="/admin/inventory-reports/incoming"
@@ -146,9 +161,6 @@ export default function InventoryReportPage() {
                     linkTo="/admin/inventory-reports/outgoing"
                     icon="fa-arrow-up"
                 />
-            </div>
-
-            <div className="report-navigation-cards">
                 <NavigationCard
                     title="Laporan Barang Tersedia"
                     description="Lihat semua unit barang yang saat ini siap digunakan."
@@ -161,6 +173,7 @@ export default function InventoryReportPage() {
                     linkTo="/admin/inventory-reports/accountability"
                     icon="fa-exclamation-triangle"
                 />
+                
             </div>
         </div>
     );

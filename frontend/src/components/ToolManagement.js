@@ -100,7 +100,7 @@ function ToolManagement() {
     return (
         <>
             <div className="user-management-container" style={{ marginBottom: '20px' }}>
-                <h1>Manajemen Gudang</h1>
+                <h1>Tambah SKU</h1>
             </div>
 
             <ItemListView
