@@ -1755,8 +1755,10 @@ body.dark-mode .proof-modal__group input[type="file"]::file-selector-button:hove
 /* ================================ */
 .info-card .card-value {
   font-size: 2.2rem;
-  word-break: break-all; /* Tetap gunakan ini sebagai pengaman */
+  word-break: break-all;
+  /* Tetap gunakan ini sebagai pengaman */
 }
+
 .card-value {
   font-size: 2rem;
   font-weight: 700;
@@ -6584,6 +6586,25 @@ body.dark-mode .welcome-title {
   margin: 0 0 10px 0;
 }
 
+.custom-tooltip {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-size: 13px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Tooltip dalam dark mode */
+body.dark-mode .custom-tooltip {
+  background-color: #1f1f1f;
+  color: #f1f1f1;
+  border: 1px solid #444;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+}
+
 /* Responsive: jadi 1 kolom di layar kecil */
 @media (max-width: 1024px) {
   .dashboard-row {
@@ -8427,6 +8448,8 @@ body.dark-mode .dashboard-card h4 {
 .dark-mode .ticket-modal-card p b {
   color: #f1f1f1;
 }
+
+
 
 /* ========================================================= */
 /* ================== RESPONSIVE STYLES ==================== */
@@ -12010,6 +12033,7 @@ body.dark-mode .btn-detail:hover {
     padding: 2px 8px;
     border-radius: 10px;
   }
+
   .info-card .card-value {
     font-size: 1.5rem;
   }

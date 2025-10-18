@@ -10,6 +10,25 @@ import {
 } from "recharts";
 import dayjs from "dayjs";
 
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="custom-tooltip">
+        <p style={{ fontWeight: 600, marginBottom: 6 }}>
+          {dayjs(label).format("DD MMM YYYY")}
+        </p>
+        {payload.map((item, i) => (
+          <p key={i} style={{ margin: 0 }}>
+            <span style={{ color: item.stroke, fontWeight: "bold" }}>●</span>{" "}
+            {item.name}: {item.value}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
 const LineChartComponent = ({ data, onPointClick }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [visibleStatuses, setVisibleStatuses] = useState([
@@ -106,16 +125,7 @@ const LineChartComponent = ({ data, onPointClick }) => {
             tickLine={{ stroke: isDarkMode ? "#888" : "#ccc" }}
           />
 
-          <Tooltip
-            labelFormatter={(label) => dayjs(label).format("DD MMM YYYY")}
-            contentStyle={{
-              backgroundColor: isDarkMode ? "#2c2c2c" : "#fff",
-              border: "1px solid",
-              borderColor: isDarkMode ? "#555" : "#ccc",
-              color: isDarkMode ? "#fff" : "#333",
-              fontSize: "12px"
-            }}
-          />
+          <Tooltip content={<CustomTooltip />} />
 
           {visibleStatuses.includes("Belum Dikerjakan") && (
             <Line

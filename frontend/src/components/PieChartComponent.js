@@ -1,6 +1,23 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const item = payload[0].payload;
+    return (
+      <div className="custom-tooltip">
+        <p style={{ fontWeight: 600, marginBottom: 6 }}>
+          {item.name}
+        </p>
+        <p style={{ margin: 0 }}>
+          {item.value} tiket ({item.percent}%)
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
 const PieChartComponent = ({ stats, handleStatusFilterClick, statusFilter }) => {
   if (!stats) return null;
 
@@ -61,12 +78,7 @@ const PieChartComponent = ({ stats, handleStatusFilterClick, statusFilter }) => 
                 />
               ))}
             </Pie>
-            <Tooltip
-              formatter={(value, name, props) => {
-                const percent = props.payload.percent;
-                return [`${value} tiket (${percent}%)`, name];
-              }}
-            />
+            <Tooltip content={<CustomTooltip />} />
           </PieChart>
         </ResponsiveContainer>
       </div>
