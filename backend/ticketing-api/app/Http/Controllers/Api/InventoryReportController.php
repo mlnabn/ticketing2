@@ -132,32 +132,45 @@ class InventoryReportController extends Controller
     public function getDetailedReport(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:in,out,available,accountability',
+            'type' => 'required|in:in,out,available,accountability,active_loans',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'search' => 'nullable|string|max:255',
         ]);
 
-        if ($request->type === 'in' || $request->type === 'available') {
+        if (in_array($request->type, ['in', 'available', 'active_loans'])) {
             
-            $query = StokBarang::with(['masterBarang', 'statusDetail', 'createdBy', 'workshop']);
+            $query = StokBarang::with(['masterBarang', 'statusDetail', 'createdBy', 'workshop', 'userPeminjam']);
 
-            if ($request->type === 'in') {
-                $query->whereNotNull('tanggal_masuk');
-                $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_masuk', '>=', $request->start_date));
-                $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_masuk', '<=', $request->end_date));
-                $query->orderBy('tanggal_masuk', 'desc');
-            } else { 
-                $statusTersediaId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
-                $query->where('status_id', $statusTersediaId);
-                $query->orderBy('created_at', 'desc');
+            switch ($request->type) {
+                case 'in':
+                    $query->whereNotNull('tanggal_masuk');
+                    $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_masuk', '>=', $request->start_date));
+                    $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_masuk', '<=', $request->end_date));
+                    $query->orderBy('tanggal_masuk', 'desc');
+                    break;
+
+                case 'available':
+                    $statusTersediaId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
+                    $query->where('status_id', $statusTersediaId);
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                
+                case 'active_loans':
+                    $statusPeminjamanIds = DB::table('status_barang')->whereIn('nama_status', ['Dipinjam', 'Digunakan'])->pluck('id');
+                    $query->whereIn('status_id', $statusPeminjamanIds);
+                    $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_keluar', '>=', $request->start_date));
+                    $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_keluar', '<=', $request->end_date));
+                    $query->orderBy('tanggal_keluar', 'asc'); 
+                    break;
             }
             
             $query->when($request->filled('search'), function ($q) use ($request) {
                 $searchTerm = '%' . $request->search . '%';
                 $q->where(function ($subQuery) use ($searchTerm) {
                     $subQuery->where('kode_unik', 'like', $searchTerm)
-                        ->orWhereHas('masterBarang', fn($masterQuery) => $masterQuery->where('nama_barang', 'like', $searchTerm));
+                        ->orWhereHas('masterBarang', fn($masterQuery) => $masterQuery->where('nama_barang', 'like', $searchTerm))
+                        ->orWhereHas('userPeminjam', fn($userQuery) => $userQuery->where('name', 'like', $searchTerm));
                 });
             });
 
@@ -166,6 +179,7 @@ class InventoryReportController extends Controller
 
         $query = \App\Models\StokBarangHistory::with([
             'stokBarang.masterBarang',
+            'stokBarang.statusDetail',
             'statusDetail',
             'relatedUser', 
             'workshop'

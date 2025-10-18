@@ -30,6 +30,8 @@ import ToolManagement from './components/ToolManagement';
 import StokBarangView from './components/StokBarangView';
 import DetailedReportPage from './components/DetailedReportPage';
 import WorkshopManagement from './components/WorkshopManagement';
+import ActiveLoanReportPage from './components/ActiveLoanReportPage';
+import ItemHistoryLookupPage from './components/ItemHistoryLookupPage';
 
 import TicketReportAdminList from './components/TicketReportAdminList';
 import ComprehensiveReportPage from './components/ComprehensiveReportPage';
@@ -99,6 +101,8 @@ export default function RootApp() {
             <Route path="inventory" element={<ToolManagement />} />
             <Route path="stock" element={<StokBarangView />} />
             <Route path="inventory-reports" element={<InventoryReportPage />} />
+            <Route path="inventory-reports/active-loans" element={<ActiveLoanReportPage />} />
+            <Route path="inventory-reports/history" element={<ItemHistoryLookupPage />} />
             <Route path="inventory-reports/incoming" element={<DetailedReportPage type="in" title="Laporan Barang Masuk" />} />
             <Route path="inventory-reports/outgoing" element={<DetailedReportPage type="out" title="Laporan Barang Keluar" />} />
             <Route path="inventory-reports/available" element={<DetailedReportPage type="available" title="Laporan Barang Tersedia" />} />
