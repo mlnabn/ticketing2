@@ -22,6 +22,7 @@ import FAQPage from './components/FAQPage';
 // Komponen Halaman di dalam AdminDashboard
 import FinancialReportPage from './pages/FinancialReportPage';
 import InventoryReportPage from './pages/InventoryReportPage';
+import UrgencyKeywordManagement from './pages/UrgencyKeywordManagement';
 
 import WelcomeHome from './components/WelcomeHome';
 import JobList from './components/JobList';
@@ -111,6 +112,7 @@ export default function RootApp() {
             <Route path="financial-report" element={<FinancialReportPage />} />
             <Route path="financial-report/new-acquisitions" element={<NewAcquisitionsReport />} />
             <Route path="financial-report/problematic-assets" element={<ProblematicAssetsReport />} />
+            <Route path="urgency-keywords" element={<UrgencyKeywordManagement />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

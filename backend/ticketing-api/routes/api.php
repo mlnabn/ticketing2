@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\MasterBarangController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\InventoryReportController;
+use App\Http\Controllers\Api\UrgencyKeywordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,6 +52,7 @@ Route::middleware('jwt')->group(function () {
     Route::get('/admins', [UserController::class, 'getAdmins']);
 
     // --- Rute untuk Tiket ---
+    Route::apiResource('urgency-keywords', UrgencyKeywordController::class)->only(['index', 'store', 'destroy']);
     Route::apiResource('workshops', WorkshopController::class);
     Route::get('/tickets/stats', [TicketController::class, 'stats']);
     Route::patch('/tickets/{ticket}/reject', [TicketController::class, 'reject']);

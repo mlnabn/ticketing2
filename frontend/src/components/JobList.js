@@ -60,6 +60,10 @@ export default function JobList() {
 
     try {
       const response = await api.get(endpoint, { params });
+      if (response.data && Array.isArray(response.data.data)) {
+        const sortedTickets = response.data.data.sort((a, b) => b.is_urgent - a.is_urgent);
+        response.data.data = sortedTickets;
+      }
       setTicketData(response.data);
     } catch (e) {
       console.error('Gagal mengambil data tiket:', e);
@@ -287,12 +291,18 @@ export default function JobList() {
               <tbody>
                 {ticketsOnPage.length > 0 ? (
                   ticketsOnPage.map(ticket => (
-                    <tr key={ticket.id} className={`${selectedIds.includes(ticket.id) ? 'selected-row' : ''} clickable-row`} onClick={(e) => handleRowClick(e, ticket)}>
+                    <tr 
+                      key={ticket.id} 
+                      className={`${selectedIds.includes(ticket.id) ? 'selected-row' : ''} 
+                                  ${ticket.is_urgent ? 'urgent-row' : ''} 
+                                  clickable-row`} 
+                      onClick={(e) => handleRowClick(e, ticket)}
+                    >
                       {isAdmin && !isMyTicketsPage && (<td><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>)}
                       <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
                       <td>{ticket.user ? ticket.user.name : '-'}</td>
                       <td>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
-                      <td><span className="description-cell">{ticket.title}</span></td>
+                      <td><span className="description-cell">{ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}{ticket.title}</span></td>
                       <td>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
                       <td>{formatWorkTime(ticket)}</td>
                       <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></td>
@@ -307,13 +317,29 @@ export default function JobList() {
             <div className="job-list-mobile">
               {ticketsOnPage.length > 0 ? (
                 ticketsOnPage.map(ticket => (
-                  <div key={ticket.id} className="ticket-card-mobile clickable-row" onClick={(e) => handleRowClick(e, ticket)}>
+                  <div 
+                    key={ticket.id} 
+                    className={`ticket-card-mobile clickable-row ${ticket.is_urgent ? 'urgent-row' : ''}`} 
+                    onClick={(e) => handleRowClick(e, ticket)}
+                  >
                     <div className="card-row">
                       <div className="data-group"><span className="label">Pengirim</span><span className="value">{ticket.creator ? ticket.creator.name : 'N/A'}</span></div>
                       <div className="data-group"><span className="label">Dikerjakan Oleh</span><span className="value">{ticket.user ? ticket.user.name : '-'}</span></div>
                     </div>
                     <div className="card-row"><div className="data-group single"><span className="label">Workshop</span><span className="value">{ticket.workshop ? ticket.workshop.name : 'N/A'}</span></div></div>
-                    <div className="card-row"><div className="data-group single"><span className="label">Deskripsi</span><span className="value description"><span className="description-cell">{ticket.title}</span></span></div></div>
+                    <div className="card-row">
+                      <div className="data-group single">
+                        <span className="label">Deskripsi</span>
+                        <span className="value description">
+                          <span className="value description">
+                            <span className="description-cell">
+                              {ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}
+                              {ticket.title}
+                            </span>
+                          </span>
+                        </span>
+                      </div>
+                    </div>
                     <div className="card-row">
                       <div className="data-group"><span className="label">Tanggal Dibuat</span><span className="value">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</span></div>
                       <div className="data-group"><span className="label">Waktu Pengerjaan</span><span className="value">{formatWorkTime(ticket)}</span></div>

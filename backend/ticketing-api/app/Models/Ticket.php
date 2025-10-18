@@ -25,7 +25,8 @@ class Ticket extends Model
         'proof_description',
         'proof_image_path',
         'kode_tiket',
-        'requester_name', // <-- PERBAIKAN 3: Ditambahkan
+        'requester_name',
+        'is_urgent',
     ];
 
     public function user()
