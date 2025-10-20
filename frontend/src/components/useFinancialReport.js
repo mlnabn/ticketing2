@@ -3,7 +3,14 @@ import api from '../services/api';
 
 // Custom hook untuk menampung state dan logika yang berulang
 export const useFinancialReport = () => {
+    const [summaryData, setSummaryData] = useState({
+        total_asset_value: 0,
+        net_asset_value: 0,
+        new_asset_value: 0,
+        problematic_asset_value: 0,
+    });
     const [detailedData, setDetailedData] = useState({ new_acquisitions: [], problematic_assets: [] });
+    const [chartData, setChartData] = useState({ bar: null, pie: null });
     const [filterType, setFilterType] = useState('month');
     const [filters, setFilters] = useState({
         year: new Date().getFullYear().toString(),
@@ -15,22 +22,30 @@ export const useFinancialReport = () => {
     const [isExporting, setIsExporting] = useState(false);
 
     // --- Data Fetching untuk Tabel Detail ---
-    const fetchDetailedReport = useCallback(async () => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true);
-        let params = {};
-        if (filterType === 'month') {
-            params = { year: filters.year, month: filters.month };
-        } else if (filterType === 'date_range') {
-            if (filters.start_date && filters.end_date) {
-                params = { start_date: filters.start_date, end_date: filters.end_date };
-            }
-        }
-
         try {
-            const detailsResponse = await api.get('/financial-report/inventory/details', { params });
-            setDetailedData(detailsResponse.data);
+            let apiParams = {};
+            if (filterType === 'month') {
+                apiParams = { year: filters.year, month: filters.month };
+            } else if (filters.start_date && filters.end_date) {
+                apiParams = { start_date: filters.start_date, end_date: filters.end_date };
+            }
+
+            // Gunakan Promise.all untuk efisiensi
+            const [summaryRes, detailsRes, barChartRes, pieChartRes] = await Promise.all([
+                api.get('/financial-report/inventory', { params: apiParams }),
+                api.get('/financial-report/inventory/details', { params: apiParams }),
+                api.get('/financial-report/value-by-category'),
+                api.get('/financial-report/asset-composition')
+            ]);
+
+            setSummaryData(summaryRes.data);
+            setDetailedData(detailsRes.data);
+            setChartData({ bar: barChartRes.data, pie: pieChartRes.data });
+
         } catch (error) {
-            console.error("Gagal mengambil detail laporan keuangan:", error);
+            console.error("Gagal mengambil data laporan keuangan:", error);
         } finally {
             setIsLoading(false);
         }
@@ -38,8 +53,8 @@ export const useFinancialReport = () => {
 
     // Jalankan fetch setiap kali filter berubah
     useEffect(() => {
-        fetchDetailedReport();
-    }, [fetchDetailedReport]);
+        fetchData();
+    }, [fetchData]);
 
     // --- Handlers ---
     const handleFilterChange = (e) => {
@@ -47,15 +62,10 @@ export const useFinancialReport = () => {
     };
 
     const handleFilterTypeChange = (e) => {
-        const newType = e.target.value;
-        setFilterType(newType);
-        const getTodayString = () => new Date().toISOString().split('T')[0];
-
+        setFilterType(e.target.value);
         setFilters({
             year: new Date().getFullYear().toString(),
-            month: '',
-            start_date: '',
-            end_date: newType === 'date_range' ? getTodayString() : ''
+            month: '', start_date: '', end_date: ''
         });
     };
 
@@ -101,7 +111,9 @@ export const useFinancialReport = () => {
 
     // Return semua state dan fungsi yang dibutuhkan oleh komponen
     return {
-        detailedData,
+        summaryData,
+        detailedData, 
+        chartData,
         filters,
         filterType,
         isLoading,
