@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import { useOutletContext } from 'react-router-dom';
-import { FaTrash, FaSpinner } from 'react-icons/fa';
+import { FaSpinner } from 'react-icons/fa';
 
 export default function UrgencyKeywordManagement() {
   const { showToast } = useOutletContext();
@@ -65,7 +65,7 @@ export default function UrgencyKeywordManagement() {
   return (
     <div className="user-management-container">
       <h1 className="page-title">Manajemen Kata Kunci Urgensi</h1>
-      <p className="page-description">
+      <p>
         Tambahkan atau hapus kata kunci yang akan menandai sebuah tiket sebagai "URGENT" secara otomatis.
       </p>
 
@@ -81,7 +81,7 @@ export default function UrgencyKeywordManagement() {
             className="filter-search-input-key"
           />
           <button type="submit" className="btn-keyword" disabled={isSubmitting}>
-            <i className="fas fa-plus" style={{marginRight: '8px'}}></i>
+            <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
             {isSubmitting ? <><FaSpinner className="spin" /> Menambahkan...</> : 'Tambah'}
           </button>
         </form>
@@ -100,7 +100,7 @@ export default function UrgencyKeywordManagement() {
                   <li key={kw.id} className="history-item">
                     <span>{kw.keyword}</span>
                     <button onClick={() => handleDelete(kw.id)} className="btn-delete-icon">
-                      <FaTrash />
+                      <i className="fas fa-trash-alt"></i>
                     </button>
                   </li>
                 ))}
