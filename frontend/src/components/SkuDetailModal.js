@@ -2,29 +2,30 @@ import React, { useState, useEffect, useMemo } from 'react';
 import api from '../services/api';
 
 function SkuDetailModal({ item, onClose }) {
-    const [stockByColor, setStockByColor] = useState([]);
+    const [stockBreakdown, setStockBreakdown] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+
     useEffect(() => {
         if (!item?.id_m_barang) return;
         setIsLoading(true);
-        api.get(`/inventory/items/${item.id_m_barang}/stock-by-color`)
+
+        api.get(`/inventory/items/${item.id_m_barang}/stock-breakdown`)
             .then(response => {
-                setStockByColor(response.data);
+                setStockBreakdown(response.data);
             })
             .catch(error => {
-                console.error("Gagal mengambil data stok per warna:", error);
-                setStockByColor([]);
+                console.error("Gagal mengambil rincian stok:", error);
+                setStockBreakdown([]);
             })
             .finally(() => {
                 setIsLoading(false);
             });
-
     }, [item]);
-    const totalStock = useMemo(() => {
-        if (!stockByColor || stockByColor.length === 0) return 0;
-        return stockByColor.reduce((sum, current) => sum + current.total, 0);
-    }, [stockByColor]);
 
+    const totalOverallStock = useMemo(() => {
+        if (!stockBreakdown || stockBreakdown.length === 0) return 0;
+        return stockBreakdown.reduce((sum, currentItem) => sum + currentItem.total_stock, 0);
+    }, [stockBreakdown]);
 
     if (!item) return null;
 
@@ -32,7 +33,7 @@ function SkuDetailModal({ item, onClose }) {
         <div className="modal-backdrop-detail">
             <div className="modal-content-detail">
                 <div className="modal-header-detail">
-                    <h3><strong>Detail SKU: </strong>{item.nama_barang || 'N/A'}</h3>
+                    <h3><strong>Detail SKU: </strong>{item.master_kategori?.nama_kategori || item.nama_barang}</h3>
                 </div>
 
                 <div className="modal-body-detail">
@@ -49,31 +50,34 @@ function SkuDetailModal({ item, onClose }) {
                             <span className="label">Sub-Kategori</span>
                             <span className="value">{item.sub_kategori?.nama_sub || '-'}</span>
                         </div>
-                        <div className="detail-item-full" data-span="2">
-                            <span className="label">Didaftarkan Oleh</span>
-                            <span className="value">{item.created_by?.name || 'N/A'}</span>
-                        </div>
                     </div>
+
+                    {/* Tampilan baru untuk rincian stok */}
                     <div className="detail-item-full" data-span="2">
-                        <span className="label">Detail Stok Tersedia</span>
+                        {/* <span className="label">Detail Stok Tersedia</span> */}
                         {isLoading ? (
                             <p className="value">Memuat data stok...</p>
                         ) : (
                             <div className="stock-detail-container">
                                 <p className="value" style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '10px' }}>
-                                    Total Stok Tersedia: {totalStock} unit
+                                    Total Keseluruhan Stok Tersedia: {totalOverallStock} unit
                                 </p>
-                                {stockByColor.length > 0 ? (
-                                    <ul className="borrowed-items-list">
-                                        {stockByColor.map((variant, index) => (
-                                            <li key={index}>
-                                                <span className="tool-name">{variant.nama_warna}</span>
-                                                <span className="tool-quantity">({variant.total} unit)</span>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                {stockBreakdown.length > 0 ? (
+                                    stockBreakdown.map((stockItem, index) => (
+                                        <div key={index} className="stock-item-group">
+                                            <h4><strong>{stockItem.item_name}</strong>: {stockItem.total_stock} unit</h4>
+                                            <ul className="borrowed-items-list nested" style={{ marginBottom: '10px' }}>
+                                                {stockItem.colors.map((color, colorIndex) => (
+                                                    <li key={colorIndex}>
+                                                        <span>{color.color_name}</span>
+                                                        <span className="tool-quantity">({color.count} unit)</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ))
                                 ) : (
-                                    <p className="value">Tidak ada rincian stok per warna yang tersedia.</p>
+                                    <p className="value">Tidak ada rincian stok yang tersedia untuk SKU ini.</p>
                                 )}
                             </div>
                         )}

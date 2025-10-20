@@ -121,6 +121,54 @@ class MasterBarangController extends Controller
     }
 
     /**
+     * Mengambil rincian stok berdasarkan nama barang lalu warna
+     * untuk semua item yang memiliki kode_barang (SKU) yang sama.
+     */
+    public function getStockBreakdown(MasterBarang $masterBarang)
+    {
+        $statusTersediaId = \App\Models\Status::where('nama_status', 'Tersedia')->value('id');
+        if (!$statusTersediaId) {
+            return response()->json([]);
+        }
+
+        $relatedMasterBarangIds = MasterBarang::where('kode_barang', $masterBarang->kode_barang)
+                                            ->pluck('id_m_barang');
+
+        $stockData = StokBarang::whereIn('master_barang_id', $relatedMasterBarangIds)
+            ->where('status_id', $statusTersediaId)
+            ->join('master_barangs', 'stok_barangs.master_barang_id', '=', 'master_barangs.id_m_barang')
+            ->leftJoin('colors', 'stok_barangs.id_warna', '=', 'colors.id_warna')
+            ->select(
+                'master_barangs.nama_barang',
+                'colors.nama_warna',
+                DB::raw('count(stok_barangs.id) as total')
+            )
+            ->groupBy('master_barangs.nama_barang', 'colors.nama_warna')
+            ->orderBy('master_barangs.nama_barang')
+            ->get();
+
+        $result = [];
+        foreach ($stockData as $stock) {
+            if (!isset($result[$stock->nama_barang])) {
+                $result[$stock->nama_barang] = [
+                    'item_name' => $stock->nama_barang,
+                    'total_stock' => 0,
+                    'colors' => [],
+                ];
+            }
+
+            $result[$stock->nama_barang]['colors'][] = [
+                'color_name' => $stock->nama_warna ?? 'Tanpa Warna',
+                'count' => (int) $stock->total,
+            ];
+
+            $result[$stock->nama_barang]['total_stock'] += (int) $stock->total;
+        }
+
+        return response()->json(array_values($result));
+    }
+
+    /**
      * Menampilkan satu tipe barang (MasterBarang) spesifik.
      */
     public function show(MasterBarang $masterBarang)

@@ -97,6 +97,7 @@ Route::middleware('jwt')->group(function () {
     Route::post('/tickets/{ticket}/process-return', [TicketController::class, 'processReturn']);
 
     // --- Rute untuk Manajemen Inventaris ---
+    Route::get('/inventory/items/{masterBarang}/stock-breakdown', [MasterBarangController::class, 'getStockBreakdown']);
     Route::get('/inventory/items/{masterBarang}/stock-by-color', [MasterBarangController::class, 'getStockByColor']);
     Route::get('/inventory/stock-items/search-available', [StokBarangController::class, 'searchAvailable']);
     Route::post('/inventory/stock-items', [StokBarangController::class, 'store']);
