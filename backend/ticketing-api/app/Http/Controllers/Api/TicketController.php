@@ -769,6 +769,9 @@ class TicketController extends Controller
             'items.*.stok_barang_id' => 'required|exists:stok_barangs,id',
             'items.*.status_id' => 'required|exists:status_barang,id',
             'items.*.keterangan' => 'nullable|string|max:1000',
+            'items.*.user_digunakan_id' => 'nullable|exists:users,id',
+            'items.*.user_rusak_id' => 'nullable|exists:users,id',
+            'items.*.user_hilang_id' => 'nullable|exists:users,id',
         ]);
 
         DB::transaction(function () use ($ticket, $validated) {
@@ -779,58 +782,55 @@ class TicketController extends Controller
                 $newStatus = \App\Models\Status::find($itemData['status_id']); // Ambil model status baru
 
                 if ($stokBarang && $stokBarang->ticket_id === $ticket->id && $newStatus) {
-                    
-                    $stokBarang->status_id = $newStatus->id;
-                    $stokBarang->deskripsi = $itemData['keterangan'] ?: null; // Gunakan keterangan atau null jika kosong
+                
+                $updateData = [
+                    'status_id' => $newStatus->id,
+                    'deskripsi' => $itemData['keterangan'] ?: null,
+                    'user_peminjam_id' => null,
+                    'workshop_id' => null,
+                    'ticket_id' => null,
+                    'tanggal_keluar' => null,
+                    'user_perusak_id' => null,
+                    'tanggal_rusak' => null,
+                    'user_penghilang_id' => null,
+                    'tanggal_hilang' => null,
+                ];
 
-                    // --- [PERBAIKAN UTAMA] LOGIKA UPDATE DATA UTAMA DIPISAHKAN ---
-                    if ($newStatus->nama_status === 'Rusak') {
-                        $stokBarang->user_perusak_id = $adminId;
-                        $stokBarang->tanggal_rusak = now();
-                    } 
-                    else if ($newStatus->nama_status === 'Hilang') {
-                        $stokBarang->user_penghilang_id = $adminId;
-                        $stokBarang->tanggal_hilang = now();
-                    }
-                    else if ($newStatus->nama_status === 'Digunakan') {
-                        // Jika statusnya 'Digunakan', SET data pengguna, bukan hapus.
-                        $stokBarang->user_peminjam_id = $ticket->user_id; // Teknisi yang mengerjakan tiket
-                        $stokBarang->workshop_id = $ticket->workshop_id; // Workshop dari tiket
-                        $stokBarang->tanggal_keluar = now();
-                        // Biarkan ticket_id terpasang untuk pelacakan
-                    }
-                    else if ($newStatus->nama_status === 'Tersedia') {
-                        // Jika statusnya 'Tersedia', BARU kita bersihkan datanya.
-                        $stokBarang->user_peminjam_id = null;
-                        $stokBarang->workshop_id = null;
-                        $stokBarang->tanggal_keluar = null;
-                        $stokBarang->ticket_id = null;
-                    }
-                    
-                    $stokBarang->save();
+                $relatedUserId = null; 
 
-                    // --- BUAT CATATAN RIWAYAT UNTUK PERUBAHAN STATUS ---
-                    $relatedUserId = null;
-                    switch ($newStatus->nama_status) {
-                        case 'Digunakan':
-                            $relatedUserId = $ticket->user_id; // Pengguna adalah teknisi yang mengerjakan tiket
-                            break;
-                        case 'Rusak':
-                        case 'Hilang':
-                            $relatedUserId = $adminId; // Penanggung jawab adalah admin yang melapor
-                            break;
-                        // Untuk 'Tersedia', relatedUserId tetap null
-                    }
-
-                    $stokBarang->histories()->create([
-                        'status_id' => $newStatus->id,
-                        'deskripsi' => $itemData['keterangan'] ?: 'Status diubah saat pengembalian tiket: ' . $ticket->kode_tiket,
-                        'triggered_by_user_id' => $adminId,
-                        'related_user_id' => $relatedUserId,
-                        'workshop_id' => $stokBarang->workshop_id, // Ambil workshop terakhir yang tercatat
-                        'event_date' => now(), // Tanggal kejadian adalah saat ini
-                    ]);
+                switch ($newStatus->nama_status) {
+                    case 'Digunakan':
+                        $responsibleUserId = $itemData['user_digunakan_id'] ?? $adminId;
+                        $updateData['user_peminjam_id'] = $responsibleUserId;
+                        $updateData['workshop_id'] = $ticket->workshop_id;
+                        $updateData['tanggal_keluar'] = now();
+                        $relatedUserId = $responsibleUserId;
+                        break;
+                    case 'Rusak':
+                        $responsibleUserId = $itemData['user_rusak_id'] ?? $adminId;
+                        $updateData['user_perusak_id'] = $responsibleUserId;
+                        $updateData['tanggal_rusak'] = now();
+                        $relatedUserId = $responsibleUserId;
+                        break;
+                    case 'Hilang':
+                        $responsibleUserId = $itemData['user_hilang_id'] ?? $adminId;
+                        $updateData['user_penghilang_id'] = $responsibleUserId;
+                        $updateData['tanggal_hilang'] = now();
+                        $relatedUserId = $responsibleUserId;
+                        break;
                 }
+                
+                $stokBarang->update($updateData);
+
+                $stokBarang->histories()->create([
+                    'status_id' => $newStatus->id,
+                    'deskripsi' => $itemData['keterangan'] ?: 'Status diubah saat pengembalian tiket: ' . $ticket->kode_tiket,
+                    'triggered_by_user_id' => $adminId,
+                    'related_user_id' => $relatedUserId,
+                    'workshop_id' => $updateData['workshop_id'],
+                    'event_date' => now(), 
+                ]);
+            }
             }
             
             $ticket->update(['status' => 'Selesai', 'completed_at' => now()]);
