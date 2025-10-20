@@ -143,7 +143,7 @@ function TicketDetailModal({ ticket, onClose }) {
                 <div className="modal-footer-user" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                     <button onClick={onClose} className="btn-cancel">Tutup</button>
                     {ticket.creator && ticket.creator.phone && (
-                        <button onClick={handleWhatsAppChat} className="btn-whatsapp">
+                        <button onClick={handleWhatsAppChat} className="btn-history">
                             <i className="fab fa-whatsapp" style={{ marginRight: '8px' }}></i>
                             Chat Pengirim
                         </button>

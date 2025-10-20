@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, {  useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, Legend } from 'recharts';
 import { useFinancialReport } from '../components/useFinancialReport';
@@ -36,8 +36,8 @@ const KpiCard = ({ title, value, iconClass, colorClass }) => (
 export default function FinancialReportPage() {
     // 1. PANGGIL HOOK UNTUK MENDAPATKAN SEMUA DATA & FUNGSI
     const {
-        summaryData, chartData, filters, filterType, isLoading,
-        handleFilterChange, handleFilterTypeChange, formatCurrency, years, months
+        summaryData, chartData, isLoading,
+         formatCurrency
     } = useFinancialReport();
 
     // 2. HAPUS SEMUA MOCK DATA & GUNAKAN DATA ASLI DARI HOOK
