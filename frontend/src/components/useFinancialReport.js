@@ -69,9 +69,12 @@ export const useFinancialReport = () => {
         });
     };
 
-    const handleExport = async (type) => {
+    const handleExport = async (type, reportView) => {
         setIsExporting(true);
-        let params = { type };
+        let params = { 
+            type,
+            report_view: reportView
+        };
         if (filterType === 'month') {
             params = { ...params, year: filters.year, month: filters.month };
         } else if (filterType === 'date_range') {
@@ -84,7 +87,7 @@ export const useFinancialReport = () => {
             const link = document.createElement('a');
             link.href = url;
             const extension = type === 'pdf' ? 'pdf' : 'xlsx';
-            link.setAttribute('download', `laporan-keuangan-aset-${new Date().toISOString().split('T')[0]}.${extension}`);
+            link.setAttribute('download', `laporan-${reportView}-${new Date().toISOString().split('T')[0]}.${extension}`);
             document.body.appendChild(link);
             link.click();
             link.parentNode.removeChild(link);
