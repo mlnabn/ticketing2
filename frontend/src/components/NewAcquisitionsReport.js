@@ -8,7 +8,7 @@ export default function NewAcquisitionsReport() {
         filters,
         filterType,
         isLoading,
-        isExporting,
+        // isExporting,
         handleFilterChange,
         handleFilterTypeChange,
         handleExport,
@@ -93,7 +93,7 @@ export default function NewAcquisitionsReport() {
                         ) : detailedData.new_acquisitions.length > 0 ? (
                             <>
                                 {detailedData.new_acquisitions.map(item => (
-                                    <tr key={`new-${item.kode_unik}`}>
+                                    <tr key={`new-${item.kode_unik}`} className="hoverable-row">
                                         <td>{formatDate(item.tanggal_pembelian)}</td>
                                         <td>{item.kode_unik}</td>
                                         <td>{item.master_barang.nama_barang}</td>
@@ -124,7 +124,7 @@ export default function NewAcquisitionsReport() {
                         <>
                             {/* Loop melalui setiap item pembelian baru dan buat card */}
                             {detailedData.new_acquisitions.map(item => (
-                                <div key={`mobile-new-${item.kode_unik}`} className="ticket-card-mobile">
+                                <div key={`mobile-new-${item.kode_unik}`} className="ticket-card-mobile hoverable-row">
                                     {/* Baris 1: Nama Barang */}
                                     <div className="card-row">
                                         <div className="data-group single">

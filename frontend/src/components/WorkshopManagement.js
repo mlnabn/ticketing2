@@ -100,7 +100,7 @@ export default function WorkshopManagement() {
               </thead>
               <tbody>
                 {workshops.map((ws) => (
-                  <tr key={ws.id}>
+                  <tr key={ws.id} className="hoverable-row">
                     <td>{ws.name}</td>
                     <td>{ws.code}</td>
                     <td>

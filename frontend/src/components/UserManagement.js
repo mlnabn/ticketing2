@@ -122,7 +122,7 @@ export default function UserManagement() {
                             </thead>
                             <tbody>
                                 {users.map((user, index) => (
-                                    <tr key={user.id}>
+                                    <tr key={user.id} className="hoverable-row"> 
                                         <td>{userData.from + index}</td>
                                         <td>{user.name}</td>
                                         <td>{user.email}</td>
@@ -141,7 +141,7 @@ export default function UserManagement() {
 
                     <div className="user-list-mobile">
                         {users.map((user) => (
-                           <div key={user.id} className="ticket-card-mobile">
+                           <div key={user.id} className="ticket-card-mobile hoverable-row"> 
                                 <div className="card-row">
                                     <div className="data-group">
                                         <span className="label">NAMA</span>

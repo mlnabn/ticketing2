@@ -2516,6 +2516,26 @@ body.dark-mode .job-table tbody tr:last-child td {
   border-bottom: none;
 }
 
+/* Efek pop untuk baris tabel yang bisa di-hover */
+.job-table tbody tr.hoverable-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  /* Menggunakan cursor default untuk menandakan ini tidak bisa diklik */
+  cursor: default;
+}
+
+/* Efek pop untuk kartu mobile yang bisa di-hover */
+.job-list-mobile .ticket-card-mobile.hoverable-row:hover,
+.workshop-list-mobile .ticket-card-mobile.hoverable-row:hover,
+.user-list-mobile .ticket-card-mobile.hoverable-row:hover,
+.notification-template-list-mobile .ticket-card-mobile.hoverable-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  cursor: default;
+}
+
 /*
   ---------------------------------------------------
   GAYA JOB LIST (TABEL TIKET) UNTUK USER
@@ -5259,6 +5279,12 @@ body.dark-mode .btn-scan:hover {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.2);
+}
+
+.user-management-container p{
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 /* =========================
@@ -12036,5 +12062,8 @@ body.dark-mode .btn-detail:hover {
 
   .info-card .card-value {
     font-size: 1.5rem;
+  }
+  .user-management-container p{
+    font-size: 0.9rem;
   }
 }

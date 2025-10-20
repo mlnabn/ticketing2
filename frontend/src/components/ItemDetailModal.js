@@ -136,7 +136,7 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                         </div>
                         <div className="info-row"><span className="info-label">Tanggal Keluar</span>
                             {/* [DIUBAH] Hapus || getTodayDate() */}
-                            <input type="date" name="tanggal_keluar" value={formData.tanggal_keluar || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong"/>
+                            <input type="date" name="tanggal_keluar" value={formData.tanggal_keluar || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong" />
                         </div>
                         {commonDescription('Deskripsi Peminjaman')}
                     </div>
@@ -151,8 +151,8 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                             </select>
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Mulai</span>
-                             {/* [DIUBAH] Hapus || getTodayDate() */}
-                            <input type="date" name="tanggal_mulai_perbaikan" value={formData.tanggal_mulai_perbaikan || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong"/>
+                            {/* [DIUBAH] Hapus || getTodayDate() */}
+                            <input type="date" name="tanggal_mulai_perbaikan" value={formData.tanggal_mulai_perbaikan || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong" />
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Selesai</span>
                             <input type="date" name="tanggal_selesai_perbaikan" value={formData.tanggal_selesai_perbaikan || ''} onChange={handleChange} className="detail-edit-input" />
@@ -170,8 +170,8 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                             </select>
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Rusak</span>
-                             {/* [DIUBAH] Hapus || getTodayDate() */}
-                            <input type="date" name="tanggal_rusak" value={formData.tanggal_rusak || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong"/>
+                            {/* [DIUBAH] Hapus || getTodayDate() */}
+                            <input type="date" name="tanggal_rusak" value={formData.tanggal_rusak || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong" />
                         </div>
                         {commonDescription('Deskripsi Kerusakan')}
                     </div>
@@ -186,8 +186,8 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                             </select>
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Hilang</span>
-                             {/* [DIUBAH] Hapus || getTodayDate() */}
-                            <input type="date" name="tanggal_hilang" value={formData.tanggal_hilang || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong"/>
+                            {/* [DIUBAH] Hapus || getTodayDate() */}
+                            <input type="date" name="tanggal_hilang" value={formData.tanggal_hilang || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong" />
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Ketemu</span>
                             <input type="date" name="tanggal_ketemu" value={formData.tanggal_ketemu || ''} onChange={handleChange} className="detail-edit-input" />
@@ -316,7 +316,7 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                 />
             )}
 
-            {showHistory && ( <HistoryModal item={item} onClose={() => setShowHistory(false)} showToast={showToast} /> )}
+            {showHistory && (<HistoryModal item={item} onClose={() => setShowHistory(false)} showToast={showToast} />)}
         </div>
     );
 }

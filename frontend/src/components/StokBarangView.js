@@ -36,8 +36,13 @@ function StokBarangView() {
     const [isAddStockOpen, setIsAddStockOpen] = useState(false);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
 
+    // --- Versi fetchData yang Diperbarui ---
+    // Menyimpan filter saat ini dalam state agar bisa digunakan oleh onSaveSuccess
+    const [currentFilters, setCurrentFilters] = useState({});
+
     const fetchData = useCallback(async (page = 1, filters = {}) => {
         setLoading(true);
+        setCurrentFilters(filters); // Simpan filter yang sedang aktif
         try {
             const params = { page, ...filters };
             const res = await api.get('/inventory/stock-items', { params });
@@ -49,8 +54,9 @@ function StokBarangView() {
         } finally {
             setLoading(false);
         }
-    }, [showToast]);
+    }, [showToast]); // Hapus fetchData dari dependencies
 
+    // --- Efek untuk mengambil data dropdown (tidak berubah) ---
     useEffect(() => {
         api.get('/inventory/categories').then(res => setCategories(res.data));
         api.get('/statuses').then(res => setStatusOptions(res.data));
@@ -66,6 +72,7 @@ function StokBarangView() {
         setSelectedSubCategory('');
     }, [selectedCategory]);
 
+    // --- Efek untuk memuat data berdasarkan filter (tidak berubah) ---
     useEffect(() => {
         const filters = {
             id_kategori: selectedCategory,
@@ -77,11 +84,30 @@ function StokBarangView() {
         fetchData(1, filters);
     }, [selectedCategory, selectedSubCategory, selectedStatus, selectedColor, debouncedSearchTerm, fetchData]);
 
+    // --- Handler untuk Modal ---
+
+    // BARU: Fungsi untuk menangani klik pada baris
+    const handleRowClick = (e, item) => {
+        // Mencegah modal terbuka jika yang diklik adalah tombol di dalam baris
+        if (e.target.tagName === 'BUTTON' || e.target.closest('.action-buttons-group')) {
+            return;
+        }
+        setDetailItem(item);
+    };
+
     const handleOpenEditModal = (itemToEdit) => {
-        setDetailItem(null);
+        setDetailItem(null); // Tutup modal detail jika sedang terbuka
         setEditItem(itemToEdit);
     };
 
+    // BARU: Fungsi untuk menyegarkan data setelah modal disimpan
+    const handleSaveSuccess = () => {
+        // Muat ulang data pada halaman saat ini dan dengan filter saat ini
+        fetchData(pagination?.current_page || 1, currentFilters);
+    };
+
+
+    // --- (Fungsi scan tidak berubah) ---
     const handleScanSearch = useCallback(async (code) => {
         if (!code) return;
         showToast(`Mencari: ${code}`, 'info');
@@ -122,14 +148,14 @@ function StokBarangView() {
             <div className="user-management-container" style={{ marginBottom: '20px' }}>
                 <h1>Daftar Stok Unit Barang</h1>
                 <div className="action-buttons-stok">
-                <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}><i className="fas fa-plus" style={{marginRight: '8px'}}></i>Tambah Stok</button>
-                <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
-                    <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
-                        <i className="fas fa-qrcode fa-stack-2x"></i>
-                        <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
-                    </span>                        
-                    Scan QR
-                </button>
+                    <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}><i className="fas fa-plus" style={{ marginRight: '8px' }}></i>Tambah Stok</button>
+                    <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
+                        <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
+                            <i className="fas fa-qrcode fa-stack-2x"></i>
+                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
+                        </span>
+                        Scan QR
+                    </button>
                 </div>
             </div>
 
@@ -159,19 +185,19 @@ function StokBarangView() {
                         <option key={color.id_warna} value={color.id_warna}>{color.nama_warna}</option>
                     ))}
                 </select>
-                
+
             </div>
 
             <input
-                    type="text"
-                    placeholder="Cari apa saja..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className="filter-search-input"
-                />
+                type="text"
+                placeholder="Cari apa saja..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="filter-search-input"
+            />
             <div className="job-list-container">
                 {/* ======================================================= */}
-                {/* ===    TAMPILAN TABEL UNTUK DESKTOP (TETAP SAMA)    === */}
+                {/* ===    TAMPILAN TABEL UNTUK DESKTOP (DIMODIFIKASI)  === */}
                 {/* ======================================================= */}
                 <table className="job-table">
                     <thead>
@@ -199,7 +225,8 @@ function StokBarangView() {
                             </td></tr>
                         ) : (
                             items.map(item => (
-                                <tr key={item.id}>
+                                // --- BARIS INI DIMODIFIKASI ---
+                                <tr key={item.id} className="clickable-row" onClick={(e) => handleRowClick(e, item)}>
                                     <td>{item.kode_unik}</td>
                                     <td>{item.serial_number || '-'}</td>
                                     <td>{item.master_barang?.nama_barang}</td>
@@ -232,8 +259,9 @@ function StokBarangView() {
                                     <td>{item.tanggal_masuk ? new Date(item.tanggal_masuk).toLocaleDateString('id-ID') : '-'}</td>
                                     <td>{item.created_by?.name || 'N/A'}</td>
                                     <td className="action-buttons-group">
-                                        <button onClick={() => setDetailItem(item)} className="btn-user-action btn-detail">Detail</button>
-                                        <button onClick={() => setQrModalItem(item)} className="btn-user-action btn-edit">QR</button>
+                                        {/* Menggunakan e.stopPropagation() agar klik tombol tidak memicu klik baris */}
+                                        <button onClick={(e) => { e.stopPropagation(); setDetailItem(item); }} className="btn-user-action btn-detail">Detail</button>
+                                        <button onClick={(e) => { e.stopPropagation(); setQrModalItem(item); }} className="btn-user-action btn-edit">QR</button>
                                     </td>
                                 </tr>
                             ))
@@ -241,7 +269,7 @@ function StokBarangView() {
                     </tbody>
                 </table>
                 {/* ======================================================= */}
-                {/* ===    TAMPILAN TABEL UNTUK DESKTOP (TETAP SAMA)    === */}
+                {/* ===    TAMPILAN MOBILE (DIMODIFIKASI)               === */}
                 {/* ======================================================= */}
                 <div className="job-list-mobile">
                     {loading ? (
@@ -252,7 +280,8 @@ function StokBarangView() {
                         </p>
                     ) : (
                         items.map(item => (
-                            <div key={item.id} className="ticket-card-mobile clickable-row" onClick={() => setDetailItem(item)}>
+                            // --- BARIS INI DIMODIFIKASI ---
+                            <div key={item.id} className="ticket-card-mobile clickable-row" onClick={(e) => handleRowClick(e, item)}>
                                 <div className="card-header">
                                     <h4>{item.master_barang?.nama_barang}</h4>
                                     <small>Kode: {item.kode_unik}</small>
@@ -319,6 +348,7 @@ function StokBarangView() {
                                 </div>
                                 <div className="card-separator"></div>
                                 <div className="card-row action-row">
+                                    {/* Menggunakan e.stopPropagation() agar klik tombol tidak memicu klik baris */}
                                     <button onClick={(e) => { e.stopPropagation(); setDetailItem(item); }} className="btn-user-action btn-detail">Detail</button>
                                     <button onClick={(e) => { e.stopPropagation(); setQrModalItem(item); }} className="btn-user-action btn-edit">QR</button>
                                 </div>
@@ -331,22 +361,18 @@ function StokBarangView() {
                 <Pagination
                     currentPage={pagination.current_page}
                     lastPage={pagination.last_page}
-                    onPageChange={(page) => fetchData(page, {
-                        id_kategori: selectedCategory,
-                        id_sub_kategori: selectedSubCategory,
-                        status_id: selectedStatus,
-                        id_warna: selectedColor
-                    })}
+                    onPageChange={(page) => fetchData(page, currentFilters)}
                 />
             )}
 
+            {/* --- PEMANGGILAN MODAL (DIMODIFIKASI) --- */}
             {detailItem && (
                 <ItemDetailModal
                     item={detailItem}
                     onClose={() => setDetailItem(null)}
-                    onEditClick={handleOpenEditModal}
+                    onEditClick={handleOpenEditModal} // Menggunakan handler yang sudah ada
                     showToast={showToast}
-                    onSaveSuccess={() => fetchData(pagination?.current_page || 1)}
+                    onSaveSuccess={handleSaveSuccess} // Menggunakan handler baru
                 />
             )}
 
@@ -356,7 +382,7 @@ function StokBarangView() {
                     onClose={() => setEditItem(null)}
                     item={editItem}
                     showToast={showToast}
-                    onSaveSuccess={() => fetchData(pagination?.current_page || 1)}
+                    onSaveSuccess={handleSaveSuccess} // Menggunakan handler baru
                 />
             )}
 
@@ -383,7 +409,7 @@ function StokBarangView() {
             <AddStockModal
                 isOpen={isAddStockOpen}
                 onClose={() => setIsAddStockOpen(false)}
-                onSaveSuccess={() => fetchData(1)}
+                onSaveSuccess={() => fetchData(1, {})} // Reset ke halaman 1 tanpa filter
                 showToast={showToast}
             />
         </>
