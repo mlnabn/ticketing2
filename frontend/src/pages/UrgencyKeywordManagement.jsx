@@ -78,8 +78,9 @@ export default function UrgencyKeywordManagement() {
             onChange={(e) => setNewKeyword(e.target.value)}
             placeholder="Masukkan kata kunci baru (mis: server down)"
             disabled={isSubmitting}
+            className="filter-search-input-key"
           />
-          <button type="submit" className="btn-primary" disabled={isSubmitting}>
+          <button type="submit" className="btn-keyword" disabled={isSubmitting}>
             <i className="fas fa-plus" style={{marginRight: '8px'}}></i>
             {isSubmitting ? <><FaSpinner className="spin" /> Menambahkan...</> : 'Tambah'}
           </button>
@@ -87,16 +88,16 @@ export default function UrgencyKeywordManagement() {
       </div>
 
       {/* Tabel untuk menampilkan daftar kata kunci */}
-      <div className="card">
-        <h2 className="card-header">Daftar Kata Kunci Saat Ini</h2>
+      <div className="global-notification-history card">
+        <h2 className="page-title2">Daftar Kata Kunci Saat Ini</h2>
         {isLoading ? (
           <p style={{ textAlign: 'center', padding: '20px' }}>Memuat data...</p>
         ) : (
           <div className="keyword-list-container">
             {keywords.length > 0 ? (
-              <ul className="keyword-list">
+              <ul className="history-list">
                 {keywords.map((kw) => (
-                  <li key={kw.id} className="keyword-item">
+                  <li key={kw.id} className="history-item">
                     <span>{kw.keyword}</span>
                     <button onClick={() => handleDelete(kw.id)} className="btn-delete-icon">
                       <FaTrash />
