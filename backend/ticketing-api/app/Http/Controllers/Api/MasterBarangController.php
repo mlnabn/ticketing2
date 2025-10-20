@@ -28,10 +28,10 @@ class MasterBarangController extends Controller
             $query->where('id_sub_kategori', $request->id_sub_kategori);
         }
         if ($request->has('with_stock')) {
-        $query->withCount(['stokBarangs as stok_tersedia' => function ($q) {
-            $q->where('status_id', 1); 
-        }]);
-    }
+            $query->withCount(['stokBarangs as stok_tersedia' => function ($q) {
+                $q->where('status_id', 1);
+            }]);
+        }
         $query->latest();
         if ($request->has('all')) {
             return $query->get();
@@ -136,11 +136,16 @@ class MasterBarangController extends Controller
 
         $stockDetails = $masterBarang->stokBarangs()
             ->whereNotIn('stok_barangs.status_id', $excludedStatuses)
-            ->join('colors', 'stok_barangs.id_warna', '=', 'colors.id_warna')
-            ->select('colors.nama_warna', DB::raw('count(*) as total'))
-            ->groupBy('colors.nama_warna')
+            // Ganti dari 'join' menjadi 'leftJoin'
+            ->leftJoin('colors', 'stok_barangs.id_warna', '=', 'colors.id_warna')
+            // Gunakan COALESCE untuk menangani warna NULL
+            ->select(
+                DB::raw('COALESCE(colors.nama_warna, "Tanpa Warna") as nama_warna'),
+                DB::raw('count(*) as total')
+            )
+            ->groupBy(DB::raw('COALESCE(colors.nama_warna, "Tanpa Warna")'))
             ->get();
-            
+
         return response()->json($stockDetails);
     }
 

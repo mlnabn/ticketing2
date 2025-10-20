@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import Pagination from '../components/Pagination';
-import { saveAs } from 'file-saver';
+// import { saveAs } from 'file-saver';
 
 // Komponen PaginationSummary tetap sama
 const PaginationSummary = ({ pagination }) => {
@@ -120,7 +120,7 @@ export default function ActiveLoanReportPage() {
                         ) : data.length > 0 ? data.map(item => {
                             const duration = calculateDuration(item.tanggal_keluar);
                             return (
-                                <tr key={item.id}>
+                                <tr key={item.id} className="hoverable-row">
                                     <td>{item.kode_unik || '-'}</td>
                                     <td>{item.master_barang?.nama_barang || '-'}</td>
                                     <td>{item.status_detail?.nama_status || '-'}</td>
@@ -135,7 +135,75 @@ export default function ActiveLoanReportPage() {
                         )}
                     </tbody>
                 </table>
-                {/* Tampilan Mobile bisa ditambahkan dengan struktur serupa jika perlu */}
+                {/*Tampilan Mobile */}
+                <div className="job-list-mobile">
+                    {loading ? (
+                        <p style={{ textAlign: 'center' }}>Memuat data...</p>
+                    ) : data.length > 0 ? (
+                        data.map(item => { 
+                            const duration = calculateDuration(item.tanggal_keluar);
+                            return (
+                                <div key={item.id} className="ticket-card-mobile hoverable-row">
+                                    
+                                    {/* Baris 1: Nama Barang (Paling penting) */}
+                                    <div className="card-row">
+                                        <div className="data-group single">
+                                            <span className="label">Nama Barang</span>
+                                            <span className="value description">
+                                                {item.master_barang?.nama_barang || '-'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Baris 2: Kode Unik & Peminjam */}
+                                    <div className="card-row">
+                                        <div className="data-group">
+                                            <span className="label">Kode Unik</span>
+                                            <span className="value">{item.kode_unik || '-'}</span>
+                                        </div>
+                                        <div className="data-group">
+                                            <span className="label">Peminjam</span>
+                                            <span className="value">{item.user_peminjam?.name || '-'}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Baris 3: Lokasi & Status */}
+                                    <div className="card-row">
+                                        <div className="data-group">
+                                            <span className="label">Lokasi</span>
+                                            <span className="value">{item.workshop?.name || '-'}</span>
+                                        </div>
+                                        <div className="data-group">
+                                            <span className="label">Status</span>
+                                            <span className="value">{item.status_detail?.nama_status || '-'}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Baris 4: Tgl Pinjam & Durasi */}
+                                    <div className="card-row">
+                                        <div className="data-group">
+                                            <span className="label">Tgl Pinjam</span>
+                                            <span className="value">{formatDate(item.tanggal_keluar)}</span>
+                                        </div>
+                                        <div className="data-group">
+                                            <span className="label">Durasi Pinjam</span>
+                                            <span className="value" style={getDurationStyle(duration.days)}>
+                                                {duration.text}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Tidak ada baris aksi untuk laporan ini */}
+
+                                </div>
+                            );
+                        })
+                    ) : (
+                        <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
+                            <p>Tidak ada data peminjaman aktif.</p>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="pagination-container">

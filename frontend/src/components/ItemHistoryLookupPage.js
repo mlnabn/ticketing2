@@ -86,7 +86,7 @@ function ItemHistoryLookupPage() {
             <div className="user-management-container">
                 <h1>Lacak Riwayat Aset</h1>
                 <p>Gunakan pencarian, klik item dari daftar, atau scan QR/Barcode untuk melihat riwayat lengkap sebuah aset.</p>
-                
+
                 <input
                     type="text"
                     placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
@@ -110,7 +110,7 @@ function ItemHistoryLookupPage() {
                             {loading ? (
                                 <tr><td colSpan="4" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
                             ) : items.length > 0 ? items.map(item => (
-                                <tr key={item.id} onClick={() => setHistoryItem(item)} style={{ cursor: 'pointer' }}>
+                                <tr key={item.id} onClick={() => setHistoryItem(item)} style={{ cursor: 'pointer' }} className="hoverable-row">
                                     <td>{item.kode_unik}</td>
                                     <td>{item.master_barang?.nama_barang || 'N/A'}</td>
                                     <td>
@@ -125,8 +125,52 @@ function ItemHistoryLookupPage() {
                             )}
                         </tbody>
                     </table>
+                    {/* Mobile View */}
+                    <div className="job-list-mobile">
+                        {loading ? (
+                            <p style={{ textAlign: 'center' }}>Memuat data...</p>
+                        ) : items.length > 0 ? (
+                            items.map(item => (
+                                <div key={item.id} className="ticket-card-mobile clickable-row" onClick={() => setHistoryItem(item)}>
+                                    {/* Baris 1: Nama Barang */}
+                                    <div className="card-row">
+                                        <div className="data-group single">
+                                            <span className="label">Nama Barang</span>
+                                            <span className="value description">{item.master_barang?.nama_barang || 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                    {/* Baris 2: Kode Unik & Status */}
+                                    <div className="card-row">
+                                        <div className="data-group">
+                                            <span className="label">Kode Unik</span>
+                                            <span className="value">{item.kode_unik}</span>
+                                        </div>
+                                        <div className="data-group">
+                                            <span className="label">Status Saat Ini</span>
+                                            <span className="value">
+                                                <span className={`status-badge status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                    {item.status_detail?.nama_status || 'N/A'}
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    {/* Baris 3: Lokasi/Pengguna */}
+                                    <div className="card-row">
+                                        <div className="data-group single">
+                                            <span className="label">Lokasi/Pengguna Terakhir</span>
+                                            <span className="value">{item.user_peminjam?.name || item.workshop?.name || '-'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
+                                <p>Tidak ada data.</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
-                
+
                 {pagination && pagination.last_page > 1 && (
                     <Pagination
                         currentPage={pagination.current_page}

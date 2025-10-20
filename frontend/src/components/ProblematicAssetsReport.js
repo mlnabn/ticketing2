@@ -7,7 +7,7 @@ export default function ProblematicAssetsReport() {
         filters,
         filterType,
         isLoading,
-        isExporting,
+        // isExporting,
         handleFilterChange,
         handleFilterTypeChange,
         handleExport,
@@ -92,7 +92,7 @@ export default function ProblematicAssetsReport() {
                         ) : detailedData.problematic_assets.length > 0 ? (
                             <>
                                 {detailedData.problematic_assets.map(item => (
-                                    <tr key={`prob-${item.kode_unik}`}>
+                                    <tr key={`prob-${item.kode_unik}`} className="hoverable-row">
                                         <td>{formatDate(item.tanggal_rusak || item.tanggal_hilang)}</td>
                                         <td>{item.kode_unik}</td>
                                         <td>{item.master_barang.nama_barang}</td>
@@ -130,7 +130,7 @@ export default function ProblematicAssetsReport() {
                         <>
                             {/* Loop melalui setiap item aset bermasalah dan buat card */}
                             {detailedData.problematic_assets.map(item => (
-                                <div key={`mobile-prob-${item.kode_unik}`} className="ticket-card-mobile">
+                                <div key={`mobile-prob-${item.kode_unik}`} className="ticket-card-mobile hoverable-row">
                                     {/* Baris 1: Nama Barang */}
                                     <div className="card-row">
                                         <div className="data-group single">

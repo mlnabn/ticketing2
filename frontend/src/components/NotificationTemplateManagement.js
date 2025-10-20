@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useOutletContext } from 'react-router-dom'; 
+import { useOutletContext } from 'react-router-dom';
 import api from '../services/api';
 import NotificationTemplateFormModal from './NotificationTemplateFormModal';
 import ConfirmationModal from './ConfirmationModal';
@@ -79,7 +79,7 @@ export default function NotificationTemplateManagement() {
     <div className="user-management-container">
       <h1>Manajemen Template Notifikasi</h1>
       <button onClick={handleAddClick} className="btn-primary">
-        <i className="fas fa-plus" style={{marginRight: '8px'}}></i>
+        <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
         Tambah Template Baru
       </button>
 
@@ -87,7 +87,7 @@ export default function NotificationTemplateManagement() {
         <p>Memuat data...</p>
       ) : templates.length === 0 ? (
         <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
-            <p>Belum ada template yang dibuat.</p>
+          <p>Belum ada template yang dibuat.</p>
         </div>
       ) : (
         <>
@@ -102,7 +102,7 @@ export default function NotificationTemplateManagement() {
               </thead>
               <tbody>
                 {templates.map((template) => (
-                  <tr key={template.id}>
+                  <tr key={template.id} className="hoverable-row">
                     <td>{template.title}</td>
                     <td style={{ whiteSpace: 'pre-wrap', maxWidth: '400px' }}>{template.message}</td>
                     <td>
@@ -119,7 +119,7 @@ export default function NotificationTemplateManagement() {
 
           <div className="notification-template-list-mobile">
             {templates.map((template) => (
-              <div key={template.id} className="ticket-card-mobile">
+              <div key={template.id} className="ticket-card-mobile hoverable-row">
                 <div className="card-row">
                   <div className="data-group single">
                     <span className="label">JUDUL TEMPLATE</span>

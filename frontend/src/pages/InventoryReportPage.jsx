@@ -60,10 +60,10 @@ export default function InventoryReportPage() {
 
             {/* Kartu Statistik */}
             <div className="info-cards-grid">
-                <div className="info-card yellow-card">
+                <div className="info-card blue-card">
                     <div className="card-header">
                         <p className="card-label">Total Unit Barang</p>
-                        <div className="card-icon yellow-icon"><i className="fas fa-box-open"></i></div>
+                        <div className="card-icon blue-icon"><i className="fas fa-box-open"></i></div>
                     </div>
                     <h3 className="card-value">{stats.total_unit_barang}</h3>
                 </div>

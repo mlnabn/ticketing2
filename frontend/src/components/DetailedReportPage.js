@@ -169,7 +169,7 @@ export default function DetailedReportPage({ type, title }) {
                         ) : data.length > 0 ? data.map(item => {
                             const itemData = getItemData(item);
                             return (
-                                <tr key={item.id}>
+                                <tr key={item.id} className="hoverable-row"> {/* <-- DITAMBAHKAN DI SINI */}
                                     <td>{itemData.kode_unik || '-'}</td>
                                     <td>{itemData.nama_barang || '-'}</td>
                                     <td>{itemData.status || '-'}</td>
@@ -202,7 +202,7 @@ export default function DetailedReportPage({ type, title }) {
                         // Ambil data yang sudah diproses dari fungsi getItemData
                         const itemData = getItemData(item);
                         return (
-                            <div key={`mobile-detail-${item.id}`} className="ticket-card-mobile">
+                            <div key={`mobile-detail-${item.id}`} className="ticket-card-mobile hoverable-row"> {/* <-- DITAMBAHKAN DI SINI */}
                                 {/* Baris 1: Informasi Utama (Nama Barang) */}
                                 <div className="card-row">
                                     <div className="data-group single">
