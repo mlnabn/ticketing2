@@ -18,41 +18,57 @@ class InventoryReportController extends Controller
 
     public function exportReport(Request $request)
     {
-        // Validasi sekarang memeriksa 'export_type'
         $request->validate([
-            'type' => 'required|in:in,out',
-            'export_type' => 'required|in:excel,pdf' // Parameter baru untuk tipe ekspor
+            'type' => 'required|in:in,out,active_loans,all_stock',
+            'export_type' => 'required|in:excel,pdf'
         ]);
-
-        // Logika query ini sama persis seperti sebelumnya, mengambil semua data tanpa paginasi
         $query = StokBarang::with(['masterBarang', 'statusDetail', 'createdBy', 'userPeminjam', 'userPerusak', 'userPenghilang', 'workshop']);
-
         $query->when($request->filled('search'), function ($q) use ($request) {
             $searchTerm = '%' . $request->search . '%';
             $q->where(function ($subQuery) use ($searchTerm) {
                 $subQuery->where('kode_unik', 'like', $searchTerm)
-                    ->orWhereHas('masterBarang', fn($masterQuery) => $masterQuery->where('nama_barang', 'like', $searchTerm));
+                    ->orWhereHas('masterBarang', fn($masterQuery) => $masterQuery->where('nama_barang', 'like', $searchTerm))
+                    ->orWhereHas('userPeminjam', fn($userQuery) => $userQuery->where('name', 'like', $searchTerm));
             });
         });
 
-        if ($request->type === 'in') {
-            $query->whereNotNull('tanggal_masuk');
-            $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_masuk', '>=', $request->start_date));
-            $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_masuk', '<=', $request->end_date));
-            $query->orderBy('tanggal_masuk', 'desc');
-        } else {
-            $statusKeluarIds = DB::table('status_barang')->whereIn('nama_status', ['Dipinjam', 'Digunakan', 'Hilang', 'Rusak'])->pluck('id');
-            $query->whereIn('status_id', $statusKeluarIds)->whereNotNull('tanggal_keluar');
-            $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_keluar', '>=', $request->start_date));
-            $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_keluar', '<=', $request->end_date));
-            $query->orderBy('tanggal_keluar', 'desc');
+        $title = 'Laporan Inventaris';
+        switch ($request->type) {
+            case 'in':
+                $query->whereNotNull('tanggal_masuk');
+                $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_masuk', '>=', $request->start_date));
+                $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_masuk', '<=', $request->end_date));
+                $query->orderBy('tanggal_masuk', 'desc');
+                $title = 'Laporan Barang Masuk';
+                break;
+
+            case 'out':
+                $statusKeluarIds = DB::table('status_barang')->whereIn('nama_status', ['Dipinjam', 'Digunakan', 'Hilang', 'Rusak'])->pluck('id');
+                $query->whereIn('status_id', $statusKeluarIds)->whereNotNull('tanggal_keluar');
+                $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_keluar', '>=', $request->start_date));
+                $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_keluar', '<=', $request->end_date));
+                $query->orderBy('tanggal_keluar', 'desc');
+                $title = 'Laporan Barang Keluar';
+                break;
+
+            case 'active_loans': 
+                $statusPeminjamanIds = DB::table('status_barang')->whereIn('nama_status', ['Dipinjam', 'Digunakan'])->pluck('id');
+                $query->whereIn('status_id', $statusPeminjamanIds);
+                $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_keluar', '>=', $request->start_date));
+                $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_keluar', '<=', $request->end_date));
+                $query->orderBy('tanggal_keluar', 'asc');
+                $title = 'Laporan Peminjaman Aktif';
+                break;
+
+            case 'all_stock': 
+                $query->orderBy('created_at', 'desc');
+                $title = 'Laporan Stok Aset Total';
+                break;
         }
 
         $data = $query->get();
-        $title = 'Laporan Barang ' . ($request->type === 'in' ? 'Masuk' : 'Keluar');
         $fileName = str_replace(' ', '_', $title) . '_' . now()->format('Ymd');
 
-        // [BARU] Logika untuk memilih tipe ekspor
         if ($request->export_type === 'excel') {
             return Excel::download(new InventoryReportExport($data, $request->type), $fileName . '.xlsx');
         }
@@ -63,7 +79,6 @@ class InventoryReportController extends Controller
                 'title' => $title,
                 'type' => $request->type
             ]);
-            // Menggunakan orientasi landscape agar tabel lebih muat
             $pdf->setPaper('a4', 'landscape');
             return $pdf->download($fileName . '.pdf');
         }
@@ -75,18 +90,10 @@ class InventoryReportController extends Controller
             ->pluck('id', 'nama_status');
 
         // === KALKULASI UNTUK 4 KARTU UTAMA ===
-
-        // 1. Total Unit Barang
         $totalUnitBarang = StokBarang::count();
-
-        // 2. Stok Tersedia
         $stokTersedia = StokBarang::where('status_id', $statusIds['Tersedia'] ?? 0)->count();
-
-        // 3. Rusak & Hilang
         $rusakHilangStatusIds = array_filter([$statusIds['Rusak'] ?? null, $statusIds['Hilang'] ?? null]);
         $rusakHilangTotal = StokBarang::whereIn('status_id', $rusakHilangStatusIds)->count();
-
-        // 4. Barang Keluar (Operasional: Dipinjam, Digunakan, Perbaikan)
         $keluarOperasionalStatusIds = array_filter([
             $statusIds['Dipinjam'] ?? null,
             $statusIds['Digunakan'] ?? null,
@@ -96,7 +103,7 @@ class InventoryReportController extends Controller
 
         // === KALKULASI DATA PENDUKUNG (Chart, Widget, dll) ===
         $year = $request->input('year', Carbon::now()->year);
-        $keluarSemuaStatusIds = $this->getKeluarStatusIds($statusIds); // Untuk chart, kita hitung semua yang keluar
+        $keluarSemuaStatusIds = $this->getKeluarStatusIds($statusIds); 
         $chartData = $this->getMonthlyMovementData($year, $keluarSemuaStatusIds);
 
         $mostActiveItems = StokBarang::select('master_barang_id', DB::raw('count(*) as total_keluar'))
@@ -121,7 +128,7 @@ class InventoryReportController extends Controller
                 'stok_tersedia' => $stokTersedia,
                 'persentase_stok_tersedia' => $totalUnitBarang > 0 ? round(($stokTersedia / $totalUnitBarang) * 100) : 0,
                 'rusak_hilang_total' => $rusakHilangTotal,
-                'barang_keluar' => $barangKeluarOperasional, // Data baru untuk kartu "Barang Keluar"
+                'barang_keluar' => $barangKeluarOperasional, 
             ],
             'chartData' => $chartData,
             'mostActiveItems' => $mostActiveItems,
@@ -139,7 +146,7 @@ class InventoryReportController extends Controller
         ]);
 
         if (in_array($request->type, ['in', 'available', 'active_loans'])) {
-            
+
             $query = StokBarang::with(['masterBarang', 'statusDetail', 'createdBy', 'workshop', 'userPeminjam']);
 
             switch ($request->type) {
@@ -155,16 +162,16 @@ class InventoryReportController extends Controller
                     $query->where('status_id', $statusTersediaId);
                     $query->orderBy('created_at', 'desc');
                     break;
-                
+
                 case 'active_loans':
                     $statusPeminjamanIds = DB::table('status_barang')->whereIn('nama_status', ['Dipinjam', 'Digunakan'])->pluck('id');
                     $query->whereIn('status_id', $statusPeminjamanIds);
                     $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_keluar', '>=', $request->start_date));
                     $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_keluar', '<=', $request->end_date));
-                    $query->orderBy('tanggal_keluar', 'asc'); 
+                    $query->orderBy('tanggal_keluar', 'asc');
                     break;
             }
-            
+
             $query->when($request->filled('search'), function ($q) use ($request) {
                 $searchTerm = '%' . $request->search . '%';
                 $q->where(function ($subQuery) use ($searchTerm) {
@@ -181,7 +188,7 @@ class InventoryReportController extends Controller
             'stokBarang.masterBarang',
             'stokBarang.statusDetail',
             'statusDetail',
-            'relatedUser', 
+            'relatedUser',
             'workshop'
         ]);
 
@@ -202,7 +209,7 @@ class InventoryReportController extends Controller
                     ->orWhereHas('masterBarang', fn($masterQuery) => $masterQuery->where('nama_barang', 'like', $searchTerm));
             });
         });
-        
+
         $query->orderBy('created_at', 'desc');
 
         return $query->paginate($request->input('per_page', 15));

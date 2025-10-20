@@ -56,17 +56,46 @@
     <table>
         <thead>
             <tr>
+                {{-- [MODIFIKASI] Logika untuk header tabel --}}
+                @if($type === 'active_loans')
+                <th>Kode Unik</th>
+                <th>Nama Barang</th>
+                <th>Status</th>
+                <th>Peminjam</th>
+                <th>Lokasi</th>
+                <th>Tgl Pinjam</th>
+                @elseif($type === 'all_stock')
+                <th>Kode Unik</th>
+                <th>Nama Barang</th>
+                <th>Status Saat Ini</th>
+                <th>Lokasi/Pengguna Terakhir</th>
+                @else
                 <th>Kode Unik</th>
                 <th>Nama Barang</th>
                 <th>Status</th>
                 <th>{{ $type === 'in' ? 'Tgl Masuk' : 'Tgl Keluar' }}</th>
                 <th>Penanggung Jawab</th>
                 <th>Workshop</th>
+                @endif
             </tr>
         </thead>
         <tbody>
             @forelse($data as $item)
             <tr>
+                {{-- [MODIFIKASI] Logika untuk data baris --}}
+                @if($type === 'active_loans')
+                <td>{{ $item->kode_unik }}</td>
+                <td>{{ $item->masterBarang->nama_barang ?? '-' }}</td>
+                <td>{{ $item->statusDetail->nama_status ?? '-' }}</td>
+                <td>{{ $item->userPeminjam->name ?? '-' }}</td>
+                <td>{{ $item->workshop->name ?? '-' }}</td>
+                <td>{{ $item->tanggal_keluar ? \Carbon\Carbon::parse($item->tanggal_keluar)->format('d M Y') : '-' }}</td>
+                @elseif($type === 'all_stock')
+                <td>{{ $item->kode_unik }}</td>
+                <td>{{ $item->masterBarang->nama_barang ?? '-' }}</td>
+                <td>{{ $item->statusDetail->nama_status ?? '-' }}</td>
+                <td>{{ $item->userPeminjam->name ?? $item->workshop->name ?? '-' }}</td>
+                @else
                 <td>{{ $item->kode_unik }}</td>
                 <td>{{ $item->masterBarang->nama_barang ?? '-' }}</td>
                 <td>{{ $item->statusDetail->nama_status ?? '-' }}</td>
@@ -85,10 +114,18 @@
                     @endif
                 </td>
                 <td>{{ $item->workshop->name ?? '-' }}</td>
+                @endif
             </tr>
             @empty
             <tr>
+                {{-- [MODIFIKASI] Menyesuaikan colspan --}}
+                @if($type === 'active_loans')
                 <td colspan="6" style="text-align: center;">Tidak ada data yang sesuai dengan filter.</td>
+                @elseif($type === 'all_stock')
+                <td colspan="4" style="text-align: center;">Tidak ada data yang sesuai dengan filter.</td>
+                @else
+                <td colspan="6" style="text-align: center;">Tidak ada data yang sesuai dengan filter.</td>
+                @endif
             </tr>
             @endforelse
         </tbody>

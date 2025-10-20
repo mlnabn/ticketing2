@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import Pagination from '../components/Pagination';
-// import { saveAs } from 'file-saver';
+import { saveAs } from 'file-saver';
 
 // Komponen PaginationSummary tetap sama
 const PaginationSummary = ({ pagination }) => {
@@ -21,10 +21,11 @@ export default function ActiveLoanReportPage() {
     const [filters, setFilters] = useState({ start_date: '', end_date: '' });
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
-    
-    // State untuk ekspor bisa ditambahkan nanti jika diperlukan
 
-    const type = 'active_loans'; // Tipe laporan spesifik untuk halaman ini
+    const [exportingExcel, setExportingExcel] = useState(false);
+    const [exportingPdf, setExportingPdf] = useState(false);
+
+    const type = 'active_loans';
     const title = 'Laporan Peminjaman Aktif';
 
     const fetchData = useCallback(async (page = 1) => {
@@ -49,30 +50,57 @@ export default function ActiveLoanReportPage() {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
+    const handleExport = async (exportType) => {
+        if (exportType === 'excel') setExportingExcel(true);
+        else setExportingPdf(true);
+
+        try {
+            const params = {
+                type,
+                ...filters,
+                search: searchTerm,
+                export_type: exportType
+            };
+
+            const response = await api.get('/reports/inventory/export', {
+                params,
+                responseType: 'blob',
+            });
+
+            const extension = exportType === 'excel' ? 'xlsx' : 'pdf';
+            const fileName = `Laporan_Peminjaman_Aktif_${new Date().toISOString().split('T')[0]}.${extension}`;
+            saveAs(response.data, fileName);
+
+        } catch (err) {
+            console.error(`Gagal mengunduh file ${exportType}:`, err);
+            alert('Gagal mengunduh file. Mohon coba lagi.');
+        } finally {
+            if (exportType === 'excel') setExportingExcel(false);
+            else setExportingPdf(false);
+        }
+    };
+
     const formatDate = (dateString) => {
         if (!dateString) return '-';
         return new Date(dateString).toLocaleDateString('id-ID', {
             day: '2-digit', month: 'long', year: 'numeric'
         });
     };
-
-    // Fungsi BARU untuk menghitung durasi
     const calculateDuration = (startDate) => {
         if (!startDate) return { text: '-', days: 0 };
         const start = new Date(startDate);
         const now = new Date();
         const diffTime = Math.abs(now - start);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays === 0) return { text: 'Hari ini', days: 0 };
         if (diffDays === 1) return { text: '1 hari', days: 1 };
         return { text: `${diffDays} hari`, days: diffDays };
     };
 
-    // Style untuk durasi berdasarkan lama peminjaman
     const getDurationStyle = (days) => {
-        if (days > 30) return { color: '#ef4444', fontWeight: 'bold' }; // Merah
-        if (days > 7) return { color: '#f97316' }; // Oranye
+        if (days > 30) return { color: '#ef4444', fontWeight: 'bold' }; 
+        if (days > 7) return { color: '#f97316' }; 
         return {};
     };
 
@@ -96,7 +124,16 @@ export default function ActiveLoanReportPage() {
                         <span className='strip'>-</span>
                         <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-cal" />
                     </div>
-                    {/* Tombol ekspor bisa ditambahkan di sini nanti */}
+                    <div className="download-buttons">
+                        <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
+                            <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
+                            {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
+                        </button>
+                        <button onClick={() => handleExport('pdf')} className="btn-download pdf" disabled={exportingPdf}>
+                            <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
+                            {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -140,12 +177,10 @@ export default function ActiveLoanReportPage() {
                     {loading ? (
                         <p style={{ textAlign: 'center' }}>Memuat data...</p>
                     ) : data.length > 0 ? (
-                        data.map(item => { 
+                        data.map(item => {
                             const duration = calculateDuration(item.tanggal_keluar);
                             return (
                                 <div key={item.id} className="ticket-card-mobile hoverable-row">
-                                    
-                                    {/* Baris 1: Nama Barang (Paling penting) */}
                                     <div className="card-row">
                                         <div className="data-group single">
                                             <span className="label">Nama Barang</span>
@@ -154,8 +189,6 @@ export default function ActiveLoanReportPage() {
                                             </span>
                                         </div>
                                     </div>
-                                    
-                                    {/* Baris 2: Kode Unik & Peminjam */}
                                     <div className="card-row">
                                         <div className="data-group">
                                             <span className="label">Kode Unik</span>
@@ -166,8 +199,6 @@ export default function ActiveLoanReportPage() {
                                             <span className="value">{item.user_peminjam?.name || '-'}</span>
                                         </div>
                                     </div>
-
-                                    {/* Baris 3: Lokasi & Status */}
                                     <div className="card-row">
                                         <div className="data-group">
                                             <span className="label">Lokasi</span>
@@ -178,8 +209,6 @@ export default function ActiveLoanReportPage() {
                                             <span className="value">{item.status_detail?.nama_status || '-'}</span>
                                         </div>
                                     </div>
-
-                                    {/* Baris 4: Tgl Pinjam & Durasi */}
                                     <div className="card-row">
                                         <div className="data-group">
                                             <span className="label">Tgl Pinjam</span>
@@ -192,7 +221,7 @@ export default function ActiveLoanReportPage() {
                                             </span>
                                         </div>
                                     </div>
-                                    
+
                                     {/* Tidak ada baris aksi untuk laporan ini */}
 
                                 </div>
