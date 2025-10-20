@@ -2461,6 +2461,11 @@ body.dark-mode .job-table td {
   border-right: 1px solid var(--border-color-dark, #2D3748);
 }
 
+.job-table tr.urgent-row {
+  background-color: #fffbe6; /* Kuning pucat */
+  font-weight: 600; /* Sedikit lebih tebal */
+}
+
 body.dark-mode .job-table th {
   background-color: transparent;
   color: #8A919E;
@@ -2872,6 +2877,19 @@ body.dark-mode .status-ditolak {
   background-color: rgba(239, 68, 68, 0.15);
   color: #f87171;
   /* Merah terang */
+}
+
+/* Styling untuk badge URGENT */
+.urgent-badge {
+  background-color: #dc2626; /* Merah */
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin-right: 8px;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 /* ADD USER PAGE */
@@ -11308,6 +11326,12 @@ body.dark-mode .btn-detail:hover {
   padding-top: 1rem;
 }
 
+/* Styling untuk kartu mobile yang urgent */
+.ticket-card-mobile.urgent-row {
+  border-left: 5px solid #f59e0b; /* Garis kuning tebal di kiri */
+  background-color: #fffbe6;
+}
+
 
 /* 3. TIPOGRAFI (TEKS & KONTEN)
 --------------------------------------------- */
@@ -12066,4 +12090,71 @@ body.dark-mode .btn-detail:hover {
   .user-management-container p{
     font-size: 0.9rem;
   }
+}
+
+/* ============================================= */
+/* STYLING Halaman Urgensi Keyword */
+
+.keyword-form {
+  display: flex;
+  gap: 1rem;
+}
+
+.keyword-form input {
+  flex-grow: 1;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.keyword-list-container {
+  padding: 1rem;
+}
+
+.keyword-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.keyword-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.keyword-item:last-child {
+  border-bottom: none;
+}
+
+.keyword-item:hover {
+  background-color: #f9f9f9;
+}
+
+.dark-mode .keyword-item:hover {
+    background-color: #333;
+}
+
+.btn-delete-icon {
+  background: none;
+  border: none;
+  color: #ef4444; /* red-500 */
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.btn-delete-icon:hover {
+  background-color: #fee2e2; /* red-100 */
+}
+
+.dark-mode .btn-delete-icon:hover {
+    background-color: #4b1d1d;
 }

@@ -57,6 +57,8 @@ class FinancialReportController extends Controller
             });
         }
 
+        $newAssetValue30Days = StokBarang::where('tanggal_pembelian', '>=', now()->subDays(30))->sum('harga_beli');
+
         $problematicStatusIds = DB::table('status_barang')->whereIn('nama_status', ['Rusak', 'Hilang'])->pluck('id');
 
         // Lakukan perhitungan
@@ -66,6 +68,7 @@ class FinancialReportController extends Controller
 
         return response()->json([
             'new_asset_value' => (float) $newAssetValue,
+            'new_asset_value_30_days' => (float) $newAssetValue30Days,
             'total_asset_value' => (float) $totalAssetValue,
             'problematic_asset_value' => (float) $problematicAssetValue,
             'net_asset_value' => (float) ($totalAssetValue - $problematicAssetValue),

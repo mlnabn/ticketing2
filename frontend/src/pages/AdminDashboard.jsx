@@ -116,6 +116,11 @@ export default function AdminDashboard() {
                 <i className="fas fa-cogs"></i><span className="nav-text"> Daftar Workshop</span>
               </NavLink>
             </li>
+            <li className="sidebar-nav-item">
+                <NavLink to="/admin/urgency-keywords" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
+                    <i className="fas fa-exclamation-triangle"></i><span className="nav-text">Kata Kunci Urgent</span>
+                </NavLink>
+            </li>
           </ul>
         </nav>
       </aside>

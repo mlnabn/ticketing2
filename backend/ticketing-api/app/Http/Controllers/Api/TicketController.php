@@ -7,6 +7,7 @@ use App\Models\Ticket;
 use App\Models\User;
 use App\Models\Workshop;
 use Illuminate\Http\Request;
+use App\Models\UrgencyKeyword;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -150,10 +151,23 @@ class TicketController extends Controller
         $workshopCode = $workshop ? $workshop->code : 'XX';
 
         $now = now();
-        $day = $now->format('d');
-        $month = $now->format('n');
-        $sequence = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
-        return strtoupper($workshopCode . $day . $month . $sequence);
+        $prefix = strtoupper($workshopCode . $now->format('dn'));
+
+        $lastTicket = Ticket::where('kode_tiket', 'like', $prefix . '%')
+                              ->orderBy('id', 'desc')
+                              ->first();
+        
+        $nextSequence = 1; 
+
+        if ($lastTicket) {
+            $lastSequencePart = substr($lastTicket->kode_tiket, strlen($prefix));
+            $lastSequenceNumber = (int)$lastSequencePart;
+            $nextSequence = $lastSequenceNumber + 1;
+        }
+
+        $sequence = str_pad($nextSequence, 4, '0', STR_PAD_LEFT);
+
+        return $prefix . $sequence;
     }
 
     /**
@@ -169,6 +183,7 @@ class TicketController extends Controller
         ]);
 
         $kodeTiket = $this->generateKodeTiket($validated['workshop_id']);
+        $isUrgent = $this->checkUrgency($validated['title']);
 
         $ticket = Ticket::create([
             'kode_tiket' => $kodeTiket,
@@ -179,6 +194,7 @@ class TicketController extends Controller
             'creator_id' => auth()->id(),
             'user_id' => null,
             'status' => 'Belum Dikerjakan',
+            'is_urgent' => $isUrgent,
         ]);
 
         return response()->json($ticket, 201);
@@ -230,6 +246,7 @@ class TicketController extends Controller
             return response()->json(['error' => 'Gagal memproses user: ' . $e->getMessage()], 500);
         }
 
+        $isUrgent = $this->checkUrgency($validated['title']);
         $kodeTiket = $this->generateKodeTiket($workshop->id);
 
         $ticket = Ticket::create([
@@ -239,6 +256,7 @@ class TicketController extends Controller
             'requester_name' => $validated['sender_name'],
             'creator_id' => $user->id,
             'status' => 'Belum Dikerjakan',
+            'is_urgent' => $isUrgent,
         ]);
 
         return response()->json($ticket, 201);
@@ -819,5 +837,33 @@ class TicketController extends Controller
         });
 
         return response()->json($ticket->load(['user', 'creator', 'masterBarangs']));
+    }
+
+    /**
+     * Ambil semua kata kunci urgensi dari DB dan cache.
+     */
+    private function getUrgentKeywords()
+    {
+        // Cache selama 60 menit untuk performa
+        return Cache::remember('urgent_keywords', 60, function () {
+            return UrgencyKeyword::pluck('keyword')->toArray();
+        });
+    }
+
+    /**
+     * Cek urgensi tiket berdasarkan deskripsi.
+     */
+    private function checkUrgency(string $description): bool
+    {
+        $keywords = $this->getUrgentKeywords();
+        if (empty($keywords)) {
+            return false;
+        }
+
+        // Buat satu regex dari semua keyword untuk pencarian yang efisien
+        // \b memastikan kita mencari kata utuh (misal: 'error' tidak akan cocok dengan 'terror')
+        $pattern = '/\b(' . implode('|', array_map('preg_quote', $keywords)) . ')\b/i';
+
+        return preg_match($pattern, $description) === 1;
     }
 }
