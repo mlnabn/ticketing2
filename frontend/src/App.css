@@ -2461,12 +2461,42 @@ body.dark-mode .job-table td {
   border-right: 1px solid var(--border-color-dark, #2D3748);
 }
 
-.job-table tr.urgent-row {
-  background-color: #fffbe6;
-  /* Kuning pucat */
-  font-weight: 600;
-  /* Sedikit lebih tebal */
+/* ======================================= */
+/* FIX UNTUK TAMPILAN DESKTOP (TABEL)      */
+/* ======================================= */
+.job-table tbody tr.urgent-row {
+  background-color: #fcf8e3 ;
+  color: #333 ;
 }
+.dark-mode .job-table tbody tr.urgent-row {
+  background-color: #4a411a ;
+  color: #f0f0f0 ;
+}
+.ticket-card-mobile.urgent-row {
+  background-color: #fcf8e3 ;
+  border-left: 5px solid #f59e0b;
+}
+.dark-mode .ticket-card-mobile.urgent-row {
+  background-color: #4a411a ;
+  border-left: 5px solid #f59e0b;
+}
+
+
+/* ======================================= */
+/* Styling untuk badge URGENT (Tidak berubah) */
+/* ======================================= */
+.urgent-badge {
+  background-color: #dc2626;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin-right: 8px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
 
 body.dark-mode .job-table th {
   background-color: transparent;
@@ -2879,20 +2909,6 @@ body.dark-mode .status-ditolak {
   background-color: rgba(239, 68, 68, 0.15);
   color: #f87171;
   /* Merah terang */
-}
-
-/* Styling untuk badge URGENT */
-.urgent-badge {
-  background-color: #dc2626;
-  /* Merah */
-  color: white;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: bold;
-  margin-right: 8px;
-  display: inline-block;
-  vertical-align: middle;
 }
 
 /* ADD USER PAGE */
@@ -11320,13 +11336,6 @@ body.dark-mode .btn-detail:hover {
   padding-top: 1rem;
 }
 
-/* Styling untuk kartu mobile yang urgent */
-.ticket-card-mobile.urgent-row {
-  border-left: 5px solid #f59e0b;
-  /* Garis kuning tebal di kiri */
-  background-color: #fffbe6;
-}
-
 
 /* 3. TIPOGRAFI (TEKS & KONTEN)
 --------------------------------------------- */
@@ -12204,5 +12213,3 @@ body.dark-mode .btn-detail:hover {
   flex-grow: 1;
   margin: 0;
 }
-
-
