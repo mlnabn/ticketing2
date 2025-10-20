@@ -77,7 +77,6 @@ class FinancialReportController extends Controller
 
     public function getDetailedTransactions(Request $request)
     {
-        // Validasi filter (sama seperti sebelumnya)
         $request->validate([
             'year' => 'nullable|integer|digits:4',
             'month' => 'nullable|integer|between:1,12',
@@ -85,12 +84,52 @@ class FinancialReportController extends Controller
             'end_date' => 'nullable|date|after_or_equal:start_date',
         ]);
 
-        $year = $request->input('year');
-        $month = $request->input('month');
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
+        $data = $this->getFilteredDetailedData(
+            $request->input('year'),
+            $request->input('month'),
+            $request->input('start_date'),
+            $request->input('end_date')
+        );
 
-        // --- Query untuk Aset Baru (Tidak ada perubahan di sini) ---
+        return response()->json($data);
+    }
+
+    public function exportReport(Request $request)
+    {
+        $request->validate([
+            'type' => 'required|in:excel,pdf',
+            'report_view' => 'nullable|in:new_acquisitions,problematic_assets'
+        ]);
+
+        $details = $this->getFilteredDetailedData(
+            $request->input('year'),
+            $request->input('month'),
+            $request->input('start_date'),
+            $request->input('end_date')
+        );
+
+        $fileName = 'laporan-keuangan-aset-' . date('Y-m-d');
+
+        $period = 'Semua Waktu';
+        if ($request->year) $period = $request->year;
+        if ($request->month) $period = date('F', mktime(0, 0, 0, $request->month, 10)) . ' ' . $request->year;
+        if ($request->start_date && $request->end_date) $period = $request->start_date . ' s/d ' . $request->end_date;
+
+        $report_view = $request->input('report_view');
+
+        if ($request->type === 'excel') {
+            return Excel::download(new FinancialReportExport($details, $report_view), $fileName . '.xlsx');
+        }
+
+        if ($request->type === 'pdf') {
+            $summary = $this->getInventoryReport($request)->getData(true);
+            $pdf = PDF::loadView('reports.financial_report_pdf', compact('summary', 'details', 'period', 'report_view'));
+            return $pdf->download($fileName . '.pdf');
+        }
+    }
+
+    private function getFilteredDetailedData($year, $month, $startDate, $endDate)
+    {
         $newAssetsQuery = StokBarang::with(['masterBarang:id_m_barang,nama_barang'])
             ->select('tanggal_pembelian', 'kode_unik', 'harga_beli', 'master_barang_id');
 
@@ -101,7 +140,6 @@ class FinancialReportController extends Controller
             if ($month) $newAssetsQuery->whereMonth('tanggal_pembelian', $month);
         }
 
-        // --- Query untuk Aset Bermasalah (PERBAIKAN DI SINI) ---
         $problematicAssetsQuery = StokBarang::with([
             'masterBarang:id_m_barang,nama_barang',
             'statusDetail:id,nama_status',
@@ -113,59 +151,28 @@ class FinancialReportController extends Controller
         $problematicStatusIds = DB::table('status_barang')->whereIn('nama_status', ['Rusak', 'Hilang'])->pluck('id');
         $problematicAssetsQuery->whereIn('status_id', $problematicStatusIds);
 
-        // Logika filter yang telah diperbaiki
         if ($startDate && $endDate) {
             $problematicAssetsQuery->where(function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('tanggal_rusak', [$startDate, $endDate])
-                    ->orWhereBetween('tanggal_hilang', [$startDate, $endDate]);
+                      ->orWhereBetween('tanggal_hilang', [$startDate, $endDate]);
             });
-        } else {
-            // Klausa where terluar untuk menampung kondisi OR
+        } elseif ($year || $month) {
             $problematicAssetsQuery->where(function ($query) use ($year, $month) {
-                // Kondisi untuk barang RUSAK pada periode yang dipilih
                 $query->where(function ($subQuery) use ($year, $month) {
                     if ($year) $subQuery->whereYear('tanggal_rusak', $year);
                     if ($month) $subQuery->whereMonth('tanggal_rusak', $month);
                 });
-                // "ATAU" kondisi untuk barang HILANG pada periode yang dipilih
                 $query->orWhere(function ($subQuery) use ($year, $month) {
                     if ($year) $subQuery->whereYear('tanggal_hilang', $year);
                     if ($month) $subQuery->whereMonth('tanggal_hilang', $month);
                 });
             });
         }
-
-        return response()->json([
+        
+        return [
             'new_acquisitions' => $newAssetsQuery->latest('tanggal_pembelian')->get(),
-            // Urutkan berdasarkan tanggal terbaru antara rusak atau hilang
             'problematic_assets' => $problematicAssetsQuery->orderByRaw('COALESCE(tanggal_rusak, tanggal_hilang) DESC')->get(),
-        ]);
-    }
-
-    public function exportReport(Request $request)
-    {
-        $request->validate(['type' => 'required|in:excel,pdf']);
-
-        // Panggil fungsi yang sudah ada untuk mendapatkan data
-        $summary = $this->getInventoryReport($request)->getData(true);
-        $details = $this->getDetailedTransactions($request)->getData(true);
-
-        $fileName = 'laporan-keuangan-aset-' . date('Y-m-d');
-
-        // Menentukan teks periode untuk judul PDF
-        $period = 'Semua Waktu';
-        if ($request->year) $period = $request->year;
-        if ($request->month) $period = date('F', mktime(0, 0, 0, $request->month, 10)) . ' ' . $request->year;
-        if ($request->start_date && $request->end_date) $period = $request->start_date . ' s/d ' . $request->end_date;
-
-        if ($request->type === 'excel') {
-            return Excel::download(new FinancialReportExport($details), $fileName . '.xlsx');
-        }
-
-        if ($request->type === 'pdf') {
-            $pdf = PDF::loadView('reports.financial_report_pdf', compact('summary', 'details', 'period'));
-            return $pdf->download($fileName . '.pdf');
-        }
+        ];
     }
 
     public function getFinancialChartData(Request $request)

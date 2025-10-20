@@ -51,13 +51,18 @@
                 <th class="text-right">Nilai</th>
             </tr>
         </thead>
+        {{-- HAPUS BLOK <tbody> YANG LAMA DARI SINI --}}
+        
+        {{-- HANYA GUNAKAN BLOK <tbody> DENGAN KONDISI @if --}}
         <tbody>
+            {{-- Tampilkan bagian ini HANYA jika report_view adalah 'new_acquisitions' atau kosong --}}
+            @if(empty($report_view) || $report_view === 'new_acquisitions')
             <tr class="section-header"><td colspan="4">Pembelian Baru (Aset Masuk)</td></tr>
             @forelse ($details['new_acquisitions'] as $item)
             <tr>
                 <td>{{ \Carbon\Carbon::parse($item['tanggal_pembelian'])->format('d/m/Y') }}</td>
                 <td>{{ $item['kode_unik'] }}</td>
-                <td>{{ $item['master_barang']['nama_barang'] }}</td>
+                <td>{{ $item['master_barang']['nama_barang'] ?? 'N/A' }}</td>
                 <td class="text-right">{{ 'Rp ' . number_format($item['harga_beli'], 0, ',', '.') }}</td>
             </tr>
             @empty
@@ -67,13 +72,16 @@
                 <td colspan="3" class="text-right">Subtotal</td>
                 <td class="text-right">{{ 'Rp ' . number_format(collect($details['new_acquisitions'])->sum('harga_beli'), 0, ',', '.') }}</td>
             </tr>
+            @endif
 
+            {{-- Tampilkan bagian ini HANYA jika report_view adalah 'problematic_assets' atau kosong --}}
+            @if(empty($report_view) || $report_view === 'problematic_assets')
             <tr class="section-header"><td colspan="4">Potensi Kerugian (Aset Rusak/Hilang)</td></tr>
             @forelse ($details['problematic_assets'] as $item)
             <tr>
                 <td>{{ \Carbon\Carbon::parse($item['tanggal_rusak'] ?? $item['tanggal_hilang'])->format('d/m/Y') }}</td>
                 <td>{{ $item['kode_unik'] }}</td>
-                <td>{{ $item['master_barang']['nama_barang'] }}</td>
+                <td>{{ $item['master_barang']['nama_barang'] ?? 'N/A' }}</td>
                 <td class="text-right">({{ 'Rp ' . number_format($item['harga_beli'], 0, ',', '.') }})</td>
             </tr>
             @empty
@@ -83,6 +91,7 @@
                 <td colspan="3" class="text-right">Subtotal</td>
                 <td class="text-right">({{ 'Rp ' . number_format(collect($details['problematic_assets'])->sum('harga_beli'), 0, ',', '.') }})</td>
             </tr>
+            @endif
         </tbody>
     </table>
 </body>

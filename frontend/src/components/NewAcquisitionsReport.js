@@ -27,7 +27,7 @@ export default function NewAcquisitionsReport() {
         if (type === 'pdf') setExportingPdf(true);
         else setExportingExcel(true);
         
-        await handleExport(type); // Panggil fungsi asli dari hook
+        await handleExport(type, 'new_acquisitions'); 
         
         if (type === 'pdf') setExportingPdf(false);
         else setExportingExcel(false);
