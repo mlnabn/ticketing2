@@ -24,38 +24,98 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
 
     public function headings(): array
     {
-        return [
-            'Kode Unik',
-            'Nama Barang',
-            'Status',
-            $this->type === 'in' ? 'Tanggal Masuk' : 'Tanggal Keluar',
-            'Penanggung Jawab',
-            'Workshop',
-            'Kondisi',
-            'Harga Beli',
-            'Serial Number',
-        ];
+        
+        switch ($this->type) {
+            case 'in':
+                return [
+                    'Kode Unik',
+                    'Nama Barang',
+                    'Status',
+                    'Tanggal Masuk',
+                    'Penanggung Jawab',
+                    'Workshop',
+                    'Kondisi',
+                    'Harga Beli',
+                    'Serial Number',
+                ];
+            case 'out':
+                 return [
+                    'Kode Unik',
+                    'Nama Barang',
+                    'Status',
+                    'Tanggal Keluar',
+                    'Penanggung Jawab',
+                    'Workshop',
+                    'Kondisi',
+                    'Harga Beli',
+                    'Serial Number',
+                ];
+            case 'active_loans':
+                return [
+                    'Kode Unik',
+                    'Nama Barang',
+                    'Status',
+                    'Peminjam',
+                    'Lokasi',
+                    'Tgl Pinjam',
+                ];
+            case 'all_stock': 
+                return [
+                    'Kode Unik',
+                    'Nama Barang',
+                    'Status Saat Ini',
+                    'Lokasi/Pengguna Terakhir',
+                ];
+            default:
+                return [];
+        }
     }
 
     public function map($item): array
     {
-        $penanggungJawab = '-';
-        if ($this->type === 'in') {
-            $penanggungJawab = $item->createdBy->name ?? '-';
-        } else {
-            $penanggungJawab = $item->userPeminjam->name ?? $item->userPerusak->name ?? $item->userPenghilang->name ?? '-';
+        switch ($this->type) {
+            case 'in':
+                return [
+                    $item->kode_unik,
+                    $item->masterBarang->nama_barang ?? '-',
+                    $item->statusDetail->nama_status ?? '-',
+                    $item->tanggal_masuk ? \Carbon\Carbon::parse($item->tanggal_masuk)->format('d M Y') : '-',
+                    $item->createdBy->name ?? '-',
+                    $item->workshop->name ?? '-',
+                    $item->kondisi,
+                    $item->harga_beli,
+                    $item->serial_number ?? '-',
+                ];
+            case 'out':
+                return [
+                    $item->kode_unik,
+                    $item->masterBarang->nama_barang ?? '-',
+                    $item->statusDetail->nama_status ?? '-',
+                    $item->tanggal_keluar ? \Carbon\Carbon::parse($item->tanggal_keluar)->format('d M Y') : '-',
+                    $item->userPeminjam->name ?? $item->userPerusak->name ?? $item->userPenghilang->name ?? '-',
+                    $item->workshop->name ?? '-',
+                    $item->kondisi,
+                    $item->harga_beli,
+                    $item->serial_number ?? '-',
+                ];
+            case 'active_loans': 
+                return [
+                    $item->kode_unik,
+                    $item->masterBarang->nama_barang ?? '-',
+                    $item->statusDetail->nama_status ?? '-',
+                    $item->userPeminjam->name ?? '-',
+                    $item->workshop->name ?? '-',
+                    $item->tanggal_keluar ? \Carbon\Carbon::parse($item->tanggal_keluar)->format('d M Y') : '-',
+                ];
+            case 'all_stock': 
+                 return [
+                    $item->kode_unik,
+                    $item->masterBarang->nama_barang ?? '-',
+                    $item->statusDetail->nama_status ?? '-',
+                    $item->userPeminjam->name ?? $item->workshop->name ?? '-',
+                ];
+            default:
+                return [];
         }
-
-        return [
-            $item->kode_unik,
-            $item->masterBarang->nama_barang ?? '-',
-            $item->statusDetail->nama_status ?? '-',
-            $this->type === 'in' ? ($item->tanggal_masuk ? \Carbon\Carbon::parse($item->tanggal_masuk)->format('d M Y') : '-') : ($item->tanggal_keluar ? \Carbon\Carbon::parse($item->tanggal_keluar)->format('d M Y') : '-'),
-            $penanggungJawab,
-            $item->workshop->name ?? '-',
-            $item->kondisi,
-            $item->harga_beli,
-            $item->serial_number ?? '-',
-        ];
     }
 }

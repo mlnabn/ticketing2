@@ -3,24 +3,19 @@ import { useOutletContext } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import Pagination from '../components/Pagination';
-import HistoryModal from '../components/HistoryModal'; // Impor modal riwayat
+import HistoryModal from '../components/HistoryModal';
+import { saveAs } from 'file-saver';
 
 function ItemHistoryLookupPage() {
     const { showToast } = useOutletContext();
-
-    // State untuk daftar barang
     const [items, setItems] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    // State untuk pencarian & scanner
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
-
-    // State untuk item yang akan dilihat riwayatnya
     const [historyItem, setHistoryItem] = useState(null);
-
-    // Mengambil daftar semua stok barang (mirip StokBarangView)
+    const [exportingExcel, setExportingExcel] = useState(false);
+    const [exportingPdf, setExportingPdf] = useState(false);
     const fetchData = useCallback(async (page = 1) => {
         setLoading(true);
         try {
@@ -39,26 +34,50 @@ function ItemHistoryLookupPage() {
         fetchData(1);
     }, [fetchData]);
 
-    // Fungsi untuk mencari item berdasarkan kode & menampilkan modal riwayat
+    const handleExport = async (exportType) => {
+        if (exportType === 'excel') setExportingExcel(true);
+        else setExportingPdf(true);
+
+        const type = 'all_stock'; 
+
+        try {
+            const params = {
+                type,
+                search: searchTerm,
+                export_type: exportType
+            };
+
+            const response = await api.get('/reports/inventory/export', {
+                params,
+                responseType: 'blob',
+            });
+
+            const extension = exportType === 'excel' ? 'xlsx' : 'pdf';
+            const fileName = `Laporan_Stok_Aset_Total_${new Date().toISOString().split('T')[0]}.${extension}`;
+            saveAs(response.data, fileName);
+
+        } catch (err) {
+            console.error(`Gagal mengunduh file ${exportType}:`, err);
+            showToast('Gagal mengunduh file. Mohon coba lagi.', 'error');
+        } finally {
+            if (exportType === 'excel') setExportingExcel(false);
+            else setExportingPdf(false);
+        }
+    };
     const handleSearchAndShowHistory = useCallback(async (code) => {
         if (!code) return;
         showToast(`Mencari riwayat untuk: ${code}`, 'info');
         try {
-            // Kita panggil API untuk mendapatkan detail item lengkap
             const res = await api.get(`/inventory/stock-items/by-serial/${code}`);
-            // Set state untuk membuka HistoryModal dengan data item yang ditemukan
             setHistoryItem(res.data);
         } catch (error) {
             showToast(`Aset dengan kode "${code}" tidak ditemukan.`, 'error');
         }
     }, [showToast]);
-
-    // LOGIKA PASIF SCANNER (diambil dari StokBarangView)
     useEffect(() => {
         let barcode = '';
         let interval;
         const handleKeyDown = (e) => {
-            // Abaikan input jika fokus pada elemen input
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             if (typeof e.key !== 'string') return;
 
@@ -66,14 +85,13 @@ function ItemHistoryLookupPage() {
 
             if (e.code === 'Enter' || e.key === 'Enter') {
                 if (barcode) handleSearchAndShowHistory(barcode.trim());
-                barcode = ''; // Reset barcode setelah Enter
+                barcode = '';
                 return;
             }
 
             if (e.key.length === 1) {
                 barcode += e.key;
             }
-            // Reset barcode jika ada jeda input
             interval = setInterval(() => barcode = '', 50);
         };
         window.addEventListener('keydown', handleKeyDown);
@@ -86,17 +104,33 @@ function ItemHistoryLookupPage() {
             <div className="user-management-container">
                 <h1>Lacak Riwayat Aset</h1>
                 <p>Gunakan pencarian, klik item dari daftar, atau scan QR/Barcode untuk melihat riwayat lengkap sebuah aset.</p>
-
-                <input
-                    type="text"
-                    placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className="filter-search-input"
-                    style={{ marginTop: '1rem' }}
-                />
+                <div className="filters-container report-filters" style={{ marginTop: '1rem', paddingBottom: '0' }}>
+                    <input
+                        type="text"
+                        placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="filter-search-input"
+                    />
+                    <div className="filter-row-bottom">
+                        <div className="date-filters" style={{ visibility: 'hidden' }}>
+                            <input type="date" className="filter-select-cal" />
+                        </div>
+                        <div className="download-buttons">
+                            <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
+                                <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
+                                {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
+                            </button>
+                            <button onClick={() => handleExport('pdf')} className="btn-download pdf" disabled={exportingPdf}>
+                                <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
+                                {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 <div className="job-list-container">
+                    {/* Desktop View */}
                     <table className="job-table">
                         <thead>
                             <tr>
@@ -132,14 +166,12 @@ function ItemHistoryLookupPage() {
                         ) : items.length > 0 ? (
                             items.map(item => (
                                 <div key={item.id} className="ticket-card-mobile clickable-row" onClick={() => setHistoryItem(item)}>
-                                    {/* Baris 1: Nama Barang */}
                                     <div className="card-row">
                                         <div className="data-group single">
                                             <span className="label">Nama Barang</span>
                                             <span className="value description">{item.master_barang?.nama_barang || 'N/A'}</span>
                                         </div>
                                     </div>
-                                    {/* Baris 2: Kode Unik & Status */}
                                     <div className="card-row">
                                         <div className="data-group">
                                             <span className="label">Kode Unik</span>
@@ -154,7 +186,6 @@ function ItemHistoryLookupPage() {
                                             </span>
                                         </div>
                                     </div>
-                                    {/* Baris 3: Lokasi/Pengguna */}
                                     <div className="card-row">
                                         <div className="data-group single">
                                             <span className="label">Lokasi/Pengguna Terakhir</span>
@@ -179,8 +210,6 @@ function ItemHistoryLookupPage() {
                     />
                 )}
             </div>
-
-            {/* Modal akan muncul jika historyItem memiliki data */}
             {historyItem && (
                 <HistoryModal
                     item={historyItem}
