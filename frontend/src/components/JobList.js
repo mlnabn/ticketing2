@@ -45,12 +45,16 @@ export default function JobList() {
 
   const ticketsOnPage = useMemo(() => ticketData?.data ?? [], [ticketData]);
 
-  const fetchTickets = useCallback(async () => {
+  useEffect(() => {
+    setPage(1);
+  }, [location.pathname]);
+
+  const fetchTickets = useCallback(async (currentPage = 1) => {
     setTicketData(null);
     const endpoint = isMyTicketsPage ? '/tickets/my-tickets' : '/tickets';
     
     const params = {
-      page,
+      page: currentPage,
       search: debouncedSearchTerm,
       status: searchParams.get('status'),
       admin_id: searchParams.get('adminId'),
@@ -70,7 +74,7 @@ export default function JobList() {
       showToast('Gagal memuat data tiket.', 'error');
       if (e.response?.status === 401) logout();
     }
-  }, [isMyTicketsPage, page, debouncedSearchTerm, logout, showToast, searchParams]);
+  }, [isMyTicketsPage, debouncedSearchTerm, logout, showToast, searchParams]);
 
   const fetchPrerequisites = useCallback(async () => {
     try {
@@ -90,8 +94,8 @@ export default function JobList() {
   }, [isAdmin, showToast]);
 
   useEffect(() => {
-    fetchTickets();
-  }, [fetchTickets]);
+    fetchTickets(page);
+  }, [fetchTickets, page]);
 
   useEffect(() => {
     fetchPrerequisites();
