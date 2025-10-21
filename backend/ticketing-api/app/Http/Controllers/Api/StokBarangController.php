@@ -18,10 +18,10 @@ class StokBarangController extends Controller
         $excludedStatuses = DB::table('status_barang')
             ->whereIn('nama_status', ['Hilang', 'Rusak', 'Digunakan'])
             ->pluck('id');
-        
+
         $query = StokBarang::with([
             'masterBarang' => function ($query) use ($excludedStatuses) {
-                    $query->withCount(['stokBarangs' => function ($q) use ($excludedStatuses) {
+                $query->withCount(['stokBarangs' => function ($q) use ($excludedStatuses) {
                     $q->whereNotIn('status_id', $excludedStatuses);
                 }]);
             },
@@ -55,8 +55,8 @@ class StokBarangController extends Controller
             $query->where(function ($q) use ($searchTerm) {
                 // Cari di kolom tabel stok_barangs
                 $q->where('kode_unik', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('serial_number', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('kondisi', 'LIKE', "%{$searchTerm}%");
+                    ->orWhere('serial_number', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('kondisi', 'LIKE', "%{$searchTerm}%");
 
                 // Cari di relasi masterBarang (untuk nama barang)
                 $q->orWhereHas('masterBarang', function ($q2) use ($searchTerm) {
@@ -69,6 +69,9 @@ class StokBarangController extends Controller
                 });
             });
         }
+        $query->when($request->boolean('has_history'), function ($q) {
+            $q->whereHas('histories');
+        });
 
         return $query->latest()->paginate(15);
     }
@@ -160,7 +163,7 @@ class StokBarangController extends Controller
                     'tanggal_masuk' => $validated['tanggal_masuk'] ?? now(),
                     'created_by' => auth()->id()
                 ]);
-                
+
                 $createdItems[] = $newItem->load('masterBarang');
             }
         });
@@ -185,7 +188,7 @@ class StokBarangController extends Controller
         $padding = ($sequence >= 10000) ? 5 : 4;
         $sequencePart = str_pad($sequence, $padding, '0', STR_PAD_LEFT);
 
-        return $baseCode . $sequencePart; 
+        return $baseCode . $sequencePart;
     }
 
     public function updateStatus(Request $request, StokBarang $stokBarang)
@@ -239,9 +242,17 @@ class StokBarangController extends Controller
 
             // Reset semua kolom tracking terlebih dahulu
             $allTrackingColumns = [
-                'user_peminjam_id', 'workshop_id', 'tanggal_keluar', 'teknisi_perbaikan_id',
-                'tanggal_mulai_perbaikan', 'tanggal_selesai_perbaikan', 'user_perusak_id',
-                'tanggal_rusak', 'user_penghilang_id', 'tanggal_hilang', 'tanggal_ketemu',
+                'user_peminjam_id',
+                'workshop_id',
+                'tanggal_keluar',
+                'teknisi_perbaikan_id',
+                'tanggal_mulai_perbaikan',
+                'tanggal_selesai_perbaikan',
+                'user_perusak_id',
+                'tanggal_rusak',
+                'user_penghilang_id',
+                'tanggal_hilang',
+                'tanggal_ketemu',
             ];
             foreach ($allTrackingColumns as $col) {
                 $updateData[$col] = null;
@@ -253,11 +264,11 @@ class StokBarangController extends Controller
                 case 'Dipinjam':
                     $updateData['user_peminjam_id'] = $validated['user_peminjam_id'];
                     $updateData['workshop_id'] = $validated['workshop_id'];
-                    $updateData['tanggal_keluar'] = $eventDate; 
+                    $updateData['tanggal_keluar'] = $eventDate;
                     break;
                 case 'Perbaikan':
                     $updateData['teknisi_perbaikan_id'] = $validated['teknisi_perbaikan_id'];
-                    $updateData['tanggal_mulai_perbaikan'] = $eventDate; 
+                    $updateData['tanggal_mulai_perbaikan'] = $eventDate;
                     $updateData['tanggal_selesai_perbaikan'] = $validated['tanggal_selesai_perbaikan'] ?? null;
                     break;
                 case 'Rusak':
@@ -266,7 +277,7 @@ class StokBarangController extends Controller
                     break;
                 case 'Hilang':
                     $updateData['user_penghilang_id'] = $validated['user_penghilang_id'];
-                    $updateData['tanggal_hilang'] = $eventDate; 
+                    $updateData['tanggal_hilang'] = $eventDate;
                     $updateData['tanggal_ketemu'] = $validated['tanggal_ketemu'] ?? null;
                     break;
             }
@@ -276,10 +287,19 @@ class StokBarangController extends Controller
             // --- 4. PERSIAPAN DATA RIWAYAT ---
             $relatedUserId = null;
             switch ($status->nama_status) {
-                case 'Digunakan': case 'Dipinjam': $relatedUserId = $validated['user_peminjam_id'] ?? null; break;
-                case 'Perbaikan': $relatedUserId = $validated['teknisi_perbaikan_id'] ?? null; break;
-                case 'Rusak': $relatedUserId = $validated['user_perusak_id'] ?? null; break;
-                case 'Hilang': $relatedUserId = $validated['user_penghilang_id'] ?? null; break;
+                case 'Digunakan':
+                case 'Dipinjam':
+                    $relatedUserId = $validated['user_peminjam_id'] ?? null;
+                    break;
+                case 'Perbaikan':
+                    $relatedUserId = $validated['teknisi_perbaikan_id'] ?? null;
+                    break;
+                case 'Rusak':
+                    $relatedUserId = $validated['user_perusak_id'] ?? null;
+                    break;
+                case 'Hilang':
+                    $relatedUserId = $validated['user_penghilang_id'] ?? null;
+                    break;
             }
 
             // --- 5. PEMBUATAN RIWAYAT DENGAN TANGGAL KUSTOM ---
@@ -293,14 +313,18 @@ class StokBarangController extends Controller
                 // 'updated_at' => $eventDate,
                 'event_date' => $eventDate,
             ];
-            
-            $stokBarang->histories()->create($historyData);
 
+            $stokBarang->histories()->create($historyData);
         });
 
         return response()->json($stokBarang->load([
-            'masterBarang', 'userPeminjam', 'workshop', 'statusDetail',
-            'teknisiPerbaikan', 'userPerusak', 'userPenghilang'
+            'masterBarang',
+            'userPeminjam',
+            'workshop',
+            'statusDetail',
+            'teknisiPerbaikan',
+            'userPerusak',
+            'userPenghilang'
         ]));
     }
 
@@ -308,7 +332,7 @@ class StokBarangController extends Controller
     {
         $history = $stokBarang->histories()->with([
             'statusDetail',
-            'triggeredByUser:id,name', 
+            'triggeredByUser:id,name',
             'relatedUser:id,name',
             'workshop:id,name'
         ])->get();
@@ -338,7 +362,7 @@ class StokBarangController extends Controller
         $item = StokBarang::with('masterBarang')
             ->where(function ($query) use ($code) {
                 $query->where('kode_unik', $code)
-                      ->orWhere('serial_number', $code);
+                    ->orWhere('serial_number', $code);
             })
             ->where('status_id', $statusTersediaId)
             ->first();
@@ -361,10 +385,10 @@ class StokBarangController extends Controller
             ->where('status_id', $statusTersediaId)
             ->where(function ($query) use ($searchTerm) {
                 $query->where('kode_unik', 'like', $searchTerm)
-                      ->orWhere('serial_number', 'like', $searchTerm)
-                      ->orWhereHas('masterBarang', function ($q) use ($searchTerm) {
-                          $q->where('nama_barang', 'like', $searchTerm);
-                      });
+                    ->orWhere('serial_number', 'like', $searchTerm)
+                    ->orWhereHas('masterBarang', function ($q) use ($searchTerm) {
+                        $q->where('nama_barang', 'like', $searchTerm);
+                    });
             })
             ->limit(10) // Batasi hasil agar dropdown tidak terlalu panjang
             ->get();

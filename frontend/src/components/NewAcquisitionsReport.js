@@ -26,9 +26,9 @@ export default function NewAcquisitionsReport() {
     const handleExportWrapper = async (type) => {
         if (type === 'pdf') setExportingPdf(true);
         else setExportingExcel(true);
-        
-        await handleExport(type, 'new_acquisitions'); 
-        
+
+        await handleExport(type, 'new_acquisitions');
+
         if (type === 'pdf') setExportingPdf(false);
         else setExportingExcel(false);
     };
@@ -77,45 +77,56 @@ export default function NewAcquisitionsReport() {
             </div>
             {/* Tabel Pembelian Baru */}
             <div className="job-list-container">
-                {/* Destop View*/}
-                <table className="job-table">
-                    <thead>
-                        <tr>
-                            <th>Tanggal</th>
-                            <th>Kode Unik</th>
-                            <th>Nama Barang</th>
-                            <th style={{ textAlign: 'right' }}>Nilai</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {isLoading ? (
-                            <tr><td colSpan="4" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
-                        ) : detailedData.new_acquisitions.length > 0 ? (
-                            <>
-                                {detailedData.new_acquisitions.map(item => (
-                                    <tr key={`new-${item.kode_unik}`} className="hoverable-row">
-                                        <td>{formatDate(item.tanggal_pembelian)}</td>
-                                        <td>{item.kode_unik}</td>
-                                        <td>{item.master_barang.nama_barang}</td>
-                                        <td style={{ textAlign: 'right' }}>{formatCurrency(parseFloat(item.harga_beli))}</td>
-                                    </tr>
-                                ))}
-                                {/* --- BARIS SUBTOTAL BARU --- */}
-                                <tr className="subtotal-row">
-                                    <td colSpan="3">Subtotal</td>
-                                    <td style={{ textAlign: 'right' }}>
-                                        {formatCurrency(newAcquisitionsSubtotal)}
-                                    </td>
-                                </tr>
-                            </>
-                        ) : (
-                            <tr><td colSpan="4" style={{ textAlign: 'center' }}>Tidak ada pembelian baru pada periode ini.</td></tr>
-                        )}
-                    </tbody>
-                </table>
-                {/*Mobile View*/}
+                {/* Desktop View */}
+                <div className="table-scroll-container"> {/* Tambahkan div pembungkus ini */}
+                    <table className="job-table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Kode Unik</th>
+                                <th>Nama Barang</th>
+                                <th style={{ textAlign: 'right' }}>Nilai</th>
+                            </tr>
+                        </thead>
+                    </table>
+
+                    {/* Div ini yang akan di-scroll */}
+                    <div className="table-body-scroll">
+                        <table className="job-table">
+                            <tbody>
+                                {isLoading ? (
+                                    <tr><td colSpan="4" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
+                                ) : detailedData.new_acquisitions.length > 0 ? (
+                                    <>
+                                        {detailedData.new_acquisitions.map(item => (
+                                            <tr key={`new-${item.kode_unik}`} className="hoverable-row">
+                                                <td>{formatDate(item.tanggal_pembelian)}</td>
+                                                <td>{item.kode_unik}</td>
+                                                <td>{item.master_barang.nama_barang}</td>
+                                                <td style={{ textAlign: 'right' }}>{formatCurrency(parseFloat(item.harga_beli))}</td>
+                                            </tr>
+                                        ))}
+                                    </>
+                                ) : (
+                                    <tr><td colSpan="4" style={{ textAlign: 'center' }}>Tidak ada pembelian baru pada periode ini.</td></tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                    {detailedData.new_acquisitions.length > 0 && (
+                        <table className="job-table">
+                            <tfoot><tr className="subtotal-row">
+                                <td colSpan="3">Subtotal</td>
+                                <td style={{ textAlign: 'right' }}>
+                                    {formatCurrency(newAcquisitionsSubtotal)}
+                                </td>
+                            </tr></tfoot>
+                        </table>
+                    )}
+                </div>
+
+                {/* Mobile View  */}
                 <div className='job-list-mobile'>
-                    {/* Tampilkan pesan loading jika data sedang dimuat */}
                     {isLoading ? (
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
                             <p>Memuat data...</p>

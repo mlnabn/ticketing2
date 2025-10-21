@@ -5,6 +5,8 @@ import api from '../services/api';
 import Pagination from '../components/Pagination';
 import HistoryModal from '../components/HistoryModal';
 import { saveAs } from 'file-saver';
+import QrScannerModal from './QrScannerModal';
+
 
 function ItemHistoryLookupPage() {
     const { showToast } = useOutletContext();
@@ -16,10 +18,15 @@ function ItemHistoryLookupPage() {
     const [historyItem, setHistoryItem] = useState(null);
     const [exportingExcel, setExportingExcel] = useState(false);
     const [exportingPdf, setExportingPdf] = useState(false);
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
     const fetchData = useCallback(async (page = 1) => {
         setLoading(true);
         try {
-            const params = { page, search: debouncedSearchTerm };
+            const params = {
+                page,
+                search: debouncedSearchTerm,
+                has_history: true
+            };
             const res = await api.get('/inventory/stock-items', { params });
             setItems(res.data.data);
             setPagination(res.data);
@@ -38,7 +45,7 @@ function ItemHistoryLookupPage() {
         if (exportType === 'excel') setExportingExcel(true);
         else setExportingPdf(true);
 
-        const type = 'all_stock'; 
+        const type = 'all_stock';
 
         try {
             const params = {
@@ -74,11 +81,17 @@ function ItemHistoryLookupPage() {
             showToast(`Aset dengan kode "${code}" tidak ditemukan.`, 'error');
         }
     }, [showToast]);
+
+    const handleScanSuccess = (decodedText) => {
+        setIsScannerOpen(false); // 1. Tutup modal scanner
+        handleSearchAndShowHistory(decodedText); // 2. Panggil fungsi pencarian yang sudah ada
+    };
     useEffect(() => {
         let barcode = '';
         let interval;
         const handleKeyDown = (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            const isModalOpen = !!historyItem || isScannerOpen;
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || isModalOpen) return;
             if (typeof e.key !== 'string') return;
 
             if (interval) clearInterval(interval);
@@ -96,7 +109,7 @@ function ItemHistoryLookupPage() {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [handleSearchAndShowHistory]);
+    }, [handleSearchAndShowHistory, historyItem, isScannerOpen]);
 
 
     return (
@@ -117,6 +130,13 @@ function ItemHistoryLookupPage() {
                             <input type="date" className="filter-select-cal" />
                         </div>
                         <div className="download-buttons">
+                            <button onClick={() => setIsScannerOpen(true)} className="btn-scan">
+                                <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
+                                    <i className="fas fa-qrcode fa-stack-2x"></i>
+                                    <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
+                                </span>
+                                Scan QR
+                            </button>
                             <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
                                 <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
                                 {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
@@ -215,6 +235,13 @@ function ItemHistoryLookupPage() {
                     item={historyItem}
                     onClose={() => setHistoryItem(null)}
                     showToast={showToast}
+                />
+            )}
+
+            {isScannerOpen && (
+                <QrScannerModal
+                    onClose={() => setIsScannerOpen(false)}
+                    onScanSuccess={handleScanSuccess}
                 />
             )}
         </>
