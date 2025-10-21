@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useOutletContext } from 'react-router-dom'; 
+import { useOutletContext } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
@@ -7,6 +7,7 @@ import { useAuth } from '../AuthContext';
 import Pagination from './Pagination';
 import UserFormModal from './UserFormModal';
 import ConfirmationModal from './ConfirmationModal';
+import UserDetailModal from './UserDetailModal';
 
 export default function UserManagement() {
     const { showToast } = useOutletContext();
@@ -19,6 +20,7 @@ export default function UserManagement() {
     const [userToDelete, setUserToDelete] = useState(null);
     const [showUserFormModal, setShowUserFormModal] = useState(false);
     const [userToEdit, setUserToEdit] = useState(null);
+    const [detailUser, setDetailUser] = useState(null);
 
     const fetchUsers = useCallback(async (page, search) => {
         try {
@@ -44,7 +46,7 @@ export default function UserManagement() {
         try {
             await api.delete(`/users/${userToDelete.id}`);
             showToast(`User "${userToDelete.name}" berhasil dihapus.`, 'success');
-            fetchUsers(userPage, debouncedSearchTerm); 
+            fetchUsers(userPage, debouncedSearchTerm);
         } catch (e) {
             showToast('Gagal menghapus pengguna.', 'error');
         } finally {
@@ -52,7 +54,7 @@ export default function UserManagement() {
             setUserToDelete(null);
         }
     };
-    
+
     const handleAddUserClick = () => {
         setUserToEdit(null);
         setShowUserFormModal(true);
@@ -62,21 +64,29 @@ export default function UserManagement() {
         setUserToEdit(user);
         setShowUserFormModal(true);
     };
-    
+
     const handleSaveUser = async (formData) => {
         const isEditMode = Boolean(userToEdit);
         const url = isEditMode ? `/users/${userToEdit.id}` : '/users';
+        const method = isEditMode ? 'post' : 'post';
+
         try {
-          const res = await api.post(url, formData);
-          showToast(isEditMode ? `User "${res.data.name}" berhasil di-edit.` : 'User baru berhasil dibuat.', 'success');
-          fetchUsers(userPage, debouncedSearchTerm); 
-          setShowUserFormModal(false);
-          setUserToEdit(null);
+            const res = await api[method](url, formData);
+            showToast(isEditMode ? `User "${res.data.name}" berhasil di-edit.` : 'User baru berhasil dibuat.', 'success');
+            fetchUsers(userPage, debouncedSearchTerm);
+            setShowUserFormModal(false);
+            setUserToEdit(null);
         } catch (e) {
-          console.error('Gagal menyimpan pengguna:', e);
-          const msgs = e.response?.data?.errors ? Object.values(e.response.data.errors).flat().join('\n') : 'Gagal menyimpan pengguna.';
-          showToast(msgs, 'error');
+            console.error('Gagal menyimpan pengguna:', e);
+            const msgs = e.response?.data?.errors ? Object.values(e.response.data.errors).flat().join('\n') : 'Gagal menyimpan pengguna.';
+            showToast(msgs, 'error');
         }
+    };
+    const handleRowClick = (e, user) => {
+        if (e.target.tagName === 'BUTTON' || e.target.closest('.action-buttons-group')) {
+            return;
+        }
+        setDetailUser(user);
     };
 
     const users = userData ? userData.data : [];
@@ -85,12 +95,11 @@ export default function UserManagement() {
         <div className="user-management-container">
             <div className="user-management-container">
                 <h1 className="page-title">Manajemen Pengguna</h1>
-                
             </div>
             <button onClick={handleAddUserClick} className="btn-primary">
-                    <i className="fas fa-plus" style={{marginRight: '8px'}}></i>
-                    Tambah Pengguna
-                </button>
+                <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
+                Tambah Pengguna
+            </button>
             <div className="filters-container report-filters" style={{ margin: '20px 0' }}>
                 <input
                     type="text"
@@ -122,7 +131,7 @@ export default function UserManagement() {
                             </thead>
                             <tbody>
                                 {users.map((user, index) => (
-                                    <tr key={user.id} className="hoverable-row"> 
+                                    <tr key={user.id} className="hoverable-row" onClick={(e) => handleRowClick(e, user)}>
                                         <td>{userData.from + index}</td>
                                         <td>{user.name}</td>
                                         <td>{user.email}</td>
@@ -141,7 +150,8 @@ export default function UserManagement() {
 
                     <div className="user-list-mobile">
                         {users.map((user) => (
-                           <div key={user.id} className="ticket-card-mobile hoverable-row"> 
+                            // --- TAMBAHAN: onClick event ---
+                            <div key={user.id} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, user)}>
                                 <div className="card-row">
                                     <div className="data-group">
                                         <span className="label">NAMA</span>
@@ -159,10 +169,10 @@ export default function UserManagement() {
                                     </div>
                                 </div>
                                 <div className="action-row">
-                                <div className="action-buttons-group">
-                                    <button onClick={() => handleUserEditClick(user)} className="btn-edit">Edit</button>
-                                    <button onClick={() => handleUserDeleteClick(user)} className="btn-delete">Hapus</button>
-                                </div>
+                                    <div className="action-buttons-group">
+                                        <button onClick={() => handleUserEditClick(user)} className="btn-edit">Edit</button>
+                                        <button onClick={() => handleUserDeleteClick(user)} className="btn-delete">Hapus</button>
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -177,12 +187,17 @@ export default function UserManagement() {
                     )}
                 </>
             )}
-            
             {showUserFormModal && (
-              <UserFormModal userToEdit={userToEdit} onClose={() => { setShowUserFormModal(false); setUserToEdit(null); }} onSave={handleSaveUser} />
+                <UserFormModal userToEdit={userToEdit} onClose={() => { setShowUserFormModal(false); setUserToEdit(null); }} onSave={handleSaveUser} />
             )}
             {showUserConfirmModal && (
-              <ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete?.name}"?`} onConfirm={confirmUserDelete} onCancel={() => setShowUserConfirmModal(false)} />
+                <ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete?.name}"?`} onConfirm={confirmUserDelete} onCancel={() => setShowUserConfirmModal(false)} />
+            )}
+            {detailUser && (
+                <UserDetailModal
+                    user={detailUser}
+                    onClose={() => setDetailUser(null)}
+                />
             )}
         </div>
     );

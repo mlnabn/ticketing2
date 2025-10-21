@@ -50,14 +50,9 @@ Route::middleware('jwt')->group(function () {
     Route::put('/user', [AuthController::class, 'updateUser']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/admins', [UserController::class, 'getAdmins']);
-
-    // [PERBAIKAN] Rute spesifik '/users/all' sekarang didefinisikan SEBELUM apiResource.
     Route::get('/users/all', [UserController::class, 'all']);
-    
-    // Route manual untuk update menggunakan POST agar sesuai dengan frontend
     Route::post('/users/{user}', [UserController::class, 'update']);
-
-    // apiResource sekarang didefinisikan setelah rute spesifik
+    Route::get('/users/{user}/stats', [UserController::class, 'activityStats']);
     Route::apiResource('users', UserController::class)->except(['create', 'edit', 'update']);
 
     // --- Rute untuk Tiket ---
@@ -78,11 +73,12 @@ Route::middleware('jwt')->group(function () {
     Route::get('/tickets/report-stats', [TicketController::class, 'reportStats']);
     Route::get('/tickets/export', [TicketController::class, 'export']);
 
-    Route::get('/notifications', [NotificationController::class, 'index']); // Untuk user mengambil notif
+    // --- Rute untuk Notifikasi ---
+    Route::get('/notifications', [NotificationController::class, 'index']); 
     Route::apiResource('notification-templates', NotificationTemplateController::class);
     Route::get('/notifications/global', [NotificationController::class, 'getGlobalNotifications']);
-    Route::post('/notifications', [NotificationController::class, 'store']); // Untuk admin mengirim notif
-    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']); // Untuk user menandai sudah baca
+    Route::post('/notifications', [NotificationController::class, 'store']); 
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
 
     // Tambahkan rute untuk Analytics di dalam group ini

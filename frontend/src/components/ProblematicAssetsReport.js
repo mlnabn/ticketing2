@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useFinancialReport } from './useFinancialReport';
+import ProblematicAssetModal from './ProblematicAssetModal';
 
 export default function ProblematicAssetsReport() {
     const {
@@ -20,7 +21,8 @@ export default function ProblematicAssetsReport() {
     const [exportingPdf, setExportingPdf] = useState(false);
     const [exportingExcel, setExportingExcel] = useState(false);
 
-    // Ini sudah benar, menggunakan problematic_assets
+    const [selectedItem, setSelectedItem] = useState(null);
+
     const problematicAssetsSubtotal = detailedData.problematic_assets.reduce((sum, item) => sum + parseFloat(item.harga_beli), 0);
 
     const handleExportWrapper = async (type) => {
@@ -33,9 +35,15 @@ export default function ProblematicAssetsReport() {
         else setExportingExcel(false);
     };
 
+    const handleRowClick = (e, item) => {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('.action-buttons-group')) {
+            return;
+        }
+        setSelectedItem(item);
+    };
+
     return (
         <div className="user-management-container">
-            {/* Header, Filter, dan Tombol Download (Tidak berubah) */}
             <div className="report-header-controls">
                 <h1 className="page-title">Laporan Potensi Kerugian (Aset Rusak/Hilang)</h1>
             </div>
@@ -75,13 +83,9 @@ export default function ProblematicAssetsReport() {
                     {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
                 </button>
             </div>
-
-            {/* --- MULAI STRUKTUR TABEL DESKTOP YANG DIPERBAIKI --- */}
             <div className="job-list-container">
                 {/* Desktop View */}
                 <div className="table-scroll-container">
-
-                    {/* Tabel 1: Hanya Header (Fixed) */}
                     <table className="job-table">
                         <thead>
                             <tr>
@@ -95,7 +99,6 @@ export default function ProblematicAssetsReport() {
                         </thead>
                     </table>
 
-                    {/* Div 2: Hanya Body (Scrollable) */}
                     <div className="table-body-scroll">
                         <table className="job-table">
                             <tbody>
@@ -103,9 +106,8 @@ export default function ProblematicAssetsReport() {
                                     <tr><td colSpan="6" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
                                 ) : detailedData.problematic_assets.length > 0 ? (
                                     <>
-                                        {/* Render data yang BENAR: problematic_assets */}
                                         {detailedData.problematic_assets.map(item => (
-                                            <tr key={`prob-${item.kode_unik}`} className="hoverable-row">
+                                            <tr key={`prob-${item.kode_unik}`} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
                                                 <td>{formatDate(item.tanggal_rusak || item.tanggal_hilang)}</td>
                                                 <td>{item.kode_unik}</td>
                                                 <td>{item.master_barang.nama_barang}</td>
@@ -120,7 +122,6 @@ export default function ProblematicAssetsReport() {
                                                 </td>
                                             </tr>
                                         ))}
-                                        {/* Hapus baris subtotal dari sini */}
                                     </>
                                 ) : (
                                     <tr><td colSpan="6" style={{ textAlign: 'center' }}>Tidak ada aset bermasalah pada periode ini.</td></tr>
@@ -128,16 +129,12 @@ export default function ProblematicAssetsReport() {
                             </tbody>
                         </table>
                     </div>
-
-                    {/* Tabel 3: Hanya Footer/Subtotal (Fixed) */}
-                    {/* Cek data yang BENAR: problematic_assets.length */}
                     {detailedData.problematic_assets.length > 0 && (
                         <table className="job-table">
 
                             <tfoot><tr className="subtotal-row">
                                 <td colSpan="5">Subtotal</td>
                                 <td style={{ textAlign: 'right', color: 'var(--red-color)' }}>
-                                    {/* Tampilkan subtotal yang BENAR: problematicAssetsSubtotal */}
                                     ({formatCurrency(problematicAssetsSubtotal)})
                                 </td>
                             </tr></tfoot>
@@ -145,10 +142,9 @@ export default function ProblematicAssetsReport() {
                         </table>
                     )}
                 </div>
-                {/* --- SELESAI STRUKTUR TABEL DESKTOP --- */}
 
 
-                {/* Mobile View (Tidak berubah, sudah benar) */}
+                {/* Mobile View */}
                 <div className="job-list-mobile">
                     {isLoading ? (
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
@@ -157,8 +153,8 @@ export default function ProblematicAssetsReport() {
                     ) : detailedData.problematic_assets.length > 0 ? (
                         <>
                             {detailedData.problematic_assets.map(item => (
-                                <div key={`mobile-prob-${item.kode_unik}`} className="ticket-card-mobile hoverable-row">
-                                    {/* Baris 1: Nama Barang */}
+                                <div key={`mobile-prob-${item.kode_unik}`} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, item)}>
+
                                     <div className="card-row">
                                         <div className="data-group single">
                                             <span className="label">Nama Barang</span>
@@ -167,7 +163,7 @@ export default function ProblematicAssetsReport() {
                                             </span>
                                         </div>
                                     </div>
-                                    {/* Baris 2: Kode Unik & User Terkait */}
+
                                     <div className="card-row">
                                         <div className="data-group">
                                             <span className="label">Kode Unik</span>
@@ -178,7 +174,7 @@ export default function ProblematicAssetsReport() {
                                             <span className="value">{item.user_perusak?.name || item.user_penghilang?.name || 'N/A'}</span>
                                         </div>
                                     </div>
-                                    {/* Baris 3: Tanggal & Status */}
+
                                     <div className="card-row">
                                         <div className="data-group">
                                             <span className="label">Tanggal</span>
@@ -193,7 +189,7 @@ export default function ProblematicAssetsReport() {
                                             </span>
                                         </div>
                                     </div>
-                                    {/* Baris 4: Nilai Kerugian (Paling Penting) */}
+
                                     <div className="card-row value-row-financial">
                                         <div className="data-group single" style={{ textAlign: 'right' }}>
                                             <span className="label">Nilai Kerugian</span>
@@ -204,7 +200,7 @@ export default function ProblematicAssetsReport() {
                                     </div>
                                 </div>
                             ))}
-                            {/* Tampilkan Card untuk Subtotal di bagian bawah */}
+
                             <div className="subtotal-card-mobile">
                                 <span className="subtotal-label">Subtotal Potensi Kerugian</span>
                                 <span className="subtotal-value value-loss">
@@ -219,6 +215,14 @@ export default function ProblematicAssetsReport() {
                     )}
                 </div>
             </div>
+            {selectedItem && (
+                <ProblematicAssetModal
+                    item={selectedItem}
+                    onClose={() => setSelectedItem(null)}
+                    formatCurrency={formatCurrency}
+                    formatDate={formatDate}
+                />
+            )}
         </div>
     );
 }

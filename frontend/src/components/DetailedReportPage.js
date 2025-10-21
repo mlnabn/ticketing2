@@ -3,6 +3,7 @@ import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import Pagination from './Pagination';
 import { saveAs } from 'file-saver';
+import InventoryDetailModal from './InventoryDetailModal';
 
 const PaginationSummary = ({ pagination }) => {
     if (!pagination || pagination.total === 0) {
@@ -24,6 +25,7 @@ export default function DetailedReportPage({ type, title }) {
     const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
     const [exportingExcel, setExportingExcel] = useState(false);
     const [exportingPdf, setExportingPdf] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
 
     const fetchData = useCallback(async (page = 1) => {
         setLoading(true);
@@ -83,6 +85,15 @@ export default function DetailedReportPage({ type, title }) {
             day: '2-digit', month: 'long', year: 'numeric'
         });
     };
+    const formatCurrency = (value) => {
+        if (isNaN(value)) return 'Rp 0';
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(value);
+    };
 
     const getItemData = (item) => {
         // Untuk laporan 'in' dan 'available', data langsung ada di item.
@@ -106,6 +117,20 @@ export default function DetailedReportPage({ type, title }) {
             workshop: item.workshop?.name,
             current_status: item.stok_barang?.status_detail?.nama_status,
         };
+    };
+
+    const handleRowClick = (e, item) => {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('.action-buttons-group')) {
+            return;
+        }
+
+        const kodeUnik = (type === 'in' || type === 'available')
+            ? item.kode_unik
+            : item.stok_barang?.kode_unik;
+
+        if (kodeUnik) {
+            setSelectedItem(kodeUnik);
+        }
     };
 
     const dateHeaders = {
@@ -169,7 +194,7 @@ export default function DetailedReportPage({ type, title }) {
                         ) : data.length > 0 ? data.map(item => {
                             const itemData = getItemData(item);
                             return (
-                                <tr key={item.id} className="hoverable-row"> {/* <-- DITAMBAHKAN DI SINI */}
+                                <tr key={item.id} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
                                     <td>{itemData.kode_unik || '-'}</td>
                                     <td>{itemData.nama_barang || '-'}</td>
                                     <td>{itemData.status || '-'}</td>
@@ -193,16 +218,14 @@ export default function DetailedReportPage({ type, title }) {
                 </table>
                 {/* Mobile view */}
                 <div className="job-list-mobile">
-                    {/* Tampilkan pesan loading jika data sedang dimuat */}
                     {loading ? (
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
                             <p>Memuat data...</p>
                         </div>
                     ) : data.length > 0 ? data.map(item => {
-                        // Ambil data yang sudah diproses dari fungsi getItemData
                         const itemData = getItemData(item);
                         return (
-                            <div key={`mobile-detail-${item.id}`} className="ticket-card-mobile hoverable-row"> {/* <-- DITAMBAHKAN DI SINI */}
+                            <div key={`mobile-detail-${item.id}`} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, item)}>
                                 {/* Baris 1: Informasi Utama (Nama Barang) */}
                                 <div className="card-row">
                                     <div className="data-group single">
@@ -267,6 +290,15 @@ export default function DetailedReportPage({ type, title }) {
                     />
                 )}
             </div>
+            {selectedItem && (
+                <InventoryDetailModal
+                    kodeUnik={selectedItem}
+                    onClose={() => setSelectedItem(null)}
+                    formatDate={formatDate}
+                    formatCurrency={formatCurrency}
+                />
+            )}
         </div>
+
     );
 }

@@ -3,8 +3,8 @@ import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import Pagination from '../components/Pagination';
 import { saveAs } from 'file-saver';
+import ActiveLoanDetailModal from './ActiveLoanDetailModal';
 
-// Komponen PaginationSummary tetap sama
 const PaginationSummary = ({ pagination }) => {
     if (!pagination || pagination.total === 0) return null;
     return (
@@ -21,10 +21,9 @@ export default function ActiveLoanReportPage() {
     const [filters, setFilters] = useState({ start_date: '', end_date: '' });
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
-
+    const [selectedItem, setSelectedItem] = useState(null);
     const [exportingExcel, setExportingExcel] = useState(false);
     const [exportingPdf, setExportingPdf] = useState(false);
-
     const type = 'active_loans';
     const title = 'Laporan Peminjaman Aktif';
 
@@ -48,6 +47,13 @@ export default function ActiveLoanReportPage() {
 
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleRowClick = (e, item) => {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('.action-buttons-group')) {
+            return;
+        }
+        setSelectedItem(item);
     };
 
     const handleExport = async (exportType) => {
@@ -157,7 +163,7 @@ export default function ActiveLoanReportPage() {
                         ) : data.length > 0 ? data.map(item => {
                             const duration = calculateDuration(item.tanggal_keluar);
                             return (
-                                <tr key={item.id} className="hoverable-row">
+                                <tr key={item.id} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
                                     <td>{item.kode_unik || '-'}</td>
                                     <td>{item.master_barang?.nama_barang || '-'}</td>
                                     <td>{item.status_detail?.nama_status || '-'}</td>
@@ -180,7 +186,7 @@ export default function ActiveLoanReportPage() {
                         data.map(item => {
                             const duration = calculateDuration(item.tanggal_keluar);
                             return (
-                                <div key={item.id} className="ticket-card-mobile hoverable-row">
+                                <div key={item.id} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, item)}>
                                     <div className="card-row">
                                         <div className="data-group single">
                                             <span className="label">Nama Barang</span>
@@ -221,9 +227,6 @@ export default function ActiveLoanReportPage() {
                                             </span>
                                         </div>
                                     </div>
-
-                                    {/* Tidak ada baris aksi untuk laporan ini */}
-
                                 </div>
                             );
                         })
@@ -245,6 +248,14 @@ export default function ActiveLoanReportPage() {
                     />
                 )}
             </div>
+            {selectedItem && (
+                <ActiveLoanDetailModal
+                    item={selectedItem}
+                    onClose={() => setSelectedItem(null)}
+                    formatDate={formatDate}
+                    calculateDuration={calculateDuration}
+                />
+            )}
         </div>
     );
 }

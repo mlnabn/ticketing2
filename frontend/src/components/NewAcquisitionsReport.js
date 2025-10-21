@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useFinancialReport } from './useFinancialReport'; // Import custom hook
+import { useFinancialReport } from './useFinancialReport';
+import AcquisitionDetailModal from './AcquisitionDetailModal';
 
 export default function NewAcquisitionsReport() {
-    // Gunakan hook untuk mendapatkan semua state dan logika
     const {
         detailedData,
         filters,
@@ -20,9 +20,8 @@ export default function NewAcquisitionsReport() {
 
     const [exportingPdf, setExportingPdf] = useState(false);
     const [exportingExcel, setExportingExcel] = useState(false);
-
+    const [selectedItem, setSelectedItem] = useState(null);
     const newAcquisitionsSubtotal = detailedData.new_acquisitions.reduce((sum, item) => sum + parseFloat(item.harga_beli), 0);
-
     const handleExportWrapper = async (type) => {
         if (type === 'pdf') setExportingPdf(true);
         else setExportingExcel(true);
@@ -33,13 +32,18 @@ export default function NewAcquisitionsReport() {
         else setExportingExcel(false);
     };
 
+    const handleRowClick = (e, item) => {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('.action-buttons-group')) {
+            return;
+        }
+        setSelectedItem(item);
+    };
+
     return (
         <div className="user-management-container">
             <div className="report-header-controls">
                 <h1 className="page-title">Laporan Pembelian Baru (Aset Masuk)</h1>
             </div>
-
-            {/* Filter & Export (UI diambil dari file lama) */}
             <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
                 <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
                     <option value="month">Filter per Bulan</option>
@@ -78,7 +82,7 @@ export default function NewAcquisitionsReport() {
             {/* Tabel Pembelian Baru */}
             <div className="job-list-container">
                 {/* Desktop View */}
-                <div className="table-scroll-container"> {/* Tambahkan div pembungkus ini */}
+                <div className="table-scroll-container">
                     <table className="job-table">
                         <thead>
                             <tr>
@@ -89,8 +93,6 @@ export default function NewAcquisitionsReport() {
                             </tr>
                         </thead>
                     </table>
-
-                    {/* Div ini yang akan di-scroll */}
                     <div className="table-body-scroll">
                         <table className="job-table">
                             <tbody>
@@ -99,7 +101,7 @@ export default function NewAcquisitionsReport() {
                                 ) : detailedData.new_acquisitions.length > 0 ? (
                                     <>
                                         {detailedData.new_acquisitions.map(item => (
-                                            <tr key={`new-${item.kode_unik}`} className="hoverable-row">
+                                            <tr key={`new-${item.kode_unik}`} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
                                                 <td>{formatDate(item.tanggal_pembelian)}</td>
                                                 <td>{item.kode_unik}</td>
                                                 <td>{item.master_barang.nama_barang}</td>
@@ -133,10 +135,8 @@ export default function NewAcquisitionsReport() {
                         </div>
                     ) : detailedData.new_acquisitions.length > 0 ? (
                         <>
-                            {/* Loop melalui setiap item pembelian baru dan buat card */}
                             {detailedData.new_acquisitions.map(item => (
-                                <div key={`mobile-new-${item.kode_unik}`} className="ticket-card-mobile hoverable-row">
-                                    {/* Baris 1: Nama Barang */}
+                                <div key={`mobile-new-${item.kode_unik}`} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, item)}>
                                     <div className="card-row">
                                         <div className="data-group single">
                                             <span className="label">Nama Barang</span>
@@ -145,8 +145,6 @@ export default function NewAcquisitionsReport() {
                                             </span>
                                         </div>
                                     </div>
-
-                                    {/* Baris 2: Kode Unik & Tanggal Beli */}
                                     <div className="card-row">
                                         <div className="data-group">
                                             <span className="label">Kode Unik</span>
@@ -157,8 +155,6 @@ export default function NewAcquisitionsReport() {
                                             <span className="value">{formatDate(item.tanggal_pembelian)}</span>
                                         </div>
                                     </div>
-
-                                    {/* Baris 3: Nilai Pembelian (Paling Penting) */}
                                     <div className="card-row value-row-financial">
                                         <div className="data-group single" style={{ textAlign: 'right' }}>
                                             <span className="label">Nilai Pembelian</span>
@@ -169,8 +165,6 @@ export default function NewAcquisitionsReport() {
                                     </div>
                                 </div>
                             ))}
-
-                            {/* Tampilkan Card untuk Subtotal di bagian bawah */}
                             <div className="subtotal-card-mobile acquisition-subtotal">
                                 <span className="subtotal-label">Subtotal Pembelian</span>
                                 <span className="subtotal-value value-acquisition">
@@ -179,12 +173,19 @@ export default function NewAcquisitionsReport() {
                             </div>
                         </>
                     ) : (
-                        // Tampilkan pesan jika tidak ada data
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
                             <p>Tidak ada pembelian baru pada periode ini.</p>
                         </div>
                     )}
                 </div>
+                {selectedItem && (
+                    <AcquisitionDetailModal
+                        item={selectedItem}
+                        onClose={() => setSelectedItem(null)}
+                        formatCurrency={formatCurrency}
+                        formatDate={formatDate}
+                    />
+                )}
             </div>
         </div>
     );

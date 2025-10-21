@@ -55,17 +55,17 @@ class StokBarangController extends Controller
         if ($request->filled('search')) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
-                // Cari di kolom tabel stok_barangs
+
                 $q->where('kode_unik', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('serial_number', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('kondisi', 'LIKE', "%{$searchTerm}%");
 
-                // Cari di relasi masterBarang (untuk nama barang)
+
                 $q->orWhereHas('masterBarang', function ($q2) use ($searchTerm) {
                     $q2->where('nama_barang', 'LIKE', "%{$searchTerm}%");
                 });
 
-                // Cari di relasi createdBy (untuk nama admin)
+
                 $q->orWhereHas('createdBy', function ($q3) use ($searchTerm) {
                     $q3->where('name', 'LIKE', "%{$searchTerm}%");
                 });
@@ -80,7 +80,6 @@ class StokBarangController extends Controller
 
     public function show(StokBarang $stokBarang)
     {
-        // Muat semua relasi yang diperlukan oleh frontend
         return response()->json($stokBarang->load([
             'masterBarang.masterKategori',
             'masterBarang.subKategori',
@@ -107,7 +106,6 @@ class StokBarangController extends Controller
             'id_warna' => 'nullable|exists:colors,id_warna',
         ]);
 
-        // PERBAIKAN 2: Tambahkan ID admin yang melakukan update
         $validated['updated_by'] = Auth::id();
 
         $stokBarang->update($validated);
@@ -117,13 +115,17 @@ class StokBarangController extends Controller
 
     public function showBySerial($code)
     {
-        // PERBAIKAN: Tambahkan with() untuk memuat relasi saat mencari via serial number
+        
         $item = StokBarang::with([
             'masterBarang.masterKategori',
             'masterBarang.subKategori',
             'userPeminjam',
             'workshop',
-            'statusDetail'
+            'statusDetail',
+            'color',
+            'createdBy',
+            'userPerusak',
+            'userPenghilang'
         ])
             ->where('kode_unik', $code)
             ->orWhere('serial_number', $code)
@@ -214,12 +216,12 @@ class StokBarangController extends Controller
         $status = \App\Models\Status::find($validated['status_id']);
 
         DB::transaction(function () use ($stokBarang, $validated, $status, $request) {
-            // --- 1. LOGIKA BARU: Tentukan Tanggal Kejadian ---
+
             $eventDate = null;
             switch ($status->nama_status) {
                 case 'Digunakan':
                 case 'Dipinjam':
-                    // [PERBAIKAN 2] Gunakan logika yang sama seperti status lain
+
                     $eventDate = $request->filled('tanggal_keluar') ? Carbon::parse($validated['tanggal_keluar']) : now();
                     break;
                 case 'Perbaikan':
@@ -260,7 +262,7 @@ class StokBarangController extends Controller
                 $updateData[$col] = null;
             }
 
-            // --- 3. PENGISIAN DATA DENGAN TANGGAL KEJADIAN ---
+
             switch ($status->nama_status) {
                 case 'Digunakan':
                 case 'Dipinjam':
@@ -286,7 +288,7 @@ class StokBarangController extends Controller
 
             $stokBarang->update($updateData);
 
-            // --- 4. PERSIAPAN DATA RIWAYAT ---
+
             $relatedUserId = null;
             switch ($status->nama_status) {
                 case 'Digunakan':
@@ -304,15 +306,13 @@ class StokBarangController extends Controller
                     break;
             }
 
-            // --- 5. PEMBUATAN RIWAYAT DENGAN TANGGAL KUSTOM ---
+
             $historyData = [
                 'status_id' => $validated['status_id'],
                 'deskripsi' => $validated['deskripsi'] ?? null,
                 'triggered_by_user_id' => Auth::id(),
                 'related_user_id' => $relatedUserId,
                 'workshop_id' => $validated['workshop_id'] ?? null,
-                // 'created_at' => $eventDate,
-                // 'updated_at' => $eventDate,
                 'event_date' => $eventDate,
             ];
 
@@ -342,12 +342,11 @@ class StokBarangController extends Controller
         return response()->json($history);
     }
 
-    // Helper untuk validasi custom (tambahkan ini di file yang sama)
     public function __construct()
     {
         \Illuminate\Support\Facades\Validator::extend('required_if_status', function ($attribute, $value, $parameters, $validator) {
             $statusId = $validator->getData()['status_id'] ?? null;
-            if (!$statusId) return true; // Lewati jika tidak ada status_id
+            if (!$statusId) return true; 
 
             $status = \App\Models\Status::find($statusId);
             if ($status && in_array($status->nama_status, $parameters)) {
@@ -392,7 +391,7 @@ class StokBarangController extends Controller
                         $q->where('nama_barang', 'like', $searchTerm);
                     });
             })
-            ->limit(10) // Batasi hasil agar dropdown tidak terlalu panjang
+            ->limit(10) 
             ->get();
 
         return response()->json($results);

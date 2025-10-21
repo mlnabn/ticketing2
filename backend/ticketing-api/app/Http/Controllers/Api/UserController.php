@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use App\Models\Ticket;
 
 class UserController extends Controller
 {
@@ -16,18 +17,18 @@ class UserController extends Controller
         $query = User::query();
 
         if ($search) {
-        $query->where(function ($q) use ($search) {
-            $q->where('name', 'like', '%' . $search . '%')
-              ->orWhere('email', 'like', '%' . $search . '%')
-              ->orWhere('role', 'like', '%' . $search . '%');
-        });
-    }
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('role', 'like', '%' . $search . '%');
+            });
+        }
 
         if ($request->has('all')) {
             return $query->get();
         }
 
-        $perPage = $request->query('per_page', 10); // Default 10 user per halaman
+        $perPage = $request->query('per_page', 10);
         $users = $query->orderBy('role', 'asc')->orderBy('name', 'asc')->paginate($perPage);
         return response()->json($users);
     }
@@ -40,10 +41,9 @@ class UserController extends Controller
 
     public function all()
     {
-        // DIUBAH: Tambahkan ->where('role', 'user') untuk hanya mengambil user biasa.
         $users = User::where('role', 'user')
-                    ->orderBy('name')
-                    ->get();
+            ->orderBy('name')
+            ->get();
 
         return response()->json($users);
     }
@@ -63,77 +63,75 @@ class UserController extends Controller
             'email'    => $validated['email'],
             'phone'    => $validated['phone'],
             'password' => bcrypt($validated['password']),
-            'role'     => $validated['role'], 
+            'role'     => $validated['role'],
         ]);
 
         return response()->json($user, 201);
     }
 
-    /**
-     * (BARU) Menampilkan data satu pengguna.
-     */
     public function show(User $user)
     {
-        // Pastikan hanya admin yang bisa mengakses
         if (auth()->user()->role !== 'admin') {
             return response()->json(['error' => 'Akses ditolak.'], 403);
         }
         return response()->json($user);
     }
 
-    /**
-     * (BARU) Memperbarui data pengguna.
-     */
+
     public function update(Request $request, User $user)
     {
-        // Otorisasi: Pastikan hanya admin yang bisa mengakses
         if (auth()->user()->role !== 'admin') {
             return response()->json(['error' => 'Akses ditolak.'], 403);
         }
-
-        // Validasi data yang masuk
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            // Pastikan email unik, kecuali untuk user yang sedang diedit
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'phone' => ['nullable', 'string', 'min:10', Rule::unique('users')->ignore($user->id)],
-            // Password bersifat opsional: hanya divalidasi jika tidak kosong
             'password' => 'nullable|string|min:8|confirmed',
             'role' => 'required|in:admin,user',
         ]);
-
-        // Update data nama dan email
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->phone = $validated['phone'];
         $user->role = $validated['role'];
-
-        // Jika field password diisi oleh admin, maka hash dan update passwordnya
         if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }
-
-        // Simpan perubahan ke database
         $user->save();
-
         return response()->json($user);
     }
-    /**
-     * (BARU) Menghapus pengguna.
-     */
+    
     public function destroy(User $user)
     {
         if (auth()->user()->role !== 'admin') {
             return response()->json(['error' => 'Akses ditolak.'], 403);
         }
-        
-        // Tambahan: Jangan biarkan admin menghapus dirinya sendiri
         if ($user->id === auth()->id()) {
             return response()->json(['error' => 'Anda tidak bisa menghapus akun Anda sendiri.'], 403);
         }
-
         $user->delete();
-
         return response()->json(null, 204);
+    }
+
+    public function activityStats(User $user)
+    {
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'Akses ditolak.'], 403);
+        }
+        $totalTicketsCreated = Ticket::where('creator_id', $user->id)->count();
+        $assetsBorrowed = $user->stokBarangDipinjam()->count();
+        $adminStats = [];
+        if ($user->role === 'admin') {
+            $adminStats['total_tickets_completed'] = Ticket::where('user_id', $user->id)
+                ->where('status', 'Selesai')
+                ->count();
+            $adminStats['total_tickets_in_progress'] = Ticket::where('user_id', $user->id)
+                ->whereIn('status', ['Sedang Dikerjakan', 'Ditunda'])
+                ->count();
+        }
+        return response()->json(array_merge([
+            'total_tickets_created' => $totalTicketsCreated,
+            'assets_currently_borrowed' => $assetsBorrowed,
+        ], $adminStats));
     }
 }
