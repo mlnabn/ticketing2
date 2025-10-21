@@ -60,11 +60,7 @@ function ActiveLoanDetailModal({ item, onClose, formatDate, calculateDuration })
                             <div className="detail-grid-section">
                                 <div className="detail-item-full">
                                     <span className="label">Status</span>
-                                    <span className="value">
-                                        <span className={`status-badge status-${fullDetail.status_detail?.nama_status.toLowerCase()}`}>
-                                            {fullDetail.status_detail?.nama_status}
-                                        </span>
-                                    </span>
+                                    <span className="value">{fullDetail.status_detail?.nama_status || '-'}</span>
                                 </div>
                                 <div className="detail-item-full">
                                     <span className="label">Peminjam</span>
@@ -88,9 +84,9 @@ function ActiveLoanDetailModal({ item, onClose, formatDate, calculateDuration })
                                 </div> */}
                                 <div className="detail-item-full" data-span="2">
                                     <span className="label">Keperluan / Deskripsi</span>
-                                    <p className="value" style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
+                                    <span className="value" style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
                                         {fullDetail.deskripsi || '(Tidak ada keterangan)'}
-                                    </p>
+                                    </span>
                                 </div>
                             </div>
                         </>

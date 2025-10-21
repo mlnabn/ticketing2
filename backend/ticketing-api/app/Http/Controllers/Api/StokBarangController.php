@@ -125,7 +125,8 @@ class StokBarangController extends Controller
             'color',
             'createdBy',
             'userPerusak',
-            'userPenghilang'
+            'userPenghilang',
+            'teknisiPerbaikan'
         ])
             ->where('kode_unik', $code)
             ->orWhere('serial_number', $code)

@@ -98,7 +98,7 @@ function HistoryModal({ item, onClose, showToast }) {
                 </div>
 
                 <div className="modal-actions">
-                    <button onClick={onClose} className="btn-confirm">Tutup</button>
+                    <button onClick={onClose} className="btn-cancel">Tutup</button>
                 </div>
             </div>
         </div>

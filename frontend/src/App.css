@@ -2996,74 +2996,53 @@ body.dark-mode .status-ditolak {
   /* Merah terang */
 }
 
-/* ADD USER PAGE */
-
 /* src/components/AddUser.css */
 
 .add-user-container {
   padding: 24px;
   font-family: 'Inter', sans-serif;
   max-width: 600px;
-  /* Ditambahkan dari instruksi sebelumnya */
   margin: 2rem auto;
-  /* Ditambahkan dari instruksi sebelumnya */
   background-color: var(--content-bg-light);
-  /* Background kontainer di light mode */
   border-radius: 12px;
-  /* Ditambahkan dari instruksi sebelumnya */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
-  /* Shadow lembut */
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  /* Ditambahkan transisi */
 }
 
 body.dark-mode .add-user-container {
   background-color: var(--content-bg-dark);
-  /* Background kontainer di dark mode */
 }
 
 .add-user-title {
   font-size: 1.5rem;
-  /* 24px */
   font-weight: 700;
   margin-bottom: 24px;
   color: var(--text-color-dashboard-light);
-  /* Menggunakan variabel tema */
   text-align: center;
   transition: color 0.3s ease;
-  /* Ditambahkan transisi */
 }
 
 body.dark-mode .add-user-title {
   color: var(--text-color-dashboard-dark);
-  /* Menggunakan variabel tema */
 }
 
 .add-user-form {
   background-color: var(--content-bg-light);
-  /* Menggunakan variabel tema */
   padding: 24px 32px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   max-width: 500px;
   margin: 0 auto;
   transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-  /* Ditambahkan transisi */
   display: flex;
-  /* Ditambahkan dari instruksi sebelumnya */
   flex-direction: column;
-  /* Ditambahkan dari instruksi sebelumnya */
   gap: 1.5rem;
-  /* Ditambahkan dari instruksi sebelumnya */
   border: 1px solid var(--border-color-light);
-  /* Menyesuaikan border */
 }
 
 body.dark-mode .add-user-form {
   background-color: #1f2937;
-  /* Warna abu-abu gelap, sesuai tema */
   border: 1px solid #374151;
-  /* Warna border di dark mode */
 }
 
 .form-group {
@@ -3073,48 +3052,37 @@ body.dark-mode .add-user-form {
 .form-label {
   display: block;
   color: var(--text-color-light);
-  /* Menggunakan variabel tema */
   font-size: 0.875rem;
   /* 14px */
   font-weight: 700;
   margin-bottom: 8px;
   transition: color 0.3s ease;
-  /* Ditambahkan transisi */
 }
 
 body.dark-mode .form-label {
   color: #d1d5db;
-  /* Abu-abu terang */
 }
 
 .form-input {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--border-color-light);
-  /* Menggunakan variabel tema */
   border-radius: 6px;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
   background-color: var(--input-bg-light);
-  /* Menggunakan variabel tema */
   color: var(--text-color-light);
-  /* Menggunakan variabel tema */
   transition: border-color 0.2s, background-color 0.3s, color 0.3s, box-shadow 0.2s;
-  /* Ditambahkan box-shadow transisi */
 }
 
 body.dark-mode .form-input {
   background-color: #374151;
-  /* Warna input lebih gelap */
   border-color: #4b5563;
-  /* Warna border gelap */
   color: #f9fafb;
-  /* Warna teks input menjadi putih */
 }
 
 .form-input:focus {
   outline: none;
   border-color: #2563eb;
-  /* Biru */
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 
@@ -3126,7 +3094,6 @@ body.dark-mode .form-input {
 
 .submit-btn {
   background-color: #3b82f6;
-  /* Biru primer */
   color: white;
   font-weight: 700;
   padding: 10px 20px;
@@ -3134,18 +3101,13 @@ body.dark-mode .form-input {
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
-  /* Ditambahkan transisi */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-  /* Shadow default */
 }
 
 .submit-btn:hover {
   background-color: #2563eb;
-  /* Biru lebih gelap */
   transform: translateY(-1px);
-  /* Efek terangkat minimal */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  /* Bayangan saat hover */
 }
 
 /* Untuk pesan error dan sukses */
@@ -3156,7 +3118,6 @@ body.dark-mode .form-input {
   font-size: 0.875rem;
   border: 1px solid transparent;
   transition: all 0.3s ease;
-  /* Ditambahkan transisi */
 }
 
 .success-message {
@@ -3173,7 +3134,6 @@ body.dark-mode .form-input {
 
 .error-list {
   color: #ef4444;
-  /* Merah */
   font-size: 0.8rem;
   margin-top: 4px;
 }
@@ -3190,7 +3150,6 @@ body.dark-mode .form-input {
 
 .dark-mode .add-user-form {
   background-color: #1f2937;
-  /* Warna abu-abu gelap, sesuai tema */
   border: 1px solid #374151;
 }
 
@@ -3201,19 +3160,15 @@ body.dark-mode .form-input {
 
 .dark-mode .form-input {
   background-color: #374151;
-  /* Warna input lebih gelap */
   border-color: #4b5563;
   color: #f9fafb;
-  /* ✅ INI FIX UTAMA: Warna teks input menjadi putih */
 }
 
 .dark-mode .form-input:focus {
   border-color: #60a5fa;
-  /* Biru terang */
   box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
 }
 
-/* Umpan balik untuk dark mode */
 .dark-mode .success-message {
   background-color: #052e16;
   color: #a7f3d0;
@@ -8460,6 +8415,14 @@ body.dark-mode .dashboard-card h4 {
 
 .status-belum-dikerjakan {
   border-left-color: #2196f3;
+}
+
+.detail-item-full .value .status-badge {
+  font-size: 1rem;
+  align-items: left;
+  text-align: left;
+  margin-left: 0;
+  padding-left: 0;
 }
 
 .legend-item2 {

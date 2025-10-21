@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api'; // Pastikan path ini benar
+import api from '../services/api';
 
-// Ambil helper format dari komponen induk
+
 function InventoryDetailModal({ kodeUnik, onClose, formatDate, formatCurrency }) {
     const [fullDetail, setFullDetail] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +43,7 @@ function InventoryDetailModal({ kodeUnik, onClose, formatDate, formatCurrency })
     // Helper untuk menampilkan info dinamis berdasarkan status
     const renderDynamicInfo = (detail) => {
         const status = detail.status_detail?.nama_status;
-
+        console.log("Status yang diterima:", status);
         switch (status) {
             case 'Dipinjam':
             case 'Digunakan':
@@ -51,9 +51,9 @@ function InventoryDetailModal({ kodeUnik, onClose, formatDate, formatCurrency })
                     <div className="detail-grid-section">
                         <div className="detail-item-full">
                             <span className="label">Status Saat Ini</span>
-                            <span className="value">
-                                <span className={`status-badge status-${status.toLowerCase()}`}>{status}</span>
-                            </span>
+                            <span className="value">{fullDetail.status_detail?.nama_status || '-'}</span>
+
+                           
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Peminjam</span>
@@ -69,7 +69,7 @@ function InventoryDetailModal({ kodeUnik, onClose, formatDate, formatCurrency })
                         </div>
                         <div className="detail-item-full" data-span="2">
                             <span className="label">Keperluan / Deskripsi</span>
-                            <p className="value">{detail.deskripsi || '-'}</p>
+                            <span className="value">{detail.deskripsi || '-'}</span>
                         </div>
                     </div>
                 );
@@ -92,7 +92,7 @@ function InventoryDetailModal({ kodeUnik, onClose, formatDate, formatCurrency })
                         </div>
                         <div className="detail-item-full" data-span="2">
                             <span className="label">Keterangan</span>
-                            <p className="value">{detail.deskripsi || '-'}</p>
+                            <span className="value">{detail.deskripsi || '-'}</span>
                         </div>
                     </div>
                 );
@@ -115,10 +115,34 @@ function InventoryDetailModal({ kodeUnik, onClose, formatDate, formatCurrency })
                         </div>
                         <div className="detail-item-full" data-span="2">
                             <span className="label">Keterangan</span>
-                            <p className="value">{detail.deskripsi || '-'}</p>
+                            <span className="value">{detail.deskripsi || '-'}</span>
                         </div>
                     </div>
                 );
+            case 'Perbaikan':
+                return (
+                    <div className="detail-grid-section">
+                        <div className="detail-item-full">
+                            <span className="label">Status Saat Ini</span>
+                            <span className="value">
+                                <span className={`status-badge status-perbaikan`}>Perbaikan</span>
+                            </span>
+                        </div>
+                        <div className="detail-item-full">
+                            <span className="label">Teknisi Terkait</span>
+                            <span className="value">{detail.teknisi_perbaikan?.name || '-'}</span>
+                        </div>
+                        <div className="detail-item-full">
+                            <span className="label">Tanggal Mulai Perbaikan</span>
+                            <span className="value">{formatDate(detail.tanggal_mulai_perbaikan)}</span>
+                        </div>
+                        <div className="detail-item-full" data-span="2">
+                            <span className="label">Keterangan</span>
+                            <span className="value">{detail.deskripsi || '-'}</span>
+                        </div>
+                    </div>
+                );
+
             case 'Tersedia':
             default:
                 return (
@@ -141,7 +165,7 @@ function InventoryDetailModal({ kodeUnik, onClose, formatDate, formatCurrency })
                 );
         }
     };
-
+    
     return (
         <div className="modal-backdrop-detail">
             <div className="modal-content-detail">
