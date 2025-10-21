@@ -2636,7 +2636,6 @@ body.dark-mode .job-table tbody tr:last-child td {
 
 /* Container untuk tabel yang bisa di-scroll */
 .table-scroll-container {
-    border: 1px solid #ddd; 
     border-radius: 8px;
     overflow: hidden; 
 }
