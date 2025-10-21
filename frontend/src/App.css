@@ -2399,12 +2399,9 @@ button.btn-pause {
   background-color: #C0392B;
 }
 
-/*
-  ---------------------------------------------------
-  GAYA JOB LIST (TABEL TIKET)
-  ---------------------------------------------------
-  Gaya untuk tabel daftar tiket.
-*/
+/* ======================================= */
+/* === GAYA JOB LIST (TABEL TIKET) === */
+/* ======================================= */
 
 /* --- Gaya Dasar Tabel --- */
 .job-table {
@@ -2417,19 +2414,6 @@ button.btn-pause {
   margin-top: 1.5rem;
 }
 
-/* [DIUBAH] Gaya dasar tabel untuk dark mode */
-body.dark-mode .job-table {
-  width: 100%;
-  border-collapse: separate;
-  box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.5);
-  background-color: transparent;
-  border: 1px solid var(--border-color-dark, #2D3748);
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-}
-
-
 /* --- Gaya Sel Umum (th & td) --- */
 .job-table th,
 .job-table td {
@@ -2437,17 +2421,9 @@ body.dark-mode .job-table {
   text-align: left;
   border-bottom: 1px solid #e2e8f0;
   color: #1e293b;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease, color 0.2s ease; /* Transisi untuk hover */
   font-size: 15px;
   vertical-align: middle;
-}
-
-body.dark-mode .job-table td {
-  border-bottom: 1px solid var(--border-color-dark, #2D3748);
-  border-right: 1px solid var(--border-color-dark, #2D3748);
-  color: #E0E1E2;
-  vertical-align: middle;
-  background-color: transparent;
 }
 
 /* --- Gaya Header Tabel (th) --- */
@@ -2458,29 +2434,114 @@ body.dark-mode .job-table td {
   text-transform: uppercase;
   color: var(--joblist-header-text-light);
   border-bottom: 2px solid #e2e8f0;
-  border-right: 1px solid var(--border-color-dark, #2D3748);
+  border-right: 1px solid #e2e8f0; /* Border kanan header light mode */
+}
+.job-table thead th:last-child {
+  border-right: none; /* Hapus border kanan pada header terakhir */
+}
+
+/* --- Gaya Badan Tabel (tbody) --- */
+
+/* Menengahkan teks di kolom Waktu Pengerjaan */
+.job-table tbody tr td:nth-child(7) {
+  text-align: center;
+}
+
+/* Zebra Striping (Light Mode) - Akan ditimpa oleh .urgent-row */
+.job-table tbody tr:nth-child(even) td {
+  background-color: #f8f9fa;
+}
+
+/* Efek Hover (Light Mode) - Akan ditimpa oleh hover .urgent-row */
+.job-table tbody tr:not(.urgent-row):hover td { /* Hanya berlaku jika BUKAN urgent */
+  background-color: #f1f5f9; /* Warna hover abu-abu terang */
 }
 
 /* ======================================= */
-/* FIX UNTUK TAMPILAN DESKTOP (TABEL)      */
+/* === DARK MODE STYLES (TABEL TIKET) === */
 /* ======================================= */
-.job-table tbody tr.urgent-row {
-  background-color: #fcf8e3 ;
-  color: #333 ;
+
+body.dark-mode .job-table {
+  background-color: transparent;
+  border: 1px solid var(--border-color-dark, #2D3748);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border-collapse: separate; /* Perlu agar border radius terlihat */
+  border-spacing: 0; /* Hapus spasi antar sel jika menggunakan separate */
 }
-.dark-mode .job-table tbody tr.urgent-row {
-  background-color: #4a411a ;
-  color: #f0f0f0 ;
+
+body.dark-mode .job-table th,
+body.dark-mode .job-table td {
+  color: #E0E1E2;
+  border-bottom: 1px solid var(--border-color-dark, #2D3748);
 }
+
+body.dark-mode .job-table th {
+  background-color: transparent;
+  color: #8A919E;
+  border-right: 1px solid var(--border-color-dark, #2D3748); /* Border kanan header dark mode */
+}
+body.dark-mode .job-table thead th:last-child {
+  border-right: none; /* Hapus border kanan pada header terakhir dark mode */
+}
+
+body.dark-mode .job-table td {
+   background-color: transparent;
+   border-right: none; /* Umumnya tidak perlu border kanan pada sel data */
+}
+
+/* Zebra Striping (Dark Mode) - Dihapus/Tidak Efektif karena background transparan */
+body.dark-mode .job-table tbody tr:nth-child(even) td {
+   background-color: transparent; /* Pastikan tetap transparan */
+}
+
+/* Efek Hover (Dark Mode) - Akan ditimpa oleh hover .urgent-row */
+body.dark-mode .job-table tbody tr:not(.urgent-row):hover td { /* Hanya berlaku jika BUKAN urgent */
+  background-color: rgba(45, 55, 72, 0.5) !important; /* Warna hover abu-biru gelap */
+}
+
+body.dark-mode .job-table tbody tr:last-child td {
+  border-bottom: none; /* Hapus border bawah pada baris terakhir dark mode */
+}
+
+/* ========================================== */
+/* === PERBAIKAN: URGENT ROW HIGHLIGHTING === */
+/* ========================================== */
+
+.job-table tbody tr.urgent-row td {
+  background-color: #FEF2F2 !important;
+  color: #991B1B !important;
+}
+
+body.dark-mode .job-table tbody tr.urgent-row td {
+  background-color: rgba(255, 0, 0, 0.049) !important; 
+  color: #fecaca !important; 
+}
+
+.job-table tbody tr.urgent-row:hover td {
+  background-color: #FEE2E2 !important;
+}
+
+body.dark-mode .job-table tbody tr.urgent-row:hover td {
+  background-color: rgba(239, 68, 68, 0.20) !important; 
+}
+
 .ticket-card-mobile.urgent-row {
-  background-color: #fcf8e3 ;
-  border-left: 5px solid #f59e0b;
-}
-.dark-mode .ticket-card-mobile.urgent-row {
-  background-color: #4a411a ;
+  background-color: #FEF2F2; 
   border-left: 5px solid #f59e0b;
 }
 
+.ticket-card-mobile.urgent-row:hover {
+  background-color: #FEE2E2; 
+}
+
+body.dark-mode .ticket-card-mobile.urgent-row {
+  background-color: rgba(239, 68, 68, 0.10);
+  border-left: 5px solid #ef4444;
+}
+
+body.dark-mode .ticket-card-mobile.urgent-row:hover {
+  background-color: rgba(239, 68, 68, 0.20); 
+}
 
 /* ======================================= */
 /* Styling untuk badge URGENT (Tidak berubah) */
@@ -2531,13 +2592,13 @@ body.dark-mode .job-table td:nth-child(8) {
 
 /* Warna baris selang-seling (Zebra Striping) */
 .job-table tbody tr:nth-child(even) td {
-  background-color: #f8f9fa;
+  background-color: #f4f5f6;
   /* Warna untuk Light Mode */
 }
 
 /* [DIUBAH] Warna baris selang-seling untuk dark mode */
 body.dark-mode .job-table tbody tr:nth-child(even) td {
-  background-color: transparent
+  background-color: rgba(45, 55, 72, 0.114);
 }
 
 body.dark-mode .job-table tbody tr:hover td {
