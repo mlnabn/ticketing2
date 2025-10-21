@@ -41,6 +41,22 @@ function ItemHistoryLookupPage() {
         fetchData(1);
     }, [fetchData]);
 
+    const getResponsiblePerson = (item) => {
+        switch (item.status_detail?.nama_status) {
+            case 'Digunakan':
+            case 'Dipinjam':
+                return item.user_peminjam?.name || item.workshop?.name || '-';
+            case 'Rusak':
+                return item.user_perusak?.name || '-';
+            case 'Hilang':
+                return item.user_penghilang?.name || '-';
+            case 'Perbaikan':
+                return item.teknisi_perbaikan?.name || '-';
+            default:
+                return '-';
+        }
+    };
+
     const handleExport = async (exportType) => {
         if (exportType === 'excel') setExportingExcel(true);
         else setExportingPdf(true);
@@ -157,7 +173,7 @@ function ItemHistoryLookupPage() {
                                 <th>Kode Unik</th>
                                 <th>Nama Barang</th>
                                 <th>Status Saat Ini</th>
-                                <th>Lokasi/Pengguna Terakhir</th>
+                                <th>Penanggung Jawab/Pengguna Terakhir</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -172,7 +188,7 @@ function ItemHistoryLookupPage() {
                                             {item.status_detail?.nama_status || 'N/A'}
                                         </span>
                                     </td>
-                                    <td>{item.user_peminjam?.name || item.workshop?.name || '-'}</td>
+                                    <td>{getResponsiblePerson(item)}</td>
                                 </tr>
                             )) : (
                                 <tr><td colSpan="4" style={{ textAlign: 'center' }}>Tidak ada data.</td></tr>
@@ -209,7 +225,7 @@ function ItemHistoryLookupPage() {
                                     <div className="card-row">
                                         <div className="data-group single">
                                             <span className="label">Lokasi/Pengguna Terakhir</span>
-                                            <span className="value">{item.user_peminjam?.name || item.workshop?.name || '-'}</span>
+                                            <span className="value">{getResponsiblePerson(item)}</span>
                                         </div>
                                     </div>
                                 </div>

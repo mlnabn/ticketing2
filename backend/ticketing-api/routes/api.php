@@ -51,6 +51,15 @@ Route::middleware('jwt')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/admins', [UserController::class, 'getAdmins']);
 
+    // [PERBAIKAN] Rute spesifik '/users/all' sekarang didefinisikan SEBELUM apiResource.
+    Route::get('/users/all', [UserController::class, 'all']);
+    
+    // Route manual untuk update menggunakan POST agar sesuai dengan frontend
+    Route::post('/users/{user}', [UserController::class, 'update']);
+
+    // apiResource sekarang didefinisikan setelah rute spesifik
+    Route::apiResource('users', UserController::class)->except(['create', 'edit', 'update']);
+
     // --- Rute untuk Tiket ---
     Route::apiResource('urgency-keywords', UrgencyKeywordController::class)->only(['index', 'store', 'destroy']);
     Route::apiResource('workshops', WorkshopController::class);
@@ -67,16 +76,7 @@ Route::middleware('jwt')->group(function () {
     Route::get('/tickets/admin-report/{adminId}', [TicketController::class, 'getAdminReport']);
     Route::get('/tickets/report-analytics', [TicketController::class, 'getReportAnalytics']);
     Route::get('/tickets/report-stats', [TicketController::class, 'reportStats']);
-    Route::get('/users/all', [UserController::class, 'all']);
     Route::get('/tickets/export', [TicketController::class, 'export']);
-
-    // --- Rute untuk Manajemen Pengguna oleh Admin ---
-    // Route manual untuk update menggunakan POST agar sesuai dengan frontend
-    Route::post('/users/{user}', [UserController::class, 'update']);
-
-    // apiResource untuk sisa method (index, store, show, destroy).
-    // 'update' dikecualikan untuk menghindari konflik dengan route POST di atas.
-    Route::apiResource('users', UserController::class)->except(['create', 'edit', 'update']);
 
     Route::get('/notifications', [NotificationController::class, 'index']); // Untuk user mengambil notif
     Route::apiResource('notification-templates', NotificationTemplateController::class);

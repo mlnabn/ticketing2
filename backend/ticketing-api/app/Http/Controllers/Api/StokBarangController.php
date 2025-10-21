@@ -35,6 +35,8 @@ class StokBarangController extends Controller
             'color',
             'teknisiPerbaikan',
             'userPerusak',
+            'userPenghilang',
+            'userPerusak',
             'userPenghilang'
         ]);
 
