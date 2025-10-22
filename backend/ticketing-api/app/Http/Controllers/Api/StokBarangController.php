@@ -75,6 +75,34 @@ class StokBarangController extends Controller
             $q->whereHas('histories');
         });
 
+        if ($request->filled('master_barang_id')) {
+            $query->where('master_barang_id', $request->master_barang_id);
+        }
+
+        if ($request->filled('master_barang_id')) {
+            return $query->latest()->get();
+        }
+
+        $statusFilter = $request->input('status_id');
+        $colorFilter = $request->input('id_warna');
+
+        if ($statusFilter && $statusFilter !== 'ALL') {
+            $query->where('status_id', $statusFilter);
+        } elseif ($statusFilter === '') {
+            $tersediaStatusId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
+            if ($tersediaStatusId) {
+                $query->where('status_id', $tersediaStatusId);
+            }
+        }
+
+        if ($colorFilter) {
+            $query->where('id_warna', $colorFilter);
+        }
+
+        if ($request->filled('master_barang_id')) {
+            return $query->latest('id')->get(); 
+        }
+
         return $query->latest()->paginate(15);
     }
 
@@ -115,7 +143,7 @@ class StokBarangController extends Controller
 
     public function showBySerial($code)
     {
-        
+
         $item = StokBarang::with([
             'masterBarang.masterKategori',
             'masterBarang.subKategori',
@@ -347,7 +375,7 @@ class StokBarangController extends Controller
     {
         \Illuminate\Support\Facades\Validator::extend('required_if_status', function ($attribute, $value, $parameters, $validator) {
             $statusId = $validator->getData()['status_id'] ?? null;
-            if (!$statusId) return true; 
+            if (!$statusId) return true;
 
             $status = \App\Models\Status::find($statusId);
             if ($status && in_array($status->nama_status, $parameters)) {
@@ -392,9 +420,77 @@ class StokBarangController extends Controller
                         $q->where('nama_barang', 'like', $searchTerm);
                     });
             })
-            ->limit(10) 
+            ->limit(10)
             ->get();
 
         return response()->json($results);
+    }
+
+    public function getStockSummary(Request $request)
+    {
+        // Ambil ID status 'Tersedia'
+        $tersediaStatusId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
+        if (!$tersediaStatusId) {
+            // Handle error jika status 'Tersedia' tidak ditemukan
+            return response()->json(['error' => 'Status "Tersedia" tidak ditemukan.'], 500);
+        }
+
+        $query = MasterBarang::with(['masterKategori', 'subKategori', 'createdBy'])
+            // --- BARU: Hitung Stok Tersedia (selalu 'Tersedia', tapi hormati filter warna) ---
+            ->withCount(['stokBarangs as available_stock_count' => function ($q) use ($request, $tersediaStatusId) {
+                $q->where('status_id', $tersediaStatusId);
+                // Filter jumlah tersedia HANYA berdasarkan warna jika filter warna aktif
+                if ($request->filled('id_warna')) {
+                    $q->where('id_warna', $request->id_warna);
+                }
+            }])
+            // --- BARU: Hitung Total Unit (semua status, tapi hormati filter warna) ---
+            ->withCount(['stokBarangs as total_stock_count' => function ($q) use ($request) {
+                // Filter jumlah total HANYA berdasarkan warna jika filter warna aktif
+                if ($request->filled('id_warna')) {
+                    $q->where('id_warna', $request->id_warna);
+                }
+                // Tidak memfilter berdasarkan status di sini, hitung semua
+            }]);
+
+        // Filter Master Barang berdasarkan Kategori, SubKategori, Search (tidak berubah)
+        if ($request->filled('id_kategori')) {
+            $query->where('id_kategori', $request->id_kategori);
+        }
+        if ($request->filled('id_sub_kategori')) {
+            $query->where('id_sub_kategori', $request->id_sub_kategori);
+        }
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('nama_barang', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('kode_barang', 'LIKE', "%{$searchTerm}%");
+            });
+        }
+
+        // --- DIUBAH: Logika Filter Master Item berdasarkan Status/Warna ---
+        // Jika ada filter status (selain 'ALL' atau default '') ATAU filter warna,
+        // pastikan Master Barang memiliki setidaknya satu unit yang cocok.
+        $statusFilter = $request->input('status_id');
+        $colorFilter = $request->input('id_warna');
+
+        if (($statusFilter && $statusFilter !== 'ALL') || $colorFilter) {
+            $query->whereHas('stokBarangs', function ($q) use ($statusFilter, $colorFilter, $tersediaStatusId) {
+                // Tentukan status ID yang dicari
+                $targetStatusId = ($statusFilter && $statusFilter !== 'ALL')
+                    ? $statusFilter
+                    : $tersediaStatusId; // Default ke Tersedia jika status tidak difilter tapi warna difilter
+
+                $q->where('status_id', $targetStatusId); // Harus punya stok dgn status ini
+
+                if ($colorFilter) {
+                    $q->where('id_warna', $colorFilter); // DAN warna ini (jika difilter)
+                }
+            });
+        }
+        // Jika tidak ada filter status/warna spesifik, tampilkan semua Master Barang
+        // yang cocok dengan filter Kategori/SubKategori/Search.
+
+        return $query->latest('id_m_barang')->paginate(15); // Order by ID or other consistent field
     }
 }

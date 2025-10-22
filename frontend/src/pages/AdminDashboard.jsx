@@ -53,38 +53,47 @@ export default function AdminDashboard() {
         </div>
         <nav className="sidebar-nav">
           <ul>
+
             <li className="sidebar-nav-item">
               <NavLink to="/admin" end className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
                 <i className="fas fa-home"></i><span className="nav-text">Home</span>
               </NavLink>
             </li>
+
             <li className="sidebar-nav-item">
               <NavLink to="/admin/users" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
                 <i className="fas fa-user-plus"></i><span className="nav-text">Pengguna</span>
               </NavLink>
             </li>
+
             <li className="sidebar-nav-item">
               <NavLink to="/admin/notifications" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
                 <i className="fas fa-bell"></i><span className="nav-text">Notifikasi</span>
               </NavLink>
             </li>
+
             <li className="sidebar-divider"><span className="nav-text">Ticketing</span></li>
+
             <li className="sidebar-nav-item">
               <NavLink to="/admin/tickets" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
                 <i className="fas fa-ticket-alt"></i><span className="nav-text">Daftar Tiket</span>
               </NavLink>
             </li>
+
             <li className="sidebar-nav-item">
               <NavLink to="/admin/my-tickets" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
                 <i className="fas fa-user-tag"></i><span className="nav-text">Tiket Saya</span>
               </NavLink>
             </li>
+
             <li className="sidebar-nav-item">
               <NavLink to="/admin/reports" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
                 <i className="fas fa-file-alt"></i><span className="nav-text">Laporan Tiket</span>
               </NavLink>
             </li>
+
             <li className="sidebar-divider"><span className="nav-text">Inventory</span></li>
+
             <li className="sidebar-nav-item">
               <NavLink to="/admin/inventory" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
                 <i className="fas fa-warehouse"></i><span className="nav-text">Tambah SKU</span>
@@ -95,32 +104,39 @@ export default function AdminDashboard() {
                 <i className="fas fa-boxes"></i><span className="nav-text">Stok Barang</span>
               </NavLink>
             </li>
-            <li className="sidebar-nav-item">
-              <NavLink to="/admin/financial-report" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
-                <i className="fas fa-file-invoice-dollar"></i><span className="nav-text">Laporan Keuangan</span>
-              </NavLink>
-            </li>
+
             <li className="sidebar-nav-item">
               <NavLink to="/admin/inventory-reports" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
                 <i className="fas fa-chart-line"></i><span className="nav-text">Laporan Inventory</span>
               </NavLink>
             </li>
+
+            <li className="sidebar-nav-item">
+              <NavLink to="/admin/financial-report" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
+                <i className="fas fa-file-invoice-dollar"></i><span className="nav-text">Laporan Keuangan</span>
+              </NavLink>
+            </li>
+
             <li className="sidebar-divider"><span className="nav-text">Settings</span></li>
+
             <li className="sidebar-nav-item">
               <NavLink to="/admin/templates" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
                 <i className="fas fa-paste"></i><span className="nav-text">Template Notif</span>
               </NavLink>
             </li>
+
             <li className="sidebar-nav-item">
               <NavLink to="/admin/workshops" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
                 <i className="fas fa-cogs"></i><span className="nav-text"> Daftar Workshop</span>
               </NavLink>
             </li>
+
             <li className="sidebar-nav-item">
-                <NavLink to="/admin/urgency-keywords" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
-                    <i className="fas fa-exclamation-triangle"></i><span className="nav-text">Kata Kunci Urgent</span>
-                </NavLink>
+              <NavLink to="/admin/urgency-keywords" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
+                <i className="fas fa-exclamation-triangle"></i><span className="nav-text">Kata Kunci Urgent</span>
+              </NavLink>
             </li>
+
           </ul>
         </nav>
       </aside>

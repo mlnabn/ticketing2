@@ -74,10 +74,10 @@ Route::middleware('jwt')->group(function () {
     Route::get('/tickets/export', [TicketController::class, 'export']);
 
     // --- Rute untuk Notifikasi ---
-    Route::get('/notifications', [NotificationController::class, 'index']); 
+    Route::get('/notifications', [NotificationController::class, 'index']);
     Route::apiResource('notification-templates', NotificationTemplateController::class);
     Route::get('/notifications/global', [NotificationController::class, 'getGlobalNotifications']);
-    Route::post('/notifications', [NotificationController::class, 'store']); 
+    Route::post('/notifications', [NotificationController::class, 'store']);
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
 
@@ -102,6 +102,7 @@ Route::middleware('jwt')->group(function () {
     Route::get('/inventory/stock-items/by-serial/{serial}', [StokBarangController::class, 'showBySerial']);
     Route::put('/inventory/stock-items/{stokBarang}', [StokBarangController::class, 'update']);
     Route::post('/inventory/stock-items/{stokBarang}/update-status', [StokBarangController::class, 'updateStatus']);
+    Route::get('/inventory/stock-summary', [StokBarangController::class, 'getStockSummary']);
 
     Route::apiResource('inventory/categories', MasterKategoriController::class);
     Route::apiResource('inventory/sub-categories', SubKategoriController::class);

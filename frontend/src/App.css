@@ -2421,7 +2421,8 @@ button.btn-pause {
   text-align: left;
   border-bottom: 1px solid #e2e8f0;
   color: #1e293b;
-  transition: background-color 0.2s ease, color 0.2s ease; /* Transisi untuk hover */
+  transition: background-color 0.2s ease, color 0.2s ease;
+  /* Transisi untuk hover */
   font-size: 15px;
   vertical-align: middle;
 }
@@ -2434,10 +2435,13 @@ button.btn-pause {
   text-transform: uppercase;
   color: var(--joblist-header-text-light);
   border-bottom: 2px solid #e2e8f0;
-  border-right: 1px solid #e2e8f0; /* Border kanan header light mode */
+  border-right: 1px solid #e2e8f0;
+  /* Border kanan header light mode */
 }
+
 .job-table thead th:last-child {
-  border-right: none; /* Hapus border kanan pada header terakhir */
+  border-right: none;
+  /* Hapus border kanan pada header terakhir */
 }
 
 /* --- Gaya Badan Tabel (tbody) --- */
@@ -2453,8 +2457,10 @@ button.btn-pause {
 }
 
 /* Efek Hover (Light Mode) - Akan ditimpa oleh hover .urgent-row */
-.job-table tbody tr:not(.urgent-row):hover td { /* Hanya berlaku jika BUKAN urgent */
-  background-color: #f1f5f9; /* Warna hover abu-abu terang */
+.job-table tbody tr:not(.urgent-row):hover td {
+  /* Hanya berlaku jika BUKAN urgent */
+  background-color: #f1f5f9;
+  /* Warna hover abu-abu terang */
 }
 
 /* ======================================= */
@@ -2465,8 +2471,10 @@ body.dark-mode .job-table {
   background-color: transparent;
   border: 1px solid var(--border-color-dark, #2D3748);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  border-collapse: separate; /* Perlu agar border radius terlihat */
-  border-spacing: 0; /* Hapus spasi antar sel jika menggunakan separate */
+  border-collapse: separate;
+  /* Perlu agar border radius terlihat */
+  border-spacing: 0;
+  /* Hapus spasi antar sel jika menggunakan separate */
 }
 
 body.dark-mode .job-table th,
@@ -2478,29 +2486,37 @@ body.dark-mode .job-table td {
 body.dark-mode .job-table th {
   background-color: transparent;
   color: #8A919E;
-  border-right: 1px solid var(--border-color-dark, #2D3748); /* Border kanan header dark mode */
+  border-right: 1px solid var(--border-color-dark, #2D3748);
+  /* Border kanan header dark mode */
 }
+
 body.dark-mode .job-table thead th:last-child {
-  border-right: none; /* Hapus border kanan pada header terakhir dark mode */
+  border-right: none;
+  /* Hapus border kanan pada header terakhir dark mode */
 }
 
 body.dark-mode .job-table td {
-   background-color: transparent;
-   border-right: none; /* Umumnya tidak perlu border kanan pada sel data */
+  background-color: transparent;
+  border-right: none;
+  /* Umumnya tidak perlu border kanan pada sel data */
 }
 
 /* Zebra Striping (Dark Mode) - Dihapus/Tidak Efektif karena background transparan */
 body.dark-mode .job-table tbody tr:nth-child(even) td {
-   background-color: transparent; /* Pastikan tetap transparan */
+  background-color: transparent;
+  /* Pastikan tetap transparan */
 }
 
 /* Efek Hover (Dark Mode) - Akan ditimpa oleh hover .urgent-row */
-body.dark-mode .job-table tbody tr:not(.urgent-row):hover td { /* Hanya berlaku jika BUKAN urgent */
-  background-color: rgba(45, 55, 72, 0.5) !important; /* Warna hover abu-biru gelap */
+body.dark-mode .job-table tbody tr:not(.urgent-row):hover td {
+  /* Hanya berlaku jika BUKAN urgent */
+  background-color: rgba(45, 55, 72, 0.5) !important;
+  /* Warna hover abu-biru gelap */
 }
 
 body.dark-mode .job-table tbody tr:last-child td {
-  border-bottom: none; /* Hapus border bawah pada baris terakhir dark mode */
+  border-bottom: none;
+  /* Hapus border bawah pada baris terakhir dark mode */
 }
 
 /* ========================================== */
@@ -2513,8 +2529,8 @@ body.dark-mode .job-table tbody tr:last-child td {
 }
 
 body.dark-mode .job-table tbody tr.urgent-row td {
-  background-color: rgba(255, 0, 0, 0.049) !important; 
-  color: #fecaca !important; 
+  background-color: rgba(255, 0, 0, 0.049) !important;
+  color: #fecaca !important;
 }
 
 .job-table tbody tr.urgent-row:hover td {
@@ -2522,16 +2538,16 @@ body.dark-mode .job-table tbody tr.urgent-row td {
 }
 
 body.dark-mode .job-table tbody tr.urgent-row:hover td {
-  background-color: rgba(239, 68, 68, 0.20) !important; 
+  background-color: rgba(239, 68, 68, 0.20) !important;
 }
 
 .ticket-card-mobile.urgent-row {
-  background-color: #FEF2F2; 
+  background-color: #FEF2F2;
   border-left: 5px solid #f59e0b;
 }
 
 .ticket-card-mobile.urgent-row:hover {
-  background-color: #FEE2E2; 
+  background-color: #FEE2E2;
 }
 
 body.dark-mode .ticket-card-mobile.urgent-row {
@@ -2540,7 +2556,7 @@ body.dark-mode .ticket-card-mobile.urgent-row {
 }
 
 body.dark-mode .ticket-card-mobile.urgent-row:hover {
-  background-color: rgba(239, 68, 68, 0.20); 
+  background-color: rgba(239, 68, 68, 0.20);
 }
 
 /* ======================================= */
@@ -2636,27 +2652,51 @@ body.dark-mode .job-table tbody tr:last-child td {
 
 /* Container untuk tabel yang bisa di-scroll */
 .table-scroll-container {
-    border-radius: 8px;
-    overflow: hidden; 
+  border-radius: 8px;
+  overflow: hidden;
 }
+
 .table-body-scroll {
-    max-height: 380px; 
-    overflow-y: auto;   
-    border-bottom: 1px solid #ddd;
+  max-height: 380px;
+  overflow-y: auto;
+  border-bottom: 1px solid #ddd;
 }
 
 .table-scroll-container .job-table {
-    width: 100%;
-    table-layout: fixed; 
+  width: 100%;
+  table-layout: fixed;
 }
 
 
-.table-scroll-container .job-table th:nth-child(1), .table-scroll-container .job-table td:nth-child(1) { width: 15%; }
-.table-scroll-container .job-table th:nth-child(2), .table-scroll-container .job-table td:nth-child(2) { width: 15%; }
-.table-scroll-container .job-table th:nth-child(3), .table-scroll-container .job-table td:nth-child(3) { width: 25%; }
-.table-scroll-container .job-table th:nth-child(4), .table-scroll-container .job-table td:nth-child(4) { width: 15%; }
-.table-scroll-container .job-table th:nth-child(5), .table-scroll-container .job-table td:nth-child(5) { width: 15%; }
-.table-scroll-container .job-table th:nth-child(6), .table-scroll-container .job-table td:nth-child(6) { width: 15%; }
+.table-scroll-container .job-table th:nth-child(1),
+.table-scroll-container .job-table td:nth-child(1) {
+  width: 15%;
+}
+
+.table-scroll-container .job-table th:nth-child(2),
+.table-scroll-container .job-table td:nth-child(2) {
+  width: 15%;
+}
+
+.table-scroll-container .job-table th:nth-child(3),
+.table-scroll-container .job-table td:nth-child(3) {
+  width: 25%;
+}
+
+.table-scroll-container .job-table th:nth-child(4),
+.table-scroll-container .job-table td:nth-child(4) {
+  width: 15%;
+}
+
+.table-scroll-container .job-table th:nth-child(5),
+.table-scroll-container .job-table td:nth-child(5) {
+  width: 15%;
+}
+
+.table-scroll-container .job-table th:nth-child(6),
+.table-scroll-container .job-table td:nth-child(6) {
+  width: 15%;
+}
 
 /*
   ---------------------------------------------------
@@ -3508,29 +3548,22 @@ body.dark-mode .content-area h3 {
 
 /* --- Tema Tombol Edit (Hijau) --- */
 .btn-edit {
-  background-color: #d1e7dd;
-  color: #0f5132;
+  color: #065F46;
   border-color: #badbcc;
-  box-shadow: 0 4px 12px rgba(15, 81, 50, 0.35);
-
-
 }
 
 .btn-edit:hover {
-  background-color: #a8d5b7;
   border-color: #a8d5b7;
   transform: translateY(-1px);
 }
 
 /* [DIUBAH] Dark Mode untuk Tombol Edit (Solid) */
 body.dark-mode .btn-edit {
-  background-color: #22C55E;
   color: #ffffff;
   border-color: #38a169;
 }
 
 body.dark-mode .btn-edit:hover {
-  background-color: #2f855a;
   border-color: #2f855a;
 }
 
@@ -5154,13 +5187,13 @@ body.dark-mode .notification-form-container label {
   background: #d6eaf8;
   color: #154360;
   border-color: transparent;
-  
+
 }
 
 .btn-primary:hover {
   background-color: #aed6f1;
   transform: translateY(-2px);
-  
+
 }
 
 .btn-primary:disabled {
@@ -5184,7 +5217,7 @@ body.dark-mode .notification-form-container label {
 .btn-scan:hover {
   background-color: #bce3c9;
   transform: translateY(-2px);
-  
+
 }
 
 .btn-scan:disabled {
@@ -8528,7 +8561,7 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .dark-mode .modal-content2 {
-  background-color: #2c2c2c;
+  background-color: #111111;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
   color: #e0e0e0;
 }
@@ -8543,7 +8576,7 @@ body.dark-mode .dashboard-card h4 {
 }
 
 .dark-mode .ticket-modal-card {
-  background-color: #3a3a3a !important;
+  background-color: #3a3f44 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -11314,25 +11347,22 @@ body {
 }
 
 .btn-detail {
-  background-color: #d1e7fd;
+
   color: #084298;
   border-color: #b6d4fe;
-  box-shadow: 0 4px 12px rgba(8, 66, 152, 0.35);
+
 }
 
 .btn-detail:hover {
-  background-color: #a3c7fe;
   border-color: #a3c7fe;
 }
 
 /* --- Dark Mode: Tombol Start / Lanjutkan / Bukti (Biru Solid) --- */
 body.dark-mode .btn-detail {
-  background-color: var(--btn-submit, #4F46E5);
   color: #ffffff;
 }
 
 body.dark-mode .btn-detail:hover {
-  background-color: #2563eb;
   border-color: #2563eb;
 }
 
@@ -12242,7 +12272,6 @@ body.dark-mode .btn-detail:hover {
 
 .btn-delete-icon:hover {
   background-color: #fee2e2;
-  /* red-100 */
 }
 
 .dark-mode .btn-delete-icon:hover {
@@ -12259,4 +12288,326 @@ body.dark-mode .btn-detail:hover {
   border: 1px solid var(--input-border, #ced4da);
   flex-grow: 1;
   margin: 0;
+}
+
+/* =========================================== */
+/* === Styling Tabel Ringkasan (Summary) ==== */
+/* =========================================== */
+
+/* Tabel utama */
+.stok-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Header tabel utama */
+.stok-summary-table thead th {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  color: var(--table-header-text, #000111);
+  background-color: var(--table-header-bg, #f8f9fa);
+  border-bottom: 2px solid var(--primary-color, #007bff);
+  vertical-align: middle;
+}
+
+/* Baris ringkasan */
+.summary-row {
+  border-bottom: 1px solid var(--table-border-color, #dee2e6);
+  transition: background-color 0.15s ease-in-out;
+  cursor: pointer;
+  /* Menandakan bisa diklik */
+}
+
+.summary-row:hover {
+  background-color: var(--table-hover-bg, #f1f3f5);
+}
+
+.summary-row td {
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.summary-row td:nth-child(2),
+.summary-row td:nth-child(3),
+.summary-row td:nth-child(4) {
+  text-align: left;
+}
+
+/* Warna background saat baris ringkasan diexpand */
+.summary-row.expanded {
+  background-color: var(--table-expanded-bg, #eef3ff);
+}
+
+/* =========================================== */
+/* === Styling Detail List (Tanpa Tabel) ==== */
+/* =========================================== */
+
+.detail-rows-container td {
+  padding: 0 !important;
+  border: none !important;
+}
+
+.detail-list-wrapper {
+  padding-left: 1rem;
+  background-color: var(--detail-bg, #f8f9fa);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--detail-border-color, #dee2e6);
+}
+
+.detail-list-header {
+  display: flex;
+  padding: 0.6rem 1rem;
+  background-color: var(--detail-header-bg, #e9ecef);
+  font-weight: 600;
+  color: var(--detail-header-text, #495057);
+  font-size: 0.8em;
+  border-bottom: 2px solid var(--detail-border-color, #dee2e6);
+  margin-bottom: 0.25rem;
+  text-align: center;
+}
+
+.detail-list-header .detail-cell {
+  padding: 0 0.5rem;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.detail-row-div {
+  display: flex;
+  border-bottom: 1px solid var(--detail-border-color, #e9ecef);
+  padding: 0.6rem 1rem;
+  font-size: 0.85em;
+  align-items: center;
+}
+
+.detail-row-div:last-child {
+  border-bottom: none;
+}
+
+.detail-row-div:hover {
+  background-color: var(--detail-hover-bg, #e9ecef);
+}
+
+.detail-cell {
+  padding: 0 0.5rem;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.header-kode,
+.cell-kode {
+  flex-basis: 14%;
+  padding-left: 1rem;
+  text-align: center;
+  justify-content: center;
+}
+
+.header-sn,
+.cell-sn {
+  flex-basis: 8%;
+}
+
+.header-kondisi,
+.cell-kondisi {
+  flex-basis: 7%;
+}
+
+.header-status,
+.cell-status {
+  flex-basis: 9%;
+}
+
+/* --- BARU: Lebar Kolom Jumlah --- */
+.header-jumlah,
+.cell-jumlah {
+  flex-basis: 5%;
+  text-align: center;
+  justify-content: center;
+}
+
+.header-warna,
+.cell-warna {
+  flex-basis: 5%;
+  justify-content: center;
+}
+
+/* Warna sedikit lebih kecil */
+.header-harga,
+.cell-harga {
+  flex-basis: 10%;
+  justify-content: center;
+  text-align: center;
+}
+
+.header-tglbeli,
+.cell-tglbeli {
+  flex-basis: 11%;
+  text-align: center;
+}
+
+.header-tanggal,
+.cell-tanggal {
+  flex-basis: 11%;
+  text-align: center;
+}
+
+/* Tgl Masuk sedikit lebih kecil */
+/* --- BARU: Lebar Kolom Creator --- */
+.header-creator,
+.cell-creator {
+  flex-basis: 8%;
+  text-align: center;
+}
+
+.header-aksi,
+.cell-aksi {
+  flex-basis: 12%;
+  justify-content: center;
+}
+
+/* Styling spesifik untuk sel */
+.cell-warna .color-swatch {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--detail-border-color, #ccc);
+  border-radius: 3px;
+  vertical-align: middle;
+  align-items: center;
+}
+
+.cell-aksi.action-buttons-group {
+  gap: 0.5rem;
+}
+
+/* Loading dan NoData di area detail */
+.detail-loading,
+.detail-nodata {
+  padding: 1rem;
+  padding-left: 1rem;
+  text-align: center;
+  font-style: italic;
+  color: var(--text-color-secondary, #6c757d);
+  background-color: var(--detail-bg, #f8f9fa);
+  border-bottom: 1px solid var(--detail-border-color, #dee2e6);
+}
+
+/* =========================================== */
+/* ===        Warna Dark Mode            ===== */
+/* =========================================== */
+
+body.dark-mode .stok-summary-table thead th {
+  background-color: #374151;
+  color: #e5e7eb;
+  border-bottom-color: #60a5fa;
+}
+
+body.dark-mode .summary-row {
+  border-bottom-color: #4b5563;
+}
+
+body.dark-mode .summary-row:hover {
+  background-color: #374151;
+}
+
+body.dark-mode .summary-row.expanded {
+  background-color: #3b4d6e;
+  /* Background berbeda saat expand di dark mode */
+}
+
+/* Styling detail di dark mode */
+body.dark-mode .detail-list-wrapper,
+body.dark-mode .detail-loading,
+body.dark-mode .detail-nodata {
+  background-color: #2c333f;
+  border-bottom-color: #4b5563;
+  color: #9ca3af;
+  /* Warna teks default untuk area detail */
+}
+
+body.dark-mode .detail-list-header {
+  background-color: #374151;
+  color: #d1d5db;
+  border-bottom-color: #4b5563;
+}
+
+body.dark-mode .detail-row-div {
+  border-bottom-color: #4b5563;
+}
+
+body.dark-mode .detail-row-div:hover {
+  background-color: #374151;
+}
+
+body.dark-mode .cell-warna .color-swatch {
+  border-color: #6b7280;
+}
+
+/* =========================================== */
+/* ===      Styling Mobile (Ringkasan)   ===== */
+/* =========================================== */
+
+.summary-card {
+  cursor: pointer;
+}
+
+.summary-card.expanded {
+  background-color: var(--card-expanded-bg, #eef3ff);
+  border-left: 3px solid var(--primary-color, #007bff);
+}
+
+body.dark-mode .summary-card.expanded {
+  background-color: #3b4d6e;
+  border-left-color: #60a5fa;
+}
+
+@keyframes slideDown {
+  from {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    /* Hilangkan border agar tidak muncul saat tertutup */
+    border-bottom-width: 0;
+    /* Mungkin perlu transform juga jika ingin efek slide */
+    /* transform: translateY(-10px); */
+  }
+  to {
+    max-height: 1000px; /* Tinggi maksimal yang cukup besar */
+    opacity: 1;
+    padding-top: 0.5rem; /* Padding saat terbuka */
+    padding-bottom: 0.5rem;
+    border-bottom-width: 1px; /* Tampilkan border saat terbuka */
+    /* transform: translateY(0); */
+  }
+}
+
+@keyframes slideUp {
+  from {
+    max-height: 1000px;
+    opacity: 1;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom-width: 1px;
+    /* transform: translateY(0); */
+  }
+  to {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-bottom-width: 0;
+    /* transform: translateY(-10px); */
+  }
 }

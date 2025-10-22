@@ -12,8 +12,8 @@ import QrScannerModal from './QrScannerModal';
 function StokBarangView() {
     const { showToast } = useOutletContext();
 
-    // State utama
-    const [items, setItems] = useState([]);
+    // State utama untuk Master Barang (SKU)
+    const [masterItems, setMasterItems] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -36,32 +36,49 @@ function StokBarangView() {
     const [isAddStockOpen, setIsAddStockOpen] = useState(false);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
 
-    // --- Versi fetchData yang Diperbarui ---
-    // Menyimpan filter saat ini dalam state agar bisa digunakan oleh onSaveSuccess
+    // State untuk expand/collapse
+    const [expandedRows, setExpandedRows] = useState({});
+    const [detailItems, setDetailItems] = useState({});
+    const [expandingId, setExpandingId] = useState(null);
+
+    // State untuk ID status 'Tersedia' (diambil dari API)
+    const [tersediaStatusId, setTersediaStatusId] = useState(null);
+
+    // Simpan filter saat ini
     const [currentFilters, setCurrentFilters] = useState({});
 
+    // fetchData mengambil data summary
     const fetchData = useCallback(async (page = 1, filters = {}) => {
         setLoading(true);
-        setCurrentFilters(filters); // Simpan filter yang sedang aktif
+        setCurrentFilters(filters); // Simpan filter saat ini untuk refresh
         try {
             const params = { page, ...filters };
-            const res = await api.get('/inventory/stock-items', { params });
-            setItems(res.data.data);
+            const res = await api.get('/inventory/stock-summary', { params });
+            setMasterItems(res.data.data);
             setPagination(res.data);
+            setExpandedRows({});
+            setDetailItems({});
         } catch (error) {
-            showToast('Gagal memuat data stok.', 'error');
-            console.error("Fetch Stok Error:", error);
+            showToast('Gagal memuat data ringkasan stok.', 'error');
+            console.error("Fetch Stok Summary Error:", error);
         } finally {
             setLoading(false);
         }
-    }, [showToast]); // Hapus fetchData dari dependencies
-
-    // --- Efek untuk mengambil data dropdown (tidak berubah) ---
+    }, [showToast]);
     useEffect(() => {
         api.get('/inventory/categories').then(res => setCategories(res.data));
-        api.get('/statuses').then(res => setStatusOptions(res.data));
+        api.get('/statuses').then(res => {
+            setStatusOptions(res.data);
+            const tersedia = res.data.find(s => s.nama_status === 'Tersedia');
+            if (tersedia) {
+                setTersediaStatusId(tersedia.id);
+            } else {
+                console.error("Status 'Tersedia' tidak ditemukan di database!");
+                showToast("Konfigurasi status 'Tersedia' tidak ditemukan.", "error");
+            }
+        });
         api.get('/colors').then(res => setColorOptions(res.data));
-    }, []);
+    }, [showToast]);
 
     useEffect(() => {
         if (selectedCategory) {
@@ -72,7 +89,6 @@ function StokBarangView() {
         setSelectedSubCategory('');
     }, [selectedCategory]);
 
-    // --- Efek untuk memuat data berdasarkan filter (tidak berubah) ---
     useEffect(() => {
         const filters = {
             id_kategori: selectedCategory,
@@ -83,31 +99,46 @@ function StokBarangView() {
         };
         fetchData(1, filters);
     }, [selectedCategory, selectedSubCategory, selectedStatus, selectedColor, debouncedSearchTerm, fetchData]);
-
-    // --- Handler untuk Modal ---
-
-    // BARU: Fungsi untuk menangani klik pada baris
-    const handleRowClick = (e, item) => {
-        // Mencegah modal terbuka jika yang diklik adalah tombol di dalam baris
-        if (e.target.tagName === 'BUTTON' || e.target.closest('.action-buttons-group')) {
+    const toggleExpand = async (masterBarangId) => {
+        const isCurrentlyExpanded = !!expandedRows[masterBarangId];
+        if (isCurrentlyExpanded) {
+            setExpandedRows(prev => ({ ...prev, [masterBarangId]: false }));
             return;
         }
-        setDetailItem(item);
+        setExpandedRows(prev => ({ ...prev, [masterBarangId]: true }));
+        if (!detailItems[masterBarangId]) {
+            setExpandingId(masterBarangId);
+            try {
+                const params = {
+                    master_barang_id: masterBarangId,
+                    status_id: selectedStatus,
+                    id_warna: selectedColor,
+                };
+                const res = await api.get('/inventory/stock-items', { params });
+                const detailsArray = Array.isArray(res.data) ? res.data : (res.data.data || []);
+                setDetailItems(prev => ({ ...prev, [masterBarangId]: detailsArray }));
+            } catch (error) {
+                console.error("Fetch Detail Error:", error);
+                showToast('Gagal memuat detail item.', 'error');
+                setExpandedRows(prev => ({ ...prev, [masterBarangId]: false }));
+            } finally {
+                setExpandingId(null);
+            }
+        }
     };
 
+    // Handler untuk membuka modal Edit dari modal Detail
     const handleOpenEditModal = (itemToEdit) => {
-        setDetailItem(null); // Tutup modal detail jika sedang terbuka
+        setDetailItem(null);
         setEditItem(itemToEdit);
     };
 
-    // BARU: Fungsi untuk menyegarkan data setelah modal disimpan
+    // Handler setelah sukses menyimpan dari modal Add/Edit/Detail (via update status)
     const handleSaveSuccess = () => {
-        // Muat ulang data pada halaman saat ini dan dengan filter saat ini
         fetchData(pagination?.current_page || 1, currentFilters);
     };
 
-
-    // --- (Fungsi scan tidak berubah) ---
+    // --- Scan Handler ---
     const handleScanSearch = useCallback(async (code) => {
         if (!code) return;
         showToast(`Mencari: ${code}`, 'info');
@@ -124,29 +155,79 @@ function StokBarangView() {
         handleScanSearch(decodedText);
     };
 
+
     useEffect(() => {
         let barcode = '';
         let interval;
         const handleKeyDown = (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            const isModalActive = !!(detailItem || editItem || qrModalItem || isAddStockOpen || isScannerOpen);
+            const isInputFocused = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT';
+
+            if (isModalActive || isInputFocused) return;
+
             if (typeof e.key !== 'string') return;
             if (interval) clearInterval(interval);
+
             if (e.code === 'Enter' || e.key === 'Enter') {
-                if (barcode) handleScanSearch(barcode.trim());
+                if (barcode.length > 3) {
+                    handleScanSearch(barcode.trim());
+                }
                 barcode = '';
                 return;
             }
-            if (e.key.length === 1) barcode += e.key;
+
+            if (e.key.length === 1) {
+                barcode += e.key;
+            }
+
             interval = setInterval(() => barcode = '', 50);
         };
+
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [handleScanSearch]);
+    }, [handleScanSearch, detailItem, editItem, qrModalItem, isAddStockOpen, isScannerOpen]);
+    const formatCurrency = (value) => {
+        if (isNaN(value)) return 'Rp 0';
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(value);
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return '-';
+        return new Date(dateString).toLocaleDateString('id-ID', {
+            day: '2-digit', month: 'long', year: 'numeric'
+        });
+    };
+    const getNoDetailMessage = () => {
+        let msg = "Tidak ada unit detail";
+        if (selectedStatus && selectedStatus !== 'ALL') {
+            const statusName = statusOptions.find(s => s.id === parseInt(selectedStatus))?.nama_status;
+            if (statusName) msg += ` dengan status "${statusName}"`;
+        } else if (selectedStatus === '') {
+            msg += ` dengan status "Tersedia"`;
+        }
+        // Cek filter warna
+        if (selectedColor) {
+            const colorName = colorOptions.find(c => c.id_warna === parseInt(selectedColor))?.nama_warna;
+            if (colorName) {
+                const hasStatusFilter = (selectedStatus && selectedStatus !== 'ALL') || selectedStatus === '';
+                msg += hasStatusFilter ? ` dan` : ` dengan`;
+                msg += ` berwarna "${colorName}"`;
+            }
+        }
+        msg += " untuk SKU ini.";
+        return msg;
+    }
 
     return (
         <>
             <div className="user-management-container" style={{ marginBottom: '20px' }}>
-                <h1>Daftar Stok Unit Barang</h1>
+                <h1>Daftar Stok Barang</h1>
                 <div className="action-buttons-stok">
                     <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}><i className="fas fa-plus" style={{ marginRight: '8px' }}></i>Tambah Stok</button>
                     <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
@@ -159,203 +240,230 @@ function StokBarangView() {
                 </div>
             </div>
 
-            {/* --- Filter Section --- */}
+            {/* Filter Section */}
             <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                 <select value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)} className="filter-select">
-                    <option value="">Semua Status</option>
+                    <option value="">Status: Tersedia</option>
                     {statusOptions.map(status => (
                         <option key={status.id} value={status.id}>{status.nama_status}</option>
                     ))}
+                    <option value="ALL">Semua Status</option>
                 </select>
                 <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)} className="filter-select">
                     <option value="">Semua Kategori</option>
-                    {categories.map(cat => (
-                        <option key={cat.id_kategori} value={cat.id_kategori}>{cat.nama_kategori}</option>
-                    ))}
+                    {categories.map(cat => (<option key={cat.id_kategori} value={cat.id_kategori}>{cat.nama_kategori}</option>))}
                 </select>
                 <select value={selectedSubCategory} onChange={e => setSelectedSubCategory(e.target.value)} disabled={!selectedCategory || subCategories.length === 0} className="filter-select">
                     <option value="">Semua Sub-Kategori</option>
-                    {subCategories.map(sub => (
-                        <option key={sub.id_sub_kategori} value={sub.id_sub_kategori}>{sub.nama_sub}</option>
-                    ))}
+                    {subCategories.map(sub => (<option key={sub.id_sub_kategori} value={sub.id_sub_kategori}>{sub.nama_sub}</option>))}
                 </select>
                 <select value={selectedColor} onChange={e => setSelectedColor(e.target.value)} className="filter-select">
                     <option value="">Semua Warna</option>
-                    {colorOptions.map(color => (
-                        <option key={color.id_warna} value={color.id_warna}>{color.nama_warna}</option>
-                    ))}
+                    {colorOptions.map(color => (<option key={color.id_warna} value={color.id_warna}>{color.nama_warna}</option>))}
                 </select>
-
             </div>
 
             <input
                 type="text"
-                placeholder="Cari apa saja..."
+                placeholder="Cari Kode SKU / Nama Barang..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 className="filter-search-input"
             />
             <div className="job-list-container">
-                {/* ======================================================= */}
-                {/* ===    TAMPILAN TABEL UNTUK DESKTOP (DIMODIFIKASI)  === */}
-                {/* ======================================================= */}
+                {/* Tampilan Tabel Desktop */}
                 <table className="job-table">
                     <thead>
                         <tr>
-                            <th>Kode Unik</th>
-                            <th>S/N</th>
+                            <th>Kode SKU</th>
                             <th>Nama Barang</th>
-                            <th>Kondisi</th>
-                            <th>Status Stok</th>
-                            <th>Jumlah Stok</th>
-                            <th>Warna</th>
-                            <th>Harga Beli</th>
-                            <th>Tgl Beli</th>
-                            <th>Tgl Masuk</th>
+                            <th>Kategori</th>
+                            <th>Sub-Kategori</th>
+                            <th>Stok Tersedia</th>
+                            <th>Total Unit</th>
                             <th>Ditambahkan Oleh</th>
-                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan="12" style={{ textAlign: 'center' }}>Memuat data stok...</td></tr>
-                        ) : items.length === 0 ? (
-                            <tr><td colSpan="12" style={{ textAlign: 'center', padding: '20px' }}>
-                                Belum ada barang yang didaftarkan dalam stok.
+                            <tr><td colSpan="8" style={{ textAlign: 'center' }}>Memuat data ringkasan...</td></tr>
+                        ) : masterItems.length === 0 ? (
+                            <tr><td colSpan="8" style={{ textAlign: 'center', padding: '20px' }}>
+                                Tidak ada barang cocok dengan filter.
                             </td></tr>
                         ) : (
-                            items.map(item => (
-                                // --- BARIS INI DIMODIFIKASI ---
-                                <tr key={item.id} className="clickable-row" onClick={(e) => handleRowClick(e, item)}>
-                                    <td>{item.kode_unik}</td>
-                                    <td>{item.serial_number || '-'}</td>
-                                    <td>{item.master_barang?.nama_barang}</td>
-                                    <td>{item.kondisi}</td>
-                                    <td>
-                                        <span className={`status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
-                                            {item.status_detail?.nama_status || 'Tanpa Status'}
-                                        </span>
-                                    </td>
-                                    <td>{item.master_barang?.stok_barangs_count || 'N/A'}</td>
-                                    <td>
-                                        {item.color ? (
-                                            <span
-                                                title={item.color.nama_warna}
-                                                style={{
-                                                    display: 'inline-block',
-                                                    width: '20px',
-                                                    height: '20px',
-                                                    backgroundColor: item.color.kode_hex,
-                                                    border: '1px solid #ccc',
-                                                    borderRadius: '4px'
-                                                }}
-                                            ></span>
-                                        ) : (
-                                            '-'
-                                        )}
-                                    </td>
-                                    <td>Rp {Number(item.harga_beli).toLocaleString('id-ID')}</td>
-                                    <td>{item.tanggal_pembelian ? new Date(item.tanggal_pembelian).toLocaleDateString('id-ID') : '-'}</td>
-                                    <td>{item.tanggal_masuk ? new Date(item.tanggal_masuk).toLocaleDateString('id-ID') : '-'}</td>
-                                    <td>{item.created_by?.name || 'N/A'}</td>
-                                    <td className="action-buttons-group">
-                                        {/* Menggunakan e.stopPropagation() agar klik tombol tidak memicu klik baris */}
-                                        <button onClick={(e) => { e.stopPropagation(); setDetailItem(item); }} className="btn-user-action btn-detail">Detail</button>
-                                        <button onClick={(e) => { e.stopPropagation(); setQrModalItem(item); }} className="btn-user-action btn-edit">QR</button>
-                                    </td>
-                                </tr>
+                            masterItems.map(masterItem => (
+                                <React.Fragment key={masterItem.id_m_barang}>
+                                    <tr
+                                        className={`summary-row hoverable-row ${expandedRows[masterItem.id_m_barang] ? 'expanded' : ''}`} // Tambah class 'expanded'
+                                        onClick={() => toggleExpand(masterItem.id_m_barang)}
+                                    >
+                                        <td>{masterItem.kode_barang}</td>
+                                        <td>{masterItem.nama_barang}</td>
+                                        <td>{masterItem.master_kategori?.nama_kategori || '-'}</td>
+                                        <td>{masterItem.sub_kategori?.nama_sub || '-'}</td>
+                                        <td>{masterItem.available_stock_count}</td>
+                                        <td>{masterItem.total_stock_count}</td>
+                                        <td>{masterItem.created_by?.name || 'N/A'}</td>
+                                    </tr>
+                                    {expandedRows[masterItem.id_m_barang] && (
+                                        <tr className="detail-rows-container">
+                                            <td colSpan="7">
+                                                {expandingId === masterItem.id_m_barang ? (
+                                                    <div className="detail-loading">Memuat detail unit...</div>
+                                                ) : detailItems[masterItem.id_m_barang]?.length > 0 ? (
+                                                    <div className="detail-list-wrapper">
+                                                        <div className="detail-list-header">
+                                                            <div className="detail-cell header-kode">Kode Unik</div>
+                                                            <div className="detail-cell header-sn">S/N</div>
+                                                            <div className="detail-cell header-kondisi">Kondisi</div>
+                                                            <div className="detail-cell header-status">Status</div>
+                                                            <div className="detail-cell header-jumlah">Jumlah</div>
+                                                            <div className="detail-cell header-warna">Warna</div>
+                                                            <div className="detail-cell header-harga">Harga Beli</div>
+                                                            <div className="detail-cell header-tglbeli">Tgl Beli</div>
+                                                            <div className="detail-cell header-tanggal">Tgl Masuk</div>
+                                                            <div className="detail-cell header-creator">Ditambahkan</div>
+                                                            <div className="detail-cell header-aksi">Aksi</div>
+                                                        </div>
+
+                                                        <div className="detail-rows-list-container">
+                                                            {detailItems[masterItem.id_m_barang].map(detail => (
+                                                                <div
+                                                                    key={detail.id}
+                                                                    className="detail-row-div hoverable-row"
+                                                                    onClick={(e) => {
+                                                                        if (e.target.tagName === 'BUTTON' || e.target.closest('.action-buttons-group')) return;
+                                                                        setDetailItem(detail);
+                                                                    }}
+                                                                >
+                                                                    <div className="detail-cell cell-kode">{detail.kode_unik}</div>
+                                                                    <div className="detail-cell cell-sn">{detail.serial_number || '-'}</div>
+                                                                    <div className="detail-cell cell-kondisi">{detail.kondisi}</div>
+                                                                    <div className="detail-cell cell-status">
+                                                                        <span className={`status-badge status-${(detail.status_detail?.nama_status || 'unknown').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                                            {detail.status_detail?.nama_status || 'N/A'}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="detail-cell cell-jumlah">1</div>
+                                                                    <div className="detail-cell cell-warna">
+                                                                        {detail.color ? (
+                                                                            <span title={detail.color.nama_warna} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                                                                <span className="color-swatch" style={{ backgroundColor: detail.color.kode_hex }}></span>
+                                                                            </span>
+                                                                        ) : '-'}
+                                                                    </div>
+                                                                    <div className="detail-cell cell-harga">{formatCurrency(detail.harga_beli)}</div>
+                                                                    <div className="detail-cell cell-tglbeli">{formatDate(detail.tanggal_pembelian)}</div>
+                                                                    <div className="detail-cell cell-tanggal">{formatDate(detail.tanggal_masuk)}</div>
+                                                                    <div className="detail-cell cell-creator">{detail.created_by?.name || '-'}</div>
+                                                                    <div className="detail-cell cell-aksi action-buttons-group">
+                                                                        <button onClick={(e) => { e.stopPropagation(); setDetailItem(detail); }} className="btn-user-action btn-detail">Detail</button>
+                                                                        <button onClick={(e) => { e.stopPropagation(); setQrModalItem(detail); }} className="btn-user-action btn-edit">QR</button>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="detail-nodata">{getNoDetailMessage()}</div>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    )}
+                                </React.Fragment>
                             ))
                         )}
                     </tbody>
                 </table>
-                {/* ======================================================= */}
-                {/* ===    TAMPILAN MOBILE (DIMODIFIKASI)               === */}
-                {/* ======================================================= */}
+
+                {/* Tampilan Mobile */}
                 <div className="job-list-mobile">
-                    {loading ? (
-                        <p style={{ textAlign: 'center' }}>Memuat data stok...</p>
-                    ) : items.length === 0 ? (
-                        <p style={{ textAlign: 'center', padding: '20px' }}>
-                            Belum ada barang yang didaftarkan dalam stok.
-                        </p>
-                    ) : (
-                        items.map(item => (
-                            // --- BARIS INI DIMODIFIKASI ---
-                            <div key={item.id} className="ticket-card-mobile clickable-row" onClick={(e) => handleRowClick(e, item)}>
-                                <div className="card-header">
-                                    <h4>{item.master_barang?.nama_barang}</h4>
-                                    <small>Kode: {item.kode_unik}</small>
-                                </div>
-                                <div className="card-body">
-                                    <div className="card-item-row">
-                                        <span className="label">Status</span>
-                                        <span className="value">
-                                            <span className={`status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
-                                                {item.status_detail?.nama_status || 'N/A'}
-                                            </span>
-                                        </span>
+                    {loading ? (<p style={{ textAlign: 'center' }}>Memuat data...</p>)
+                        : masterItems.length === 0 ? (<p style={{ textAlign: 'center', padding: '20px' }}>Tidak ada barang cocok filter.</p>)
+                            : (
+                                masterItems.map(masterItem => (
+                                    <div
+                                        key={masterItem.id_m_barang}
+                                        onClick={() => toggleExpand(masterItem.id_m_barang)}
+                                        className={`ticket-card-mobile summary-card hoverable-row ${expandedRows[masterItem.id_m_barang] ? 'expanded' : ''}`}
+                                    >
+                                        <div className="card-header">
+                                            <h4>{masterItem.nama_barang} ({masterItem.kode_barang})</h4>
+                                        </div>
+                                        <div className="card-body">
+                                            <div className="card-item-row">
+                                                <span className="label">Kategori</span>
+                                                <span className="value">{masterItem.master_kategori?.nama_kategori || '-'}</span>
+                                            </div>
+                                            <div className="card-separator"></div>
+                                            <div className="card-item-row">
+                                                <span className="label">Sub-Kategori</span>
+                                                <span className="value">{masterItem.sub_kategori?.nama_sub || '-'}</span>
+                                            </div>
+                                            <div className="card-separator"></div>
+                                            <div className="card-item-row">
+                                                <span className="label">Stok Tersedia</span>
+                                                <span className="value">{masterItem.available_stock_count}</span>
+                                            </div>
+                                            <div className="card-separator"></div>
+                                            <div className="card-item-row">
+                                                <span className="label">Total Unit</span>
+                                                <span className="value">{masterItem.total_stock_count}</span>
+                                            </div>
+                                        </div>
+
+                                        {expandedRows[masterItem.id_m_barang] && (
+                                            <div className="detail-items-mobile-container">
+                                                {expandingId === masterItem.id_m_barang ? (<p className="detail-loading-mobile">Memuat unit...</p>)
+                                                    : detailItems[masterItem.id_m_barang]?.length > 0 ? (
+                                                        detailItems[masterItem.id_m_barang].map(detail => (
+                                                            <div key={detail.id} className="ticket-card-mobile detail-card">
+                                                                <div className="card-header-detail">
+                                                                    <span>{detail.kode_unik}</span>
+                                                                    {detail.serial_number && <small>S/N: {detail.serial_number}</small>}
+                                                                </div>
+                                                                <div className="card-body">
+                                                                    <div className="card-item-row">
+                                                                        <span className="label">Kondisi</span><span className="value">{detail.kondisi}</span>
+                                                                    </div>
+                                                                    <div className="card-separator"></div>
+                                                                    <div className="card-item-row">
+                                                                        <span className="label">Status</span>
+                                                                        <span className="value">
+                                                                            <span className={`status-badge status-${(detail.status_detail?.nama_status || 'unknown').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                                                {detail.status_detail?.nama_status || 'N/A'}
+                                                                            </span>
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="card-separator"></div>
+                                                                    <div className="card-item-row">
+                                                                        <span className="label">Warna</span>
+                                                                        <span className="value">{detail.color ? detail.color.nama_warna : '-'}</span>
+                                                                    </div>
+                                                                    <div className="card-separator"></div>
+                                                                    <div className="card-item-row">
+                                                                        <span className="label">Harga</span>
+                                                                        <span className="value">{formatCurrency(detail.harga_beli)}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="card-separator"></div>
+                                                                <div className="card-row action-row">
+                                                                    <button onClick={() => setDetailItem(detail)} className="btn-user-action btn-detail">Detail</button>
+                                                                    <button onClick={() => setQrModalItem(detail)} className="btn-user-action btn-edit">QR</button>
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <p className="detail-nodata-mobile">{getNoDetailMessage()}</p>
+                                                    )}
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="card-separator"></div>
-                                    <div className="card-item-row">
-                                        <span className="label">S/N</span>
-                                        <span className="value">{item.serial_number || '-'}</span>
-                                    </div>
-                                    <div className="card-separator"></div>
-                                    <div className="card-item-row">
-                                        <span className="label">Kondisi</span>
-                                        <span className="value">{item.kondisi}</span>
-                                    </div>
-                                    <div className="card-separator"></div>
-                                    <div className="card-item-row">
-                                        <span className="label">Warna</span>
-                                        <span className="value">
-                                            {item.color ? (
-                                                <span title={item.color.nama_warna} style={{
-                                                    display: 'inline-block',
-                                                    width: '20px', height: '20px',
-                                                    backgroundColor: item.color.kode_hex,
-                                                    border: '1px solid #ccc', borderRadius: '4px',
-                                                    verticalAlign: 'middle'
-                                                }}></span>
-                                            ) : '-'}
-                                        </span>
-                                    </div>
-                                    <div className="card-separator"></div>
-                                    <div className="card-item-row">
-                                        <span className="label">Harga Beli</span>
-                                        <span className="value">Rp {Number(item.harga_beli).toLocaleString('id-ID')}</span>
-                                    </div>
-                                    <div className="card-separator"></div>
-                                    <div className="card-item-row">
-                                        <span className="label">Tgl. Beli</span>
-                                        <span className="value">{item.tanggal_pembelian ? new Date(item.tanggal_pembelian).toLocaleDateString('id-ID') : '-'}</span>
-                                    </div>
-                                    <div className="card-separator"></div>
-                                    <div className="card-item-row">
-                                        <span className="label">Tgl. Masuk</span>
-                                        <span className="value">{item.tanggal_masuk ? new Date(item.tanggal_masuk).toLocaleDateString('id-ID') : '-'}</span>
-                                    </div>
-                                    <div className="card-separator"></div>
-                                    <div className="card-item-row">
-                                        <span className="label">Total Stok SKU</span>
-                                        <span className="value">{item.master_barang?.stok_barangs_count || 'N/A'}</span>
-                                    </div>
-                                    <div className="card-separator"></div>
-                                    <div className="card-item-row">
-                                        <span className="label">Ditambahkan</span>
-                                        <span className="value">{item.created_by?.name || 'N/A'}</span>
-                                    </div>
-                                </div>
-                                <div className="card-separator"></div>
-                                <div className="card-row action-row">
-                                    {/* Menggunakan e.stopPropagation() agar klik tombol tidak memicu klik baris */}
-                                    <button onClick={(e) => { e.stopPropagation(); setDetailItem(item); }} className="btn-user-action btn-detail">Detail</button>
-                                    <button onClick={(e) => { e.stopPropagation(); setQrModalItem(item); }} className="btn-user-action btn-edit">QR</button>
-                                </div>
-                            </div>
-                        ))
-                    )}
+                                ))
+                            )}
                 </div>
+
             </div>
             {pagination && pagination.last_page > 1 && (
                 <Pagination
@@ -365,38 +473,39 @@ function StokBarangView() {
                 />
             )}
 
-            {/* --- PEMANGGILAN MODAL (DIMODIFIKASI) --- */}
+            {/* Modal */}
             {detailItem && (
                 <ItemDetailModal
                     item={detailItem}
                     onClose={() => setDetailItem(null)}
-                    onEditClick={handleOpenEditModal} // Menggunakan handler yang sudah ada
+                    onEditClick={handleOpenEditModal}
                     showToast={showToast}
-                    onSaveSuccess={handleSaveSuccess} // Menggunakan handler baru
+                    onSaveSuccess={handleSaveSuccess}
+                    formatDate={formatDate}
+                    formatCurrency={formatCurrency}
                 />
             )}
-
             {editItem && (
                 <EditStokBarangModal
                     isOpen={!!editItem}
                     onClose={() => setEditItem(null)}
                     item={editItem}
                     showToast={showToast}
-                    onSaveSuccess={handleSaveSuccess} // Menggunakan handler baru
+                    onSaveSuccess={handleSaveSuccess}
+                    statusOptions={statusOptions}
+                    colorOptions={colorOptions}
+                    userOptions={[]}
                 />
             )}
-
             {qrModalItem && (
                 <div className="modal-backdrop" onClick={() => setQrModalItem(null)}>
                     <div className="modal-content-qr" onClick={e => e.stopPropagation()}>
                         <h3>QR Code untuk {qrModalItem.kode_unik}</h3>
-
                         <div className="qr-container">
                             <QRCode value={qrModalItem.kode_unik} size={256} level="H" />
                             <p className="item-name">{qrModalItem.master_barang?.nama_barang}</p>
                             <p className="item-serial">S/N: {qrModalItem.serial_number || 'N/A'}</p>
                         </div>
-
                     </div>
                 </div>
             )}
@@ -409,7 +518,7 @@ function StokBarangView() {
             <AddStockModal
                 isOpen={isAddStockOpen}
                 onClose={() => setIsAddStockOpen(false)}
-                onSaveSuccess={() => fetchData(1, {})} // Reset ke halaman 1 tanpa filter
+                onSaveSuccess={() => fetchData(1, {})}
                 showToast={showToast}
             />
         </>
