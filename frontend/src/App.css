@@ -3548,22 +3548,28 @@ body.dark-mode .content-area h3 {
 
 /* --- Tema Tombol Edit (Hijau) --- */
 .btn-edit {
-  color: #065F46;
+  background-color: #d1e7dd;
+  color: #0f5132;
   border-color: #badbcc;
+  box-shadow: 0 4px 12px rgba(15, 81, 50, 0.35);
+
+
 }
 
 .btn-edit:hover {
+  background-color: #a8d5b7;
   border-color: #a8d5b7;
   transform: translateY(-1px);
 }
 
-/* [DIUBAH] Dark Mode untuk Tombol Edit (Solid) */
 body.dark-mode .btn-edit {
+  background-color: #22C55E;
   color: #ffffff;
   border-color: #38a169;
 }
 
 body.dark-mode .btn-edit:hover {
+  background-color: #2f855a;
   border-color: #2f855a;
 }
 
@@ -5299,9 +5305,9 @@ body.dark-mode .btn-scan:hover {
 .modal-content .form-group textarea,
 .modal-content .form-group input {
   width: 100%;
-  background-color: #4A4A4A;
-  color: #FFFFFF;
-  border: 1px solid #666;
+  background: #ffffff;
+  border-color: #d1d5db;
+  color: #111827;
   border-radius: 8px;
   font-size: 16px;
   padding: 12px 15px;
@@ -10907,7 +10913,8 @@ input:disabled {
   padding-right: 8px;
   padding-top: 10px;
   padding-bottom: 10px;
-  padding-left: 10px; /* Tambahkan padding kiri agar seimbang */
+  padding-left: 10px;
+  /* Tambahkan padding kiri agar seimbang */
   border: 1px solid var(--border-color-light);
   border-radius: 8px;
   background-color: var(--input-bg-light);
@@ -11361,10 +11368,9 @@ body {
 }
 
 .btn-detail {
-
   color: #084298;
   border-color: #b6d4fe;
-
+  ;
 }
 
 .btn-detail:hover {
@@ -11373,11 +11379,27 @@ body {
 
 /* --- Dark Mode: Tombol Start / Lanjutkan / Bukti (Biru Solid) --- */
 body.dark-mode .btn-detail {
-  color: #ffffff;
+  color: #93c5fd;
 }
 
 body.dark-mode .btn-detail:hover {
   border-color: #2563eb;
+}
+
+.btn-qr {
+  color: #1EBE57;
+}
+
+.btn-qr:hover {
+  border-color: #16a34a;
+}
+
+body.dark-mode .btn-qr {
+  color: #d1fae5;
+}
+
+body.dark-mode .btn-qr:hover {
+  border-color: #16a34a;
 }
 
 
@@ -12303,15 +12325,18 @@ body.dark-mode .btn-detail:hover {
 }
 
 .score-badge.positive {
-  background-color: #10b981; /* green-500 */
+  background-color: #10b981;
+  /* green-500 */
 }
 
 .score-badge.negative {
-  background-color: #ef4444; /* red-500 */
+  background-color: #ef4444;
+  /* red-500 */
 }
 
 .score-badge.neutral {
-  background-color: #6b7280; /* gray-500 */
+  background-color: #6b7280;
+  /* gray-500 */
 }
 
 .btn-delete-icon {
@@ -12565,21 +12590,20 @@ body.dark-mode .btn-detail:hover {
 /* =========================================== */
 
 body.dark-mode .stok-summary-table thead th {
-  background-color: #374151;
+  background-color: #1f1f1f;
   color: #e5e7eb;
-  border-bottom-color: #60a5fa;
 }
 
 body.dark-mode .summary-row {
-  border-bottom-color: #4b5563;
+  border-bottom-color: #1f1f1f;
 }
 
-body.dark-mode .summary-row:hover {
-  background-color: #374151;
+.dark-mode .summary-row:hover {
+  background-color: #1f1f1f;
 }
 
 body.dark-mode .summary-row.expanded {
-  background-color: #3b4d6e;
+  background-color: #1f1f1f;
   /* Background berbeda saat expand di dark mode */
 }
 
@@ -12587,28 +12611,27 @@ body.dark-mode .summary-row.expanded {
 body.dark-mode .detail-list-wrapper,
 body.dark-mode .detail-loading,
 body.dark-mode .detail-nodata {
-  background-color: #2c333f;
-  border-bottom-color: #4b5563;
-  color: #9ca3af;
+  background-color: #1f1f1f;
+  border-bottom-color: #374151;
+  color: #d1d5db;
   /* Warna teks default untuk area detail */
 }
 
 body.dark-mode .detail-list-header {
-  background-color: #374151;
+  background-color: #1f1f1f;
   color: #d1d5db;
-  border-bottom-color: #4b5563;
+  border-bottom-color: #374151;
 }
 
 body.dark-mode .detail-row-div {
-  border-bottom-color: #4b5563;
+  border-bottom-color: #374151;
 }
-
-body.dark-mode .detail-row-div:hover {
+.dark-mode .detail-row-div:hover {
   background-color: #374151;
 }
 
 body.dark-mode .cell-warna .color-swatch {
-  border-color: #6b7280;
+  border-color: #374151;
 }
 
 /* =========================================== */
@@ -12625,8 +12648,8 @@ body.dark-mode .cell-warna .color-swatch {
 }
 
 body.dark-mode .summary-card.expanded {
-  background-color: #3b4d6e;
-  border-left-color: #60a5fa;
+  background-color: #1f1f1f;
+  border-left-color: #3b82f6;
 }
 
 @keyframes slideDown {
@@ -12640,12 +12663,16 @@ body.dark-mode .summary-card.expanded {
     /* Mungkin perlu transform juga jika ingin efek slide */
     /* transform: translateY(-10px); */
   }
+
   to {
-    max-height: 1000px; /* Tinggi maksimal yang cukup besar */
+    max-height: 1000px;
+    /* Tinggi maksimal yang cukup besar */
     opacity: 1;
-    padding-top: 0.5rem; /* Padding saat terbuka */
+    padding-top: 0.5rem;
+    /* Padding saat terbuka */
     padding-bottom: 0.5rem;
-    border-bottom-width: 1px; /* Tampilkan border saat terbuka */
+    border-bottom-width: 1px;
+    /* Tampilkan border saat terbuka */
     /* transform: translateY(0); */
   }
 }
@@ -12659,6 +12686,7 @@ body.dark-mode .summary-card.expanded {
     border-bottom-width: 1px;
     /* transform: translateY(0); */
   }
+
   to {
     max-height: 0;
     opacity: 0;

@@ -19,13 +19,17 @@ function ItemHistoryLookupPage() {
     const [exportingExcel, setExportingExcel] = useState(false);
     const [exportingPdf, setExportingPdf] = useState(false);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
     const fetchData = useCallback(async (page = 1) => {
         setLoading(true);
         try {
             const params = {
                 page,
                 search: debouncedSearchTerm,
-                has_history: true
+                has_history: true,
+                start_date: startDate,
+                end_date: endDate
             };
             const res = await api.get('/inventory/stock-items', { params });
             setItems(res.data.data);
@@ -35,7 +39,7 @@ function ItemHistoryLookupPage() {
         } finally {
             setLoading(false);
         }
-    }, [showToast, debouncedSearchTerm]);
+    }, [showToast, debouncedSearchTerm, startDate, endDate]);
 
     useEffect(() => {
         fetchData(1);
@@ -67,7 +71,9 @@ function ItemHistoryLookupPage() {
             const params = {
                 type,
                 search: searchTerm,
-                export_type: exportType
+                export_type: exportType,
+                start_date: startDate, 
+                end_date: endDate       
             };
 
             const response = await api.get('/reports/inventory/export', {
@@ -142,8 +148,21 @@ function ItemHistoryLookupPage() {
                         className="filter-search-input"
                     />
                     <div className="filter-row-bottom">
-                        <div className="date-filters" style={{ visibility: 'hidden' }}>
-                            <input type="date" className="filter-select-cal" />
+                        <div className="date-filters">
+                            <input
+                                type="date"
+                                className="filter-select-cal"
+                                value={startDate}
+                                onChange={e => setStartDate(e.target.value)}
+                            />
+                            <span style={{ margin: '0 0.5rem', alignSelf: 'center' }}>-</span>
+                            <input
+                                type="date"
+                                className="filter-select-cal"
+                                value={endDate}
+                                onChange={e => setEndDate(e.target.value)}
+                                min={startDate} // Mencegah tanggal akhir sebelum tanggal mulai
+                            />
                         </div>
                         <div className="download-buttons">
                             <button onClick={() => setIsScannerOpen(true)} className="btn-scan">

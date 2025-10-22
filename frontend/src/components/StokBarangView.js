@@ -25,7 +25,7 @@ function StokBarangView() {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedSubCategory, setSelectedSubCategory] = useState('');
     const [statusOptions, setStatusOptions] = useState([]);
-    const [selectedStatus, setSelectedStatus] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState('ALL');
     const [colorOptions, setColorOptions] = useState([]);
     const [selectedColor, setSelectedColor] = useState('');
 
@@ -78,7 +78,7 @@ function StokBarangView() {
             }
         });
         api.get('/colors').then(res => setColorOptions(res.data));
-    }, [showToast]);
+    }, [showToast, setTersediaStatusId]);
 
     useEffect(() => {
         if (selectedCategory) {
@@ -109,10 +109,20 @@ function StokBarangView() {
         if (!detailItems[masterBarangId]) {
             setExpandingId(masterBarangId);
             try {
+                let detailStatusId = (selectedStatus === "ALL") ? "" : selectedStatus;
+                if (selectedStatus === "" && !tersediaStatusId) {
+                    console.error("ID Status 'Tersedia' belum siap untuk fetch detail.");
+                    showToast("Gagal memuat detail: Status default belum siap.", "error");
+                    setExpandedRows(prev => ({ ...prev, [masterBarangId]: false }));
+                    setExpandingId(null);
+                    return;
+                }
+
                 const params = {
                     master_barang_id: masterBarangId,
-                    status_id: selectedStatus,
+                    status_id: detailStatusId,
                     id_warna: selectedColor,
+                    search: debouncedSearchTerm
                 };
                 const res = await api.get('/inventory/stock-items', { params });
                 const detailsArray = Array.isArray(res.data) ? res.data : (res.data.data || []);
@@ -152,7 +162,7 @@ function StokBarangView() {
 
     const handleScanSuccess = (decodedText) => {
         setIsScannerOpen(false);
-        handleScanSearch(decodedText);
+        handleScanSearch(decodedText); // <-- Panggil handleScanSearch
     };
 
 
@@ -171,7 +181,8 @@ function StokBarangView() {
 
             if (e.code === 'Enter' || e.key === 'Enter') {
                 if (barcode.length > 3) {
-                    handleScanSearch(barcode.trim());
+                    const code = barcode.trim();
+                    handleScanSearch(code); // <-- Panggil handleScanSearch
                 }
                 barcode = '';
                 return;
@@ -243,11 +254,15 @@ function StokBarangView() {
             {/* Filter Section */}
             <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                 <select value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)} className="filter-select">
-                    <option value="">Status: Tersedia</option>
-                    {statusOptions.map(status => (
-                        <option key={status.id} value={status.id}>{status.nama_status}</option>
-                    ))}
                     <option value="ALL">Semua Status</option>
+                    {tersediaStatusId && (
+                        <option value={tersediaStatusId}>Tersedia</option>
+                    )}
+                    {statusOptions
+                        .filter(status => status.id !== tersediaStatusId) // Hapus 'Tersedia' jika ada
+                        .map(status => (
+                            <option key={status.id} value={status.id}>{status.nama_status}</option>
+                        ))}
                 </select>
                 <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)} className="filter-select">
                     <option value="">Semua Kategori</option>
@@ -286,16 +301,16 @@ function StokBarangView() {
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan="8" style={{ textAlign: 'center' }}>Memuat data ringkasan...</td></tr>
+                            <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat data ringkasan...</td></tr>
                         ) : masterItems.length === 0 ? (
-                            <tr><td colSpan="8" style={{ textAlign: 'center', padding: '20px' }}>
+                            <tr><td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>
                                 Tidak ada barang cocok dengan filter.
                             </td></tr>
                         ) : (
                             masterItems.map(masterItem => (
                                 <React.Fragment key={masterItem.id_m_barang}>
                                     <tr
-                                        className={`summary-row hoverable-row ${expandedRows[masterItem.id_m_barang] ? 'expanded' : ''}`} // Tambah class 'expanded'
+                                        className={`summary-row hoverable-row ${expandedRows[masterItem.id_m_barang] ? 'expanded' : ''}`}
                                         onClick={() => toggleExpand(masterItem.id_m_barang)}
                                     >
                                         <td>{masterItem.kode_barang}</td>
@@ -359,7 +374,7 @@ function StokBarangView() {
                                                                     <div className="detail-cell cell-creator">{detail.created_by?.name || '-'}</div>
                                                                     <div className="detail-cell cell-aksi action-buttons-group">
                                                                         <button onClick={(e) => { e.stopPropagation(); setDetailItem(detail); }} className="btn-user-action btn-detail">Detail</button>
-                                                                        <button onClick={(e) => { e.stopPropagation(); setQrModalItem(detail); }} className="btn-user-action btn-edit">QR</button>
+                                                                        <button onClick={(e) => { e.stopPropagation(); setQrModalItem(detail); }} className="btn-user-action btn-qr">QR</button>
                                                                     </div>
                                                                 </div>
                                                             ))}
@@ -450,7 +465,7 @@ function StokBarangView() {
                                                                 <div className="card-separator"></div>
                                                                 <div className="card-row action-row">
                                                                     <button onClick={() => setDetailItem(detail)} className="btn-user-action btn-detail">Detail</button>
-                                                                    <button onClick={() => setQrModalItem(detail)} className="btn-user-action btn-edit">QR</button>
+                                                                    <button onClick={() => setQrModalItem(detail)} className="btn-user-action btn-qr">QR</button>
                                                                 </div>
                                                             </div>
                                                         ))
@@ -463,7 +478,6 @@ function StokBarangView() {
                                 ))
                             )}
                 </div>
-
             </div>
             {pagination && pagination.last_page > 1 && (
                 <Pagination

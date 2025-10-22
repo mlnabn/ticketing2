@@ -3,7 +3,7 @@ import Select from 'react-select';
 import AsyncSelect from 'react-select/async';
 import api from '../services/api';
 
-// Custom hook untuk listener scanner
+
 const useScannerListener = (onScan, isOpen) => {
     useEffect(() => {
         if (!isOpen) return;
