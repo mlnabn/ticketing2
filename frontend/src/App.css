@@ -10869,6 +10869,20 @@ input:disabled {
   flex-direction: column;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 0.75rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px; /* Tambahkan padding kiri agar seimbang */
+  border: 1px solid var(--border-color-light);
+  border-radius: 8px;
+  background-color: var(--input-bg-light);
+}
+
+.dark-mode .serial-number-container {
+  border-color: var(--border-color-dark);
+  background-color: #111111;
 }
 
 .item-detail-container {
