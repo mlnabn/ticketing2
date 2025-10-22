@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import { useOutletContext } from 'react-router-dom';
-import { FaSpinner } from 'react-icons/fa';
+import { FaSpinner, FaTrash } from 'react-icons/fa';
 
 export default function UrgencyKeywordManagement() {
   const { showToast } = useOutletContext();
   const [keywords, setKeywords] = useState([]);
   const [newKeyword, setNewKeyword] = useState('');
+  const [newScore, setNewScore] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Fungsi untuk mengambil daftar kata kunci dari API
   const fetchKeywords = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -28,7 +28,6 @@ export default function UrgencyKeywordManagement() {
     fetchKeywords();
   }, [fetchKeywords]);
 
-  // Fungsi untuk menangani penambahan kata kunci baru
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!newKeyword.trim()) {
@@ -37,10 +36,11 @@ export default function UrgencyKeywordManagement() {
     }
     setIsSubmitting(true);
     try {
-      await api.post('/urgency-keywords', { keyword: newKeyword });
+      await api.post('/urgency-keywords', { keyword: newKeyword, score: newScore });
       showToast('Kata kunci berhasil ditambahkan.', 'success');
-      setNewKeyword(''); // Kosongkan input setelah berhasil
-      fetchKeywords(); // Muat ulang daftar
+      setNewKeyword(''); 
+      setNewScore(1);
+      fetchKeywords();
     } catch (error) {
       const errorMsg = error.response?.data?.message || 'Gagal menambahkan kata kunci.';
       showToast(errorMsg, 'error');
@@ -49,39 +49,55 @@ export default function UrgencyKeywordManagement() {
     }
   };
 
-  // Fungsi untuk menghapus kata kunci
   const handleDelete = async (keywordId) => {
     if (window.confirm('Anda yakin ingin menghapus kata kunci ini?')) {
       try {
         await api.delete(`/urgency-keywords/${keywordId}`);
         showToast('Kata kunci berhasil dihapus.', 'success');
-        fetchKeywords(); // Muat ulang daftar
+        fetchKeywords();
       } catch (error) {
         showToast('Gagal menghapus kata kunci.', 'error');
       }
     }
   };
 
+  const getScoreBadgeClass = (score) => {
+    if (score > 0) return 'score-badge positive';
+    if (score < 0) return 'score-badge negative';
+    return 'score-badge neutral';
+  };
+
   return (
     <div className="user-management-container">
       <h1 className="page-title">Manajemen Kata Kunci Urgensi</h1>
-      <p>
-        Tambahkan atau hapus kata kunci yang akan menandai sebuah tiket sebagai "URGENT" secara otomatis.
+      <p className="page-description">
+        Tambahkan kata kunci dan skornya. Tiket akan dianggap URGENT jika total skor
+        mencapai <b>{process.env.REACT_APP_URGENCY_THRESHOLD || 5}</b>.
+        <br/>
+        <b>Contoh:</b> "server down" (Skor: 10), "tidak" (Skor: -5), "lemot" (Skor: 3).
       </p>
 
       {/* Form untuk menambah kata kunci baru */}
       <div className="card" style={{ marginBottom: '2rem' }}>
         <form onSubmit={handleSubmit} className="keyword-form">
-          <input
-            type="text"
-            value={newKeyword}
-            onChange={(e) => setNewKeyword(e.target.value)}
-            placeholder="Masukkan kata kunci baru (mis: server down)"
-            disabled={isSubmitting}
-            className="filter-search-input-key"
-          />
-          <button type="submit" className="btn-keyword" disabled={isSubmitting}>
-            <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
+          {/* PERUBAHAN: Form sekarang punya 2 input */}
+          <div className="keyword-form-inputs">
+            <input
+              type="text"
+              value={newKeyword}
+              onChange={(e) => setNewKeyword(e.target.value)}
+              placeholder="Masukkan kata kunci (mis: server down)"
+              disabled={isSubmitting}
+            />
+            <input
+              type="number"
+              value={newScore}
+              onChange={(e) => setNewScore(parseInt(e.target.value, 10))}
+              disabled={isSubmitting}
+              className="score-input"
+            />
+          </div>
+          <button type="submit" className="btn-primary" disabled={isSubmitting}> {/* (modified) */}
             {isSubmitting ? <><FaSpinner className="spin" /> Menambahkan...</> : 'Tambah'}
           </button>
         </form>
@@ -99,9 +115,12 @@ export default function UrgencyKeywordManagement() {
                 {keywords.map((kw) => (
                   <li key={kw.id} className="history-item">
                     <span>{kw.keyword}</span>
-                    <button onClick={() => handleDelete(kw.id)} className="btn-delete-icon">
-                      <i className="fas fa-trash-alt"></i>
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <span className={getScoreBadgeClass(kw.score)}>{kw.score}</span>
+                      <button onClick={() => handleDelete(kw.id)} className="btn-delete-icon">
+                        <FaTrash /> {/* (modified) */}
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>

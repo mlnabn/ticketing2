@@ -845,8 +845,8 @@ class TicketController extends Controller
     private function getUrgentKeywords()
     {
         // Cache selama 60 menit untuk performa
-        return Cache::remember('urgent_keywords', 60, function () {
-            return UrgencyKeyword::pluck('keyword')->toArray();
+        return Cache::remember('urgent_keywords_scores', 60, function () {
+            return UrgencyKeyword::pluck('score', 'keyword')->toArray();
         });
     }
 
@@ -860,10 +860,18 @@ class TicketController extends Controller
             return false;
         }
 
-        // Buat satu regex dari semua keyword untuk pencarian yang efisien
-        // \b memastikan kita mencari kata utuh (misal: 'error' tidak akan cocok dengan 'terror')
-        $pattern = '/\b(' . implode('|', array_map('preg_quote', $keywords)) . ')\b/i';
+        $totalScore = 0;
+        $descriptionLower = strtolower($description);
 
-        return preg_match($pattern, $description) === 1;
+        foreach ($keywords as $keyword => $score) {
+            $pattern = '/\b' . preg_quote($keyword, '/') . '\b/i';
+
+            if (preg_match($pattern, $descriptionLower)) {
+                $totalScore += $score;
+            }
+        }
+
+        $threshold = config('app.urgency_threshold', 5);
+        return $totalScore >= $threshold;
     }
 }
