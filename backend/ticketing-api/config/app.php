@@ -125,4 +125,6 @@ return [
 
     
     'n8n_api_key' => env('N8N_API_KEY'),
+
+    'urgency_threshold' => env('URGENCY_THRESHOLD', 5),
 ];

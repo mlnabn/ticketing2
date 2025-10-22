@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class UrgencyKeyword extends Model
 {
     use HasFactory;
-    protected $fillable = ['keyword'];
+    protected $fillable = ['keyword', 'score'];
 }
