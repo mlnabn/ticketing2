@@ -20,6 +20,7 @@ export default function JobList() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const [isLoading, setIsLoading] = useState(true);
 
   const isMyTicketsPage = location.pathname.includes('/my-tickets');
   const isAdmin = user?.role?.toLowerCase() === 'admin';
@@ -50,7 +51,8 @@ export default function JobList() {
   }, [location.pathname]);
 
   const fetchTickets = useCallback(async (currentPage = 1) => {
-    setTicketData(null);
+    // setTicketData(null);
+    setIsLoading(true);
     const endpoint = isMyTicketsPage ? '/tickets/my-tickets' : '/tickets';
     
     const params = {
@@ -64,15 +66,12 @@ export default function JobList() {
 
     try {
       const response = await api.get(endpoint, { params });
-      if (response.data && Array.isArray(response.data.data)) {
-        const sortedTickets = response.data.data.sort((a, b) => b.is_urgent - a.is_urgent);
-        response.data.data = sortedTickets;
-      }
       setTicketData(response.data);
     } catch (e) {
       console.error('Gagal mengambil data tiket:', e);
       showToast('Gagal memuat data tiket.', 'error');
       if (e.response?.status === 401) logout();
+      setTicketData({ data: [], current_page: 1, last_page: 1 });
     }
   }, [isMyTicketsPage, debouncedSearchTerm, logout, showToast, searchParams]);
 
@@ -112,7 +111,7 @@ export default function JobList() {
       try {
         await api.patch(`/tickets/${ticket.id}/status`, { status: newStatus });
         showToast('Status tiket berhasil diupdate.', 'success');
-        fetchTickets();
+        fetchTickets(page);
       } catch (e) {
         showToast(e.response?.data?.error || 'Gagal mengupdate status tiket.', 'error');
       }
@@ -123,7 +122,7 @@ export default function JobList() {
     try {
       await api.patch(`/tickets/${ticketId}/assign`, { user_id: adminId, stok_barang_ids: stokIds });
       setTicketToAssign(null);
-      fetchTickets();
+      fetchTickets(page);
       showToast('Tiket berhasil ditugaskan.', 'success');
     } catch (e) {
       const errorMsg = e.response?.data?.errors?.tools || e.response?.data?.message || 'Gagal menugaskan tiket.';
@@ -135,7 +134,7 @@ export default function JobList() {
     try {
       await api.patch(`/tickets/${ticketId}/reject`, { reason });
       setTicketToReject(null);
-      fetchTickets();
+      fetchTickets(page);
       showToast('Tiket berhasil ditolak.', 'success');
     } catch (e) {
       showToast('Gagal menolak tiket.', 'error');
@@ -147,7 +146,7 @@ export default function JobList() {
       await api.post(`/tickets/${ticketId}/submit-proof`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       showToast('Bukti pengerjaan berhasil disimpan.', 'success');
       setTicketForProof(null);
-      fetchTickets();
+      fetchTickets(page);
     } catch (e) {
       const errorMessage = e.response?.data?.error || 'Gagal menyimpan bukti.';
       showToast(errorMessage, 'error');
@@ -159,7 +158,7 @@ export default function JobList() {
       await api.post(`/tickets/${ticketId}/process-return`, { items });
       showToast('Tiket selesai dan barang telah diproses.', 'success');
       setTicketToReturn(null);
-      fetchTickets();
+      fetchTickets(page);
       fetchPrerequisites();
     } catch (e) {
       showToast(e.response?.data?.message || 'Gagal memproses pengembalian.', 'error');
@@ -170,7 +169,7 @@ export default function JobList() {
     if (!ticketToDelete) return;
     try {
       await api.delete(`/tickets/${ticketToDelete.id}`);
-      fetchTickets();
+      fetchTickets(page);
       showToast('Tiket berhasil dihapus.', 'success');
     } catch (e) {
       const message = e.response?.data?.error || 'Gagal menghapus tiket.';
@@ -189,7 +188,7 @@ export default function JobList() {
       try {
         await api.post('/tickets/bulk-delete', { ids: selectedIds });
         showToast(`${selectedIds.length} tiket berhasil dihapus.`, 'success');
-        fetchTickets();
+        fetchTickets(page);
         setSelectedIds([]);
       } catch (e) {
         showToast('Terjadi kesalahan saat mencoba menghapus tiket.', 'error');
@@ -297,9 +296,9 @@ export default function JobList() {
                   ticketsOnPage.map(ticket => (
                     <tr 
                       key={ticket.id} 
-                      className={`${selectedIds.includes(ticket.id) ? 'selected-row' : ''} 
-                                  ${ticket.is_urgent ? 'urgent-row' : ''} 
-                                  clickable-row`} 
+                      className={`${selectedIds.includes(ticket.id) ? 'selected-row' : ''}
+                      ${(ticket.is_urgent && ticket.status !== 'Selesai' && ticket.status !== 'Ditolak') ? 'urgent-row' : ''}
+                      clickable-row`}
                       onClick={(e) => handleRowClick(e, ticket)}
                     >
                       {isAdmin && !isMyTicketsPage && (<td><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>)}
@@ -323,7 +322,7 @@ export default function JobList() {
                 ticketsOnPage.map(ticket => (
                   <div 
                     key={ticket.id} 
-                    className={`ticket-card-mobile clickable-row ${ticket.is_urgent ? 'urgent-row' : ''}`} 
+                    className={`ticket-card-mobile clickable-row ${(ticket.is_urgent && ticket.status !== 'Selesai' && ticket.status !== 'Ditolak') ? 'urgent-row' : ''}`}
                     onClick={(e) => handleRowClick(e, ticket)}
                   >
                     <div className="card-row">
