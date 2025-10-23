@@ -110,7 +110,7 @@ class TicketController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $perPage = $request->query('per_page', 15);
+        $perPage = $request->query('per_page', 15); // Ambil perPage di awal
 
         $query = Ticket::with(['user', 'creator', 'masterBarangs', 'workshop']);
 
@@ -120,36 +120,42 @@ class TicketController extends Controller
 
         $query = $this->applyFilters($query, $request);
 
+        // Terapkan sorting utama (Urgent dulu, lalu tanggal terbaru)
         $query->orderByRaw("CASE
                                 WHEN is_urgent = 1 AND status NOT IN ('Selesai', 'Ditolak') THEN 0
                                 ELSE 1
                              END ASC");
+        $query->orderBy('created_at', 'DESC'); // Gunakan DESC untuk terbaru dulu
 
-        $query->orderBy('created_at', 'DESC');
-
-        $ticketsData = $query->paginate($perPage);
-
-        if ($ticketsData->items() && count($ticketsData->items()) > 0) {
-            $sortedItems = collect($ticketsData->items())->sortByDesc(function ($ticket) {
-                if ($ticket->is_urgent && !in_array($ticket->status, ['Selesai', 'Ditolak'])) {
-                    return 2;
-                }
-                return 0;
-            })->values()->all();
-
-            $ticketsData->setCollection(collect($sortedItems));
-        }
-        return response()->json($ticketsData);
-
+        // --- PINDAHKAN LOGIKA 'all' KE SINI ---
         if ($request->boolean('all')) {
-            $ticketsResult = $query->latest()->get(); // Ambil semua
-            // Kembalikan langsung array jika 'all'
-            return response()->json($ticketsResult);
+            $ticketsResult = $query->get(); // Ambil semua data (Collection)
+
+            // Terapkan sorting sekunder jika diperlukan (walau orderBy di query sudah cukup)
+            $sortedItems = $ticketsResult->sortByDesc(function ($ticket) {
+                if ($ticket->is_urgent && !in_array($ticket->status, ['Selesai', 'Ditolak'])) {
+                    return 2; // Prioritas tertinggi
+                }
+                return 0; // Prioritas normal
+            })->values(); // Reset keys agar menjadi array biasa
+
+            return response()->json($sortedItems); // Kembalikan array/collection langsung
+
         } else {
-            $perPage = $request->query('per_page', 10);
-            $ticketsResult = $query->latest()->paginate($perPage); // Paginate
-            // Kembalikan objek pagination jika tidak 'all'
-            return response()->json($ticketsResult);
+            // --- JIKA TIDAK 'all', LAKUKAN PAGINATION ---
+            $ticketsData = $query->paginate($perPage); // Lakukan paginate
+
+            // Terapkan sorting sekunder pada item hasil pagination
+            if ($ticketsData->items() && count($ticketsData->items()) > 0) {
+                $sortedItems = collect($ticketsData->items())->sortByDesc(function ($ticket) {
+                    if ($ticket->is_urgent && !in_array($ticket->status, ['Selesai', 'Ditolak'])) {
+                        return 2;
+                    }
+                    return 0;
+                })->values()->all();
+                $ticketsData->setCollection(collect($sortedItems));
+            }
+            return response()->json($ticketsData); // Kembalikan objek pagination
         }
     }
 
@@ -913,7 +919,7 @@ class TicketController extends Controller
                         return true;
                     }
                 } else {
-                     Log::warning('Gagal mengekstrak klasifikasi dari respons DeepSeek.', ['response' => $result]);
+                    Log::warning('Gagal mengekstrak klasifikasi dari respons DeepSeek.', ['response' => $result]);
                 }
             } else {
                 Log::error('Gagal menghubungi DeepSeek API.', [
