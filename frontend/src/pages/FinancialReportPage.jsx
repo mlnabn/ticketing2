@@ -125,7 +125,7 @@ export default function FinancialReportPage() {
             </div>
 
             {/* Navigation Section (tidak berubah) */}
-            <div className="navigation-section">
+            <div className="navigation-section" style={{ marginTop: '25px' }}>
                 <h1>Lihat Laporan Detail</h1>
                 <div className="report-navigation-cards">
                     <NavigationCard title="Pembelian Baru (Aset Masuk)" description="Lihat semua data aset yang baru dibeli berdasarkan periode." linkTo="/admin/financial-report/new-acquisitions" icon="fa-dolly-flatbed" />
