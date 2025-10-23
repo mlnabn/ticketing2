@@ -82,24 +82,22 @@ function AcquisitionDetailModal({ item, onClose, formatCurrency, formatDate }) {
                                     <span className="value">{formatCurrency(parseFloat(fullDetail.harga_beli))}</span>
                                 </div>
                                 <div className="detail-item-full">
-                                    <span className="label">Tanggal Pembelian</span>
-                                    <span className="value">{formatDate(fullDetail.tanggal_pembelian)}</span>
-                                </div>
-                                <div className="detail-item-full">
                                     <span className="label">Kondisi Saat Beli</span>
                                     <span className="value">{fullDetail.kondisi}</span>
                                 </div>
-                            </div>
-                            <h4 className="detail-section-title">Informasi Sistem</h4>
-                            <div className="detail-grid-section">
                                 <div className="detail-item-full">
-                                    <span className="label">Dicatat oleh Admin</span>
-                                    <span className="value">{fullDetail.created_by?.name || 'N/A'}</span>
+                                    <span className="label">Tanggal Pembelian</span>
+                                    <span className="value">{formatDate(fullDetail.tanggal_pembelian)}</span>
                                 </div>
                                 <div className="detail-item-full">
                                     <span className="label">Tanggal Masuk Stok</span>
                                     <span className="value">{formatDate(fullDetail.tanggal_masuk)}</span>
                                 </div>
+                            </div>
+                            <h4 className="detail-section-title">Informasi Sistem</h4>
+                            <div className="detail-item-full">
+                                <span className="label">Dicatat oleh Admin</span>
+                                <span className="value">{fullDetail.created_by?.name || 'N/A'}</span>
                             </div>
                         </>
                     )}
