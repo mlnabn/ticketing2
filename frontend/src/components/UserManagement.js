@@ -55,6 +55,12 @@ export default function UserManagement() {
         }
     };
 
+    const handleEditRequest = (userToEditFromModal) => {
+        setDetailUser(null);
+        setUserToEdit(userToEditFromModal);
+        setShowUserFormModal(true); 
+    };
+
     const handleAddUserClick = () => {
         setUserToEdit(null);
         setShowUserFormModal(true);
@@ -197,6 +203,7 @@ export default function UserManagement() {
                 <UserDetailModal
                     user={detailUser}
                     onClose={() => setDetailUser(null)}
+                    onEditRequest={handleEditRequest}
                 />
             )}
         </div>

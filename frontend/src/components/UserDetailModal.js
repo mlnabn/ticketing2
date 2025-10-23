@@ -8,7 +8,7 @@ const formatSimpleDate = (dateTimeString) => {
     return format(new Date(dateTimeString), 'dd MMMM yyyy', { locale: id });
 };
 
-function UserDetailModal({ user, onClose }) {
+function UserDetailModal({ user, onClose, onEditRequest }) {
     const [stats, setStats] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
@@ -107,6 +107,10 @@ function UserDetailModal({ user, onClose }) {
                 </div>
                 <div className="modal-footer-user" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                     <button onClick={onClose} className="btn-cancel">Tutup</button>
+                    <button onClick={() => onEditRequest && onEditRequest(user)} className="btn-confirm">
+                        <i className="fas fa-edit" style={{ marginRight: '8px' }}></i>
+                        Edit Pengguna
+                    </button>
                     {user.phone && (
                         <button onClick={handleWhatsAppChat} className="btn-history">
                             <i className="fab fa-whatsapp" style={{ marginRight: '8px' }}></i>
