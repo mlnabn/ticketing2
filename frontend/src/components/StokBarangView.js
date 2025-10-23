@@ -377,8 +377,7 @@ function StokBarangView() {
                                                                             onClick={(e) => { e.stopPropagation(); setDetailItem(detail); }}
                                                                             className="btn-user-action btn-detail"
                                                                         >
-                                                                            <i className="fas fa-info-circle" style={{ marginRight: '5px' }}></i> {/* <-- Icon Added */}
-                                                                            Detail
+                                                                            <i className="fas fa-info-circle" style={{ fontSize: '20px', marginRight: '5px' }}></i>
                                                                         </button>
 
                                                                         {/* Button QR */}
@@ -386,8 +385,7 @@ function StokBarangView() {
                                                                             onClick={(e) => { e.stopPropagation(); setQrModalItem(detail); }}
                                                                             className="btn-user-action btn-qr"
                                                                         >
-                                                                            <i className="fas fa-qrcode" style={{ marginRight: '5px' }}></i> {/* <-- Icon Added */}
-                                                                            QR
+                                                                            <i className="fas fa-qrcode" style={{ fontSize: '20px', marginRight: '5px' }}></i>
                                                                         </button>
                                                                     </div>
                                                                 </div>

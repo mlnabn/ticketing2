@@ -2657,7 +2657,7 @@ body.dark-mode .job-table tbody tr:last-child td {
 }
 
 .table-body-scroll {
-  max-height: 380px;
+  max-height: 600px;
   overflow-y: auto;
   border-bottom: 1px solid #ddd;
 }

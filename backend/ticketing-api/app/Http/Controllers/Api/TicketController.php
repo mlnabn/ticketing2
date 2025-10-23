@@ -716,7 +716,6 @@ class TicketController extends Controller
     {
         $query = Ticket::query();
 
-        // Terapkan filter tanggal (kode ini sudah benar)
         if ($request->has('year')) {
             $query->whereYear('created_at', $request->year);
         }
@@ -724,11 +723,9 @@ class TicketController extends Controller
             $query->whereMonth('created_at', $request->month);
         }
 
-        // (DIUBAH) Cek apakah ini untuk laporan "handled"
         $isHandledReport = $request->has('handled_status');
 
         $stats = $query->select(
-            // Ganti nama 'total' menjadi 'total_created' agar tidak ambigu
             DB::raw("COUNT(*) as total_created"),
             DB::raw("SUM(CASE WHEN user_id IS NOT NULL THEN 1 ELSE 0 END) as handled"),
             DB::raw("SUM(CASE WHEN status = 'Selesai' THEN 1 ELSE 0 END) as completed"),
@@ -737,9 +734,6 @@ class TicketController extends Controller
         )->first();
 
         $result = [
-            // (DIUBAH) Logika penentuan nilai 'total'
-            // Jika ini laporan "handled", maka total = completed + in_progress.
-            // Jika bukan, maka total = total tiket yang dibuat.
             'total'       => $isHandledReport
                 ? (int)$stats->completed + (int)$stats->in_progress
                 : (int)$stats->total_created,
@@ -781,7 +775,6 @@ class TicketController extends Controller
             $pdf = PDF::loadView('reports.tickets_pdf', compact('tickets', 'title'));
             $pdf->setPaper('a4', 'landscape');
 
-            // DIUBAH: Kembalikan sebagai download stream, bukan file biasa
             return $pdf->download($fileName . '.pdf');
         }
     }
@@ -808,11 +801,11 @@ class TicketController extends Controller
         ]);
 
         DB::transaction(function () use ($ticket, $validated) {
-            $adminId = Auth::id(); // Ambil ID admin yang sedang login
+            $adminId = Auth::id();
 
             foreach ($validated['items'] as $itemData) {
                 $stokBarang = StokBarang::find($itemData['stok_barang_id']);
-                $newStatus = \App\Models\Status::find($itemData['status_id']); // Ambil model status baru
+                $newStatus = \App\Models\Status::find($itemData['status_id']);
 
                 if ($stokBarang && $stokBarang->ticket_id === $ticket->id && $newStatus) {
 
@@ -931,11 +924,10 @@ class TicketController extends Controller
             Log::error('Koneksi ke DeepSeek API gagal.', ['error' => $e->getMessage()]);
         } catch (RequestException $e) {
             Log::error('Request ke DeepSeek API error.', ['error' => $e->getMessage(), 'response' => $e->response?->body()]);
-        } catch (\Exception $e) { // Tangkap error umum lainnya
+        } catch (\Exception $e) { 
             Log::error('Error saat klasifikasi urgensi dengan AI.', ['error' => $e->getMessage()]);
         }
 
-        // Default: Anggap tidak urgent jika ada error atau hasil tidak sesuai
         return false;
     }
 }

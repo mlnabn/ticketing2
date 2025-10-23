@@ -154,8 +154,8 @@ function InventoryDetailModal({ kodeUnik, onClose, formatDate, formatCurrency })
                             </span>
                         </div>
                         <div className="detail-item-full">
-                            <span className="label">Tanggal Masuk Stok</span>
-                            <span className="value">{formatDate(detail.tanggal_masuk)}</span>
+                            <span className="label">Terakhir Status Diubah</span>
+                            <span className="value">{formatDate(detail.updated_at)}</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Dicatat oleh</span>

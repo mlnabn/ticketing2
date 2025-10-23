@@ -65,9 +65,9 @@ function ItemHistoryLookupPage() {
             case 'Perbaikan':
                 return item.tanggal_mulai_perbaikan;
             case 'Tersedia':
-                return item.tanggal_masuk; // Tanggal saat item tersedia
+                return item.updated_at;
             default:
-                return item.updated_at; // Fallback jika status tidak dikenal
+                return item.updated_at;
         }
     };
 
