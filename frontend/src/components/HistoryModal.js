@@ -2,21 +2,24 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
-function HistoryModal({ item, onClose, showToast }) {
+function HistoryModal({ item, onClose, showToast, startDate, endDate }) {
     const [history, setHistory] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (item) {
-            api.get(`/inventory/stock-items/${item.id}/history`)
+        if (item?.id) {
+            setIsLoading(true);
+            const params = {
+                start_date: startDate,
+                end_date: endDate
+            };
+
+            api.get(`/inventory/stock-items/${item.id}/history`, { params }) // <-- Tambahkan { params }
                 .then(res => setHistory(res.data))
-                .catch(err => {
-                    console.error("Gagal mengambil riwayat:", err);
-                    showToast("Gagal memuat riwayat aset.", "error");
-                })
+                .catch(err => showToast('Gagal memuat riwayat', 'error'))
                 .finally(() => setIsLoading(false));
         }
-    }, [item, showToast]);
+    }, [item, showToast, startDate, endDate]);
 
     // Format untuk waktu pencatatan (dengan jam)
     const formatLogTime = (dateString) => {

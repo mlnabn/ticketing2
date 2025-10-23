@@ -1600,6 +1600,7 @@ body.dark-mode .content-area {
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 24px;
   margin-bottom: 30px;
+  cursor: pointer;
 }
 
 .info-card {
@@ -2635,8 +2636,7 @@ body.dark-mode .job-table tbody tr:last-child td {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-  /* Menggunakan cursor default untuk menandakan ini tidak bisa diklik */
-  cursor: default;
+  cursor: pointer;
 }
 
 /* Efek pop untuk kartu mobile yang bisa di-hover */
@@ -2647,7 +2647,7 @@ body.dark-mode .job-table tbody tr:last-child td {
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-  cursor: default;
+  cursor: pointer;
 }
 
 /* Container untuk tabel yang bisa di-scroll */
@@ -2670,33 +2670,64 @@ body.dark-mode .job-table tbody tr:last-child td {
 
 .table-scroll-container .job-table th:nth-child(1),
 .table-scroll-container .job-table td:nth-child(1) {
-  width: 15%;
+  width: 10%;
 }
 
+/* Kode Tiket */
 .table-scroll-container .job-table th:nth-child(2),
 .table-scroll-container .job-table td:nth-child(2) {
-  width: 15%;
+  width: 20%;
 }
 
+/* Judul */
 .table-scroll-container .job-table th:nth-child(3),
 .table-scroll-container .job-table td:nth-child(3) {
-  width: 25%;
+  width: 8%;
 }
 
+/* Status */
 .table-scroll-container .job-table th:nth-child(4),
 .table-scroll-container .job-table td:nth-child(4) {
-  width: 15%;
+  width: 10%;
 }
 
+/* Workshop */
 .table-scroll-container .job-table th:nth-child(5),
 .table-scroll-container .job-table td:nth-child(5) {
-  width: 15%;
+  width: 10%;
 }
 
+/* Admin Pengerja */
 .table-scroll-container .job-table th:nth-child(6),
 .table-scroll-container .job-table td:nth-child(6) {
-  width: 15%;
+  width: 10%;
 }
+
+/* Pembuat */
+.table-scroll-container .job-table th:nth-child(7),
+.table-scroll-container .job-table td:nth-child(7) {
+  width: 8%;
+}
+
+/* Tgl Dibuat */
+.table-scroll-container .job-table th:nth-child(8),
+.table-scroll-container .job-table td:nth-child(8) {
+  width: 8%;
+}
+
+/* Tgl Mulai */
+.table-scroll-container .job-table th:nth-child(9),
+.table-scroll-container .job-table td:nth-child(9) {
+  width: 8%;
+}
+
+/* Tgl Selesai */
+.table-scroll-container .job-table th:nth-child(10),
+.table-scroll-container .job-table td:nth-child(10) {
+  width: 8%;
+}
+
+/* Durasi */
 
 /*
   ---------------------------------------------------
@@ -4328,10 +4359,8 @@ body.dark-mode .password-toggle-btn:hover {
   border-radius: 20px;
   padding: 30px;
   width: 500px;
-  /* min-width: 30%;
-  max-width: 30%; */
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  animation: slideUp 0.4s ease;
+  /* animation: slideUp 0.4s ease; */
   text-align: center;
   transition: all 0.3s ease;
 }
@@ -4359,10 +4388,11 @@ body.dark-mode .password-toggle-btn:hover {
   white-space: normal;
   margin-bottom: 20px;
   margin-top: 0;
-  margin-bottom: 12px;
+  margin-bottom: 1.5rem;
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-color-light);
+  text-align: center;
 }
 
 .dark-mode .confirmation-modal-content h3 {
@@ -4475,15 +4505,16 @@ body.dark-mode .password-toggle-btn:hover {
 
 /* ===== Assign Admin Section ===== */
 .form-group-AssignAdmin {
-  margin-top: 20px;
+  margin-bottom: 1.25rem;
   text-align: center;
 }
 
 .modal-label {
   display: block;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 0.5rem;
   font-size: 1rem;
+  font-weight: 600;
 }
 
 .modal-subtitle {
@@ -4495,6 +4526,26 @@ body.dark-mode .password-toggle-btn:hover {
 .assigned-items-list {
   margin-top: 16px;
   text-align: left;
+}
+
+.assigned-items-list-scan {
+  min-height: 60px;
+  max-height: 150px;
+  overflow-y: auto;
+  background-color: var(--input-bg-secondary, #f4f7f6);
+  border: 1px dashed var(--input-border, #ccc);
+  border-radius: 8px;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.empty-list-text {
+  text-align: center;
+  padding: 1rem 0;
+  color: var(--text-color-secondary, #6c757d);
+  font-style: italic;
+  font-size: 0.9rem;
 }
 
 .assigned-item-row {
@@ -5009,7 +5060,7 @@ body.dark-mode .rejection-reason-display p {
   padding: 24px;
   border-radius: 14px;
   margin-top: 24px;
-  background: var(--bg-color);
+  background: #FFFFFF;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
@@ -5629,11 +5680,11 @@ body.dark-mode .feedback-message {
    GLOBAL NOTIFICATION HISTORY
    =============================== */
 .global-notification-history {
-  background-color: var(--bg-color);
+  background: #ffffff;
   padding: 25px;
   border-radius: 8px;
   margin-top: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 .global-notification-history h2 {
@@ -9321,6 +9372,7 @@ body.dark-mode .dashboard-card h4 {
   gap: 1.5rem;
   margin-bottom: 2rem;
   margin-top: 1.5rem;
+  cursor: pointer;
 }
 
 .summary-cards .card {
@@ -10902,6 +10954,31 @@ input:disabled {
   padding-top: 1.5rem;
 }
 
+.assigned-item-row-scan {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--body-bg, #fff);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--input-border, #ddd);
+}
+
+.assigned-item-row-scan:last-child {
+  margin-bottom: 0;
+}
+
+body.dark-mode .assigned-items-list-scan {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-color: var(--input-border-dark, #4a5568);
+}
+
+body.dark-mode .assigned-item-row-scan {
+  background-color: var(--card-bg-dark, #2d3748);
+  border-color: var(--input-border-dark, #4a5568);
+}
+
 /* --- Layout Khusus Komponen --- */
 .serial-number-container {
   display: flex;
@@ -11418,6 +11495,7 @@ body.dark-mode .btn-qr:hover {
 .clickable-row:hover {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
   transform: translateY(-3px);
+  cursor: pointer;  
 }
 
 
@@ -12081,7 +12159,7 @@ body.dark-mode .btn-qr:hover {
   border: 1px solid var(--input-border, #495057);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1290px) {
   .dashboard-container-financial {
     margin-top: 30px;
 
@@ -12244,6 +12322,20 @@ body.dark-mode .btn-qr:hover {
   gap: 1rem;
 }
 
+.keyword-input {
+  flex-grow: 1;
+  background-color: var(--input-bg, #FFFFFF);
+  color: var(--text-primary, #212529);
+  border: 1px solid var(--input-border, #ced4da);
+}
+
+.score-input {
+
+  background-color: var(--input-bg, #FFFFFF);
+  color: var(--text-primary, #212529);
+  border: 1px solid var(--input-border, #ced4da);
+}
+
 .keyword-form-inputs input[type="text"] {
   flex-grow: 1;
   padding: 0.75rem;
@@ -12360,7 +12452,7 @@ body.dark-mode .btn-qr:hover {
   background-color: #4b1d1d;
 }
 
-.filter-search-input-key {
+/* .filter-search-input-key {
   padding: 8px 12px;
   border-radius: 6px;
   min-width: 250px;
@@ -12370,6 +12462,37 @@ body.dark-mode .btn-qr:hover {
   border: 1px solid var(--input-border, #ced4da);
   flex-grow: 1;
   margin: 0;
+} */
+
+/* =========================================== */
+/* ===         Versi Mobile                ===== */
+/* =========================================== */
+
+
+@media (max-width: 1920px) {
+
+  .keyword-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .keyword-form-inputs {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .score-input {
+    width: 100%;
+    flex-grow: 1;
+  }
+
+  .keyword-input {
+    width: 100%;
+  }
+
+  .keyword-list-container {
+    padding: 0.5rem;
+  }
 }
 
 /* =========================================== */
@@ -12381,6 +12504,7 @@ body.dark-mode .btn-qr:hover {
   width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
+
 }
 
 /* Header tabel utama */
@@ -12626,6 +12750,7 @@ body.dark-mode .detail-list-header {
 body.dark-mode .detail-row-div {
   border-bottom-color: #374151;
 }
+
 .dark-mode .detail-row-div:hover {
   background-color: #374151;
 }
@@ -12650,49 +12775,4 @@ body.dark-mode .cell-warna .color-swatch {
 body.dark-mode .summary-card.expanded {
   background-color: #1f1f1f;
   border-left-color: #3b82f6;
-}
-
-@keyframes slideDown {
-  from {
-    max-height: 0;
-    opacity: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    /* Hilangkan border agar tidak muncul saat tertutup */
-    border-bottom-width: 0;
-    /* Mungkin perlu transform juga jika ingin efek slide */
-    /* transform: translateY(-10px); */
-  }
-
-  to {
-    max-height: 1000px;
-    /* Tinggi maksimal yang cukup besar */
-    opacity: 1;
-    padding-top: 0.5rem;
-    /* Padding saat terbuka */
-    padding-bottom: 0.5rem;
-    border-bottom-width: 1px;
-    /* Tampilkan border saat terbuka */
-    /* transform: translateY(0); */
-  }
-}
-
-@keyframes slideUp {
-  from {
-    max-height: 1000px;
-    opacity: 1;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom-width: 1px;
-    /* transform: translateY(0); */
-  }
-
-  to {
-    max-height: 0;
-    opacity: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    border-bottom-width: 0;
-    /* transform: translateY(-10px); */
-  }
 }

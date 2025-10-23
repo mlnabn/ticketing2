@@ -88,6 +88,7 @@ export default function UrgencyKeywordManagement() {
               onChange={(e) => setNewKeyword(e.target.value)}
               placeholder="Masukkan kata kunci (mis: server down)"
               disabled={isSubmitting}
+              className="keyword-input"
             />
             <input
               type="number"

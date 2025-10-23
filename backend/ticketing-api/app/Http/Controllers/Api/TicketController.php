@@ -42,7 +42,7 @@ class TicketController extends Controller
             $query->where(function (Builder $q) use ($search) {
                 // Cari di dalam tabel 'tickets'
                 $q->where('kode_tiket', 'like', '%' . $search . '%')
-                ->orWhere('title', 'like', '%' . $search . '%');
+                    ->orWhere('title', 'like', '%' . $search . '%');
 
                 // Cari di relasi 'user' (admin yang mengerjakan)
                 $q->orWhereHas('user', function (Builder $userQuery) use ($search) {
@@ -53,7 +53,7 @@ class TicketController extends Controller
                 $q->orWhereHas('creator', function (Builder $creatorQuery) use ($search) {
                     $creatorQuery->where('name', 'like', '%' . $search . '%');
                 });
-                
+
                 // Cari di relasi 'workshop'
                 $q->orWhereHas('workshop', function (Builder $workshopQuery) use ($search) {
                     $workshopQuery->where('name', 'like', '%' . $search . '%');
@@ -84,7 +84,7 @@ class TicketController extends Controller
                 }
             }
         }
-        
+
         if ($adminId) {
             $query->where('user_id', $adminId);
         }
@@ -122,8 +122,16 @@ class TicketController extends Controller
         // Terapkan semua filter dari request
         $query = $this->applyFilters($query, $request);
 
-        $ticketsData = $query->latest()->paginate($perPage);
-        return response()->json($ticketsData);
+        if ($request->boolean('all')) {
+            $ticketsResult = $query->latest()->get(); // Ambil semua
+            // Kembalikan langsung array jika 'all'
+            return response()->json($ticketsResult);
+        } else {
+            $perPage = $request->query('per_page', 10);
+            $ticketsResult = $query->latest()->paginate($perPage); // Paginate
+            // Kembalikan objek pagination jika tidak 'all'
+            return response()->json($ticketsResult);
+        }
     }
 
     /**
@@ -154,10 +162,10 @@ class TicketController extends Controller
         $prefix = strtoupper($workshopCode . $now->format('dn'));
 
         $lastTicket = Ticket::where('kode_tiket', 'like', $prefix . '%')
-                              ->orderBy('id', 'desc')
-                              ->first();
-        
-        $nextSequence = 1; 
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $nextSequence = 1;
 
         if ($lastTicket) {
             $lastSequencePart = substr($lastTicket->kode_tiket, strlen($prefix));
@@ -389,18 +397,21 @@ class TicketController extends Controller
             }
         }
 
-        $perPage = $request->query('per_page', 10);
-        $paginatedTickets = $paginatedQuery->latest()->paginate($perPage);
+        if ($request->boolean('all')) {
+            $ticketsResult = $paginatedQuery->latest()->get(); // Ambil semua
+        } else {
+            $perPage = $request->query('per_page', 10);
+            $ticketsResult = $paginatedQuery->latest()->paginate($perPage); // Paginate
+        }
 
         return response()->json([
             'total' => (int) $stats->total,
             'completed' => (int) $stats->completed,
             'rejected' => (int) $stats->rejected,
             'in_progress' => (int) $stats->in_progress,
-            'tickets' => $paginatedTickets,
+            'tickets' => $ticketsResult, // Kirim hasil (bisa array atau objek pagination)
         ]);
     }
-
     /**
      * Menugaskan tiket ke admin.
      */
@@ -422,7 +433,7 @@ class TicketController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($ticket, $validated, $assignee) { 
+            DB::transaction(function () use ($ticket, $validated, $assignee) {
                 $ticket->update([
                     'user_id' => $validated['user_id'],
                     'status' => 'Sedang Dikerjakan',
@@ -431,11 +442,11 @@ class TicketController extends Controller
 
                 if (!empty($validated['stok_barang_ids'])) {
                     $statusDipinjamId = DB::table('status_barang')->where('nama_status', 'Dipinjam')->value('id');
-                    
+
                     // Ambil semua item stok yang valid
                     $itemsToAssign = StokBarang::whereIn('id', $validated['stok_barang_ids'])->get();
 
-                    foreach($itemsToAssign as $item) {
+                    foreach ($itemsToAssign as $item) {
                         $item->update([
                             'status_id' => $statusDipinjamId,
                             'user_peminjam_id' => $assignee->id,
@@ -448,7 +459,7 @@ class TicketController extends Controller
                             'status_id' => $statusDipinjamId,
                             'deskripsi' => 'Dipinjam untuk tiket: ' . $ticket->kode_tiket,
                             'triggered_by_user_id' => Auth::id(),
-                            'related_user_id' => $assignee->id, 
+                            'related_user_id' => $assignee->id,
                             'workshop_id' => $ticket->workshop_id,
                             'event_date' => now(),
                         ]);
@@ -456,7 +467,7 @@ class TicketController extends Controller
 
                     // Update tabel pivot untuk rekap (berdasarkan master barang)
                     $masterBarangSummary = $itemsToAssign->groupBy('master_barang_id')
-                                                        ->map->count();
+                        ->map->count();
 
                     foreach ($masterBarangSummary as $masterId => $quantity) {
                         $ticket->masterBarangs()->syncWithoutDetaching([
@@ -468,7 +479,6 @@ class TicketController extends Controller
                     }
                 }
             });
-            
         } catch (\Exception $e) { // Tangkap semua jenis exception
             return response()->json(['message' => 'Terjadi kesalahan saat menugaskan tiket: ' . $e->getMessage()], 500);
         }
@@ -597,7 +607,7 @@ class TicketController extends Controller
         }
 
         $ticket->update($updateData);
-        
+
         return response()->json($ticket->load(['user', 'creator', 'masterBarangs']));
     }
 
@@ -758,7 +768,7 @@ class TicketController extends Controller
         $borrowedItems = StokBarang::with('masterBarang')
             ->where('ticket_id', $ticket->id)
             ->get();
-                
+
         return response()->json($borrowedItems);
     }
 
@@ -782,57 +792,57 @@ class TicketController extends Controller
                 $newStatus = \App\Models\Status::find($itemData['status_id']); // Ambil model status baru
 
                 if ($stokBarang && $stokBarang->ticket_id === $ticket->id && $newStatus) {
-                
-                $updateData = [
-                    'status_id' => $newStatus->id,
-                    'deskripsi' => $itemData['keterangan'] ?: null,
-                    'user_peminjam_id' => null,
-                    'workshop_id' => null,
-                    'ticket_id' => null,
-                    'tanggal_keluar' => null,
-                    'user_perusak_id' => null,
-                    'tanggal_rusak' => null,
-                    'user_penghilang_id' => null,
-                    'tanggal_hilang' => null,
-                ];
 
-                $relatedUserId = null; 
+                    $updateData = [
+                        'status_id' => $newStatus->id,
+                        'deskripsi' => $itemData['keterangan'] ?: null,
+                        'user_peminjam_id' => null,
+                        'workshop_id' => null,
+                        'ticket_id' => null,
+                        'tanggal_keluar' => null,
+                        'user_perusak_id' => null,
+                        'tanggal_rusak' => null,
+                        'user_penghilang_id' => null,
+                        'tanggal_hilang' => null,
+                    ];
 
-                switch ($newStatus->nama_status) {
-                    case 'Digunakan':
-                        $responsibleUserId = $itemData['user_digunakan_id'] ?? $adminId;
-                        $updateData['user_peminjam_id'] = $responsibleUserId;
-                        $updateData['workshop_id'] = $ticket->workshop_id;
-                        $updateData['tanggal_keluar'] = now();
-                        $relatedUserId = $responsibleUserId;
-                        break;
-                    case 'Rusak':
-                        $responsibleUserId = $itemData['user_rusak_id'] ?? $adminId;
-                        $updateData['user_perusak_id'] = $responsibleUserId;
-                        $updateData['tanggal_rusak'] = now();
-                        $relatedUserId = $responsibleUserId;
-                        break;
-                    case 'Hilang':
-                        $responsibleUserId = $itemData['user_hilang_id'] ?? $adminId;
-                        $updateData['user_penghilang_id'] = $responsibleUserId;
-                        $updateData['tanggal_hilang'] = now();
-                        $relatedUserId = $responsibleUserId;
-                        break;
+                    $relatedUserId = null;
+
+                    switch ($newStatus->nama_status) {
+                        case 'Digunakan':
+                            $responsibleUserId = $itemData['user_digunakan_id'] ?? $adminId;
+                            $updateData['user_peminjam_id'] = $responsibleUserId;
+                            $updateData['workshop_id'] = $ticket->workshop_id;
+                            $updateData['tanggal_keluar'] = now();
+                            $relatedUserId = $responsibleUserId;
+                            break;
+                        case 'Rusak':
+                            $responsibleUserId = $itemData['user_rusak_id'] ?? $adminId;
+                            $updateData['user_perusak_id'] = $responsibleUserId;
+                            $updateData['tanggal_rusak'] = now();
+                            $relatedUserId = $responsibleUserId;
+                            break;
+                        case 'Hilang':
+                            $responsibleUserId = $itemData['user_hilang_id'] ?? $adminId;
+                            $updateData['user_penghilang_id'] = $responsibleUserId;
+                            $updateData['tanggal_hilang'] = now();
+                            $relatedUserId = $responsibleUserId;
+                            break;
+                    }
+
+                    $stokBarang->update($updateData);
+
+                    $stokBarang->histories()->create([
+                        'status_id' => $newStatus->id,
+                        'deskripsi' => $itemData['keterangan'] ?: 'Status diubah saat pengembalian tiket: ' . $ticket->kode_tiket,
+                        'triggered_by_user_id' => $adminId,
+                        'related_user_id' => $relatedUserId,
+                        'workshop_id' => $updateData['workshop_id'],
+                        'event_date' => now(),
+                    ]);
                 }
-                
-                $stokBarang->update($updateData);
+            }
 
-                $stokBarang->histories()->create([
-                    'status_id' => $newStatus->id,
-                    'deskripsi' => $itemData['keterangan'] ?: 'Status diubah saat pengembalian tiket: ' . $ticket->kode_tiket,
-                    'triggered_by_user_id' => $adminId,
-                    'related_user_id' => $relatedUserId,
-                    'workshop_id' => $updateData['workshop_id'],
-                    'event_date' => now(), 
-                ]);
-            }
-            }
-            
             $ticket->update(['status' => 'Selesai', 'completed_at' => now()]);
         });
 

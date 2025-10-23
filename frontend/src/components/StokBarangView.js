@@ -373,8 +373,22 @@ function StokBarangView() {
                                                                     <div className="detail-cell cell-tanggal">{formatDate(detail.tanggal_masuk)}</div>
                                                                     <div className="detail-cell cell-creator">{detail.created_by?.name || '-'}</div>
                                                                     <div className="detail-cell cell-aksi action-buttons-group">
-                                                                        <button onClick={(e) => { e.stopPropagation(); setDetailItem(detail); }} className="btn-user-action btn-detail">Detail</button>
-                                                                        <button onClick={(e) => { e.stopPropagation(); setQrModalItem(detail); }} className="btn-user-action btn-qr">QR</button>
+                                                                        <button
+                                                                            onClick={(e) => { e.stopPropagation(); setDetailItem(detail); }}
+                                                                            className="btn-user-action btn-detail"
+                                                                        >
+                                                                            <i className="fas fa-info-circle" style={{ marginRight: '5px' }}></i> {/* <-- Icon Added */}
+                                                                            Detail
+                                                                        </button>
+
+                                                                        {/* Button QR */}
+                                                                        <button
+                                                                            onClick={(e) => { e.stopPropagation(); setQrModalItem(detail); }}
+                                                                            className="btn-user-action btn-qr"
+                                                                        >
+                                                                            <i className="fas fa-qrcode" style={{ marginRight: '5px' }}></i> {/* <-- Icon Added */}
+                                                                            QR
+                                                                        </button>
                                                                     </div>
                                                                 </div>
                                                             ))}

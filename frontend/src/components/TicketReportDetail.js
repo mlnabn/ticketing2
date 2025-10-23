@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
-import Pagination from './Pagination';
+// import Pagination from './Pagination';
 import TicketDetailModal from './TicketDetailModal';
 import { saveAs } from 'file-saver';
 
@@ -34,59 +34,59 @@ export default function TicketReportDetail() {
     year: searchParams.get('year'),
     month: searchParams.get('month'),
   };
-  
+
   // BARU: State untuk data admin, diambil secara lokal
-  const [admin, setAdmin] = useState(null); 
+  const [admin, setAdmin] = useState(null);
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
   const [exportingPdf, setExportingPdf] = useState(false);
   const [exportingExcel, setExportingExcel] = useState(false);
-  
+
   // BARU: State untuk modal, dikelola lokal
   const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
-  
+
   // BARU: Effect untuk mengambil data admin berdasarkan ID dari URL
   useEffect(() => {
     const fetchAdminDetails = async () => {
-        if(!adminId) return;
-        try {
-            const res = await api.get(`/users/${adminId}`);
-            setAdmin(res.data);
-        } catch (err) {
-            console.error('Gagal mengambil detail admin:', err);
-            // Mungkin arahkan ke halaman error atau kembali
-        }
+      if (!adminId) return;
+      try {
+        const res = await api.get(`/users/${adminId}`);
+        setAdmin(res.data);
+      } catch (err) {
+        console.error('Gagal mengambil detail admin:', err);
+        // Mungkin arahkan ke halaman error atau kembali
+      }
     };
     fetchAdminDetails();
   }, [adminId]);
 
-  const fetchAdminReport = useCallback(async (page, statusFilter) => {
+  const fetchAdminReport = useCallback(async (statusFilter) => { // Hapus 'page'
     if (!adminId) return;
     setLoading(true);
     try {
-      const params = { page };
+      const params = { all: true }; // Tambahkan 'all: true', Hapus 'page'
       if (statusFilter !== 'all') params.status = statusFilter;
       if (filters.year) params.year = filters.year;
       if (filters.month) params.month = filters.month;
 
       const res = await api.get(`/tickets/admin-report/${adminId}`, { params });
-      setReportData(res.data);
+      setReportData(res.data); // 'res.data' akan berisi { total: ..., completed: ..., tickets: [...] }
     } catch (err) {
       console.error('Gagal mengambil laporan tiket:', err);
     } finally {
       setLoading(false);
     }
-  }, [adminId, filters.year, filters.month]);
+  }, [adminId, filters.year, filters.month]); // Hapus 'currentPage' dari dependencies
 
   useEffect(() => {
-    fetchAdminReport(currentPage, filter);
-  }, [fetchAdminReport, currentPage, filter]);
+    fetchAdminReport(filter); // Panggil hanya dengan filter
+  }, [fetchAdminReport, filter]); // Hapus 'currentPage' dari dependencies
 
   const handleFilterClick = (newFilter) => {
     setFilter(newFilter);
-    setCurrentPage(1);
+    // setCurrentPage(1);
   };
 
   const handleDownload = async (type) => {
@@ -136,8 +136,7 @@ export default function TicketReportDetail() {
   }
 
   const { total, completed, rejected, in_progress } = reportData || {};
-  const ticketsData = reportData ? reportData.tickets : null;
-  const ticketsOnPage = ticketsData ? ticketsData.data : [];
+  const ticketsOnPage = reportData ? reportData.tickets : [];
 
   return (
     <div className="report-container">
@@ -160,11 +159,11 @@ export default function TicketReportDetail() {
           <h3>Daftar Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</h3>
           <div className="download-buttons">
             <button className="btn-download pdf" onClick={() => handleDownload('pdf')} disabled={exportingPdf}>
-              <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i> 
+              <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
               {exportingPdf ? 'Mengekspor...' : 'Download PDF'}
             </button>
             <button className="btn-download excel" onClick={() => handleDownload('excel')} disabled={exportingExcel}>
-              <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i> 
+              <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
               {exportingExcel ? 'Mengekspor...' : 'Download Excel'}
             </button>
           </div>
@@ -174,31 +173,47 @@ export default function TicketReportDetail() {
             {loading ? <p>Memuat tabel...</p> : ticketsOnPage.length === 0 ? (
               <p>Tidak ada tiket yang sesuai dengan filter ini.</p>
             ) : (
-              <table className="job-table">
-                <thead>
-                  <tr>
-                    <th>Kode Tiket</th><th>Judul</th><th>Status</th><th>Workshop</th><th>Pembuat</th>
-                    <th>Tgl Dibuat</th><th>Tgl Mulai</th><th>Tgl Selesai</th><th>Durasi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ticketsOnPage.map(t => (
-                    <tr key={t.id} className="clickable-row" onClick={(e) => handleRowClick(e, t)}>
-                      <td>{t.kode_tiket || '-'}</td>
-                      <td>
-                        <span className="description-cell">{t.title}</span>
-                      </td>
-                      <td>{t.status}</td>
-                      <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
-                      <td>{t.creator?.name ?? '-'}</td>
-                      <td>{formatDate(t.created_at)}</td>
-                      <td>{formatDate(t.started_at)}</td>
-                      <td>{formatDate(t.completed_at)}</td>
-                      <td>{calculateDuration(t.started_at, t.completed_at)}</td>
+              // --- MULAI STRUKTUR BARU ---
+              <div className="table-scroll-container">
+                {/* TABEL 1: HEADER */}
+                <table className="job-table">
+                  <thead>
+                    <tr>
+                      <th>Kode Tiket</th>
+                      <th>Judul</th>
+                      <th>Status</th>
+                      <th>Workshop</th>
+                      <th>Pembuat</th>
+                      <th>Tgl Dibuat</th>
+                      <th>Tgl Mulai</th>
+                      <th>Tgl Selesai</th>
+                      <th>Durasi</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                </table>
+                {/* DIV SCROLL BODY */}
+                <div className="table-body-scroll">
+                  <table className="job-table">
+                    <tbody>
+                      {ticketsOnPage.map(t => (
+                        <tr key={t.id} className="clickable-row" onClick={(e) => handleRowClick(e, t)}>
+                          <td>{t.kode_tiket || '-'}</td>
+                          <td>
+                            <span className="description-cell">{t.title}</span>
+                          </td>
+                          <td>{t.status}</td>
+                          <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
+                          <td>{t.creator?.name ?? '-'}</td>
+                          <td>{formatDate(t.created_at)}</td>
+                          <td>{formatDate(t.started_at)}</td>
+                          <td>{formatDate(t.completed_at)}</td>
+                          <td>{calculateDuration(t.started_at, t.completed_at)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             )}
           </div>
 
@@ -266,13 +281,13 @@ export default function TicketReportDetail() {
             )}
           </div>
 
-          {ticketsData && ticketsData.last_page > 1 && (
+          {/* {ticketsData && ticketsData.last_page > 1 && (
             <Pagination
               currentPage={ticketsData.current_page}
               lastPage={ticketsData.last_page}
               onPageChange={setCurrentPage}
             />
-          )}
+          )} */}
         </>
       )}
       {selectedTicketForDetail && (

@@ -1,24 +1,24 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
-import Pagination from './Pagination';
+// import Pagination from './Pagination';
 import { saveAs } from 'file-saver';
 import InventoryDetailModal from './InventoryDetailModal';
 
-const PaginationSummary = ({ pagination }) => {
-    if (!pagination || pagination.total === 0) {
-        return null;
-    }
-    return (
-        <div className="pagination-summary">
-            Menampilkan <strong>{pagination.from}</strong> - <strong>{pagination.to}</strong> dari <strong>{pagination.total}</strong> data
-        </div>
-    );
-};
+// const PaginationSummary = ({ pagination }) => {
+//     if (!pagination || pagination.total === 0) {
+//         return null;
+//     }
+//     return (
+//         <div className="pagination-summary">
+//             Menampilkan <strong>{pagination.from}</strong> - <strong>{pagination.to}</strong> dari <strong>{pagination.total}</strong> data
+//         </div>
+//     );
+// };
 
 export default function DetailedReportPage({ type, title }) {
     const [data, setData] = useState([]);
-    const [pagination, setPagination] = useState(null);
+    // const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({ start_date: '', end_date: '' });
     const [searchTerm, setSearchTerm] = useState('');
@@ -27,13 +27,13 @@ export default function DetailedReportPage({ type, title }) {
     const [exportingPdf, setExportingPdf] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
 
-    const fetchData = useCallback(async (page = 1) => {
+    const fetchData = useCallback(async () => { 
         setLoading(true);
         try {
-            const params = { page, type, ...filters, search: debouncedSearchTerm };
+            const params = { type, ...filters, search: debouncedSearchTerm, all: true };
             const res = await api.get('/reports/inventory/detailed', { params });
-            setData(res.data.data);
-            setPagination(res.data);
+            setData(res.data);
+
         } catch (error) {
             console.error(`Gagal memuat laporan ${type}`, error);
         } finally {
@@ -42,7 +42,11 @@ export default function DetailedReportPage({ type, title }) {
     }, [type, filters, debouncedSearchTerm]);
 
     useEffect(() => {
-        fetchData(1);
+        fetchData(); // 5. Panggil tanpa parameter '1'
+    }, [fetchData]);
+
+    useEffect(() => {
+        fetchData();
     }, [fetchData]);
 
     const handleFilterChange = (e) => {
@@ -176,46 +180,54 @@ export default function DetailedReportPage({ type, title }) {
 
             <div className="job-list-container">
                 {/*Destop view*/}
-                <table className="job-table">
-                    <thead>
-                        <tr>
-                            <th>Kode Unik</th>
-                            <th>Nama Barang</th>
-                            <th>Status Kejadian</th>
-                            <th>{dateHeaders[type] || 'Tanggal'}</th>
-                            <th>Penanggung Jawab</th>
-                            <th>Workshop</th>
-                            {(type === 'out' || type === 'accountability') && <th>Status Saat Ini</th>}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr><td colSpan="6" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
-                        ) : data.length > 0 ? data.map(item => {
-                            const itemData = getItemData(item);
-                            return (
-                                <tr key={item.id} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
-                                    <td>{itemData.kode_unik || '-'}</td>
-                                    <td>{itemData.nama_barang || '-'}</td>
-                                    <td>{itemData.status || '-'}</td>
-                                    <td>{formatDate(itemData.tanggal)}</td>
-                                    <td>{itemData.penanggung_jawab || '-'}</td>
-                                    <td>{itemData.workshop || '-'}</td>
-                                    {(type === 'out' || type === 'accountability') && (
-                                        <td>
-                                            {/* Beri warna agar mudah dibedakan */}
-                                            <span className={`badge-status status-${itemData.current_status?.toLowerCase()}`}>
-                                                {itemData.current_status || '-'}
-                                            </span>
-                                        </td>
-                                    )}
-                                </tr>
-                            )
-                        }) : (
-                            <tr><td colSpan="6" style={{ textAlign: 'center' }}>Tidak ada data untuk ditampilkan.</td></tr>
-                        )}
-                    </tbody>
-                </table>
+                <div className="table-scroll-container"> {/* DITAMBAHKAN */}
+                    {/* TABEL 1: KHUSUS HEADER */}
+                    <table className="job-table">
+                        <thead>
+                            <tr>
+                                <th>Kode Unik</th>
+                                <th>Nama Barang</th>
+                                <th>Status Kejadian</th>
+                                <th>{dateHeaders[type] || 'Tanggal'}</th>
+                                <th>Penanggung Jawab</th>
+                                <th>Workshop</th>
+                                {(type === 'out' || type === 'accountability') && <th>Status Saat Ini</th>}
+                            </tr>
+                        </thead>
+                    </table>
+
+                    {/* DIV UNTUK SCROLLING BODY */}
+                    <div className="table-body-scroll"> {/* DITAMBAHKAN */}
+                        <table className="job-table">
+                            <tbody>
+                                {loading ? (
+                                    <tr><td colSpan={(type === 'out' || type === 'accountability') ? 7 : 6} style={{ textAlign: 'center' }}>Memuat data...</td></tr>
+                                ) : data.length > 0 ? data.map(item => {
+                                    const itemData = getItemData(item);
+                                    return (
+                                        <tr key={item.id} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
+                                            <td>{itemData.kode_unik || '-'}</td>
+                                            <td>{itemData.nama_barang || '-'}</td>
+                                            <td>{itemData.status || '-'}</td>
+                                            <td>{formatDate(itemData.tanggal)}</td>
+                                            <td>{itemData.penanggung_jawab || '-'}</td>
+                                            <td>{itemData.workshop || '-'}</td>
+                                            {(type === 'out' || type === 'accountability') && (
+                                                <td>
+                                                    <span className={`badge-status status-${itemData.current_status?.toLowerCase()}`}>
+                                                        {itemData.current_status || '-'}
+                                                    </span>
+                                                </td>
+                                            )}
+                                        </tr>
+                                    )
+                                }) : (
+                                    <tr><td colSpan={(type === 'out' || type === 'accountability') ? 7 : 6} style={{ textAlign: 'center' }}>Tidak ada data untuk ditampilkan.</td></tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                 {/* Mobile view */}
                 <div className="job-list-mobile">
                     {loading ? (
@@ -280,7 +292,7 @@ export default function DetailedReportPage({ type, title }) {
                 </div>
             </div>
 
-            <div className="pagination-container">
+            {/* <div className="pagination-container">
                 <PaginationSummary pagination={pagination} />
                 {pagination && pagination.last_page > 1 && (
                     <Pagination
@@ -289,7 +301,7 @@ export default function DetailedReportPage({ type, title }) {
                         onPageChange={fetchData}
                     />
                 )}
-            </div>
+            </div> */}
             {selectedItem && (
                 <InventoryDetailModal
                     kodeUnik={selectedItem}

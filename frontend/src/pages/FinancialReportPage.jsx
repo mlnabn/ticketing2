@@ -1,4 +1,4 @@
-import React, {  useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, Legend } from 'recharts';
 import { useFinancialReport } from '../components/useFinancialReport';
@@ -37,7 +37,7 @@ export default function FinancialReportPage() {
     // 1. PANGGIL HOOK UNTUK MENDAPATKAN SEMUA DATA & FUNGSI
     const {
         summaryData, chartData, isLoading,
-         formatCurrency
+        formatCurrency
     } = useFinancialReport();
 
     // 2. HAPUS SEMUA MOCK DATA & GUNAKAN DATA ASLI DARI HOOK
@@ -82,12 +82,15 @@ export default function FinancialReportPage() {
                         <div className="chart-canvas-container">
                             {isLoading ? <p>Memuat grafik...</p> : (
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={transformedBarData} /* ... sisa props tidak berubah ... */ >
+                                    <BarChart data={transformedBarData}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                         <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} angle={-20} textAnchor="end" height={50} />
                                         <YAxis tickFormatter={yAxisFormatter} tick={{ fontSize: 12 }} />
                                         <Tooltip formatter={tooltipFormatter} />
-                                        <Bar dataKey="Total Nilai" fill="rgba(153, 102, 255, 0.8)" barSize={30} />
+                                        <Bar dataKey="Total Nilai"
+                                            fill="rgba(153, 102, 255, 0.8)"
+                                            barSize={30}
+                                            cursor="pointer" />
                                     </BarChart>
                                 </ResponsiveContainer>
                             )}
@@ -99,7 +102,16 @@ export default function FinancialReportPage() {
                             {isLoading ? <p>Memuat grafik...</p> : (
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
-                                        <Pie data={transformedPieData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90} fill="#8884d8" paddingAngle={5}>
+                                        <Pie data={transformedPieData}
+                                            dataKey="value"
+                                            nameKey="name"
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={90}
+                                            fill="#8884d8"
+                                            paddingAngle={5}
+                                            cursor="pointer">
                                             {transformedPieData.map((entry, index) => <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />)}
                                         </Pie>
                                         <Tooltip formatter={tooltipFormatter} />

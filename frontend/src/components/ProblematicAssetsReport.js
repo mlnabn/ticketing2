@@ -134,7 +134,7 @@ export default function ProblematicAssetsReport() {
 
                             <tfoot><tr className="subtotal-row">
                                 <td colSpan="5">Subtotal</td>
-                                <td style={{ textAlign: 'right', color: 'var(--red-color)' }}>
+                                <td style={{ textAlign: 'right'}}>
                                     ({formatCurrency(problematicAssetsSubtotal)})
                                 </td>
                             </tr></tfoot>
