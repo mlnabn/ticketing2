@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 // BARU: Impor hooks dari React Router
 import { useLocation, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
-import Pagination from './Pagination';
+// import Pagination from './Pagination';
 import TicketDetailModal from './TicketDetailModal'; // BARU: Impor modal
 import { saveAs } from 'file-saver';
 
@@ -41,36 +41,43 @@ export default function ComprehensiveReportPage() {
 
   const [tableData, setTableData] = useState(null);
   const [stats, setStats] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState(filterType);
   const [loading, setLoading] = useState(true);
-  
+
   // BARU: State untuk modal detail tiket, sekarang dikelola di sini
   const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
 
   const [exportingPdf, setExportingPdf] = useState(false);
   const [exportingExcel, setExportingExcel] = useState(false);
 
-  const fetchTableData = useCallback(async (page, currentFilter) => {
+  const fetchTableData = useCallback(async (currentFilter) => { // Hapus 'page'
     setLoading(true);
     try {
-      const params = { page, per_page: 10 };
+      const params = { all: true }; // Tambahkan 'all: true', Hapus 'page'
       if (dateFilters.year) params.year = dateFilters.year;
       if (dateFilters.month) params.month = dateFilters.month;
-      
+
+      // Filter logika tetap sama
       if (currentFilter === 'handled') {
         params.handled_status = 'handled';
       } else if (currentFilter !== 'all') {
         params.status = currentFilter;
       }
+
       const res = await api.get('/tickets', { params });
-      setTableData(res.data);
+      // 'res.data' akan berisi array tiket jika 'all' true
+      setTableData({ data: res.data }); // Bungkus array dalam { data: ... } agar cocok dengan penggunaan 'tickets' nanti
     } catch (err) {
       console.error('Gagal mengambil data tabel laporan:', err);
     } finally {
       setLoading(false);
     }
-  }, [dateFilters.year, dateFilters.month]);
+  }, [dateFilters.year, dateFilters.month]); // Hapus 'currentPage' dari dependencies
+
+  useEffect(() => {
+    fetchTableData(filter); // Panggil hanya dengan filter
+  }, [filter, fetchTableData]); // Hapus 'currentPage' dari dependencies
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -79,7 +86,7 @@ export default function ComprehensiveReportPage() {
         if (dateFilters.year) params.year = dateFilters.year;
         if (dateFilters.month) params.month = dateFilters.month;
         if (filterType === 'handled') params.handled_status = 'true';
-        
+
         const res = await api.get('/tickets/report-stats', { params });
         setStats(res.data);
       } catch (err) {
@@ -90,12 +97,12 @@ export default function ComprehensiveReportPage() {
   }, [dateFilters.year, dateFilters.month, filterType]);
 
   useEffect(() => {
-    fetchTableData(currentPage, filter);
-  }, [currentPage, filter, fetchTableData]);
+    fetchTableData(filter); // <-- Panggil hanya dengan 'filter'
+  }, [filter, fetchTableData]);
 
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);
-    setCurrentPage(1);
+    // setCurrentPage(1);
   };
 
   const handleDownload = async (type) => {
@@ -123,8 +130,8 @@ export default function ComprehensiveReportPage() {
       console.error('Gagal mengunduh file laporan:', err);
       alert('Gagal mengunduh file. Mohon coba lagi.');
     } finally {
-          if (type === 'pdf') setExportingPdf(false);
-          else setExportingExcel(false);
+      if (type === 'pdf') setExportingPdf(false);
+      else setExportingExcel(false);
     }
   };
 
@@ -172,14 +179,14 @@ export default function ComprehensiveReportPage() {
 
           <h3>Daftar Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</h3>
           <div className="download-buttons">
-              <button className="btn-download pdf" onClick={() => handleDownload('pdf')} disabled={exportingPdf}>
-                  <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
-                  {exportingPdf ? 'Mengekspor...' : 'Download PDF'}
-              </button>
-              <button className="btn-download excel" onClick={() => handleDownload('excel')} disabled={exportingExcel}>
-                  <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
-                  {exportingExcel ? 'Mengekspor...' : 'Download Excel'}
-              </button>
+            <button className="btn-download pdf" onClick={() => handleDownload('pdf')} disabled={exportingPdf}>
+              <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
+              {exportingPdf ? 'Mengekspor...' : 'Download PDF'}
+            </button>
+            <button className="btn-download excel" onClick={() => handleDownload('excel')} disabled={exportingExcel}>
+              <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
+              {exportingExcel ? 'Mengekspor...' : 'Download Excel'}
+            </button>
           </div>
 
           {loading ? <p>Memuat data...</p> : tickets.length === 0 ? (
@@ -188,33 +195,49 @@ export default function ComprehensiveReportPage() {
             <>
               {/* --- Desktop Table --- */}
               <div className="job-list-container">
-                <table className="job-table">
-                  <thead>
-                    <tr>
-                      <th>Kode Tiket</th><th>Judul</th><th>Status</th><th>Workshop</th>
-                      <th>Admin Pengerja</th><th>Pembuat</th><th>Tgl Dibuat</th>
-                      <th>Tgl Mulai</th><th>Tgl Selesai</th><th>Durasi</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tickets.map(t => (
-                      <tr key={t.id} className="clickable-row" onClick={(e) => handleRowClick(e, t)}>
-                        <td>{t.kode_tiket || '-'}</td>
-                        <td>
-                          <span className="description-cell">{t.title}</span>
-                        </td>
-                        <td>{t.status}</td>
-                        <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
-                        <td>{t.user?.name ?? 'N/A'}</td>
-                        <td>{t.creator?.name ?? 'N/A'}</td>
-                        <td>{formatDate(t.created_at)}</td>
-                        <td>{formatDate(t.started_at)}</td>
-                        <td>{formatDate(t.completed_at)}</td>
-                        <td>{calculateDuration(t.started_at, t.completed_at)}</td>
+                {/* --- MULAI STRUKTUR BARU --- */}
+                <div className="table-scroll-container">
+                  {/* TABEL 1: HEADER */}
+                  <table className="job-table">
+                    <thead>
+                      <tr>
+                        <th>Kode Tiket</th>
+                        <th>Judul</th>
+                        <th>Status</th>
+                        <th>Workshop</th>
+                        <th>Admin Pengerja</th>
+                        <th>Pembuat</th>
+                        <th>Tgl Dibuat</th>
+                        <th>Tgl Mulai</th>
+                        <th>Tgl Selesai</th>
+                        <th>Durasi</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                  </table>
+                  {/* DIV SCROLL BODY */}
+                  <div className="table-body-scroll">
+                    <table className="job-table">
+                      <tbody>
+                        {tickets.map(t => (
+                          <tr key={t.id} className="clickable-row" onClick={(e) => handleRowClick(e, t)}>
+                            <td>{t.kode_tiket || '-'}</td>
+                            <td>
+                              <span className="description-cell">{t.title}</span>
+                            </td>
+                            <td>{t.status}</td>
+                            <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
+                            <td>{t.user?.name ?? 'N/A'}</td>
+                            <td>{t.creator?.name ?? 'N/A'}</td>
+                            <td>{formatDate(t.created_at)}</td>
+                            <td>{formatDate(t.started_at)}</td>
+                            <td>{formatDate(t.completed_at)}</td>
+                            <td>{calculateDuration(t.started_at, t.completed_at)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
 
               {/* --- Mobile Card View --- */}
@@ -281,13 +304,13 @@ export default function ComprehensiveReportPage() {
                 ))}
               </div>
 
-              {tableData && tableData.last_page > 1 && (
+              {/* {tableData && tableData.last_page > 1 && (
                 <Pagination
                   currentPage={tableData.current_page}
                   lastPage={tableData.last_page}
                   onPageChange={setCurrentPage}
                 />
-              )}
+              )} */}
             </>
           )}
         </>

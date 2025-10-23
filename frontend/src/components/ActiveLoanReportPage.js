@@ -105,8 +105,8 @@ export default function ActiveLoanReportPage() {
     };
 
     const getDurationStyle = (days) => {
-        if (days > 30) return { color: '#ef4444', fontWeight: 'bold' }; 
-        if (days > 7) return { color: '#f97316' }; 
+        if (days > 30) return { color: '#ef4444', fontWeight: 'bold' };
+        if (days > 7) return { color: '#f97316' };
         return {};
     };
 
@@ -145,39 +145,45 @@ export default function ActiveLoanReportPage() {
 
             <div className="job-list-container">
                 {/* Tampilan Desktop */}
-                <table className="job-table">
-                    <thead>
-                        <tr>
-                            <th>Kode Unik</th>
-                            <th>Nama Barang</th>
-                            <th>Status</th>
-                            <th>Peminjam</th>
-                            <th>Lokasi</th>
-                            <th>Tgl Pinjam</th>
-                            <th>Durasi Pinjam</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
-                        ) : data.length > 0 ? data.map(item => {
-                            const duration = calculateDuration(item.tanggal_keluar);
-                            return (
-                                <tr key={item.id} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
-                                    <td>{item.kode_unik || '-'}</td>
-                                    <td>{item.master_barang?.nama_barang || '-'}</td>
-                                    <td>{item.status_detail?.nama_status || '-'}</td>
-                                    <td>{item.user_peminjam?.name || '-'}</td>
-                                    <td>{item.workshop?.name || '-'}</td>
-                                    <td>{formatDate(item.tanggal_keluar)}</td>
-                                    <td style={getDurationStyle(duration.days)}>{duration.text}</td>
-                                </tr>
-                            )
-                        }) : (
-                            <tr><td colSpan="7" style={{ textAlign: 'center' }}>Tidak ada data peminjaman aktif.</td></tr>
-                        )}
-                    </tbody>
-                </table>
+                <div className="table-scroll-container">
+                    <table className="job-table">
+                        <thead>
+                            <tr>
+                                <th>Kode Unik</th>
+                                <th>Nama Barang</th>
+                                <th>Status</th>
+                                <th>Peminjam</th>
+                                <th>Lokasi</th>
+                                <th>Tgl Pinjam</th>
+                                <th>Durasi Pinjam</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <div className="table-body-scroll">
+                        <table className="job-table">
+                            <tbody>
+                                {loading ? (
+                                    <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
+                                ) : data.length > 0 ? data.map(item => {
+                                    const duration = calculateDuration(item.tanggal_keluar);
+                                    return (
+                                        <tr key={item.id} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
+                                            <td>{item.kode_unik || '-'}</td>
+                                            <td>{item.master_barang?.nama_barang || '-'}</td>
+                                            <td>{item.status_detail?.nama_status || '-'}</td>
+                                            <td>{item.user_peminjam?.name || '-'}</td>
+                                            <td>{item.workshop?.name || '-'}</td>
+                                            <td>{formatDate(item.tanggal_keluar)}</td>
+                                            <td style={getDurationStyle(duration.days)}>{duration.text}</td>
+                                        </tr>
+                                    )
+                                }) : (
+                                    <tr><td colSpan="7" style={{ textAlign: 'center' }}>Tidak ada data peminjaman aktif.</td></tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                 {/*Tampilan Mobile */}
                 <div className="job-list-mobile">
                     {loading ? (

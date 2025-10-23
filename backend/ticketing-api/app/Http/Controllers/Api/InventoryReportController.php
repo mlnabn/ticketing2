@@ -51,7 +51,7 @@ class InventoryReportController extends Controller
                 $title = 'Laporan Barang Keluar';
                 break;
 
-            case 'active_loans': 
+            case 'active_loans':
                 $statusPeminjamanIds = DB::table('status_barang')->whereIn('nama_status', ['Dipinjam', 'Digunakan'])->pluck('id');
                 $query->whereIn('status_id', $statusPeminjamanIds);
                 $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_keluar', '>=', $request->start_date));
@@ -60,7 +60,7 @@ class InventoryReportController extends Controller
                 $title = 'Laporan Peminjaman Aktif';
                 break;
 
-            case 'all_stock': 
+            case 'all_stock':
                 $query->orderBy('created_at', 'desc');
                 $title = 'Laporan Stok Aset Total';
                 break;
@@ -92,18 +92,18 @@ class InventoryReportController extends Controller
         // === KALKULASI UNTUK 4 KARTU UTAMA ===
         $totalUnitBarang = StokBarang::count();
         $stokTersedia = StokBarang::where('status_id', $statusIds['Tersedia'] ?? 0)->count();
-        $rusakHilangStatusIds = array_filter([$statusIds['Rusak'] ?? null, $statusIds['Hilang'] ?? null]);
+        $rusakHilangStatusIds = array_filter([$statusIds['Rusak'] ?? null, $statusIds['Hilang'] ?? null, $statusIds['Perbaikan'] ?? null]);
         $rusakHilangTotal = StokBarang::whereIn('status_id', $rusakHilangStatusIds)->count();
         $keluarOperasionalStatusIds = array_filter([
             $statusIds['Dipinjam'] ?? null,
             $statusIds['Digunakan'] ?? null,
-            $statusIds['Perbaikan'] ?? null,
+            
         ]);
         $barangKeluarOperasional = StokBarang::whereIn('status_id', $keluarOperasionalStatusIds)->count();
 
         // === KALKULASI DATA PENDUKUNG (Chart, Widget, dll) ===
         $year = $request->input('year', Carbon::now()->year);
-        $keluarSemuaStatusIds = $this->getKeluarStatusIds($statusIds); 
+        $keluarSemuaStatusIds = $this->getKeluarStatusIds($statusIds);
         $chartData = $this->getMonthlyMovementData($year, $keluarSemuaStatusIds);
 
         $mostActiveItems = StokBarang::select('master_barang_id', DB::raw('count(*) as total_keluar'))
@@ -128,7 +128,7 @@ class InventoryReportController extends Controller
                 'stok_tersedia' => $stokTersedia,
                 'persentase_stok_tersedia' => $totalUnitBarang > 0 ? round(($stokTersedia / $totalUnitBarang) * 100) : 0,
                 'rusak_hilang_total' => $rusakHilangTotal,
-                'barang_keluar' => $barangKeluarOperasional, 
+                'barang_keluar' => $barangKeluarOperasional,
             ],
             'chartData' => $chartData,
             'mostActiveItems' => $mostActiveItems,
@@ -181,6 +181,9 @@ class InventoryReportController extends Controller
                 });
             });
 
+            if ($request->boolean('all')) {
+                return $query->get();
+            }
             return $query->paginate($request->input('per_page', 15));
         }
 
@@ -212,6 +215,9 @@ class InventoryReportController extends Controller
 
         $query->orderBy('created_at', 'desc');
 
+        if ($request->boolean('all')) {
+            return $query->get();
+        }
         return $query->paginate($request->input('per_page', 15));
     }
 

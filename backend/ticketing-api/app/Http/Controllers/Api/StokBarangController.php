@@ -363,14 +363,22 @@ class StokBarangController extends Controller
         ]));
     }
 
-    public function getHistory(StokBarang $stokBarang)
+    public function getHistory(StokBarang $stokBarang, Request $request)
     {
-        $history = $stokBarang->histories()->with([
+        $query = $stokBarang->histories()->with([
             'statusDetail',
             'triggeredByUser:id,name',
             'relatedUser:id,name',
             'workshop:id,name'
-        ])->get();
+        ]);
+        if ($request->filled('start_date')) {
+            $query->whereDate('event_date', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('event_date', '<=', $request->end_date);
+        }
+
+        $history = $query->latest('event_date')->get();
 
         return response()->json($history);
     }

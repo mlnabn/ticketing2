@@ -21,6 +21,14 @@ function ItemHistoryLookupPage() {
     const [isScannerOpen, setIsScannerOpen] = useState(false);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+
+    const formatDate = (dateString) => {
+        if (!dateString) return '-';
+        // Menggunakan toLocaleDateString untuk format tanggal lokal
+        return new Date(dateString).toLocaleDateString('id-ID', {
+            day: '2-digit', month: 'long', year: 'numeric'
+        });
+    };
     const fetchData = useCallback(async (page = 1) => {
         setLoading(true);
         try {
@@ -44,6 +52,24 @@ function ItemHistoryLookupPage() {
     useEffect(() => {
         fetchData(1);
     }, [fetchData]);
+
+    const getRelevantDate = (item) => {
+        switch (item.status_detail?.nama_status) {
+            case 'Digunakan':
+            case 'Dipinjam':
+                return item.tanggal_keluar;
+            case 'Rusak':
+                return item.tanggal_rusak;
+            case 'Hilang':
+                return item.tanggal_hilang;
+            case 'Perbaikan':
+                return item.tanggal_mulai_perbaikan;
+            case 'Tersedia':
+                return item.tanggal_masuk; // Tanggal saat item tersedia
+            default:
+                return item.updated_at; // Fallback jika status tidak dikenal
+        }
+    };
 
     const getResponsiblePerson = (item) => {
         switch (item.status_detail?.nama_status) {
@@ -72,8 +98,8 @@ function ItemHistoryLookupPage() {
                 type,
                 search: searchTerm,
                 export_type: exportType,
-                start_date: startDate, 
-                end_date: endDate       
+                start_date: startDate,
+                end_date: endDate
             };
 
             const response = await api.get('/reports/inventory/export', {
@@ -186,34 +212,43 @@ function ItemHistoryLookupPage() {
 
                 <div className="job-list-container">
                     {/* Desktop View */}
-                    <table className="job-table">
-                        <thead>
-                            <tr>
-                                <th>Kode Unik</th>
-                                <th>Nama Barang</th>
-                                <th>Status Saat Ini</th>
-                                <th>Penanggung Jawab/Pengguna Terakhir</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {loading ? (
-                                <tr><td colSpan="4" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
-                            ) : items.length > 0 ? items.map(item => (
-                                <tr key={item.id} onClick={() => setHistoryItem(item)} style={{ cursor: 'pointer' }} className="hoverable-row">
-                                    <td>{item.kode_unik}</td>
-                                    <td>{item.master_barang?.nama_barang || 'N/A'}</td>
-                                    <td>
-                                        <span className={`status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
-                                            {item.status_detail?.nama_status || 'N/A'}
-                                        </span>
-                                    </td>
-                                    <td>{getResponsiblePerson(item)}</td>
+                    <div className="table-scroll-container"> {/* DITAMBAHKAN */}
+                        {/* TABEL 1: KHUSUS HEADER */}
+                        <table className="job-table">
+                            <thead>
+                                <tr>
+                                    <th>Kode Unik</th>
+                                    <th>Nama Barang</th>
+                                    <th>Status Saat Ini</th>
+                                    <th>Tgl Status Terakhir</th>
+                                    <th>Penanggung Jawab/Pengguna Terakhir</th>
                                 </tr>
-                            )) : (
-                                <tr><td colSpan="4" style={{ textAlign: 'center' }}>Tidak ada data.</td></tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                        </table>
+                        <div className="table-body-scroll">
+                            <table className="job-table">
+                                <tbody>
+                                    {loading ? (
+                                        <tr><td colSpan="4" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
+                                    ) : items.length > 0 ? items.map(item => (
+                                        <tr key={item.id} onClick={() => setHistoryItem(item)} style={{ cursor: 'pointer' }} className="hoverable-row">
+                                            <td>{item.kode_unik}</td>
+                                            <td>{item.master_barang?.nama_barang || 'N/A'}</td>
+                                            <td>
+                                                <span className={`status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                    {item.status_detail?.nama_status || 'N/A'}
+                                                </span>
+                                            </td>
+                                            <td>{formatDate(getRelevantDate(item))}</td>
+                                            <td>{getResponsiblePerson(item)}</td>
+                                        </tr>
+                                    )) : (
+                                        <tr><td colSpan="4" style={{ textAlign: 'center' }}>Tidak ada data.</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                     {/* Mobile View */}
                     <div className="job-list-mobile">
                         {loading ? (
@@ -239,6 +274,12 @@ function ItemHistoryLookupPage() {
                                                     {item.status_detail?.nama_status || 'N/A'}
                                                 </span>
                                             </span>
+                                        </div>
+                                    </div>
+                                    <div className="card-row">
+                                        <div className="data-group single">
+                                            <span className="label">Tgl Status Terakhir</span>
+                                            <span className="value">{formatDate(getRelevantDate(item))}</span>
                                         </div>
                                     </div>
                                     <div className="card-row">
@@ -270,6 +311,8 @@ function ItemHistoryLookupPage() {
                     item={historyItem}
                     onClose={() => setHistoryItem(null)}
                     showToast={showToast}
+                    startDate={startDate}
+                    endDate={endDate}
                 />
             )}
 
