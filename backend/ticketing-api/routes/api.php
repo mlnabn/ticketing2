@@ -55,8 +55,8 @@ Route::middleware('jwt')->group(function () {
     Route::get('/users/{user}/stats', [UserController::class, 'activityStats']);
     Route::apiResource('users', UserController::class)->except(['create', 'edit', 'update']);
 
-    // --- Rute untuk Tiket ---
-    Route::apiResource('urgency-keywords', UrgencyKeywordController::class)->only(['index', 'store', 'destroy']);
+    // // --- Rute untuk Tiket ---
+    // Route::apiResource('urgency-keywords', UrgencyKeywordController::class)->only(['index', 'store', 'destroy']);
     Route::apiResource('workshops', WorkshopController::class);
     Route::get('/tickets/stats', [TicketController::class, 'stats']);
     Route::patch('/tickets/{ticket}/reject', [TicketController::class, 'reject']);

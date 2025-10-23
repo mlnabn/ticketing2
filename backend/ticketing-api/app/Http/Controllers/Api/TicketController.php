@@ -7,7 +7,6 @@ use App\Models\Ticket;
 use App\Models\User;
 use App\Models\Workshop;
 use Illuminate\Http\Request;
-use App\Models\UrgencyKeyword;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -18,10 +17,11 @@ use Illuminate\Support\Facades\Cache;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\TicketsExport;
-use Illuminate\Validation\ValidationException;
-use App\Models\MasterBarang;
 use App\Models\StokBarang;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\Client\ConnectionException;
 
 
 class TicketController extends Controller
@@ -105,25 +105,42 @@ class TicketController extends Controller
     }
 
     /**
-     * Ambil tiket berdasarkan peran pengguna.
+     * Ambil tiket berdasarkan peran pengguna dan mengurutkan tiket berdasarkan urgensi dan tanggal pembuatan.
      */
     public function index(Request $request)
     {
         $user = auth()->user();
-        $perPage = $request->query('per_page', 10);
+        $perPage = $request->query('per_page', 15);
 
         $query = Ticket::with(['user', 'creator', 'masterBarangs', 'workshop']);
 
-        // Jika user biasa → hanya tiket miliknya
         if ($user->role !== 'admin') {
             $query->where('creator_id', $user->id);
         }
 
-        // Terapkan semua filter dari request
         $query = $this->applyFilters($query, $request);
 
-        $ticketsData = $query->latest()->paginate($perPage);
+        $query->orderByRaw("CASE
+                                WHEN is_urgent = 1 AND status NOT IN ('Selesai', 'Ditolak') THEN 0
+                                ELSE 1
+                             END ASC");
+
+        $query->orderBy('created_at', 'DESC');
+
+        $ticketsData = $query->paginate($perPage);
+
+        if ($ticketsData->items() && count($ticketsData->items()) > 0) {
+            $sortedItems = collect($ticketsData->items())->sortByDesc(function ($ticket) {
+                if ($ticket->is_urgent && !in_array($ticket->status, ['Selesai', 'Ditolak'])) {
+                    return 2;
+                }
+                return 0;
+            })->values()->all();
+
+            $ticketsData->setCollection(collect($sortedItems));
+        }
         return response()->json($ticketsData);
+
     }
 
     /**
@@ -183,7 +200,7 @@ class TicketController extends Controller
         ]);
 
         $kodeTiket = $this->generateKodeTiket($validated['workshop_id']);
-        $isUrgent = $this->checkUrgency($validated['title']);
+        $isUrgent = $this->classifyUrgencyWithAI($validated['title']);
 
         $ticket = Ticket::create([
             'kode_tiket' => $kodeTiket,
@@ -229,7 +246,7 @@ class TicketController extends Controller
                     ['phone' => $cleanPhoneNumber],
                     [
                         'name' => $validated['sender_name'],
-                        'email' => $cleanPhoneNumber . '@whatsapp.user', // Sekarang menggunakan nomor yang sudah bersih
+                        'email' => $cleanPhoneNumber . '@whatsapp.user',
                         'password' => bcrypt(Str::random(16)),
                         'role' => 'user'
                     ]
@@ -246,7 +263,7 @@ class TicketController extends Controller
             return response()->json(['error' => 'Gagal memproses user: ' . $e->getMessage()], 500);
         }
 
-        $isUrgent = $this->checkUrgency($validated['title']);
+        $isUrgent = $this->classifyUrgencyWithAI($validated['title']);
         $kodeTiket = $this->generateKodeTiket($workshop->id);
 
         $ticket = Ticket::create([
@@ -273,7 +290,6 @@ class TicketController extends Controller
         $year = $request->input('year', Carbon::now()->year);
         $month = $request->input('month');
 
-        // --- LOGIKA 1: HANYA TAHUN DIPILIH (ATAU DEFAULT) ---
         if (!$month) {
             $monthlyCreated = Ticket::select(
                 DB::raw('MONTH(created_at) as month'),
@@ -296,7 +312,7 @@ class TicketController extends Controller
             $report = [];
             for ($m = 1; $m <= 12; $m++) {
                 $report[] = [
-                    'month' => Carbon::create()->month($m)->format('M'), // e.g., 'Jan', 'Feb'
+                    'month' => Carbon::create()->month($m)->format('M'),
                     'total' => $monthlyCreated[$m] ?? 0,
                     'dikerjakan' => $monthlyStarted[$m] ?? 0,
                 ];
@@ -304,7 +320,6 @@ class TicketController extends Controller
             return response()->json($report);
         }
 
-        // --- LOGIKA 2: TAHUN DAN BULAN DIPILIH ---
         $dailyCreatedCounts = Ticket::select(
             DB::raw('DATE(created_at) as date'),
             DB::raw('count(*) as count')
@@ -839,39 +854,70 @@ class TicketController extends Controller
         return response()->json($ticket->load(['user', 'creator', 'masterBarangs']));
     }
 
-    /**
-     * Ambil semua kata kunci urgensi dari DB dan cache.
-     */
-    private function getUrgentKeywords()
+    private function classifyUrgencyWithAI(string $description): bool
     {
-        // Cache selama 60 menit untuk performa
-        return Cache::remember('urgent_keywords_scores', 60, function () {
-            return UrgencyKeyword::pluck('score', 'keyword')->toArray();
-        });
-    }
+        $apiKey = config('deepseek.api_key');
+        $apiEndpoint = config('deepseek.api_endpoint');
+        $model = config('deepseek.model');
 
-    /**
-     * Cek urgensi tiket berdasarkan deskripsi.
-     */
-    private function checkUrgency(string $description): bool
-    {
-        $keywords = $this->getUrgentKeywords();
-        if (empty($keywords)) {
+        if (!$apiKey) {
+            Log::error('DeepSeek API Key tidak ditemukan di konfigurasi.');
+            return false;
+        }
+        if (!$model) {
+            Log::error('DeepSeek Model tidak ditemukan di konfigurasi.');
             return false;
         }
 
-        $totalScore = 0;
-        $descriptionLower = strtolower($description);
+        $systemPrompt = "You are an assistant specialized in classifying IT support ticket urgency for 'Dtech Company'. 
+        Analyze the following ticket description and determine if it's 'Urgent' or 'Not Urgent'. 
+        Consider factors like inability to work, system down, security issues, or widespread impact as Urgent. 
+        Respond ONLY with the word 'Urgent' or 'Not Urgent'.";
 
-        foreach ($keywords as $keyword => $score) {
-            $pattern = '/\b' . preg_quote($keyword, '/') . '\b/i';
+        $userPrompt = "Ticket Description: \"" . $description . "\"";
 
-            if (preg_match($pattern, $descriptionLower)) {
-                $totalScore += $score;
+        $payload = [
+            'model' => $model,
+            'messages' => [
+                ['role' => 'system', 'content' => $systemPrompt],
+                ['role' => 'user', 'content' => $userPrompt]
+            ],
+            'max_tokens' => 10,
+            'temperature' => 0.1,
+        ];
+
+        try {
+            $response = Http::withToken($apiKey)
+                ->timeout(15)
+                ->post($apiEndpoint, $payload);
+
+            if ($response->successful()) {
+                $result = $response->json();
+                $classification = $result['choices'][0]['message']['content'] ?? null;
+
+                if ($classification) {
+                    $cleanedClassification = strtolower(trim($classification));
+                    if ($cleanedClassification === 'urgent') {
+                        return true;
+                    }
+                } else {
+                     Log::warning('Gagal mengekstrak klasifikasi dari respons DeepSeek.', ['response' => $result]);
+                }
+            } else {
+                Log::error('Gagal menghubungi DeepSeek API.', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
             }
+        } catch (ConnectionException $e) {
+            Log::error('Koneksi ke DeepSeek API gagal.', ['error' => $e->getMessage()]);
+        } catch (RequestException $e) {
+            Log::error('Request ke DeepSeek API error.', ['error' => $e->getMessage(), 'response' => $e->response?->body()]);
+        } catch (\Exception $e) { // Tangkap error umum lainnya
+            Log::error('Error saat klasifikasi urgensi dengan AI.', ['error' => $e->getMessage()]);
         }
 
-        $threshold = config('app.urgency_threshold', 5);
-        return $totalScore >= $threshold;
+        // Default: Anggap tidak urgent jika ada error atau hasil tidak sesuai
+        return false;
     }
 }
