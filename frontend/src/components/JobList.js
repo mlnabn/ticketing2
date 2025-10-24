@@ -31,7 +31,7 @@ export default function JobList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
   const [selectedIds, setSelectedIds] = useState([]);
-  
+
   // State untuk data pendukung modal
   const [adminList, setAdminList] = useState([]);
   const [itemList, setItemList] = useState([]);
@@ -54,7 +54,7 @@ export default function JobList() {
     // setTicketData(null);
     setIsLoading(true);
     const endpoint = isMyTicketsPage ? '/tickets/my-tickets' : '/tickets';
-    
+
     const params = {
       page: currentPage,
       search: debouncedSearchTerm,
@@ -72,6 +72,9 @@ export default function JobList() {
       showToast('Gagal memuat data tiket.', 'error');
       if (e.response?.status === 401) logout();
       setTicketData({ data: [], current_page: 1, last_page: 1 });
+    }
+    finally {
+      setIsLoading(false);
     }
   }, [isMyTicketsPage, debouncedSearchTerm, logout, showToast, searchParams]);
 
@@ -99,11 +102,11 @@ export default function JobList() {
   useEffect(() => {
     fetchPrerequisites();
   }, [fetchPrerequisites]);
-  
+
   useEffect(() => {
     setSelectedIds([]);
   }, [ticketsOnPage]);
-  
+
   const updateTicketStatus = async (ticket, newStatus) => {
     if (newStatus === 'Selesai' && ticket.master_barangs && ticket.master_barangs.length > 0) {
       setTicketToReturn(ticket);
@@ -140,7 +143,7 @@ export default function JobList() {
       showToast('Gagal menolak tiket.', 'error');
     }
   };
-  
+
   const handleSaveProof = async (ticketId, formData) => {
     try {
       await api.post(`/tickets/${ticketId}/submit-proof`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
@@ -254,122 +257,122 @@ export default function JobList() {
     if (ticket.requested_time) return `Waktu Diminta: ${ticket.requested_time}`;
     return 'Jadwal Fleksibel';
   };
-    return (
+  return (
     <>
-    <div className="user-management-container">
-      <h1 className="page-title">{isMyTicketsPage ? 'Tiket yang Saya Kerjakan' : 'Daftar Semua Tiket'}</h1>
+      <div className="user-management-container">
+        <h1 className="page-title">{isMyTicketsPage ? 'Tiket yang Saya Kerjakan' : 'Daftar Semua Tiket'}</h1>
 
-      {!isMyTicketsPage && isAdmin && (
-        <div className="filters-container report-filters" style={{ margin: '20px 0' }}>
-          <input
-            type="text"
-            placeholder="Cari tiket, deskripsi, nama, workshop..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="filter-search-input"
-          />
-        </div>
-      )}
-                
-      {selectedIds.length > 0 && (
-        <div className="bulk-action-bar" style={{ margin: '20px 0' }}>
-          <button onClick={handleBulkDelete} className="btn-delete">Hapus {selectedIds.length} Tiket yang Dipilih</button>
-        </div>
-      )}
+        {!isMyTicketsPage && isAdmin && (
+          <div className="filters-container report-filters" style={{ margin: '20px 0' }}>
+            <input
+              type="text"
+              placeholder="Cari tiket, deskripsi, nama, workshop..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="filter-search-input"
+            />
+          </div>
+        )}
 
-      {!ticketData ? (
-        <p>Memuat data tiket...</p>
-      ) : (
-        <>
-          <div className="job-list-container">
-            <table className="job-table">
-              <thead>
-                <tr>
-                  {isAdmin && !isMyTicketsPage && (<th><input type="checkbox" onChange={handleSelectAll} checked={ticketsOnPage.length > 0 && selectedIds.length === ticketsOnPage.length} /></th>)}
-                  <th>Pengirim</th><th>Dikerjakan Oleh</th><th>Workshop</th>
-                  <th>Deskripsi</th><th>Tanggal Dibuat</th><th>Waktu Pengerjaan</th>
-                  <th>Status</th><th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ticketsOnPage.length > 0 ? (
-                  ticketsOnPage.map(ticket => (
-                    <tr 
-                      key={ticket.id} 
-                      className={`${selectedIds.includes(ticket.id) ? 'selected-row' : ''}
+        {selectedIds.length > 0 && (
+          <div className="bulk-action-bar" style={{ margin: '20px 0' }}>
+            <button onClick={handleBulkDelete} className="btn-delete">Hapus {selectedIds.length} Tiket yang Dipilih</button>
+          </div>
+        )}
+
+        {isLoading ? (
+          <p>Memuat data tiket...</p>
+        ) : (
+          <>
+            <div className="job-list-container">
+              <table className="job-table">
+                <thead>
+                  <tr>
+                    {isAdmin && !isMyTicketsPage && (<th><input type="checkbox" onChange={handleSelectAll} checked={ticketsOnPage.length > 0 && selectedIds.length === ticketsOnPage.length} /></th>)}
+                    <th>Pengirim</th><th>Dikerjakan Oleh</th><th>Workshop</th>
+                    <th>Deskripsi</th><th>Tanggal Dibuat</th><th>Waktu Pengerjaan</th>
+                    <th>Status</th><th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ticketsOnPage.length > 0 ? (
+                    ticketsOnPage.map(ticket => (
+                      <tr
+                        key={ticket.id}
+                        className={`${selectedIds.includes(ticket.id) ? 'selected-row' : ''}
                       ${(ticket.is_urgent && ticket.status !== 'Selesai' && ticket.status !== 'Ditolak') ? 'urgent-row' : ''}
                       clickable-row`}
+                        onClick={(e) => handleRowClick(e, ticket)}
+                      >
+                        {isAdmin && !isMyTicketsPage && (<td><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>)}
+                        <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
+                        <td>{ticket.user ? ticket.user.name : '-'}</td>
+                        <td>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
+                        <td><span className="description-cell">{ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}{ticket.title}</span></td>
+                        <td>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
+                        <td>{formatWorkTime(ticket)}</td>
+                        <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></td>
+                        <td><div className="action-buttons-group">{renderActionButtons(ticket)}</div></td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr><td colSpan={isAdmin && !isMyTicketsPage ? 9 : 8} style={{ textAlign: 'center', padding: '20px' }}>Tidak ada pekerjaan yang ditemukan.</td></tr>
+                  )}
+                </tbody>
+              </table>
+              <div className="job-list-mobile">
+                {ticketsOnPage.length > 0 ? (
+                  ticketsOnPage.map(ticket => (
+                    <div
+                      key={ticket.id}
+                      className={`ticket-card-mobile clickable-row ${(ticket.is_urgent && ticket.status !== 'Selesai' && ticket.status !== 'Ditolak') ? 'urgent-row' : ''}`}
                       onClick={(e) => handleRowClick(e, ticket)}
                     >
-                      {isAdmin && !isMyTicketsPage && (<td><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>)}
-                      <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
-                      <td>{ticket.user ? ticket.user.name : '-'}</td>
-                      <td>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
-                      <td><span className="description-cell">{ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}{ticket.title}</span></td>
-                      <td>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
-                      <td>{formatWorkTime(ticket)}</td>
-                      <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></td>
-                      <td><div className="action-buttons-group">{renderActionButtons(ticket)}</div></td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr><td colSpan={isAdmin && !isMyTicketsPage ? 9 : 8} style={{ textAlign: 'center', padding: '20px' }}>Tidak ada pekerjaan yang ditemukan.</td></tr>
-                )}
-              </tbody>
-            </table>
-            <div className="job-list-mobile">
-              {ticketsOnPage.length > 0 ? (
-                ticketsOnPage.map(ticket => (
-                  <div 
-                    key={ticket.id} 
-                    className={`ticket-card-mobile clickable-row ${(ticket.is_urgent && ticket.status !== 'Selesai' && ticket.status !== 'Ditolak') ? 'urgent-row' : ''}`}
-                    onClick={(e) => handleRowClick(e, ticket)}
-                  >
-                    <div className="card-row">
-                      <div className="data-group"><span className="label">Pengirim</span><span className="value">{ticket.creator ? ticket.creator.name : 'N/A'}</span></div>
-                      <div className="data-group"><span className="label">Dikerjakan Oleh</span><span className="value">{ticket.user ? ticket.user.name : '-'}</span></div>
-                    </div>
-                    <div className="card-row"><div className="data-group single"><span className="label">Workshop</span><span className="value">{ticket.workshop ? ticket.workshop.name : 'N/A'}</span></div></div>
-                    <div className="card-row">
-                      <div className="data-group single">
-                        <span className="label">Deskripsi</span>
-                        <span className="value description">
+                      <div className="card-row">
+                        <div className="data-group"><span className="label">Pengirim</span><span className="value">{ticket.creator ? ticket.creator.name : 'N/A'}</span></div>
+                        <div className="data-group"><span className="label">Dikerjakan Oleh</span><span className="value">{ticket.user ? ticket.user.name : '-'}</span></div>
+                      </div>
+                      <div className="card-row"><div className="data-group single"><span className="label">Workshop</span><span className="value">{ticket.workshop ? ticket.workshop.name : 'N/A'}</span></div></div>
+                      <div className="card-row">
+                        <div className="data-group single">
+                          <span className="label">Deskripsi</span>
                           <span className="value description">
-                            <span className="description-cell">
-                              {ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}
-                              {ticket.title}
+                            <span className="value description">
+                              <span className="description-cell">
+                                {ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}
+                                {ticket.title}
+                              </span>
                             </span>
                           </span>
-                        </span>
+                        </div>
                       </div>
+                      <div className="card-row">
+                        <div className="data-group"><span className="label">Tanggal Dibuat</span><span className="value">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</span></div>
+                        <div className="data-group"><span className="label">Waktu Pengerjaan</span><span className="value">{formatWorkTime(ticket)}</span></div>
+                      </div>
+                      <div className="card-row status-row"><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></div>
+                      <div className="card-row action-row"><div className="action-buttons-group">{renderActionButtons(ticket)}</div></div>
                     </div>
-                    <div className="card-row">
-                      <div className="data-group"><span className="label">Tanggal Dibuat</span><span className="value">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</span></div>
-                      <div className="data-group"><span className="label">Waktu Pengerjaan</span><span className="value">{formatWorkTime(ticket)}</span></div>
-                    </div>
-                    <div className="card-row status-row"><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></div>
-                    <div className="card-row action-row"><div className="action-buttons-group">{renderActionButtons(ticket)}</div></div>
-                  </div>
-                ))
-              ) : (
-                <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Tidak ada pekerjaan yang ditemukan.</p></div>
-              )}
+                  ))
+                ) : (
+                  <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Tidak ada pekerjaan yang ditemukan.</p></div>
+                )}
+              </div>
             </div>
-          </div>
 
-          {ticketData.last_page > 1 && (
-            <Pagination currentPage={page} lastPage={ticketData.last_page} onPageChange={setPage} />
-          )}
-        </>
-      )}
-      
-      {ticketToAssign && <AssignAdminModal ticket={ticketToAssign} admins={adminList} items={itemList} onAssign={handleConfirmAssign} onClose={() => setTicketToAssign(null)} showToast={showToast} />}
-      {ticketToReject && <RejectTicketModal ticket={ticketToReject} onReject={handleConfirmReject} onClose={() => setTicketToReject(null)} showToast={showToast} />}
-      {ticketForProof && <ProofModal ticket={ticketForProof} onSave={handleSaveProof} onClose={() => setTicketForProof(null)} />}
-      {ticketToDelete && <ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={() => setTicketToDelete(null)} />}
-      {selectedTicketForDetail && <TicketDetailModal ticket={selectedTicketForDetail} onClose={() => setSelectedTicketForDetail(null)} />}
-      {ticketToReturn && <ReturnItemsModal ticket={ticketToReturn} onSave={handleConfirmReturn} onClose={() => setTicketToReturn(null)} showToast={showToast} />}
-    </div>
+            {ticketData.last_page > 1 && (
+              <Pagination currentPage={page} lastPage={ticketData.last_page} onPageChange={setPage} />
+            )}
+          </>
+        )}
+
+        {ticketToAssign && <AssignAdminModal ticket={ticketToAssign} admins={adminList} items={itemList} onAssign={handleConfirmAssign} onClose={() => setTicketToAssign(null)} showToast={showToast} />}
+        {ticketToReject && <RejectTicketModal ticket={ticketToReject} onReject={handleConfirmReject} onClose={() => setTicketToReject(null)} showToast={showToast} />}
+        {ticketForProof && <ProofModal ticket={ticketForProof} onSave={handleSaveProof} onClose={() => setTicketForProof(null)} />}
+        {ticketToDelete && <ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={() => setTicketToDelete(null)} />}
+        {selectedTicketForDetail && <TicketDetailModal ticket={selectedTicketForDetail} onClose={() => setSelectedTicketForDetail(null)} />}
+        {ticketToReturn && <ReturnItemsModal ticket={ticketToReturn} onSave={handleConfirmReturn} onClose={() => setTicketToReturn(null)} showToast={showToast} />}
+      </div>
     </>
   );
 }
