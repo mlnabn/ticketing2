@@ -170,6 +170,8 @@ export default function DetailedReportPage({ type, title }) {
         active_loans: 'Tgl Keluar'
     };
 
+    const showWorkshop = type === 'out' || type === 'accountability';
+
     return (
         <div className="user-management-container">
             {/* ... (Header dan Filter tidak diubah) ... */}
@@ -216,7 +218,7 @@ export default function DetailedReportPage({ type, title }) {
                                 <th>Status Kejadian</th>
                                 <th>{dateHeaders[type] || 'Tanggal'}</th>
                                 <th>Penanggung Jawab</th>
-                                <th>Workshop</th>
+                                {showWorkshop && <th>Workshop</th>}
                                 {(type === 'out' || type === 'accountability') && <th>Status Saat Ini</th>}
                             </tr>
                         </thead>
@@ -225,9 +227,8 @@ export default function DetailedReportPage({ type, title }) {
                     <div className="table-body-scroll">
                         <table className="job-table">
                             <tbody>
-                                {/* --- PERBAIKAN 2: colSpan (dari 7:6 menjadi 8:7) --- */}
                                 {loading ? (
-                                    <tr><td colSpan={(type === 'out' || type === 'accountability') ? 8 : 7} style={{ textAlign: 'center' }}>Memuat data...</td></tr>
+                                    <tr><td colSpan={showWorkshop ? 8 : 6} style={{ textAlign: 'center' }}>Memuat data...</td></tr>
                                 ) : data.length > 0 ? data.map(item => {
                                     const itemData = getItemData(item);
                                     return (
@@ -238,7 +239,7 @@ export default function DetailedReportPage({ type, title }) {
                                             <td>{itemData.status || '-'}</td>
                                             <td>{formatDate(itemData.tanggal)}</td>
                                             <td>{itemData.penanggung_jawab || '-'}</td>
-                                            <td>{itemData.workshop || '-'}</td>
+                                            {showWorkshop && <td>{itemData.workshop || '-'}</td>}
                                             {(type === 'out' || type === 'accountability') && (
                                                 <td>
                                                     <span className={`badge-status status-${(itemData.current_status || '-').toLowerCase()}`}>
@@ -249,9 +250,8 @@ export default function DetailedReportPage({ type, title }) {
                                         </tr>
                                     )
                                 }) : (
-                                    <tr><td colSpan={(type === 'out' || type === 'accountability') ? 8 : 7} style={{ textAlign: 'center' }}>Tidak ada data untuk ditampilkan.</td></tr>
+                                    <tr><td colSpan={showWorkshop ? 8 : 6} style={{ textAlign: 'center' }}>Tidak ada data untuk ditampilkan.</td></tr>
                                 )}
-                                {/* --- AKHIR PERBAIKAN 2 --- */}
                             </tbody>
                         </table>
                     </div>
@@ -264,7 +264,6 @@ export default function DetailedReportPage({ type, title }) {
                         const itemData = getItemData(item);
                         return (
                             <div key={`mobile-detail-${item.id}`} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, item)}>
-                                {/* ... (Baris 1, 2, 3 tidak diubah) ... */}
                                 <div className="card-row">
                                     <div className="data-group single">
                                         <span className="label">Nama Barang</span>
@@ -291,21 +290,20 @@ export default function DetailedReportPage({ type, title }) {
                                         <span className="value">{itemData.penanggung_jawab || '-'}</span>
                                     </div>
                                 </div>
-
-                                {/* --- PERBAIKAN 3: Tampilan Mobile --- */}
-                                <div className="card-row">
-                                    <div className={`data-group ${!(type === 'out' || type === 'accountability') ? 'single' : ''}`}>
-                                        <span className="label">Workshop</span>
-                                        <span className="value">{itemData.workshop || '-'}</span>
-                                    </div>
-                                    {(type === 'out' || type === 'accountability') && (
+                                {showWorkshop && (
+                                    <div className="card-row">
                                         <div className="data-group">
-                                            <span className="label">Status Saat Ini</span>
-                                            <span className="value">{itemData.current_status || '-'}</span>
+                                            <span className="label">Workshop</span>
+                                            <span className="value">{itemData.workshop || '-'}</span>
                                         </div>
-                                    )}
-                                </div>
-                                {/* --- AKHIR PERBAIKAN 3 --- */}
+                                        {(type === 'out' || type === 'accountability') && (
+                                            <div className="data-group">
+                                                <span className="label">Status Saat Ini</span>
+                                                <span className="value">{itemData.current_status || '-'}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         );
                     }) : (
