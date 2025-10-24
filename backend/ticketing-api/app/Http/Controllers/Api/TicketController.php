@@ -781,8 +781,27 @@ class TicketController extends Controller
 
     public function getBorrowedItems(Ticket $ticket)
     {
-        $borrowedItems = StokBarang::with('masterBarang')
-            ->where('ticket_id', $ticket->id)
+        $statusDipinjamId = DB::table('status_barang')->where('nama_status', 'Dipinjam')->value('id');
+        if (!$statusDipinjamId) {
+            Log::error('Status "Dipinjam" tidak ditemukan di status_barang.');
+            return response()->json([]);
+        }
+
+        $searchDescription = 'Dipinjam untuk tiket: ' . $ticket->kode_tiket;
+
+        $borrowedItemIds = DB::table('stok_barang_histories')
+            ->where('status_id', $statusDipinjamId) 
+            ->where('deskripsi', $searchDescription) 
+            ->distinct() 
+            ->pluck('stok_barang_id');
+
+        if ($borrowedItemIds->isEmpty()) {
+            return response()->json([]);
+        }
+
+        $borrowedItems = StokBarang::with('masterBarang:id_m_barang,nama_barang') 
+            ->whereIn('id', $borrowedItemIds)
+            ->select('id', 'master_barang_id', 'kode_unik') 
             ->get();
 
         return response()->json($borrowedItems);
