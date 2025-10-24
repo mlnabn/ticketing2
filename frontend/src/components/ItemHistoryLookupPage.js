@@ -4,7 +4,7 @@ import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 // import Pagination from '../components/Pagination';
 import HistoryModal from '../components/HistoryModal';
-import { saveAs } from 'file-saver';
+// import { saveAs } from 'file-saver';
 import QrScannerModal from './QrScannerModal';
 
 
@@ -16,8 +16,8 @@ function ItemHistoryLookupPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
     const [historyItem, setHistoryItem] = useState(null);
-    const [exportingExcel, setExportingExcel] = useState(false);
-    const [exportingPdf, setExportingPdf] = useState(false);
+    // const [exportingExcel, setExportingExcel] = useState(false);
+    // const [exportingPdf, setExportingPdf] = useState(false);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
@@ -86,38 +86,38 @@ function ItemHistoryLookupPage() {
         }
     };
 
-    const handleExport = async (exportType) => {
-        if (exportType === 'excel') setExportingExcel(true);
-        else setExportingPdf(true);
+    // const handleExport = async (exportType) => {
+    //     if (exportType === 'excel') setExportingExcel(true);
+    //     else setExportingPdf(true);
 
-        const type = 'all_stock';
+    //     const type = 'all_stock';
 
-        try {
-            const params = {
-                type,
-                search: searchTerm,
-                export_type: exportType,
-                start_date: startDate,
-                end_date: endDate
-            };
+    //     try {
+    //         const params = {
+    //             type,
+    //             search: searchTerm,
+    //             export_type: exportType,
+    //             start_date: startDate,
+    //             end_date: endDate
+    //         };
 
-            const response = await api.get('/reports/inventory/export', {
-                params,
-                responseType: 'blob',
-            });
+    //         const response = await api.get('/reports/inventory/export', {
+    //             params,
+    //             responseType: 'blob',
+    //         });
 
-            const extension = exportType === 'excel' ? 'xlsx' : 'pdf';
-            const fileName = `Laporan_Riwayat_Aset_${new Date().toISOString().split('T')[0]}.${extension}`;
-            saveAs(response.data, fileName);
+    //         const extension = exportType === 'excel' ? 'xlsx' : 'pdf';
+    //         const fileName = `Laporan_Riwayat_Aset_${new Date().toISOString().split('T')[0]}.${extension}`;
+    //         saveAs(response.data, fileName);
 
-        } catch (err) {
-            console.error(`Gagal mengunduh file ${exportType}:`, err);
-            showToast('Gagal mengunduh file. Mohon coba lagi.', 'error');
-        } finally {
-            if (exportType === 'excel') setExportingExcel(false);
-            else setExportingPdf(false);
-        }
-    };
+    //     } catch (err) {
+    //         console.error(`Gagal mengunduh file ${exportType}:`, err);
+    //         showToast('Gagal mengunduh file. Mohon coba lagi.', 'error');
+    //     } finally {
+    //         if (exportType === 'excel') setExportingExcel(false);
+    //         else setExportingPdf(false);
+    //     }
+    // };
     const handleSearchAndShowHistory = useCallback(async (code) => {
         if (!code) return;
         showToast(`Mencari riwayat untuk: ${code}`, 'info');
@@ -197,14 +197,14 @@ function ItemHistoryLookupPage() {
                                 </span>
                                 Scan QR
                             </button>
-                            <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
+                            {/* <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
                                 <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
                                 {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
                             </button>
                             <button onClick={() => handleExport('pdf')} className="btn-download pdf" disabled={exportingPdf}>
                                 <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
                                 {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
-                            </button>
+                            </button> */}
                         </div>
                     </div>
                 </div>
