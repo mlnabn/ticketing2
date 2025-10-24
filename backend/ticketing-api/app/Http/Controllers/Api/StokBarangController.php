@@ -40,6 +40,9 @@ class StokBarangController extends Controller
             'teknisiPerbaikan',
             'userPerusak',
             'userPenghilang',
+            'latestHistory.triggeredByUser:id,name',
+            'latestHistory.relatedUser:id,name',  
+            'latestHistory.statusDetail',
         ]);
 
         if ($request->filled('id_kategori')) {

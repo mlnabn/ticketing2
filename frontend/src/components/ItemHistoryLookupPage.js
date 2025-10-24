@@ -98,6 +98,10 @@ function ItemHistoryLookupPage() {
     }, [fetchData]);
 
     const getRelevantDate = (item) => {
+        const latestHistoryRecord = item.latest_history;
+        if (latestHistoryRecord) {
+            return latestHistoryRecord.event_date || latestHistoryRecord.created_at;
+        }
         switch (item.status_detail?.nama_status) {
             case 'Digunakan':
             case 'Dipinjam':
@@ -116,6 +120,16 @@ function ItemHistoryLookupPage() {
     };
 
     const getResponsiblePerson = (item) => {
+        const latestHistoryRecord = item.latest_history;
+        if (latestHistoryRecord) {
+            if (latestHistoryRecord.related_user?.name) {
+                return latestHistoryRecord.related_user.name;
+            }
+            if (latestHistoryRecord.triggered_by_user?.name) {
+                return latestHistoryRecord.triggered_by_user.name;
+            }
+            return '-';
+        }
         switch (item.status_detail?.nama_status) {
             case 'Digunakan':
             case 'Dipinjam':
@@ -287,7 +301,7 @@ function ItemHistoryLookupPage() {
                                     <th>Kode Unik</th>
                                     <th>Nama Barang</th>
                                     <th>Status Saat Ini</th>
-                                    <th>Tgl Status Terakhir</th>
+                                    <th>Tgl Status Terakhir Diubah</th>
                                     <th>Penanggung Jawab/Pengguna Terakhir</th>
                                 </tr>
                             </thead>
@@ -345,7 +359,7 @@ function ItemHistoryLookupPage() {
                                     </div>
                                     <div className="card-row">
                                         <div className="data-group single">
-                                            <span className="label">Tgl Status Terakhir</span>
+                                            <span className="label">Tgl Status Terakhir Diubah</span>
                                             <span className="value">{formatDate(getRelevantDate(item))}</span>
                                         </div>
                                     </div>
