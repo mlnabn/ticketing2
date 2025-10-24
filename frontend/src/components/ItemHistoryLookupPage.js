@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
-import Pagination from '../components/Pagination';
+// import Pagination from '../components/Pagination';
 import HistoryModal from '../components/HistoryModal';
 import { saveAs } from 'file-saver';
 import QrScannerModal from './QrScannerModal';
@@ -11,7 +11,7 @@ import QrScannerModal from './QrScannerModal';
 function ItemHistoryLookupPage() {
     const { showToast } = useOutletContext();
     const [items, setItems] = useState([]);
-    const [pagination, setPagination] = useState(null);
+    // const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
@@ -24,24 +24,23 @@ function ItemHistoryLookupPage() {
 
     const formatDate = (dateString) => {
         if (!dateString) return '-';
-        // Menggunakan toLocaleDateString untuk format tanggal lokal
         return new Date(dateString).toLocaleDateString('id-ID', {
             day: '2-digit', month: 'long', year: 'numeric'
         });
     };
-    const fetchData = useCallback(async (page = 1) => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
             const params = {
-                page,
+                all: true,
                 search: debouncedSearchTerm,
                 has_history: true,
                 start_date: startDate,
                 end_date: endDate
             };
             const res = await api.get('/inventory/stock-items', { params });
-            setItems(res.data.data);
-            setPagination(res.data);
+            setItems(res.data);
+            // setPagination(res.data);
         } catch (error) {
             showToast('Gagal memuat data stok.', 'error');
         } finally {
@@ -50,7 +49,7 @@ function ItemHistoryLookupPage() {
     }, [showToast, debouncedSearchTerm, startDate, endDate]);
 
     useEffect(() => {
-        fetchData(1);
+        fetchData();
     }, [fetchData]);
 
     const getRelevantDate = (item) => {
@@ -108,7 +107,7 @@ function ItemHistoryLookupPage() {
             });
 
             const extension = exportType === 'excel' ? 'xlsx' : 'pdf';
-            const fileName = `Laporan_Stok_Aset_Total_${new Date().toISOString().split('T')[0]}.${extension}`;
+            const fileName = `Laporan_Riwayat_Aset_${new Date().toISOString().split('T')[0]}.${extension}`;
             saveAs(response.data, fileName);
 
         } catch (err) {
@@ -229,7 +228,7 @@ function ItemHistoryLookupPage() {
                             <table className="job-table">
                                 <tbody>
                                     {loading ? (
-                                        <tr><td colSpan="4" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
+                                        <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
                                     ) : items.length > 0 ? items.map(item => (
                                         <tr key={item.id} onClick={() => setHistoryItem(item)} style={{ cursor: 'pointer' }} className="hoverable-row">
                                             <td>{item.kode_unik}</td>
@@ -243,7 +242,7 @@ function ItemHistoryLookupPage() {
                                             <td>{getResponsiblePerson(item)}</td>
                                         </tr>
                                     )) : (
-                                        <tr><td colSpan="4" style={{ textAlign: 'center' }}>Tidak ada data.</td></tr>
+                                        <tr><td colSpan="5" style={{ textAlign: 'center' }}>Tidak ada data.</td></tr>
                                     )}
                                 </tbody>
                             </table>
@@ -298,13 +297,13 @@ function ItemHistoryLookupPage() {
                     </div>
                 </div>
 
-                {pagination && pagination.last_page > 1 && (
+                {/* {pagination && pagination.last_page > 1 && (
                     <Pagination
                         currentPage={pagination.current_page}
                         lastPage={pagination.last_page}
                         onPageChange={(page) => fetchData(page)}
                     />
-                )}
+                )} */}
             </div>
             {historyItem && (
                 <HistoryModal

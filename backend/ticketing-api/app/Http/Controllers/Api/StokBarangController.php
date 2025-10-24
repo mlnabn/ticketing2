@@ -106,6 +106,10 @@ class StokBarangController extends Controller
         if ($request->filled('master_barang_id')) {
             return $query->latest('id')->get();
         }
+        if ($request->boolean('all')) {
+            // .get() akan mengembalikan array biasa: [ ... ]
+            return $query->latest()->get();
+        }
 
         return $query->latest()->paginate(15);
     }

@@ -24,7 +24,7 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
 
     public function headings(): array
     {
-        
+
         switch ($this->type) {
             case 'in':
                 return [
@@ -39,7 +39,7 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
                     'Serial Number',
                 ];
             case 'out':
-                 return [
+                return [
                     'Kode Unik',
                     'Nama Barang',
                     'Status',
@@ -59,7 +59,7 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
                     'Lokasi',
                     'Tgl Pinjam',
                 ];
-            case 'all_stock': 
+            case 'all_stock':
                 return [
                     'Kode Unik',
                     'Nama Barang',
@@ -98,7 +98,7 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
                     $item->harga_beli,
                     $item->serial_number ?? '-',
                 ];
-            case 'active_loans': 
+            case 'active_loans':
                 return [
                     $item->kode_unik,
                     $item->masterBarang->nama_barang ?? '-',
@@ -107,15 +107,35 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
                     $item->workshop->name ?? '-',
                     $item->tanggal_keluar ? \Carbon\Carbon::parse($item->tanggal_keluar)->format('d M Y') : '-',
                 ];
-            case 'all_stock': 
-                 return [
+            case 'all_stock':
+                return [
                     $item->kode_unik,
                     $item->masterBarang->nama_barang ?? '-',
                     $item->statusDetail->nama_status ?? '-',
-                    $item->userPeminjam->name ?? $item->workshop->name ?? '-',
+                    $this->getResponsiblePerson($item),
                 ];
             default:
                 return [];
+        }
+    }
+    private function getResponsiblePerson($item)
+    {
+        if (!$item->statusDetail) {
+            return '-';
+        }
+
+        switch ($item->statusDetail->nama_status) {
+            case 'Digunakan':
+            case 'Dipinjam':
+                return $item->userPeminjam->name ?? $item->workshop->name ?? '-';
+            case 'Rusak':
+                return $item->userPerusak->name ?? '-';
+            case 'Hilang':
+                return $item->userPenghilang->name ?? '-';
+            case 'Perbaikan':
+                return $item->teknisiPerbaikan->name ?? '-';
+            default:
+                return '-';
         }
     }
 }

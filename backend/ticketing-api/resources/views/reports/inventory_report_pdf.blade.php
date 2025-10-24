@@ -90,11 +90,33 @@
                 <td>{{ $item->userPeminjam->name ?? '-' }}</td>
                 <td>{{ $item->workshop->name ?? '-' }}</td>
                 <td>{{ $item->tanggal_keluar ? \Carbon\Carbon::parse($item->tanggal_keluar)->format('d M Y') : '-' }}</td>
+
                 @elseif($type === 'all_stock')
                 <td>{{ $item->kode_unik }}</td>
                 <td>{{ $item->masterBarang->nama_barang ?? '-' }}</td>
                 <td>{{ $item->statusDetail->nama_status ?? '-' }}</td>
-                <td>{{ $item->userPeminjam->name ?? $item->workshop->name ?? '-' }}</td>
+
+                {{-- [PERBAIKAN] Menambahkan logika switch untuk penanggung jawab yang benar --}}
+                <td>
+                    @switch($item->statusDetail->nama_status ?? null)
+                    @case('Digunakan')
+                    @case('Dipinjam')
+                    {{ $item->userPeminjam->name ?? $item->workshop->name ?? '-' }}
+                    @break
+                    @case('Rusak')
+                    {{ $item->userPerusak->name ?? '-' }}
+                    @break
+                    @case('Hilang')
+                    {{ $item->userPenghilang->name ?? '-' }}
+                    @break
+                    @case('Perbaikan')
+                    {{ $item->teknisiPerbaikan->name ?? '-' }}
+                    @break
+                    @default
+                    -
+                    @endswitch
+                </td>
+
                 @else
                 <td>{{ $item->kode_unik }}</td>
                 <td>{{ $item->masterBarang->nama_barang ?? '-' }}</td>

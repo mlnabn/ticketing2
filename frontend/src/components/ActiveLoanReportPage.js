@@ -1,22 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
-import Pagination from '../components/Pagination';
+// import Pagination from '../components/Pagination';
 import { saveAs } from 'file-saver';
 import ActiveLoanDetailModal from './ActiveLoanDetailModal';
 
-const PaginationSummary = ({ pagination }) => {
-    if (!pagination || pagination.total === 0) return null;
-    return (
-        <div className="pagination-summary">
-            Menampilkan <strong>{pagination.from}</strong> - <strong>{pagination.to}</strong> dari <strong>{pagination.total}</strong> data
-        </div>
-    );
-};
+// const PaginationSummary = ({ pagination }) => {
+//     if (!pagination || pagination.total === 0) return null;
+//     return (
+//         <div className="pagination-summary">
+//             Menampilkan <strong>{pagination.from}</strong> - <strong>{pagination.to}</strong> dari <strong>{pagination.total}</strong> data
+//         </div>
+//     );
+// };
 
 export default function ActiveLoanReportPage() {
     const [data, setData] = useState([]);
-    const [pagination, setPagination] = useState(null);
+    // const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({ start_date: '', end_date: '' });
     const [searchTerm, setSearchTerm] = useState('');
@@ -27,22 +27,22 @@ export default function ActiveLoanReportPage() {
     const type = 'active_loans';
     const title = 'Laporan Peminjaman Aktif';
 
-    const fetchData = useCallback(async (page = 1) => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const params = { page, type, ...filters, search: debouncedSearchTerm };
+            const params = { all: true, type, ...filters, search: debouncedSearchTerm };
             const res = await api.get('/reports/inventory/detailed', { params });
-            setData(res.data.data);
-            setPagination(res.data);
+            setData(res.data);
+            // setPagination(res.data);
         } catch (error) {
             console.error(`Gagal memuat laporan ${type}`, error);
         } finally {
             setLoading(false);
         }
-    }, [filters, debouncedSearchTerm]);
+    }, [filters, debouncedSearchTerm, type]);
 
     useEffect(() => {
-        fetchData(1);
+        fetchData();
     }, [fetchData]);
 
     const handleFilterChange = (e) => {
@@ -244,7 +244,7 @@ export default function ActiveLoanReportPage() {
                 </div>
             </div>
 
-            <div className="pagination-container">
+            {/* <div className="pagination-container">
                 <PaginationSummary pagination={pagination} />
                 {pagination && pagination.last_page > 1 && (
                     <Pagination
@@ -253,7 +253,7 @@ export default function ActiveLoanReportPage() {
                         onPageChange={fetchData}
                     />
                 )}
-            </div>
+            </div> */}
             {selectedItem && (
                 <ActiveLoanDetailModal
                     item={selectedItem}

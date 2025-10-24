@@ -22,7 +22,7 @@ class InventoryReportController extends Controller
             'type' => 'required|in:in,out,active_loans,all_stock',
             'export_type' => 'required|in:excel,pdf'
         ]);
-        $query = StokBarang::with(['masterBarang', 'statusDetail', 'createdBy', 'userPeminjam', 'userPerusak', 'userPenghilang', 'workshop']);
+        $query = StokBarang::with(['masterBarang', 'statusDetail', 'createdBy', 'userPeminjam', 'userPerusak', 'userPenghilang', 'workshop', 'teknisiPerbaikan']);
         $query->when($request->filled('search'), function ($q) use ($request) {
             $searchTerm = '%' . $request->search . '%';
             $q->where(function ($subQuery) use ($searchTerm) {
@@ -62,7 +62,17 @@ class InventoryReportController extends Controller
 
             case 'all_stock':
                 $query->orderBy('created_at', 'desc');
-                $title = 'Laporan Stok Aset Total';
+                $title = 'Laporan Riwayat Aset';
+                $query->when($request->filled('start_date') || $request->filled('end_date'), function ($q) use ($request) {
+                    $q->whereHas('histories', function ($historyQuery) use ($request) {
+                        if ($request->filled('start_date')) {
+                            $historyQuery->whereDate('event_date', '>=', $request->start_date);
+                        }
+                        if ($request->filled('end_date')) {
+                            $historyQuery->whereDate('event_date', '<=', $request->end_date);
+                        }
+                    });
+                });
                 break;
         }
 
@@ -97,7 +107,7 @@ class InventoryReportController extends Controller
         $keluarOperasionalStatusIds = array_filter([
             $statusIds['Dipinjam'] ?? null,
             $statusIds['Digunakan'] ?? null,
-            
+
         ]);
         $barangKeluarOperasional = StokBarang::whereIn('status_id', $keluarOperasionalStatusIds)->count();
 
