@@ -40,7 +40,10 @@ class StokBarangController extends Controller
             'userPerusak',
             'userPenghilang',
             'userPerusak',
-            'userPenghilang'
+            'userPenghilang',
+            'latestHistory.triggeredByUser:id,name',
+            'latestHistory.relatedUser:id,name',  
+            'latestHistory.statusDetail',
         ]);
 
         if ($request->filled('id_kategori')) {

@@ -79,4 +79,10 @@ class StokBarang extends Model
     {
         return $this->hasMany(StokBarangHistory::class, 'stok_barang_id')->latest();
     }
+    public function latestHistory()
+    {
+        return $this->hasOne(StokBarangHistory::class, 'stok_barang_id')
+                    ->latest('event_date')
+                    ->latest('id'); 
+    }
 }
