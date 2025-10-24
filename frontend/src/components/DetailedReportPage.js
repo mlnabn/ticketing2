@@ -27,7 +27,7 @@ export default function DetailedReportPage({ type, title }) {
     const [exportingPdf, setExportingPdf] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
 
-    const fetchData = useCallback(async () => { 
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
             const params = { type, ...filters, search: debouncedSearchTerm, all: true };
@@ -42,12 +42,13 @@ export default function DetailedReportPage({ type, title }) {
     }, [type, filters, debouncedSearchTerm]);
 
     useEffect(() => {
-        fetchData(); // 5. Panggil tanpa parameter '1'
-    }, [fetchData]);
-
-    useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    // Hapus duplikat useEffect
+    // useEffect(() => {
+    //     fetchData();
+    // }, [fetchData]);
 
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -71,7 +72,20 @@ export default function DetailedReportPage({ type, title }) {
             });
 
             const extension = exportType === 'excel' ? 'xlsx' : 'pdf';
-            const fileName = `Laporan_Barang_${type === 'in' ? 'Masuk' : 'Keluar'}_${new Date().toISOString().split('T')[0]}.${extension}`;
+
+            // --- PERBAIKAN 1: Nama File Ekspor ---
+            let reportName = 'Laporan';
+            switch (type) {
+                case 'in': reportName = 'Laporan_Barang_Masuk'; break;
+                case 'out': reportName = 'Laporan_Barang_Keluar'; break;
+                case 'available': reportName = 'Laporan_Barang_Tersedia'; break;
+                case 'accountability': reportName = 'Laporan_Hilang_Rusak'; break;
+                case 'active_loans': reportName = 'Laporan_Peminjaman_Aktif'; break;
+                default: reportName = 'Laporan_Inventaris';
+            }
+            const fileName = `${reportName}_${new Date().toISOString().split('T')[0]}.${extension}`;
+            // --- AKHIR PERBAIKAN 1 ---
+
             saveAs(response.data, fileName);
 
         } catch (err) {
@@ -100,68 +114,55 @@ export default function DetailedReportPage({ type, title }) {
     };
 
     const getItemData = (item) => {
-        // Logika untuk tipe 'available' dan 'active_loans' tidak berubah
-        // Sumber datanya adalah objek StokBarang langsung
+        // ... (Fungsi ini tidak diubah) ...
         if (type === 'available' || type === 'active_loans') {
-             return {
-                 kode_unik: item.kode_unik,
-                 serial_number: item.serial_number || '-', // Tampilkan '-' jika null
-                 nama_barang: item.master_barang?.nama_barang || 'N/A', // Fallback jika relasi tidak ada
-                 status: item.status_detail?.nama_status || 'N/A', // Status item saat ini
-                 tanggal: (type === 'available' ? item.tanggal_masuk : item.tanggal_keluar),
-                 penanggung_jawab: (type === 'available' ? item.created_by?.name : item.user_peminjam?.name) || '-', // Penanggung jawab sesuai tipe
-                 workshop: item.workshop?.name || '-', // Workshop terkait (jika ada)
-                 current_status: item.status_detail?.nama_status || 'N/A', // Sama dengan status
-             };
+            return {
+                kode_unik: item.kode_unik,
+                serial_number: item.serial_number || '-',
+                nama_barang: item.master_barang?.nama_barang || 'N/A',
+                status: item.status_detail?.nama_status || 'N/A',
+                tanggal: (type === 'available' ? item.tanggal_masuk : item.tanggal_keluar),
+                penanggung_jawab: (type === 'available' ? item.created_by?.name : item.user_peminjam?.name) || '-',
+                workshop: item.workshop?.name || '-',
+                current_status: item.status_detail?.nama_status || 'N/A',
+            };
         }
 
-        // === PERBAIKAN UNTUK TIPE 'in', 'out', 'accountability' ===
-        // Sumber datanya adalah objek StokBarangHistory ('item')
-        // Data stok barang ada di dalam relasi 'item.stok_barang'
-
-        // Ambil objek stok barang dari relasi (beri fallback objek kosong jika null)
         const stokInfo = item.stok_barang || {};
-        // Ambil objek master barang dari relasi di dalam stok barang (beri fallback)
         const masterInfo = stokInfo.master_barang || {};
-        // Tentukan tanggal kejadian (event_date atau created_at history)
         const historyDate = item.event_date || item.created_at;
-        // Tentukan penanggung jawab (user yg trigger history)
         const triggeredBy = item.triggered_by_user?.name || '-';
-        // Tentukan workshop (dari history jika ada, fallback ke stok jika perlu, atau '-')
         const workshopName = item.workshop?.name || stokInfo.workshop?.name || '-';
-        // Ambil status saat history terjadi
         const historyStatus = item.status_detail?.nama_status || 'N/A';
-        // Ambil status item saat ini (dari relasi stokInfo)
-        const currentStatus = stokInfo.status_detail?.nama_status || 'N/A';
-
+        const currentStatus = stokInfo.status_detail?.nama_status || 'N/A'; // Ambil dari relasi
 
         return {
             kode_unik: stokInfo.kode_unik || '-',
             serial_number: stokInfo.serial_number || '-',
             nama_barang: masterInfo.nama_barang || 'N/A',
-            status: historyStatus, // Ini adalah status saat history terjadi ('Tersedia' untuk type 'in')
-            tanggal: historyDate, // Ini adalah tanggal history terjadi ('Tgl Jadi Tersedia')
+            status: historyStatus,
+            tanggal: historyDate,
             penanggung_jawab: triggeredBy,
             workshop: workshopName,
-            current_status: currentStatus, // Status item saat ini (bisa saja sudah dipinjam lagi)
+            current_status: currentStatus,
         };
     };
 
     const handleRowClick = (e, item) => {
+        // ... (Fungsi ini tidak diubah) ...
         if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('.action-buttons-group')) {
             return;
         }
-
         const kodeUnik = (type === 'available' || type === 'active_loans')
             ? item.kode_unik
             : item.stok_barang?.kode_unik;
-
         if (kodeUnik) {
             setSelectedItem(kodeUnik);
         }
     };
 
     const dateHeaders = {
+        // ... (Tidak diubah) ...
         in: 'Tgl Masuk',
         out: 'Tgl Kejadian',
         available: 'Tgl Masuk',
@@ -171,12 +172,12 @@ export default function DetailedReportPage({ type, title }) {
 
     return (
         <div className="user-management-container">
+            {/* ... (Header dan Filter tidak diubah) ... */}
             <div className="user-management-header-report">
                 <h1>{title}</h1>
             </div>
 
             <div className="filters-container report-filters">
-                {/* Baris 1: Input Pencarian */}
                 <input
                     type="text"
                     placeholder="Cari Kode Unik / Nama Barang..."
@@ -205,8 +206,7 @@ export default function DetailedReportPage({ type, title }) {
 
             <div className="job-list-container">
                 {/*Destop view*/}
-                <div className="table-scroll-container"> {/* DITAMBAHKAN */}
-                    {/* TABEL 1: KHUSUS HEADER */}
+                <div className="table-scroll-container">
                     <table className="job-table">
                         <thead>
                             <tr>
@@ -222,12 +222,12 @@ export default function DetailedReportPage({ type, title }) {
                         </thead>
                     </table>
 
-                    {/* DIV UNTUK SCROLLING BODY */}
-                    <div className="table-body-scroll"> {/* DITAMBAHKAN */}
+                    <div className="table-body-scroll">
                         <table className="job-table">
                             <tbody>
+                                {/* --- PERBAIKAN 2: colSpan (dari 7:6 menjadi 8:7) --- */}
                                 {loading ? (
-                                    <tr><td colSpan={(type === 'out' || type === 'accountability') ? 7 : 6} style={{ textAlign: 'center' }}>Memuat data...</td></tr>
+                                    <tr><td colSpan={(type === 'out' || type === 'accountability') ? 8 : 7} style={{ textAlign: 'center' }}>Memuat data...</td></tr>
                                 ) : data.length > 0 ? data.map(item => {
                                     const itemData = getItemData(item);
                                     return (
@@ -241,7 +241,7 @@ export default function DetailedReportPage({ type, title }) {
                                             <td>{itemData.workshop || '-'}</td>
                                             {(type === 'out' || type === 'accountability') && (
                                                 <td>
-                                                    <span className={`badge-status status-${itemData.current_status?.toLowerCase()}`}>
+                                                    <span className={`badge-status status-${(itemData.current_status || '-').toLowerCase()}`}>
                                                         {itemData.current_status || '-'}
                                                     </span>
                                                 </td>
@@ -249,8 +249,9 @@ export default function DetailedReportPage({ type, title }) {
                                         </tr>
                                     )
                                 }) : (
-                                    <tr><td colSpan={(type === 'out' || type === 'accountability') ? 7 : 6} style={{ textAlign: 'center' }}>Tidak ada data untuk ditampilkan.</td></tr>
+                                    <tr><td colSpan={(type === 'out' || type === 'accountability') ? 8 : 7} style={{ textAlign: 'center' }}>Tidak ada data untuk ditampilkan.</td></tr>
                                 )}
+                                {/* --- AKHIR PERBAIKAN 2 --- */}
                             </tbody>
                         </table>
                     </div>
@@ -258,22 +259,18 @@ export default function DetailedReportPage({ type, title }) {
                 {/* Mobile view */}
                 <div className="job-list-mobile">
                     {loading ? (
-                        <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
-                            <p>Memuat data...</p>
-                        </div>
+                        <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Memuat data...</p></div>
                     ) : data.length > 0 ? data.map(item => {
                         const itemData = getItemData(item);
                         return (
                             <div key={`mobile-detail-${item.id}`} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, item)}>
-                                {/* Baris 1: Informasi Utama (Nama Barang) */}
+                                {/* ... (Baris 1, 2, 3 tidak diubah) ... */}
                                 <div className="card-row">
                                     <div className="data-group single">
                                         <span className="label">Nama Barang</span>
                                         <span className="value description">{itemData.nama_barang || '-'}</span>
                                     </div>
                                 </div>
-
-                                {/* Baris 2: Kode Unik & Status */}
                                 <div className="card-row">
                                     <div className="data-group">
                                         <span className="label">Kode Unik</span>
@@ -284,8 +281,6 @@ export default function DetailedReportPage({ type, title }) {
                                         <span className="value">{itemData.status || '-'}</span>
                                     </div>
                                 </div>
-
-                                {/* Baris 3: Tanggal & Penanggung Jawab */}
                                 <div className="card-row">
                                     <div className="data-group">
                                         <span className="label">{dateHeaders[type] || 'Tanggal'}</span>
@@ -297,38 +292,29 @@ export default function DetailedReportPage({ type, title }) {
                                     </div>
                                 </div>
 
-                                {/* Baris 4: Workshop */}
+                                {/* --- PERBAIKAN 3: Tampilan Mobile --- */}
                                 <div className="card-row">
-                                    <div className="data-group single">
+                                    <div className={`data-group ${!(type === 'out' || type === 'accountability') ? 'single' : ''}`}>
                                         <span className="label">Workshop</span>
                                         <span className="value">{itemData.workshop || '-'}</span>
                                     </div>
-                                    <div className="data-group">
-                                        <span className="label">Status Saat Ini</span>
-                                        <span className="value">{itemData.current_status || '-'}</span>
-                                    </div>
+                                    {(type === 'out' || type === 'accountability') && (
+                                        <div className="data-group">
+                                            <span className="label">Status Saat Ini</span>
+                                            <span className="value">{itemData.current_status || '-'}</span>
+                                        </div>
+                                    )}
                                 </div>
+                                {/* --- AKHIR PERBAIKAN 3 --- */}
                             </div>
                         );
                     }) : (
-                        // Tampilkan pesan jika tidak ada data yang ditemukan
-                        <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
-                            <p>Tidak ada data untuk ditampilkan.</p>
-                        </div>
+                        <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Tidak ada data untuk ditampilkan.</p></div>
                     )}
                 </div>
             </div>
 
-            {/* <div className="pagination-container">
-                <PaginationSummary pagination={pagination} />
-                {pagination && pagination.last_page > 1 && (
-                    <Pagination
-                        currentPage={pagination.current_page}
-                        lastPage={pagination.last_page}
-                        onPageChange={fetchData}
-                    />
-                )}
-            </div> */}
+            {/* ... (Pagination dan Modal tidak diubah) ... */}
             {selectedItem && (
                 <InventoryDetailModal
                     kodeUnik={selectedItem}
@@ -338,6 +324,5 @@ export default function DetailedReportPage({ type, title }) {
                 />
             )}
         </div>
-
     );
 }
