@@ -16,8 +16,9 @@ class StokBarangController extends Controller
 {
     public function index(Request $request)
     {
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
+        // $startDate = $request->input('start_date');
+        // $endDate = $request->input('end_date');
+
         $excludedStatuses = DB::table('status_barang')
             ->whereIn('nama_status', ['Hilang', 'Rusak', 'Digunakan'])
             ->pluck('id');
@@ -39,8 +40,6 @@ class StokBarangController extends Controller
             'teknisiPerbaikan',
             'userPerusak',
             'userPenghilang',
-            'userPerusak',
-            'userPenghilang'
         ]);
 
         if ($request->filled('id_kategori')) {
@@ -74,18 +73,18 @@ class StokBarangController extends Controller
                 });
             });
         }
-        $query->when($request->boolean('has_history'), function ($q) use ($startDate, $endDate) {
-            $q->whereHas('histories', function ($historyQuery) use ($startDate, $endDate) {
-                if ($startDate) {
-                    // Gunakan whereDate untuk membandingkan tanggal saja (mengabaikan waktu)
-                    $historyQuery->whereDate('event_date', '>=', $startDate);
-                }
-                if ($endDate) {
-                    $historyQuery->whereDate('event_date', '<=', $endDate);
-                }
+        $query->when($request->boolean('has_history') || $request->filled('start_date') || $request->filled('end_date') || $request->filled('month') || $request->filled('year'), function ($q) use ($request) {
+            $q->whereHas('histories', function ($historyQuery) use ($request) {
+
+                // Tambahkan filter month/year
+                $historyQuery->when($request->filled('month'), fn($hq) => $hq->whereMonth('event_date', $request->month));
+                $historyQuery->when($request->filled('year'), fn($hq) => $hq->whereYear('event_date', $request->year));
+
+                // Filter start/end date
+                $historyQuery->when($request->filled('start_date'), fn($hq) => $hq->whereDate('event_date', '>=', $request->start_date));
+                $historyQuery->when($request->filled('end_date'), fn($hq) => $hq->whereDate('event_date', '<=', $request->end_date));
             });
         });
-
         if ($request->filled('master_barang_id')) {
             $query->where('master_barang_id', $request->master_barang_id);
         }

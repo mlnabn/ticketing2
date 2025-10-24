@@ -206,7 +206,6 @@ class InventoryReportController extends Controller
         $type = $request->type;
         $statusTersediaId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
 
-        // Tentukan apakah kita query 'stok_barangs' (state) atau 'stok_barang_histories' (log)
         if (in_array($type, ['available', 'active_loans', 'all_stock'])) {
             $query = StokBarang::with([
                 'masterBarang',
@@ -223,29 +222,38 @@ class InventoryReportController extends Controller
             switch ($type) {
                 case 'available':
                     $query->where('status_id', $statusTersediaId);
+
+                    $query->when($request->filled('month'), fn($q) => $q->whereMonth('tanggal_masuk', $request->month));
+                    $query->when($request->filled('year'), fn($q) => $q->whereYear('tanggal_masuk', $request->year));
+
+                    $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_masuk', '>=', $request->start_date));
+                    $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_masuk', '<=', $request->end_date));
+
                     $query->orderBy('created_at', 'desc');
                     break;
 
                 case 'active_loans':
                     $statusPeminjamanIds = DB::table('status_barang')->whereIn('nama_status', ['Dipinjam', 'Digunakan'])->pluck('id');
                     $query->whereIn('status_id', $statusPeminjamanIds);
+
+                    $query->when($request->filled('month'), fn($q) => $q->whereMonth('tanggal_keluar', $request->month));
+                    $query->when($request->filled('year'), fn($q) => $q->whereYear('tanggal_keluar', $request->year));
+
                     $query->when($request->filled('start_date'), fn($q) => $q->whereDate('tanggal_keluar', '>=', $request->start_date));
                     $query->when($request->filled('end_date'), fn($q) => $q->whereDate('tanggal_keluar', '<=', $request->end_date));
+
                     $query->orderBy('tanggal_keluar', 'asc');
                     break;
 
                 case 'all_stock':
-                    // INI ADALAH LOGIKA UNTUK 'LACAK RIWAYAT ASET'
-                    // Kita samakan dengan logika di StokBarangController@index
-                    $query->when($request->boolean('has_history') || $request->filled('start_date') || $request->filled('end_date'), function ($q) use ($request) {
+                    $query->when($request->boolean('has_history') || $request->filled('start_date') || $request->filled('end_date') || $request->filled('month') || $request->filled('year'), function ($q) use ($request) {
                         $q->whereHas('histories', function ($historyQuery) use ($request) {
-                            // Filter tanggal hanya jika 'has_history' aktif atau tanggal diisi
-                            if ($request->filled('start_date')) {
-                                $historyQuery->whereDate('event_date', '>=', $request->start_date);
-                            }
-                            if ($request->filled('end_date')) {
-                                $historyQuery->whereDate('event_date', '<=', $request->end_date);
-                            }
+
+                            $historyQuery->when($request->filled('month'), fn($hq) => $hq->whereMonth('event_date', $request->month));
+                            $historyQuery->when($request->filled('year'), fn($hq) => $hq->whereYear('event_date', $request->year));
+
+                            $historyQuery->when($request->filled('start_date'), fn($hq) => $hq->whereDate('event_date', '>=', $request->start_date));
+                            $historyQuery->when($request->filled('end_date'), fn($hq) => $hq->whereDate('event_date', '<=', $request->end_date));
                         });
                     });
                     $query->orderBy('created_at', 'desc');
@@ -287,10 +295,15 @@ class InventoryReportController extends Controller
                 return $query->whereRaw('1=0');
             }
             $query->whereIn('status_id', $targetStatusIds);
+            $dateColumn = DB::raw('COALESCE(event_date, created_at)');
 
-            // Filter Tanggal History
-            $query->when($request->filled('start_date'), fn($q) => $q->whereDate(DB::raw('COALESCE(event_date, created_at)'), '>=', $request->start_date));
-            $query->when($request->filled('end_date'), fn($q) => $q->whereDate(DB::raw('COALESCE(event_date, created_at)'), '<=', $request->end_date));
+            // Filter bulan/tahun
+            $query->when($request->filled('month'), fn($q) => $q->whereMonth($dateColumn, $request->month));
+            $query->when($request->filled('year'), fn($q) => $q->whereYear($dateColumn, $request->year));
+
+            // Filter start/end date
+            $query->when($request->filled('start_date'), fn($q) => $q->whereDate($dateColumn, '>=', $request->start_date));
+            $query->when($request->filled('end_date'), fn($q) => $q->whereDate($dateColumn, '<=', $request->end_date));
 
             // Filter Pencarian History
             $query->when($request->filled('search'), function ($q) use ($request) {

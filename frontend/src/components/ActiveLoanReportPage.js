@@ -14,11 +14,25 @@ import ActiveLoanDetailModal from './ActiveLoanDetailModal';
 //     );
 // };
 
+const months = [
+    { value: 1, name: 'Januari' }, { value: 2, name: 'Februari' }, { value: 3, name: 'Maret' },
+    { value: 4, name: 'April' }, { value: 5, name: 'Mei' }, { value: 6, name: 'Juni' },
+    { value: 7, name: 'Juli' }, { value: 8, name: 'Agustus' }, { value: 9, name: 'September' },
+    { value: 10, name: 'Oktober' }, { value: 11, name: 'November' }, { value: 12, name: 'Desember' }
+];
+
 export default function ActiveLoanReportPage() {
     const [data, setData] = useState([]);
     // const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [filters, setFilters] = useState({ start_date: '', end_date: '' });
+    const [filterType, setFilterType] = useState('date_range'); // 'month' or 'date_range'
+    const [filters, setFilters] = useState({
+        start_date: '',
+        end_date: '',
+        month: '',
+        year: new Date().getFullYear().toString()
+    });
+    const [years, setYears] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -27,10 +41,32 @@ export default function ActiveLoanReportPage() {
     const type = 'active_loans';
     const title = 'Laporan Peminjaman Aktif';
 
+    const getApiParams = useCallback((isExport = false) => {
+        const baseParams = {
+            type,
+            search: isExport ? searchTerm : debouncedSearchTerm,
+        };
+
+        if (filterType === 'month') {
+            baseParams.month = filters.month;
+            baseParams.year = filters.year;
+        } else { // 'date_range'
+            baseParams.start_date = filters.start_date;
+            baseParams.end_date = filters.end_date;
+        }
+
+        if (isExport) {
+            baseParams.export_type = isExport;
+        } else {
+            baseParams.all = true;
+        }
+        return baseParams;
+    }, [type, searchTerm, debouncedSearchTerm, filterType, filters]);
+
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const params = { all: true, type, ...filters, search: debouncedSearchTerm };
+            const params = getApiParams(false);
             const res = await api.get('/reports/inventory/detailed', { params });
             setData(res.data);
             // setPagination(res.data);
@@ -39,7 +75,27 @@ export default function ActiveLoanReportPage() {
         } finally {
             setLoading(false);
         }
-    }, [filters, debouncedSearchTerm, type]);
+    }, [getApiParams, type]);
+
+    useEffect(() => {
+        api.get('/reports/inventory/dashboard')
+            .then(res => {
+                if (res.data.availableYears && res.data.availableYears.length > 0) {
+                    setYears(res.data.availableYears);
+                    if (!filters.year) {
+                        setFilters(prev => ({ ...prev, year: res.data.availableYears[0] }));
+                    }
+                } else {
+                    const currentYear = new Date().getFullYear().toString();
+                    setYears([currentYear]);
+                }
+            })
+            .catch(err => {
+                console.error("Gagal memuat data tahun", err);
+                const currentYear = new Date().getFullYear().toString();
+                setYears([currentYear]);
+            });
+    }, [filters.year]);
 
     useEffect(() => {
         fetchData();
@@ -47,6 +103,16 @@ export default function ActiveLoanReportPage() {
 
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleFilterTypeChange = (e) => {
+        setFilterType(e.target.value);
+        setFilters(prev => ({
+            ...prev,
+            start_date: '',
+            end_date: '',
+            month: '',
+        }));
     };
 
     const handleRowClick = (e, item) => {
@@ -61,12 +127,7 @@ export default function ActiveLoanReportPage() {
         else setExportingPdf(true);
 
         try {
-            const params = {
-                type,
-                ...filters,
-                search: searchTerm,
-                export_type: exportType
-            };
+            const params = getApiParams(exportType); // <-- Gunakan helper
 
             const response = await api.get('/reports/inventory/export', {
                 params,
@@ -124,23 +185,42 @@ export default function ActiveLoanReportPage() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <div className="filter-row-bottom">
-                    <div className="date-filters">
-                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-cal" />
-                        <span className='strip'>-</span>
-                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-cal" />
-                    </div>
-                    <div className="download-buttons">
-                        <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
-                            <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
-                            {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
-                        </button>
-                        <button onClick={() => handleExport('pdf')} className="btn-download pdf" disabled={exportingPdf}>
-                            <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
-                            {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
-                        </button>
-                    </div>
-                </div>
+
+            </div>
+            <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+                <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
+                    <option value="month">Filter per Bulan</option>
+                    <option value="date_range">Filter per Tanggal</option>
+                </select>
+                {filterType === 'month' && (
+                    <>
+                        <select name="month" value={filters.month} onChange={handleFilterChange} className="filter-select">
+                            <option value="">Semua Bulan</option>
+                            {months.map(m => <option key={m.value} value={m.value}>{m.name}</option>)}
+                        </select>
+                        <select name="year" value={filters.year} onChange={handleFilterChange} className="filter-select">
+                            <option value="">Semua Tahun</option>
+                            {years.map(y => <option key={y} value={y}>{y}</option>)}
+                        </select>
+                    </>
+                )}
+                {filterType === 'date_range' && (
+                    <>
+                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" />
+                        <span style={{ alignSelf: 'center' }}>-</span>
+                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
+                    </>
+                )}
+            </div>
+            <div className="download-buttons">
+                <button onClick={() => handleExport('excel')} disabled={exportingExcel} className="btn-download excel">
+                    <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
+                    {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
+                </button>
+                <button onClick={() => handleExport('pdf')} disabled={exportingPdf} className="btn-download pdf">
+                    <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
+                    {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
+                </button>
             </div>
 
             <div className="job-list-container">

@@ -9728,8 +9728,8 @@ body.dark-mode .summary-cards .card h3 {
 
 .download-buttons {
   display: flex;
-  gap: 10px;
-  margin-bottom: 1rem;
+  gap: 1rem;
+  justify-content: left;
 }
 
 .btn-download.pdf {

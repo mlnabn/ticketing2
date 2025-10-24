@@ -7,6 +7,13 @@ import HistoryModal from '../components/HistoryModal';
 // import { saveAs } from 'file-saver';
 import QrScannerModal from './QrScannerModal';
 
+const months = [
+    { value: 1, name: 'Januari' }, { value: 2, name: 'Februari' }, { value: 3, name: 'Maret' },
+    { value: 4, name: 'April' }, { value: 5, name: 'Mei' }, { value: 6, name: 'Juni' },
+    { value: 7, name: 'Juli' }, { value: 8, name: 'Agustus' }, { value: 9, name: 'September' },
+    { value: 10, name: 'Oktober' }, { value: 11, name: 'November' }, { value: 12, name: 'Desember' }
+];
+
 
 function ItemHistoryLookupPage() {
     const { showToast } = useOutletContext();
@@ -19,8 +26,14 @@ function ItemHistoryLookupPage() {
     // const [exportingExcel, setExportingExcel] = useState(false);
     // const [exportingPdf, setExportingPdf] = useState(false);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
+    const [filterType, setFilterType] = useState('date_range');
+    const [filters, setFilters] = useState({
+        start_date: '',
+        end_date: '',
+        month: '',
+        year: new Date().getFullYear().toString()
+    });
+    const [years, setYears] = useState([]);
 
     const formatDate = (dateString) => {
         if (!dateString) return '-';
@@ -28,16 +41,28 @@ function ItemHistoryLookupPage() {
             day: '2-digit', month: 'long', year: 'numeric'
         });
     };
+
+    const getApiParams = useCallback(() => {
+        const baseParams = {
+            all: true,
+            has_history: true,
+            search: debouncedSearchTerm,
+        };
+
+        if (filterType === 'month') {
+            baseParams.month = filters.month;
+            baseParams.year = filters.year;
+        } else { // 'date_range'
+            baseParams.start_date = filters.start_date;
+            baseParams.end_date = filters.end_date;
+        }
+        return baseParams;
+    }, [debouncedSearchTerm, filterType, filters]);
+
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const params = {
-                all: true,
-                search: debouncedSearchTerm,
-                has_history: true,
-                start_date: startDate,
-                end_date: endDate
-            };
+            const params = getApiParams();
             const res = await api.get('/inventory/stock-items', { params });
             setItems(res.data);
             // setPagination(res.data);
@@ -46,7 +71,27 @@ function ItemHistoryLookupPage() {
         } finally {
             setLoading(false);
         }
-    }, [showToast, debouncedSearchTerm, startDate, endDate]);
+    }, [showToast, getApiParams]);
+
+    useEffect(() => {
+        api.get('/reports/inventory/dashboard')
+            .then(res => {
+                if (res.data.availableYears && res.data.availableYears.length > 0) {
+                    setYears(res.data.availableYears);
+                    if (!filters.year) {
+                        setFilters(prev => ({ ...prev, year: res.data.availableYears[0] }));
+                    }
+                } else {
+                    const currentYear = new Date().getFullYear().toString();
+                    setYears([currentYear]);
+                }
+            })
+            .catch(err => {
+                console.error("Gagal memuat data tahun", err);
+                const currentYear = new Date().getFullYear().toString();
+                setYears([currentYear]);
+            });
+    }, [filters.year]);
 
     useEffect(() => {
         fetchData();
@@ -158,6 +203,20 @@ function ItemHistoryLookupPage() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleSearchAndShowHistory, historyItem, isScannerOpen]);
 
+    const handleFilterChange = (e) => {
+        setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleFilterTypeChange = (e) => {
+        setFilterType(e.target.value);
+        setFilters(prev => ({
+            ...prev,
+            start_date: '',
+            end_date: '',
+            month: '',
+        }));
+    };
+
 
     return (
         <>
@@ -172,32 +231,8 @@ function ItemHistoryLookupPage() {
                         onChange={e => setSearchTerm(e.target.value)}
                         className="filter-search-input"
                     />
-                    <div className="filter-row-bottom">
-                        <div className="date-filters">
-                            <input
-                                type="date"
-                                className="filter-select-cal"
-                                value={startDate}
-                                onChange={e => setStartDate(e.target.value)}
-                            />
-                            <span style={{ margin: '0 0.5rem', alignSelf: 'center' }}>-</span>
-                            <input
-                                type="date"
-                                className="filter-select-cal"
-                                value={endDate}
-                                onChange={e => setEndDate(e.target.value)}
-                                min={startDate} // Mencegah tanggal akhir sebelum tanggal mulai
-                            />
-                        </div>
-                        <div className="download-buttons">
-                            <button onClick={() => setIsScannerOpen(true)} className="btn-scan">
-                                <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
-                                    <i className="fas fa-qrcode fa-stack-2x"></i>
-                                    <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
-                                </span>
-                                Scan QR
-                            </button>
-                            {/* <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
+
+                    {/* <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
                                 <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
                                 {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
                             </button>
@@ -205,8 +240,41 @@ function ItemHistoryLookupPage() {
                                 <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
                                 {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
                             </button> */}
-                        </div>
-                    </div>
+
+                </div>
+                <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+                    <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
+                        <option value="month">Filter per Bulan</option>
+                        <option value="date_range">Filter per Tanggal</option>
+                    </select>
+                    {filterType === 'month' && (
+                        <>
+                            <select name="month" value={filters.month} onChange={handleFilterChange} className="filter-select">
+                                <option value="">Semua Bulan</option>
+                                {months.map(m => <option key={m.value} value={m.value}>{m.name}</option>)}
+                            </select>
+                            <select name="year" value={filters.year} onChange={handleFilterChange} className="filter-select">
+                                <option value="">Semua Tahun</option>
+                                {years.map(y => <option key={y} value={y}>{y}</option>)}
+                            </select>
+                        </>
+                    )}
+                    {filterType === 'date_range' && (
+                        <>
+                            <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" />
+                            <span style={{ alignSelf: 'center' }}>-</span>
+                            <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
+                        </>
+                    )}
+                </div>
+                <div className="download-buttons">
+                    <button onClick={() => setIsScannerOpen(true)} className="btn-scan">
+                        <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
+                            <i className="fas fa-qrcode fa-stack-2x"></i>
+                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
+                        </span>
+                        Scan QR
+                    </button>
                 </div>
 
                 <div className="job-list-container">
@@ -304,23 +372,26 @@ function ItemHistoryLookupPage() {
                         onPageChange={(page) => fetchData(page)}
                     />
                 )} */}
-            </div>
+            </div >
             {historyItem && (
                 <HistoryModal
                     item={historyItem}
                     onClose={() => setHistoryItem(null)}
                     showToast={showToast}
-                    startDate={startDate}
-                    endDate={endDate}
+                    startDate={filterType === 'date_range' ? filters.start_date : null} // <-- Kirim filter
+                    endDate={filterType === 'date_range' ? filters.end_date : null} // <-- Kirim filter
                 />
-            )}
+            )
+            }
 
-            {isScannerOpen && (
-                <QrScannerModal
-                    onClose={() => setIsScannerOpen(false)}
-                    onScanSuccess={handleScanSuccess}
-                />
-            )}
+            {
+                isScannerOpen && (
+                    <QrScannerModal
+                        onClose={() => setIsScannerOpen(false)}
+                        onScanSuccess={handleScanSuccess}
+                    />
+                )
+            }
         </>
     );
 }
