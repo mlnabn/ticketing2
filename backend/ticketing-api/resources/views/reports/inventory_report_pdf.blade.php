@@ -68,7 +68,7 @@
             <tr>
                 {{-- ... (Logika Header tidak diubah) ... --}}
                 @php
-                $isHistoryBased = in_array($type, ['in', 'out', 'accountability']);
+                $isHistoryBased = in_array($type, ['in', 'out', 'accountability', 'item_history']);
                 @endphp
                 <th>Kode Unik</th>
                 <th>Serial Number</th>
@@ -100,7 +100,7 @@
                     @elseif($type === 'active_loans') Lokasi Peminjaman
                     @else Workshop @endif
                 </th>
-                @if($type === 'out' || $type === 'accountability')<th>Deskripsi</th>@endif {{-- Tambah Deskripsi --}}
+                @if($type === 'out' || $type === 'accountability' || $type === 'item_history')<th>Deskripsi</th>@endif
             </tr>
         </thead>
         <tbody>
@@ -110,7 +110,7 @@
             $kodeUnik = '-'; $serialNumber = '-'; $namaBarang = '-'; $displayStatus = '-';
             $relevantDate = null; $responsiblePerson = '-'; $workshopName = '-'; $deskripsi = '-';
 
-            $isHistoryBased = in_array($type, ['in', 'out', 'accountability']);
+            $isHistoryBased = in_array($type, ['in', 'out', 'accountability', 'item_history']);
 
             if ($isHistoryBased) {
             $stokInfo = $item->stokBarang ?? null;
@@ -123,7 +123,7 @@
 
             if ($type === 'in') {
             $responsiblePerson = $item->triggeredByUser->name ?? '-';
-            } elseif ($type === 'out' || $type === 'accountability') {
+            } elseif ($type === 'out' || $type === 'accountability' || $type === 'item_history') {
             $responsiblePerson = $item->relatedUser->name ?? $item->triggeredByUser->name ?? '-';
             $deskripsi = $item->deskripsi ?? '-'; // Ambil deskripsi history
             }
@@ -160,7 +160,6 @@
                 <td>{{ $displayStatus }}</td>
                 <td>{{ $relevantDate ? \Carbon\Carbon::parse($relevantDate)->format('d M Y H:i') : '-' }}</td>
 
-                {{-- --- PERBAIKAN --- --}}
                 <td>
                     @if ($type === 'all_stock')
                     @switch($stokInfo->statusDetail->nama_status ?? null)
@@ -184,16 +183,15 @@
                     {{ $responsiblePerson }} {{-- Fallback untuk tipe laporan lain --}}
                     @endif
                 </td>
-                {{-- --- AKHIR PERBAIKAN --- --}}
 
                 <td>{{ $workshopName }}</td>
-                @if($type === 'out' || $type === 'accountability')<td>{{ $deskripsi }}</td>@endif
+                @if($type === 'out' || $type === 'accountability' || $type === 'item_history')<td>{{ $deskripsi }}</td>@endif
             </tr>
             @empty
             <tr>
                 @php
                 $colspan = 7;
-                if (in_array($type, ['out', 'accountability'])) $colspan = 8;
+                if (in_array($type, ['out', 'accountability', 'item_history'])) $colspan = 8;
                 @endphp
                 <td colspan="{{ $colspan }}" style="text-align: center;">Tidak ada data yang sesuai dengan filter.</td>
             </tr>

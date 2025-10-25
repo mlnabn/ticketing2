@@ -25,13 +25,14 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
 
     public function headings(): array
     {
-        // ... (Tidak diubah) ...
         switch ($this->type) {
             case 'in':
                 return [ 'Kode Unik', 'Serial Number', 'Nama Barang', 'Status Kejadian', 'Tgl Jadi Tersedia', 'Diubah Oleh', 'Workshop (Saat Kejadian)', ];
             case 'out': 
             case 'accountability': 
                  return [ 'Kode Unik', 'Serial Number', 'Nama Barang', 'Status Kejadian', 'Tgl Kejadian', 'Pengguna/Penanggung Jawab', 'Workshop (Saat Kejadian)', 'Deskripsi', ]; // <-- Tambah Deskripsi
+            case 'item_history':
+                 return [ 'Kode Unik', 'Serial Number', 'Nama Barang', 'Status Kejadian', 'Tgl Kejadian', 'Pengguna/Penanggung Jawab', 'Workshop (Saat Kejadian)', 'Deskripsi', ];
             case 'available':
                 return [ 'Kode Unik', 'Serial Number', 'Nama Barang', 'Status', 'Tgl Masuk Awal', 'Ditambahkan Oleh', 'Kondisi', 'Harga Beli', ];
             case 'active_loans':
@@ -46,7 +47,6 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
     public function map($item): array
     {
         switch ($this->type) {
-            // ... (case 'in', 'out', 'accountability', 'available', 'active_loans' tidak diubah) ...
             case 'in':
                 $stokInfo = $item->stokBarang; 
                 $historyDate = $item->event_date ?? $item->created_at;
@@ -61,6 +61,20 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
                 ];
             case 'out':
             case 'accountability': 
+                $stokInfo = $item->stokBarang;
+                $historyDate = $item->event_date ?? $item->created_at;
+                $responsibleUser = $item->relatedUser->name ?? $item->triggeredByUser->name ?? '-';
+                return [
+                    $stokInfo->kode_unik ?? '-',
+                    $stokInfo->serial_number ?? '-', 
+                    $stokInfo->masterBarang->nama_barang ?? '-',
+                    $item->statusDetail->nama_status ?? '-', 
+                    $historyDate ? Carbon::parse($historyDate)->format('d M Y H:i') : '-', 
+                    $responsibleUser,
+                    $item->workshop->name ?? '-', 
+                    $item->deskripsi ?? '-',
+                ];
+            case 'item_history':
                 $stokInfo = $item->stokBarang;
                 $historyDate = $item->event_date ?? $item->created_at;
                 $responsibleUser = $item->relatedUser->name ?? $item->triggeredByUser->name ?? '-';

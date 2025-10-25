@@ -2,9 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
-// import Pagination from '../components/Pagination';
-import HistoryModal from '../components/HistoryModal';
-// import { saveAs } from 'file-saver';
+import { saveAs } from 'file-saver';
 import QrScannerModal from './QrScannerModal';
 
 const months = [
@@ -18,13 +16,9 @@ const months = [
 function ItemHistoryLookupPage() {
     const { showToast } = useOutletContext();
     const [items, setItems] = useState([]);
-    // const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
-    const [historyItem, setHistoryItem] = useState(null);
-    // const [exportingExcel, setExportingExcel] = useState(false);
-    // const [exportingPdf, setExportingPdf] = useState(false);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
     const [filterType, setFilterType] = useState('date_range');
     const [filters, setFilters] = useState({
@@ -35,8 +29,28 @@ function ItemHistoryLookupPage() {
     });
     const [years, setYears] = useState([]);
 
+    const [selectedItem, setSelectedItem] = useState(null); 
+    const [historyData, setHistoryData] = useState([]);
+    const [historyLoading, setHistoryLoading] = useState(false); 
+    const [historyFilters, setHistoryFilters] = useState({ start_date: '', end_date: '' });
+    const [exportingHistoryExcel, setExportingHistoryExcel] = useState(false);
+    const [exportingHistoryPdf, setExportingHistoryPdf] = useState(false);
+
     const formatDate = (dateString) => {
         if (!dateString) return '-';
+        return new Date(dateString).toLocaleDateString('id-ID', {
+            day: '2-digit', month: 'long', year: 'numeric'
+        });
+    };
+    const formatLogTime = (dateString) => {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleString('id-ID', {
+            day: '2-digit', month: 'long', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+    };
+    const formatEventDate = (dateString) => {
+        if (!dateString) return 'N/A';
         return new Date(dateString).toLocaleDateString('id-ID', {
             day: '2-digit', month: 'long', year: 'numeric'
         });
@@ -50,24 +64,26 @@ function ItemHistoryLookupPage() {
         };
 
         if (filterType === 'month') {
-            baseParams.month = filters.month;
-            baseParams.year = filters.year;
-        } else { // 'date_range'
-            baseParams.start_date = filters.start_date;
-            baseParams.end_date = filters.end_date;
+            if (filters.month) baseParams.month = filters.month;
+            if (filters.year) baseParams.year = filters.year;
+        } else {
+            if (filters.start_date) baseParams.start_date = filters.start_date;
+            if (filters.end_date) baseParams.end_date = filters.end_date;
         }
         return baseParams;
     }, [debouncedSearchTerm, filterType, filters]);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
+        setSelectedItem(null);
+        setHistoryData([]);
         try {
             const params = getApiParams();
             const res = await api.get('/inventory/stock-items', { params });
             setItems(res.data);
-            // setPagination(res.data);
         } catch (error) {
             showToast('Gagal memuat data stok.', 'error');
+            setItems([]);
         } finally {
             setLoading(false);
         }
@@ -132,71 +148,40 @@ function ItemHistoryLookupPage() {
         }
         switch (item.status_detail?.nama_status) {
             case 'Digunakan':
-            case 'Dipinjam':
-                return item.user_peminjam?.name || item.workshop?.name || '-';
-            case 'Rusak':
-                return item.user_perusak?.name || '-';
-            case 'Hilang':
-                return item.user_penghilang?.name || '-';
-            case 'Perbaikan':
-                return item.teknisi_perbaikan?.name || '-';
-            default:
-                return '-';
+            case 'Dipinjam': return item.user_peminjam?.name || item.workshop?.name || '-';
+            case 'Rusak': return item.user_perusak?.name || '-';
+            case 'Hilang': return item.user_penghilang?.name || '-';
+            case 'Perbaikan': return item.teknisi_perbaikan?.name || '-';
+            default: return '-';
         }
     };
 
-    // const handleExport = async (exportType) => {
-    //     if (exportType === 'excel') setExportingExcel(true);
-    //     else setExportingPdf(true);
-
-    //     const type = 'all_stock';
-
-    //     try {
-    //         const params = {
-    //             type,
-    //             search: searchTerm,
-    //             export_type: exportType,
-    //             start_date: startDate,
-    //             end_date: endDate
-    //         };
-
-    //         const response = await api.get('/reports/inventory/export', {
-    //             params,
-    //             responseType: 'blob',
-    //         });
-
-    //         const extension = exportType === 'excel' ? 'xlsx' : 'pdf';
-    //         const fileName = `Laporan_Riwayat_Aset_${new Date().toISOString().split('T')[0]}.${extension}`;
-    //         saveAs(response.data, fileName);
-
-    //     } catch (err) {
-    //         console.error(`Gagal mengunduh file ${exportType}:`, err);
-    //         showToast('Gagal mengunduh file. Mohon coba lagi.', 'error');
-    //     } finally {
-    //         if (exportType === 'excel') setExportingExcel(false);
-    //         else setExportingPdf(false);
-    //     }
-    // };
     const handleSearchAndShowHistory = useCallback(async (code) => {
         if (!code) return;
         showToast(`Mencari riwayat untuk: ${code}`, 'info');
+        setSelectedItem(null);
+        setHistoryData([]);
+        setLoading(true);
         try {
             const res = await api.get(`/inventory/stock-items/by-serial/${code}`);
-            setHistoryItem(res.data);
+            setSelectedItem(res.data);
         } catch (error) {
             showToast(`Aset dengan kode "${code}" tidak ditemukan.`, 'error');
+        } finally {
+            setLoading(false);
         }
     }, [showToast]);
 
     const handleScanSuccess = (decodedText) => {
-        setIsScannerOpen(false); // 1. Tutup modal scanner
-        handleSearchAndShowHistory(decodedText); // 2. Panggil fungsi pencarian yang sudah ada
+        setIsScannerOpen(false);
+        handleSearchAndShowHistory(decodedText);
     };
+
     useEffect(() => {
         let barcode = '';
         let interval;
         const handleKeyDown = (e) => {
-            const isModalOpen = !!historyItem || isScannerOpen;
+            const isModalOpen = isScannerOpen || !!selectedItem;
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || isModalOpen) return;
             if (typeof e.key !== 'string') return;
 
@@ -215,7 +200,7 @@ function ItemHistoryLookupPage() {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [handleSearchAndShowHistory, historyItem, isScannerOpen]);
+    }, [handleSearchAndShowHistory, isScannerOpen, selectedItem]);
 
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -231,35 +216,83 @@ function ItemHistoryLookupPage() {
         }));
     };
 
+    const fetchHistory = useCallback(async () => {
+        if (!selectedItem?.id) return;
+        setHistoryLoading(true);
+        setHistoryData([]);
+        try {
+            const params = {
+                start_date: historyFilters.start_date,
+                end_date: historyFilters.end_date
+            };
+            const res = await api.get(`/inventory/stock-items/${selectedItem.id}/history`, { params });
+            setHistoryData(res.data);
+        } catch (error) {
+            showToast('Gagal memuat riwayat aset.', 'error');
+        } finally {
+            setHistoryLoading(false);
+        }
+    }, [selectedItem, historyFilters, showToast]);
+
+    useEffect(() => {
+        fetchHistory();
+    }, [fetchHistory]);
+
+    const handleHistoryFilterChange = (e) => {
+        setHistoryFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleHistoryExport = async (exportType) => {
+        if (!selectedItem) return;
+        if (exportType === 'excel') setExportingHistoryExcel(true); else setExportingHistoryPdf(true);
+        try {
+            const params = {
+                type: 'item_history',
+                stok_barang_id: selectedItem.id, 
+                start_date: historyFilters.start_date,
+                end_date: historyFilters.end_date,
+                export_type: exportType
+            };
+            const response = await api.get('/reports/inventory/export', { 
+                params,
+                responseType: 'blob',
+            });
+            const extension = exportType === 'excel' ? 'xlsx' : 'pdf';
+            const fileName = `Riwayat_${selectedItem.kode_unik}_${new Date().toISOString().split('T')[0]}.${extension}`;
+            saveAs(response.data, fileName);
+        } catch (err) {
+            console.error(`Gagal mengunduh riwayat ${exportType}:`, err);
+            showToast('Gagal mengunduh riwayat. Mohon coba lagi.', 'error');
+        } finally {
+            if (exportType === 'excel') setExportingHistoryExcel(false); else setExportingHistoryPdf(false);
+        }
+    };
+
+    const closeHistoryPanel = () => {
+        setSelectedItem(null);
+        setHistoryData([]);
+        setHistoryFilters({ start_date: '', end_date: '' });
+    };
 
     return (
         <>
             <div className="user-management-container">
-                <h1>Lacak Riwayat Aset</h1>
-                <p>Gunakan pencarian, klik item dari daftar, atau scan QR/Barcode untuk melihat riwayat lengkap sebuah aset.</p>
+                <h1 className="page-title">Lacak Riwayat Aset</h1>
+                <p className="page-description" style={{textAlign:'center'}}>Gunakan pencarian, klik item dari daftar, atau scan QR/Barcode untuk melihat riwayat lengkap sebuah aset.</p>
+
                 <div className="filters-container report-filters" style={{ marginTop: '1rem', paddingBottom: '0' }}>
-                    <input
-                        type="text"
-                        placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
-                        value={searchTerm}
-                        onChange={e => setSearchTerm(e.target.value)}
-                        className="filter-search-input"
-                    />
-
-                    {/* <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
-                                <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
-                                {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
-                            </button>
-                            <button onClick={() => handleExport('pdf')} className="btn-download pdf" disabled={exportingPdf}>
-                                <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
-                                {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
-                            </button> */}
-
+                     <input
+                         type="text"
+                         placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
+                         value={searchTerm}
+                         onChange={e => setSearchTerm(e.target.value)}
+                         className="filter-search-input"
+                     />
                 </div>
-                <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+                 <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
                     <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
-                        <option value="month">Filter per Bulan</option>
-                        <option value="date_range">Filter per Tanggal</option>
+                        <option value="month">Filter Riwayat per Bulan</option>
+                        <option value="date_range">Filter Riwayat per Tanggal</option>
                     </select>
                     {filterType === 'month' && (
                         <>
@@ -280,132 +313,205 @@ function ItemHistoryLookupPage() {
                             <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
                         </>
                     )}
-                </div>
-                <div className="download-buttons">
-                    <button onClick={() => setIsScannerOpen(true)} className="btn-scan">
+                    <button onClick={() => setIsScannerOpen(true)} style={{marginLeft: 'auto'}}>
                         <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
                             <i className="fas fa-qrcode fa-stack-2x"></i>
                             <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
                         </span>
-                        Scan QR
                     </button>
-                </div>
+                 </div>
 
-                <div className="job-list-container">
-                    {/* Desktop View */}
-                    <div className="table-scroll-container"> {/* DITAMBAHKAN */}
-                        {/* TABEL 1: KHUSUS HEADER */}
-                        <table className="job-table">
-                            <thead>
-                                <tr>
-                                    <th>Kode Unik</th>
-                                    <th>Nama Barang</th>
-                                    <th>Status Saat Ini</th>
-                                    <th>Tgl Status Terakhir Diubah</th>
-                                    <th>Penanggung Jawab/Pengguna Terakhir</th>
-                                </tr>
-                            </thead>
-                        </table>
-                        <div className="table-body-scroll">
-                            <table className="job-table">
-                                <tbody>
-                                    {loading ? (
-                                        <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
-                                    ) : items.length > 0 ? items.map(item => (
-                                        <tr key={item.id} onClick={() => setHistoryItem(item)} style={{ cursor: 'pointer' }} className="hoverable-row">
-                                            <td>{item.kode_unik}</td>
-                                            <td>{item.master_barang?.nama_barang || 'N/A'}</td>
-                                            <td>
-                                                <span className={`status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
-                                                    {item.status_detail?.nama_status || 'N/A'}
-                                                </span>
-                                            </td>
-                                            <td>{formatDate(getRelevantDate(item))}</td>
-                                            <td>{getResponsiblePerson(item)}</td>
+                {/* === CONTAINER SPLIT VIEW === */}
+                <div className={`split-view-container ${selectedItem ? 'split-view-active' : ''}`}>
+
+                    {/* === PANEL KIRI: DAFTAR ITEM === */}
+                    <div className="list-panel">
+                        <div className="job-list-container">
+                            {/* Desktop View */}
+                            <div className="table-scroll-container" style={{maxHeight: '65vh'}}>
+                                <table className="job-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Kode Unik</th>
+                                            <th>Nama Barang</th>
+                                            <th className={selectedItem ? 'hide-on-narrow' : ''}>Status Saat Ini</th>
+                                            <th className={selectedItem ? 'hide-on-narrow' : ''}>Tgl Kejadian Terakhir</th>
+                                            <th className={selectedItem ? 'hide-on-narrow' : ''}>Penanggung Jawab/Pengguna Terakhir</th>
                                         </tr>
-                                    )) : (
-                                        <tr><td colSpan="5" style={{ textAlign: 'center' }}>Tidak ada data.</td></tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                </table>
+                                <div style={{overflowY:'auto', maxHeight:'calc(65vh - 45px)'}}>
+                                    <table className="job-table">
+                                        <tbody>
+                                            {loading ? (
+                                                <tr><td colSpan={selectedItem ? 2 : 5} style={{ textAlign: 'center' }}>Memuat data...</td></tr>
+                                            ) : items.length > 0 ? items.map(item => (
+                                                <tr
+                                                    key={item.id}
+                                                    onClick={() => setSelectedItem(item)}
+                                                    style={{ cursor: 'pointer' }}
+                                                    className={`hoverable-row ${selectedItem?.id === item.id ? 'selected-row' : ''}`}
+                                                >
+                                                    <td>{item.kode_unik}</td>
+                                                    <td>{item.master_barang?.nama_barang || 'N/A'}</td>
+                                                    <td className={selectedItem ? 'hide-on-narrow' : ''}>
+                                                        <span className={`badge-status status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                            {item.status_detail?.nama_status || 'N/A'}
+                                                        </span>
+                                                    </td>
+                                                    <td className={selectedItem ? 'hide-on-narrow' : ''}>{formatDate(getRelevantDate(item))}</td>
+                                                    <td className={selectedItem ? 'hide-on-narrow' : ''}>{getResponsiblePerson(item)}</td>
+                                                </tr>
+                                            )) : (
+                                                <tr><td colSpan={selectedItem ? 2 : 5} style={{ textAlign: 'center' }}>Tidak ada data.</td></tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {/* Mobile View */}
+                             <div className="job-list-mobile">
+                                {loading ? ( <p style={{textAlign:'center'}}>Memuat...</p>) : items.length > 0 ? (
+                                    items.map(item => (
+                                        <div
+                                           key={item.id}
+                                           className={`ticket-card-mobile clickable-row ${selectedItem?.id === item.id ? 'selected-row' : ''}`}
+                                           onClick={() => setSelectedItem(item)}
+                                         >
+                                            <div className="card-row">
+                                                <div className="data-group single">
+                                                    <span className="label">Nama Barang</span>
+                                                    <span className="value description">{item.master_barang?.nama_barang || 'N/A'}</span>
+                                                </div>
+                                            </div>
+                                             <div className="card-row">
+                                                 <div className="data-group">
+                                                     <span className="label">Kode Unik</span>
+                                                     <span className="value">{item.kode_unik}</span>
+                                                 </div>
+                                                 <div className="data-group">
+                                                     <span className="label">Status Saat Ini</span>
+                                                     <span className="value">
+                                                         <span className={`status-badge status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                             {item.status_detail?.nama_status || 'N/A'}
+                                                         </span>
+                                                     </span>
+                                                 </div>
+                                             </div>
+                                             <div className="card-row">
+                                                 <div className="data-group single">
+                                                     <span className="label">Tgl Kejadian Terakhir</span>
+                                                     <span className="value">{formatDate(getRelevantDate(item))}</span>
+                                                 </div>
+                                             </div>
+                                             <div className="card-row">
+                                                 <div className="data-group single">
+                                                     <span className="label">Lokasi/Pengguna Terakhir</span>
+                                                     <span className="value">{getResponsiblePerson(item)}</span>
+                                                 </div>
+                                             </div>
+                                        </div>
+                                    ))
+                                ) : ( <p style={{textAlign:'center'}}>Tidak ada data.</p>)}
+                             </div>
                         </div>
                     </div>
-                    {/* Mobile View */}
-                    <div className="job-list-mobile">
-                        {loading ? (
-                            <p style={{ textAlign: 'center' }}>Memuat data...</p>
-                        ) : items.length > 0 ? (
-                            items.map(item => (
-                                <div key={item.id} className="ticket-card-mobile clickable-row" onClick={() => setHistoryItem(item)}>
-                                    <div className="card-row">
-                                        <div className="data-group single">
-                                            <span className="label">Nama Barang</span>
-                                            <span className="value description">{item.master_barang?.nama_barang || 'N/A'}</span>
-                                        </div>
-                                    </div>
-                                    <div className="card-row">
-                                        <div className="data-group">
-                                            <span className="label">Kode Unik</span>
-                                            <span className="value">{item.kode_unik}</span>
-                                        </div>
-                                        <div className="data-group">
-                                            <span className="label">Status Saat Ini</span>
-                                            <span className="value">
-                                                <span className={`status-badge status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
-                                                    {item.status_detail?.nama_status || 'N/A'}
-                                                </span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="card-row">
-                                        <div className="data-group single">
-                                            <span className="label">Tgl Status Terakhir Diubah</span>
-                                            <span className="value">{formatDate(getRelevantDate(item))}</span>
-                                        </div>
-                                    </div>
-                                    <div className="card-row">
-                                        <div className="data-group single">
-                                            <span className="label">Lokasi/Pengguna Terakhir</span>
-                                            <span className="value">{getResponsiblePerson(item)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
-                                <p>Tidak ada data.</p>
+
+                    {/* === PANEL KANAN: RIWAYAT ITEM === */}
+                    {selectedItem && (
+                        <div className="history-panel">
+                            <div className="history-panel-header">
+                                <h4>Riwayat Aset: {selectedItem.master_barang?.nama_barang} ({selectedItem.kode_unik})</h4>
+                                <button onClick={closeHistoryPanel} className="modal-close-button">&times;</button>
                             </div>
-                        )}
-                    </div>
+
+                            <div className="history-panel-controls">
+                                <div className="date-filters">
+                                    <input
+                                        type="date"
+                                        name="start_date"
+                                        value={historyFilters.start_date}
+                                        onChange={handleHistoryFilterChange}
+                                        className="filter-select-date"
+                                     />
+                                    <span>-</span>
+                                    <input
+                                        type="date"
+                                        name="end_date"
+                                        value={historyFilters.end_date}
+                                        onChange={handleHistoryFilterChange}
+                                        className="filter-select-date"
+                                    />
+                                </div>
+                                <div className="download-buttons">
+                                    <button onClick={() => handleHistoryExport('excel')} className="btn-download excel" disabled={exportingHistoryExcel}>
+                                        <i className="fas fa-file-excel"></i> {exportingHistoryExcel ? '...' : 'Ekspor Excel'}
+                                    </button>
+                                    <button onClick={() => handleHistoryExport('pdf')} className="btn-download pdf" disabled={exportingHistoryPdf}>
+                                        <i className="fas fa-file-pdf"></i> {exportingHistoryPdf ? '...' : 'Ekspor PDF'}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="history-list-scroll">
+                                {historyLoading ? (
+                                    <p style={{textAlign: 'center', padding: '2rem'}}>Memuat riwayat...</p>
+                                ) : historyData.length > 0 ? (
+                                    historyData.map(log => (
+                                        <div key={log.id} className="history-log-item">
+                                            <div className="info-row full-width" style={{ marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid #4A5568' }}>
+                                                <span className="info-label" style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>Dicatat pada: {formatLogTime(log.created_at)}</span>
+                                            </div>
+                                            <div className="form-row2">
+                                                <div className="info-row">
+                                                    <span className="info-label">Status</span>
+                                                    <span className="info-value-info" style={{ fontWeight: 'bold' }}>{log.status_detail?.nama_status || 'N/A'}</span>
+                                                </div>
+                                                <div className="info-row">
+                                                    <span className="info-label">Tanggal Kejadian</span>
+                                                    <span className="info-value-info">{formatEventDate(log.event_date)}</span>
+                                                </div>
+                                                <div className="info-row">
+                                                    <span className="info-label">Aksi oleh</span>
+                                                    <span className="info-value-info">{log.triggered_by_user?.name || 'Sistem'}</span>
+                                                </div>
+                                                {log.related_user && (
+                                                    <div className="info-row">
+                                                        <span className="info-label">Terkait</span>
+                                                        <span className="info-value-info">{log.related_user.name}</span>
+                                                    </div>
+                                                )}
+                                                {log.workshop && (
+                                                    <div className="info-row">
+                                                        <span className="info-label">Lokasi</span>
+                                                        <span className="info-value-info">{log.workshop.name}</span>
+                                                    </div>
+                                                )}
+                                                {log.deskripsi && (
+                                                    <div className="info-row full-width">
+                                                        <span className="info-label">Catatan</span>
+                                                        <span className="info-value-info" style={{ whiteSpace: 'pre-wrap' }}>{log.deskripsi}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p style={{textAlign: 'center', padding: '2rem'}}>Tidak ada riwayat ditemukan untuk filter ini.</p>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
+            </div> 
 
-                {/* {pagination && pagination.last_page > 1 && (
-                    <Pagination
-                        currentPage={pagination.current_page}
-                        lastPage={pagination.last_page}
-                        onPageChange={(page) => fetchData(page)}
-                    />
-                )} */}
-            </div >
-            {historyItem && (
-                <HistoryModal
-                    item={historyItem}
-                    onClose={() => setHistoryItem(null)}
-                    showToast={showToast}
-                    startDate={filterType === 'date_range' ? filters.start_date : null} // <-- Kirim filter
-                    endDate={filterType === 'date_range' ? filters.end_date : null} // <-- Kirim filter
+            {isScannerOpen && (
+                <QrScannerModal
+                    onClose={() => setIsScannerOpen(false)}
+                    onScanSuccess={handleScanSuccess}
                 />
-            )
-            }
-
-            {
-                isScannerOpen && (
-                    <QrScannerModal
-                        onClose={() => setIsScannerOpen(false)}
-                        onScanSuccess={handleScanSuccess}
-                    />
-                )
-            }
+            )}
         </>
     );
 }

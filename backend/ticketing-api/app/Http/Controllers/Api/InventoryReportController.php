@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\MasterBarang;
 use App\Models\StokBarang;
+use App\Models\StokBarangHistory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // <-- Pastikan DB di-import
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Exports\InventoryReportExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -19,26 +20,19 @@ class InventoryReportController extends Controller
 
     public function exportReport(Request $request)
     {
-        // --- PERBAIKAN (Blok Validasi) ---
-        // Validasi disamakan dengan buildReportQuery
         $request->validate([
-            'type' => 'required|in:in,out,active_loans,all_stock,available,accountability',
+            'type' => 'required|in:in,out,active_loans,all_stock,available,accountability,item_history',
             'export_type' => 'required|in:excel,pdf',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'search' => 'nullable|string|max:255',
-            'has_history' => 'nullable|boolean', // <-- Tambahkan ini
+            'has_history' => 'nullable|boolean',
+            'stok_barang_id' => 'required_if:type,item_history|integer|exists:stok_barangs,id', 
         ]);
 
-        // --- PERBAIKAN (Query) ---
-        // Panggil fungsi query terpusat kita
         $query = $this->buildReportQuery($request);
-
-        // Ambil datanya
         $data = $query->get();
 
-        // --- PERBAIKAN (Judul) ---
-        // Tentukan Judul Laporan (Logika ini tetap di sini)
         $title = 'Laporan Inventaris';
         switch ($request->type) {
             case 'in':
@@ -58,7 +52,12 @@ class InventoryReportController extends Controller
                 break;
             case 'all_stock':
                 $title = 'Laporan Riwayat Aset';
-                break; // <-- Judul diperbaiki
+                break;
+            case 'item_history':
+                $item = StokBarang::with('masterBarang')->find($request->stok_barang_id);
+                $itemName = $item ? ($item->masterBarang->nama_barang ?? $item->kode_unik) : 'Item';
+                $title = 'Laporan Riwayat Aset: ' . $itemName;
+                break;
         }
 
         // --- Logika Ekspor (Tidak Berubah) ---
@@ -134,11 +133,12 @@ class InventoryReportController extends Controller
     public function getDetailedReport(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:in,out,available,accountability,active_loans,all_stock', // <-- Tambahkan all_stock
+            'type' => 'required|in:in,out,available,accountability,active_loans,all_stock',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'search' => 'nullable|string|max:255',
-            'has_history' => 'nullable|boolean', // <-- Tambahkan ini
+            'has_history' => 'nullable|boolean',
+            'stok_barang_id' => 'required_if:type,item_history|nullable|exists:stok_barangs,id',
         ]);
 
         $perPage = $request->input('per_page', 15);
@@ -196,7 +196,6 @@ class InventoryReportController extends Controller
         ];
     }
 
-    // --- PERBAIKAN (FUNGSI HELPER BARU) ---
     /**
      * Membangun query dasar untuk laporan inventaris (UI dan Ekspor)
      * agar logikanya terpusat di satu tempat.
@@ -272,29 +271,35 @@ class InventoryReportController extends Controller
             });
         } else {
             // Query History untuk 'in', 'out', 'accountability'
-            $query = \App\Models\StokBarangHistory::with([
+            $query = StokBarangHistory::with([
                 'stokBarang.masterBarang',
                 'stokBarang.color',
-                'stokBarang.statusDetail', // <-- Ambil status stok saat ini
-                'statusDetail', // Status saat kejadian history
+                'stokBarang.statusDetail',
+                'statusDetail',
                 'triggeredByUser:id,name',
                 'relatedUser:id,name',
                 'workshop:id,name'
             ]);
 
-            $statusMap = [
-                'in' => [$statusTersediaId],
-                'out' => DB::table('status_barang')->whereIn('nama_status', ['Dipinjam', 'Digunakan'])->pluck('id')->toArray(),
-                'accountability' => DB::table('status_barang')->whereIn('nama_status', ['Hilang', 'Rusak', 'Perbaikan'])->pluck('id')->toArray()
-            ];
+            if ($type === 'item_history') {
+                // Jika ini laporan riwayat item spesifik, filter berdasarkan ID item.
+                // Validasi 'exists' sudah dilakukan di 'exportReport'
+                $query->where('stok_barang_id', $request->stok_barang_id);
+            } else {
+                // Ini adalah logika lama untuk 'in', 'out', 'accountability'
+                $statusMap = [
+                    'in' => [$statusTersediaId],
+                    'out' => DB::table('status_barang')->whereIn('nama_status', ['Dipinjam', 'Digunakan'])->pluck('id')->toArray(),
+                    'accountability' => DB::table('status_barang')->whereIn('nama_status', ['Hilang', 'Rusak', 'Perbaikan'])->pluck('id')->toArray()
+                ];
 
-            $targetStatusIds = $statusMap[$type] ?? [];
-            if (empty($targetStatusIds)) {
-                Log::error("Status target tidak ditemukan untuk tipe laporan: {$request->type}");
-                // Hentikan query jika tipe tidak valid
-                return $query->whereRaw('1=0');
+                $targetStatusIds = $statusMap[$type] ?? [];
+                if (empty($targetStatusIds)) {
+                    Log::error("Status target tidak ditemukan untuk tipe laporan: {$request->type}");
+                    return $query->whereRaw('1=0');
+                }
+                $query->whereIn('status_id', $targetStatusIds);
             }
-            $query->whereIn('status_id', $targetStatusIds);
             $dateColumn = DB::raw('COALESCE(event_date, created_at)');
 
             // Filter bulan/tahun
