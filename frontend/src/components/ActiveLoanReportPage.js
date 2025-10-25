@@ -25,7 +25,7 @@ export default function ActiveLoanReportPage() {
     const [data, setData] = useState([]);
     // const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [filterType, setFilterType] = useState('date_range'); // 'month' or 'date_range'
+    const [filterType, setFilterType] = useState('month');
     const [filters, setFilters] = useState({
         start_date: '',
         end_date: '',
@@ -187,7 +187,7 @@ export default function ActiveLoanReportPage() {
                 />
 
             </div>
-            <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+            <div className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
                 <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
                     <option value="month">Filter per Bulan</option>
                     <option value="date_range">Filter per Tanggal</option>
