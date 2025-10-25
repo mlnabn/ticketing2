@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
@@ -35,6 +35,10 @@ function ItemHistoryLookupPage() {
     const [historyFilters, setHistoryFilters] = useState({ start_date: '', end_date: '' });
     const [exportingHistoryExcel, setExportingHistoryExcel] = useState(false);
     const [exportingHistoryPdf, setExportingHistoryPdf] = useState(false);
+    const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1 });
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const desktopListRef = useRef(null); 
+    const mobileListRef = useRef(null);
 
     const formatDate = (dateString) => {
         if (!dateString) return '-';
@@ -56,9 +60,9 @@ function ItemHistoryLookupPage() {
         });
     };
 
-    const getApiParams = useCallback(() => {
+    const getApiParams = useCallback((page = 1) => {
         const baseParams = {
-            all: true,
+            page: page,
             has_history: true,
             search: debouncedSearchTerm,
         };
@@ -78,9 +82,13 @@ function ItemHistoryLookupPage() {
         setSelectedItem(null);
         setHistoryData([]);
         try {
-            const params = getApiParams();
+            const params = getApiParams(1);
             const res = await api.get('/inventory/stock-items', { params });
-            setItems(res.data);
+            setItems(res.data.data);
+            setPagination({
+                currentPage: res.data.current_page,
+                totalPages: res.data.last_page
+            });
         } catch (error) {
             showToast('Gagal memuat data stok.', 'error');
             setItems([]);
@@ -274,6 +282,38 @@ function ItemHistoryLookupPage() {
         setHistoryFilters({ start_date: '', end_date: '' });
     };
 
+    const loadMoreItems = async () => {
+        // Hentikan jika sedang memuat atau sudah di halaman terakhir
+        if (isLoadingMore || pagination.currentPage >= pagination.totalPages) return;
+
+        setIsLoadingMore(true);
+        try {
+            const nextPage = pagination.currentPage + 1;
+            const params = getApiParams(nextPage);
+            const res = await api.get('/inventory/stock-items', { params });
+
+            setItems(prevItems => [...prevItems, ...res.data.data]); // Tambahkan data baru
+            setPagination({
+                currentPage: res.data.current_page,
+                totalPages: res.data.last_page
+            });
+        } catch (error) {
+            showToast('Gagal memuat data tambahan.', 'error');
+        } finally {
+            setIsLoadingMore(false);
+        }
+    };
+
+    const handleScroll = (e) => {
+        const target = e.currentTarget;
+        // Cek jika scroll sudah mendekati 200px dari bawah
+        const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
+
+        if (nearBottom && !loading && !isLoadingMore && pagination.currentPage < pagination.totalPages) {
+            loadMoreItems();
+        }
+    };
+
     return (
         <>
             <div className="user-management-container">
@@ -340,12 +380,18 @@ function ItemHistoryLookupPage() {
                                         </tr>
                                     </thead>
                                 </table>
-                                <div style={{overflowY:'auto', maxHeight:'calc(65vh - 45px)'}}>
+                                <div 
+                                    ref={desktopListRef}
+                                    onScroll={handleScroll}
+                                    style={{overflowY:'auto', maxHeight:'calc(65vh - 45px)'}}
+                                >
                                     <table className="job-table">
                                         <tbody>
-                                            {loading ? (
+                                            {loading && (
                                                 <tr><td colSpan={selectedItem ? 2 : 5} style={{ textAlign: 'center' }}>Memuat data...</td></tr>
-                                            ) : items.length > 0 ? items.map(item => (
+                                            )}
+
+                                            {!loading && items.map(item => (
                                                 <tr
                                                     key={item.id}
                                                     onClick={() => setSelectedItem(item)}
@@ -362,8 +408,14 @@ function ItemHistoryLookupPage() {
                                                     <td className={selectedItem ? 'hide-on-narrow' : ''}>{formatDate(getRelevantDate(item))}</td>
                                                     <td className={selectedItem ? 'hide-on-narrow' : ''}>{getResponsiblePerson(item)}</td>
                                                 </tr>
-                                            )) : (
-                                                <tr><td colSpan={selectedItem ? 2 : 5} style={{ textAlign: 'center' }}>Tidak ada data.</td></tr>
+                                            ))}
+
+                                            {isLoadingMore && (
+                                                <tr><td colSpan={selectedItem ? 2 : 5} style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                                            )}
+
+                                            {!loading && !isLoadingMore && items.length === 0 && (
+                                                <tr><td colSpan={selectedItem ? 2 : 5} style={{ textAlign: 'center' }}>Tidak ada data ditemukan.</td></tr>
                                             )}
                                         </tbody>
                                     </table>
@@ -371,7 +423,12 @@ function ItemHistoryLookupPage() {
                             </div>
 
                             {/* Mobile View */}
-                             <div className="job-list-mobile">
+                            <div 
+                                className="job-list-mobile"
+                                ref={mobileListRef}
+                                onScroll={handleScroll}
+                                style={{ overflowY: 'auto', height: '65vh' }}
+                            >
                                 {loading ? ( <p style={{textAlign:'center'}}>Memuat...</p>) : items.length > 0 ? (
                                     items.map(item => (
                                         <div
@@ -414,6 +471,7 @@ function ItemHistoryLookupPage() {
                                         </div>
                                     ))
                                 ) : ( <p style={{textAlign:'center'}}>Tidak ada data.</p>)}
+                                {isLoadingMore && (<p style={{textAlign:'center'}}>Memuat lebih banyak...</p>)}
                              </div>
                         </div>
                     </div>
