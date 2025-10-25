@@ -313,8 +313,8 @@ function ItemHistoryLookupPage() {
                             <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
                         </>
                     )}
-                    <button onClick={() => setIsScannerOpen(true)} style={{marginLeft: 'auto'}}>
-                        <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
+                    <button className="btn-scan-qr-history" onClick={() => setIsScannerOpen(true)} style={{marginLeft: 'auto'}}>
+                        <span className="fa-stack" style={{ marginRight: '8px', fontSize: '1.2em' }}>
                             <i className="fas fa-qrcode fa-stack-2x"></i>
                             <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
                         </span>
@@ -423,7 +423,7 @@ function ItemHistoryLookupPage() {
                         <div className="history-panel">
                             <div className="history-panel-header">
                                 <h4>Riwayat Aset: {selectedItem.master_barang?.nama_barang} ({selectedItem.kode_unik})</h4>
-                                <button onClick={closeHistoryPanel} className="modal-close-button">&times;</button>
+                                <button onClick={closeHistoryPanel} className="close-button">&times;</button>
                             </div>
 
                             <div className="history-panel-controls">

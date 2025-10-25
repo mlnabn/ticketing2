@@ -12805,7 +12805,7 @@ body.dark-mode .summary-card.expanded {
   display: flex;
   gap: 1.5rem;
   margin-top: 1.5rem;
-  align-items: stretch; 
+  align-items: stretch;
   transition: all 0.4s ease-out;
 }
 
@@ -12813,32 +12813,33 @@ body.dark-mode .summary-card.expanded {
 .list-panel {
   width: 100%;
   transition: width 0.4s ease-out;
-  display: flex; 
-  flex-direction: column; 
+  display: flex;
+  flex-direction: column;
 }
 
 .split-view-active .list-panel {
-  width: 30%; 
+  width: 30%;
   flex-shrink: 0;
 }
 
 .list-panel .job-list-container {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-.list-panel .table-scroll-container {
-    flex-grow: 1;
-    max-height: none;
-    height: 65vh;
-    display: flex; 
-    flex-direction: column;
-    overflow: hidden; 
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.list-panel .table-scroll-container > div:last-child {
-   flex-grow: 1;
-   overflow-y: auto; 
+.list-panel .table-scroll-container {
+  flex-grow: 1;
+  max-height: none;
+  height: 65vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.list-panel .table-scroll-container>div:last-child {
+  flex-grow: 1;
+  overflow-y: auto;
 }
 
 .split-view-active .list-panel .hide-on-narrow {
@@ -12860,9 +12861,10 @@ body.dark-mode .summary-card.expanded {
   max-height: 65vh;
   overflow: hidden;
 }
+
 .dark-mode .history-panel {
-    background-color: #111111;
-    border-color: var(--border-color-dark);
+  background-color: #111111;
+  border-color: var(--border-color-dark);
 }
 
 .history-panel-header {
@@ -12873,38 +12875,46 @@ body.dark-mode .summary-card.expanded {
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 }
-.dark-mode .history-panel-header { border-bottom-color: var(--border-color-dark); }
 
-.history-panel-header h4 { 
+.dark-mode .history-panel-header {
+  border-bottom-color: var(--border-color-dark);
+}
+
+.history-panel-header h4 {
   margin: 0;
-  font-size: 1.1rem; 
-  font-weight: 600; 
-  color: var(--text-color-dark); 
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color-dark);
 }
 
 .history-panel-controls {
-  display: flex; 
+  display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 }
-.dark-mode .history-panel-controls { border-bottom-color: var(--border-color-dark); }
+
+.dark-mode .history-panel-controls {
+  border-bottom-color: var(--border-color-dark);
+}
 
 
 /* Area Daftar Riwayat (Scrollable) */
 .history-list-scroll {
-  flex-grow: 1; /* Mengisi sisa tinggi panel */
-  overflow-y: auto; /* Aktifkan scroll vertikal */
+  flex-grow: 1;
+  /* Mengisi sisa tinggi panel */
+  overflow-y: auto;
+  /* Aktifkan scroll vertikal */
   padding: 1rem 1.5rem;
 }
 
 .history-panel-controls .date-filters {
-    display: flex;
-    align-items: center;
-    width: 500px;
-    gap: 0.5rem;
+  display: flex;
+  align-items: center;
+  width: 500px;
+  gap: 0.5rem;
 }
 
 .modal-close-button {
@@ -12921,9 +12931,67 @@ body.dark-mode .summary-card.expanded {
   transition: color 0.2s ease;
 }
 
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  font-size: 2.2rem;
+  line-height: 1;
+  font-weight: 300;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  color: #000000;
+}
+
+.dark-mode .close-button {
+  color: #ffffff;
+}
+
 /* Responsiveness (Tetap sama) */
 @media (max-width: 900px) {
-  .split-view-container { flex-direction: column; }
-  .split-view-active .list-panel, .history-panel { width: 100%; height: auto; max-height: 50vh; } /* Tinggi auto di mobile */
-  .list-panel .hide-on-narrow { display: none; }
+  .split-view-container {
+    flex-direction: column;
+  }
+
+  .split-view-active .list-panel,
+  .history-panel {
+    width: 100%;
+    height: auto;
+    max-height: 50vh;
+  }
+
+  /* Tinggi auto di mobile */
+  .list-panel .hide-on-narrow {
+    display: none;
+  }
+}
+
+.btn-scan-qr-history {
+  color: #00b341;
+}
+
+.btn-scan-qr-history .fa-inverse {
+  color: #0d0d0d;
+}
+
+/* Dark mode */
+.dark-mode .btn-scan-qr-history {
+  color: #4ade80;
+
+}
+
+.dark-mode .btn-scan-qr-history .fa-inverse {
+  color: #ffffff;
+}
+
+.btn-scan-qr-history {
+  transition: color 0.3s ease, transform 0.2s ease, text-shadow 0.3s ease;
+}
+
+.btn-scan-qr-history:hover {
+  transform: scale(1.05);
+  color: #22c55e;
 }
