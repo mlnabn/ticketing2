@@ -10613,41 +10613,51 @@ body.dark-mode .form-group-recover textarea:focus {
 
 
 
-/* ==========================================================================
-   Filter Select Styling (Light & Dark Mode)
-   ========================================================================== */
+/*
+==========================================================================
+  Filter Component Styling
+  - .filter-select (Dropdown)
+  - .filter-select-date (Date Input)
+==========================================================================
+*/
 
+/*
+==========================================================================
+  1. Dropdown Styling (.filter-select)
+==========================================================================
+*/
+
+/* --- Base --- */
 .filter-select {
-  padding: 0.75rem 2.5rem 0.75rem 1rem;
-  border: 1px solid;
+  position: relative;
+  height: 44px;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--input-border, #ced4da);
   border-radius: 8px;
+
   font-size: 1rem;
   font-family: inherit;
+  color: var(--text-primary, #212529);
+  background-color: var(--input-bg, #FFFFFF);
+
+  /* Remove default appearance */
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
   cursor: pointer;
+
+  /* Custom Arrow Icon (Light) */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   background-size: 1.2em 1.2em;
+
+  /* Transitions */
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.filter-select {
-  background-color: var(--input-bg, #FFFFFF);
-  color: var(--text-primary, #212529);
-  border: 1px solid var(--input-border, #ced4da);
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-}
-
-/* --- Dark Mode --- */
-.dark-mode .filter-select {
-  background-color: #3a3f44;
-  color: #e2e8f0;
-  border-color: #4a5568;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23e2e8f0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-}
-
+/* --- States (Hover, Focus) --- */
 .filter-select:hover {
   border-color: #3b82f6;
 }
@@ -10655,26 +10665,146 @@ body.dark-mode .form-group-recover textarea:focus {
 .filter-select:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 
-/* State ketika disabled (untuk Sub-Kategori) */
+/* --- State (Disabled) --- */
 .filter-select:disabled {
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.filter-select:disabled:hover {
+  border-color: var(--input-border, #ced4da);
+}
+
+/* --- Dark Mode --- */
+.dark-mode .filter-select {
+  background-color: #3a3f44;
+  color: #e2e8f0;
+  border-color: #4a5568;
+
+  /* Custom Arrow Icon (Dark) */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23e2e8f0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
 }
 
 .dark-mode .filter-select:disabled {
   background-color: #2a313d;
 }
 
-.filter-select:disabled:hover {
-  border-color: #ced4da;
-}
-
 .dark-mode .filter-select:disabled:hover {
   border-color: #4a5568;
 }
+
+/*
+==========================================================================
+  2. Date Input Styling (.filter-select-date)
+==========================================================================
+*/
+
+/* --- Base --- */
+.filter-select-date {
+  /* Box Model & Layout */
+  position: relative;
+  height: 44px;
+  /* Fixed height for alignment */
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--input-border, #ced4da);
+  border-radius: 8px;
+
+  /* Typography & Appearance */
+  font-size: 0.9rem;
+  line-height: 1.5;
+  font-family: inherit;
+  color: var(--text-primary, #212529);
+  background-color: var(--input-bg, #FFFFFF);
+
+  /* Remove default appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: text;
+
+  /* Transitions */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* --- Remove unwanted webkit elements --- */
+.filter-select-date::-webkit-inner-spin-button,
+.filter-select-date::-webkit-clear-button {
+  display: none;
+}
+
+/* --- Custom Calendar Icon (Picker Indicator) --- */
+.filter-select-date::-webkit-calendar-picker-indicator {
+  /* Position over the input padding */
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+
+  /* Reset appearance */
+  -webkit-appearance: none;
+  appearance: none;
+
+  /* Use SVG as a mask */
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-calendar-event' viewBox='0 0 16 16'%3E%3Cpath d='M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z'/%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-1h12a1 1 0 0 1 1 1v1H0V4a1 1 0 0 1 1-1z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+
+  /* Icon Color (Light) & Transition */
+  background-color: #6c757d;
+  transition: background-color 0.2s;
+}
+
+.filter-select-date::-webkit-calendar-picker-indicator:hover {
+  background-color: #343a40;
+  /* Icon hover color (Light) */
+}
+
+/* --- States (Focus) --- */
+.filter-select-date:focus {
+  outline: none;
+  border-color: var(--input-focus-border, #86b7fe);
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+/* --- State (Disabled) --- */
+.filter-select-date:disabled {
+  background-color: var(--input-disabled-bg, #e9ecef);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* --- Dark Mode --- */
+.dark-mode .filter-select-date {
+  background-color: #3a3f44 !important;
+  color: #e2e8f0;
+  border: 1px solid #4a5568;
+  color-scheme: dark;
+}
+
+.dark-mode .filter-select-date:focus {
+  border-color: #0d6efd;
+}
+
+.dark-mode .filter-select-date:disabled {
+  background-color: #343a40;
+}
+
+/* Icon Color (Dark) */
+.dark-mode .filter-select-date::-webkit-calendar-picker-indicator {
+  background-color: #adb5bd !important;
+}
+
+.dark-mode .filter-select-date::-webkit-calendar-picker-indicator:hover {
+  background-color: #e9ecef !important;
+}
+
 
 /* ============================================= */
 /* STYLING UNTUK FILTER INVENTARIS                 */
@@ -11495,7 +11625,7 @@ body.dark-mode .btn-qr:hover {
 .clickable-row:hover {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
   transform: translateY(-3px);
-  cursor: pointer;  
+  cursor: pointer;
 }
 
 
@@ -11969,116 +12099,6 @@ body.dark-mode .btn-qr:hover {
 }
 
 .dark-mode .filter-select-cal::-webkit-calendar-picker-indicator:hover {
-  background-color: #e9ecef !important;
-}
-
-/* ========================================================= */
-/* GAYA UNTUK INPUT TANGGAL FILTER (.filter-select-date) */
-/* ========================================================= */
-
-/* --- 1. Gaya Dasar untuk Kotak Input --- */
-.filter-select-date {
-  /* Menghilangkan tampilan default browser */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-
-  /* Dimensi dan Teks */
-  position: relative;
-  height: 44px;
-  width: 100%;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  font-family: inherit;
-  /* Pastikan font konsisten */
-  border-radius: 8px;
-
-  /* Transisi dan Kursor */
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  cursor: text;
-  /* Kursor teks, bukan pointer */
-}
-
-.filter-select-date::-webkit-calendar-picker-indicator {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-
-  /* [PERBAIKAN UTAMA] Gunakan SVG Mask */
-  -webkit-appearance: none;
-  appearance: none;
-  background-color: #6c757d;
-  /* Warna ikon default (abu-abu gelap) */
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-calendar-event' viewBox='0 0 16 16'%3E%3Cpath d='M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z'/%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-1h12a1 1 0 0 1 1 1v1H0V4a1 1 0 0 1 1-1z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: center;
-  transition: background-color 0.2s;
-}
-
-.filter-select-date::-webkit-calendar-picker-indicator:hover {
-  background-color: #343a40;
-  /* Warna ikon saat hover */
-}
-
-/* --- 3. Menghilangkan elemen yang tidak perlu (misal: panah spinner) --- */
-.filter-select-date::-webkit-inner-spin-button,
-.filter-select-date::-webkit-clear-button {
-  display: none;
-}
-
-
-
-/* ============================================= */
-/* --- 4. THEMING (WARNA LIGHT & DARK MODE) --- */
-/* ============================================= */
-
-/* --- Default (Light Mode) --- */
-.filter-select-date {
-  background-color: var(--input-bg, #FFFFFF);
-  color: var(--text-primary, #212529);
-  border: 1px solid var(--input-border, #ced4da);
-}
-
-.filter-select-date:focus {
-  outline: none;
-  border-color: var(--input-focus-border, #86b7fe);
-  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
-}
-
-.filter-select-date:disabled {
-  background-color: var(--input-disabled-bg, #e9ecef);
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* --- Overrides untuk Dark Mode --- */
-.dark-mode .filter-select-date {
-  background-color: #111111 !important;
-  color: var(--text-primary, #FFFFFF);
-  border: 1px solid var(--input-border, #495057);
-  color-scheme: dark;
-}
-
-.dark-mode .filter-select-date:focus {
-  border-color: var(--input-focus-border, #0d6efd);
-}
-
-.dark-mode .filter-select-date:disabled {
-  background-color: var(--input-disabled-bg, #343a40);
-}
-
-/* [PERBAIKAN UTAMA] Cukup ubah warna latar belakang ikon di dark mode */
-.dark-mode .filter-select-date::-webkit-calendar-picker-indicator {
-  background-color: #adb5bd !important;
-
-}
-
-.dark-mode .filter-select-date::-webkit-calendar-picker-indicator:hover {
   background-color: #e9ecef !important;
 }
 

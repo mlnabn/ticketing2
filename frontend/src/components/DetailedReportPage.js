@@ -25,9 +25,8 @@ const months = [
 
 export default function DetailedReportPage({ type, title }) {
     const [data, setData] = useState([]);
-    // const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [filterType, setFilterType] = useState('date_range');
+    const [filterType, setFilterType] = useState('month');
     const [filters, setFilters] = useState({
         start_date: '',
         end_date: '',
@@ -50,7 +49,7 @@ export default function DetailedReportPage({ type, title }) {
         if (filterType === 'month') {
             baseParams.month = filters.month;
             baseParams.year = filters.year;
-        } else { // 'date_range'
+        } else { 
             baseParams.start_date = filters.start_date;
             baseParams.end_date = filters.end_date;
         }
@@ -78,12 +77,10 @@ export default function DetailedReportPage({ type, title }) {
     }, [getApiParams, type]);
 
     useEffect(() => {
-        // Ambil data dashboard hanya untuk mendapatkan daftar tahun
         api.get('/reports/inventory/dashboard')
             .then(res => {
                 if (res.data.availableYears && res.data.availableYears.length > 0) {
                     setYears(res.data.availableYears);
-                    // Set tahun default ke tahun terbaru jika belum di-set
                     if (!filters.year) { //
                         setFilters(prev => ({ ...prev, year: res.data.availableYears[0] }));
                     }
@@ -103,24 +100,17 @@ export default function DetailedReportPage({ type, title }) {
         fetchData();
     }, [fetchData]);
 
-    // Hapus duplikat useEffect
-    // useEffect(() => {
-    //     fetchData();
-    // }, [fetchData]);
-
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
     const handleFilterTypeChange = (e) => {
         setFilterType(e.target.value);
-        // Reset filter tanggal saat berganti
         setFilters(prev => ({
             ...prev,
             start_date: '',
             end_date: '',
             month: '',
-            // year: prev.year // biarkan tahun tetap
         }));
     };
 
@@ -138,7 +128,6 @@ export default function DetailedReportPage({ type, title }) {
 
             const extension = exportType === 'excel' ? 'xlsx' : 'pdf';
 
-            // --- PERBAIKAN 1: Nama File Ekspor ---
             let reportName = 'Laporan';
             switch (type) {
                 case 'in': reportName = 'Laporan_Barang_Masuk'; break;
@@ -149,7 +138,6 @@ export default function DetailedReportPage({ type, title }) {
                 default: reportName = 'Laporan_Inventaris';
             }
             const fileName = `${reportName}_${new Date().toISOString().split('T')[0]}.${extension}`;
-            // --- AKHIR PERBAIKAN 1 ---
 
             saveAs(response.data, fileName);
 
@@ -179,7 +167,6 @@ export default function DetailedReportPage({ type, title }) {
     };
 
     const getItemData = (item) => {
-        // ... (Fungsi ini tidak diubah) ...
         if (type === 'available' || type === 'active_loans') {
             return {
                 kode_unik: item.kode_unik,
@@ -199,7 +186,7 @@ export default function DetailedReportPage({ type, title }) {
         const triggeredBy = item.triggered_by_user?.name || '-';
         const workshopName = item.workshop?.name || stokInfo.workshop?.name || '-';
         const historyStatus = item.status_detail?.nama_status || 'N/A';
-        const currentStatus = stokInfo.status_detail?.nama_status || 'N/A'; // Ambil dari relasi
+        const currentStatus = stokInfo.status_detail?.nama_status || 'N/A';
 
         return {
             kode_unik: stokInfo.kode_unik || '-',
@@ -214,7 +201,6 @@ export default function DetailedReportPage({ type, title }) {
     };
 
     const handleRowClick = (e, item) => {
-        // ... (Fungsi ini tidak diubah) ...
         if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('.action-buttons-group')) {
             return;
         }
@@ -227,7 +213,6 @@ export default function DetailedReportPage({ type, title }) {
     };
 
     const dateHeaders = {
-        // ... (Tidak diubah) ...
         in: 'Tgl Masuk',
         out: 'Tgl Kejadian',
         available: 'Tgl Masuk',
@@ -239,7 +224,6 @@ export default function DetailedReportPage({ type, title }) {
 
     return (
         <div className="user-management-container">
-            {/* ... (Header dan Filter tidak diubah) ... */}
             <div className="user-management-header-report">
                 <h1>{title}</h1>
             </div>

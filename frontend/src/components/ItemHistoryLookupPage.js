@@ -26,7 +26,7 @@ function ItemHistoryLookupPage() {
     // const [exportingExcel, setExportingExcel] = useState(false);
     // const [exportingPdf, setExportingPdf] = useState(false);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
-    const [filterType, setFilterType] = useState('date_range');
+    const [filterType, setFilterType] = useState('month');
     const [filters, setFilters] = useState({
         start_date: '',
         end_date: '',
@@ -52,7 +52,7 @@ function ItemHistoryLookupPage() {
         if (filterType === 'month') {
             baseParams.month = filters.month;
             baseParams.year = filters.year;
-        } else { // 'date_range'
+        } else {
             baseParams.start_date = filters.start_date;
             baseParams.end_date = filters.end_date;
         }
@@ -65,7 +65,6 @@ function ItemHistoryLookupPage() {
             const params = getApiParams();
             const res = await api.get('/inventory/stock-items', { params });
             setItems(res.data);
-            // setPagination(res.data);
         } catch (error) {
             showToast('Gagal memuat data stok.', 'error');
         } finally {
@@ -189,8 +188,8 @@ function ItemHistoryLookupPage() {
     }, [showToast]);
 
     const handleScanSuccess = (decodedText) => {
-        setIsScannerOpen(false); // 1. Tutup modal scanner
-        handleSearchAndShowHistory(decodedText); // 2. Panggil fungsi pencarian yang sudah ada
+        setIsScannerOpen(false);
+        handleSearchAndShowHistory(decodedText);
     };
     useEffect(() => {
         let barcode = '';

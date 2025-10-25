@@ -25,7 +25,7 @@ export default function ActiveLoanReportPage() {
     const [data, setData] = useState([]);
     // const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [filterType, setFilterType] = useState('date_range'); // 'month' or 'date_range'
+    const [filterType, setFilterType] = useState('month');
     const [filters, setFilters] = useState({
         start_date: '',
         end_date: '',

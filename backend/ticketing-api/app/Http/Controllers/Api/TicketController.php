@@ -37,24 +37,22 @@ class TicketController extends Controller
         $handledStatus = $request->query('handled_status');
         $year = $request->query('year');
         $month = $request->query('month');
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
 
         if ($search) {
             $query->where(function (Builder $q) use ($search) {
-                // Cari di dalam tabel 'tickets'
                 $q->where('kode_tiket', 'like', '%' . $search . '%')
                     ->orWhere('title', 'like', '%' . $search . '%');
 
-                // Cari di relasi 'user' (admin yang mengerjakan)
                 $q->orWhereHas('user', function (Builder $userQuery) use ($search) {
                     $userQuery->where('name', 'like', '%' . $search . '%');
                 });
 
-                // Cari di relasi 'creator' (user yang membuat tiket)
                 $q->orWhereHas('creator', function (Builder $creatorQuery) use ($search) {
                     $creatorQuery->where('name', 'like', '%' . $search . '%');
                 });
 
-                // Cari di relasi 'workshop'
                 $q->orWhereHas('workshop', function (Builder $workshopQuery) use ($search) {
                     $workshopQuery->where('name', 'like', '%' . $search . '%');
                 });
@@ -94,11 +92,15 @@ class TicketController extends Controller
         if ($ticketId) {
             $query->where('id', $ticketId);
         }
-        if ($year) {
-            $query->whereYear('created_at', $year);
-        }
-        if ($month) {
-            $query->whereMonth('created_at', $month);
+        if ($startDate && $endDate) {
+            $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+        } else {
+            if ($year) {
+                $query->whereYear('created_at', $year);
+            }
+            if ($month) {
+                $query->whereMonth('created_at', $month);
+            }
         }
 
         return $query;
@@ -110,7 +112,7 @@ class TicketController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $perPage = $request->query('per_page', 15); // Ambil perPage di awal
+        $perPage = $request->query('per_page', 15);
 
         $query = Ticket::with(['user', 'creator', 'masterBarangs', 'workshop']);
 
@@ -119,33 +121,24 @@ class TicketController extends Controller
         }
 
         $query = $this->applyFilters($query, $request);
-
-        // Terapkan sorting utama (Urgent dulu, lalu tanggal terbaru)
         $query->orderByRaw("CASE
                                 WHEN is_urgent = 1 AND status NOT IN ('Selesai', 'Ditolak') THEN 0
                                 ELSE 1
                              END ASC");
-        $query->orderBy('created_at', 'DESC'); // Gunakan DESC untuk terbaru dulu
-
-        // --- PINDAHKAN LOGIKA 'all' KE SINI ---
+        $query->orderBy('created_at', 'DESC');
         if ($request->boolean('all')) {
-            $ticketsResult = $query->get(); // Ambil semua data (Collection)
-
-            // Terapkan sorting sekunder jika diperlukan (walau orderBy di query sudah cukup)
+            $ticketsResult = $query->get();
             $sortedItems = $ticketsResult->sortByDesc(function ($ticket) {
                 if ($ticket->is_urgent && !in_array($ticket->status, ['Selesai', 'Ditolak'])) {
-                    return 2; // Prioritas tertinggi
+                    return 2;
                 }
-                return 0; // Prioritas normal
-            })->values(); // Reset keys agar menjadi array biasa
+                return 0;
+            })->values();
 
-            return response()->json($sortedItems); // Kembalikan array/collection langsung
+            return response()->json($sortedItems);
 
         } else {
-            // --- JIKA TIDAK 'all', LAKUKAN PAGINATION ---
-            $ticketsData = $query->paginate($perPage); // Lakukan paginate
-
-            // Terapkan sorting sekunder pada item hasil pagination
+            $ticketsData = $query->paginate($perPage);
             if ($ticketsData->items() && count($ticketsData->items()) > 0) {
                 $sortedItems = collect($ticketsData->items())->sortByDesc(function ($ticket) {
                     if ($ticket->is_urgent && !in_array($ticket->status, ['Selesai', 'Ditolak'])) {
@@ -155,7 +148,7 @@ class TicketController extends Controller
                 })->values()->all();
                 $ticketsData->setCollection(collect($sortedItems));
             }
-            return response()->json($ticketsData); // Kembalikan objek pagination
+            return response()->json($ticketsData);
         }
     }
 
@@ -379,23 +372,24 @@ class TicketController extends Controller
         if ($admin->role !== 'admin') {
             return response()->json(['error' => 'Hanya admin yang bisa dilihat laporannya.'], 403);
         }
-
-        // (BARU) Ambil filter tahun dan bulan
         $year = $request->input('year');
         $month = $request->input('month');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
 
-        // Buat query dasar
         $baseQuery = Ticket::where('user_id', $adminId);
 
-        // (BARU) Terapkan filter tahun dan bulan jika ada
-        if ($year) {
-            $baseQuery->whereYear('created_at', $year);
-        }
-        if ($month) {
-            $baseQuery->whereMonth('created_at', $month);
+        if ($startDate && $endDate) {
+            $baseQuery->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+        } else {
+            if ($year) {
+                $baseQuery->whereYear('created_at', $year);
+            }
+            if ($month) {
+                $baseQuery->whereMonth('created_at', $month);
+            }
         }
 
-        // Clone query dasar untuk statistik
         $statsQuery = clone $baseQuery;
 
         $stats = $statsQuery->select(
@@ -405,7 +399,6 @@ class TicketController extends Controller
             DB::raw("SUM(CASE WHEN status IN ('Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan') THEN 1 ELSE 0 END) as in_progress")
         )->first();
 
-        // Clone query dasar untuk data paginasi, lalu terapkan filter status
         $paginatedQuery = $baseQuery->with(['user', 'creator', 'workshop']);
 
         if ($request->has('status') && $request->query('status') !== 'all') {
@@ -421,10 +414,10 @@ class TicketController extends Controller
         }
 
         if ($request->boolean('all')) {
-            $ticketsResult = $paginatedQuery->latest()->get(); // Ambil semua
+            $ticketsResult = $paginatedQuery->latest()->get();
         } else {
             $perPage = $request->query('per_page', 10);
-            $ticketsResult = $paginatedQuery->latest()->paginate($perPage); // Paginate
+            $ticketsResult = $paginatedQuery->latest()->paginate($perPage);
         }
 
         return response()->json([
@@ -432,7 +425,7 @@ class TicketController extends Controller
             'completed' => (int) $stats->completed,
             'rejected' => (int) $stats->rejected,
             'in_progress' => (int) $stats->in_progress,
-            'tickets' => $ticketsResult, // Kirim hasil (bisa array atau objek pagination)
+            'tickets' => $ticketsResult,
         ]);
     }
     /**
@@ -465,8 +458,6 @@ class TicketController extends Controller
 
                 if (!empty($validated['stok_barang_ids'])) {
                     $statusDipinjamId = DB::table('status_barang')->where('nama_status', 'Dipinjam')->value('id');
-
-                    // Ambil semua item stok yang valid
                     $itemsToAssign = StokBarang::whereIn('id', $validated['stok_barang_ids'])->get();
 
                     foreach ($itemsToAssign as $item) {
@@ -487,8 +478,6 @@ class TicketController extends Controller
                             'event_date' => now(),
                         ]);
                     }
-
-                    // Update tabel pivot untuk rekap (berdasarkan master barang)
                     $masterBarangSummary = $itemsToAssign->groupBy('master_barang_id')
                         ->map->count();
 
@@ -502,7 +491,7 @@ class TicketController extends Controller
                     }
                 }
             });
-        } catch (\Exception $e) { // Tangkap semua jenis exception
+        } catch (\Exception $e) { 
             return response()->json(['message' => 'Terjadi kesalahan saat menugaskan tiket: ' . $e->getMessage()], 500);
         }
 
@@ -662,16 +651,10 @@ class TicketController extends Controller
             'selesai' => $counts['Selesai']->total ?? 0,
             'ditolak' => $counts['Ditolak']->total ?? 0,
         ];
-
-        // 🚀 PERBAIKAN: Hitung total HANYA dari status dasar.
         $totalTickets = array_sum($stats);
-
-        // Setelah total dihitung, baru tambahkan subtotal untuk frontend.
         $stats['pending_tickets']   = $stats['belum_dikerjakan'] + $stats['ditunda'] + $stats['sedang_dikerjakan'];
         $stats['completed_tickets'] = $stats['selesai'];
         $stats['rejected_tickets']  = $stats['ditolak'];
-
-        // Masukkan total yang sudah benar ke dalam array.
         $stats['total_tickets'] = $totalTickets;
 
         if ($user->role === 'admin') {
