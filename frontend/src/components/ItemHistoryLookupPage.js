@@ -255,7 +255,7 @@ function ItemHistoryLookupPage() {
                             </button> */}
 
                 </div>
-                <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+                <div className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
                     <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
                         <option value="month">Filter per Bulan</option>
                         <option value="date_range">Filter per Tanggal</option>
