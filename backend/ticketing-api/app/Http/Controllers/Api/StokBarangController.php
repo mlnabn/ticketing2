@@ -92,9 +92,9 @@ class StokBarangController extends Controller
             $query->where('master_barang_id', $request->master_barang_id);
         }
 
-        if ($request->filled('master_barang_id')) {
-            return $query->latest()->get();
-        }
+        // if ($request->filled('master_barang_id')) {
+        //     return $query->latest()->get();
+        // }
 
         $statusFilter = $request->input('status_id');
         $colorFilter = $request->input('id_warna');
@@ -105,9 +105,9 @@ class StokBarangController extends Controller
             $query->where('id_warna', $colorFilter);
         }
 
-        if ($request->filled('master_barang_id')) {
-            return $query->latest('id')->get();
-        }
+        // if ($request->filled('master_barang_id')) {
+        //     return $query->latest('id')->get();
+        // }
         if ($request->boolean('all')) {
             // .get() akan mengembalikan array biasa: [ ... ]
             return $query->latest()->get();
