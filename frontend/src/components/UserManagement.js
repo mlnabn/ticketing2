@@ -145,19 +145,15 @@ export default function UserManagement() {
                     className="filter-search-input"
                 />
             </div>
-
-            {/* ... di dalam return() ... */}
             {!userData ? (
                 <p>Memuat data pengguna...</p>
             ) : (
                 <>
-                    {/* Ganti div.job-list-table menjadi div.table-scroll-container */}
                     <div className="table-scroll-container">
-                        {/* 1. Tabel pertama HANYA untuk Header */}
                         <table className='job-table'>
                             <thead>
                                 <tr>
-                                    <th>No.</th>
+                                    <th style={{ width: '50px' }}>No.</th>
                                     <th>Nama</th>
                                     <th>Email</th>
                                     <th>Peran</th>
@@ -165,15 +161,12 @@ export default function UserManagement() {
                                 </tr>
                             </thead>
                         </table>
-
-                        {/* 2. Div baru untuk body yang bisa di-scroll */}
                         <div
                             className="table-body-scroll"
                             ref={desktopListRef}
                             onScroll={handleScroll}
-                            style={{ overflowY: 'auto', maxHeight: '65vh' }} // Pindahkan style ke sini
+                            style={{ overflowY: 'auto', maxHeight: '65vh' }}
                         >
-                            {/* 3. Tabel kedua HANYA untuk Body */}
                             <table className='job-table'>
                                 <tbody>
                                     {users.length === 0 && !isLoadingMore ? (
@@ -181,7 +174,7 @@ export default function UserManagement() {
                                     ) : (
                                         users.map((user, index) => (
                                             <tr key={user.id} className="hoverable-row" onClick={(e) => handleRowClick(e, user)}>
-                                                <td>{userData.from + index}</td>
+                                                <td style={{ width: '50px' }}>{userData.from + index}</td>
                                                 <td>{user.name}</td>
                                                 <td>{user.email}</td>
                                                 <td>{user.role}</td>
