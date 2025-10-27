@@ -42,21 +42,15 @@ function StokBarangView() {
     const [expandedRows, setExpandedRows] = useState({});
     const [detailItems, setDetailItems] = useState({});
     const [expandingId, setExpandingId] = useState(null);
-
-    // State untuk ID status 'Tersedia' (diambil dari API)
     const [tersediaStatusId, setTersediaStatusId] = useState(null);
-
-    // Simpan filter saat ini
     const [currentFilters, setCurrentFilters] = useState({});
-
-    // --- BARU: State untuk Print QR ---
     const [selectedItems, setSelectedItems] = useState(new Set());
     const [itemsToPrint, setItemsToPrint] = useState([]);
 
     // fetchData mengambil data summary
     const fetchData = useCallback(async (page = 1, filters = {}) => {
         setLoading(true);
-        setCurrentFilters(filters); // Simpan filter saat ini untuk refresh
+        setCurrentFilters(filters);
         try {
             const params = { page, ...filters };
             const res = await api.get('/inventory/stock-summary', { params });
@@ -170,7 +164,7 @@ function StokBarangView() {
 
     const handleScanSuccess = (decodedText) => {
         setIsScannerOpen(false);
-        handleScanSearch(decodedText); // <-- Panggil handleScanSearch
+        handleScanSearch(decodedText);
     };
 
     // --- BARU: Handler untuk Print QR ---
@@ -311,6 +305,10 @@ function StokBarangView() {
         return msg;
     }
 
+    const handleClearSelection = () => {
+        setSelectedItems(new Set());
+    };
+
     return (
         <>
             <div className="user-management-container" style={{ marginBottom: '20px' }}>
@@ -336,6 +334,15 @@ function StokBarangView() {
                         <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
                         Print QR ({selectedItems.size})
                     </button>
+                    {selectedItems.size > 0 && (
+                        <button
+                            className="btn-soft-grey"
+                            onClick={handleClearSelection}
+                            title="Hilangkan semua pilihan"
+                        >
+                            <i className="fas fa-times"></i>
+                        </button>
+                    )}
                 </div>
             </div>
 
