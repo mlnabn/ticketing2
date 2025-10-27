@@ -206,11 +206,10 @@ export default function UserManagement() {
                         className="user-list-mobile"
                         ref={mobileListRef}
                         onScroll={handleScroll}
-                        style={{ overflowY: 'auto', maxHeight: '65vh' }} // Atur tinggi & scroll
+                        style={{ overflowY: 'auto', maxHeight: '65vh' }}
                     >
                         {users.length > 0 ? (
                             users.map((user) => (
-                                // --- TAMBAHAN: onClick event ---
                                 <div key={user.id} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, user)}>
                                     <div className="card-row">
                                         <div className="data-group">

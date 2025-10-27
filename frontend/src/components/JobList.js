@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import { format } from 'date-fns';
-
-import Pagination from './Pagination';
 import AssignAdminModal from './AssignAdminModal';
 import RejectTicketModal from './RejectTicketModal';
 import ProofModal from './ProofModal';
@@ -27,7 +25,6 @@ export default function JobList() {
 
   // State untuk data dan UI
   const [ticketData, setTicketData] = useState(null);
-  const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -44,19 +41,18 @@ export default function JobList() {
   const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
   const [ticketToReturn, setTicketToReturn] = useState(null);
 
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const desktopListRef = useRef(null);
+  const mobileListRef = useRef(null);
+
   const ticketsOnPage = useMemo(() => ticketData?.data ?? [], [ticketData]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [location.pathname]);
-
-  const fetchTickets = useCallback(async (currentPage = 1) => {
-    // setTicketData(null);
+  const fetchTickets = useCallback(async () => {
     setIsLoading(true);
     const endpoint = isMyTicketsPage ? '/tickets/my-tickets' : '/tickets';
 
     const params = {
-      page: currentPage,
+      page: 1,
       search: debouncedSearchTerm,
       status: searchParams.get('status'),
       admin_id: searchParams.get('adminId'),
@@ -96,8 +92,8 @@ export default function JobList() {
   }, [isAdmin, showToast]);
 
   useEffect(() => {
-    fetchTickets(page);
-  }, [fetchTickets, page]);
+    fetchTickets();
+  }, [fetchTickets]);
 
   useEffect(() => {
     fetchPrerequisites();
@@ -107,6 +103,45 @@ export default function JobList() {
     setSelectedIds([]);
   }, [ticketsOnPage]);
 
+  const loadMoreItems = async () => {
+    if (isLoadingMore || !ticketData || ticketData.current_page >= ticketData.last_page) return;
+
+    setIsLoadingMore(true);
+    const endpoint = isMyTicketsPage ? '/tickets/my-tickets' : '/tickets';
+    const nextPage = ticketData.current_page + 1;
+
+    const params = {
+      page: nextPage, 
+      search: debouncedSearchTerm,
+      status: searchParams.get('status'),
+      admin_id: searchParams.get('adminId'),
+      date: searchParams.get('date'),
+      id: searchParams.get('ticketId'),
+    };
+
+    try {
+      const response = await api.get(endpoint, { params });
+      setTicketData(prev => ({
+        ...response.data, 
+        data: [...prev.data, ...response.data.data] 
+      }));
+    } catch (e) {
+      console.error('Gagal memuat data tiket tambahan:', e);
+      showToast('Gagal memuat lebih banyak tiket.', 'error');
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  const handleScroll = (e) => {
+    const target = e.currentTarget;
+    const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
+
+    if (nearBottom && ticketData && !isLoading && !isLoadingMore && ticketData.current_page < ticketData.last_page) {
+      loadMoreItems();
+    }
+  };
+
   const updateTicketStatus = async (ticket, newStatus) => {
     if (newStatus === 'Selesai' && ticket.master_barangs && ticket.master_barangs.length > 0) {
       setTicketToReturn(ticket);
@@ -114,7 +149,7 @@ export default function JobList() {
       try {
         await api.patch(`/tickets/${ticket.id}/status`, { status: newStatus });
         showToast('Status tiket berhasil diupdate.', 'success');
-        fetchTickets(page);
+        fetchTickets();
       } catch (e) {
         showToast(e.response?.data?.error || 'Gagal mengupdate status tiket.', 'error');
       }
@@ -125,7 +160,7 @@ export default function JobList() {
     try {
       await api.patch(`/tickets/${ticketId}/assign`, { user_id: adminId, stok_barang_ids: stokIds });
       setTicketToAssign(null);
-      fetchTickets(page);
+      fetchTickets();
       showToast('Tiket berhasil ditugaskan.', 'success');
     } catch (e) {
       const errorMsg = e.response?.data?.errors?.tools || e.response?.data?.message || 'Gagal menugaskan tiket.';
@@ -137,7 +172,7 @@ export default function JobList() {
     try {
       await api.patch(`/tickets/${ticketId}/reject`, { reason });
       setTicketToReject(null);
-      fetchTickets(page);
+      fetchTickets();
       showToast('Tiket berhasil ditolak.', 'success');
     } catch (e) {
       showToast('Gagal menolak tiket.', 'error');
@@ -149,7 +184,7 @@ export default function JobList() {
       await api.post(`/tickets/${ticketId}/submit-proof`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       showToast('Bukti pengerjaan berhasil disimpan.', 'success');
       setTicketForProof(null);
-      fetchTickets(page);
+      fetchTickets();
     } catch (e) {
       const errorMessage = e.response?.data?.error || 'Gagal menyimpan bukti.';
       showToast(errorMessage, 'error');
@@ -161,7 +196,7 @@ export default function JobList() {
       await api.post(`/tickets/${ticketId}/process-return`, { items });
       showToast('Tiket selesai dan barang telah diproses.', 'success');
       setTicketToReturn(null);
-      fetchTickets(page);
+      fetchTickets();
       fetchPrerequisites();
     } catch (e) {
       showToast(e.response?.data?.message || 'Gagal memproses pengembalian.', 'error');
@@ -172,7 +207,7 @@ export default function JobList() {
     if (!ticketToDelete) return;
     try {
       await api.delete(`/tickets/${ticketToDelete.id}`);
-      fetchTickets(page);
+      fetchTickets();
       showToast('Tiket berhasil dihapus.', 'success');
     } catch (e) {
       const message = e.response?.data?.error || 'Gagal menghapus tiket.';
@@ -191,7 +226,7 @@ export default function JobList() {
       try {
         await api.post('/tickets/bulk-delete', { ids: selectedIds });
         showToast(`${selectedIds.length} tiket berhasil dihapus.`, 'success');
-        fetchTickets(page);
+        fetchTickets();
         setSelectedIds([]);
       } catch (e) {
         showToast('Terjadi kesalahan saat mencoba menghapus tiket.', 'error');
@@ -257,6 +292,7 @@ export default function JobList() {
     if (ticket.requested_time) return `Waktu Diminta: ${ticket.requested_time}`;
     return 'Jadwal Fleksibel';
   };
+
   return (
     <>
       <div className="user-management-container">
@@ -280,47 +316,63 @@ export default function JobList() {
           </div>
         )}
 
-        {isLoading ? (
+        {isLoading && !ticketData ? (
           <p>Memuat data tiket...</p>
         ) : (
           <>
             <div className="job-list-container">
-              <table className="job-table">
-                <thead>
-                  <tr>
-                    {isAdmin && !isMyTicketsPage && (<th><input type="checkbox" onChange={handleSelectAll} checked={ticketsOnPage.length > 0 && selectedIds.length === ticketsOnPage.length} /></th>)}
-                    <th>Pengirim</th><th>Dikerjakan Oleh</th><th>Workshop</th>
-                    <th>Deskripsi</th><th>Tanggal Dibuat</th><th>Waktu Pengerjaan</th>
-                    <th>Status</th><th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ticketsOnPage.length > 0 ? (
-                    ticketsOnPage.map(ticket => (
-                      <tr
-                        key={ticket.id}
-                        className={`${selectedIds.includes(ticket.id) ? 'selected-row' : ''}
-                      ${(ticket.is_urgent && ticket.status !== 'Selesai' && ticket.status !== 'Ditolak') ? 'urgent-row' : ''}
-                      clickable-row`}
-                        onClick={(e) => handleRowClick(e, ticket)}
-                      >
-                        {isAdmin && !isMyTicketsPage && (<td><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>)}
-                        <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
-                        <td>{ticket.user ? ticket.user.name : '-'}</td>
-                        <td>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
-                        <td><span className="description-cell">{ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}{ticket.title}</span></td>
-                        <td>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
-                        <td>{formatWorkTime(ticket)}</td>
-                        <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></td>
-                        <td><div className="action-buttons-group">{renderActionButtons(ticket)}</div></td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr><td colSpan={isAdmin && !isMyTicketsPage ? 9 : 8} style={{ textAlign: 'center', padding: '20px' }}>Tidak ada pekerjaan yang ditemukan.</td></tr>
-                  )}
-                </tbody>
-              </table>
-              <div className="job-list-mobile">
+              <div 
+                className="table-scroll-container" 
+                ref={desktopListRef} 
+                onScroll={handleScroll}
+                style={{ overflowY: 'auto', maxHeight: '70vh' }} 
+              >
+                <table className="job-table" style={{ tableLayout: 'fixed' }}>
+                  <thead>
+                    <tr>
+                      {isAdmin && !isMyTicketsPage && (<th style={{ width: '40px' }}><input type="checkbox" onChange={handleSelectAll} checked={ticketsOnPage.length > 0 && selectedIds.length === ticketsOnPage.length} /></th>)}
+                      <th>Pengirim</th><th>Dikerjakan Oleh</th><th>Workshop</th>
+                      <th>Deskripsi</th><th>Tanggal Dibuat</th><th>Waktu Pengerjaan</th>
+                      <th>Status</th><th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ticketsOnPage.length > 0 ? (
+                      ticketsOnPage.map(ticket => (
+                        <tr
+                          key={ticket.id}
+                          className={`${selectedIds.includes(ticket.id) ? 'selected-row' : ''}
+                        ${(ticket.is_urgent && ticket.status !== 'Selesai' && ticket.status !== 'Ditolak') ? 'urgent-row' : ''}
+                        clickable-row`}
+                          onClick={(e) => handleRowClick(e, ticket)}
+                        >
+                          {isAdmin && !isMyTicketsPage && (<td style={{ width: '40px' }}><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>)}
+                          <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
+                          <td>{ticket.user ? ticket.user.name : '-'}</td>
+                          <td>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
+                          <td><span className="description-cell">{ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}{ticket.title}</span></td>
+                          <td>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
+                          <td>{formatWorkTime(ticket)}</td>
+                          <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></td>
+                          <td><div className="action-buttons-group">{renderActionButtons(ticket)}</div></td>
+                        </tr>
+                      ))
+                    ) : (
+                      !isLoadingMore && <tr><td colSpan={isAdmin && !isMyTicketsPage ? 9 : 8} style={{ textAlign: 'center', padding: '20px' }}>Tidak ada pekerjaan yang ditemukan.</td></tr> // <-- UBAH
+                    )}
+                    {isLoadingMore && (
+                      <tr><td colSpan={isAdmin && !isMyTicketsPage ? 9 : 8} style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div 
+                className="job-list-mobile" 
+                ref={mobileListRef} 
+                onScroll={handleScroll}
+                style={{ overflowY: 'auto', maxHeight: '70vh' }}
+              >
                 {ticketsOnPage.length > 0 ? (
                   ticketsOnPage.map(ticket => (
                     <div
@@ -355,14 +407,13 @@ export default function JobList() {
                     </div>
                   ))
                 ) : (
-                  <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Tidak ada pekerjaan yang ditemukan.</p></div>
+                  !isLoadingMore && <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Tidak ada pekerjaan yang ditemukan.</p></div> // <-- UBAH
+                )}
+                {isLoadingMore && (
+                  <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
                 )}
               </div>
             </div>
-
-            {ticketData.last_page > 1 && (
-              <Pagination currentPage={page} lastPage={ticketData.last_page} onPageChange={setPage} />
-            )}
           </>
         )}
 
