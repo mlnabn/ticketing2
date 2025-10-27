@@ -32,8 +32,6 @@ function ItemListView({ items, loading, onAdd, onEdit, onDelete, onFilterChange,
         onFilterChange(1, filters);
     }, [selectedCategory, selectedSubCategory, onFilterChange]);
 
-    // --- BARU: Handler untuk membuka modal ---
-    // Mencegah pembukaan modal jika tombol aksi di dalam baris diklik
     const handleRowClick = (e, item) => {
         if (e.target.tagName === 'BUTTON' || e.target.closest('.action-buttons-group')) {
             return;
@@ -46,8 +44,6 @@ function ItemListView({ items, loading, onAdd, onEdit, onDelete, onFilterChange,
             <div className="user-management-header">
                 <button className="btn-primary" onClick={onAdd}><i className="fas fa-plus" style={{ marginRight: '8px' }}></i>Daftarkan SKU Baru</button>
             </div>
-
-            {/* --- Filter Section --- */}
             <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                 <select
                     value={selectedCategory}
@@ -73,13 +69,8 @@ function ItemListView({ items, loading, onAdd, onEdit, onDelete, onFilterChange,
             </div>
 
             <div className="job-list-container">
-                {/* ===    TAMPILAN TABEL UNTUK DESKTOP (DIMODIFIKASI)  === */}
-                <div 
-                    className="table-scroll-container" 
-                    style={{ overflowY: 'auto', maxHeight: '65vh' }}
-                    ref={desktopListRef}
-                    onScroll={onScroll}
-                >
+                <div className="table-scroll-container">
+
                     <table className="job-table">
                         <thead>
                             <tr>
@@ -90,58 +81,81 @@ function ItemListView({ items, loading, onAdd, onEdit, onDelete, onFilterChange,
                                 <th>Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {loading && items.length === 0 && ( 
-                                <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat data barang...</td></tr>
-                            )}
-                            
-                            {!loading && items.length === 0 && ( 
-                                <tr><td colSpan="5" style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</td></tr>
-                            )}
+                    </table>
+                    <div
+                        className="table-body-scroll"
+                        ref={desktopListRef}
+                        onScroll={onScroll} 
+                        // style={{ overflowY: 'auto', maxHeight: 'calc(65vh - 90px)' }}
+                    >
+                        <table className="job-table">
+                            <tbody>
+                                {loading && items.length === 0 && (
+                                    <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat data barang...</td></tr>
+                                )}
 
-                            {items.map(item => (
-                                <tr
-                                    key={item.id_m_barang}
-                                    className="clickable-row"
-                                    onClick={(e) => handleRowClick(e, item)}
-                                >
-                                    <td>{item.kode_barang}</td>
-                                    <td>{item.nama_barang}</td>
-                                    <td>{item.master_kategori?.nama_kategori || '-'}</td>
-                                    <td>{item.sub_kategori?.nama_sub || '-'}</td>
-                                    <td className="action-buttons-group">
-                                        <button onClick={(e) => { e.stopPropagation(); onEdit(item); }} className="btn-user-action btn-edit">Edit</button>
-                                        <button onClick={(e) => { e.stopPropagation(); onDelete(item); }} className="btn-user-action btn-delete">Hapus</button>
+                                {!loading && items.length === 0 && (
+                                    <tr><td colSpan="5" style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</td></tr>
+                                )}
+
+                                {items.map(item => (
+                                    <tr
+                                        key={item.id_m_barang}
+                                        className="clickable-row"
+                                        onClick={(e) => handleRowClick(e, item)}
+                                    >
+                                        <td>{item.kode_barang}</td>
+                                        <td>{item.nama_barang}</td>
+                                        <td>{item.master_kategori?.nama_kategori || '-'}</td>
+                                        <td>{item.sub_kategori?.nama_sub || '-'}</td>
+                                        <td className="action-buttons-group">
+                                            <button onClick={(e) => { e.stopPropagation(); onEdit(item); }} className="btn-user-action btn-edit">Edit</button>
+                                            <button onClick={(e) => { e.stopPropagation(); onDelete(item); }} className="btn-user-action btn-delete">Hapus</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {isLoadingMore && (
+                                    <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* 3. Tabel Footer (Fixed) - Menggunakan 'totalItems'
+                    {!loading && items.length > 0 && (
+                        <table className="job-table">
+                            <tfoot>
+                                <tr className="subtotal-row">
+                                    <td colSpan="4">Total SKU</td>
+                                    <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
+                                        {totalItems} Data
                                     </td>
                                 </tr>
-                            ))}
-                            {isLoadingMore && (
-                                <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </tfoot>
+                        </table>
+                    )} */}
                 </div>
 
                 {/* === TAMPILAN KARTU UNTUK MOBILE (DIMODIFIKASI) === */}
-                <div 
+                <div
                     className="job-list-mobile"
                     ref={mobileListRef}
                     onScroll={onScroll}
                     style={{ overflowY: 'auto', maxHeight: '65vh' }}
                 >
-                    {loading && items.length === 0 && ( // <-- UBAH
+                    {loading && items.length === 0 && (
                         <p style={{ textAlign: 'center' }}>Memuat data barang...</p>
                     )}
-                    
-                    {!loading && items.length === 0 && ( // <-- UBAH
+
+                    {!loading && items.length === 0 && (
                         <p style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</p>
                     )}
-                    
+
                     {items.map(item => (
                         <div
                             key={item.id_m_barang}
                             className="ticket-card-mobile clickable-row"
-                            onClick={(e) => handleRowClick(e, item)} 
+                            onClick={(e) => handleRowClick(e, item)}
                         >
                             <div className="card-header">
                                 <h4>{item.nama_barang}</h4>
@@ -166,12 +180,11 @@ function ItemListView({ items, loading, onAdd, onEdit, onDelete, onFilterChange,
                         </div>
                     ))}
                     {isLoadingMore && (
-                         <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
-                    )}:
+                        <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+                    )}
                 </div>
             </div>
 
-            {/* --- BARU: Render Modal Detail SKU --- */}
             {selectedItemForDetail && (
                 <SkuDetailModal
                     item={selectedItemForDetail}
