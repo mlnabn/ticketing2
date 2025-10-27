@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import { useAuth } from '../AuthContext';
-
-import Pagination from './Pagination';
 import UserFormModal from './UserFormModal';
 import ConfirmationModal from './ConfirmationModal';
 import UserDetailModal from './UserDetailModal';
@@ -13,7 +11,6 @@ export default function UserManagement() {
     const { showToast } = useOutletContext();
     const { logout } = useAuth();
     const [userData, setUserData] = useState(null);
-    const [userPage, setUserPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
     const [showUserConfirmModal, setShowUserConfirmModal] = useState(false);
@@ -21,10 +18,13 @@ export default function UserManagement() {
     const [showUserFormModal, setShowUserFormModal] = useState(false);
     const [userToEdit, setUserToEdit] = useState(null);
     const [detailUser, setDetailUser] = useState(null);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const desktopListRef = useRef(null);
+    const mobileListRef = useRef(null);
 
-    const fetchUsers = useCallback(async (page, search) => {
+    const fetchUsers = useCallback(async (search) => {
         try {
-            const response = await api.get('/users', { params: { page, search } });
+            const response = await api.get('/users', { params: { page: 1, search } });
             setUserData(response.data);
         } catch (e) {
             console.error('Gagal mengambil data pengguna:', e);
@@ -33,8 +33,37 @@ export default function UserManagement() {
     }, [logout]);
 
     useEffect(() => {
-        fetchUsers(userPage, debouncedSearchTerm);
-    }, [userPage, debouncedSearchTerm, fetchUsers]);
+        fetchUsers(debouncedSearchTerm);
+    }, [debouncedSearchTerm, fetchUsers]);
+
+    const loadMoreItems = async () => {
+        if (isLoadingMore || !userData || userData.current_page >= userData.last_page) return;
+
+        setIsLoadingMore(true);
+        try {
+            const nextPage = userData.current_page + 1;
+            const response = await api.get('/users', { params: { page: nextPage, search: debouncedSearchTerm } });
+            
+            setUserData(prev => ({
+                ...response.data, 
+                data: [...prev.data, ...response.data.data] 
+            }));
+        } catch (e) {
+            console.error('Gagal memuat data pengguna tambahan:', e);
+            showToast('Gagal memuat lebih banyak pengguna.', 'error');
+        } finally {
+            setIsLoadingMore(false);
+        }
+    };
+
+    const handleScroll = (e) => {
+        const target = e.currentTarget;
+        const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
+
+        if (nearBottom && userData && !isLoadingMore && userData.current_page < userData.last_page) {
+            loadMoreItems();
+        }
+    };
 
     const handleUserDeleteClick = (user) => {
         setUserToDelete(user);
@@ -46,7 +75,7 @@ export default function UserManagement() {
         try {
             await api.delete(`/users/${userToDelete.id}`);
             showToast(`User "${userToDelete.name}" berhasil dihapus.`, 'success');
-            fetchUsers(userPage, debouncedSearchTerm);
+            fetchUsers(debouncedSearchTerm);
         } catch (e) {
             showToast('Gagal menghapus pengguna.', 'error');
         } finally {
@@ -79,7 +108,7 @@ export default function UserManagement() {
         try {
             const res = await api[method](url, formData);
             showToast(isEditMode ? `User "${res.data.name}" berhasil di-edit.` : 'User baru berhasil dibuat.', 'success');
-            fetchUsers(userPage, debouncedSearchTerm);
+            fetchUsers(debouncedSearchTerm);
             setShowUserFormModal(false);
             setUserToEdit(null);
         } catch (e) {
@@ -118,13 +147,14 @@ export default function UserManagement() {
 
             {!userData ? (
                 <p>Memuat data pengguna...</p>
-            ) : users.length === 0 ? (
-                <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
-                    <p>Tidak ada pengguna yang ditemukan.</p>
-                </div>
-            ) : (
+            ) : ( 
                 <>
-                    <div className="job-list-table">
+                    <div 
+                        className="job-list-table" 
+                        ref={desktopListRef} 
+                        onScroll={handleScroll}
+                        style={{ overflowY: 'auto', maxHeight: '65vh' }}
+                    >
                         <table className='job-table'>
                             <thead>
                                 <tr>
@@ -136,61 +166,72 @@ export default function UserManagement() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.map((user, index) => (
-                                    <tr key={user.id} className="hoverable-row" onClick={(e) => handleRowClick(e, user)}>
-                                        <td>{userData.from + index}</td>
-                                        <td>{user.name}</td>
-                                        <td>{user.email}</td>
-                                        <td>{user.role}</td>
-                                        <td>
-                                            <div className="action-buttons-group">
-                                                <button onClick={() => handleUserEditClick(user)} className="btn-user-action btn-edit">Edit</button>
-                                                <button onClick={() => handleUserDeleteClick(user)} className="btn-user-action btn-delete">Hapus</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {users.length === 0 && !isLoadingMore ? (
+                                    <tr><td colSpan="5" style={{ textAlign: 'center' }}>Tidak ada pengguna yang ditemukan.</td></tr>
+                                ) : (
+                                    users.map((user, index) => (
+                                        <tr key={user.id} className="hoverable-row" onClick={(e) => handleRowClick(e, user)}>
+                                            <td>{userData.from + index}</td>
+                                            <td>{user.name}</td>
+                                            <td>{user.email}</td>
+                                            <td>{user.role}</td>
+                                            <td>
+                                                <div className="action-buttons-group">
+                                                    <button onClick={() => handleUserEditClick(user)} className="btn-user-action btn-edit">Edit</button>
+                                                    <button onClick={() => handleUserDeleteClick(user)} className="btn-user-action btn-delete">Hapus</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                                {isLoadingMore && (
+                                    <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
 
-                    <div className="user-list-mobile">
-                        {users.map((user) => (
+                    <div 
+                        className="user-list-mobile"
+                        ref={mobileListRef}
+                        onScroll={handleScroll}
+                        style={{ overflowY: 'auto', maxHeight: '65vh' }} // Atur tinggi & scroll
+                    >
+                        {users.length > 0 ? (
+                            users.map((user) => (
                             // --- TAMBAHAN: onClick event ---
-                            <div key={user.id} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, user)}>
-                                <div className="card-row">
-                                    <div className="data-group">
-                                        <span className="label">NAMA</span>
-                                        <span className="value">{user.name}</span>
+                                <div key={user.id} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, user)}>
+                                    <div className="card-row">
+                                        <div className="data-group">
+                                            <span className="label">NAMA</span>
+                                            <span className="value">{user.name}</span>
+                                        </div>
+                                        <div className="data-group">
+                                            <span className="label">EMAIL</span>
+                                            <span className="value">{user.email}</span>
+                                        </div>
                                     </div>
-                                    <div className="data-group">
-                                        <span className="label">EMAIL</span>
-                                        <span className="value">{user.email}</span>
+                                    <div className="card-row">
+                                        <div className="data-group single">
+                                            <span className="label">PERAN</span>
+                                            <span className="value" style={{ textTransform: 'capitalize' }}>{user.role}</span>
+                                        </div>
+                                    </div>
+                                    <div className="action-row">
+                                        <div className="action-buttons-group">
+                                            <button onClick={() => handleUserEditClick(user)} className="btn-edit">Edit</button>
+                                            <button onClick={() => handleUserDeleteClick(user)} className="btn-delete">Hapus</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="card-row">
-                                    <div className="data-group single">
-                                        <span className="label">PERAN</span>
-                                        <span className="value" style={{ textTransform: 'capitalize' }}>{user.role}</span>
-                                    </div>
-                                </div>
-                                <div className="action-row">
-                                    <div className="action-buttons-group">
-                                        <button onClick={() => handleUserEditClick(user)} className="btn-edit">Edit</button>
-                                        <button onClick={() => handleUserDeleteClick(user)} className="btn-delete">Hapus</button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            !isLoadingMore && <p style={{textAlign: 'center'}}>Tidak ada pengguna yang ditemukan.</p> 
+                        )}
+                        {isLoadingMore && (
+                            <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+                        )}
                     </div>
-
-                    {userData.last_page > 1 && (
-                        <Pagination
-                            currentPage={userData.current_page}
-                            lastPage={userData.last_page}
-                            onPageChange={setUserPage}
-                        />
-                    )}
                 </>
             )}
             {showUserFormModal && (
