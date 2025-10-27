@@ -29,15 +29,18 @@ function ItemHistoryLookupPage() {
     });
     const [years, setYears] = useState([]);
 
-    const [selectedItem, setSelectedItem] = useState(null); 
+    const [selectedItem, setSelectedItem] = useState(null);
     const [historyData, setHistoryData] = useState([]);
-    const [historyLoading, setHistoryLoading] = useState(false); 
+    const [historyLoading, setHistoryLoading] = useState(false);
     const [historyFilters, setHistoryFilters] = useState({ start_date: '', end_date: '' });
     const [exportingHistoryExcel, setExportingHistoryExcel] = useState(false);
     const [exportingHistoryPdf, setExportingHistoryPdf] = useState(false);
-    const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1 });
+
+    // --- PERBAIKAN 1: Tambahkan 'total: 0' ---
+    const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 });
+
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const desktopListRef = useRef(null); 
+    const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
 
     const formatDate = (dateString) => {
@@ -63,7 +66,7 @@ function ItemHistoryLookupPage() {
     const getApiParams = useCallback((page = 1) => {
         const baseParams = {
             page: page,
-            has_history: true,
+            type: 'all_stock', // <-- Ganti type ke 'all_stock' agar konsisten
             search: debouncedSearchTerm,
         };
 
@@ -81,13 +84,18 @@ function ItemHistoryLookupPage() {
         setLoading(true);
         setSelectedItem(null);
         setHistoryData([]);
+        setItems([]); // <-- BARU: Pastikan data dikosongkan
         try {
             const params = getApiParams(1);
-            const res = await api.get('/inventory/stock-items', { params });
+            // --- PERBAIKAN 2: Ganti endpoint ke /detailed ---
+            const res = await api.get('/reports/inventory/detailed', { params });
             setItems(res.data.data);
+
+            // --- PERBAIKAN 3: Simpan 'total' dari API ---
             setPagination({
                 currentPage: res.data.current_page,
-                totalPages: res.data.last_page
+                totalPages: res.data.last_page,
+                total: res.data.total // <-- Simpan total data
             });
         } catch (error) {
             showToast('Gagal memuat data stok.', 'error');
@@ -173,8 +181,13 @@ function ItemHistoryLookupPage() {
         try {
             const res = await api.get(`/inventory/stock-items/by-serial/${code}`);
             setSelectedItem(res.data);
+            // Setel item yang dicari sebagai satu-satunya item di daftar kiri
+            setItems([res.data]);
+            setPagination(prev => ({ ...prev, total: 1 })); // Set total jadi 1
         } catch (error) {
             showToast(`Aset dengan kode "${code}" tidak ditemukan.`, 'error');
+            setItems([]); // Kosongkan item jika tidak ketemu
+            setPagination(prev => ({ ...prev, total: 0 })); // Set total jadi 0
         } finally {
             setLoading(false);
         }
@@ -189,7 +202,7 @@ function ItemHistoryLookupPage() {
         let barcode = '';
         let interval;
         const handleKeyDown = (e) => {
-            const isModalOpen = isScannerOpen || !!selectedItem;
+            const isModalOpen = isScannerOpen; // <-- Hapus '!!selectedItem'
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || isModalOpen) return;
             if (typeof e.key !== 'string') return;
 
@@ -208,7 +221,7 @@ function ItemHistoryLookupPage() {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [handleSearchAndShowHistory, isScannerOpen, selectedItem]);
+    }, [handleSearchAndShowHistory, isScannerOpen]); // <-- Hapus 'selectedItem'
 
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -256,12 +269,12 @@ function ItemHistoryLookupPage() {
         try {
             const params = {
                 type: 'item_history',
-                stok_barang_id: selectedItem.id, 
+                stok_barang_id: selectedItem.id,
                 start_date: historyFilters.start_date,
                 end_date: historyFilters.end_date,
                 export_type: exportType
             };
-            const response = await api.get('/reports/inventory/export', { 
+            const response = await api.get('/reports/inventory/export', {
                 params,
                 responseType: 'blob',
             });
@@ -280,6 +293,8 @@ function ItemHistoryLookupPage() {
         setSelectedItem(null);
         setHistoryData([]);
         setHistoryFilters({ start_date: '', end_date: '' });
+        // Muat ulang daftar item default
+        fetchData();
     };
 
     const loadMoreItems = async () => {
@@ -290,13 +305,17 @@ function ItemHistoryLookupPage() {
         try {
             const nextPage = pagination.currentPage + 1;
             const params = getApiParams(nextPage);
-            const res = await api.get('/inventory/stock-items', { params });
+            // --- PERBAIKAN 5: Ganti endpoint ke /detailed ---
+            const res = await api.get('/reports/inventory/detailed', { params });
 
             setItems(prevItems => [...prevItems, ...res.data.data]); // Tambahkan data baru
-            setPagination({
+
+            // --- PERBAIKAN 6: Gunakan 'prev' state ---
+            setPagination(prev => ({
+                ...prev, // <- Pertahankan 'total'
                 currentPage: res.data.current_page,
                 totalPages: res.data.last_page
-            });
+            }));
         } catch (error) {
             showToast('Gagal memuat data tambahan.', 'error');
         } finally {
@@ -318,16 +337,16 @@ function ItemHistoryLookupPage() {
         <>
             <div className="user-management-container">
                 <h1 className="page-title">Lacak Riwayat Aset</h1>
-                <p className="page-description" style={{textAlign:'center'}}>Gunakan pencarian, klik item dari daftar, atau scan QR/Barcode untuk melihat riwayat lengkap sebuah aset.</p>
+                <p className="page-description" style={{ textAlign: 'center' }}>Gunakan pencarian, klik item dari daftar, atau scan QR/Barcode untuk melihat riwayat lengkap sebuah aset.</p>
 
                 <div className="filters-container report-filters" style={{ marginTop: '1rem', paddingBottom: '0' }}>
-                     <input
-                         type="text"
-                         placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
-                         value={searchTerm}
-                         onChange={e => setSearchTerm(e.target.value)}
-                         className="filter-search-input"
-                     />
+                    <input
+                        type="text"
+                        placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="filter-search-input"
+                    />
                 </div>
                 <div className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
                     <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
@@ -353,13 +372,13 @@ function ItemHistoryLookupPage() {
                             <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
                         </>
                     )}
-                    <button className="btn-scan-qr-history" onClick={() => setIsScannerOpen(true)} style={{marginLeft: 'auto'}}>
+                    <button className="btn-scan-qr-history" onClick={() => setIsScannerOpen(true)} style={{ marginLeft: 'auto' }}>
                         <span className="fa-stack" style={{ marginRight: '8px', fontSize: '1.2em' }}>
                             <i className="fas fa-qrcode fa-stack-2x"></i>
                             <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
                         </span>
                     </button>
-                 </div>
+                </div>
 
                 {/* === CONTAINER SPLIT VIEW === */}
                 <div className={`split-view-container ${selectedItem ? 'split-view-active' : ''}`}>
@@ -368,7 +387,7 @@ function ItemHistoryLookupPage() {
                     <div className="list-panel">
                         <div className="job-list-container">
                             {/* Desktop View */}
-                            <div className="table-scroll-container" style={{maxHeight: '65vh'}}>
+                            <div className="table-scroll-container" style={{ maxHeight: '65vh' }}>
                                 <table className="job-table">
                                     <thead>
                                         <tr>
@@ -380,10 +399,10 @@ function ItemHistoryLookupPage() {
                                         </tr>
                                     </thead>
                                 </table>
-                                <div 
+                                <div
                                     ref={desktopListRef}
                                     onScroll={handleScroll}
-                                    style={{overflowY:'auto', maxHeight:'calc(65vh - 45px)'}}
+                                    style={{ overflowY: 'auto', maxHeight: 'calc(65vh - 45px)' }}
                                 >
                                     <table className="job-table">
                                         <tbody>
@@ -420,59 +439,85 @@ function ItemHistoryLookupPage() {
                                         </tbody>
                                     </table>
                                 </div>
+
+                                {/* --- PERBAIKAN 7: Tambahkan tfoot untuk Total Aset --- */}
+                                {!loading && items.length > 0 && (
+                                    <table className="job-table">
+                                        <tfoot>
+                                            <tr className="subtotal-row">
+                                                {/* Kolom span dinamis berdasarkan 'selectedItem' */}
+                                                <td colSpan={selectedItem ? 1 : 4}>Total Aset</td>
+                                                <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
+                                                    {pagination.total} Data
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                )}
                             </div>
 
                             {/* Mobile View */}
-                            <div 
+                            <div
                                 className="job-list-mobile"
                                 ref={mobileListRef}
                                 onScroll={handleScroll}
                                 style={{ overflowY: 'auto', height: '65vh' }}
                             >
-                                {loading ? ( <p style={{textAlign:'center'}}>Memuat...</p>) : items.length > 0 ? (
+                                {loading ? (<p style={{ textAlign: 'center' }}>Memuat...</p>) : items.length > 0 ? (
                                     items.map(item => (
                                         <div
-                                           key={item.id}
-                                           className={`ticket-card-mobile clickable-row ${selectedItem?.id === item.id ? 'selected-row' : ''}`}
-                                           onClick={() => setSelectedItem(item)}
-                                         >
+                                            key={item.id}
+                                            className={`ticket-card-mobile clickable-row ${selectedItem?.id === item.id ? 'selected-row' : ''}`}
+                                            onClick={() => setSelectedItem(item)}
+                                        >
                                             <div className="card-row">
                                                 <div className="data-group single">
                                                     <span className="label">Nama Barang</span>
                                                     <span className="value description">{item.master_barang?.nama_barang || 'N/A'}</span>
                                                 </div>
                                             </div>
-                                             <div className="card-row">
-                                                 <div className="data-group">
-                                                     <span className="label">Kode Unik</span>
-                                                     <span className="value">{item.kode_unik}</span>
-                                                 </div>
-                                                 <div className="data-group">
-                                                     <span className="label">Status Saat Ini</span>
-                                                     <span className="value">
-                                                         <span className={`status-badge status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
-                                                             {item.status_detail?.nama_status || 'N/A'}
-                                                         </span>
-                                                     </span>
-                                                 </div>
-                                             </div>
-                                             <div className="card-row">
-                                                 <div className="data-group single">
-                                                     <span className="label">Tgl Kejadian Terakhir</span>
-                                                     <span className="value">{formatDate(getRelevantDate(item))}</span>
-                                                 </div>
-                                             </div>
-                                             <div className="card-row">
-                                                 <div className="data-group single">
-                                                     <span className="label">Lokasi/Pengguna Terakhir</span>
-                                                     <span className="value">{getResponsiblePerson(item)}</span>
-                                                 </div>
-                                             </div>
+                                            <div className="card-row">
+                                                <div className="data-group">
+                                                    <span className="label">Kode Unik</span>
+                                                    <span className="value">{item.kode_unik}</span>
+                                                </div>
+                                                <div className="data-group">
+                                                    <span className="label">Status Saat Ini</span>
+                                                    <span className="value">
+                                                        <span className={`status-badge status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                            {item.status_detail?.nama_status || 'N/A'}
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="card-row">
+                                                <div className="data-group single">
+                                                    <span className="label">Tgl Kejadian Terakhir</span>
+                                                    <span className="value">{formatDate(getRelevantDate(item))}</span>
+                                                </div>
+                                            </div>
+                                            <div className="card-row">
+                                                <div className="data-group single">
+                                                    <span className="label">Lokasi/Pengguna Terakhir</span>
+                                                    <span className="value">{getResponsiblePerson(item)}</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     ))
-                                ) : ( <p style={{textAlign:'center'}}>Tidak ada data.</p>)}
-                                {isLoadingMore && (<p style={{textAlign:'center'}}>Memuat lebih banyak...</p>)}
-                             </div>
+                                ) : (<p style={{ textAlign: 'center' }}>Tidak ada data.</p>)}
+
+                                {/* --- PERBAIKAN 8: Tambahkan Kartu Total untuk Mobile --- */}
+                                {!loading && !isLoadingMore && items.length > 0 && (
+                                    <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+                                        <span className="subtotal-label">Total Aset</span>
+                                        <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                            {pagination.total} Data
+                                        </span>
+                                    </div>
+                                )}
+
+                                {isLoadingMore && (<p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>)}
+                            </div>
                         </div>
                     </div>
 
@@ -492,7 +537,7 @@ function ItemHistoryLookupPage() {
                                         value={historyFilters.start_date}
                                         onChange={handleHistoryFilterChange}
                                         className="filter-select-date"
-                                     />
+                                    />
                                     <span>-</span>
                                     <input
                                         type="date"
@@ -514,7 +559,7 @@ function ItemHistoryLookupPage() {
 
                             <div className="history-list-scroll">
                                 {historyLoading ? (
-                                    <p style={{textAlign: 'center', padding: '2rem'}}>Memuat riwayat...</p>
+                                    <p style={{ textAlign: 'center', padding: '2rem' }}>Memuat riwayat...</p>
                                 ) : historyData.length > 0 ? (
                                     historyData.map(log => (
                                         <div key={log.id} className="history-log-item">
@@ -556,13 +601,21 @@ function ItemHistoryLookupPage() {
                                         </div>
                                     ))
                                 ) : (
-                                    <p style={{textAlign: 'center', padding: '2rem'}}>Tidak ada riwayat ditemukan untuk filter ini.</p>
+                                    <p style={{ textAlign: 'center', padding: '2rem' }}>Tidak ada riwayat ditemukan untuk filter ini.</p>
                                 )}
                             </div>
+                            {!historyLoading && historyData.length > 0 && (
+                                <div className="subtotal-card-mobile acquisition-subtotal" style={{ margin: '0.5rem', borderTop: '1px solid #4A5568', borderRadius: '0' }}>
+                                    <span className="subtotal-label">Total Riwayat (filter ini)</span>
+                                    <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                        {historyData.length} Data
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
-            </div> 
+            </div>
 
             {isScannerOpen && (
                 <QrScannerModal

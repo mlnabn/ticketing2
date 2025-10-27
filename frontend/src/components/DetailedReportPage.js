@@ -39,12 +39,11 @@ export default function DetailedReportPage({ type, title }) {
     const [exportingExcel, setExportingExcel] = useState(false);
     const [exportingPdf, setExportingPdf] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
-    const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1 });
+    const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 });
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
-
-    const getApiParams = useCallback((page = 1,isExport = false) => {
+    const getApiParams = useCallback((page = 1, isExport = false) => {
         const baseParams = {
             type,
             search: isExport ? searchTerm : debouncedSearchTerm,
@@ -53,7 +52,7 @@ export default function DetailedReportPage({ type, title }) {
         if (filterType === 'month') {
             baseParams.month = filters.month;
             baseParams.year = filters.year;
-        } else { 
+        } else {
             baseParams.start_date = filters.start_date;
             baseParams.end_date = filters.end_date;
         }
@@ -76,7 +75,8 @@ export default function DetailedReportPage({ type, title }) {
             setData(res.data.data);
             setPagination({
                 currentPage: res.data.current_page,
-                totalPages: res.data.last_page
+                totalPages: res.data.last_page,
+                total: res.data.total
             })
         } catch (error) {
             console.error(`Gagal memuat laporan ${type}`, error);
@@ -229,23 +229,24 @@ export default function DetailedReportPage({ type, title }) {
         accountability: 'Tgl Kejadian',
         active_loans: 'Tgl Keluar'
     };
-
     const showWorkshop = type === 'out' || type === 'accountability';
-
+    const showCurrentStatus = type === 'out' || type === 'accountability';
+    const totalColSpan = 6 + (showWorkshop ? 1 : 0) + (showCurrentStatus ? 1 : 0);
     const loadMoreItems = async () => {
         if (isLoadingMore || pagination.currentPage >= pagination.totalPages) return;
 
         setIsLoadingMore(true);
         try {
             const nextPage = pagination.currentPage + 1;
-            const params = getApiParams(nextPage, false); // Ambil halaman berikutnya
+            const params = getApiParams(nextPage, false);
             const res = await api.get('/reports/inventory/detailed', { params });
 
-            setData(prevData => [...prevData, ...res.data.data]); // Tambahkan data baru
-            setPagination({
+            setData(prevData => [...prevData, ...res.data.data]);
+            setPagination(prev => ({
+                ...prev,
                 currentPage: res.data.current_page,
                 totalPages: res.data.last_page
-            });
+            }));
         } catch (error) {
             console.error('Gagal memuat data tambahan', error);
         } finally {
@@ -327,12 +328,12 @@ export default function DetailedReportPage({ type, title }) {
                                 <th>{dateHeaders[type] || 'Tanggal'}</th>
                                 <th>Penanggung Jawab</th>
                                 {showWorkshop && <th>Workshop</th>}
-                                {(type === 'out' || type === 'accountability') && <th>Status Saat Ini</th>}
+                                {showCurrentStatus && <th>Status Saat Ini</th>}
                             </tr>
                         </thead>
                     </table>
 
-                    <div 
+                    <div
                         className="table-body-scroll"
                         ref={desktopListRef}
                         onScroll={handleScroll}
@@ -340,7 +341,7 @@ export default function DetailedReportPage({ type, title }) {
                         <table className="job-table">
                             <tbody>
                                 {loading && (
-                                    <tr><td colSpan={showWorkshop ? 8 : 6} style={{ textAlign: 'center' }}>Memuat data...</td></tr>
+                                    <tr><td colSpan={totalColSpan} style={{ textAlign: 'center' }}>Memuat data...</td></tr>
                                 )}
 
                                 {!loading && data.map(item => {
@@ -354,7 +355,7 @@ export default function DetailedReportPage({ type, title }) {
                                             <td>{formatDate(itemData.tanggal)}</td>
                                             <td>{itemData.penanggung_jawab || '-'}</td>
                                             {showWorkshop && <td>{itemData.workshop || '-'}</td>}
-                                            {(type === 'out' || type === 'accountability') && (
+                                            {showCurrentStatus && (
                                                 <td>
                                                     <span className={`badge-status status-${(itemData.current_status || '-').toLowerCase()}`}>
                                                         {itemData.current_status || '-'}
@@ -364,28 +365,40 @@ export default function DetailedReportPage({ type, title }) {
                                         </tr>
                                     )
                                 })}
-                                
+
                                 {isLoadingMore && (
-                                    <tr><td colSpan={showWorkshop ? 8 : 6} style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                                    <tr><td colSpan={totalColSpan} style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
                                 )}
 
                                 {!loading && !isLoadingMore && data.length === 0 && (
-                                    <tr><td colSpan={showWorkshop ? 8 : 6} style={{ textAlign: 'center' }}>Tidak ada data untuk ditampilkan.</td></tr>
+                                    <tr><td colSpan={totalColSpan} style={{ textAlign: 'center' }}>Tidak ada data untuk ditampilkan.</td></tr>
                                 )}
                             </tbody>
                         </table>
                     </div>
+                    {!loading && data.length > 0 && (
+                        <table className="job-table">
+                            <tfoot>
+                                <tr className="subtotal-row">
+                                    <td colSpan={totalColSpan - 1}>Total Data</td>
+                                    <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
+                                        {pagination.total} Data
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    )}
                 </div>
                 {/* Mobile view */}
-                <div 
+                <div
                     className="job-list-mobile"
-                    ref={mobileListRef} 
-                    onScroll={handleScroll} 
+                    ref={mobileListRef}
+                    onScroll={handleScroll}
                 >
                     {loading && (
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Memuat data...</p></div>
                     )}
-                    
+
                     {!loading && data.map(item => {
                         const itemData = getItemData(item);
                         return (
@@ -422,7 +435,7 @@ export default function DetailedReportPage({ type, title }) {
                                             <span className="label">Workshop</span>
                                             <span className="value">{itemData.workshop || '-'}</span>
                                         </div>
-                                        {(type === 'out' || type === 'accountability') && (
+                                        {showCurrentStatus && (
                                             <div className="data-group">
                                                 <span className="label">Status Saat Ini</span>
                                                 <span className="value">{itemData.current_status || '-'}</span>
@@ -433,7 +446,16 @@ export default function DetailedReportPage({ type, title }) {
                             </div>
                         );
                     })}
-                     {isLoadingMore && (
+                    {!loading && !isLoadingMore && data.length > 0 && (
+                        <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
+                            <span className="subtotal-label">Total Riwayat</span>
+                            <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                {pagination.total} Data
+                            </span>
+                        </div>
+                    )}
+
+                    {isLoadingMore && (
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Memuat lebih banyak...</p></div>
                     )}
                     {!loading && !isLoadingMore && data.length === 0 && (
