@@ -1,18 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
-// import Pagination from '../components/Pagination';
 import { saveAs } from 'file-saver';
 import ActiveLoanDetailModal from './ActiveLoanDetailModal';
 
-// const PaginationSummary = ({ pagination }) => {
-//     if (!pagination || pagination.total === 0) return null;
-//     return (
-//         <div className="pagination-summary">
-//             Menampilkan <strong>{pagination.from}</strong> - <strong>{pagination.to}</strong> dari <strong>{pagination.total}</strong> data
-//         </div>
-//     );
-// };
 
 const months = [
     { value: 1, name: 'Januari' }, { value: 2, name: 'Februari' }, { value: 3, name: 'Maret' },
@@ -23,7 +14,6 @@ const months = [
 
 export default function ActiveLoanReportPage() {
     const [data, setData] = useState([]);
-    // const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
     const [filterType, setFilterType] = useState('month');
     const [filters, setFilters] = useState({
@@ -38,10 +28,14 @@ export default function ActiveLoanReportPage() {
     const [selectedItem, setSelectedItem] = useState(null);
     const [exportingExcel, setExportingExcel] = useState(false);
     const [exportingPdf, setExportingPdf] = useState(false);
+    const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1 });
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const desktopListRef = useRef(null);
+    const mobileListRef = useRef(null);
     const type = 'active_loans';
     const title = 'Laporan Peminjaman Aktif';
 
-    const getApiParams = useCallback((isExport = false) => {
+    const getApiParams = useCallback((page = 1, isExport = false) => {
         const baseParams = {
             type,
             search: isExport ? searchTerm : debouncedSearchTerm,
@@ -50,15 +44,16 @@ export default function ActiveLoanReportPage() {
         if (filterType === 'month') {
             baseParams.month = filters.month;
             baseParams.year = filters.year;
-        } else { // 'date_range'
+        } else { 
             baseParams.start_date = filters.start_date;
             baseParams.end_date = filters.end_date;
         }
 
         if (isExport) {
             baseParams.export_type = isExport;
-        } else {
             baseParams.all = true;
+        } else {
+            baseParams.page = page;
         }
         return baseParams;
     }, [type, searchTerm, debouncedSearchTerm, filterType, filters]);
@@ -66,12 +61,16 @@ export default function ActiveLoanReportPage() {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const params = getApiParams(false);
+            const params = getApiParams(1, false);
             const res = await api.get('/reports/inventory/detailed', { params });
-            setData(res.data);
-            // setPagination(res.data);
+            setData(res.data.data);
+            setPagination({
+                currentPage: res.data.current_page,
+                totalPages: res.data.last_page,
+            }); 
         } catch (error) {
             console.error(`Gagal memuat laporan ${type}`, error);
+            setData([]);
         } finally {
             setLoading(false);
         }
@@ -127,7 +126,7 @@ export default function ActiveLoanReportPage() {
         else setExportingPdf(true);
 
         try {
-            const params = getApiParams(exportType); // <-- Gunakan helper
+            const params = getApiParams(1, exportType);
 
             const response = await api.get('/reports/inventory/export', {
                 params,
@@ -169,6 +168,36 @@ export default function ActiveLoanReportPage() {
         if (days > 30) return { color: '#ef4444', fontWeight: 'bold' };
         if (days > 7) return { color: '#f97316' };
         return {};
+    };
+
+    const loadMoreItems = async () => {
+        if (isLoadingMore || pagination.currentPage >= pagination.totalPages) return;
+
+        setIsLoadingMore(true);
+        try {
+            const nextPage = pagination.currentPage + 1;
+            const params = getApiParams(nextPage, false);
+            const res = await api.get('/reports/inventory/detailed', { params });
+
+            setData(prevData => [...prevData, ...res.data.data]); 
+            setPagination({
+                currentPage: res.data.current_page,
+                totalPages: res.data.last_page
+            });
+        } catch (error) {
+            console.error('Gagal memuat data tambahan', error);
+        } finally {
+            setIsLoadingMore(false);
+        }
+    };
+
+    const handleScroll = (e) => {
+        const target = e.currentTarget;
+        const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
+
+        if (nearBottom && !loading && !isLoadingMore && pagination.currentPage < pagination.totalPages) {
+            loadMoreItems();
+        }
     };
 
     return (
@@ -239,7 +268,11 @@ export default function ActiveLoanReportPage() {
                             </tr>
                         </thead>
                     </table>
-                    <div className="table-body-scroll">
+                    <div 
+                        className="table-body-scroll"
+                        ref={desktopListRef}
+                        onScroll={handleScroll}
+                    >
                         <table className="job-table">
                             <tbody>
                                 {loading ? (
@@ -260,18 +293,29 @@ export default function ActiveLoanReportPage() {
                                 }) : (
                                     <tr><td colSpan="7" style={{ textAlign: 'center' }}>Tidak ada data peminjaman aktif.</td></tr>
                                 )}
+                                {isLoadingMore && (
+                                    <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                                )}
+                                {!loading && !isLoadingMore && data.length === 0 && (
+                                    <tr><td colSpan="7" style={{ textAlign: 'center' }}>Tidak ada data peminjaman aktif.</td></tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
                 </div>
                 {/*Tampilan Mobile */}
-                <div className="job-list-mobile">
-                    {loading ? (
+                <div 
+                    className="job-list-mobile"
+                    ref={mobileListRef}
+                    onScroll={handleScroll}
+                >
+                    {loading && (
                         <p style={{ textAlign: 'center' }}>Memuat data...</p>
-                    ) : data.length > 0 ? (
-                        data.map(item => {
-                            const duration = calculateDuration(item.tanggal_keluar);
-                            return (
+                    )}
+
+                    {!loading && data.map(item => {
+                        const duration = calculateDuration(item.tanggal_keluar);
+                        return (
                                 <div key={item.id} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, item)}>
                                     <div className="card-row">
                                         <div className="data-group single">
@@ -315,8 +359,12 @@ export default function ActiveLoanReportPage() {
                                     </div>
                                 </div>
                             );
-                        })
-                    ) : (
+                        })}
+                    {isLoadingMore && (
+                         <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+                    )}
+
+                    {!loading && !isLoadingMore && data.length === 0 && (
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
                             <p>Tidak ada data peminjaman aktif.</p>
                         </div>

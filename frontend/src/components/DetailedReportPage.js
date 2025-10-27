@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 // import Pagination from './Pagination';
@@ -39,8 +39,12 @@ export default function DetailedReportPage({ type, title }) {
     const [exportingExcel, setExportingExcel] = useState(false);
     const [exportingPdf, setExportingPdf] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1 });
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const desktopListRef = useRef(null);
+    const mobileListRef = useRef(null);
 
-    const getApiParams = useCallback((isExport = false) => {
+    const getApiParams = useCallback((page = 1,isExport = false) => {
         const baseParams = {
             type,
             search: isExport ? searchTerm : debouncedSearchTerm,
@@ -56,21 +60,27 @@ export default function DetailedReportPage({ type, title }) {
 
         if (isExport) {
             baseParams.export_type = isExport;
-        } else {
             baseParams.all = true;
+        } else {
+            baseParams.page = page;
         }
         return baseParams;
     }, [type, searchTerm, debouncedSearchTerm, filterType, filters]);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
+        setData([]);
         try {
-            const params = getApiParams(false);
+            const params = getApiParams(1, false);
             const res = await api.get('/reports/inventory/detailed', { params });
-            setData(res.data);
-
+            setData(res.data.data);
+            setPagination({
+                currentPage: res.data.current_page,
+                totalPages: res.data.last_page
+            })
         } catch (error) {
             console.error(`Gagal memuat laporan ${type}`, error);
+            setData([]);
         } finally {
             setLoading(false);
         }
@@ -119,7 +129,7 @@ export default function DetailedReportPage({ type, title }) {
         else setExportingPdf(true);
 
         try {
-            const params = getApiParams(exportType);
+            const params = getApiParams(1, exportType);
 
             const response = await api.get('/reports/inventory/export', {
                 params,
@@ -222,6 +232,36 @@ export default function DetailedReportPage({ type, title }) {
 
     const showWorkshop = type === 'out' || type === 'accountability';
 
+    const loadMoreItems = async () => {
+        if (isLoadingMore || pagination.currentPage >= pagination.totalPages) return;
+
+        setIsLoadingMore(true);
+        try {
+            const nextPage = pagination.currentPage + 1;
+            const params = getApiParams(nextPage, false); // Ambil halaman berikutnya
+            const res = await api.get('/reports/inventory/detailed', { params });
+
+            setData(prevData => [...prevData, ...res.data.data]); // Tambahkan data baru
+            setPagination({
+                currentPage: res.data.current_page,
+                totalPages: res.data.last_page
+            });
+        } catch (error) {
+            console.error('Gagal memuat data tambahan', error);
+        } finally {
+            setIsLoadingMore(false);
+        }
+    };
+
+    const handleScroll = (e) => {
+        const target = e.currentTarget;
+        const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
+
+        if (nearBottom && !loading && !isLoadingMore && pagination.currentPage < pagination.totalPages) {
+            loadMoreItems();
+        }
+    };
+
     return (
         <div className="user-management-container">
             <div className="user-management-header-report">
@@ -275,7 +315,7 @@ export default function DetailedReportPage({ type, title }) {
             </div>
 
             <div className="job-list-container">
-                {/*Destop view*/}
+                {/*Desktop view*/}
                 <div className="table-scroll-container">
                     <table className="job-table">
                         <thead>
@@ -292,12 +332,18 @@ export default function DetailedReportPage({ type, title }) {
                         </thead>
                     </table>
 
-                    <div className="table-body-scroll">
+                    <div 
+                        className="table-body-scroll"
+                        ref={desktopListRef}
+                        onScroll={handleScroll}
+                    >
                         <table className="job-table">
                             <tbody>
-                                {loading ? (
+                                {loading && (
                                     <tr><td colSpan={showWorkshop ? 8 : 6} style={{ textAlign: 'center' }}>Memuat data...</td></tr>
-                                ) : data.length > 0 ? data.map(item => {
+                                )}
+
+                                {!loading && data.map(item => {
                                     const itemData = getItemData(item);
                                     return (
                                         <tr key={item.id} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
@@ -317,7 +363,13 @@ export default function DetailedReportPage({ type, title }) {
                                             )}
                                         </tr>
                                     )
-                                }) : (
+                                })}
+                                
+                                {isLoadingMore && (
+                                    <tr><td colSpan={showWorkshop ? 8 : 6} style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                                )}
+
+                                {!loading && !isLoadingMore && data.length === 0 && (
                                     <tr><td colSpan={showWorkshop ? 8 : 6} style={{ textAlign: 'center' }}>Tidak ada data untuk ditampilkan.</td></tr>
                                 )}
                             </tbody>
@@ -325,10 +377,16 @@ export default function DetailedReportPage({ type, title }) {
                     </div>
                 </div>
                 {/* Mobile view */}
-                <div className="job-list-mobile">
-                    {loading ? (
+                <div 
+                    className="job-list-mobile"
+                    ref={mobileListRef} 
+                    onScroll={handleScroll} 
+                >
+                    {loading && (
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Memuat data...</p></div>
-                    ) : data.length > 0 ? data.map(item => {
+                    )}
+                    
+                    {!loading && data.map(item => {
                         const itemData = getItemData(item);
                         return (
                             <div key={`mobile-detail-${item.id}`} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, item)}>
@@ -374,13 +432,16 @@ export default function DetailedReportPage({ type, title }) {
                                 )}
                             </div>
                         );
-                    }) : (
+                    })}
+                     {isLoadingMore && (
+                        <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Memuat lebih banyak...</p></div>
+                    )}
+                    {!loading && !isLoadingMore && data.length === 0 && (
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Tidak ada data untuk ditampilkan.</p></div>
                     )}
                 </div>
             </div>
 
-            {/* ... (Pagination dan Modal tidak diubah) ... */}
             {selectedItem && (
                 <InventoryDetailModal
                     kodeUnik={selectedItem}

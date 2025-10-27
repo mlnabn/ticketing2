@@ -36,7 +36,7 @@ class InventoryReportController extends Controller
         $title = 'Laporan Inventaris';
         switch ($request->type) {
             case 'in':
-                $title = 'Laporan Barang Jadi Tersedia';
+                $title = 'Laporan Barang Masuk';
                 break;
             case 'out':
                 $title = 'Laporan Barang Keluar';
