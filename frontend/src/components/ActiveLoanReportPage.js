@@ -28,7 +28,7 @@ export default function ActiveLoanReportPage() {
     const [selectedItem, setSelectedItem] = useState(null);
     const [exportingExcel, setExportingExcel] = useState(false);
     const [exportingPdf, setExportingPdf] = useState(false);
-    const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1 });
+    const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 });
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
@@ -44,7 +44,7 @@ export default function ActiveLoanReportPage() {
         if (filterType === 'month') {
             baseParams.month = filters.month;
             baseParams.year = filters.year;
-        } else { 
+        } else {
             baseParams.start_date = filters.start_date;
             baseParams.end_date = filters.end_date;
         }
@@ -60,6 +60,7 @@ export default function ActiveLoanReportPage() {
 
     const fetchData = useCallback(async () => {
         setLoading(true);
+        setData([]);
         try {
             const params = getApiParams(1, false);
             const res = await api.get('/reports/inventory/detailed', { params });
@@ -67,7 +68,8 @@ export default function ActiveLoanReportPage() {
             setPagination({
                 currentPage: res.data.current_page,
                 totalPages: res.data.last_page,
-            }); 
+                total: res.data.total
+            });
         } catch (error) {
             console.error(`Gagal memuat laporan ${type}`, error);
             setData([]);
@@ -159,7 +161,7 @@ export default function ActiveLoanReportPage() {
         const diffTime = Math.abs(now - start);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        if (diffDays === 0) return { text: 'Hari ini', days: 0 };
+        if (diffDays <= 0) return { text: 'Hari ini', days: 0 };
         if (diffDays === 1) return { text: '1 hari', days: 1 };
         return { text: `${diffDays} hari`, days: diffDays };
     };
@@ -179,11 +181,12 @@ export default function ActiveLoanReportPage() {
             const params = getApiParams(nextPage, false);
             const res = await api.get('/reports/inventory/detailed', { params });
 
-            setData(prevData => [...prevData, ...res.data.data]); 
-            setPagination({
+            setData(prevData => [...prevData, ...res.data.data]);
+            setPagination(prev => ({
+                ...prev,
                 currentPage: res.data.current_page,
                 totalPages: res.data.last_page
-            });
+            }));
         } catch (error) {
             console.error('Gagal memuat data tambahan', error);
         } finally {
@@ -268,16 +271,17 @@ export default function ActiveLoanReportPage() {
                             </tr>
                         </thead>
                     </table>
-                    <div 
+                    <div
                         className="table-body-scroll"
                         ref={desktopListRef}
                         onScroll={handleScroll}
                     >
                         <table className="job-table">
                             <tbody>
-                                {loading ? (
+                                {loading && (
                                     <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat data...</td></tr>
-                                ) : data.length > 0 ? data.map(item => {
+                                )}
+                                {!loading && data.map(item => {
                                     const duration = calculateDuration(item.tanggal_keluar);
                                     return (
                                         <tr key={item.id} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
@@ -290,21 +294,32 @@ export default function ActiveLoanReportPage() {
                                             <td style={getDurationStyle(duration.days)}>{duration.text}</td>
                                         </tr>
                                     )
-                                }) : (
-                                    <tr><td colSpan="7" style={{ textAlign: 'center' }}>Tidak ada data peminjaman aktif.</td></tr>
-                                )}
+                                })}
                                 {isLoadingMore && (
                                     <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
                                 )}
+
                                 {!loading && !isLoadingMore && data.length === 0 && (
                                     <tr><td colSpan="7" style={{ textAlign: 'center' }}>Tidak ada data peminjaman aktif.</td></tr>
                                 )}
                             </tbody>
                         </table>
                     </div>
+                    {!loading && data.length > 0 && (
+                        <table className="job-table">
+                            <tfoot>
+                                <tr className="subtotal-row">
+                                    <td colSpan="6">Total Peminjaman</td>
+                                    <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
+                                        {pagination.total} Data
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    )}
                 </div>
                 {/*Tampilan Mobile */}
-                <div 
+                <div
                     className="job-list-mobile"
                     ref={mobileListRef}
                     onScroll={handleScroll}
@@ -316,52 +331,61 @@ export default function ActiveLoanReportPage() {
                     {!loading && data.map(item => {
                         const duration = calculateDuration(item.tanggal_keluar);
                         return (
-                                <div key={item.id} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, item)}>
-                                    <div className="card-row">
-                                        <div className="data-group single">
-                                            <span className="label">Nama Barang</span>
-                                            <span className="value description">
-                                                {item.master_barang?.nama_barang || '-'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="card-row">
-                                        <div className="data-group">
-                                            <span className="label">Kode Unik</span>
-                                            <span className="value">{item.kode_unik || '-'}</span>
-                                        </div>
-                                        <div className="data-group">
-                                            <span className="label">Peminjam</span>
-                                            <span className="value">{item.user_peminjam?.name || '-'}</span>
-                                        </div>
-                                    </div>
-                                    <div className="card-row">
-                                        <div className="data-group">
-                                            <span className="label">Lokasi</span>
-                                            <span className="value">{item.workshop?.name || '-'}</span>
-                                        </div>
-                                        <div className="data-group">
-                                            <span className="label">Status</span>
-                                            <span className="value">{item.status_detail?.nama_status || '-'}</span>
-                                        </div>
-                                    </div>
-                                    <div className="card-row">
-                                        <div className="data-group">
-                                            <span className="label">Tgl Pinjam</span>
-                                            <span className="value">{formatDate(item.tanggal_keluar)}</span>
-                                        </div>
-                                        <div className="data-group">
-                                            <span className="label">Durasi Pinjam</span>
-                                            <span className="value" style={getDurationStyle(duration.days)}>
-                                                {duration.text}
-                                            </span>
-                                        </div>
+                            <div key={item.id} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, item)}>
+                                <div className="card-row">
+                                    <div className="data-group single">
+                                        <span className="label">Nama Barang</span>
+                                        <span className="value description">
+                                            {item.master_barang?.nama_barang || '-'}
+                                        </span>
                                     </div>
                                 </div>
-                            );
-                        })}
+                                <div className="card-row">
+                                    <div className="data-group">
+                                        <span className="label">Kode Unik</span>
+                                        <span className="value">{item.kode_unik || '-'}</span>
+                                    </div>
+                                    <div className="data-group">
+                                        <span className="label">Peminjam</span>
+                                        <span className="value">{item.user_peminjam?.name || '-'}</span>
+                                    </div>
+                                </div>
+                                <div className="card-row">
+                                    <div className="data-group">
+                                        <span className="label">Lokasi</span>
+                                        <span className="value">{item.workshop?.name || '-'}</span>
+                                    </div>
+                                    <div className="data-group">
+                                        <span className="label">Status</span>
+                                        <span className="value">{item.status_detail?.nama_status || '-'}</span>
+                                    </div>
+                                </div>
+                                <div className="card-row">
+                                    <div className="data-group">
+                                        <span className="label">Tgl Pinjam</span>
+                                        <span className="value">{formatDate(item.tanggal_keluar)}</span>
+                                    </div>
+                                    <div className="data-group">
+                                        <span className="label">Durasi Pinjam</span>
+                                        <span className="value" style={getDurationStyle(duration.days)}>
+                                            {duration.text}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                    {!loading && !isLoadingMore && data.length > 0 && (
+                        <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
+                            <span className="subtotal-label">Total Peminjaman</span>
+                            <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                {pagination.total} Data
+                            </span>
+                        </div>
+                    )}
+
                     {isLoadingMore && (
-                         <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+                        <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
                     )}
 
                     {!loading && !isLoadingMore && data.length === 0 && (
@@ -372,16 +396,6 @@ export default function ActiveLoanReportPage() {
                 </div>
             </div>
 
-            {/* <div className="pagination-container">
-                <PaginationSummary pagination={pagination} />
-                {pagination && pagination.last_page > 1 && (
-                    <Pagination
-                        currentPage={pagination.current_page}
-                        lastPage={pagination.last_page}
-                        onPageChange={fetchData}
-                    />
-                )}
-            </div> */}
             {selectedItem && (
                 <ActiveLoanDetailModal
                     item={selectedItem}
