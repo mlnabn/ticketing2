@@ -12631,75 +12631,111 @@ body.dark-mode .btn-qr:hover {
   text-align: center;
 }
 
+/* --- (DISEIMBANGKAN) Total Lebar Kolom = 100% --- */
+
+/* --- Atur Lebar Kolom Checkbox --- */
+.header-select,
+.cell-select {
+  flex-basis: 4%;
+  padding: 0 8px;
+  text-align: center;
+  justify-content: center;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
 .header-kode,
 .cell-kode {
   flex-basis: 14%;
+  /* Tetap 14% */
   padding-left: 1rem;
   text-align: center;
   justify-content: center;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .header-sn,
 .cell-sn {
-  flex-basis: 8%;
+  flex-basis: 7%;
+  /* Turun dari 8% */
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .header-kondisi,
 .cell-kondisi {
-  flex-basis: 7%;
+  flex-basis: 6%;
+  /* Turun dari 7% */
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .header-status,
 .cell-status {
-  flex-basis: 9%;
+  flex-basis: 8%;
+  /* Turun dari 9% */
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
-/* --- BARU: Lebar Kolom Jumlah --- */
 .header-jumlah,
 .cell-jumlah {
   flex-basis: 5%;
   text-align: center;
   justify-content: center;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .header-warna,
 .cell-warna {
   flex-basis: 5%;
   justify-content: center;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
-/* Warna sedikit lebih kecil */
 .header-harga,
 .cell-harga {
   flex-basis: 10%;
   justify-content: center;
   text-align: center;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .header-tglbeli,
 .cell-tglbeli {
   flex-basis: 11%;
   text-align: center;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .header-tanggal,
 .cell-tanggal {
   flex-basis: 11%;
   text-align: center;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
-/* Tgl Masuk sedikit lebih kecil */
-/* --- BARU: Lebar Kolom Creator --- */
 .header-creator,
 .cell-creator {
   flex-basis: 8%;
   text-align: center;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .header-aksi,
 .cell-aksi {
-  flex-basis: 12%;
+  flex-basis: 11%;
+  /* Turun dari 12% */
   justify-content: center;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 /* Styling spesifik untuk sel */
@@ -12994,4 +13030,54 @@ body.dark-mode .summary-card.expanded {
 .btn-scan-qr-history:hover {
   transform: scale(1.05);
   color: #22c55e;
+}
+
+/* ===== Submit Button ===== */
+.btn-primary-outline {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  background: #DDD6FE;
+  color: #154360;
+  border-color: transparent;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary-outline:hover:not(:disabled) {
+  background-color: #D8B4FE;
+  color: #154360;
+  transform: translateY(-2px);
+}
+
+.btn-primary-outline:disabled {
+  color: #A9A9A9;
+  background-color: #D3D3D3;
+  border-color: #F3F4F6;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* --- Dark Mode --- */
+body.dark-mode .btn-primary-outline {
+  background-color: #9932CC;
+  color: #FFFFFF;
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(76, 29, 149, 0.25);
+}
+
+body.dark-mode .btn-primary-outline:hover:not(:disabled) {
+  background-color: #9400D3;
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(91, 33, 182, 0.3);
+}
+
+body.dark-mode .btn-primary-outline:disabled {
+  color: #A9A9A9;
+  background-color: #DCDCDC;
+  border-color: #374151;
+  opacity: 0.7;
 }

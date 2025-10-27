@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
@@ -8,10 +8,12 @@ import { QRCodeSVG as QRCode } from 'qrcode.react';
 import EditStokBarangModal from './EditStokBarangModal';
 import AddStockModal from './AddStockModal';
 import QrScannerModal from './QrScannerModal';
+import { createPortal } from 'react-dom';
+import QrPrintSheet from './QrPrintSheet';
 
 function StokBarangView() {
     const { showToast } = useOutletContext();
-
+    const printRef = useRef();
     // State utama untuk Master Barang (SKU)
     const [masterItems, setMasterItems] = useState([]);
     const [pagination, setPagination] = useState(null);
@@ -47,6 +49,10 @@ function StokBarangView() {
     // Simpan filter saat ini
     const [currentFilters, setCurrentFilters] = useState({});
 
+    // --- BARU: State untuk Print QR ---
+    const [selectedItems, setSelectedItems] = useState(new Set());
+    const [itemsToPrint, setItemsToPrint] = useState([]);
+
     // fetchData mengambil data summary
     const fetchData = useCallback(async (page = 1, filters = {}) => {
         setLoading(true);
@@ -58,6 +64,7 @@ function StokBarangView() {
             setPagination(res.data);
             setExpandedRows({});
             setDetailItems({});
+            setSelectedItems(new Set());
         } catch (error) {
             showToast('Gagal memuat data ringkasan stok.', 'error');
             console.error("Fetch Stok Summary Error:", error);
@@ -122,7 +129,8 @@ function StokBarangView() {
                     master_barang_id: masterBarangId,
                     status_id: detailStatusId,
                     id_warna: selectedColor,
-                    search: debouncedSearchTerm
+                    search: debouncedSearchTerm,
+                    all: true
                 };
                 const res = await api.get('/inventory/stock-items', { params });
                 const detailsArray = Array.isArray(res.data) ? res.data : (res.data.data || []);
@@ -165,6 +173,75 @@ function StokBarangView() {
         handleScanSearch(decodedText); // <-- Panggil handleScanSearch
     };
 
+    // --- BARU: Handler untuk Print QR ---
+
+    // 1. Memilih/membatalkan 1 item
+    const handleSelectItem = (id, isChecked) => {
+        setSelectedItems(prev => {
+            const newSet = new Set(prev);
+            if (isChecked) {
+                newSet.add(id);
+            } else {
+                newSet.delete(id);
+            }
+            return newSet;
+        });
+    };
+
+    // 2. Memilih/membatalkan semua item di dalam 1 grup SKU
+    const handleSelectAllMaster = (masterBarangId, isChecked) => {
+        const itemIds = detailItems[masterBarangId]?.map(item => item.id) || [];
+        setSelectedItems(prev => {
+            const newSet = new Set(prev);
+            if (isChecked) {
+                itemIds.forEach(id => newSet.add(id));
+            } else {
+                itemIds.forEach(id => newSet.delete(id));
+            }
+            return newSet;
+        });
+    };
+
+    // 3. Pengecekan apakah semua item dalam grup SKU terpilih (untuk checkbox header)
+    const isAllMasterSelected = (masterBarangId) => {
+        const itemIds = detailItems[masterBarangId]?.map(item => item.id) || [];
+        if (itemIds.length === 0) return false;
+        return itemIds.every(id => selectedItems.has(id));
+    };
+
+    // 4. Menyiapkan data dan memicu print
+    const handlePreparePrint = () => {
+        const itemsToPrintData = [];
+        Object.values(detailItems).forEach(itemList => {
+            itemList.forEach(item => {
+                if (selectedItems.has(item.id)) {
+                    if (item.kode_unik && item.master_barang) {
+                        itemsToPrintData.push(item);
+                    }
+                }
+            });
+        });
+
+        if (itemsToPrintData.length === 0) {
+            showToast('Tidak ada item terpilih untuk di-print.', 'warning');
+            return;
+        }
+
+        setItemsToPrint(itemsToPrintData);
+    };
+
+    // 5. useEffect untuk memicu print SETELAH state itemsToPrint di-update
+    useEffect(() => {
+        if (itemsToPrint.length > 0) {
+            const timer = setTimeout(() => {
+                window.print();
+                setItemsToPrint([]);
+            }, 500);
+
+            return () => clearTimeout(timer);
+        }
+    }, [itemsToPrint]);
+
 
     useEffect(() => {
         let barcode = '';
@@ -182,7 +259,7 @@ function StokBarangView() {
             if (e.code === 'Enter' || e.key === 'Enter') {
                 if (barcode.length > 3) {
                     const code = barcode.trim();
-                    handleScanSearch(code); // <-- Panggil handleScanSearch
+                    handleScanSearch(code);
                 }
                 barcode = '';
                 return;
@@ -222,7 +299,6 @@ function StokBarangView() {
         } else if (selectedStatus === '') {
             msg += ` dengan status "Tersedia"`;
         }
-        // Cek filter warna
         if (selectedColor) {
             const colorName = colorOptions.find(c => c.id_warna === parseInt(selectedColor))?.nama_warna;
             if (colorName) {
@@ -240,13 +316,25 @@ function StokBarangView() {
             <div className="user-management-container" style={{ marginBottom: '20px' }}>
                 <h1>Daftar Stok Barang</h1>
                 <div className="action-buttons-stok">
-                    <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}><i className="fas fa-plus" style={{ marginRight: '8px' }}></i>Tambah Stok</button>
+                    <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>
+                        <i className="fas fa-plus" style={{ marginRight: '8px' }}>
+                        </i>Tambah Stok
+                    </button>
+
                     <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
                         <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
                             <i className="fas fa-qrcode fa-stack-2x"></i>
                             <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
                         </span>
                         Scan QR
+                    </button>
+                    <button
+                        className="btn-primary-outline"
+                        onClick={handlePreparePrint}
+                        disabled={selectedItems.size === 0}
+                    >
+                        <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
+                        Print QR ({selectedItems.size})
                     </button>
                 </div>
             </div>
@@ -329,6 +417,14 @@ function StokBarangView() {
                                                 ) : detailItems[masterItem.id_m_barang]?.length > 0 ? (
                                                     <div className="detail-list-wrapper">
                                                         <div className="detail-list-header">
+                                                            <div className="detail-cell header-select">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    title="Pilih Semua di grup ini"
+                                                                    checked={isAllMasterSelected(masterItem.id_m_barang)}
+                                                                    onChange={(e) => handleSelectAllMaster(masterItem.id_m_barang, e.target.checked)}
+                                                                />
+                                                            </div>
                                                             <div className="detail-cell header-kode">Kode Unik</div>
                                                             <div className="detail-cell header-sn">S/N</div>
                                                             <div className="detail-cell header-kondisi">Kondisi</div>
@@ -352,6 +448,14 @@ function StokBarangView() {
                                                                         setDetailItem(detail);
                                                                     }}
                                                                 >
+                                                                    <div className="detail-cell cell-select">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={selectedItems.has(detail.id)}
+                                                                            onChange={(e) => handleSelectItem(detail.id, e.target.checked)}
+                                                                            onClick={(e) => e.stopPropagation()} // Hentikan propagasi agar tidak trigger onClick row
+                                                                        />
+                                                                    </div>
                                                                     <div className="detail-cell cell-kode">{detail.kode_unik}</div>
                                                                     <div className="detail-cell cell-sn">{detail.serial_number || '-'}</div>
                                                                     <div className="detail-cell cell-kondisi">{detail.kondisi}</div>
@@ -547,6 +651,10 @@ function StokBarangView() {
                 onSaveSuccess={() => fetchData(1, {})}
                 showToast={showToast}
             />
+            {createPortal(
+                <QrPrintSheet ref={printRef} items={itemsToPrint} />,
+                document.getElementById('print-portal')
+            )}
         </>
     );
 }
