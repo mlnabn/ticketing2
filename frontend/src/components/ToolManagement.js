@@ -1,5 +1,3 @@
-// src/components/ToolManagement.js
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom'; // 1. Import hook
 import api from '../services/api';
@@ -21,11 +19,14 @@ function ToolManagement() {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [itemToEditName, setItemToEditName] = useState(null);
+    const [currentFilters, setCurrentFilters] = useState({});
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     const fetchItems = useCallback(async (page = 1, filters = {}) => {
         setLoading(true);
+        setCurrentFilters(filters);
         try {
-            const params = { page, ...filters };
+            const params = { page: 1, ...filters };
             const response = await api.get('/inventory/items', { params });
             setItems(response.data.data);
             setPagination(response.data);
@@ -40,6 +41,34 @@ function ToolManagement() {
     useEffect(() => {
         fetchItems();
     }, [fetchItems]);
+
+    const loadMoreItems = async () => {
+        if (isLoadingMore || !pagination || pagination.current_page >= pagination.last_page) return;
+
+        setIsLoadingMore(true);
+        try {
+            const nextPage = pagination.current_page + 1;
+            const params = { page: nextPage, ...currentFilters }; 
+            const response = await api.get('/inventory/items', { params });
+            
+            setItems(prev => [...prev, ...response.data.data]); 
+            setPagination(response.data);
+        } catch (error) {
+            console.error("Gagal memuat lebih banyak:", error);
+            showToast("Gagal memuat lebih banyak.", "error");
+        } finally {
+            setIsLoadingMore(false);
+        }
+    };
+
+    const handleScroll = (e) => {
+        const target = e.currentTarget;
+        const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
+
+        if (nearBottom && !loading && !isLoadingMore && pagination && pagination.current_page < pagination.last_page) {
+            loadMoreItems();
+        }
+    };
 
     const handleOpenAddModal = () => { setItemToEdit(null); setIsItemModalOpen(true); };
     const handleCloseItemModal = () => { setIsItemModalOpen(false); setItemToEdit(null); };
@@ -105,13 +134,14 @@ function ToolManagement() {
 
             <ItemListView
                 items={items}
-                pagination={pagination}
+                // pagination={pagination}
                 loading={loading}
                 onAdd={handleOpenAddModal}
                 onEdit={handleOpenEditNameModal}
                 onDelete={handleDeleteClick}
-                onPageChange={fetchItems}
                 onFilterChange={fetchItems}
+                onScroll={handleScroll}
+                isLoadingMore={isLoadingMore}
             />
 
             <ItemFormModal

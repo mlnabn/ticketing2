@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
-import Pagination from './Pagination';
-import SkuDetailModal from './SkuDetailModal'; // <-- BARU: Import modal detail SKU
+import SkuDetailModal from './SkuDetailModal';
 
-function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDelete, onPageChange, onFilterChange }) {
+function ItemListView({ items, loading, onAdd, onEdit, onDelete, onFilterChange, onScroll, isLoadingMore }) {
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedSubCategory, setSelectedSubCategory] = useState('');
-
-    // --- BARU: State untuk mengontrol modal detail ---
+    const desktopListRef = useRef(null);
+    const mobileListRef = useRef(null);
     const [selectedItemForDetail, setSelectedItemForDetail] = useState(null);
 
     useEffect(() => {
@@ -74,56 +73,75 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
             </div>
 
             <div className="job-list-container">
-                {/* ======================================================= */}
                 {/* ===    TAMPILAN TABEL UNTUK DESKTOP (DIMODIFIKASI)  === */}
-                {/* ======================================================= */}
-                <table className="job-table">
-                    <thead>
-                        <tr>
-                            <th>Kode</th>
-                            <th>Nama Barang</th>
-                            <th>Kategori</th>
-                            <th>Sub-Kategori</th>
-                            {/* HAPUS: Kolom 'Didaftarkan Oleh' dihapus dari tabel */}
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat data barang...</td></tr>
-                        ) : items.length > 0 ? items.map(item => (
-                            <tr
-                                key={item.id_m_barang}
-                                className="clickable-row" // BARU: Menambahkan class agar bisa diklik
-                                onClick={(e) => handleRowClick(e, item)} // BARU: Menambahkan onClick handler
-                            >
-                                <td>{item.kode_barang}</td>
-                                <td>{item.nama_barang}</td>
-                                <td>{item.master_kategori?.nama_kategori || '-'}</td>
-                                <td>{item.sub_kategori?.nama_sub || '-'}</td>
-                                {/* HAPUS: Data 'Didaftarkan Oleh' dihapus */}
-                                <td className="action-buttons-group">
-                                    <button onClick={(e) => { e.stopPropagation(); onEdit(item); }} className="btn-user-action btn-edit">Edit</button>
-                                    <button onClick={(e) => { e.stopPropagation(); onDelete(item); }} className="btn-user-action btn-delete">Hapus</button>
-                                </td>
+                <div 
+                    className="table-scroll-container" 
+                    style={{ overflowY: 'auto', maxHeight: '65vh' }}
+                    ref={desktopListRef}
+                    onScroll={onScroll}
+                >
+                    <table className="job-table">
+                        <thead>
+                            <tr>
+                                <th>Kode</th>
+                                <th>Nama Barang</th>
+                                <th>Kategori</th>
+                                <th>Sub-Kategori</th>
+                                <th>Aksi</th>
                             </tr>
-                        )) : (
-                            <tr><td colSpan="5" style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</td></tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {loading && items.length === 0 && ( 
+                                <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat data barang...</td></tr>
+                            )}
+                            
+                            {!loading && items.length === 0 && ( 
+                                <tr><td colSpan="5" style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</td></tr>
+                            )}
 
-                {/* ======================================================= */}
+                            {items.map(item => (
+                                <tr
+                                    key={item.id_m_barang}
+                                    className="clickable-row"
+                                    onClick={(e) => handleRowClick(e, item)}
+                                >
+                                    <td>{item.kode_barang}</td>
+                                    <td>{item.nama_barang}</td>
+                                    <td>{item.master_kategori?.nama_kategori || '-'}</td>
+                                    <td>{item.sub_kategori?.nama_sub || '-'}</td>
+                                    <td className="action-buttons-group">
+                                        <button onClick={(e) => { e.stopPropagation(); onEdit(item); }} className="btn-user-action btn-edit">Edit</button>
+                                        <button onClick={(e) => { e.stopPropagation(); onDelete(item); }} className="btn-user-action btn-delete">Hapus</button>
+                                    </td>
+                                </tr>
+                            ))}
+                            {isLoadingMore && (
+                                <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
                 {/* === TAMPILAN KARTU UNTUK MOBILE (DIMODIFIKASI) === */}
-                {/* ======================================================= */}
-                <div className="job-list-mobile">
-                    {loading ? (
+                <div 
+                    className="job-list-mobile"
+                    ref={mobileListRef}
+                    onScroll={onScroll}
+                    style={{ overflowY: 'auto', maxHeight: '65vh' }}
+                >
+                    {loading && items.length === 0 && ( // <-- UBAH
                         <p style={{ textAlign: 'center' }}>Memuat data barang...</p>
-                    ) : items.length > 0 ? items.map(item => (
+                    )}
+                    
+                    {!loading && items.length === 0 && ( // <-- UBAH
+                        <p style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</p>
+                    )}
+                    
+                    {items.map(item => (
                         <div
                             key={item.id_m_barang}
                             className="ticket-card-mobile clickable-row"
-                            onClick={(e) => handleRowClick(e, item)} // BARU: Menambahkan onClick handler
+                            onClick={(e) => handleRowClick(e, item)} 
                         >
                             <div className="card-header">
                                 <h4>{item.nama_barang}</h4>
@@ -139,7 +157,6 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
                                     <span className="label">Sub-Kategori:</span>
                                     <span className="value">{item.sub_kategori?.nama_sub || '-'}</span>
                                 </div>
-                                {/* HAPUS: Info 'Didaftarkan Oleh' dihapus dari kartu */}
                             </div>
                             <div className="card-separator"></div>
                             <div className="card-row action-row">
@@ -147,16 +164,12 @@ function ItemListView({ items, pagination, loading, onBack, onAdd, onEdit, onDel
                                 <button onClick={(e) => { e.stopPropagation(); onDelete(item); }} className="action-buttons-group btn-delete">Hapus</button>
                             </div>
                         </div>
-                    )) : (
-                        <p style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</p>
-                    )}
+                    ))}
+                    {isLoadingMore && (
+                         <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+                    )}:
                 </div>
             </div>
-            {pagination && <Pagination
-                currentPage={pagination.current_page}
-                lastPage={pagination.last_page}
-                onPageChange={(page) => onPageChange(page, { id_kategori: selectedCategory, id_sub_kategori: selectedSubCategory })}
-            />}
 
             {/* --- BARU: Render Modal Detail SKU --- */}
             {selectedItemForDetail && (
