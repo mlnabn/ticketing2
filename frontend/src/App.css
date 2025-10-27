@@ -403,25 +403,45 @@ body.dark-mode .dashboard-container {
 .login-options {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+/* --- Bagian "Remember me" --- */
+.login-options label {
+  display: flex;
   align-items: center;
   font-size: 14px;
-  margin-bottom: 20px;
-  color: #ffffff;
+  color: #4B5563;
+  cursor: pointer;
+  user-select: none;
+}
+
+.login-options input[type="checkbox"] {
+  margin-right: 0.5rem;
+  width: 15px;
+  height: 15px;
+  accent-color: #2563EB;
 }
 
 .forgot-password {
-  color: #4da6ff;
   background: none;
   border: none;
-  font-size: 14px;
-  cursor: pointer;
-  font-weight: 600;
-  text-decoration: underline;
   padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #4da6ff;
+  cursor: pointer;
+  transition: color 0.2s;
 }
 
 .forgot-password:hover {
   color: #7bb0ff;
+  text-decoration: underline;
 }
 
 .login-btn,
@@ -13080,4 +13100,39 @@ body.dark-mode .btn-primary-outline:disabled {
   background-color: #DCDCDC;
   border-color: #374151;
   opacity: 0.7;
+}
+
+.btn-soft-grey {
+  display: inline-block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  /* background: #F3F4F6; */
+  color: #4B5563;
+  border-color: transparent;
+  transition: all 0.2s ease-in-out;
+  line-height: 1.25;
+}
+
+.btn-soft-grey:hover:not(:disabled) {
+  /* background-color: #E5E7EB; */
+  color: #1F2937;
+  transform: translateY(-2px);
+}
+
+/* --- Dark Mode --- */
+body.dark-mode .btn-soft-grey {
+  /* background-color: #374151; */
+  color: #D1D5DB;
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(55, 65, 81, 0.25);
+}
+
+body.dark-mode .btn-soft-grey:hover:not(:disabled) {
+  /* background-color: #4B5563; */
+  color: #F3F4F6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(75, 85, 99, 0.3);
 }
