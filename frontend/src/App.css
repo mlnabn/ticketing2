@@ -2688,64 +2688,7 @@ body.dark-mode .job-table tbody tr:last-child td {
 }
 
 
-.table-scroll-container .job-table th:nth-child(1),
-.table-scroll-container .job-table td:nth-child(1) {
-  width: 10%;
-}
 
-/* Kode Tiket */
-.table-scroll-container .job-table th:nth-child(2),
-.table-scroll-container .job-table td:nth-child(2) {
-  width: 20%;
-}
-
-/* Judul */
-.table-scroll-container .job-table th:nth-child(3),
-.table-scroll-container .job-table td:nth-child(3) {
-  width: 8%;
-}
-
-/* Status */
-.table-scroll-container .job-table th:nth-child(4),
-.table-scroll-container .job-table td:nth-child(4) {
-  width: 10%;
-}
-
-/* Workshop */
-.table-scroll-container .job-table th:nth-child(5),
-.table-scroll-container .job-table td:nth-child(5) {
-  width: 10%;
-}
-
-/* Admin Pengerja */
-.table-scroll-container .job-table th:nth-child(6),
-.table-scroll-container .job-table td:nth-child(6) {
-  width: 10%;
-}
-
-/* Pembuat */
-.table-scroll-container .job-table th:nth-child(7),
-.table-scroll-container .job-table td:nth-child(7) {
-  width: 8%;
-}
-
-/* Tgl Dibuat */
-.table-scroll-container .job-table th:nth-child(8),
-.table-scroll-container .job-table td:nth-child(8) {
-  width: 8%;
-}
-
-/* Tgl Mulai */
-.table-scroll-container .job-table th:nth-child(9),
-.table-scroll-container .job-table td:nth-child(9) {
-  width: 8%;
-}
-
-/* Tgl Selesai */
-.table-scroll-container .job-table th:nth-child(10),
-.table-scroll-container .job-table td:nth-child(10) {
-  width: 8%;
-}
 
 /* Durasi */
 
