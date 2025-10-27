@@ -43,9 +43,10 @@ export default function UserManagement() {
         try {
             const nextPage = userData.current_page + 1;
             const response = await api.get('/users', { params: { page: nextPage, search: debouncedSearchTerm } });
-            
+
             setUserData(prev => ({
-                ...response.data, 
+                ...response.data,
+                from: prev.from, 
                 data: [...prev.data, ...response.data.data] 
             }));
         } catch (e) {
@@ -87,7 +88,7 @@ export default function UserManagement() {
     const handleEditRequest = (userToEditFromModal) => {
         setDetailUser(null);
         setUserToEdit(userToEditFromModal);
-        setShowUserFormModal(true); 
+        setShowUserFormModal(true);
     };
 
     const handleAddUserClick = () => {
@@ -128,9 +129,9 @@ export default function UserManagement() {
 
     return (
         <div className="user-management-container">
-            
-                <h1 className="page-title">Manajemen Pengguna</h1>
-            
+
+            <h1 className="page-title">Manajemen Pengguna</h1>
+
             <button onClick={handleAddUserClick} className="btn-primary">
                 <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
                 Tambah Pengguna
@@ -145,16 +146,14 @@ export default function UserManagement() {
                 />
             </div>
 
+            {/* ... di dalam return() ... */}
             {!userData ? (
                 <p>Memuat data pengguna...</p>
-            ) : ( 
+            ) : (
                 <>
-                    <div 
-                        className="job-list-table" 
-                        ref={desktopListRef} 
-                        onScroll={handleScroll}
-                        style={{ overflowY: 'auto', maxHeight: '65vh' }}
-                    >
+                    {/* Ganti div.job-list-table menjadi div.table-scroll-container */}
+                    <div className="table-scroll-container">
+                        {/* 1. Tabel pertama HANYA untuk Header */}
                         <table className='job-table'>
                             <thead>
                                 <tr>
@@ -165,33 +164,45 @@ export default function UserManagement() {
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {users.length === 0 && !isLoadingMore ? (
-                                    <tr><td colSpan="5" style={{ textAlign: 'center' }}>Tidak ada pengguna yang ditemukan.</td></tr>
-                                ) : (
-                                    users.map((user, index) => (
-                                        <tr key={user.id} className="hoverable-row" onClick={(e) => handleRowClick(e, user)}>
-                                            <td>{userData.from + index}</td>
-                                            <td>{user.name}</td>
-                                            <td>{user.email}</td>
-                                            <td>{user.role}</td>
-                                            <td>
-                                                <div className="action-buttons-group">
-                                                    <button onClick={() => handleUserEditClick(user)} className="btn-user-action btn-edit">Edit</button>
-                                                    <button onClick={() => handleUserDeleteClick(user)} className="btn-user-action btn-delete">Hapus</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                                {isLoadingMore && (
-                                    <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
-                                )}
-                            </tbody>
                         </table>
+
+                        {/* 2. Div baru untuk body yang bisa di-scroll */}
+                        <div
+                            className="table-body-scroll"
+                            ref={desktopListRef}
+                            onScroll={handleScroll}
+                            style={{ overflowY: 'auto', maxHeight: '65vh' }} // Pindahkan style ke sini
+                        >
+                            {/* 3. Tabel kedua HANYA untuk Body */}
+                            <table className='job-table'>
+                                <tbody>
+                                    {users.length === 0 && !isLoadingMore ? (
+                                        <tr><td colSpan="5" style={{ textAlign: 'center' }}>Tidak ada pengguna yang ditemukan.</td></tr>
+                                    ) : (
+                                        users.map((user, index) => (
+                                            <tr key={user.id} className="hoverable-row" onClick={(e) => handleRowClick(e, user)}>
+                                                <td>{userData.from + index}</td>
+                                                <td>{user.name}</td>
+                                                <td>{user.email}</td>
+                                                <td>{user.role}</td>
+                                                <td>
+                                                    <div className="action-buttons-group">
+                                                        <button onClick={() => handleUserEditClick(user)} className="btn-user-action btn-edit">Edit</button>
+                                                        <button onClick={() => handleUserDeleteClick(user)} className="btn-user-action btn-delete">Hapus</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                    {isLoadingMore && (
+                                        <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <div 
+                    <div
                         className="user-list-mobile"
                         ref={mobileListRef}
                         onScroll={handleScroll}
@@ -199,7 +210,7 @@ export default function UserManagement() {
                     >
                         {users.length > 0 ? (
                             users.map((user) => (
-                            // --- TAMBAHAN: onClick event ---
+                                // --- TAMBAHAN: onClick event ---
                                 <div key={user.id} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, user)}>
                                     <div className="card-row">
                                         <div className="data-group">
@@ -226,7 +237,7 @@ export default function UserManagement() {
                                 </div>
                             ))
                         ) : (
-                            !isLoadingMore && <p style={{textAlign: 'center'}}>Tidak ada pengguna yang ditemukan.</p> 
+                            !isLoadingMore && <p style={{ textAlign: 'center' }}>Tidak ada pengguna yang ditemukan.</p>
                         )}
                         {isLoadingMore && (
                             <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
