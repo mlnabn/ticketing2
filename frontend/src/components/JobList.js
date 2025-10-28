@@ -47,8 +47,10 @@ export default function JobList() {
 
   const ticketsOnPage = useMemo(() => ticketData?.data ?? [], [ticketData]);
 
-  const fetchTickets = useCallback(async () => {
-    setIsLoading(true);
+  const fetchTickets = useCallback(async (isPoll = false) => {
+    if (!isPoll) {
+      setIsLoading(true);
+    }
     const endpoint = isMyTicketsPage ? '/tickets/my-tickets' : '/tickets';
 
     const params = {
@@ -92,12 +94,25 @@ export default function JobList() {
   }, [isAdmin, showToast]);
 
   useEffect(() => {
-    fetchTickets();
+    fetchTickets(false);
   }, [fetchTickets]);
 
   useEffect(() => {
     fetchPrerequisites();
   }, [fetchPrerequisites]);
+
+  useEffect(() => {
+    const POLLING_INTERVAL = 30000;
+
+    const intervalId = setInterval(() => {
+      console.log("Polling data tiket terbaru...");
+      fetchTickets(true); 
+    }, POLLING_INTERVAL);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [fetchTickets]);
 
   useEffect(() => {
     setSelectedIds([]);
