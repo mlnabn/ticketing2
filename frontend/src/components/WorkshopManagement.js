@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom'; 
 import api from '../services/api';
 import WorkshopFormModal from './WorkshopFormModal';
@@ -13,22 +13,35 @@ export default function WorkshopManagement() {
   const [workshopToEdit, setWorkshopToEdit] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [workshopToDelete, setWorkshopToDelete] = useState(null);
+  const [pagination, setPagination] = useState(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const desktopListRef = useRef(null);
+  const mobileListRef = useRef(null);
 
-  const fetchWorkshops = useCallback(async () => {
-    setLoading(true);
+  const fetchWorkshops = useCallback(async (page = 1) => {
+    if (page === 1) setLoading(true);
+
     try {
-      const response = await api.get('/workshops');
-      setWorkshops(response.data.data || response.data);
+      const response = await api.get('/workshops', { params: { page } });
+      if (page === 1) {
+        setWorkshops(response.data.data); 
+      } else {
+        setWorkshops(prev => [...prev, ...response.data.data]);
+      }
+      setPagination({
+          currentPage: response.data.current_page,
+          totalPages: response.data.last_page,
+      });
     } catch (error) {
       console.error("Gagal mengambil data workshop:", error);
       showToast('Gagal memuat data workshop.', 'error');
     } finally {
-      setLoading(false);
+      if (page === 1) setLoading(false);
     }
   }, [showToast]);
 
   useEffect(() => {
-    fetchWorkshops();
+    fetchWorkshops(1);
   }, [fetchWorkshops]);
 
   const handleAddClick = () => {
@@ -55,7 +68,7 @@ export default function WorkshopManagement() {
       await api[method](url, formData);
       showToast(`Workshop berhasil ${isEditMode ? 'diperbarui' : 'ditambahkan'}.`, 'success');
       setShowFormModal(false);
-      fetchWorkshops();
+      fetchWorkshops(1);
     } catch (error) {
       console.error("Gagal menyimpan workshop:", error);
       showToast('Gagal menyimpan workshop.', 'error');
@@ -68,10 +81,28 @@ export default function WorkshopManagement() {
       await api.delete(`/workshops/${workshopToDelete.id}`);
       showToast('Workshop berhasil dihapus.', 'success');
       setShowConfirmModal(false);
-      fetchWorkshops();
+      fetchWorkshops(1);
     } catch (error) {
       console.error("Gagal menghapus workshop:", error);
       showToast('Gagal menghapus workshop. Pastikan tidak ada tiket yang terkait.', 'error');
+    }
+  };
+
+  const loadMoreItems = async () => {
+    if (isLoadingMore || !pagination || pagination.currentPage >= pagination.totalPages) {
+        return;
+    }
+    setIsLoadingMore(true);
+    await fetchWorkshops(pagination.currentPage + 1);
+    setIsLoadingMore(false);
+  };
+
+  const handleScroll = (e) => {
+    const target = e.currentTarget;
+    const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 100;
+
+    if (nearBottom && !loading && !isLoadingMore && pagination && pagination.currentPage < pagination.totalPages) {
+        loadMoreItems();
     }
   };
 
@@ -83,13 +114,11 @@ export default function WorkshopManagement() {
         Tambah Workshop Baru
       </button>
       
-      {loading ? <p>Memuat data...</p> : workshops.length === 0 ? (
-        <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
-            <p>Belum ada workshop yang ditambahkan.</p>
-        </div>
+      {loading && workshops.length === 0 ? ( // <-- UBAH: Tampilkan hanya jika list kosong
+        <p>Memuat data...</p>
       ) : (
         <>
-          <div className="job-list-table">
+          <div className="table-scroll-container">
             <table className='job-table'>
               <thead>
                 <tr>
@@ -98,25 +127,47 @@ export default function WorkshopManagement() {
                   <th>Aksi</th>
                 </tr>
               </thead>
-              <tbody>
-                {workshops.map((ws) => (
-                  <tr key={ws.id} className="hoverable-row">
-                    <td>{ws.name}</td>
-                    <td>{ws.code}</td>
-                    <td>
-                      <div className="action-buttons-group">
-                        <button onClick={() => handleEditClick(ws)} className="btn-user-action btn-edit">Edit</button>
-                        <button onClick={() => handleDeleteClick(ws)} className="btn-user-action btn-delete">Hapus</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
             </table>
+            <div
+                className="table-body-scroll"
+                ref={desktopListRef}
+                onScroll={handleScroll}
+                style={{ overflowY: 'auto', maxHeight: '65vh' }}
+              >
+                <table className='job-table'>
+                  <tbody>
+                    {workshops.length === 0 && !isLoadingMore ? ( // <-- UBAH: Logika "Tidak ada data"
+                      <tr><td colSpan="3" style={{ textAlign: 'center' }}>Belum ada workshop yang ditambahkan.</td></tr>
+                    ) : (
+                      workshops.map((ws) => (
+                      <tr key={ws.id} className="hoverable-row">
+                        <td>{ws.name}</td>
+                        <td>{ws.code}</td>
+                        <td>
+                          <div className="action-buttons-group">
+                            <button onClick={() => handleEditClick(ws)} className="btn-user-action btn-edit">Edit</button>
+                            <button onClick={() => handleDeleteClick(ws)} className="btn-user-action btn-delete">Hapus</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                    )}
+                    {isLoadingMore && (
+                      <tr><td colSpan="3" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
           </div>
 
-          <div className="workshop-list-mobile">
-            {workshops.map((ws) => (
+          <div
+            className="workshop-list-mobile"
+            ref={mobileListRef}
+            onScroll={handleScroll}
+            style={{ maxHeight: '65vh', overflowY: 'auto' }} // Atur tinggi & scroll
+          >
+            {workshops.length > 0 ? (
+              workshops.map((ws) => (
               <div key={ws.id} className="ticket-card-mobile">
                 <div className="card-row">
                   <div className="data-group">
@@ -135,7 +186,14 @@ export default function WorkshopManagement() {
                   </div>
                 </div>
               </div>
-            ))}
+            ))
+            ) : (
+               !isLoadingMore && <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Belum ada workshop yang ditambahkan.</p></div> // <-- UBAH
+            )}
+            {/* --- BARU: Indikator Loading More --- */}
+            {isLoadingMore && (
+              <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+            )}
           </div>
         </>
       )}

@@ -13,12 +13,16 @@ class NotificationTemplateController extends Controller
      * Menampilkan daftar semua template notifikasi.
      * Hanya bisa diakses oleh admin.
      */
-    public function index()
+    public function index(Request $request)
     {
         if (Auth::user()->role !== 'admin') {
             return response()->json(['error' => 'Akses ditolak.'], 403);
         }
-        return NotificationTemplate::orderBy('title')->get();
+        $perPage = $request->input('per_page', 15);
+
+        $templates = NotificationTemplate::orderBy('title')->paginate($perPage);
+        
+        return response()->json($templates);
     }
 
     /**

@@ -54,15 +54,15 @@ class NotificationController extends Controller
         return response()->json(['message' => 'Notifikasi ditandai sebagai dibaca']);
     }
 
-    public function getGlobalNotifications()
+    public function getGlobalNotifications(Request $request)
     {
         if (Auth::user()->role !== 'admin') {
             return response()->json(['error' => 'Aksi tidak diizinkan.'], 403);
         }
-
+        $perPage = $request->input('per_page', 15);
         $globalNotifications = Notification::whereNull('user_id')
                                            ->orderBy('created_at', 'desc')
-                                           ->get();
+                                           ->paginate($perPage);
         
         return response()->json($globalNotifications);
     }

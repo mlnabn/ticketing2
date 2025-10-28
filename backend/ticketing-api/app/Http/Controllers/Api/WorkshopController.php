@@ -10,9 +10,13 @@ use Illuminate\Validation\Rule;
 
 class WorkshopController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Workshop::orderBy('name')->get();
+        $perPage = $request->input('per_page', 15);
+
+        $workshops = Workshop::orderBy('name')->paginate($perPage);
+
+        return response()->json($workshops);
     }
 
     public function store(Request $request)
