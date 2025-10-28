@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
-// import Pagination from './Pagination';
 import TicketDetailModal from './TicketDetailModal';
 import { saveAs } from 'file-saver';
 
@@ -52,10 +51,12 @@ export default function TicketReportDetail() {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
-  // const [currentPage, setCurrentPage] = useState(1);
   const [exportingPdf, setExportingPdf] = useState(false);
   const [exportingExcel, setExportingExcel] = useState(false);
   const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const desktopListRef = useRef(null);
+  const mobileListRef = useRef(null);
 
   useEffect(() => {
     if (dateFilters.start_date || dateFilters.end_date) {
@@ -108,11 +109,11 @@ export default function TicketReportDetail() {
     fetchAdminDetails();
   }, [adminId]);
 
-  const fetchAdminReport = useCallback(async (statusFilter) => {
+  const fetchAdminReport = useCallback(async (statusFilter, page = 1) => {
     if (!adminId) return;
     setLoading(true);
     try {
-      const params = { all: true };
+      const params = { page };
       if (statusFilter !== 'all') params.status = statusFilter;
       if (filterType === 'month') {
         if (dateFilters.year) params.year = dateFilters.year;
@@ -132,19 +133,65 @@ export default function TicketReportDetail() {
   }, [adminId, dateFilters.year, dateFilters.month, dateFilters.start_date, dateFilters.end_date, filterType]);
 
   useEffect(() => {
-    fetchAdminReport(filter);
+    fetchAdminReport(filter, 1);
   }, [fetchAdminReport, filter]);
 
   const handleFilterClick = (newFilter) => {
     setFilter(newFilter);
-    // setCurrentPage(1);
+  };
+
+  const loadMoreItems = async () => {
+    if (isLoadingMore || !reportData || !reportData.tickets || reportData.tickets.current_page >= reportData.tickets.last_page) {
+      return;
+    }
+
+    setIsLoadingMore(true);
+    const nextPage = reportData.tickets.current_page + 1;
+    
+    try {
+      const params = { page: nextPage };
+      if (filter !== 'all') params.status = filter;
+      if (filterType === 'month') {
+        if (dateFilters.year) params.year = dateFilters.year;
+        if (dateFilters.month) params.month = dateFilters.month;
+      } else if (filterType === 'date_range') {
+        if (dateFilters.start_date) params.start_date = dateFilters.start_date;
+        if (dateFilters.end_date) params.end_date = dateFilters.end_date;
+      }
+
+      const res = await api.get(`/tickets/admin-report/${adminId}`, { params });
+      
+      setReportData(prev => ({
+        ...prev,
+        tickets: { 
+          ...res.data.tickets, 
+          data: [ 
+            ...prev.tickets.data,
+            ...res.data.tickets.data
+          ]
+        }
+      }));
+    } catch (err) {
+      console.error('Gagal memuat lebih banyak tiket:', err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  const handleScroll = (e) => {
+    const target = e.currentTarget;
+    const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
+
+    if (nearBottom && !loading && !isLoadingMore && reportData && reportData.tickets && reportData.tickets.current_page < reportData.tickets.last_page) {
+      loadMoreItems();
+    }
   };
 
   const handleDownload = async (type) => {
     if (type === 'pdf') setExportingPdf(true);
     else setExportingExcel(true);
 
-    const params = new URLSearchParams({ type, admin_id: admin.id });
+    const params = new URLSearchParams({ type, admin_id: admin.id, all: 'true' });
     if (filter !== 'all') params.append('status', filter);
     if (filterType === 'month') {
       if (dateFilters.year) params.append('year', dateFilters.year);
@@ -190,13 +237,11 @@ export default function TicketReportDetail() {
   }
 
   const { total, completed, rejected, in_progress } = reportData || {};
-  const ticketsOnPage = reportData ? reportData.tickets : [];
+  const ticketsOnPage = reportData ? reportData.tickets.data : [];
 
   return (
     <div className="report-container">
       <h2>Laporan Penyelesaian - {admin.name}</h2>
-
-
 
       {!reportData ? <p>Memuat data statistik...</p> : (
         <>
@@ -206,7 +251,6 @@ export default function TicketReportDetail() {
             <div className={`card ${filter === 'in_progress' ? 'active' : ''}`} onClick={() => handleFilterClick('in_progress')}><h3>Tiket Belum Selesai</h3><p>{in_progress}</p></div>
             <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterClick('rejected')}><h3>Tiket Ditolak</h3><p>{rejected}</p></div>
           </div>
-
           
           <h3>Filter Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</h3>
 
@@ -277,9 +321,7 @@ export default function TicketReportDetail() {
 
           {/* --- Desktop Table --- */}
           <div className="job-list-container">
-            {loading ? <p>Memuat tabel...</p> : ticketsOnPage.length === 0 ? (
-              <p>Tidak ada tiket yang sesuai dengan filter ini.</p>
-            ) : (
+            {loading ? <p>Memuat tabel...</p> : (
               <div className="table-scroll-container">
                 <table className="job-table">
                   <thead>
@@ -296,26 +338,35 @@ export default function TicketReportDetail() {
                     </tr>
                   </thead>
                 </table>
-
-                {/* DIV SCROLL BODY */}
-                <div className="table-body-scroll">
+                <div 
+                  className="table-body-scroll"
+                  ref={desktopListRef}
+                  onScroll={handleScroll}
+                >
                   <table className="job-table">
                     <tbody>
-                      {ticketsOnPage.map(t => (
-                        <tr key={t.id} className="clickable-row" onClick={(e) => handleRowClick(e, t)}>
-                          <td>{t.kode_tiket || '-'}</td>
-                          <td>
-                            <span className="description-cell">{t.title}</span>
-                          </td>
-                          <td>{t.status}</td>
-                          <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
-                          <td>{t.creator?.name ?? '-'}</td>
-                          <td>{formatDate(t.created_at)}</td>
-                          <td>{formatDate(t.started_at)}</td>
-                          <td>{formatDate(t.completed_at)}</td>
-                          <td>{calculateDuration(t.started_at, t.completed_at)}</td>
-                        </tr>
-                      ))}
+                      {ticketsOnPage.length > 0 ? (
+                        ticketsOnPage.map(t => (
+                          <tr key={t.id} className="clickable-row" onClick={(e) => handleRowClick(e, t)}>
+                            <td>{t.kode_tiket || '-'}</td>
+                            <td>
+                              <span className="description-cell">{t.title}</span>
+                            </td>
+                            <td>{t.status}</td>
+                            <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
+                            <td>{t.creator?.name ?? '-'}</td>
+                            <td>{formatDate(t.created_at)}</td>
+                            <td>{formatDate(t.started_at)}</td>
+                            <td>{formatDate(t.completed_at)}</td>
+                            <td>{calculateDuration(t.started_at, t.completed_at)}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        !isLoadingMore && <tr><td colSpan="9" style={{ textAlign: 'center' }}>Tidak ada tiket yang sesuai dengan filter ini.</td></tr> // <-- UBAH
+                      )}
+                      {isLoadingMore && (
+                        <tr><td colSpan="9" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -324,10 +375,16 @@ export default function TicketReportDetail() {
           </div>
 
           {/* --- Mobile Card View --- */}
-          <div className="job-list-mobile">
+          <div 
+            className="job-list-mobile"
+            ref={mobileListRef}
+            onScroll={handleScroll}
+            style={{ overflowY: 'auto', maxHeight: '65vh' }}
+          >
             {loading ? (
               <p style={{ textAlign: 'center' }}>Memuat tiket...</p>
-            ) : ticketsOnPage.length > 0 ? ticketsOnPage.map((t) => (
+            ) : ticketsOnPage.length > 0 ? (
+              ticketsOnPage.map((t) => (
               <div key={t.id} className="ticket-card-mobile clickable-row" onClick={(e) => handleRowClick(e, t)}>
                 <div className="card-row">
                   <div className="data-group">
@@ -382,18 +439,14 @@ export default function TicketReportDetail() {
                   </div>
                 </div>
               </div>
-            )) : (
-              <p style={{ textAlign: 'center' }}>Tidak ada tiket yang sesuai.</p>
+            ))
+            ) : (
+              !isLoadingMore && <p style={{ textAlign: 'center' }}>Tidak ada tiket yang sesuai.</p> 
+            )}
+            {isLoadingMore && (
+              <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
             )}
           </div>
-
-          {/* {ticketsData && ticketsData.last_page > 1 && (
-            <Pagination
-              currentPage={ticketsData.current_page}
-              lastPage={ticketsData.last_page}
-              onPageChange={setCurrentPage}
-            />
-          )} */}
         </>
       )}
       {selectedTicketForDetail && (
