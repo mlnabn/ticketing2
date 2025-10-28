@@ -5899,15 +5899,14 @@ body.dark-mode .btn-pause:hover {
 
 /* Box isi */
 .welcome-card {
-  max-width: 800px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
-  background: #1f29372a;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0px 2px 148px 35px rgba(0, 0, 0, 0.6);
-  -webkit-box-shadow: 0px 2px 148px 35px rgba(0, 0, 0, 0.6);
-  -moz-box-shadow: 0px 2px 148px 35px rgba(0, 0, 0, 0.6);
+  padding: 1.5rem;
+  background: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
+  animation: none;
 }
 
 
@@ -6787,20 +6786,127 @@ body.dark-mode .dashboard-card h4 {
   transition: background-color 0.3s, color 0.3s;
 }
 
+/* ================================
+   1. GLOBAL STYLES & ANIMATIONS
+   ================================ */
+
+/* Mengaktifkan smooth scroll untuk <a> href="#..." */
+html {
+  scroll-behavior: smooth;
+}
+
+.dashboard-container.landing-page {
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  /* Membuat background diam di tempat */
+  background-color: #0a0f1e;
+  /* Warna fallback jika gambar gagal dimuat */
+}
+
+/* Kumpulan semua animasi Anda */
+@keyframes shine {
+  0% {
+    background-position: 200% center;
+  }
+
+  100% {
+    background-position: -200% center;
+  }
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 5px rgba(168, 85, 247, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.7);
+  }
+
+  100% {
+    box-shadow: 0 0 5px rgba(168, 85, 247, 0.4);
+  }
+}
+
+@keyframes floatY {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 
+/* ================================
+   2. LAYOUT: HEADER & SECTIONS
+   ================================ */
 
-/* ===== HEADER LANDING PAGE ===== */
+/* Header Utama (Sudah digabung + sticky) */
 .landing-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.8rem 2rem;
-  background: rgba(10, 15, 30, 0.65);
+  background: rgba(10, 15, 30, 0.75);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(6px);
-  position: relative;
-  z-index: 10;
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  position: sticky;
+  top: 0;
+  width: 100%;
 }
 
 /* Logo kiri */
@@ -6814,11 +6920,9 @@ body.dark-mode .dashboard-card h4 {
   transform: scale(1.05);
 }
 
-/* NAVIGATION ACTIVE UNDERLINE ANIMATION */
+/* Navigasi (Tengah) - (Style duplikat dihapus) */
 .header-nav {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  /* Hapus 'position: absolute' agar rapi */
   display: flex;
   gap: 2rem;
 }
@@ -6831,13 +6935,14 @@ body.dark-mode .dashboard-card h4 {
   font-weight: 500;
   padding: 0.25rem 0.5rem;
   transition: color 0.3s ease;
+  cursor: pointer;
 }
 
-/* Garis bawah animasi */
 .header-nav a::after {
   content: "";
   position: absolute;
-  bottom: -3px;
+  bottom: -4px;
+  /* Sedikit jarak */
   left: 50%;
   width: 0;
   height: 2px;
@@ -6846,43 +6951,15 @@ body.dark-mode .dashboard-card h4 {
   transform: translateX(-50%);
 }
 
-/* Saat hover */
 .header-nav a:hover {
   color: #60a5fa;
 }
 
 .header-nav a:hover::after {
-  width: 60%;
+  width: 70%;
 }
 
-/* Aktif */
-.header-nav a.active {
-  color: #60a5fa;
-}
-
-.header-nav a.active::after {
-  width: 60%;
-}
-
-/* Efek gradient animasi underline */
-.header-nav a.active::after {
-  background: linear-gradient(90deg, #60a5fa, #3b82f6, #60a5fa);
-  background-size: 200% auto;
-  animation: shine 2s linear infinite;
-}
-
-@keyframes shine {
-  0% {
-    background-position: 200% center;
-  }
-
-  100% {
-    background-position: -200% center;
-  }
-}
-
-
-/* Login button kanan */
+/* Login button kanan - (Style duplikat dihapus) */
 .header-right-group .btn-btn2 {
   display: flex;
   align-items: center;
@@ -6904,32 +6981,43 @@ body.dark-mode .dashboard-card h4 {
   font-size: 1.2rem;
 }
 
-
-/* Content */
-.public-content {
-  flex: 1;
-  padding: 2rem;
-  overflow-y: auto;
+/* Layout Single Page (BARU) */
+.public-content-singlepage {
+  padding-top: 80px;
 }
 
+.landing-section {
+  width: 100%;
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  position: relative;
+  overflow: hidden;
+  background: transparent !important;
+}
 
-/* ====== LANDING - ABOUT US ====== */
+.landing-section.full-height {
+  min-height: 100vh;
+  padding: 0;
+}
+
 .public-content {
+  flex: 1;
+  padding: 3rem 2rem;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 3rem 2rem;
   gap: 2rem;
 }
 
-/* Judul utama (About Company, Team Collaboration, dll.) */
 .public-content h2,
 .public-content h1 {
   font-size: 2rem;
   font-weight: bold;
   text-align: center;
   color: #8b5cf6;
-  /* ungu neon */
   margin-bottom: 1rem;
 }
 
@@ -6938,938 +7026,14 @@ body.dark-mode .dashboard-card h4 {
   font-weight: bold;
   text-align: center;
   color: #8b5cf6;
-  /* ungu neon */
   margin-bottom: 1rem;
 }
 
 
-/* Logo kiri */
-.header-left-group img {
-  height: 40px;
-  object-fit: contain;
-}
-
-/* NAV di tengah */
-.header-nav {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 2rem;
-}
-
-/* Style tombol nav */
-.header-nav button {
-  background: transparent;
-  border: none;
-  color: #e2e8f0;
-  font-size: 1rem;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  transition: color 0.3s, border-bottom 0.3s;
-}
-
-.header-nav button:hover {
-  color: #60a5fa;
-}
-
-.header-nav button.active {
-  color: #60a5fa;
-  border-bottom: 2px solid #60a5fa;
-}
-
-/* Login icon kanan */
-.header-right-group button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #fff;
-}
-
-/* Tombol login */
-.login-btn2 {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.login-btn2 i {
-  font-size: 1.2rem;
-}
-
-.login-btn2:hover {
-  color: #60a5fa;
-  /* efek hover */
-}
-
-.back-to-landing {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 8px 16px;
-  /* ungu ke biru */
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.back-to-landing:hover {
-  transform: translateY(-2px);
-}
-
-
 /* ================================
-   AboutUsPage.css - Compact Version
+   3. SECTION: WELCOME
    ================================ */
-
-/* ------------------------
-   General Container
------------------------- */
-.about-us-container {
-  padding: 1.5rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 80px rgba(83, 83, 83, 1);
-  border-radius: 12px;
-  animation: fadeSlideIn 0.6s ease-out;
-}
-
-/* ------------------------
-   Header
------------------------- */
-.about-us-header {
-  text-align: center;
-  margin-bottom: 2rem;
-  padding-top: 1.5rem;
-}
-
-.about-us-header h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  line-height: 1.2;
-  font-weight: bold;
-  background: linear-gradient(to right, #1e40af, #3b82f6, #60a5fa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.about-us-header p {
-  max-width: 700px;
-  margin: 0 auto;
-  color: #ccc;
-  line-height: 1.5;
-}
-
-/* ------------------------
-   General Section
------------------------- */
-.about-us-section {
-  max-width: 800px;
-  /* lebih kecil */
-  margin: 0 auto 3rem;
-  padding: 1.5rem;
-  text-align: center;
-}
-
-.about-us-section h2,
-.aboutus-section .mission-text h2,
-.contact-section h2 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 0.4rem;
-  background: linear-gradient(to right, #1e3a8a, #2563eb, #38bdf8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.about-us-section .text-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0rem;
-  /* lebih rapat */
-}
-
-.about-us-section .text-content h2 {
-  margin-bottom: 0.2rem;
-}
-
-.about-us-section .text-content h3 {
-  margin-bottom: 0.2rem;
-}
-
-
-.about-us-section h3 {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.text-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.underline,
-.underline-line {
-  width: 100px;
-  height: 3px;
-  margin: 0.4rem auto 1rem;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, #6366f1, #3b82f6);
-  align-items: center;
-}
-
-/* ------------------------
-   Mission Section (Office Life & Work & Fun)
------------------------- */
-.aboutus-section.office-life,
-.aboutus-section.work-fun,
-.mission-section {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  max-width: 800px;
-  margin: 0 auto 3rem;
-  padding: 1.5rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-}
-
-.aboutus-section.work-fun {
-  flex-direction: row-reverse;
-  border: 1px dashed rgba(168, 85, 247, 0.4);
-  background: rgba(255, 200, 255, 0.05);
-}
-
-.mission-section .text-content,
-.aboutus-section.office-life .mission-text,
-.aboutus-section.work-fun .mission-text {
-  flex: 1.2;
-  text-align: left;
-  color: #ccc;
-}
-
-.mission-section .image-container,
-.aboutus-section.office-life .mission-image,
-.aboutus-section.work-fun .mission-image {
-  flex: 1;
-}
-
-.mission-section .image-container img,
-.aboutus-section.office-life .mission-image img,
-.aboutus-section.work-fun .mission-image img {
-  width: 100%;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.mission-section p,
-.aboutus-section.office-life .mission-text p,
-.aboutus-section.work-fun .mission-text p {
-  line-height: 1.5;
-  margin-bottom: 0.8rem;
-}
-
-.aboutus-section.work-fun .mission-text p {
-  color: #f3f4f6;
-}
-
-/* ------------------------
-   Team Section
------------------------- */
-.team-section {
-  padding: 1.5rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  text-align: center;
-}
-
-.team-section h2 {
-  color: #fff;
-  margin-bottom: 0.4rem;
-}
-
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  justify-items: center;
-}
-
-.team-row-2 {
-  grid-column: 1 / span 3;
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-}
-
-.team-member-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 140px;
-  text-align: center;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 15px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-}
-
-.team-member-card:hover {
-  transform: translateY(-8px);
-  background: rgba(59, 130, 246, 0.1);
-  /* biru transparan */
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
-  /* glow biru */
-}
-
-.member-avatar {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #6b46c1;
-  transition: border-color 0.3s ease;
-}
-
-.team-member-card:hover .member-avatar {
-  border-color: #a855f7;
-}
-
-.team-member-card h3 {
-  margin-top: 0.8rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #fff;
-}
-
-.team-member-card p {
-  font-size: 0.85rem;
-  color: #aaa;
-}
-
-/* ------------------------
-   Values Section
------------------------- */
-.values-and-image-section {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-}
-
-.values-and-image-section .image-container,
-.values-and-image-section .values-grid {
-  flex: 1;
-}
-
-.values-and-image-section img {
-  width: 100%;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.value-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.8rem;
-  text-align: left;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  transition: background 0.3s ease;
-}
-
-.value-card:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.value-card .icon-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #a855f7, #6b46c1);
-}
-
-.value-card .icon-container svg {
-  width: 20px;
-  height: 20px;
-  color: #fff;
-}
-
-.value-card h3 {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 0.4rem;
-  background: linear-gradient(to right, #312e81, #3b82f6, #93c5fd);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.value-card p {
-  font-size: 0.9rem;
-  line-height: 1.4;
-  color: #ccc;
-}
-
-/* ------------------------
-   Contact Section
------------------------- */
-.contact-section p {
-  font-size: 0.95rem;
-  color: #d1d5db;
-  margin-bottom: 1.5rem;
-}
-
-.social-links {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.social-links a {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #e5e7eb;
-  font-size: 0.95rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  padding: 0.5rem 1rem;
-  border-radius: 9999px;
-  background: rgba(55, 65, 81, 0.4);
-}
-
-.social-links a i {
-  font-size: 1rem;
-}
-
-.social-links a:hover {
-  background: linear-gradient(135deg, #2563eb, #3b82f6, #38bdf8);
-  /* biru tua → biru → biru muda */
-  color: #fff;
-  transform: translateY(-3px);
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
-}
-
-
-/* ================================
-   Animations
-================================ */
-
-/* Fade + Slide In */
-@keyframes fadeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Glow Pulse (tim / card) */
-@keyframes glowPulse {
-  0% {
-    box-shadow: 0 0 5px rgba(168, 85, 247, 0.4),
-      0 0 10px rgba(236, 72, 153, 0.2);
-  }
-
-  50% {
-    box-shadow: 0 0 15px rgba(168, 85, 247, 0.6),
-      0 0 25px rgba(236, 72, 153, 0.3);
-  }
-
-  100% {
-    box-shadow: 0 0 5px rgba(168, 85, 247, 0.4),
-      0 0 10px rgba(236, 72, 153, 0.2);
-  }
-}
-
-/* Floating Effect */
-@keyframes floatY {
-  0% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-8px);
-  }
-
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-/* Gradient shimmer (text) */
-@keyframes gradientMove {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  100% {
-    background-position: 100% 50%;
-  }
-}
-
-/* ================================
-   Apply Animations
-================================ */
-
-/* Section masuk smooth */
-.about-us-section,
-.team-section,
-.values-and-image-section,
-.aboutus-section.office-life,
-.aboutus-section.work-fun,
-.contact-section {
-  animation: fadeSlideIn 0.8s ease-out;
-}
-
-/* Avatar tim glow */
-.member-avatar {
-  animation: glowPulse 3s infinite ease-in-out;
-}
-
-/* Card hover + pulse */
-.team-member-card:hover {
-  animation: glowPulse 2.5s infinite ease-in-out;
-}
-
-/* Image floating */
-.aboutus-section .mission-image img,
-.values-and-image-section img {
-  animation: floatY 6s ease-in-out infinite;
-}
-
-/* Gradient text bergerak */
-.about-us-header h1,
-.about-us-section h2,
-.value-card h3 {
-  background-size: 200% auto;
-  animation: gradientMove 5s linear infinite alternate;
-}
-
-/* 📱 Responsive untuk layar kecil (max-width: 400px) */
-@media (max-width: 1009px) {
-
-  /* Header */
-  .landing-header {
-    flex-direction: column;
-    padding: 0.5rem 1rem;
-    gap: 0.5rem;
-  }
-
-  .header-left-group img {
-    height: 30px;
-  }
-
-  /* Nav */
-  .header-nav {
-    position: static;
-    /* biar nggak absolute */
-    transform: none;
-    justify-content: center;
-    gap: 1rem;
-  }
-
-  .header-nav button {
-    font-size: 0.9rem;
-  }
-
-  /* Login btn */
-  .login-btn2 {
-    font-size: 0.9rem;
-  }
-
-  .login-btn2 i {
-    font-size: 1rem;
-  }
-
-  /* Content */
-  .public-content {
-    padding: 1.5rem 1rem;
-    gap: 1.5rem;
-  }
-
-  /* Judul utama */
-  .public-content h1,
-  .public-content h2 {
-    font-size: 1.5rem;
-  }
-
-  .public-content h3 {
-    font-size: 1.1rem;
-  }
-
-  /* Back to landing */
-  .back-to-landing {
-    font-size: 0.85rem;
-    padding: 6px 12px;
-  }
-
-  .welcome-intro {
-    font-size: 1rem;
-    /* font lebih kecil di mobile */
-    max-width: 90%;
-    /* lebar teks menyesuaikan layar */
-  }
-
-  /* ================================
-   Responsive
-   ================================ */
-
-  /* Mobile */
-  @media (max-width: 1008px) {
-
-    /* ================================
-   Header
-   ================================ */
-
-    .about-us-header h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      line-height: 1.2;
-      background: linear-gradient(135deg, #a855f7, #6b46c1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* ================================
-   Section General
-   ================================ */
-    .about-us-section {
-      max-width: 900px;
-      margin: 0 auto 4rem;
-      text-align: center;
-    }
-
-    .about-us-section h2 {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 0rem;
-      background: linear-gradient(135deg, #a855f7, #ec4899);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .about-us-section h3 {
-      font-size: 0.8rem;
-      font-weight: 500;
-      margin-bottom: 0rem;
-      background: rgba(255, 255, 255, 0.4);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-
-    .underline {
-      width: 100px;
-      height: 2px;
-      margin: 0.5rem auto 2rem;
-    }
-
-    .mission-section p {
-      font-size: 0.9rem;
-    }
-
-    /* ================================
-   Team Section
-   ================================ */
-
-    .team-section h2 {
-      font-size: 1.3rem;
-      color: #fff;
-      margin-bottom: 0.5rem;
-    }
-
-    .underline {
-      width: 100px;
-      height: 2px;
-      margin: 0.5rem auto 2rem;
-    }
-
-    .team-grid {
-      grid-template-columns: repeat(2, 1fr);
-      /* 2 kolom sejajar */
-      gap: 1.5rem;
-    }
-
-    .team-row-2 {
-      grid-column: unset;
-      /* lepas aturan span 3 */
-      display: contents;
-      /* ikut grid parent */
-    }
-
-    .team-member-card {
-      width: 100%;
-      max-width: 150px;
-      /* biar ga terlalu lebar */
-      padding: 16px;
-      margin: 0 auto;
-    }
-
-    .member-avatar {
-      width: 80px;
-      height: 80px;
-    }
-
-
-    /* ================================
-   Values Section
-   ================================ */
-
-    .value-card {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      /* sedikit lebih longgar dari 0.4rem untuk readability */
-      padding: 0.7rem;
-      /* lebih pas di layar kecil */
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      transition: background 0.3s ease;
-    }
-
-    .value-card:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .value-card .icon-container {
-      width: 38px;
-      /* sedikit lebih kecil agar proporsional */
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      background: linear-gradient(135deg, #a855f7, #6b46c1);
-    }
-
-    .value-card .icon-container svg {
-      width: 18px;
-      /* lebih pas untuk icon container 38px */
-      height: 18px;
-      color: #fff;
-    }
-
-    .value-card h3 {
-      font-size: 1rem;
-      /* lebih kecil agar muat di mobile */
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-      line-height: 1.2;
-    }
-
-    .value-card p {
-      font-size: 0.85rem;
-      /* masih nyaman dibaca */
-      line-height: 1.3;
-      color: #ccc;
-      margin: 0;
-      /* hilangkan margin default */
-    }
-
-
-    /* ================================
-   Office Life (mobile style)
-   ================================ */
-    .aboutus-section.office-life {
-      flex-direction: column;
-      /* gambar atas, teks bawah */
-      gap: 1.2rem;
-      padding: 1rem;
-      margin: 0 auto 2rem;
-    }
-
-    .aboutus-section.office-life .mission-image,
-    .aboutus-section.office-life .mission-text {
-      flex: unset;
-      width: 100%;
-    }
-
-    .aboutus-section.office-life .mission-image img {
-      width: 100%;
-      height: auto;
-      border-radius: 0.5rem;
-    }
-
-    .aboutus-section.office-life .mission-text {
-      text-align: center;
-    }
-
-    .aboutus-section.office-life .mission-text h2 {
-      font-size: 1.3rem;
-    }
-
-    .aboutus-section.office-life .mission-text p {
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-
-    .aboutus-section.office-life .underline-line {
-      margin: 0.5rem auto 1rem;
-      width: 80px;
-      height: 2px;
-    }
-
-
-    /* ================================
-   Work & Fun (mobile style)
-   ================================ */
-    .aboutus-section.work-fun {
-      flex-direction: column;
-      /* meski di desktop dia reverse, di mobile tetap stack */
-      gap: 1.2rem;
-      padding: 1rem;
-      margin: 0 auto 2rem;
-    }
-
-    .aboutus-section.work-fun .mission-image,
-    .aboutus-section.work-fun .mission-text {
-      flex: unset;
-      width: 100%;
-    }
-
-    .aboutus-section.work-fun .mission-image img {
-      width: 100%;
-      height: auto;
-      border-radius: 0.5rem;
-    }
-
-    .aboutus-section.work-fun .mission-text {
-      text-align: center;
-    }
-
-    .aboutus-section.work-fun .mission-text h2 {
-      font-size: 1.3rem;
-    }
-
-    .aboutus-section.work-fun .mission-text p {
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-
-    .aboutus-section.work-fun .underline-line {
-      margin: 0.5rem auto 1rem;
-      width: 80px;
-      height: 2px;
-    }
-
-
-    /* ================================
-   Contact Section
-   ================================ */
-
-    .contact-section h2 {
-      font-size: 1.5rem;
-      text-align: center;
-    }
-
-    .contact-section p {
-      font-size: 0.9rem;
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .social-links {
-      gap: 1rem;
-    }
-
-    .social-links a {
-      font-size: 0.9rem;
-      padding: 0.5rem 1rem;
-    }
-
-    .social-links a i {
-      font-size: 1rem;
-    }
-  }
-
-
-  /* ================================
-   Responsive WelcomeHomeUser
-   ================================ */
-
-  /* Tablet & HP Medium (<= 1008px) */
-  @media (max-width: 1008px) {
-
-    /* Judul */
-    .welcome-card-container h2 {
-      font-size: 1.5rem;
-      font-weight: 800;
-    }
-
-    /* Sub Judul / teks isi */
-    .welcome-card-container p {
-      font-size: 0.9rem;
-      line-height: 1.7;
-      color: #f1f1f1;
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
-
-    /* Tombol */
-    .welcome-card-container button {
-      font-size: 0.9rem;
-      padding: 0.6rem 1.2rem;
-    }
-  }
-
-  /* HP Kecil (<= 400px) */
-  @media (max-width: 400px) {
-
-    /* Judul lebih kecil */
-    .welcome-card-container h2 {
-      font-size: 1.2rem;
-    }
-
-    /* Sub Judul / teks isi */
-    .welcome-card-container p {
-      font-size: 0.8rem;
-      line-height: 1.4;
-    }
-
-    /* List item */
-    .welcome-card-container li span {
-      font-size: 0.8rem;
-    }
-
-    /* Tombol lebih kecil */
-    .welcome-card-container button {
-      font-size: 0.8rem;
-      padding: 0.5rem 1rem;
-    }
-  }
-}
-
+/* (Sebagian besar diatur oleh Tailwind di WelcomeHomeUser.js) */
 
 .welcome-intro {
   font-size: 1.1rem;
@@ -7883,183 +7047,128 @@ body.dark-mode .dashboard-card h4 {
 }
 
 
+/* ================================
+   4. SECTION: FEATURES (DIGANTI BARU)
+   ================================ */
+/* (Style lama Anda untuk .features-container telah diganti) */
 
-/* ==================================== */
-/* FEATURES PAGE STYLES */
-/* ==================================== */
 .features-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4rem;
-  padding: 4rem 2rem;
-  color: #fff;
-  text-align: center;
+  width: 100%;
   max-width: 1200px;
-  /* Lebarkan area */
-  margin: auto;
-  animation: fadeSlideIn 0.6s ease-out;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  background: transparent;
 }
 
-/* Grup setiap kategori fitur */
 .features-group {
-  width: 100%;
-  margin-bottom: 2rem;
+  margin-bottom: 4rem;
+  text-align: center;
 }
 
 .features-group h2 {
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  color: #3aa8ff;
-  /* biru seperti About Us */
+  font-size: 2.25rem;
   font-weight: 700;
-  text-align: center;
-  position: relative;
+  color: #cddcff;
+  margin-bottom: 2.5rem;
+  background: linear-gradient(90deg, #6366f1, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Garis biru kecil di bawah judul */
-.features-group h2::after {
-  content: "";
-  display: block;
-  width: 60px;
-  height: 3px;
-  background: #3aa8ff;
-  margin: 10px auto 0;
-  border-radius: 2px;
-}
-
-
-/* Grid fitur */
+/* Grid untuk 3 Card Fitur */
 .feature-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  justify-content: center;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
 }
 
-/* Kartu fitur */
 .feature-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  min-height: 280px;
-  /* Biar semua tinggi seimbang */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  backdrop-filter: blur(10px);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: left;
 }
 
 .feature-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .feature-card i {
-  font-size: 2.5rem;
-  color: #00aaff;
+  font-size: 2rem;
+  color: #60a5fa;
+  /* Biru */
+  margin-bottom: 1rem;
 }
 
 .feature-card h3 {
-  font-size: 1.3rem;
-  margin: 0;
-  color: #3aa8ff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0.5rem;
 }
 
 .feature-card p {
-  font-size: 1rem;
-  color: #ccc;
-  line-height: 1.5;
+  font-size: 0.95rem;
+  color: #b0c4de;
+  line-height: 1.6;
 }
 
-/* Trust signals */
+/* Grid untuk Trust Signal */
 .trust-grid {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
 }
 
 .trust-card {
-  background: rgba(0, 170, 255, 0.1);
-  border: 1px solid rgba(0, 170, 255, 0.3);
-  padding: 1rem 2rem;
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.25rem;
   font-size: 1rem;
+  color: #cddcff;
   font-weight: 500;
-  color: #e0e0e0;
-  transition: transform 0.3s ease, background 0.3s ease;
 }
 
-.trust-card:hover {
-  transform: translateY(-4px);
-  background: rgba(0, 170, 255, 0.15);
-}
-
-.highlight {
-  color: #3aa8ff;
+.trust-card .highlight {
+  color: #81c784;
+  /* Hijau */
   font-weight: 700;
 }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .features-container {
-    padding: 2rem 1rem;
-    gap: 3rem;
-  }
 
-  .feature-card {
-    min-height: auto;
-    /* biar fleksibel di HP */
-  }
-}
+/* ================================
+   5. SECTION: FAQ (DIRAPIKAN)
+   ================================ */
 
-
-/* ==================================== */
-/* FAQ PAGE STYLES UPGRADE */
-/* ==================================== */
-
-/* Animasi masuk dari bawah ke atas */
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Container Utama */
 .faq-container {
-  width: 85%;
+  width: 100%;
   max-width: 1200px;
+  /* Disesuaikan agar pas */
   margin: 0 auto;
-  padding: 4rem 2rem;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.4);
-  animation: fadeInUp 0.6s ease-out;
+  padding: 2rem 1rem;
   color: #fff;
+  background: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
+  animation: none;
 }
 
-/* Judul Utama */
 .faq-container h2 {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #3aa8ff;
-  margin-bottom: 2rem;
+  font-size: 2.25rem;
+  /* Samakan dengan Features */
+  font-weight: 700;
+  margin-bottom: 2.5rem;
   text-align: center;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(to right, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Judul Kategori */
 .faq-container h3 {
   font-size: 1.3rem;
   font-weight: 600;
@@ -8069,7 +7178,6 @@ body.dark-mode .dashboard-card h4 {
   padding-left: 10px;
 }
 
-/* Item FAQ */
 .faq-item {
   border-radius: 14px;
   background: rgba(0, 0, 0, 0.3);
@@ -8077,15 +7185,14 @@ body.dark-mode .dashboard-card h4 {
   transition: all 0.3s ease;
 }
 
-.faq-item button {
-  font-size: 1rem;
-}
-
 .faq-item:hover {
   background: rgba(58, 168, 255, 0.08);
 }
 
-/* Teks Jawaban */
+.faq-item button {
+  font-size: 1rem;
+}
+
 .faq-item p {
   white-space: normal;
   word-break: break-word;
@@ -8096,9 +7203,7 @@ body.dark-mode .dashboard-card h4 {
   margin-top: 0.5rem;
 }
 
-/* ============================= */
-/* FEEDBACK SECTION */
-/* ============================= */
+/* Feedback Section */
 .faq-item .feedback {
   display: flex;
   align-items: center;
@@ -8108,7 +7213,6 @@ body.dark-mode .dashboard-card h4 {
   color: #9ca3af;
 }
 
-/* Tombol feedback */
 .faq-item .feedback button {
   background: transparent;
   border: none;
@@ -8132,20 +7236,16 @@ body.dark-mode .dashboard-card h4 {
   animation: fadeIn 0.4s ease-in-out;
 }
 
-/* Jika klik YA */
 .feedback-yes {
   color: #4ade80;
   /* hijau terang */
   text-shadow: 0 0 6px rgba(74, 222, 128, 0.4);
 }
 
-/* Jika klik TIDAK */
-/* Feedback setelah klik Tidak */
 .feedback-no {
   display: flex;
   align-items: center;
   gap: 8px;
-  /* kasih jarak antar teks & link */
   color: #f87171;
   /* merah soft */
   font-weight: 500;
@@ -8167,12 +7267,11 @@ body.dark-mode .dashboard-card h4 {
   justify-content: center;
   align-items: center;
   gap: 8px;
-  /* kasih jarak antar teks & link */
   margin-top: 2rem;
   font-size: 0.95rem;
   font-weight: 500;
-  color: #f87171;
-  /* merah soft */
+  color: #d1d5db;
+  /* Warna netral */
   animation: fadeIn 0.4s ease-in-out;
 }
 
@@ -8188,16 +7287,506 @@ body.dark-mode .dashboard-card h4 {
   text-shadow: 0 0 6px rgba(59, 130, 246, 0.6);
 }
 
-/* Animasi muncul */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
+
+/* ================================
+   6. SECTION: ABOUT US (DIRAPIKAN)
+   ================================ */
+
+.about-us-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
+  animation: none;
+}
+
+.about-us-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-top: 1.5rem;
+}
+
+.about-us-header h1 {
+  font-size: 2.25rem;
+  /* Samakan dengan Features */
+  font-weight: 700;
+  line-height: 1.2;
+  background: linear-gradient(to right, #3b82f6, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: gradientMove 5s linear infinite alternate;
+}
+
+/* General Section Styling */
+.about-us-section,
+.aboutus-section {
+  margin: 0 auto 3rem;
+  padding: 2rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  text-align: center;
+  animation: fadeSlideIn 0.8s ease-out;
+  /* Terapkan animasi di sini */
+}
+
+.about-us-section h2,
+.aboutus-section .mission-text h2,
+.contact-section h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  background: linear-gradient(to right, #2563eb, #38bdf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: gradientMove 5s linear infinite alternate;
+}
+
+.about-us-section h3 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.5rem;
+}
+
+.about-us-section .text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0rem;
+}
+.about-us-section .text-content h2,
+.about-us-section .text-content h3{
+  text-align: left;
+}
+
+.underline-2{
+  width: 100px;
+  height: 3px;
+  margin-bottom : 1.5rem;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #6366f1, #3b82f6);
+}
+.underline,
+.underline-line {
+  width: 100px;
+  height: 3px;
+  margin: 0.4rem auto 1.5rem;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #6366f1, #3b82f6);
+}
+
+/* Mission / Office / Work Sections */
+.mission-section,
+.aboutus-section.office-life,
+.aboutus-section.work-fun {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  text-align: left;
+}
+
+.aboutus-section.work-fun {
+  flex-direction: row-reverse;
+}
+
+.mission-section .text-content,
+.aboutus-section .mission-text {
+  flex: 1.2;
+  color: #ccc;
+}
+
+.mission-section .image-container,
+.aboutus-section .mission-image {
+  flex: 1;
+}
+
+.aboutus-section .mission-image img {
+  width: 100%;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  animation: floatY 6s ease-in-out infinite;
+}
+
+.mission-section p,
+.aboutus-section .mission-text p {
+  line-height: 1.6;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+/* Team Section */
+.team-section {
+  text-align: center;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  justify-items: center;
+  margin-top: 1.5rem;
+}
+
+.team-row-2 {
+  grid-column: 1 / span 3;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.team-member-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 160px;
+  text-align: center;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.25rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.team-member-card:hover {
+  transform: translateY(-8px);
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+  animation: glowPulse 2.5s infinite ease-in-out;
+  /* Pindah ke hover */
+}
+
+.member-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #6b46c1;
+  /* Ungu */
+  transition: border-color 0.3s ease;
+  animation: glowPulse 3s infinite ease-in-out;
+}
+
+.team-member-card:hover .member-avatar {
+  border-color: #a855f7;
+}
+
+.team-member-card h3 {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.team-member-card p {
+  font-size: 0.85rem;
+  color: #aaa;
+  margin: 0;
+}
+
+/* Values Section (Disederhanakan) */
+.values-and-image-section {
+  text-align: left;
+  /* Hapus display:flex */
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  /* 1 kolom */
+  gap: 1rem;
+}
+
+.value-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem;
+  text-align: left;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  transition: background 0.3s ease;
+}
+
+.value-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.value-card .icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a855f7, #6b46c1);
+}
+
+.value-card .icon-container svg {
+  width: 22px;
+  height: 22px;
+  color: #fff;
+}
+
+.value-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #e0e0e0;
+  background: none;
+  /* Hapus gradient agar bersih */
+  animation: none;
+  /* Hapus animasi */
+}
+
+.value-card p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #ccc;
+}
+
+/* Contact Section */
+.contact-section p {
+  font-size: 1rem;
+  color: #d1d5db;
+  margin-bottom: 1.5rem;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.social-links a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e5e7eb;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  padding: 0.6rem 1.2rem;
+  border-radius: 9999px;
+  background: rgba(55, 65, 81, 0.6);
+}
+
+.social-links a:hover {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
+}
+
+
+/* ================================
+   7. RESPONSIVE (MEDIA QUERIES)
+   ================================ */
+
+/* --------------------------------
+   TABLET (Layar <= 900px)
+   -------------------------------- */
+@media (max-width: 900px) {
+
+  /* Features */
+  .feature-grid,
+  .trust-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  /* Team */
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .team-row-2 {
+    grid-column: unset;
+    display: contents;
+  }
+}
+
+/* --------------------------------
+   MOBILE (Layar <= 768px)
+   -------------------------------- */
+@media (max-width: 768px) {
+
+  /* Header */
+  .landing-header {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .header-left-group {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    order: 1;
+    /* Logo di atas */
+  }
+
+  .header-left-group .header-logo {
+    height: 36px;
+  }
+
+  .header-nav {
+    width: 100%;
+    justify-content: center;
+    gap: 1rem;
+    order: 3;
+    /* Nav di bawah */
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .header-nav a {
+    font-size: 0.9rem;
+  }
+
+  .header-right-group {
+    position: absolute;
+    top: 0.75rem;
+    right: 1rem;
+    order: 2;
+    /* Tombol login di pojok */
+  }
+
+  .header-right-group .btn-btn2 span {
+    display: none;
+    /* Sembunyikan teks "Login" */
+  }
+
+  .header-right-group .btn-btn2 i {
+    font-size: 1.4rem;
+    /* Perbesar ikon */
+  }
+
+  /* Layout */
+  .public-content-singlepage {
+    padding-top: 100px;
+    /* Sesuaikan padding atas krn header lebih tinggi */
+  }
+
+  .landing-section {
+    padding: 2.5rem 1rem;
+  }
+
+  .public-content {
+    padding: 1.5rem 1rem;
+  }
+
+  /* Typography */
+  .public-content h1,
+  .public-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .public-content h3 {
+    font-size: 1.1rem;
+  }
+
+  .welcome-intro {
+    font-size: 1rem;
+  }
+
+  /* Features */
+  .features-group h2 {
+    font-size: 1.75rem;
+  }
+
+  .feature-grid,
+  .trust-grid {
+    grid-template-columns: 1fr;
+    /* 1 kolom */
+  }
+
+  .feature-card {
+    text-align: center;
+  }
+
+  /* FAQ */
+  .faq-container {
+    padding: 2rem 1rem;
+  }
+
+  .faq-container h2 {
+    font-size: 1.75rem;
+  }
+
+  /* About Us */
+  .about-us-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .about-us-section,
+  .aboutus-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .about-us-section h2,
+  .aboutus-section .mission-text h2,
+  .contact-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .mission-section,
+  .aboutus-section.office-life,
+  .aboutus-section.work-fun {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .aboutus-section .mission-text {
+    text-align: center;
+  }
+
+  .aboutus-section .mission-image img {
+    animation: none;
+    /* Matikan animasi float di mobile */
+  }
+
+  .team-member-card {
+    width: 100%;
+    max-width: 160px;
+    padding: 1rem;
+  }
+
+  .member-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .value-card {
+    gap: 1rem;
+    padding: 0.75rem;
+    flex-direction: column;
+    /* Stack ikon dan teks */
+    text-align: center;
+  }
+
+  .value-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .value-card p {
+    font-size: 0.85rem;
+  }
+
+  .social-links {
+    gap: 0.75rem;
+  }
+
+  .social-links a {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
   }
 }
 
