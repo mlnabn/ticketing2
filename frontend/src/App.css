@@ -6799,9 +6799,7 @@ html {
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
-  /* Membuat background diam di tempat */
   background-color: #0a0f1e;
-  /* Warna fallback jika gambar gagal dimuat */
 }
 
 /* Kumpulan semua animasi Anda */
@@ -7066,8 +7064,8 @@ html {
 }
 
 .features-group h2 {
-  font-size: 2.25rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 450;
   color: #cddcff;
   margin-bottom: 2.5rem;
   background: linear-gradient(90deg, #6366f1, #3b82f6);
@@ -7159,12 +7157,12 @@ html {
 }
 
 .faq-container h2 {
-  font-size: 2.25rem;
+  font-size: 2rem;
   /* Samakan dengan Features */
-  font-weight: 700;
+  font-weight: 450;
   margin-bottom: 2.5rem;
   text-align: center;
-  background: linear-gradient(to right, #60a5fa, #a78bfa);
+  background: linear-gradient(90deg, #6366f1, #3b82f6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -7310,11 +7308,10 @@ html {
 }
 
 .about-us-header h1 {
-  font-size: 2.25rem;
-  /* Samakan dengan Features */
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 450;
   line-height: 1.2;
-  background: linear-gradient(to right, #3b82f6, #60a5fa, #a78bfa);
+  background: linear-gradient(90deg, #6366f1, #3b82f6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-size: 200% auto;
@@ -7360,18 +7357,20 @@ html {
   flex-direction: column;
   gap: 0rem;
 }
+
 .about-us-section .text-content h2,
-.about-us-section .text-content h3{
+.about-us-section .text-content h3 {
   text-align: left;
 }
 
-.underline-2{
+.underline-2 {
   width: 100px;
   height: 3px;
-  margin-bottom : 1.5rem;
+  margin-bottom: 1.5rem;
   border-radius: 9999px;
   background: linear-gradient(90deg, #6366f1, #3b82f6);
 }
+
 .underline,
 .underline-line {
   width: 100px;
