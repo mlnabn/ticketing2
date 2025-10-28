@@ -18,6 +18,7 @@ export default function UserManagement() {
     const [showUserFormModal, setShowUserFormModal] = useState(false);
     const [userToEdit, setUserToEdit] = useState(null);
     const [detailUser, setDetailUser] = useState(null);
+    const [selectedIds, setSelectedIds] = useState([]);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
@@ -64,6 +65,16 @@ export default function UserManagement() {
         if (nearBottom && userData && !isLoadingMore && userData.current_page < userData.last_page) {
             loadMoreItems();
         }
+    };
+
+    const handleSelect = (id) => {
+        setSelectedIds(prev =>
+            prev.includes(id) ? prev.filter(userId => userId !== id) : [...prev, id]
+        );
+    };
+
+    const handleSelectAll = (e) => {
+        setSelectedIds(e.target.checked ? users.map(u => u.id) : []);
     };
 
     const handleUserDeleteClick = (user) => {
@@ -125,7 +136,26 @@ export default function UserManagement() {
         setDetailUser(user);
     };
 
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) {
+            showToast('Pilih setidaknya satu pengguna untuk dihapus.', 'info');
+            return;
+        }
+        if (window.confirm(`Anda yakin ingin menghapus ${selectedIds.length} pengguna yang dipilih?`)) {
+            try {
+                const response = await api.post('/users/bulk-delete', { ids: selectedIds });
+                showToast(response.data.message, 'success'); 
+                fetchUsers(debouncedSearchTerm); 
+                setSelectedIds([]); 
+            } catch (e) {
+                console.error('Gagal menghapus pengguna secara massal:', e);
+                showToast(e.response?.data?.message || 'Terjadi kesalahan saat mencoba menghapus pengguna.', 'error');
+            }
+        }
+    };
+
     const users = userData ? userData.data : [];
+    const isAllSelectedOnPage = users.length > 0 && selectedIds.length === users.length;
 
     return (
         <div className="user-management-container">
@@ -145,6 +175,13 @@ export default function UserManagement() {
                     className="filter-search-input"
                 />
             </div>
+            {selectedIds.length > 0 && (
+                <div className="bulk-action-bar" style={{ margin: '20px 0' }}>
+                    <button onClick={handleBulkDelete} className="btn-delete">
+                        Hapus {selectedIds.length} Pengguna yang Dipilih
+                    </button>
+                </div>
+            )}
             {!userData ? (
                 <p>Memuat data pengguna...</p>
             ) : (
@@ -153,7 +190,13 @@ export default function UserManagement() {
                         <table className='job-table'>
                             <thead>
                                 <tr>
-                                    <th style={{ width: '50px' }}>No.</th>
+                                    <th style={{ width: '40px' }}>
+                                        <input
+                                            type="checkbox"
+                                            onChange={handleSelectAll}
+                                            checked={isAllSelectedOnPage}
+                                        />
+                                    </th>
                                     <th>Nama</th>
                                     <th>Email</th>
                                     <th>Peran</th>
@@ -170,11 +213,22 @@ export default function UserManagement() {
                             <table className='job-table'>
                                 <tbody>
                                     {users.length === 0 && !isLoadingMore ? (
-                                        <tr><td colSpan="5" style={{ textAlign: 'center' }}>Tidak ada pengguna yang ditemukan.</td></tr>
+                                        <tr><td colSpan="6" style={{ textAlign: 'center' }}>Tidak ada pengguna yang ditemukan.</td></tr>
                                     ) : (
                                         users.map((user, index) => (
-                                            <tr key={user.id} className="hoverable-row" onClick={(e) => handleRowClick(e, user)}>
-                                                <td style={{ width: '50px' }}>{userData.from + index}</td>
+                                            <tr
+                                                key={user.id}
+                                                className={`hoverable-row ${selectedIds.includes(user.id) ? 'selected-row' : ''}`}
+                                                onClick={(e) => handleRowClick(e, user)}
+                                            >
+                                                <td style={{ width: '40px' }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedIds.includes(user.id)}
+                                                        onChange={() => handleSelect(user.id)}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    />
+                                                </td>
                                                 <td>{user.name}</td>
                                                 <td>{user.email}</td>
                                                 <td>{user.role}</td>
@@ -188,7 +242,7 @@ export default function UserManagement() {
                                         ))
                                     )}
                                     {isLoadingMore && (
-                                        <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                                        <tr><td colSpan="6" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
                                     )}
                                 </tbody>
                             </table>

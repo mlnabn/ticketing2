@@ -51,6 +51,7 @@ Route::middleware('jwt')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/admins', [UserController::class, 'getAdmins']);
     Route::get('/users/all', [UserController::class, 'all']);
+    Route::post('/users/bulk-delete', [UserController::class, 'bulkDelete']);
     Route::post('/users/{user}', [UserController::class, 'update']);
     Route::get('/users/{user}/stats', [UserController::class, 'activityStats']);
     Route::apiResource('users', UserController::class)->except(['create', 'edit', 'update']);

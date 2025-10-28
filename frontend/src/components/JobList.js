@@ -47,8 +47,10 @@ export default function JobList() {
 
   const ticketsOnPage = useMemo(() => ticketData?.data ?? [], [ticketData]);
 
-  const fetchTickets = useCallback(async () => {
-    setIsLoading(true);
+  const fetchTickets = useCallback(async (isPoll = false) => {
+    if (!isPoll) {
+      setIsLoading(true);
+    }
     const endpoint = isMyTicketsPage ? '/tickets/my-tickets' : '/tickets';
 
     const params = {
@@ -92,12 +94,25 @@ export default function JobList() {
   }, [isAdmin, showToast]);
 
   useEffect(() => {
-    fetchTickets();
+    fetchTickets(false);
   }, [fetchTickets]);
 
   useEffect(() => {
     fetchPrerequisites();
   }, [fetchPrerequisites]);
+
+  useEffect(() => {
+    const POLLING_INTERVAL = 30000;
+
+    const intervalId = setInterval(() => {
+      console.log("Polling data tiket terbaru...");
+      fetchTickets(true); 
+    }, POLLING_INTERVAL);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [fetchTickets]);
 
   useEffect(() => {
     setSelectedIds([]);
@@ -324,8 +339,7 @@ export default function JobList() {
               <table className="job-table">
                 <thead>
                   <tr>
-                    {isAdmin && !isMyTicketsPage && (<th style={{ width: '40px' }}>
-                      <input type="checkbox" onChange={handleSelectAll} checked={ticketsOnPage.length > 0 && selectedIds.length === ticketsOnPage.length} /></th>)}
+                    <th style={{ width: '40px' }}><input type="checkbox" onChange={handleSelectAll} checked={ticketsOnPage.length > 0 && selectedIds.length === ticketsOnPage.length} /></th>
                     <th>Pengirim</th>
                     <th>Dikerjakan Oleh</th>
                     <th>Workshop</th>
@@ -354,7 +368,7 @@ export default function JobList() {
                         clickable-row`}
                       onClick={(e) => handleRowClick(e, ticket)}
                     >
-                      {isAdmin && !isMyTicketsPage && (<td style={{ width: '40px' }}><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>)}
+                      <td style={{ width: '40px' }}><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>
                       <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
                       <td>{ticket.user ? ticket.user.name : '-'}</td>
                       <td>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>

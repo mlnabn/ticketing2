@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
-// import Pagination from './Pagination';
 import TicketDetailModal from './TicketDetailModal';
 import { saveAs } from 'file-saver';
 
@@ -58,6 +57,9 @@ export default function ComprehensiveReportPage() {
   const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
   const [exportingPdf, setExportingPdf] = useState(false);
   const [exportingExcel, setExportingExcel] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const desktopListRef = useRef(null);
+  const mobileListRef = useRef(null);
 
   // (BARU) Set tipe filter awal berdasarkan parameter URL
   useEffect(() => {
@@ -101,10 +103,10 @@ export default function ComprehensiveReportPage() {
     setSearchParams(newParams);
   };
 
-  const fetchTableData = useCallback(async (currentFilter) => {
+  const fetchTableData = useCallback(async (currentFilter, page = 1) => {
     setLoading(true);
     try {
-      const params = { all: true };
+      const params = { page };
       if (filterType === 'month') {
         if (dateFilters.year) params.year = dateFilters.year;
         if (dateFilters.month) params.month = dateFilters.month;
@@ -113,7 +115,6 @@ export default function ComprehensiveReportPage() {
         if (dateFilters.end_date) params.end_date = dateFilters.end_date;
       }
 
-
       if (currentFilter === 'handled') {
         params.handled_status = 'handled';
       } else if (currentFilter !== 'all') {
@@ -121,7 +122,7 @@ export default function ComprehensiveReportPage() {
       }
 
       const res = await api.get('/tickets', { params });
-      setTableData({ data: res.data });
+      setTableData(res.data);
     } catch (err) {
       console.error('Gagal mengambil data tabel laporan:', err);
     } finally {
@@ -130,7 +131,7 @@ export default function ComprehensiveReportPage() {
   }, [dateFilters.year, dateFilters.month, dateFilters.start_date, dateFilters.end_date, filterType]);
 
   useEffect(() => {
-    fetchTableData(filter);
+    fetchTableData(filter, 1);
   }, [filter, fetchTableData]);
 
   useEffect(() => {
@@ -205,13 +206,59 @@ export default function ComprehensiveReportPage() {
     handleTicketClick(ticket);
   };
 
+  const loadMoreItems = async () => {
+    if (isLoadingMore || !tableData || tableData.current_page >= tableData.last_page) {
+      return;
+    }
+
+    setIsLoadingMore(true);
+    const nextPage = tableData.current_page + 1;
+
+    try {
+      const params = { page: nextPage };
+      if (filterType === 'month') {
+        if (dateFilters.year) params.year = dateFilters.year;
+        if (dateFilters.month) params.month = dateFilters.month;
+      } else if (filterType === 'date_range') {
+        if (dateFilters.start_date) params.start_date = dateFilters.start_date;
+        if (dateFilters.end_date) params.end_date = dateFilters.end_date;
+      }
+      if (filter === 'handled') {
+        params.handled_status = 'handled';
+      } else if (filter !== 'all') {
+        params.status = filter;
+      }
+
+      const res = await api.get('/tickets', { params });
+
+      setTableData(prev => ({
+        ...res.data,
+        data: [ 
+          ...prev.data,
+          ...res.data.data
+        ]
+      }));
+    } catch (err) {
+      console.error('Gagal memuat lebih banyak tiket:', err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  const handleScroll = (e) => {
+    const target = e.currentTarget;
+    const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
+
+    if (nearBottom && !loading && !isLoadingMore && tableData && tableData.current_page < tableData.last_page) {
+      loadMoreItems();
+    }
+  };
+
   const tickets = tableData ? tableData.data : [];
 
   return (
     <div className="report-container">
       <h2>{title}</h2>
-
-
 
       {!stats ? <p className="report-status-message">Memuat data statistik...</p> : (
         <>
@@ -232,8 +279,6 @@ export default function ComprehensiveReportPage() {
               </div>
             )}
           </div>
-
-          
 
           <h3>Filter Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</h3>
 
@@ -302,9 +347,7 @@ export default function ComprehensiveReportPage() {
             </button>
           </div>
 
-          {loading ? <p>Memuat data...</p> : tickets.length === 0 ? (
-            <p>Tidak ada tiket yang sesuai dengan filter ini.</p>
-          ) : (
+          {loading && !tableData ? <p>Memuat data...</p> : ( 
             <>
               {/* --- Desktop Table --- */}
               <div className="job-list-container">
@@ -326,25 +369,36 @@ export default function ComprehensiveReportPage() {
                     </thead>
                   </table>
 
-                  <div className="table-body-scroll">
+                  <div 
+                    className="table-body-scroll"
+                    ref={desktopListRef}
+                    onScroll={handleScroll}
+                  >
                     <table className="job-table">
                       <tbody>
-                        {tickets.map(t => (
-                          <tr key={t.id} className="clickable-row" onClick={(e) => handleRowClick(e, t)}>
-                            <td>{t.kode_tiket || '-'}</td>
-                            <td>
-                              <span className="description-cell">{t.title}</span>
-                            </td>
-                            <td>{t.status}</td>
-                            <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
-                            <td>{t.user?.name ?? 'N/A'}</td>
-                            <td>{t.creator?.name ?? 'N/A'}</td>
-                            <td>{formatDate(t.created_at)}</td>
-                            <td>{formatDate(t.started_at)}</td>
-                            <td>{formatDate(t.completed_at)}</td>
-                            <td>{calculateDuration(t.started_at, t.completed_at)}</td>
-                          </tr>
-                        ))}
+                        {tickets.length > 0 ? (
+                          tickets.map(t => (
+                            <tr key={t.id} className="clickable-row" onClick={(e) => handleRowClick(e, t)}>
+                              <td>{t.kode_tiket || '-'}</td>
+                              <td>
+                                <span className="description-cell">{t.title}</span>
+                              </td>
+                              <td>{t.status}</td>
+                              <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
+                              <td>{t.user?.name ?? 'N/A'}</td>
+                              <td>{t.creator?.name ?? 'N/A'}</td>
+                              <td>{formatDate(t.created_at)}</td>
+                              <td>{formatDate(t.started_at)}</td>
+                              <td>{formatDate(t.completed_at)}</td>
+                              <td>{calculateDuration(t.started_at, t.completed_at)}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          !isLoadingMore && <tr><td colSpan="10" style={{ textAlign: 'center' }}>Tidak ada tiket yang sesuai dengan filter ini.</td></tr> // <-- UBAH
+                        )}
+                        {isLoadingMore && (
+                          <tr><td colSpan="10" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -352,76 +406,80 @@ export default function ComprehensiveReportPage() {
               </div>
 
               {/* --- Mobile Card View --- */}
-              <div className="job-list-mobile">
-                {tickets.map(t => (
-                  <div key={t.id} className="ticket-card-mobile clickable-row" onClick={(e) => handleRowClick(e, t)}>
-                    <div className="card-row">
-                      <div className="data-group">
-                        <span className="label">Kode Tiket</span>
-                        <span className="value">{t.kode_tiket || '-'}</span>
+              <div 
+                className="job-list-mobile"
+                ref={mobileListRef}
+                onScroll={handleScroll}
+                style={{ overflowY: 'auto', maxHeight: '65vh' }}
+              >
+                {tickets.length > 0 ? (
+                  tickets.map(t => (
+                    <div key={t.id} className="ticket-card-mobile clickable-row" onClick={(e) => handleRowClick(e, t)}>
+                      <div className="card-row">
+                        <div className="data-group">
+                          <span className="label">Kode Tiket</span>
+                          <span className="value">{t.kode_tiket || '-'}</span>
+                        </div>
+                        <div className="data-group">
+                          <span className="label">Judul</span>
+                          <span className="value">
+                            <span className="description-cell">{t.title}</span>
+                          </span>
+                        </div>
                       </div>
-                      <div className="data-group">
-                        <span className="label">Judul</span>
-                        <span className="value">
-                          <span className="description-cell">{t.title}</span>
-                        </span>
-                      </div>
-                    </div>
 
-                    <div className="card-row">
-                      <div className="data-group">
-                        <span className="label">Status</span>
-                        <span className={`value status-${t.status}`}>{t.status}</span>
+                      <div className="card-row">
+                        <div className="data-group">
+                          <span className="label">Status</span>
+                          <span className={`value status-${t.status}`}>{t.status}</span>
+                        </div>
+                        <div className="data-group">
+                          <span className="label">Workshop</span>
+                          <span className="value">{t.workshop ? t.workshop.name : 'N/A'}</span>
+                        </div>
                       </div>
-                      <div className="data-group">
-                        <span className="label">Workshop</span>
-                        <span className="value">{t.workshop ? t.workshop.name : 'N/A'}</span>
-                      </div>
-                    </div>
 
-                    <div className="card-row">
-                      <div className="data-group">
-                        <span className="label">Admin</span>
-                        <span className="value">{t.user?.name ?? 'N/A'}</span>
+                      <div className="card-row">
+                        <div className="data-group">
+                          <span className="label">Admin</span>
+                          <span className="value">{t.user?.name ?? 'N/A'}</span>
+                        </div>
+                        <div className="data-group">
+                          <span className="label">Pembuat</span>
+                          <span className="value">{t.creator?.name ?? 'N/A'}</span>
+                        </div>
                       </div>
-                      <div className="data-group">
-                        <span className="label">Pembuat</span>
-                        <span className="value">{t.creator?.name ?? 'N/A'}</span>
-                      </div>
-                    </div>
 
-                    <div className="card-row">
-                      <div className="data-group">
-                        <span className="label">Dibuat</span>
-                        <span className="value">{formatDate(t.created_at)}</span>
+                      <div className="card-row">
+                        <div className="data-group">
+                          <span className="label">Dibuat</span>
+                          <span className="value">{formatDate(t.created_at)}</span>
+                        </div>
+                        <div className="data-group">
+                          <span className="label">Mulai</span>
+                          <span className="value">{formatDate(t.started_at)}</span>
+                        </div>
                       </div>
-                      <div className="data-group">
-                        <span className="label">Mulai</span>
-                        <span className="value">{formatDate(t.started_at)}</span>
-                      </div>
-                    </div>
 
-                    <div className="card-row">
-                      <div className="data-group">
-                        <span className="label">Selesai</span>
-                        <span className="value">{formatDate(t.completed_at)}</span>
-                      </div>
-                      <div className="data-group">
-                        <span className="label">Durasi</span>
-                        <span className="value">{calculateDuration(t.started_at, t.completed_at)}</span>
+                      <div className="card-row">
+                        <div className="data-group">
+                          <span className="label">Selesai</span>
+                          <span className="value">{formatDate(t.completed_at)}</span>
+                        </div>
+                        <div className="data-group">
+                          <span className="label">Durasi</span>
+                          <span className="value">{calculateDuration(t.started_at, t.completed_at)}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  !isLoadingMore && <p style={{ textAlign: 'center' }}>Tidak ada tiket yang sesuai.</p> 
+                )}
+                {isLoadingMore && (
+                  <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+                )}
               </div>
-
-              {/* {tableData && tableData.last_page > 1 && (
-                <Pagination
-                  currentPage={tableData.current_page}
-                  lastPage={tableData.last_page}
-                  onPageChange={setCurrentPage}
-                />
-              )} */}
             </>
           )
           }

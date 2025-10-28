@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom'; 
 import api from '../services/api';
 import { format } from 'date-fns';
@@ -14,6 +14,9 @@ export default function NotificationForm() {
     const [users, setUsers] = useState([]);
     const [globalNotifications, setGlobalNotifications] = useState([]);
     const [templates, setTemplates] = useState([]);
+    const [globalNotifPagination, setGlobalNotifPagination] = useState(null); // Menyimpan info paginasi
+    const [isLoadingMoreGlobal, setIsLoadingMoreGlobal] = useState(false);
+    const historyListRef = useRef(null);
 
     const fetchAllUsers = useCallback(async () => {
         try {
@@ -25,13 +28,25 @@ export default function NotificationForm() {
         }
     }, [showToast]);
 
-    const fetchNotifications = useCallback(async () => {
+    const fetchGlobalNotifications = useCallback(async (page = 1) => {
+        if (page === 1) setIsLoading(true);
+
         try {
-          const response = await api.get('/notifications');
-          setGlobalNotifications(response.data.filter(n => n.user_id === null));
+            const response = await api.get('/notifications/global', { params: { page } });
+            if (page === 1) {
+                setGlobalNotifications(response.data.data); 
+            } else {
+                setGlobalNotifications(prev => [...prev, ...response.data.data]);
+            }
+            setGlobalNotifPagination({
+                currentPage: response.data.current_page,
+                totalPages: response.data.last_page,
+            });
         } catch (e) {
-          console.error('Gagal mengambil notifikasi:', e);
-          showToast('Gagal memuat notifikasi.', 'error');
+            console.error('Gagal mengambil notifikasi global:', e);
+            showToast('Gagal memuat riwayat pengumuman.', 'error');
+        } finally {
+            if (page === 1) setIsLoading(false);
         }
     }, [showToast]);
 
@@ -47,9 +62,9 @@ export default function NotificationForm() {
 
   useEffect(() => {
     fetchAllUsers();
-    fetchNotifications();
+    fetchGlobalNotifications();
     fetchTemplates();
-  }, [fetchAllUsers, fetchNotifications, fetchTemplates]);
+  }, [fetchAllUsers, fetchGlobalNotifications, fetchTemplates]);
 
   const handleDelete = async (id) => {
     if (!window.confirm('Anda yakin ingin menghapus pengumuman ini secara permanen?')) {
@@ -57,7 +72,7 @@ export default function NotificationForm() {
     }
     try {
       await api.delete(`/notifications/${id}`);
-      fetchNotifications(); // Panggil ulang untuk refresh
+      fetchGlobalNotifications(); // Panggil ulang untuk refresh
       showToast('Notifikasi berhasil dihapus.', 'success');
     } catch (error) {
       console.error('Gagal menghapus notifikasi:', error);
@@ -81,15 +96,33 @@ export default function NotificationForm() {
       setMessage('');
       setTarget('all');
 
-            if (payload.target_user_id === null) {
-                fetchNotifications(); 
-            }
-            showToast('Notifikasi berhasil dikirim.', 'success');
+        if (payload.target_user_id === null) {
+            fetchGlobalNotifications();
+        }
+          showToast('Notifikasi berhasil dikirim.', 'success');
         } catch (error) {
             console.error('Gagal mengirim notifikasi:', error);
             showToast('Gagal mengirim notifikasi.', 'error');
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const loadMoreGlobalNotifications = async () => {
+        if (isLoadingMoreGlobal || !globalNotifPagination || globalNotifPagination.currentPage >= globalNotifPagination.totalPages) {
+            return;
+        }
+        setIsLoadingMoreGlobal(true);
+        await fetchGlobalNotifications(globalNotifPagination.currentPage + 1);
+        setIsLoadingMoreGlobal(false);
+    };
+
+    const handleScroll = (e) => {
+        const target = e.currentTarget;
+        const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 100;
+
+        if (nearBottom && !isLoading && !isLoadingMoreGlobal && globalNotifPagination && globalNotifPagination.currentPage < globalNotifPagination.totalPages) {
+            loadMoreGlobalNotifications();
         }
     };
 
@@ -136,24 +169,34 @@ export default function NotificationForm() {
         </div>
         <div className="global-notification-history card">
               <h2 className="page-title2">Riwayat Pengumuman Global</h2>
-              {globalNotifications && globalNotifications.length > 0 ? (
-                  <ul className="history-list">
-                      {globalNotifications.map((notif) => (
+              <ul
+                className="history-list"
+                ref={historyListRef}
+                onScroll={handleScroll}
+                style={{ maxHeight: '600px', overflowY: 'auto' }}
+              >
+                  {isLoading && globalNotifications.length === 0 ? ( 
+                      <p>Memuat riwayat...</p>
+                  ) : globalNotifications.length > 0 ? (
+                      globalNotifications.map((notif) => (
                           <li key={notif.id} className="history-item">
                               <div className="history-item-content">
                                   <strong>{notif.title}</strong>
                                   <p>{notif.message}</p>
                                   <small>Dikirim pada:{' '}{format(new Date(notif.created_at), 'dd MMMM yyyy, HH:mm')}</small>
                               </div>
-                              <button onClick={() => handleDelete(notif.id)} className="btn-delete-small">
+                              <button onClick={() => handleDelete(notif.id)} className="btn-delete-small" style={{marginRight: '10px'}}>
                                   <i className="fas fa-trash-alt"></i> Hapus
                               </button>
                           </li>
-                      ))}
+                      ))
+                  ) : (
+                       !isLoadingMoreGlobal && <p>Belum ada pengumuman global yang dikirim.</p>
+                  )}
+                   {isLoadingMoreGlobal && (
+                       <li className="loading-indicator" style={{textAlign: 'center', padding: '10px'}}>Memuat lebih banyak...</li>
+                   )}
                   </ul>
-              ) : (
-                  <p>Belum ada pengumuman global yang dikirim.</p>
-              )}
             </div>
       </>
     );
