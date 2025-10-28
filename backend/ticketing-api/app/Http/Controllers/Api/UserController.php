@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use App\Models\Ticket;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -111,6 +112,37 @@ class UserController extends Controller
         }
         $user->delete();
         return response()->json(null, 204);
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        if (Auth::user()->role !== 'admin') {
+            return response()->json(['error' => 'Akses ditolak.'], 403);
+        }
+
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:users,id',
+        ]);
+
+        $idsToDelete = $validated['ids'];
+        $currentUserId = Auth::id();
+
+        $filteredIds = array_filter($idsToDelete, function ($id) use ($currentUserId) {
+            return $id != $currentUserId;
+        });
+
+        if (count($filteredIds) > 0) {
+            User::whereIn('id', $filteredIds)->delete();
+        }
+
+        $skippedCount = count($idsToDelete) - count($filteredIds);
+        $message = count($filteredIds) . ' pengguna berhasil dihapus.';
+        if ($skippedCount > 0) {
+            $message .= ' Anda tidak dapat menghapus akun Anda sendiri.';
+        }
+
+        return response()->json(['message' => $message]);
     }
 
     public function activityStats(User $user)

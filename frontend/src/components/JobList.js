@@ -339,8 +339,7 @@ export default function JobList() {
               <table className="job-table">
                 <thead>
                   <tr>
-                    {isAdmin && !isMyTicketsPage && (<th style={{ width: '40px' }}>
-                      <input type="checkbox" onChange={handleSelectAll} checked={ticketsOnPage.length > 0 && selectedIds.length === ticketsOnPage.length} /></th>)}
+                    <th style={{ width: '40px' }}><input type="checkbox" onChange={handleSelectAll} checked={ticketsOnPage.length > 0 && selectedIds.length === ticketsOnPage.length} /></th>
                     <th>Pengirim</th>
                     <th>Dikerjakan Oleh</th>
                     <th>Workshop</th>
@@ -369,7 +368,7 @@ export default function JobList() {
                         clickable-row`}
                       onClick={(e) => handleRowClick(e, ticket)}
                     >
-                      {isAdmin && !isMyTicketsPage && (<td style={{ width: '40px' }}><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>)}
+                      <td style={{ width: '40px' }}><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>
                       <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
                       <td>{ticket.user ? ticket.user.name : '-'}</td>
                       <td>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
