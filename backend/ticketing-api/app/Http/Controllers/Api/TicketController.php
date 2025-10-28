@@ -884,7 +884,7 @@ class TicketController extends Controller
 
         $systemPrompt = "You are an assistant specialized in classifying IT support ticket urgency for 'Dtech Company'. 
         Analyze the following ticket description and determine if it's 'Urgent' or 'Not Urgent'. 
-        Consider factors like inability to work, system down, security issues, or widespread impact as Urgent. 
+        Consider factors like inability to work, system down, security issues, item installation, installation, or widespread impact as Urgent. 
         Respond ONLY with the word 'Urgent' or 'Not Urgent'.";
 
         $userPrompt = "Ticket Description: \"" . $description . "\"";
