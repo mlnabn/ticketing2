@@ -133,12 +133,9 @@ const FAQPage = () => {
     // Container utama tidak perlu AnimateOnScroll jika isinya sudah
     <div className="faq-container">
       <AnimateOnScroll className="w-full">
-        <h1 className="text-3xl font-bold mb-4 text-center 
-               bg-[linear-gradient(90deg,#6366f1,#3b82f6)] 
-               bg-clip-text text-transparent"
-        >
+        <h2>
           Pusat Bantuan (FAQ)
-        </h1>
+        </h2>
       </AnimateOnScroll>
 
       {/* FAQ Populer */}
