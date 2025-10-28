@@ -18,7 +18,6 @@ use App\Http\Controllers\Api\MasterBarangController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\InventoryReportController;
-use App\Http\Controllers\Api\UrgencyKeywordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -108,6 +107,7 @@ Route::middleware('jwt')->group(function () {
     Route::apiResource('inventory/categories', MasterKategoriController::class);
     Route::apiResource('inventory/sub-categories', SubKategoriController::class);
     Route::apiResource('inventory/items', MasterBarangController::class)->parameters(['items' => 'masterBarang']);
+    Route::post('/inventory/items/bulk-delete', [MasterBarangController::class, 'bulkDelete']);
     Route::post('/inventory/items/check-exists', [MasterBarangController::class, 'checkIfExists']);
     Route::post('/inventory/items/{masterBarang}', [MasterBarangController::class, 'update']);
     Route::get('/inventory/items/search/{query}', [MasterBarangController::class, 'searchByName']);

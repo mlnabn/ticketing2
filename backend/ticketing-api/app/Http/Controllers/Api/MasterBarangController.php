@@ -210,6 +210,37 @@ class MasterBarangController extends Controller
         return response()->json($masterBarang);
     }
 
+    public function bulkDelete(Request $request)
+    {
+        // 1. Validasi input
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:master_barangs,id_m_barang',
+        ]);
+
+        $allIds = $validated['ids'];
+
+        $idsWithStock = MasterBarang::whereIn('id_m_barang', $allIds)
+                                  ->has('stokBarangs') 
+                                  ->pluck('id_m_barang')
+                                  ->all();
+
+        $idsToDelete = array_diff($allIds, $idsWithStock);
+
+        $deletedCount = 0;
+        if (count($idsToDelete) > 0) {
+            $deletedCount = MasterBarang::whereIn('id_m_barang', $idsToDelete)->delete();
+        }
+
+        $skippedCount = count($allIds) - $deletedCount;
+        $message = $deletedCount . ' SKU berhasil dihapus.';
+        if ($skippedCount > 0) {
+            $message .= ' ' . $skippedCount . ' SKU tidak dapat dihapus karena masih memiliki stok fisik terkait.';
+        }
+
+        return response()->json(['message' => $message]);
+    }
+
     /**
      * Menghapus sebuah tipe barang (MasterBarang).
      * Hanya bisa dilakukan jika tidak ada lagi item fisik yang tercatat.
