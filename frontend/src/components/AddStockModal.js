@@ -175,7 +175,7 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
     /* ---------------- Load Data ---------------- */
     useEffect(() => {
         if (!isOpen) return;
-        api.get('/inventory/items?all=true').then((res) => {
+        api.get('/inventory/items-flat?all=true').then((res) => {
             const data = res.data.data || res.data;
             const options = data.map((item) => ({
                 value: item.id_m_barang,
