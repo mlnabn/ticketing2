@@ -47,8 +47,8 @@ export default function UserManagement() {
 
             setUserData(prev => ({
                 ...response.data,
-                from: prev.from, 
-                data: [...prev.data, ...response.data.data] 
+                from: prev.from,
+                data: [...prev.data, ...response.data.data]
             }));
         } catch (e) {
             console.error('Gagal memuat data pengguna tambahan:', e);
@@ -144,9 +144,9 @@ export default function UserManagement() {
         if (window.confirm(`Anda yakin ingin menghapus ${selectedIds.length} pengguna yang dipilih?`)) {
             try {
                 const response = await api.post('/users/bulk-delete', { ids: selectedIds });
-                showToast(response.data.message, 'success'); 
-                fetchUsers(debouncedSearchTerm); 
-                setSelectedIds([]); 
+                showToast(response.data.message, 'success');
+                fetchUsers(debouncedSearchTerm);
+                setSelectedIds([]);
             } catch (e) {
                 console.error('Gagal menghapus pengguna secara massal:', e);
                 showToast(e.response?.data?.message || 'Terjadi kesalahan saat mencoba menghapus pengguna.', 'error');
@@ -176,8 +176,8 @@ export default function UserManagement() {
                 />
             </div>
             {selectedIds.length > 0 && (
-                <div className="bulk-action-bar" style={{ margin: '20px 0' }}>
-                    <button onClick={handleBulkDelete} className="btn-delete">
+                <div className="bulk-action-bar">
+                    <button onClick={handleBulkDelete} className="btn-clear">
                         Hapus {selectedIds.length} Pengguna yang Dipilih
                     </button>
                 </div>
@@ -208,12 +208,12 @@ export default function UserManagement() {
                             className="table-body-scroll"
                             ref={desktopListRef}
                             onScroll={handleScroll}
-                            style={{ overflowY: 'auto', maxHeight: '65vh' }}
+                            style={{ overflowY: 'auto', maxHeight: '70vh' }}
                         >
                             <table className='job-table'>
                                 <tbody>
                                     {users.length === 0 && !isLoadingMore ? (
-                                        <tr><td colSpan="6" style={{ textAlign: 'center' }}>Tidak ada pengguna yang ditemukan.</td></tr>
+                                        <tr><td colSpan="5" style={{ textAlign: 'center', padding: '20px' }}>Tidak ada pengguna yang ditemukan.</td></tr>
                                     ) : (
                                         users.map((user, index) => (
                                             <tr
@@ -242,11 +242,25 @@ export default function UserManagement() {
                                         ))
                                     )}
                                     {isLoadingMore && (
-                                        <tr><td colSpan="6" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                                        <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
                                     )}
                                 </tbody>
                             </table>
                         </div>
+                        {!isLoadingMore && userData && userData.total > 0 && (
+                            <table className="job-table">
+                                <tfoot>
+                                    <tr className="subtotal-row">
+                                        <td colSpan="4" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>
+                                            Total Pengguna
+                                        </td>
+                                        <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                                            {userData.total}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        )}
                     </div>
 
                     <div

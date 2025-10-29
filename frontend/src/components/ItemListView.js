@@ -9,7 +9,7 @@ function ItemListView({
     mobileItems, isMobileLoading, onMobileScroll, isLoadingMoreMobile,
     onAdd, onEdit, onDelete, onFilterChange,
     selectedIds, onSelectId, onSelectAll, onBulkDelete, expandedRows, detailItems,
-    expandingId, onToggleExpand
+    expandingId, onToggleExpand, totalItems
 }) {
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
@@ -81,7 +81,7 @@ function ItemListView({
                 </select>
                 {selectedIds.length > 0 && (
                     <div className="bulk-action-bar" >
-                        <button onClick={onBulkDelete} className="btn-delete">
+                        <button onClick={onBulkDelete} className="btn-clear">
                             Hapus {selectedIds.length} SKU yang Dipilih
                         </button>
                     </div>
@@ -198,6 +198,18 @@ function ItemListView({
                             </tbody>
                         </table>
                     </div>
+                    {!loading && !isLoadingMore && items.length > 0 && (
+                        <table className="job-table">
+                            <tfoot>
+                                <tr className="subtotal-row">
+                                    <td colSpan="5" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>Total SKU</td>
+                                    <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
+                                        {totalItems} Data
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    )}
                 </div>
 
                 {/* === TAMPILAN KARTU UNTUK MOBILE === */}
@@ -244,6 +256,14 @@ function ItemListView({
                     ))}
                     {isLoadingMoreMobile && ( 
                         <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+                    )}
+                    {!loading && !isLoadingMore && items.length > 0 && (
+                        <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
+                            <span className="subtotal-label">Total SKU</span>
+                            <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                {totalItems} Data
+                            </span>
+                        </div>
                     )}
                 </div>
             </div>

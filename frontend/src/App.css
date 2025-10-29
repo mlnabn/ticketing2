@@ -2659,7 +2659,6 @@ body.dark-mode .job-table tbody tr:last-child td {
   cursor: pointer;
 }
 
-/* Efek pop untuk kartu mobile yang bisa di-hover */
 .job-list-mobile .ticket-card-mobile.hoverable-row:hover,
 .workshop-list-mobile .ticket-card-mobile.hoverable-row:hover,
 .user-list-mobile .ticket-card-mobile.hoverable-row:hover,
@@ -2670,7 +2669,6 @@ body.dark-mode .job-table tbody tr:last-child td {
   cursor: pointer;
 }
 
-/* Container untuk tabel yang bisa di-scroll */
 .table-scroll-container {
   border-radius: 8px;
   overflow: hidden;
@@ -2679,7 +2677,7 @@ body.dark-mode .job-table tbody tr:last-child td {
 .table-body-scroll {
   max-height: 600px;
   overflow-y: auto;
-  border-bottom: 1px solid #ddd;
+  /* border-bottom: 1px solid #ddd; */
 }
 
 .table-scroll-container .job-table {
@@ -2714,9 +2712,7 @@ body.dark-mode .job-table tbody tr:last-child td {
 body.dark-mode .job-table-user {
   box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.5);
   background-color: transparent;
-  /* Latar belakang dikontrol oleh sel (td) */
   border: none;
-  /* Border dikontrol oleh sel (td) */
 }
 
 
@@ -2726,20 +2722,14 @@ body.dark-mode .job-table-user {
   padding: 1rem;
   text-align: left;
   border-bottom: 1px solid #e2e8f0;
-  /* Garis bawah untuk light mode */
   color: #1e293b;
-  /* Warna teks untuk light mode */
   transition: all 0.3s ease;
 }
 
-/* [DIUBAH] Gaya sel data (td) untuk dark mode */
 body.dark-mode .job-table-user td {
   border-bottom: 1px solid #2d3748;
-  /* Warna garis pemisah baris */
   color: #e2e8f0;
-  /* Warna teks utama (putih gading) */
   border-right: none;
-  /* Hapus border kanan default, kita atur di header */
 }
 
 
@@ -2754,11 +2744,8 @@ body.dark-mode .job-table-user td {
 
 body.dark-mode .job-table-user th {
   background-color: var(--joblist-header-bg-dark);
-  /* Menggunakan variabel baru */
   color: var(--joblist-header-text-dark);
-  /* Menggunakan variabel baru */
   border-bottom: 2px solid #4a5568;
-  /* Garis bawah header yang tegas */
 }
 
 /* Divider untuk header */
@@ -2835,54 +2822,35 @@ body.dark-mode .user-table tbody tr:hover {
 
 .user-history-table {
   background-color: transparent;
-  /* Hapus background putih */
   border: 1px solid #5a6d8d;
-  /* PERUBAHAN: Border lebih tegas di sekeliling tabel */
   box-shadow: none;
-  /* Hapus shadow agar lebih flat */
   border-radius: 12px;
-  /* Menjaga sudut membulat */
   overflow: hidden;
-  /* Penting agar radius terlihat */
   border-collapse: separate;
-  /* Memastikan border luar terlihat */
   border-spacing: 0;
 }
 
-/* Header tabel yang lebih gelap dan menyatu */
 .user-history-table th {
-  /* PERUBAHAN: Menggunakan gradien untuk header yang lebih estetik */
   background: linear-gradient(90deg, rgba(46, 39, 112, 0.6) 0%, rgba(30, 67, 137, 0.6) 100%);
   color: #FFFFFF;
-  /* Teks header putih */
   border-bottom: 1px solid #5a6d8d;
-  /* Border bawah yang lebih tegas */
 }
 
-/* Sel data dengan warna teks yang sesuai */
 .user-history-table td {
   color: #E0E0E0;
-  /* Teks putih/terang secara langsung */
   border-bottom: 1px solid #4A5568;
-  /* Border gelap antar baris */
   border-right: 1px solid #4A5568;
-  /* Border gelap antar kolom */
 }
-
-/* Menghilangkan border bawah pada baris terakhir */
 .user-history-table tr:last-child td {
   border-bottom: none;
 }
 
-/* Hapus border kanan di sel terakhir */
 .user-history-table td:last-child {
   border-right: none;
 }
 
-/* Efek hover yang lebih gelap */
 .user-history-table tbody tr:hover {
   background-color: rgba(74, 74, 102, 0.7);
-  /* Warna hover gelap dengan transparansi */
 }
 
 /*
@@ -5281,6 +5249,35 @@ body.dark-mode .btn-scan:hover {
 .btn-hover {
   background-color: #059669;
   color: #ffffff;
+}
+
+
+.bulk-action-bar {
+    display: flex;
+    align-items: center;}
+
+.bulk-action-bar .btn-clear {
+
+    background-color: #FEE2E2;
+    color: #B91C1C;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    display: inline-flex;
+    align-items: center;
+}
+.bulk-action-bar .btn-clear:hover {
+    background-color: #FECACA;
+    color: #991B1B;
+}
+
+.bulk-action-bar .btn-clear:active {
+    background-color: #FCA5A5;
+    transform: scale(0.98);
 }
 
 
@@ -11523,7 +11520,7 @@ body.dark-mode .btn-dlt:hover {
   border-radius: 6px;
   min-width: 250px;
   flex-grow: 1;
-  margin-bottom: 18px;
+
   background-color: var(--input-bg, #FFFFFF);
   color: var(--text-primary, #212529);
   border: 1px solid var(--input-border, #ced4da);
@@ -12153,13 +12150,19 @@ body.dark-mode .btn-dlt:hover {
 .detail-list-header {
   display: flex;
   padding: 0.6rem 1rem;
-  background-color: var(--detail-header-bg, #e9ecef);
+  background-color: #b3bac6ff;
   font-weight: 600;
   color: var(--detail-header-text, #495057);
   font-size: 0.8em;
-  border-bottom: 2px solid var(--detail-border-color, #dee2e6);
   margin-bottom: 0.25rem;
   text-align: center;
+  border-top: 1px solid #4A5568;
+}
+
+body.dark-mode .detail-list-header {
+  background-color: #374151ff;
+  color: var(--detail-header-text-dark, #d1d5db);
+  border-top: 1px solid #9ca3af;
 }
 
 .detail-list-header .detail-cell {
@@ -12364,11 +12367,7 @@ body.dark-mode .detail-nodata {
   /* Warna teks default untuk area detail */
 }
 
-body.dark-mode .detail-list-header {
-  background-color: #1f1f1f;
-  color: #d1d5db;
-  border-bottom-color: #374151;
-}
+
 
 body.dark-mode .detail-row-div {
   border-bottom-color: #374151;

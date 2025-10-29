@@ -112,6 +112,10 @@ export default function TicketReportDetail() {
   const fetchAdminReport = useCallback(async (statusFilter, page = 1) => {
     if (!adminId) return;
     setLoading(true);
+
+    if (page === 1) {
+      setReportData(null);
+    }
     try {
       const params = { page };
       if (statusFilter !== 'all') params.status = statusFilter;
@@ -147,7 +151,7 @@ export default function TicketReportDetail() {
 
     setIsLoadingMore(true);
     const nextPage = reportData.tickets.current_page + 1;
-    
+
     try {
       const params = { page: nextPage };
       if (filter !== 'all') params.status = filter;
@@ -160,12 +164,12 @@ export default function TicketReportDetail() {
       }
 
       const res = await api.get(`/tickets/admin-report/${adminId}`, { params });
-      
+
       setReportData(prev => ({
         ...prev,
-        tickets: { 
-          ...res.data.tickets, 
-          data: [ 
+        tickets: {
+          ...res.data.tickets,
+          data: [
             ...prev.tickets.data,
             ...res.data.tickets.data
           ]
@@ -231,13 +235,12 @@ export default function TicketReportDetail() {
   if (!admin) {
     return <p>Memuat data admin...</p>;
   }
-
   if (loading && !reportData) {
     return <p>Memuat data...</p>;
   }
 
   const { total, completed, rejected, in_progress } = reportData || {};
-  const ticketsOnPage = reportData ? reportData.tickets.data : [];
+  const ticketsOnPage = (reportData && reportData.tickets) ? reportData.tickets.data : [];
 
   return (
     <div className="report-container">
@@ -251,7 +254,7 @@ export default function TicketReportDetail() {
             <div className={`card ${filter === 'in_progress' ? 'active' : ''}`} onClick={() => handleFilterClick('in_progress')}><h3>Tiket Belum Selesai</h3><p>{in_progress}</p></div>
             <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterClick('rejected')}><h3>Tiket Ditolak</h3><p>{rejected}</p></div>
           </div>
-          
+
           <h3>Filter Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</h3>
 
           <div className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
@@ -321,7 +324,7 @@ export default function TicketReportDetail() {
 
           {/* --- Desktop Table --- */}
           <div className="job-list-container">
-            {loading ? <p>Memuat tabel...</p> : (
+            {(loading && !reportData.tickets) ? <p>Memuat tabel...</p> : (
               <div className="table-scroll-container">
                 <table className="job-table">
                   <thead>
@@ -338,7 +341,7 @@ export default function TicketReportDetail() {
                     </tr>
                   </thead>
                 </table>
-                <div 
+                <div
                   className="table-body-scroll"
                   ref={desktopListRef}
                   onScroll={handleScroll}
@@ -370,79 +373,101 @@ export default function TicketReportDetail() {
                     </tbody>
                   </table>
                 </div>
+                {!loading && ticketsOnPage.length > 0 && reportData && reportData.tickets && (
+                  <table className="job-table">
+                    <tfoot>
+                      <tr className="subtotal-row">
+                        <td colSpan={8}>Total Data</td>
+                        <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
+                          {reportData.tickets.total} Data
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                )}
+
               </div>
             )}
           </div>
 
           {/* --- Mobile Card View --- */}
-          <div 
+          <div
             className="job-list-mobile"
             ref={mobileListRef}
             onScroll={handleScroll}
             style={{ overflowY: 'auto', maxHeight: '65vh' }}
           >
-            {loading ? (
+            {(loading && !reportData.tickets) ? (
               <p style={{ textAlign: 'center' }}>Memuat tiket...</p>
             ) : ticketsOnPage.length > 0 ? (
               ticketsOnPage.map((t) => (
-              <div key={t.id} className="ticket-card-mobile clickable-row" onClick={(e) => handleRowClick(e, t)}>
-                <div className="card-row">
-                  <div className="data-group">
-                    <span className="label">Kode Tiket</span>
-                    <span className="value">{t.kode_tiket || '-'}</span>
+                <div key={t.id} className="ticket-card-mobile clickable-row" onClick={(e) => handleRowClick(e, t)}>
+                  <div className="card-row">
+                    <div className="data-group">
+                      <span className="label">Kode Tiket</span>
+                      <span className="value">{t.kode_tiket || '-'}</span>
+                    </div>
+                    <div className="data-group">
+                      <span className="label">Judul</span>
+                      <span className="value">
+                        <span className="description-cell">{t.title}</span>
+                      </span>
+                    </div>
                   </div>
-                  <div className="data-group">
-                    <span className="label">Judul</span>
-                    <span className="value">
-                      <span className="description-cell">{t.title}</span>
-                    </span>
-                  </div>
-                </div>
 
-                <div className="card-row">
-                  <div className="data-group">
-                    <span className="label">Status</span>
-                    <span className="value">{t.status}</span>
+                  <div className="card-row">
+                    <div className="data-group">
+                      <span className="label">Status</span>
+                      <span className="value">{t.status}</span>
+                    </div>
+                    <div className="data-group">
+                      <span className="label">Workshop</span>
+                      <span className="value">{t.workshop ? t.workshop.name : 'N/A'}</span>
+                    </div>
                   </div>
-                  <div className="data-group">
-                    <span className="label">Workshop</span>
-                    <span className="value">{t.workshop ? t.workshop.name : 'N/A'}</span>
-                  </div>
-                </div>
 
-                <div className="card-row">
-                  <div className="data-group">
-                    <span className="label">Pembuat</span>
-                    <span className="value">{t.creator?.name ?? '-'}</span>
+                  <div className="card-row">
+                    <div className="data-group">
+                      <span className="label">Pembuat</span>
+                      <span className="value">{t.creator?.name ?? '-'}</span>
+                    </div>
+                    <div className="data-group">
+                      <span className="label">Tgl Dibuat</span>
+                      <span className="value">{formatDate(t.created_at)}</span>
+                    </div>
                   </div>
-                  <div className="data-group">
-                    <span className="label">Tgl Dibuat</span>
-                    <span className="value">{formatDate(t.created_at)}</span>
-                  </div>
-                </div>
 
-                <div className="card-row">
-                  <div className="data-group">
-                    <span className="label">Mulai</span>
-                    <span className="value">{formatDate(t.started_at)}</span>
+                  <div className="card-row">
+                    <div className="data-group">
+                      <span className="label">Mulai</span>
+                      <span className="value">{formatDate(t.started_at)}</span>
+                    </div>
+                    <div className="data-group">
+                      <span className="label">Selesai</span>
+                      <span className="value">{formatDate(t.completed_at)}</span>
+                    </div>
                   </div>
-                  <div className="data-group">
-                    <span className="label">Selesai</span>
-                    <span className="value">{formatDate(t.completed_at)}</span>
-                  </div>
-                </div>
 
-                <div className="card-row">
-                  <div className="data-group single">
-                    <span className="label">Durasi</span>
-                    <span className="value">{calculateDuration(t.started_at, t.completed_at)}</span>
+                  <div className="card-row">
+                    <div className="data-group single">
+                      <span className="label">Durasi</span>
+                      <span className="value">{calculateDuration(t.started_at, t.completed_at)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              ))
             ) : (
-              !isLoadingMore && <p style={{ textAlign: 'center' }}>Tidak ada tiket yang sesuai.</p> 
+              !isLoadingMore && <p style={{ textAlign: 'center' }}>Tidak ada tiket yang sesuai.</p>
             )}
+            {!loading && !isLoadingMore && ticketsOnPage.length > 0 && reportData && reportData.tickets && (
+              <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
+                <span className="subtotal-label">Total Tiket</span>
+                <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                  {reportData.tickets.total} Data
+                </span>
+              </div>
+            )}
+
             {isLoadingMore && (
               <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
             )}

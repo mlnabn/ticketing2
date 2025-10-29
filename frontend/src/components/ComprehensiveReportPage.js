@@ -38,16 +38,12 @@ export default function ComprehensiveReportPage() {
 
   const filterTypePath = location.pathname.includes('/handled') ? 'handled' : 'all';
   const title = filterTypePath === 'handled' ? 'Laporan Tiket yang Dikerjakan' : 'Laporan Seluruh Tiket';
-
-  // (DIUBAH) Baca semua parameter filter tanggal dari URL
   const dateFilters = {
     year: searchParams.get('year') || currentYear.toString(),
     month: searchParams.get('month') || '',
     start_date: searchParams.get('start_date') || '',
     end_date: searchParams.get('end_date') || '',
   };
-
-  // (BARU) State untuk tipe filter (bulan atau rentang tanggal)
   const [filterType, setFilterType] = useState('month');
 
   const [tableData, setTableData] = useState(null);
@@ -61,7 +57,7 @@ export default function ComprehensiveReportPage() {
   const desktopListRef = useRef(null);
   const mobileListRef = useRef(null);
 
-  // (BARU) Set tipe filter awal berdasarkan parameter URL
+ 
   useEffect(() => {
     if (dateFilters.start_date || dateFilters.end_date) {
       setFilterType('date_range');
@@ -88,10 +84,8 @@ export default function ComprehensiveReportPage() {
     const newParams = new URLSearchParams(searchParams);
 
     if (newType === 'month') {
-      // Hapus filter rentang tanggal
       newParams.delete('start_date');
       newParams.delete('end_date');
-      // Set default tahun jika belum ada
       if (!newParams.get('year')) {
         newParams.set('year', currentYear.toString());
       }
@@ -105,6 +99,9 @@ export default function ComprehensiveReportPage() {
 
   const fetchTableData = useCallback(async (currentFilter, page = 1) => {
     setLoading(true);
+    if (page === 1) {
+      setTableData(null);
+    }
     try {
       const params = { page };
       if (filterType === 'month') {
@@ -233,7 +230,7 @@ export default function ComprehensiveReportPage() {
 
       setTableData(prev => ({
         ...res.data,
-        data: [ 
+        data: [
           ...prev.data,
           ...res.data.data
         ]
@@ -347,7 +344,7 @@ export default function ComprehensiveReportPage() {
             </button>
           </div>
 
-          {loading && !tableData ? <p>Memuat data...</p> : ( 
+          {loading && !tableData ? <p>Memuat data...</p> : (
             <>
               {/* --- Desktop Table --- */}
               <div className="job-list-container">
@@ -369,7 +366,7 @@ export default function ComprehensiveReportPage() {
                     </thead>
                   </table>
 
-                  <div 
+                  <div
                     className="table-body-scroll"
                     ref={desktopListRef}
                     onScroll={handleScroll}
@@ -402,11 +399,26 @@ export default function ComprehensiveReportPage() {
                       </tbody>
                     </table>
                   </div>
+
+                  {/* BARU: Tambahkan tfoot untuk total data (Desktop) */}
+                  {!loading && tickets.length > 0 && tableData && (
+                    <table className="job-table">
+                      <tfoot>
+                        <tr className="subtotal-row">
+                          <td colSpan={9}>Total Data</td>
+                          <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
+                            {tableData.total} Data
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  )}
+
                 </div>
               </div>
 
               {/* --- Mobile Card View --- */}
-              <div 
+              <div
                 className="job-list-mobile"
                 ref={mobileListRef}
                 onScroll={handleScroll}
@@ -474,8 +486,19 @@ export default function ComprehensiveReportPage() {
                     </div>
                   ))
                 ) : (
-                  !isLoadingMore && <p style={{ textAlign: 'center' }}>Tidak ada tiket yang sesuai.</p> 
+                  !isLoadingMore && <p style={{ textAlign: 'center' }}>Tidak ada tiket yang sesuai.</p>
                 )}
+
+                {/* BARU: Tambahkan total data card (Mobile) */}
+                {!loading && !isLoadingMore && tickets.length > 0 && tableData && (
+                  <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
+                    <span className="subtotal-label">Total Tiket</span>
+                    <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                      {tableData.total} Data
+                    </span>
+                  </div>
+                )}
+
                 {isLoadingMore && (
                   <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
                 )}

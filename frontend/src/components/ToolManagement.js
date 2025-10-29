@@ -80,10 +80,10 @@ function ToolManagement() {
         setIsLoadingMore(true);
         try {
             const nextPage = pagination.current_page + 1;
-            const params = { page: nextPage, ...currentFilters }; 
+            const params = { page: nextPage, ...currentFilters };
             const response = await api.get('/inventory/items', { params });
-            
-            setItems(prev => [...prev, ...response.data.data]); 
+
+            setItems(prev => [...prev, ...response.data.data]);
             setPagination(response.data);
         } catch (error) {
             console.error("Gagal memuat lebih banyak:", error);
@@ -275,6 +275,7 @@ function ToolManagement() {
                 isLoadingMoreMobile={isLoadingMoreMobile}
 
                 // Props Bersama
+                totalItems={pagination?.total || 0} // <-- TAMBAHKAN BARIS INI
                 onAdd={handleOpenAddModal}
                 onEdit={handleOpenEditNameModal}
                 onDelete={handleDeleteClick}
