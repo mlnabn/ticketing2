@@ -1,10 +1,53 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 import '../App.css';
-import bgImage2 from '../Image/Login.png';   // ✅ pakai react-icons Google
+import bgImage2 from '../Image/Login.png';
 import GoogleLogo from "../Image/google.svg";
 
 const API_URL = 'http://127.0.0.1:8000/api';
+
+const imageVariants = {
+  hidden: {
+    opacity: 0,
+    scale: 0.8,
+    y: 10,
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 80,
+      damping: 15,
+      delay: 0.4,
+    },
+  },
+};
+
+const formContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      delayChildren: 0.1,
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+const formItemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 100,
+    },
+  },
+};
 
 function Login({ onLogin, onShowRegister, onBackToLanding }) {
   const [email, setEmail] = useState('');
@@ -47,12 +90,21 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
       <div className="split-card">
         {/* Kiri - Form Login */}
         <div className="login-card">
-          <form onSubmit={handleSubmit}>
-            <h2>Login</h2>
+          <motion.form
+            onSubmit={handleSubmit}
+            variants={formContainerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.h2 variants={formItemVariants}>Login</motion.h2>
 
-            {error && <p className="error-message">{error}</p>}
+            {error && (
+              <motion.p variants={formItemVariants} className="error-message">
+                {error}
+              </motion.p>
+            )}
 
-            <div className="input-group">
+            <motion.div variants={formItemVariants} className="input-group">
               <span className="input-icon">📧</span>
               <input
                 type="email"
@@ -61,9 +113,9 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-            </div>
+            </motion.div>
 
-            <div className="input-group">
+            <motion.div variants={formItemVariants} className="input-group">
               <span className="input-icon">🔒</span>
               <input
                 type="password"
@@ -72,9 +124,9 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-            </div>
+            </motion.div>
 
-            <div className="login-options">
+            <motion.div variants={formItemVariants} className="login-options">
               <label>
                 <input type="checkbox" /> Remember me
               </label>
@@ -85,22 +137,32 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
               >
                 Forgot password?
               </button>
-            </div>
+            </motion.div>
 
-            <button type="submit" className="login-btn" disabled={loading}>
+            <motion.button
+              type="submit"
+              className="login-btn"
+              disabled={loading}
+              variants={formItemVariants}
+            >
               {loading ? 'Processing...' : 'Login'}
-            </button>
+            </motion.button>
 
-            <div className="divider">atau</div>
+            <motion.div variants={formItemVariants} className="divider">
+              atau
+            </motion.div>
 
-            {/* Tombol Google */}
-            <button onClick={handleGoogleLogin} className="google-login-button">
+            <motion.button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="google-login-button"
+              variants={formItemVariants}
+            >
               <img src={GoogleLogo} alt="Google Logo" className="google-icon" />
               <span>Login with Google</span>
-            </button>
+            </motion.button>
 
-
-            <p className="auth-toggle">
+            <motion.p variants={formItemVariants} className="auth-toggle">
               Don't have an account?{' '}
               <button
                 type="button"
@@ -109,23 +171,30 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
               >
                 Register
               </button>
-            </p>
+            </motion.p>
 
-            <button
+            <motion.button
               type="button"
               onClick={onBackToLanding}
               className="back-to-landing"
+              variants={formItemVariants}
             >
               ← Back to Landing
-            </button>
-          </form>
+            </motion.button>
+          </motion.form>
         </div>
 
         {/* Kanan - Gambar */}
-        <div
-          className="login-background-side"
-          style={{ backgroundImage: `url(${bgImage2})` }}
-        />
+        <div className="login-background-side">
+          <motion.img
+            src={bgImage2}
+            alt="DTECH Engineering Logo"
+            className="login-logo-image"
+            variants={imageVariants}
+            initial="hidden"
+            animate="visible"
+          />
+        </div>
       </div>
     </div>
   );
