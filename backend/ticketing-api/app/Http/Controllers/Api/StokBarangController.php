@@ -41,7 +41,7 @@ class StokBarangController extends Controller
             'userPerusak',
             'userPenghilang',
             'latestHistory.triggeredByUser:id,name',
-            'latestHistory.relatedUser:id,name',  
+            'latestHistory.relatedUser:id,name',
             'latestHistory.statusDetail',
         ]);
 
@@ -487,25 +487,42 @@ class StokBarangController extends Controller
         $statusFilter = $request->input('status_id');
         $colorFilter = $request->input('id_warna');
 
-        // Logika filter status (kembali ke versi awal)
         if (($statusFilter && $statusFilter !== 'ALL') || $colorFilter) {
             $query->whereHas('stokBarangs', function ($q) use ($statusFilter, $colorFilter, $tersediaStatusId) {
                 $targetStatusId = ($statusFilter && $statusFilter !== 'ALL')
                     ? $statusFilter
-                    // Ini adalah logika filter "Semua Status"
                     : (($statusFilter === 'ALL') ? null : $tersediaStatusId);
 
                 if ($targetStatusId) {
                     $q->where('status_id', $targetStatusId);
                 }
-
                 if ($colorFilter) {
                     $q->where('id_warna', $colorFilter);
                 }
             });
         }
+        $allItems = $query->latest('id_m_barang')->get();
+        $grandTotalUnits = $allItems->sum('total_stock_count');
+        $perPage = 15;
+        $currentPage = $request->input('page', 1);
+        $itemsForCurrentPage = $allItems->slice(($currentPage - 1) * $perPage, $perPage);
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            $itemsForCurrentPage->values(),
+            $allItems->count(),             
+            $perPage,                        
+            $currentPage,                    
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
 
-        // Kembalikan hasil tanpa 'result_type'
-        return $query->latest('id_m_barang')->paginate(15);
+        
+        return response()->json([
+            'data' => $paginator->items(),
+            'current_page' => $paginator->currentPage(),
+            'last_page' => $paginator->lastPage(),
+            'per_page' => $paginator->perPage(),
+            'total' => $paginator->total(), 
+            'grand_total_units' => $grandTotalUnits,
+        ]);
+
     }
 }
