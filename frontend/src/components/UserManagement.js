@@ -176,8 +176,8 @@ export default function UserManagement() {
                 />
             </div>
             {selectedIds.length > 0 && (
-                <div className="bulk-action-bar" style={{ margin: '20px 0' }}>
-                    <button onClick={handleBulkDelete} className="btn-delete">
+                <div className="bulk-action-bar">
+                    <button onClick={handleBulkDelete} className="btn-clear">
                         Hapus {selectedIds.length} Pengguna yang Dipilih
                     </button>
                 </div>

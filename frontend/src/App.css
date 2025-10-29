@@ -5252,6 +5252,35 @@ body.dark-mode .btn-scan:hover {
 }
 
 
+.bulk-action-bar {
+    display: flex;
+    align-items: center;}
+
+.bulk-action-bar .btn-clear {
+
+    background-color: #FEE2E2;
+    color: #B91C1C;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    display: inline-flex;
+    align-items: center;
+}
+.bulk-action-bar .btn-clear:hover {
+    background-color: #FECACA;
+    color: #991B1B;
+}
+
+.bulk-action-bar .btn-clear:active {
+    background-color: #FCA5A5;
+    transform: scale(0.98);
+}
+
+
 /* =========================
    LIGHT THEME (default)
    ========================= */
@@ -11475,7 +11504,7 @@ body.dark-mode .btn-qr:hover {
   border-radius: 6px;
   min-width: 250px;
   flex-grow: 1;
-  margin-bottom: 18px;
+
   background-color: var(--input-bg, #FFFFFF);
   color: var(--text-primary, #212529);
   border: 1px solid var(--input-border, #ced4da);

@@ -72,7 +72,7 @@ function ItemListView({
                 </select>
                 {selectedIds.length > 0 && (
                     <div className="bulk-action-bar" >
-                        <button onClick={onBulkDelete} className="btn-delete">
+                        <button onClick={onBulkDelete} className="btn-clear">
                             Hapus {selectedIds.length} SKU yang Dipilih
                         </button>
                     </div>
