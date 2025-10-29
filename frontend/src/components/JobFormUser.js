@@ -16,12 +16,20 @@ function JobFormUser({ addTicket }) {
     const fetchWorkshops = async () => {
       try {
         const response = await api.get('/workshops');
-        // Ubah format data agar sesuai dengan react-select: { value, label }
-        const options = response.data.data || response.data.map(ws => ({
-          value: ws.id,
-          label: ws.name,
-        }));
-        setWorkshopOptions(options);
+        
+        // --- PERBAIKAN DI SINI ---
+        const dataArray = response.data.data || response.data;
+        if (Array.isArray(dataArray)) {
+          const options = dataArray.map(ws => ({
+            value: ws.id,
+            label: ws.name,
+          }));
+          setWorkshopOptions(options);
+        } else {
+          console.error("Data workshop yang diterima bukan array:", dataArray);
+          setWorkshopOptions([]);
+        }
+
       } catch (error) {
         console.error("Gagal mengambil daftar workshop:", error);
       } finally {
