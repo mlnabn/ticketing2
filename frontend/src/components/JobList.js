@@ -81,7 +81,7 @@ export default function JobList() {
       if (isAdmin) {
         const [adminsRes, itemsRes] = await Promise.all([
           api.get('/admins'),
-          api.get('/inventory/items?all=true&with_stock=true')
+          api.get('/inventory/items-flat?all=true')
         ]);
         setAdminList(adminsRes.data);
         const itemsData = Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data.data || []);
