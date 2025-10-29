@@ -124,25 +124,16 @@ class MasterBarangController extends Controller
             ],
         ]);
 
-        // --- LOGIKA BARU YANG LEBIH SEDERHANA ---
-
-        // 1. Ambil model Kategori dan Sub-Kategori
         $kategori = MasterKategori::find($validated['id_kategori']);
         $subKategori = SubKategori::find($validated['id_sub_kategori']);
 
-        // 2. Pastikan kode sub-kategori ada, jika tidak, buat sekarang
-        if (empty($subKategori->kode_sub_kategori)) {
-            // Memanggil fungsi publik dari SubKategoriController
-            $subKategori->kode_sub_kategori = (new SubKategoriController)->generateSubKategoriCode($subKategori->nama_sub);
-            $subKategori->save();
-        }
+        $uniqueKodeBarang = $this->generateUniqueKodeBarang(
+            $kategori->nama_kategori,
+            $subKategori->nama_sub
+        );
 
-        // 3. Gabungkan kode awalan SAJA (tanpa nomor urut)
-        $baseCode = $kategori->kode_kategori . $subKategori->kode_sub_kategori; // Hasilnya: "RUZT"
-
-        // 4. Simpan MasterBarang baru dengan kode dasar tersebut
         $dataToCreate = array_merge($validated, [
-            'kode_barang' => $baseCode, // <-- Hanya menyimpan kode dasar
+            'kode_barang' => $uniqueKodeBarang, 
             'created_by' => Auth::id(),
         ]);
 
@@ -245,6 +236,107 @@ class MasterBarangController extends Controller
             ->get();
 
         return response()->json($stockDetails);
+    }
+
+    /**
+     * Generates a unique 4 or 5 character kode_barang based on category and subcategory names.
+     * Follows specific fallback rules to ensure uniqueness.
+     *
+     * @param string $kategoriNama
+     * @param string $subKategoriNama
+     * @return string The unique kode_barang.
+     * @throws \Exception If a unique code cannot be generated after extensive tries.
+     */
+    private function generateUniqueKodeBarang(string $kategoriNama, string $subKategoriNama): string
+    {
+        $catNameClean = strtoupper(preg_replace('/[^a-zA-Z]/', '', $kategoriNama));
+        $subCatNameClean = strtoupper(preg_replace('/[^a-zA-Z]/', '', $subKategoriNama));
+
+        $catLen = strlen($catNameClean);
+        $subCatLen = strlen($subCatNameClean);
+
+        $preferredCode = $this->getCodeLetters($catNameClean, 0, 2) . $this->getCodeLetters($subCatNameClean, 0, 2);
+        if (!$this->checkCodeExists($preferredCode)) {
+            return $preferredCode;
+        }
+
+        for ($j = 3; $j < $subCatLen; $j++) {
+            $code = $this->getCodeLetters($catNameClean, 0, 2) . $this->getCodeLetters($subCatNameClean, 0, $j);
+            if (!$this->checkCodeExists($code)) {
+                return $code;
+            }
+        }
+
+        for ($i = 3; $i < $catLen; $i++) {
+            $codeRule3 = $this->getCodeLetters($catNameClean, 0, $i) . $this->getCodeLetters($subCatNameClean, 0, 2);
+            if (!$this->checkCodeExists($codeRule3)) {
+                return $codeRule3;
+            }
+
+            for ($j = 3; $j < $subCatLen; $j++) {
+                $codeRule4 = $this->getCodeLetters($catNameClean, 0, $i) . $this->getCodeLetters($subCatNameClean, 0, $j);
+                if (!$this->checkCodeExists($codeRule4)) {
+                    return $codeRule4;
+                }
+            }
+        }
+
+        for ($charCode = ord('A'); $charCode <= ord('Z'); $charCode++) {
+            $appendedChar = chr($charCode);
+            $code5 = $preferredCode . $appendedChar;
+            if (!$this->checkCodeExists($code5)) {
+                return $code5;
+            }
+        }
+        
+         for ($num = 0; $num <= 9; $num++) {
+            $code6 = $preferredCode . $num;
+            if (!$this->checkCodeExists($code6)) {
+                return $code6;
+            }
+        }
+        throw new \Exception("Could not generate a unique kode_barang for $kategoriNama / $subKategoriNama after extensive tries.");
+    }
+
+    /**
+     * Helper to safely get two letters from a string at given indices.
+     * Returns 'X' if index is out of bounds or character is not available.
+     *
+     * @param string $str The cleaned uppercase string.
+     * @param int $index1 First index (0-based).
+     * @param int $index2 Second index (0-based).
+     * @return string Two uppercase letters or 'X' placeholders.
+     */
+    private function getCodeLetters(string $str, int $index1, int $index2): string
+    {
+        $len = strlen($str);
+        $char1 = ($index1 >= 0 && $index1 < $len) ? $str[$index1] : 'X';
+        $char2 = ($index2 >= 0 && $index2 < $len && $index2 !== $index1) ? $str[$index2] : 'X'; 
+        
+        if ($char2 === 'X' || $index2 === $index1) {
+             $nextIndex = $index2 + 1;
+             $char2 = ($nextIndex >= 0 && $nextIndex < $len && $nextIndex !== $index1) ? $str[$nextIndex] : 'X';
+        }
+        if ($char2 === 'X') {
+             $prevIndex = $index2 -1;
+             if ($prevIndex >= 0 && $prevIndex !== $index1) {
+                 $char2 = ($prevIndex < $len) ? $str[$prevIndex] : 'X';
+             }
+        }
+
+
+        return $char1 . $char2;
+    }
+
+    /**
+     * Helper to check if a kode_barang already exists in the master_barangs table.
+     *
+     * @param string $code The code to check.
+     * @return bool True if the code exists, false otherwise.
+     */
+    private function checkCodeExists(string $code): bool
+    {
+        return DB::table('master_barangs')->where('kode_barang', $code)->exists();
     }
 
     /**
