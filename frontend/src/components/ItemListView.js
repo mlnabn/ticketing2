@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import SkuDetailModal from './SkuDetailModal';
 
-function ItemListView({ 
+function ItemListView({
     items, loading, onAdd, onEdit, onDelete, onFilterChange, onScroll, isLoadingMore,
-    selectedIds, onSelectId, onSelectAll, onBulkDelete 
+    selectedIds, onSelectId, onSelectAll, onBulkDelete, totalItems
 }) {
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
@@ -71,12 +71,12 @@ function ItemListView({
                     ))}
                 </select>
                 {selectedIds.length > 0 && (
-                <div className="bulk-action-bar" >
-                    <button onClick={onBulkDelete} className="btn-delete">
-                        Hapus {selectedIds.length} SKU yang Dipilih
-                    </button>
-                </div>
-            )}
+                    <div className="bulk-action-bar" >
+                        <button onClick={onBulkDelete} className="btn-delete">
+                            Hapus {selectedIds.length} SKU yang Dipilih
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className="job-list-container">
@@ -103,7 +103,7 @@ function ItemListView({
                     <div
                         className="table-body-scroll"
                         ref={desktopListRef}
-                        onScroll={onScroll} 
+                        onScroll={onScroll}
                     >
                         <table className="job-table">
                             <tbody>
@@ -149,9 +149,9 @@ function ItemListView({
                         <table className="job-table">
                             <tfoot>
                                 <tr className="subtotal-row">
-                                    <td colSpan="4" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>Total SKU</td>
-                                    <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                                        {totalItems}
+                                    <td colSpan="5" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>Total SKU</td>
+                                    <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
+                                        {totalItems} Data
                                     </td>
                                 </tr>
                             </tfoot>
@@ -204,6 +204,14 @@ function ItemListView({
                     ))}
                     {isLoadingMore && (
                         <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+                    )}
+                    {!loading && !isLoadingMore && items.length > 0 && (
+                        <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
+                            <span className="subtotal-label">Total SKU</span>
+                            <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                {totalItems} Data
+                            </span>
+                        </div>
                     )}
                 </div>
             </div>
