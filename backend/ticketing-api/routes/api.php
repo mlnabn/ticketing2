@@ -107,6 +107,8 @@ Route::middleware('jwt')->group(function () {
     Route::apiResource('inventory/categories', MasterKategoriController::class);
     Route::apiResource('inventory/sub-categories', SubKategoriController::class);
     Route::apiResource('inventory/items', MasterBarangController::class)->parameters(['items' => 'masterBarang']);
+    Route::get('/inventory/items/variations/{kode_barang}', [MasterBarangController::class, 'getVariations']);
+    Route::get('/inventory/items-flat', [MasterBarangController::class, 'indexFlat']);
     Route::post('/inventory/items/bulk-delete', [MasterBarangController::class, 'bulkDelete']);
     Route::post('/inventory/items/check-exists', [MasterBarangController::class, 'checkIfExists']);
     Route::post('/inventory/items/{masterBarang}', [MasterBarangController::class, 'update']);

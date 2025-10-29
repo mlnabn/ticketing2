@@ -11160,6 +11160,22 @@ body.dark-mode .btn-qr:hover {
   border-color: #16a34a;
 }
 
+.btn-dlt {
+  color: #c70000;
+}
+
+.btn-dlt:hover {
+  border-color: #16a34a;
+}
+
+body.dark-mode .btn-dlt {
+  color: #c70000;
+}
+
+body.dark-mode .btn-dlt:hover {
+  border-color: #16a34a;
+}
+
 
 /* ============================================= */
 /* STYLING UNTUK KARTU MOBILE (JOB & TICKET) */
@@ -12382,6 +12398,119 @@ body.dark-mode .cell-warna .color-swatch {
 body.dark-mode .summary-card.expanded {
   background-color: #1f1f1f;
   border-left-color: #3b82f6;
+}
+
+/* ======================================================= */
+/* ===    STYLING KHUSUS UNTUK CHILD VIEW TAMBAH SKU   === */
+/* ======================================================= */
+
+.sku-detail-list-wrapper {
+  padding: 0 1rem;
+  background-color: var(--detail-bg, #f8f9fa); 
+  border-bottom: 1px solid var(--detail-border-color, #dee2e6);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.dark-mode .sku-detail-list-wrapper {
+  background-color: #1f1f1f; 
+  border-bottom-color: #374151;
+}
+
+.sku-detail-list-header {
+  display: flex; 
+  padding: 0.6rem 0.5rem; 
+  background-color: var(--detail-header-bg, #e9ecef); 
+  font-weight: 600;
+  color: var(--detail-header-text, #495057);
+  font-size: 0.8em;
+  border-bottom: 2px solid var(--detail-border-color, #dee2e6);
+  margin-bottom: 0.25rem;
+  text-align: center;
+}
+.dark-mode .sku-detail-list-header {
+  background-color: #1f1f1f; 
+  color: #d1d5db; 
+  border-bottom-color: #374151; 
+}
+
+.sku-detail-row-div {
+  display: flex; 
+  border-bottom: 1px solid var(--detail-border-color, #e9ecef); 
+  padding: 0.6rem 0.5rem; 
+  font-size: 0.85em;
+  align-items: center; 
+}
+.sku-detail-row-div:last-child {
+  border-bottom: none;
+}
+.dark-mode .sku-detail-row-div {
+  border-bottom-color: #374151;
+}
+
+.sku-detail-row-div:hover {
+  background-color: var(--detail-hover-bg, #e9ecef);
+}
+.dark-mode .sku-detail-row-div:hover {
+  background-color: #374151; 
+}
+
+.sku-detail-list-header .detail-cell,
+.sku-detail-row-div .detail-cell {
+  padding: 0 0.5rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+.sku-detail-list-header .header-select,
+.sku-detail-row-div .cell-select {
+  flex-basis: 40px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  justify-content: center;
+}
+
+.sku-detail-list-header .header-kode, 
+.sku-detail-row-div .cell-kode {   
+  flex: 1; 
+  min-width: 150px;
+  justify-content: flex-start; 
+  text-align: left;
+  padding-left: 1rem;
+}
+
+.sku-detail-list-header .header-stok{
+  flex-basis: 90px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  justify-content: center; 
+  text-align: center;
+}
+
+.sku-detail-row-div .cell-stok {
+  flex-basis: 120px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  justify-content: center; 
+  text-align: center;
+}
+
+.sku-detail-list-header .header-aksi{
+  flex-basis: 180px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  justify-content: center;
+}
+
+.sku-detail-row-div .cell-aksi {
+  flex-basis: 150px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  justify-content: center;
+}
+
+.sku-detail-row-div .cell-aksi .action-buttons-group {
+    justify-content: center;
 }
 
 /* ======================================= */

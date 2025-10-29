@@ -3,8 +3,13 @@ import api from '../services/api';
 import SkuDetailModal from './SkuDetailModal';
 
 function ItemListView({ 
-    items, loading, onAdd, onEdit, onDelete, onFilterChange, onScroll, isLoadingMore,
-    selectedIds, onSelectId, onSelectAll, onBulkDelete 
+    // Props Desktop
+    items, loading, onScroll, isLoadingMore,
+    // Props Mobile
+    mobileItems, isMobileLoading, onMobileScroll, isLoadingMoreMobile,
+    onAdd, onEdit, onDelete, onFilterChange,
+    selectedIds, onSelectId, onSelectAll, onBulkDelete, expandedRows, detailItems,
+    expandingId, onToggleExpand
 }) {
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
@@ -12,8 +17,8 @@ function ItemListView({
     const [selectedSubCategory, setSelectedSubCategory] = useState('');
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
+    const isInitialMount = useRef(true);
     const [selectedItemForDetail, setSelectedItemForDetail] = useState(null);
-    const isAllSelectedOnPage = items.length > 0 && selectedIds.length === items.length;
 
     useEffect(() => {
         api.get('/inventory/categories').then(res => setCategories(res.data));
@@ -30,6 +35,10 @@ function ItemListView({
     }, [selectedCategory]);
 
     useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return; 
+        }
         const filters = {};
         if (selectedCategory) filters.id_kategori = selectedCategory;
         if (selectedSubCategory) filters.id_sub_kategori = selectedSubCategory;
@@ -37,7 +46,7 @@ function ItemListView({
     }, [selectedCategory, selectedSubCategory, onFilterChange]);
 
     const handleRowClick = (e, item) => {
-        if (e.target.tagName === 'BUTTON' || e.target.closest('.action-buttons-group')) {
+        if (e.target.tagName === 'BUTTON' || e.target.closest('.action-buttons-group') || e.target.type === 'checkbox') {
             return;
         }
         setSelectedItemForDetail(item);
@@ -45,10 +54,10 @@ function ItemListView({
 
     return (
         <>
-            <div className="user-management-header">
+            <div className="user-management-container">
                 <button className="btn-primary" onClick={onAdd}><i className="fas fa-plus" style={{ marginRight: '8px' }}></i>Daftarkan SKU Baru</button>
             </div>
-            <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+            <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginTop: '1rem', marginBottom: '1rem' }}>
                 <select
                     value={selectedCategory}
                     onChange={e => setSelectedCategory(e.target.value)}
@@ -71,12 +80,12 @@ function ItemListView({
                     ))}
                 </select>
                 {selectedIds.length > 0 && (
-                <div className="bulk-action-bar" >
-                    <button onClick={onBulkDelete} className="btn-delete">
-                        Hapus {selectedIds.length} SKU yang Dipilih
-                    </button>
-                </div>
-            )}
+                    <div className="bulk-action-bar" >
+                        <button onClick={onBulkDelete} className="btn-delete">
+                            Hapus {selectedIds.length} SKU yang Dipilih
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className="job-list-container">
@@ -85,18 +94,10 @@ function ItemListView({
                     <table className="job-table">
                         <thead>
                             <tr>
-                                <th style={{ width: '40px' }}>
-                                    <input
-                                        type="checkbox"
-                                        onChange={onSelectAll}
-                                        checked={isAllSelectedOnPage}
-                                    />
-                                </th>
                                 <th>Kode</th>
-                                <th>Nama Barang</th>
                                 <th>Kategori</th>
                                 <th>Sub-Kategori</th>
-                                <th>Aksi</th>
+                                <th>Jumlah Variasi</th>
                             </tr>
                         </thead>
                     </table>
@@ -104,65 +105,116 @@ function ItemListView({
                         className="table-body-scroll"
                         ref={desktopListRef}
                         onScroll={onScroll} 
+                        style={{ overflowY: 'auto', maxHeight: '65vh' }}
                     >
                         <table className="job-table">
                             <tbody>
                                 {loading && items.length === 0 && (
-                                    <tr><td colSpan="6" style={{ textAlign: 'center' }}>Memuat data barang...</td></tr>
+                                    <tr><td colSpan="4" style={{ textAlign: 'center' }}>Memuat data barang...</td></tr>
                                 )}
 
                                 {!loading && items.length === 0 && (
-                                    <tr><td colSpan="6" style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</td></tr>
+                                    <tr><td colSpan="4" style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</td></tr>
                                 )}
 
                                 {items.map(item => (
-                                    <tr
-                                        key={item.id_m_barang}
-                                        className="clickable-row"
-                                        onClick={(e) => handleRowClick(e, item)}
-                                    >
-                                        <td style={{ width: '40px' }}>
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedIds.includes(item.id_m_barang)}
-                                                onChange={() => onSelectId(item.id_m_barang)}
-                                                onClick={(e) => e.stopPropagation()}
-                                            />
-                                        </td>
-                                        <td>{item.kode_barang}</td>
-                                        <td>{item.nama_barang}</td>
-                                        <td>{item.master_kategori?.nama_kategori || '-'}</td>
-                                        <td>{item.sub_kategori?.nama_sub || '-'}</td>
-                                        <td className="action-buttons-group">
-                                            <button onClick={(e) => { e.stopPropagation(); onEdit(item); }} className="btn-user-action btn-edit">Edit</button>
-                                            <button onClick={(e) => { e.stopPropagation(); onDelete(item); }} className="btn-user-action btn-delete">Hapus</button>
-                                        </td>
-                                    </tr>
+                                    <React.Fragment key={item.kode_barang}>
+                                        <tr
+                                            className={`summary-row hoverable-row ${expandedRows[item.kode_barang] ? 'expanded' : ''}`}
+                                            onClick={() => onToggleExpand(item.kode_barang)}
+                                        >
+                                            <td>{item.kode_barang}</td>
+                                            <td>{item.nama_kategori || '-'}</td>
+                                            <td>{item.nama_sub || '-'}</td>
+                                            <td>{item.variations_count} VARIASI</td>
+                                        </tr>
+                                        
+                                        {/* --- CHILD VIEW (EXPANDED ROW) --- */}
+                                        {expandedRows[item.kode_barang] && (
+                                            <tr className="detail-rows-container">
+                                                <td colSpan="4">
+                                                    {expandingId === item.kode_barang ? (
+                                                        <div className="detail-loading">Memuat variasi SKU...</div>
+                                                    ) : detailItems[item.kode_barang]?.length > 0 ? (
+                                                        <div className="sku-detail-list-wrapper" style={{ padding: '0 20px' }}>
+                                                            <div className="sku-detail-list-header">
+                                                                <div className="detail-cell header-select">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        title="Pilih Semua di grup ini"
+                                                                        checked={detailItems[item.kode_barang].every(child => selectedIds.includes(child.id_m_barang))}
+                                                                        onChange={(e) => onSelectAll(e, item.kode_barang)}
+                                                                    />
+                                                                </div>
+                                                                <div className="detail-cell header-kode" style={{fontSize: '15px'}}>Nama Barang (Variasi)</div>
+                                                                <div className="detail-cell header-stok" style={{fontSize: '15px'}}>Stok Tersedia</div>
+                                                                <div className="detail-cell header-aksi" style={{fontSize: '15px'}}>Aksi</div>
+                                                            </div>
+                                                            <div 
+                                                                className="detail-rows-list-container"
+                                                                style={{ overflowY: 'auto', maxHeight: '300px' }}
+                                                            >
+                                                                    {detailItems[item.kode_barang].map(detail => (
+                                                                        <div
+                                                                            key={detail.id_m_barang}
+                                                                            className={`sku-detail-row-div hoverable-row ${selectedIds.includes(detail.id_m_barang) ? 'selected-row' : ''}`}
+                                                                            onClick={(e) => {
+                                                                                handleRowClick(e, detail); 
+                                                                            }}
+                                                                        >
+                                                                            <div className="detail-cell cell-select">
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    checked={selectedIds.includes(detail.id_m_barang)}
+                                                                                    onChange={() => onSelectId(detail.id_m_barang)}
+                                                                                    onClick={(e) => e.stopPropagation()}
+                                                                                />
+                                                                            </div>
+                                                                            <div className="detail-cell cell-kode">{detail.nama_barang}</div>
+                                                                            <div className="detail-cell cell-stok">{detail.stok_tersedia_count}</div>
+                                                                            <div className="detail-cell cell-aksi action-buttons-group">
+                                                                                    <button onClick={(e) => { e.stopPropagation(); onEdit(detail); }} className="btn-user-action btn-detail">
+                                                                                        <i className="fas fa-edit" style={{ fontSize: '20px', marginRight: '5px' }}></i>
+                                                                                    </button>
+                                                                                    <button onClick={(e) => { e.stopPropagation(); onDelete(detail); }} className="btn-user-action btn-dlt">
+                                                                                        <i className="fas fa-trash-alt" style={{ fontSize: '20px', marginRight: '5px' }}></i>
+                                                                                    </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="detail-nodata">Tidak ada variasi SKU untuk kode ini.</div>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
                                 ))}
                                 {isLoadingMore && (
-                                    <tr><td colSpan="6" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                                    <tr><td colSpan="4" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
                                 )}
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                {/* === TAMPILAN KARTU UNTUK MOBILE (DIMODIFIKASI) === */}
+                {/* === TAMPILAN KARTU UNTUK MOBILE === */}
                 <div
                     className="job-list-mobile"
                     ref={mobileListRef}
-                    onScroll={onScroll}
+                    onScroll={onMobileScroll}
                     style={{ overflowY: 'auto', maxHeight: '65vh' }}
                 >
-                    {loading && items.length === 0 && (
+                    {isMobileLoading && mobileItems.length === 0 && ( /* uses 'isMobileLoading' */
                         <p style={{ textAlign: 'center' }}>Memuat data barang...</p>
                     )}
-
-                    {!loading && items.length === 0 && (
+                    {!isMobileLoading && mobileItems.length === 0 && ( /* uses 'isMobileLoading' */
                         <p style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</p>
                     )}
 
-                    {items.map(item => (
+                    {mobileItems.map(item => (
                         <div
                             key={item.id_m_barang}
                             className="ticket-card-mobile clickable-row"
@@ -190,7 +242,7 @@ function ItemListView({
                             </div>
                         </div>
                     ))}
-                    {isLoadingMore && (
+                    {isLoadingMoreMobile && ( 
                         <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
                     )}
                 </div>

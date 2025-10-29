@@ -229,18 +229,15 @@ function StokBarangView() {
         }
     };
 
-    // Handler untuk membuka modal Edit dari modal Detail
     const handleOpenEditModal = (itemToEdit) => {
         setDetailItem(null);
         setEditItem(itemToEdit);
     };
 
-    // Handler setelah sukses menyimpan dari modal Add/Edit/Detail (via update status)
     const handleSaveSuccess = () => {
         fetchData(pagination?.current_page || 1, currentFilters);
     };
 
-    // --- Scan Handler ---
     const handleScanSearch = useCallback(async (code) => {
         if (!code) return;
         showToast(`Mencari: ${code}`, 'info');
@@ -257,9 +254,6 @@ function StokBarangView() {
         handleScanSearch(decodedText);
     };
 
-    // --- BARU: Handler untuk Print QR ---
-
-    // 1. Memilih/membatalkan 1 item
     const handleSelectItem = (id, isChecked) => {
         setSelectedItems(prev => {
             const newSet = new Set(prev);
@@ -272,7 +266,6 @@ function StokBarangView() {
         });
     };
 
-    // 2. Memilih/membatalkan semua item di dalam 1 grup SKU
     const handleSelectAllMaster = (masterBarangId, isChecked) => {
         const itemIds = detailItems[masterBarangId]?.items?.map(item => item.id) || [];
         setSelectedItems(prev => {
@@ -286,14 +279,13 @@ function StokBarangView() {
         });
     };
 
-    // 3. Pengecekan apakah semua item dalam grup SKU terpilih (untuk checkbox header)
+    
     const isAllMasterSelected = (masterBarangId) => {
         const itemIds = detailItems[masterBarangId]?.items?.map(item => item.id) || [];
         if (itemIds.length === 0) return false;
         return itemIds.every(id => selectedItems.has(id));
     };
 
-    // 4. Menyiapkan data dan memicu print
     const handlePreparePrint = () => {
         const itemsToPrintData = [];
         Object.values(detailItems).forEach(detailState => {
@@ -314,7 +306,6 @@ function StokBarangView() {
         setItemsToPrint(itemsToPrintData);
     };
 
-    // 5. useEffect untuk memicu print SETELAH state itemsToPrint di-update
     useEffect(() => {
         if (itemsToPrint.length > 0) {
             const timer = setTimeout(() => {
@@ -325,7 +316,6 @@ function StokBarangView() {
             return () => clearTimeout(timer);
         }
     }, [itemsToPrint]);
-
 
     useEffect(() => {
         let barcode = '';
@@ -359,6 +349,7 @@ function StokBarangView() {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleScanSearch, detailItem, editItem, qrModalItem, isAddStockOpen, isScannerOpen]);
+    
     const formatCurrency = (value) => {
         if (isNaN(value)) return 'Rp 0';
         return new Intl.NumberFormat('id-ID', {
@@ -538,7 +529,6 @@ function StokBarangView() {
                                                                 <div className="detail-cell header-sn">S/N</div>
                                                                 <div className="detail-cell header-kondisi">Kondisi</div>
                                                                 <div className="detail-cell header-status">Status</div>
-                                                                <div className="detail-cell header-jumlah">Jumlah</div>
                                                                 <div className="detail-cell header-warna">Warna</div>
                                                                 <div className="detail-cell header-harga">Harga Beli</div>
                                                                 <div className="detail-cell header-tglbeli">Tgl Beli</div>
@@ -577,7 +567,6 @@ function StokBarangView() {
                                                                                 {detail.status_detail?.nama_status || 'N/A'}
                                                                             </span>
                                                                         </div>
-                                                                        <div className="detail-cell cell-jumlah">1</div>
                                                                         <div className="detail-cell cell-warna">
                                                                             {detail.color ? (
                                                                                 <span title={detail.color.nama_warna} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>

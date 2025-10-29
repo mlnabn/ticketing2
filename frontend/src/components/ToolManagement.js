@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useOutletContext } from 'react-router-dom'; // 1. Import hook
+import { useOutletContext } from 'react-router-dom';
 import api from '../services/api';
 import ItemListView from './ItemListView';
 import ItemFormModal from './ItemFormModal';
 import ConfirmationModal from './ConfirmationModal';
 import EditNamaBarangModal from './EditNamaBarangModal';
 
-// 2. Hapus `showToast` dari props
 function ToolManagement() {
-    // 3. Ambil `showToast` dari context
     const { showToast } = useOutletContext();
 
     const [items, setItems] = useState([]);
@@ -20,17 +18,26 @@ function ToolManagement() {
     const [loading, setLoading] = useState(true);
     const [itemToEditName, setItemToEditName] = useState(null);
     const [currentFilters, setCurrentFilters] = useState({});
+    const [mobileItems, setMobileItems] = useState([]);
+    const [mobilePagination, setMobilePagination] = useState(null);
+    const [isMobileLoading, setIsMobileLoading] = useState(true);
+    const [isLoadingMoreMobile, setIsLoadingMoreMobile] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [selectedIds, setSelectedIds] = useState([]);
+    const [expandedRows, setExpandedRows] = useState({});
+    const [detailItems, setDetailItems] = useState({});
+    const [expandingId, setExpandingId] = useState(null);
 
     const fetchItems = useCallback(async (page = 1, filters = {}) => {
         if (page === 1) setLoading(true);
-        setCurrentFilters(filters);
         try {
             const params = { page, ...filters };
             const response = await api.get('/inventory/items', { params });
             if (page === 1) {
                 setItems(response.data.data);
+                setExpandedRows({});
+                setDetailItems({});
+                setSelectedIds([]);
             } else {
                 setItems(prev => [...prev, ...response.data.data]);
             }
@@ -43,9 +50,29 @@ function ToolManagement() {
         }
     }, [showToast]);
 
+    const fetchMobileItems = useCallback(async (page = 1, filters = {}) => {
+        if (page === 1) setIsMobileLoading(true);
+        try {
+            const params = { page, ...filters };
+            const response = await api.get('/inventory/items-flat', { params });
+            if (page === 1) {
+                setMobileItems(response.data.data);
+            } else {
+                setMobileItems(prev => [...prev, ...response.data.data]);
+            }
+            setMobilePagination(response.data);
+        } catch (error) {
+            console.error("Gagal mengambil data mobile:", error);
+            showToast("Gagal mengambil data inventaris (mobile).", "error");
+        } finally {
+            if (page === 1) setIsMobileLoading(false);
+        }
+    }, [showToast]);
+
     useEffect(() => {
         fetchItems(1, currentFilters);
-    }, [fetchItems, currentFilters]);
+        fetchMobileItems(1, currentFilters);
+    }, [fetchItems, fetchMobileItems]);
 
     const loadMoreItems = async () => {
         if (isLoadingMore || !pagination || pagination.current_page >= pagination.last_page) return;
@@ -75,6 +102,57 @@ function ToolManagement() {
         }
     };
 
+    const loadMoreMobileItems = async () => {
+        if (isLoadingMoreMobile || !mobilePagination || mobilePagination.current_page >= mobilePagination.last_page) return;
+        setIsLoadingMoreMobile(true);
+        try {
+            const nextPage = mobilePagination.current_page + 1;
+            const params = { page: nextPage, ...currentFilters };
+            const response = await api.get('/inventory/items-flat', { params });
+            setMobileItems(prev => [...prev, ...response.data.data]);
+            setMobilePagination(response.data);
+        } catch (error) {
+            showToast('Gagal memuat lebih banyak (mobile).', 'error');
+        } finally {
+            setIsLoadingMoreMobile(false);
+        }
+    };
+    const handleMobileScroll = (e) => {
+        const target = e.currentTarget;
+        const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
+        if (nearBottom && !isMobileLoading && !isLoadingMoreMobile) {
+            loadMoreMobileItems();
+        }
+    };
+
+    const toggleExpand = async (kodeBarang) => {
+        const isCurrentlyExpanded = !!expandedRows[kodeBarang];
+        if (isCurrentlyExpanded) {
+            setExpandedRows(prev => ({ ...prev, [kodeBarang]: false }));
+            return;
+        }
+
+        setExpandedRows(prev => ({ ...prev, [kodeBarang]: true }));
+        if (detailItems[kodeBarang]) {
+            return;
+        }
+
+        setExpandingId(kodeBarang);
+        try {
+            const res = await api.get(`/inventory/items/variations/${kodeBarang}`);
+            setDetailItems(prev => ({
+                ...prev,
+                [kodeBarang]: res.data 
+            }));
+        } catch (error) {
+            console.error("Fetch Detail Error:", error);
+            showToast('Gagal memuat detail SKU.', 'error');
+            setExpandedRows(prev => ({ ...prev, [kodeBarang]: false })); 
+        } finally {
+            setExpandingId(null);
+        }
+    };
+
     const handleOpenAddModal = () => { setItemToEdit(null); setIsItemModalOpen(true); };
     const handleCloseItemModal = () => { setIsItemModalOpen(false); setItemToEdit(null); };
     const handleOpenEditNameModal = (item) => setItemToEditName(item);
@@ -91,6 +169,7 @@ function ToolManagement() {
             const errorMsg = e.response?.data?.message || 'Gagal menyimpan data barang.';
             showToast(errorMsg, 'error');
         }
+        fetchItems(1, currentFilters);
     };
 
     const handleDeleteClick = (item) => {
@@ -108,17 +187,18 @@ function ToolManagement() {
         try {
             const response = await api.delete(`/inventory/items/${itemToDelete.id_m_barang}`);
             
-            // Cek status sukses (200 OK atau 204 No Content)
             if (response.status === 200 || response.status === 204) {
                 showToast(response.data?.message || "Barang berhasil dihapus.");
-                
-                // Logika untuk pindah halaman jika item terakhir di halaman dihapus
-                const currentPage = pagination?.current_page || 1;
-                if (items.length === 1 && currentPage > 1) {
-                    fetchItems(currentPage - 1);
-                } else {
-                    fetchItems(currentPage);
-                }
+                fetchItems(1, currentFilters);
+                setDetailItems(prev => {
+                    const newDetails = { ...prev };
+                    if (newDetails[itemToDelete.kode_barang]) {
+                        newDetails[itemToDelete.kode_barang] = newDetails[itemToDelete.kode_barang].filter(
+                            it => it.id_m_barang !== itemToDelete.id_m_barang
+                        );
+                    }
+                    return newDetails;
+                });
             } else {
                 showToast(response.data?.message || "Gagal menghapus barang.", "error");
             }
@@ -137,8 +217,18 @@ function ToolManagement() {
         );
     };
 
-    const handleSelectAll = (e) => {
-        setSelectedIds(e.target.checked ? items.map(item => item.id_m_barang) : []);
+    const handleSelectAll = (e, kodeBarang) => {
+        const itemIds = detailItems[kodeBarang]?.map(item => item.id_m_barang) || [];
+        
+        setSelectedIds(prev => {
+            const newSet = new Set(prev);
+            if (e.target.checked) {
+                itemIds.forEach(id => newSet.add(id));
+            } else {
+                itemIds.forEach(id => newSet.delete(id));
+            }
+            return Array.from(newSet);
+        });
     };
 
     const handleBulkDelete = async () => {
@@ -150,8 +240,7 @@ function ToolManagement() {
             try {
                 const response = await api.post('/inventory/items/bulk-delete', { ids: selectedIds });
                 showToast(response.data.message, 'success'); 
-                // Refresh data di halaman saat ini dan reset selection
-                fetchItems(1, currentFilters); // Fetch ulang dari halaman 1
+                fetchItems(1, currentFilters); 
                 setSelectedIds([]); 
             } catch (e) {
                 console.error('Gagal menghapus SKU secara massal:', e);
@@ -160,6 +249,12 @@ function ToolManagement() {
         }
     };
 
+    const handleFilterChange = useCallback((page, filters) => {
+        setCurrentFilters(filters);
+        fetchItems(1, filters);
+        fetchMobileItems(1, filters);
+    }, [fetchItems, fetchMobileItems]);
+
     return (
         <>
             <div className="user-management-container" style={{ marginBottom: '20px' }}>
@@ -167,19 +262,31 @@ function ToolManagement() {
             </div>
 
             <ItemListView
+                // Props Desktop
                 items={items}
-                // pagination={pagination}
                 loading={loading}
+                onScroll={handleScroll}
+                isLoadingMore={isLoadingMore}
+                
+                // Props Mobile
+                mobileItems={mobileItems}
+                isMobileLoading={isMobileLoading}
+                onMobileScroll={handleMobileScroll}
+                isLoadingMoreMobile={isLoadingMoreMobile}
+
+                // Props Bersama
                 onAdd={handleOpenAddModal}
                 onEdit={handleOpenEditNameModal}
                 onDelete={handleDeleteClick}
-                onFilterChange={fetchItems}
-                onScroll={handleScroll}
-                isLoadingMore={isLoadingMore}
+                onFilterChange={handleFilterChange}
                 selectedIds={selectedIds}
                 onSelectId={handleSelectId}
                 onSelectAll={handleSelectAll}
                 onBulkDelete={handleBulkDelete}
+                expandedRows={expandedRows}
+                detailItems={detailItems}
+                expandingId={expandingId}
+                onToggleExpand={toggleExpand}
             />
 
             <ItemFormModal

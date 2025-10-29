@@ -20,23 +20,69 @@ class MasterBarangController extends Controller
      */
     public function index(Request $request)
     {
-        $query = MasterBarang::with(['masterKategori', 'subKategori', 'createdBy']);
+        $query = MasterBarang::query()
+            ->join('master_kategoris', 'master_barangs.id_kategori', '=', 'master_kategoris.id_kategori')
+            ->join('sub_kategoris', 'master_barangs.id_sub_kategori', '=', 'sub_kategoris.id_sub_kategori')
+            
+            ->select(
+                'master_barangs.kode_barang',
+                'master_kategoris.nama_kategori',
+                'sub_kategoris.nama_sub',
+                DB::raw('COUNT(master_barangs.id_m_barang) as variations_count') 
+            )
+            ->groupBy(
+                'master_barangs.kode_barang',
+                'master_kategoris.nama_kategori',
+                'sub_kategoris.nama_sub'
+            );
+
+        // $query = MasterBarang::with(['masterKategori', 'subKategori', 'createdBy']);
         if ($request->filled('id_kategori')) {
-            $query->where('id_kategori', $request->id_kategori);
+            $query->where('master_barangs.id_kategori', $request->id_kategori);
         }
         if ($request->filled('id_sub_kategori')) {
-            $query->where('id_sub_kategori', $request->id_sub_kategori);
+            $query->where('master_barangs.id_sub_kategori', $request->id_sub_kategori);
         }
         if ($request->has('with_stock')) {
             $query->withCount(['stokBarangs as stok_tersedia' => function ($q) {
                 $q->where('status_id', 1);
             }]);
         }
-        $query->latest();
+        $query->latest('master_barangs.kode_barang');
         if ($request->has('all')) {
             return $query->get();
         }
         return $query->paginate(10);
+    }
+
+    public function getVariations($kode_barang)
+    {
+        $tersediaStatusId = 1;
+        $items = MasterBarang::where('kode_barang', $kode_barang)
+                    ->with(['masterKategori', 'subKategori'])
+                    ->withCount(['stokBarangs as stok_tersedia_count' => function ($query) use ($tersediaStatusId) {
+                        $query->where('status_id', $tersediaStatusId);
+                    }])
+                    ->orderBy('nama_barang', 'asc')
+                    ->get();
+        
+        return response()->json($items);
+    }
+
+    public function indexFlat(Request $request)
+    {
+        $query = MasterBarang::with(['masterKategori', 'subKategori', 'createdBy']);
+
+        if ($request->filled('id_kategori')) {
+            $query->where('id_kategori', $request->id_kategori);
+        }
+        if ($request->filled('id_sub_kategori')) {
+            $query->where('id_sub_kategori', $request->id_sub_kategori);
+        }
+        
+        $query->latest('id_m_barang');
+
+        return $query->paginate(10); 
     }
 
     // Untuk mengecek apakah master barang sudah ada
