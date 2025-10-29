@@ -82,6 +82,10 @@ class MasterBarangController extends Controller
         
         $query->latest('id_m_barang');
 
+        if ($request->has('all')) {
+            return $query->get();
+        }
+
         return $query->paginate(10); 
     }
 

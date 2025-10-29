@@ -642,9 +642,9 @@ function StokBarangView() {
                         <table className="job-table">
                             <tfoot>
                                 <tr className="subtotal-row">
-                                    <td colSpan={6}>Total Tipe Barang (SKU)</td>
+                                    <td colSpan={6}>Total Tipe Barang</td>
                                     <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
-                                        {pagination.total} Data
+                                        {pagination.total} Tipe Barang
                                     </td>
                                 </tr>
                             </tfoot>
