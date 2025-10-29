@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom'; // BARU: Gunakan Link untuk navigasi
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 import ReportLineChart from './ReportLineChart';
 
@@ -11,14 +11,13 @@ const generateYearOptions = () => {
 };
 
 export default function TicketReportAdminList() {
-  // DIHAPUS: State `view` dan `selectedAdminData` karena navigasi ditangani oleh router
+
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [admins, setAdmins] = useState([]);
   const [loadingAdmins, setLoadingAdmins] = useState(false);
   const [chartData, setChartData] = useState([]);
   const [loadingChart, setLoadingChart] = useState(false);
-  // DIHAPUS: State `selectedTicketForDetail` karena modal akan ditangani oleh halaman anak
 
   const fetchAdmins = useCallback(async () => {
     setLoadingAdmins(true);
@@ -63,7 +62,6 @@ export default function TicketReportAdminList() {
     { value: 10, label: 'Oktober' }, { value: 11, label: 'November' }, { value: 12, label: 'Desember' }
   ];
 
-  // BARU: Buat query string untuk dioper ke Link
   const filterQueryString = `?year=${selectedYear}${selectedMonth ? `&month=${selectedMonth}` : ''}`;
 
   return (
@@ -86,7 +84,6 @@ export default function TicketReportAdminList() {
         {loadingChart ? <p>Memuat data chart...</p> : <ReportLineChart data={chartData} />}
       </div>
       <div className="report-navigation-cards">
-        {/* DIUBAH: Gunakan Link dengan query string */}
         <Link to={`/admin/reports/all${filterQueryString}`} className="nav-card">
           <h3>Laporan Seluruh Tiket</h3><p>Lihat semua tiket sesuai filter di atas.</p>
         </Link>

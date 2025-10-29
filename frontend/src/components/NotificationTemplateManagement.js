@@ -29,8 +29,9 @@ export default function NotificationTemplateManagement() {
         setTemplates(prev => [...prev, ...response.data.data]);
       }
       setPagination({
-          currentPage: response.data.current_page,
-          totalPages: response.data.last_page,
+        currentPage: response.data.current_page,
+        totalPages: response.data.last_page,
+        total: response.data.total 
       });
     } catch (error) {
       console.error("Gagal mengambil data template:", error);
@@ -90,7 +91,7 @@ export default function NotificationTemplateManagement() {
 
   const loadMoreItems = async () => {
     if (isLoadingMore || !pagination || pagination.currentPage >= pagination.totalPages) {
-        return;
+      return;
     }
     setIsLoadingMore(true);
     await fetchTemplates(pagination.currentPage + 1);
@@ -102,7 +103,7 @@ export default function NotificationTemplateManagement() {
     const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 100;
 
     if (nearBottom && !loading && !isLoadingMore && pagination && pagination.currentPage < pagination.totalPages) {
-        loadMoreItems();
+      loadMoreItems();
     }
   };
 
@@ -128,43 +129,55 @@ export default function NotificationTemplateManagement() {
                 </tr>
               </thead>
             </table>
-              <div
-                className="table-body-scroll"
-                ref={desktopListRef}
-                onScroll={handleScroll}
-                style={{ overflowY: 'auto', maxHeight: '65vh' }}
-              >
-                <table className='job-table'>
-                  <tbody>
-                    {templates.length === 0 && !isLoadingMore ? (
-                      <tr><td colSpan="3" style={{ textAlign: 'center' }}>Belum ada template yang dibuat.</td></tr>
-                    ) : (
-                      templates.map((template) => (
-                        <tr key={template.id} className="hoverable-row">
-                          <td>{template.title}</td>
-                          <td style={{ whiteSpace: 'pre-wrap', maxWidth: '400px' }}>{template.message}</td>
-                          <td>
-                            <div className="action-buttons-group">
-                              <button onClick={() => handleEditClick(template)} className="btn-user-action btn-edit">Edit</button>
-                              <button onClick={() => handleDeleteClick(template)} className="btn-user-action btn-delete">Hapus</button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                    {isLoadingMore && (
-                      <tr><td colSpan="3" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+            <div
+              className="table-body-scroll"
+              ref={desktopListRef}
+              onScroll={handleScroll}
+              style={{ overflowY: 'auto', maxHeight: '65vh' }}
+            >
+              <table className='job-table'>
+                <tbody>
+                  {templates.length === 0 && !isLoadingMore ? (
+                    <tr><td colSpan="3" style={{ textAlign: 'center' }}>Belum ada template yang dibuat.</td></tr>
+                  ) : (
+                    templates.map((template) => (
+                      <tr key={template.id} className="hoverable-row">
+                        <td>{template.title}</td>
+                        <td style={{ whiteSpace: 'pre-wrap', maxWidth: '400px' }}>{template.message}</td>
+                        <td>
+                          <div className="action-buttons-group">
+                            <button onClick={() => handleEditClick(template)} className="btn-user-action btn-edit">Edit</button>
+                            <button onClick={() => handleDeleteClick(template)} className="btn-user-action btn-delete">Hapus</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                  {isLoadingMore && (
+                    <tr><td colSpan="3" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            {!loading && templates.length > 0 && pagination && (
+              <table className="job-table">
+                <tfoot>
+                  <tr className="subtotal-row">
+                    <td colSpan={2}>Total Template</td>
+                    <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
+                      {pagination.total} Data
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            )}
           </div>
 
           <div
             className="notification-template-list-mobile"
             ref={mobileListRef}
             onScroll={handleScroll}
-            style={{ maxHeight: '65vh', overflowY: 'auto' }} 
+            style={{ maxHeight: '65vh', overflowY: 'auto' }}
           >
             {templates.length > 0 ? (
               templates.map((template) => (
@@ -196,6 +209,15 @@ export default function NotificationTemplateManagement() {
             ) : (
               !isLoadingMore && <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Belum ada template yang dibuat.</p></div> // <-- UBAH
             )}
+            {!loading && !isLoadingMore && templates.length > 0 && pagination && (
+              <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
+                <span className="subtotal-label">Total Template</span>
+                <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                  {pagination.total} Data
+                </span>
+              </div>
+            )}
+
             {isLoadingMore && (
               <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
             )}

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import SkuDetailModal from './SkuDetailModal';
 
-function ItemListView({ items, loading, onAdd, onEdit, onDelete, onFilterChange, onScroll, isLoadingMore }) {
+function ItemListView({ items, loading, totalItems, onAdd, onEdit, onDelete, onFilterChange, onScroll, isLoadingMore }) {
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -85,8 +85,8 @@ function ItemListView({ items, loading, onAdd, onEdit, onDelete, onFilterChange,
                     <div
                         className="table-body-scroll"
                         ref={desktopListRef}
-                        onScroll={onScroll} 
-                        // style={{ overflowY: 'auto', maxHeight: 'calc(65vh - 90px)' }}
+                        onScroll={onScroll}
+                    // style={{ overflowY: 'auto', maxHeight: 'calc(65vh - 90px)' }}
                     >
                         <table className="job-table">
                             <tbody>
@@ -120,20 +120,18 @@ function ItemListView({ items, loading, onAdd, onEdit, onDelete, onFilterChange,
                             </tbody>
                         </table>
                     </div>
-
-                    {/* 3. Tabel Footer (Fixed) - Menggunakan 'totalItems'
-                    {!loading && items.length > 0 && (
+                    {!loading && !isLoadingMore && items.length > 0 && (
                         <table className="job-table">
                             <tfoot>
                                 <tr className="subtotal-row">
-                                    <td colSpan="4">Total SKU</td>
-                                    <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
-                                        {totalItems} Data
+                                    <td colSpan="4" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>Total SKU</td>
+                                    <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                                        {totalItems}
                                     </td>
                                 </tr>
                             </tfoot>
                         </table>
-                    )} */}
+                    )}
                 </div>
 
                 {/* === TAMPILAN KARTU UNTUK MOBILE (DIMODIFIKASI) === */}

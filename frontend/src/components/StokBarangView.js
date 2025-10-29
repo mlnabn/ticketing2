@@ -57,21 +57,34 @@ function StokBarangView() {
     const fetchData = useCallback(async (page = 1, filters = {}) => {
         setLoading(true);
         setCurrentFilters(filters);
+        if (page === 1) {
+            setMasterItems([]);
+            setPagination(null);
+        }
         try {
             const params = { page, ...filters };
             const res = await api.get('/inventory/stock-summary', { params });
-            setMasterItems(res.data.data);
+            if (page > 1) {
+                setMasterItems(prev => [...prev, ...res.data.data]);
+            } else {
+                setMasterItems(res.data.data);
+            }
+
             setPagination(res.data);
-            setExpandedRows({});
-            setDetailItems({});
-            setSelectedItems(new Set());
+            if (page === 1) {
+                setExpandedRows({});
+                setDetailItems({});
+                setSelectedItems(new Set());
+            }
+
         } catch (error) {
             showToast('Gagal memuat data ringkasan stok.', 'error');
             console.error("Fetch Stok Summary Error:", error);
         } finally {
             setLoading(false);
         }
-    }, [showToast]);
+    }, [showToast, setSelectedItems]); // dependensi tetap
+
     useEffect(() => {
         api.get('/inventory/categories').then(res => setCategories(res.data));
         api.get('/statuses').then(res => {
@@ -108,7 +121,6 @@ function StokBarangView() {
     }, [selectedCategory, selectedSubCategory, selectedStatus, selectedColor, debouncedSearchTerm, fetchData]);
 
     const loadMoreItems = async () => {
-        // Hentikan jika sedang memuat atau sudah di halaman terakhir
         if (isLoadingMore || !pagination || pagination.current_page >= pagination.last_page) return;
 
         setIsLoadingMore(true);
@@ -118,7 +130,7 @@ function StokBarangView() {
             const res = await api.get('/inventory/stock-summary', { params });
 
             setMasterItems(prev => [...prev, ...res.data.data]); // Tambahkan data baru
-            setPagination(res.data); // Update info paginasi
+            setPagination(res.data);
         } catch (error) {
             showToast('Gagal memuat data tambahan.', 'error');
             console.error("Fetch More Stok Summary Error:", error);
@@ -157,8 +169,10 @@ function StokBarangView() {
             setDetailItems(prev => ({
                 ...prev,
                 [masterBarangId]: {
+                    ...prev[masterBarangId],
                     items: [...prev[masterBarangId].items, ...res.data.data],
                     pagination: {
+                        ...prev[masterBarangId].pagination,
                         currentPage: res.data.current_page,
                         totalPages: res.data.last_page
                     }
@@ -174,7 +188,7 @@ function StokBarangView() {
     const handleDetailScroll = (e, masterBarangId) => {
         const target = e.currentTarget;
         const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 100;
-        
+
         const detailState = detailItems[masterBarangId];
         if (!detailState) return;
 
@@ -206,16 +220,17 @@ function StokBarangView() {
                     status_id: (selectedStatus === "ALL") ? "" : selectedStatus,
                     id_warna: selectedColor,
                     search: debouncedSearchTerm,
-                    page: 1 
+                    page: 1
                 };
                 const res = await api.get('/inventory/stock-items', { params });
-                setDetailItems(prev => ({ 
-                    ...prev, 
+                setDetailItems(prev => ({
+                    ...prev,
                     [masterBarangId]: {
                         items: res.data.data,
                         pagination: {
                             currentPage: res.data.current_page,
-                            totalPages: res.data.last_page
+                            totalPages: res.data.last_page,
+                            total: res.data.total
                         }
                     }
                 }));
@@ -256,8 +271,6 @@ function StokBarangView() {
         setIsScannerOpen(false);
         handleScanSearch(decodedText);
     };
-
-    // --- BARU: Handler untuk Print QR ---
 
     // 1. Memilih/membatalkan 1 item
     const handleSelectItem = (id, isChecked) => {
@@ -486,25 +499,23 @@ function StokBarangView() {
                             </tr>
                         </thead>
                     </table>
-                
-                
-                <div 
-                    className="table-body-scroll"
-                    ref={desktopListRef}
-                    onScroll={handleScroll}
-                    style={{ overflowY: 'auto', maxHeight: '65vh' }}
-                >
-                    <table className="job-table">
-                        <tbody>
-                            {loading && (
-                                <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat data ringkasan...</td></tr>
-                            )}
-                            {!loading && masterItems.length === 0 && (
-                                <tr><td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>
-                                    Tidak ada barang cocok dengan filter.
-                                </td></tr>
-                            )}
-                            {!loading && masterItems.map(masterItem => (
+                    <div
+                        className="table-body-scroll"
+                        ref={desktopListRef}
+                        onScroll={handleScroll}
+                        style={{ overflowY: 'auto', maxHeight: '65vh' }}
+                    >
+                        <table className="job-table">
+                            <tbody>
+                                {loading && masterItems.length === 0 && (
+                                    <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat data ringkasan...</td></tr>
+                                )}
+                                {!loading && masterItems.length === 0 && (
+                                    <tr><td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>
+                                        Tidak ada barang cocok dengan filter.
+                                    </td></tr>
+                                )}
+                                {!loading && masterItems.map(masterItem => (
                                     <React.Fragment key={masterItem.id_m_barang}>
                                         <tr
                                             className={`summary-row hoverable-row ${expandedRows[masterItem.id_m_barang] ? 'expanded' : ''}`}
@@ -547,7 +558,7 @@ function StokBarangView() {
                                                                 <div className="detail-cell header-aksi">Aksi</div>
                                                             </div>
 
-                                                            <div 
+                                                            <div
                                                                 className="detail-rows-list-container"
                                                                 style={{ overflowY: 'auto', maxHeight: '300px' }}
                                                                 onScroll={(e) => handleDetailScroll(e, masterItem.id_m_barang)}
@@ -566,7 +577,7 @@ function StokBarangView() {
                                                                                 type="checkbox"
                                                                                 checked={selectedItems.has(detail.id)}
                                                                                 onChange={(e) => handleSelectItem(detail.id, e.target.checked)}
-                                                                                onClick={(e) => e.stopPropagation()} // Hentikan propagasi agar tidak trigger onClick row
+                                                                                onClick={(e) => e.stopPropagation()}
                                                                             />
                                                                         </div>
                                                                         <div className="detail-cell cell-kode">{detail.kode_unik}</div>
@@ -609,7 +620,17 @@ function StokBarangView() {
                                                                 ))}
                                                             </div>
                                                             {isLoadingMoreDetail === masterItem.id_m_barang && (
-                                                                <div className="detail-loading" style={{padding: '10px 0'}}>Memuat unit lainnya...</div>
+                                                                <div className="detail-loading" style={{ padding: '10px 0' }}>Memuat unit lainnya...</div>
+                                                            )}
+                                                            {!loading && !isLoadingMoreDetail && detailItems[masterItem.id_m_barang] && (
+                                                                <div className="detail-list-header" >
+                                                                    <div className="detail-cell" style={{ flex: 1, fontWeight: 'bold' }}>
+                                                                        Total Unit (SKU Ini)
+                                                                    </div>
+                                                                    <div className="detail-cell header-aksi" style={{ justifyContent: 'flex-end', fontWeight: 'bold' }}>
+                                                                        {detailItems[masterItem.id_m_barang].pagination.total} Data
+                                                                    </div>
+                                                                </div>
                                                             )}
                                                         </div>
                                                     ) : (
@@ -620,21 +641,33 @@ function StokBarangView() {
                                         )}
                                     </React.Fragment>
                                 ))}
-                            {isLoadingMore && (
-                                <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                {isLoadingMore && (
+                                    <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                    {!loading && masterItems.length > 0 && pagination && (
+                        <table className="job-table">
+                            <tfoot>
+                                <tr className="subtotal-row">
+                                    <td colSpan={6}>Total Tipe Barang (SKU)</td>
+                                    <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
+                                        {pagination.total} Data
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    )}
                 </div>
                 {/* Tampilan Mobile */}
-                <div 
+                <div
                     className="job-list-mobile"
                     ref={mobileListRef}
                     onScroll={handleScroll}
                     style={{ overflowY: 'auto', maxHeight: '65vh' }}
                 >
-                    {loading ? (<p style={{ textAlign: 'center' }}>Memuat data...</p>)
+                    {(loading && masterItems.length === 0) ? (<p style={{ textAlign: 'center' }}>Memuat data...</p>)
                         : masterItems.length === 0 ? (<p style={{ textAlign: 'center', padding: '20px' }}>Tidak ada barang cocok filter.</p>)
                             : (
                                 masterItems.map(masterItem => (
@@ -669,7 +702,7 @@ function StokBarangView() {
                                         </div>
 
                                         {expandedRows[masterItem.id_m_barang] && (
-                                            <div 
+                                            <div
                                                 className="detail-items-mobile-container"
                                                 style={{ overflowY: 'auto', maxHeight: '300px' }}
                                                 onScroll={(e) => handleDetailScroll(e, masterItem.id_m_barang)}
@@ -717,20 +750,35 @@ function StokBarangView() {
                                                         <p className="detail-nodata-mobile">{getNoDetailMessage()}</p>
                                                     )}
                                                 {isLoadingMoreDetail === masterItem.id_m_barang && (
-                                                <p className="detail-loading-mobile" style={{padding: '10px 0'}}>Memuat unit lainnya...</p>
+                                                    <p className="detail-loading-mobile" style={{ padding: '10px 0' }}>Memuat unit lainnya...</p>
+                                                )}
+                                                {!loading && !isLoadingMoreDetail && detailItems[masterItem.id_m_barang] && detailItems[masterItem.id_m_barang].items.length > 0 && (
+                                                    <div className="subtotal-card-mobile acquisition-subtotal" style={{ margin: '10px 0 5px 0', padding: '10px', backgroundColor: '#2D3748' }}>
+                                                        <span className="subtotal-label">Total Unit (SKU Ini)</span>
+                                                        <span className="subtotal-value value-acquisition" style={{ fontSize: '1.0rem', fontWeight: 'bold' }}>
+                                                            {detailItems[masterItem.id_m_barang].pagination.total} Data
+                                                        </span>
+                                                    </div>
                                                 )}
                                             </div>
                                         )}
                                     </div>
                                 ))
                             )}
-                        {isLoadingMore && (
-                            <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
-                        )}
+                    {!loading && !isLoadingMore && masterItems.length > 0 && pagination && (
+                        <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+                            <span className="subtotal-label">Total Tipe Barang (SKU)</span>
+                            <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                {pagination.total} Data
+                            </span>
+                        </div>
+                    )}
+
+                    {isLoadingMore && (
+                        <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+                    )}
                 </div>
             </div>
-
-            {/* Modal */}
             {detailItem && (
                 <ItemDetailModal
                     item={detailItem}

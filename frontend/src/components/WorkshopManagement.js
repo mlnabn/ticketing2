@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useOutletContext } from 'react-router-dom'; 
+import { useOutletContext } from 'react-router-dom';
 import api from '../services/api';
 import WorkshopFormModal from './WorkshopFormModal';
 import ConfirmationModal from './ConfirmationModal';
@@ -24,13 +24,14 @@ export default function WorkshopManagement() {
     try {
       const response = await api.get('/workshops', { params: { page } });
       if (page === 1) {
-        setWorkshops(response.data.data); 
+        setWorkshops(response.data.data);
       } else {
         setWorkshops(prev => [...prev, ...response.data.data]);
       }
       setPagination({
-          currentPage: response.data.current_page,
-          totalPages: response.data.last_page,
+        currentPage: response.data.current_page,
+        totalPages: response.data.last_page,
+        total: response.data.total
       });
     } catch (error) {
       console.error("Gagal mengambil data workshop:", error);
@@ -90,7 +91,7 @@ export default function WorkshopManagement() {
 
   const loadMoreItems = async () => {
     if (isLoadingMore || !pagination || pagination.currentPage >= pagination.totalPages) {
-        return;
+      return;
     }
     setIsLoadingMore(true);
     await fetchWorkshops(pagination.currentPage + 1);
@@ -102,7 +103,7 @@ export default function WorkshopManagement() {
     const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 100;
 
     if (nearBottom && !loading && !isLoadingMore && pagination && pagination.currentPage < pagination.totalPages) {
-        loadMoreItems();
+      loadMoreItems();
     }
   };
 
@@ -110,11 +111,11 @@ export default function WorkshopManagement() {
     <div className="user-management-container">
       <h1>Manajemen Workshop</h1>
       <button onClick={handleAddClick} className="btn-primary">
-        <i className="fas fa-plus" style={{marginRight: '8px'}}></i>
+        <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
         Tambah Workshop Baru
       </button>
-      
-      {loading && workshops.length === 0 ? ( // <-- UBAH: Tampilkan hanya jika list kosong
+
+      {loading && workshops.length === 0 ? (
         <p>Memuat data...</p>
       ) : (
         <>
@@ -129,17 +130,17 @@ export default function WorkshopManagement() {
               </thead>
             </table>
             <div
-                className="table-body-scroll"
-                ref={desktopListRef}
-                onScroll={handleScroll}
-                style={{ overflowY: 'auto', maxHeight: '65vh' }}
-              >
-                <table className='job-table'>
-                  <tbody>
-                    {workshops.length === 0 && !isLoadingMore ? ( // <-- UBAH: Logika "Tidak ada data"
-                      <tr><td colSpan="3" style={{ textAlign: 'center' }}>Belum ada workshop yang ditambahkan.</td></tr>
-                    ) : (
-                      workshops.map((ws) => (
+              className="table-body-scroll"
+              ref={desktopListRef}
+              onScroll={handleScroll}
+              style={{ overflowY: 'auto', maxHeight: '65vh' }}
+            >
+              <table className='job-table'>
+                <tbody>
+                  {workshops.length === 0 && !isLoadingMore ? (
+                    <tr><td colSpan="3" style={{ textAlign: 'center' }}>Belum ada workshop yang ditambahkan.</td></tr>
+                  ) : (
+                    workshops.map((ws) => (
                       <tr key={ws.id} className="hoverable-row">
                         <td>{ws.name}</td>
                         <td>{ws.code}</td>
@@ -151,13 +152,25 @@ export default function WorkshopManagement() {
                         </td>
                       </tr>
                     ))
-                    )}
-                    {isLoadingMore && (
-                      <tr><td colSpan="3" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                  )}
+                  {isLoadingMore && (
+                    <tr><td colSpan="3" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            {!loading && workshops.length > 0 && pagination && (
+              <table className="job-table">
+                <tfoot>
+                  <tr className="subtotal-row">
+                    <td colSpan={2}>Total Workshop</td>
+                    <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
+                      {pagination.total} Data
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            )}
           </div>
 
           <div
@@ -168,29 +181,36 @@ export default function WorkshopManagement() {
           >
             {workshops.length > 0 ? (
               workshops.map((ws) => (
-              <div key={ws.id} className="ticket-card-mobile">
-                <div className="card-row">
-                  <div className="data-group">
-                    <span className="label">NAMA WORKSHOP</span>
-                    <span className="value">{ws.name}</span>
+                <div key={ws.id} className="ticket-card-mobile">
+                  <div className="card-row">
+                    <div className="data-group">
+                      <span className="label">NAMA WORKSHOP</span>
+                      <span className="value">{ws.name}</span>
+                    </div>
+                    <div className="data-group">
+                      <span className="label">KODE</span>
+                      <span className="value">{ws.code}</span>
+                    </div>
                   </div>
-                  <div className="data-group">
-                    <span className="label">KODE</span>
-                    <span className="value">{ws.code}</span>
-                  </div>
-                </div>
-                <div className="action-row">
-                  <div className="action-buttons-group">
+                  <div className="action-row">
+                    <div className="action-buttons-group">
                       <button onClick={() => handleEditClick(ws)} className="btn-edit">Edit</button>
                       <button onClick={() => handleDeleteClick(ws)} className="btn-delete">Hapus</button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              ))
             ) : (
-               !isLoadingMore && <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Belum ada workshop yang ditambahkan.</p></div> // <-- UBAH
+              !isLoadingMore && <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Belum ada workshop yang ditambahkan.</p></div> // <-- UBAH
             )}
-            {/* --- BARU: Indikator Loading More --- */}
+            {!loading && !isLoadingMore && workshops.length > 0 && pagination && (
+              <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
+                <span className="subtotal-label">Total Workshop</span>
+                <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                  {pagination.total} Data
+                </span>
+              </div>
+            )}
             {isLoadingMore && (
               <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
             )}

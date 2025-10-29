@@ -48,10 +48,10 @@ function ToolManagement() {
         setIsLoadingMore(true);
         try {
             const nextPage = pagination.current_page + 1;
-            const params = { page: nextPage, ...currentFilters }; 
+            const params = { page: nextPage, ...currentFilters };
             const response = await api.get('/inventory/items', { params });
-            
-            setItems(prev => [...prev, ...response.data.data]); 
+
+            setItems(prev => [...prev, ...response.data.data]);
             setPagination(response.data);
         } catch (error) {
             console.error("Gagal memuat lebih banyak:", error);
@@ -102,11 +102,11 @@ function ToolManagement() {
         if (!itemToDelete) return;
         try {
             const response = await api.delete(`/inventory/items/${itemToDelete.id_m_barang}`);
-            
+
             // Cek status sukses (200 OK atau 204 No Content)
             if (response.status === 200 || response.status === 204) {
                 showToast(response.data?.message || "Barang berhasil dihapus.");
-                
+
                 // Logika untuk pindah halaman jika item terakhir di halaman dihapus
                 const currentPage = pagination?.current_page || 1;
                 if (items.length === 1 && currentPage > 1) {
@@ -136,6 +136,7 @@ function ToolManagement() {
                 items={items}
                 // pagination={pagination}
                 loading={loading}
+                totalItems={pagination?.total || 0} // <-- TAMBAHKAN BARIS INI
                 onAdd={handleOpenAddModal}
                 onEdit={handleOpenEditNameModal}
                 onDelete={handleDeleteClick}

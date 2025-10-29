@@ -106,7 +106,7 @@ export default function JobList() {
 
     const intervalId = setInterval(() => {
       console.log("Polling data tiket terbaru...");
-      fetchTickets(true); 
+      fetchTickets(true);
     }, POLLING_INTERVAL);
 
     return () => {
@@ -351,102 +351,125 @@ export default function JobList() {
                   </tr>
                 </thead>
               </table>
-              <div 
+              <div
                 className="table-body-scroll"
                 ref={desktopListRef}
                 onScroll={handleScroll}
                 style={{ overflowY: 'auto', maxHeight: '70vh' }}
               >
-            <table className="job-table">
-              <tbody>
-                {ticketsOnPage.length > 0 ? (
-                  ticketsOnPage.map(ticket => (
-                    <tr
-                      key={ticket.id}
-                      className={`${selectedIds.includes(ticket.id) ? 'selected-row' : ''}
+                <table className="job-table">
+                  <tbody>
+                    {ticketsOnPage.length > 0 ? (
+                      ticketsOnPage.map(ticket => (
+                        <tr
+                          key={ticket.id}
+                          className={`${selectedIds.includes(ticket.id) ? 'selected-row' : ''}
                         ${(ticket.is_urgent && ticket.status !== 'Selesai' && ticket.status !== 'Ditolak') ? 'urgent-row' : ''}
                         clickable-row`}
+                          onClick={(e) => handleRowClick(e, ticket)}
+                        >
+                          <td style={{ width: '40px' }}><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>
+                          <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
+                          <td>{ticket.user ? ticket.user.name : '-'}</td>
+                          <td>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
+                          <td><span className="description-cell">{ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}{ticket.title}</span></td>
+                          <td>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
+                          <td>{formatWorkTime(ticket)}</td>
+                          <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></td>
+                          <td><div className="action-buttons-group">{renderActionButtons(ticket)}</div></td>
+                        </tr>
+                      ))
+                    ) : (
+                      !isLoadingMore && <tr><td colSpan={9} style={{ textAlign: 'center', padding: '20px' }}>Tidak ada pekerjaan yang ditemukan.</td></tr> // <-- DIUBAH
+                    )}
+                    {isLoadingMore && (
+                      <tr><td colSpan={9} style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr> // <-- DIUBAH
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              {!isLoading && ticketData && ticketData.total > 0 && (
+                <table className="job-table">
+                  <tfoot>
+                    <tr className="subtotal-row">
+                      <td colSpan={8} style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>
+                        Total Tiket
+                      </td>
+                      <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                        {ticketData.total}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              )}
+
+              <div
+                className="job-list-mobile"
+                ref={mobileListRef}
+                onScroll={handleScroll}
+                style={{ overflowY: 'auto', maxHeight: '70vh' }}
+              >
+                {ticketsOnPage.length > 0 ? (
+                  ticketsOnPage.map(ticket => (
+                    <div
+                      key={ticket.id}
+                      className={`ticket-card-mobile clickable-row ${(ticket.is_urgent && ticket.status !== 'Selesai' && ticket.status !== 'Ditolak') ? 'urgent-row' : ''}`}
                       onClick={(e) => handleRowClick(e, ticket)}
                     >
-                      <td style={{ width: '40px' }}><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>
-                      <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
-                      <td>{ticket.user ? ticket.user.name : '-'}</td>
-                      <td>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
-                      <td><span className="description-cell">{ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}{ticket.title}</span></td>
-                      <td>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
-                      <td>{formatWorkTime(ticket)}</td>
-                      <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></td>
-                      <td><div className="action-buttons-group">{renderActionButtons(ticket)}</div></td>
-                    </tr>
+                      <div className="card-row">
+                        <div className="data-group"><span className="label">Pengirim</span><span className="value">{ticket.creator ? ticket.creator.name : 'N/A'}</span></div>
+                        <div className="data-group"><span className="label">Dikerjakan Oleh</span><span className="value">{ticket.user ? ticket.user.name : '-'}</span></div>
+                      </div>
+                      <div className="card-row"><div className="data-group single"><span className="label">Workshop</span><span className="value">{ticket.workshop ? ticket.workshop.name : 'N/A'}</span></div></div>
+                      <div className="card-row">
+                        <div className="data-group single">
+                          <span className="label">Deskripsi</span>
+                          <span className="value description">
+                            <span className="value description">
+                              <span className="description-cell">
+                                {ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}
+                                {ticket.title}
+                              </span>
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                      <div className="card-row">
+                        <div className="data-group"><span className="label">Tanggal Dibuat</span><span className="value">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</span></div>
+                        <div className="data-group"><span className="label">Waktu Pengerjaan</span><span className="value">{formatWorkTime(ticket)}</span></div>
+                      </div>
+                      <div className="card-row status-row"><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></div>
+                      <div className="card-row action-row"><div className="action-buttons-group">{renderActionButtons(ticket)}</div></div>
+                    </div>
                   ))
                 ) : (
-                  !isLoadingMore && <tr><td colSpan={isAdmin && !isMyTicketsPage ? 9 : 8} style={{ textAlign: 'center', padding: '20px' }}>Tidak ada pekerjaan yang ditemukan.</td></tr> // <-- UBAH
+                  !isLoadingMore && <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Tidak ada pekerjaan yang ditemukan.</p></div> // <-- UBAH
                 )}
                 {isLoadingMore && (
-                  <tr><td colSpan={isAdmin && !isMyTicketsPage ? 9 : 8} style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                  <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
                 )}
-              </tbody>
-            </table>
-          </div>
 
-        <div
-          className="job-list-mobile"
-          ref={mobileListRef}
-          onScroll={handleScroll}
-          style={{ overflowY: 'auto', maxHeight: '70vh' }}
-        >
-          {ticketsOnPage.length > 0 ? (
-            ticketsOnPage.map(ticket => (
-              <div
-                key={ticket.id}
-                className={`ticket-card-mobile clickable-row ${(ticket.is_urgent && ticket.status !== 'Selesai' && ticket.status !== 'Ditolak') ? 'urgent-row' : ''}`}
-                onClick={(e) => handleRowClick(e, ticket)}
-              >
-                <div className="card-row">
-                  <div className="data-group"><span className="label">Pengirim</span><span className="value">{ticket.creator ? ticket.creator.name : 'N/A'}</span></div>
-                  <div className="data-group"><span className="label">Dikerjakan Oleh</span><span className="value">{ticket.user ? ticket.user.name : '-'}</span></div>
-                </div>
-                <div className="card-row"><div className="data-group single"><span className="label">Workshop</span><span className="value">{ticket.workshop ? ticket.workshop.name : 'N/A'}</span></div></div>
-                <div className="card-row">
-                  <div className="data-group single">
-                    <span className="label">Deskripsi</span>
-                    <span className="value description">
-                      <span className="value description">
-                        <span className="description-cell">
-                          {ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}
-                          {ticket.title}
-                        </span>
-                      </span>
+                {!isLoading && !isLoadingMore && ticketData && ticketData.total > 0 && (
+                  <div className="subtotal-card-mobile" style={{ marginTop: '1rem', backgroundColor: '#2d3748' }}>
+                    <span className="subtotal-label">Total Tiket</span>
+                    <span className="subtotal-value">
+                      {ticketData.total}
                     </span>
                   </div>
-                </div>
-                <div className="card-row">
-                  <div className="data-group"><span className="label">Tanggal Dibuat</span><span className="value">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</span></div>
-                  <div className="data-group"><span className="label">Waktu Pengerjaan</span><span className="value">{formatWorkTime(ticket)}</span></div>
-                </div>
-                <div className="card-row status-row"><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></div>
-                <div className="card-row action-row"><div className="action-buttons-group">{renderActionButtons(ticket)}</div></div>
+                )}
               </div>
-            ))
-          ) : (
-            !isLoadingMore && <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Tidak ada pekerjaan yang ditemukan.</p></div> // <-- UBAH
-          )}
-          {isLoadingMore && (
-            <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
-          )}
-        </div>
-      </div>
-    </>
-  )
-}
+            </div>
+          </>
+        )
+        }
 
-{ ticketToAssign && <AssignAdminModal ticket={ticketToAssign} admins={adminList} items={itemList} onAssign={handleConfirmAssign} onClose={() => setTicketToAssign(null)} showToast={showToast} /> }
-{ ticketToReject && <RejectTicketModal ticket={ticketToReject} onReject={handleConfirmReject} onClose={() => setTicketToReject(null)} showToast={showToast} /> }
-{ ticketForProof && <ProofModal ticket={ticketForProof} onSave={handleSaveProof} onClose={() => setTicketForProof(null)} /> }
-{ ticketToDelete && <ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={() => setTicketToDelete(null)} /> }
-{ selectedTicketForDetail && <TicketDetailModal ticket={selectedTicketForDetail} onClose={() => setSelectedTicketForDetail(null)} /> }
-{ ticketToReturn && <ReturnItemsModal ticket={ticketToReturn} onSave={handleConfirmReturn} onClose={() => setTicketToReturn(null)} showToast={showToast} /> }
-    </div >
+        {ticketToAssign && <AssignAdminModal ticket={ticketToAssign} admins={adminList} items={itemList} onAssign={handleConfirmAssign} onClose={() => setTicketToAssign(null)} showToast={showToast} />}
+        {ticketToReject && <RejectTicketModal ticket={ticketToReject} onReject={handleConfirmReject} onClose={() => setTicketToReject(null)} showToast={showToast} />}
+        {ticketForProof && <ProofModal ticket={ticketForProof} onSave={handleSaveProof} onClose={() => setTicketForProof(null)} />}
+        {ticketToDelete && <ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={() => setTicketToDelete(null)} />}
+        {selectedTicketForDetail && <TicketDetailModal ticket={selectedTicketForDetail} onClose={() => setSelectedTicketForDetail(null)} />}
+        {ticketToReturn && <ReturnItemsModal ticket={ticketToReturn} onSave={handleConfirmReturn} onClose={() => setTicketToReturn(null)} showToast={showToast} />}
+      </div >
     </>
   );
 }
