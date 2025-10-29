@@ -52,7 +52,7 @@ class MasterBarangController extends Controller
         if ($request->has('all')) {
             return $query->get();
         }
-        return $query->paginate(10);
+        return $query->paginate(15);
     }
 
     public function getVariations($kode_barang)

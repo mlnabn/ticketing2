@@ -196,6 +196,7 @@ function ItemListView({
                                     <tr><td colSpan="4" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
                                 )}
                             </tbody>
+                            
                         </table>
                     </div>
                     {!loading && !isLoadingMore && items.length > 0 && (
@@ -204,7 +205,7 @@ function ItemListView({
                                 <tr className="subtotal-row">
                                     <td colSpan="5" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>Total SKU</td>
                                     <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
-                                        {totalItems} Data
+                                        {totalItems} SKU
                                     </td>
                                 </tr>
                             </tfoot>
@@ -256,14 +257,6 @@ function ItemListView({
                     ))}
                     {isLoadingMoreMobile && ( 
                         <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
-                    )}
-                    {!loading && !isLoadingMore && items.length > 0 && (
-                        <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
-                            <span className="subtotal-label">Total SKU</span>
-                            <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
-                                {totalItems} Data
-                            </span>
-                        </div>
                     )}
                 </div>
             </div>
