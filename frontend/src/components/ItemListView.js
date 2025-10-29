@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import SkuDetailModal from './SkuDetailModal';
 
-function ItemListView({ items, loading, totalItems, onAdd, onEdit, onDelete, onFilterChange, onScroll, isLoadingMore }) {
+function ItemListView({ 
+    items, loading, onAdd, onEdit, onDelete, onFilterChange, onScroll, isLoadingMore,
+    selectedIds, onSelectId, onSelectAll, onBulkDelete 
+}) {
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -10,6 +13,7 @@ function ItemListView({ items, loading, totalItems, onAdd, onEdit, onDelete, onF
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
     const [selectedItemForDetail, setSelectedItemForDetail] = useState(null);
+    const isAllSelectedOnPage = items.length > 0 && selectedIds.length === items.length;
 
     useEffect(() => {
         api.get('/inventory/categories').then(res => setCategories(res.data));
@@ -66,6 +70,13 @@ function ItemListView({ items, loading, totalItems, onAdd, onEdit, onDelete, onF
                         <option key={sub.id_sub_kategori} value={sub.id_sub_kategori}>{sub.nama_sub}</option>
                     ))}
                 </select>
+                {selectedIds.length > 0 && (
+                <div className="bulk-action-bar" >
+                    <button onClick={onBulkDelete} className="btn-delete">
+                        Hapus {selectedIds.length} SKU yang Dipilih
+                    </button>
+                </div>
+            )}
             </div>
 
             <div className="job-list-container">
@@ -74,6 +85,13 @@ function ItemListView({ items, loading, totalItems, onAdd, onEdit, onDelete, onF
                     <table className="job-table">
                         <thead>
                             <tr>
+                                <th style={{ width: '40px' }}>
+                                    <input
+                                        type="checkbox"
+                                        onChange={onSelectAll}
+                                        checked={isAllSelectedOnPage}
+                                    />
+                                </th>
                                 <th>Kode</th>
                                 <th>Nama Barang</th>
                                 <th>Kategori</th>
@@ -85,17 +103,16 @@ function ItemListView({ items, loading, totalItems, onAdd, onEdit, onDelete, onF
                     <div
                         className="table-body-scroll"
                         ref={desktopListRef}
-                        onScroll={onScroll}
-                    // style={{ overflowY: 'auto', maxHeight: 'calc(65vh - 90px)' }}
+                        onScroll={onScroll} 
                     >
                         <table className="job-table">
                             <tbody>
                                 {loading && items.length === 0 && (
-                                    <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat data barang...</td></tr>
+                                    <tr><td colSpan="6" style={{ textAlign: 'center' }}>Memuat data barang...</td></tr>
                                 )}
 
                                 {!loading && items.length === 0 && (
-                                    <tr><td colSpan="5" style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</td></tr>
+                                    <tr><td colSpan="6" style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</td></tr>
                                 )}
 
                                 {items.map(item => (
@@ -104,6 +121,14 @@ function ItemListView({ items, loading, totalItems, onAdd, onEdit, onDelete, onF
                                         className="clickable-row"
                                         onClick={(e) => handleRowClick(e, item)}
                                     >
+                                        <td style={{ width: '40px' }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.includes(item.id_m_barang)}
+                                                onChange={() => onSelectId(item.id_m_barang)}
+                                                onClick={(e) => e.stopPropagation()}
+                                            />
+                                        </td>
                                         <td>{item.kode_barang}</td>
                                         <td>{item.nama_barang}</td>
                                         <td>{item.master_kategori?.nama_kategori || '-'}</td>
@@ -115,7 +140,7 @@ function ItemListView({ items, loading, totalItems, onAdd, onEdit, onDelete, onF
                                     </tr>
                                 ))}
                                 {isLoadingMore && (
-                                    <tr><td colSpan="5" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                                    <tr><td colSpan="6" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
                                 )}
                             </tbody>
                         </table>

@@ -21,26 +21,31 @@ function ToolManagement() {
     const [itemToEditName, setItemToEditName] = useState(null);
     const [currentFilters, setCurrentFilters] = useState({});
     const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [selectedIds, setSelectedIds] = useState([]);
 
     const fetchItems = useCallback(async (page = 1, filters = {}) => {
-        setLoading(true);
+        if (page === 1) setLoading(true);
         setCurrentFilters(filters);
         try {
-            const params = { page: 1, ...filters };
+            const params = { page, ...filters };
             const response = await api.get('/inventory/items', { params });
-            setItems(response.data.data);
+            if (page === 1) {
+                setItems(response.data.data);
+            } else {
+                setItems(prev => [...prev, ...response.data.data]);
+            }
             setPagination(response.data);
         } catch (error) {
             console.error("Gagal mengambil data inventaris:", error);
             showToast("Gagal mengambil data inventaris.", "error");
         } finally {
-            setLoading(false);
+            if (page === 1) setLoading(false);
         }
     }, [showToast]);
 
     useEffect(() => {
-        fetchItems();
-    }, [fetchItems]);
+        fetchItems(1, currentFilters);
+    }, [fetchItems, currentFilters]);
 
     const loadMoreItems = async () => {
         if (isLoadingMore || !pagination || pagination.current_page >= pagination.last_page) return;
@@ -126,6 +131,35 @@ function ToolManagement() {
         }
     };
 
+    const handleSelectId = (id) => {
+        setSelectedIds(prev =>
+            prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
+        );
+    };
+
+    const handleSelectAll = (e) => {
+        setSelectedIds(e.target.checked ? items.map(item => item.id_m_barang) : []);
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) {
+            showToast('Pilih setidaknya satu SKU untuk dihapus.', 'info');
+            return;
+        }
+        if (window.confirm(`Anda yakin ingin menghapus ${selectedIds.length} SKU yang dipilih?`)) {
+            try {
+                const response = await api.post('/inventory/items/bulk-delete', { ids: selectedIds });
+                showToast(response.data.message, 'success'); 
+                // Refresh data di halaman saat ini dan reset selection
+                fetchItems(1, currentFilters); // Fetch ulang dari halaman 1
+                setSelectedIds([]); 
+            } catch (e) {
+                console.error('Gagal menghapus SKU secara massal:', e);
+                showToast(e.response?.data?.message || 'Terjadi kesalahan saat mencoba menghapus SKU.', 'error');
+            }
+        }
+    };
+
     return (
         <>
             <div className="user-management-container" style={{ marginBottom: '20px' }}>
@@ -143,6 +177,10 @@ function ToolManagement() {
                 onFilterChange={fetchItems}
                 onScroll={handleScroll}
                 isLoadingMore={isLoadingMore}
+                selectedIds={selectedIds}
+                onSelectId={handleSelectId}
+                onSelectAll={handleSelectAll}
+                onBulkDelete={handleBulkDelete}
             />
 
             <ItemFormModal
