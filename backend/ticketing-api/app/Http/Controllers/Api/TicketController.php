@@ -416,7 +416,7 @@ class TicketController extends Controller
         if ($request->boolean('all')) {
             $ticketsResult = $paginatedQuery->latest()->get();
         } else {
-            $perPage = $request->query('per_page', 10);
+            $perPage = $request->query('per_page', 15);
             $ticketsResult = $paginatedQuery->latest()->paginate($perPage);
         }
 
@@ -510,7 +510,7 @@ class TicketController extends Controller
             return response()->json(['error' => 'Akses ditolak.'], 403);
         }
 
-        $perPage = $request->query('per_page', 10);
+        $perPage = $request->query('per_page', 15);
 
         $ticketsData = Ticket::with(['user', 'creator', 'workshop', 'masterBarangs'])
             ->where('user_id', $user->id)
