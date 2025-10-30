@@ -190,24 +190,57 @@ export default function DetailedReportPage({ type, title }) {
             };
         }
 
-        const stokInfo = item.stok_barang || {};
-        const masterInfo = stokInfo.master_barang || {};
-        const historyDate = item.event_date || item.created_at;
-        const triggeredBy = item.triggered_by_user?.name || '-';
-        const workshopName = item.workshop?.name || stokInfo.workshop?.name || '-';
-        const historyStatus = item.status_detail?.nama_status || 'N/A';
-        const currentStatus = stokInfo.status_detail?.nama_status || 'N/A';
+        else if (type === 'accountability') {
+            let responsibleUser = '-';
+            let eventDate = item.updated_at; // Default ke tanggal update terakhir
+            const currentStatus = item.status_detail?.nama_status || 'N/A';
 
-        return {
-            kode_unik: stokInfo.kode_unik || '-',
-            serial_number: stokInfo.serial_number || '-',
-            nama_barang: masterInfo.nama_barang || 'N/A',
-            status: historyStatus,
-            tanggal: historyDate,
-            penanggung_jawab: triggeredBy,
-            workshop: workshopName,
-            current_status: currentStatus,
-        };
+            if (currentStatus === 'Rusak' && item.user_perusak) {
+                responsibleUser = item.user_perusak.name;
+                eventDate = item.tanggal_rusak || eventDate;
+            } else if (currentStatus === 'Hilang' && item.user_penghilang) {
+                responsibleUser = item.user_penghilang.name;
+                eventDate = item.tanggal_hilang || eventDate;
+            } else if (currentStatus === 'Perbaikan' && item.teknisi_perbaikan) {
+                responsibleUser = item.teknisi_perbaikan.name;
+                 eventDate = item.tanggal_mulai_perbaikan || eventDate;
+            }
+
+             return {
+                kode_unik: item.kode_unik,
+                serial_number: item.serial_number || '-',
+                nama_barang: item.master_barang?.nama_barang || 'N/A',
+                // Kolom 'status' sekarang adalah status SAAT INI
+                status: currentStatus, 
+                tanggal: eventDate, // Tanggal relevan dengan status
+                penanggung_jawab: responsibleUser,
+                workshop: item.workshop?.name || '-', // Mungkin relevan jika rusak/hilang saat dipinjam
+                current_status: currentStatus, // Sama dengan 'status'
+             };
+        }
+
+        else{
+            const stokInfo = item.stok_barang || {};
+            const masterInfo = stokInfo.master_barang || {};
+            const historyDate = item.event_date || item.created_at;
+            const triggeredBy = item.triggered_by_user?.name || '-';
+            const workshopName = item.workshop?.name || stokInfo.workshop?.name || '-';
+            const historyStatus = item.status_detail?.nama_status || 'N/A';
+            const currentStatus = stokInfo.status_detail?.nama_status || 'N/A';
+            const previousStatus = item.previous_status_detail?.nama_status || 'Tersedia';
+
+            return {
+                kode_unik: stokInfo.kode_unik || '-',
+                serial_number: stokInfo.serial_number || '-',
+                nama_barang: masterInfo.nama_barang || 'N/A',
+                status_dari: previousStatus,
+                status: historyStatus,
+                tanggal: historyDate,
+                penanggung_jawab: triggeredBy,
+                workshop: workshopName,
+                current_status: currentStatus,
+            };
+        }
     };
 
     const handleRowClick = (e, item) => {
@@ -224,14 +257,40 @@ export default function DetailedReportPage({ type, title }) {
 
     const dateHeaders = {
         in: 'Tgl Masuk',
-        out: 'Tgl Kejadian',
+        out: 'Tgl Status Diubah',
         available: 'Tgl Masuk',
-        accountability: 'Tgl Kejadian',
+        accountability: 'Tgl Status',
         active_loans: 'Tgl Keluar'
     };
-    const showWorkshop = type === 'out' || type === 'accountability';
-    const showCurrentStatus = type === 'out' || type === 'accountability';
-    const totalColSpan = 6 + (showWorkshop ? 1 : 0) + (showCurrentStatus ? 1 : 0);
+    // const showWorkshop = type === 'out' || type === 'accountability';
+    // const showCurrentStatus = type === 'out' || type === 'accountability';
+    // const showStatusDari = type === 'in' || type === 'out' || type === 'accountability' || type === 'item_history';
+
+    // Status Dari hanya untuk history
+    const showStatusDari = type === 'in' || type === 'out' || type === 'item_history'; 
+    // Status Kejadian hanya untuk history
+    const showStatusKejadian = type === 'in' || type === 'out' || type === 'item_history'; 
+    // Penanggung Jawab Kejadian hanya untuk history
+    const showPJKejadian = type === 'in' || type === 'out' || type === 'item_history'; 
+
+    // Status Saat Ini & Penanggung Jawab Status hanya untuk list barang (bukan history)
+    const showCurrentStatus = type === 'available' || type === 'active_loans' || type === 'accountability' || type === 'all_stock';
+    const showPJStatus = type === 'available' || type === 'active_loans' || type === 'accountability' || type === 'all_stock';
+    
+    // Workshop relevan untuk peminjaman dan history keluar/accountability
+    const showWorkshop = type === 'out' || type === 'accountability' || type === 'active_loans';
+
+    // const totalColSpan = 6 + (showWorkshop ? 1 : 0) + (showCurrentStatus ? 1 : 0) + (showStatusDari ? 1 : 0);
+
+    const totalColSpan = 3 
+                         + (showStatusDari ? 1 : 0) 
+                         + (showStatusKejadian ? 1 : 0) 
+                         + 1 
+                         + (showPJKejadian ? 1 : 0)
+                         + (showWorkshop ? 1 : 0) 
+                         + (showCurrentStatus ? 1 : 0)
+                         + (showPJStatus ? 1 : 0);
+
     const loadMoreItems = async () => {
         if (isLoadingMore || pagination.currentPage >= pagination.totalPages) return;
 
@@ -324,11 +383,13 @@ export default function DetailedReportPage({ type, title }) {
                                 <th>Kode Unik</th>
                                 <th>Serial Number</th>
                                 <th>Nama Barang</th>
-                                <th>Status Kejadian</th>
+                                {showStatusDari && <th>Status Dari</th>} 
+                                {showStatusKejadian && <th>Status Perubahan</th>}
                                 <th>{dateHeaders[type] || 'Tanggal'}</th>
-                                <th>Penanggung Jawab</th>
+                                {showPJKejadian && <th>Penanggung Jawab Kejadian</th>}
                                 {showWorkshop && <th>Workshop</th>}
                                 {showCurrentStatus && <th>Status Saat Ini</th>}
+                                {showPJStatus && <th>Penanggung Jawab Status</th>}
                             </tr>
                         </thead>
                     </table>
@@ -351,17 +412,19 @@ export default function DetailedReportPage({ type, title }) {
                                             <td>{itemData.kode_unik || '-'}</td>
                                             <td>{itemData.serial_number || '-'}</td>
                                             <td>{itemData.nama_barang || '-'}</td>
-                                            <td>{itemData.status || '-'}</td>
+                                            {showStatusDari && <td>{itemData.status_dari || '-'}</td>}
+                                            {showStatusKejadian && <td>{itemData.status || '-'}</td>}
                                             <td>{formatDate(itemData.tanggal)}</td>
-                                            <td>{itemData.penanggung_jawab || '-'}</td>
+                                            {showPJKejadian && <td>{itemData.penanggung_jawab || '-'}</td>}
                                             {showWorkshop && <td>{itemData.workshop || '-'}</td>}
                                             {showCurrentStatus && (
                                                 <td>
-                                                    <span className={`badge-status status-${(itemData.current_status || '-').toLowerCase()}`}>
+                                                    <span className={`badge-status status-${(itemData.current_status || '-').toLowerCase().replace(/\s+/g, '-')}`}>
                                                         {itemData.current_status || '-'}
                                                     </span>
                                                 </td>
                                             )}
+                                             {showPJStatus && <td>{itemData.penanggung_jawab || '-'}</td>}
                                         </tr>
                                     )
                                 })}
@@ -409,12 +472,18 @@ export default function DetailedReportPage({ type, title }) {
                                         <span className="label">Nama Barang</span>
                                         <span className="value description">{itemData.nama_barang || '-'}</span>
                                     </div>
-                                </div>
-                                <div className="card-row">
                                     <div className="data-group">
                                         <span className="label">Kode Unik</span>
                                         <span className="value">{itemData.kode_unik || '-'}</span>
                                     </div>
+                                </div>
+                                <div className="card-row">
+                                    {showStatusDari && (
+                                        <div className="data-group">
+                                            <span className="label">Status Dari</span>
+                                            <span className="value">{itemData.status_dari || '-'}</span>
+                                        </div>
+                                    )}
                                     <div className="data-group">
                                         <span className="label">Status Kejadian</span>
                                         <span className="value">{itemData.status || '-'}</span>

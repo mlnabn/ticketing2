@@ -205,7 +205,7 @@ class InventoryReportController extends Controller
         $type = $request->type;
         $statusTersediaId = DB::table('status_barang')->where('nama_status', 'Tersedia')->value('id');
 
-        if (in_array($type, ['available', 'active_loans', 'all_stock'])) {
+        if (in_array($type, ['available', 'active_loans', 'all_stock', 'accountability'])) {
             $query = StokBarang::with([
                 'masterBarang',
                 'statusDetail',
@@ -257,24 +257,84 @@ class InventoryReportController extends Controller
                     });
                     $query->orderBy('created_at', 'desc');
                     break;
+                
+                case 'accountability':
+                    $targetStatusIds = DB::table('status_barang')
+                                        ->whereIn('nama_status', ['Hilang', 'Rusak', 'Perbaikan'])
+                                        ->pluck('id');
+                    $query->whereIn('status_id', $targetStatusIds);
+
+                    $query->when($request->filled('month'), function($q) use ($request) {
+                        $q->where(function($sub) use ($request) {
+                            $sub->whereMonth('tanggal_rusak', $request->month)
+                                ->orWhereMonth('tanggal_hilang', $request->month)
+                                ->orWhereMonth('tanggal_mulai_perbaikan', $request->month);
+                        });
+                    });
+                    $query->when($request->filled('year'), function($q) use ($request) {
+                        $q->where(function($sub) use ($request) {
+                            $sub->whereYear('tanggal_rusak', $request->year)
+                                ->orWhereYear('tanggal_hilang', $request->year)
+                                ->orWhereYear('tanggal_mulai_perbaikan', $request->year);
+                        });
+                    });
+                    $query->when($request->filled('start_date'), function($q) use ($request) {
+                         $q->where(function($sub) use ($request) {
+                             $sub->whereDate('tanggal_rusak', '>=', $request->start_date)
+                                ->orWhereDate('tanggal_hilang', '>=', $request->start_date)
+                                ->orWhereDate('tanggal_mulai_perbaikan', '>=', $request->start_date);
+                         });
+                    });
+                     $query->when($request->filled('end_date'), function($q) use ($request) {
+                         $q->where(function($sub) use ($request) {
+                             $sub->whereDate('tanggal_rusak', '<=', $request->end_date)
+                                ->orWhereDate('tanggal_hilang', '<=', $request->end_date)
+                                ->orWhereDate('tanggal_mulai_perbaikan', '<=', $request->end_date);
+                         });
+                     });
+
+                    $query->orderBy('updated_at', 'desc');
+                    break;
             }
 
             // Filter Pencarian untuk StokBarang
-            $query->when($request->filled('search'), function ($q) use ($request) {
+            $query->when($request->filled('search'), function ($q) use ($request, $type) {
                 $searchTerm = '%' . $request->search . '%';
-                $q->where(function ($subQuery) use ($searchTerm) {
+                $q->where(function ($subQuery) use ($searchTerm, $type) {
                     $subQuery->where('kode_unik', 'like', $searchTerm)
                         ->orWhere('serial_number', 'like', $searchTerm)
                         ->orWhereHas('masterBarang', fn($masterQuery) => $masterQuery->where('nama_barang', 'like', $searchTerm))
                         ->orWhereHas('userPeminjam', fn($userQuery) => $userQuery->where('name', 'like', $searchTerm));
+                    
+                    if ($type === 'active_loans') {
+                        $subQuery->orWhereHas('userPeminjam', fn($userQuery) => $userQuery->where('name', 'like', $searchTerm));
+                    } elseif ($type === 'accountability') {
+                        $subQuery->orWhereHas('userPerusak', fn($userQuery) => $userQuery->where('name', 'like', $searchTerm))
+                                ->orWhereHas('userPenghilang', fn($userQuery) => $userQuery->where('name', 'like', $searchTerm))
+                                ->orWhereHas('teknisiPerbaikan', fn($userQuery) => $userQuery->where('name', 'like', $searchTerm));
+                    }
                 });
             });
+
         } else {
-            // Query History untuk 'in', 'out', 'accountability'
-            $query = StokBarangHistory::with([
+            $query = StokBarangHistory::select('stok_barang_histories.*')
+                ->addSelect(DB::raw("(
+                    COALESCE(
+                        (SELECT status_id 
+                         FROM stok_barang_histories AS sh_inner 
+                         WHERE sh_inner.stok_barang_id = stok_barang_histories.stok_barang_id 
+                           AND sh_inner.id < stok_barang_histories.id 
+                         ORDER BY sh_inner.id DESC 
+                         LIMIT 1), 
+                        $statusTersediaId 
+                    )
+                ) AS previous_status_id"));
+            
+            $query->with([
                 'stokBarang.masterBarang',
                 'stokBarang.color',
                 'stokBarang.statusDetail',
+                'previousStatusDetail',
                 'statusDetail',
                 'triggeredByUser:id,name',
                 'relatedUser:id,name',
@@ -282,15 +342,11 @@ class InventoryReportController extends Controller
             ]);
 
             if ($type === 'item_history') {
-                // Jika ini laporan riwayat item spesifik, filter berdasarkan ID item.
-                // Validasi 'exists' sudah dilakukan di 'exportReport'
                 $query->where('stok_barang_id', $request->stok_barang_id);
             } else {
-                // Ini adalah logika lama untuk 'in', 'out', 'accountability'
                 $statusMap = [
                     'in' => [$statusTersediaId],
-                    'out' => DB::table('status_barang')->whereIn('nama_status', ['Dipinjam', 'Digunakan'])->pluck('id')->toArray(),
-                    'accountability' => DB::table('status_barang')->whereIn('nama_status', ['Hilang', 'Rusak', 'Perbaikan'])->pluck('id')->toArray()
+                    'out' => DB::table('status_barang')->where('nama_status', '!=', 'Tersedia')->pluck('id')->toArray(),
                 ];
 
                 $targetStatusIds = $statusMap[$type] ?? [];

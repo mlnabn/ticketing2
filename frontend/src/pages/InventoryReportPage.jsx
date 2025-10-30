@@ -127,48 +127,43 @@ export default function InventoryReportPage() {
                 </ul>
             </div>
 
-            {/* Navigasi laporan */}
-            <div className="report-navigation-cards">
-                <NavigationCard
-                    title="Laporan Peminjaman Aktif"
-                    description="Lihat semua aset yang saat ini sedang dipinjam atau digunakan."
-                    linkTo="/admin/inventory-reports/active-loans"
-                    icon="fa-user-clock"
-                />
-                <NavigationCard
-                    title="Lacak Riwayat Aset"
-                    description="Cari atau scan untuk melihat riwayat lengkap satu unit aset."
-                    linkTo="/admin/inventory-reports/history"
-                    icon="fa-history"
-                />
-            </div>
-
             <div className="report-navigation-cards">
                 <NavigationCard
                     title="Laporan Barang Masuk"
-                    description="Lihat riwayat detail semua barang yang masuk ke gudang."
+                    description="Lacak semua barang yang kembali."
                     linkTo="/admin/inventory-reports/incoming"
                     icon="fa-arrow-down"
                 />
                 <NavigationCard
                     title="Laporan Barang Keluar"
-                    description="Lacak semua barang yang dipinjam, dan digunakan."
+                    description="Lacak semua barang yang keluar atau statusnya diubah."
                     linkTo="/admin/inventory-reports/outgoing"
                     icon="fa-arrow-up"
                 />
                 <NavigationCard
-                    title="Laporan Barang Tersedia"
+                    title="Daftar Barang Tersedia"
                     description="Lihat semua unit barang yang saat ini siap digunakan."
                     linkTo="/admin/inventory-reports/available"
                     icon="fa-archive"
                 />
                 <NavigationCard
-                    title="Laporan Barang Hilang & Rusak"
-                    description="Lacak semua barang yang hilang atau rusak untuk audit."
+                    title="Daftar Barang Dipinjam & Digunakan"
+                    description="Lihat semua barang yang sedang dipinjam atau digunakan."
+                    linkTo="/admin/inventory-reports/active-loans"
+                    icon="fa-user-clock"
+                />
+                <NavigationCard
+                    title="Daftar Barang Hilang, Rusak, & Perbaikan"
+                    description="Lihat semua barang yang hilang, rusak, atau sedang perbaikan."
                     linkTo="/admin/inventory-reports/accountability"
                     icon="fa-exclamation-triangle"
                 />
-                
+                <NavigationCard
+                    title="Riwayat Barang"
+                    description="Cari atau scan qr barang untuk melihat riwayat lengkap suatu barang."
+                    linkTo="/admin/inventory-reports/history"
+                    icon="fa-history"
+                />
             </div>
         </div>
     );
