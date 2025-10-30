@@ -1,20 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
-// import Pagination from './Pagination';
 import { saveAs } from 'file-saver';
 import InventoryDetailModal from './InventoryDetailModal';
-
-// const PaginationSummary = ({ pagination }) => {
-//     if (!pagination || pagination.total === 0) {
-//         return null;
-//     }
-//     return (
-//         <div className="pagination-summary">
-//             Menampilkan <strong>{pagination.from}</strong> - <strong>{pagination.to}</strong> dari <strong>{pagination.total}</strong> data
-//         </div>
-//     );
-// };
 
 const months = [
     { value: 1, name: 'Januari' }, { value: 2, name: 'Februari' }, { value: 3, name: 'Maret' },
@@ -43,10 +31,11 @@ export default function DetailedReportPage({ type, title }) {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
-    const getApiParams = useCallback((page = 1, isExport = false) => {
+
+    const getApiParams = useCallback((page = 1) => {
         const baseParams = {
             type,
-            search: isExport ? searchTerm : debouncedSearchTerm,
+            search: debouncedSearchTerm,
         };
 
         if (filterType === 'month') {
@@ -57,20 +46,16 @@ export default function DetailedReportPage({ type, title }) {
             baseParams.end_date = filters.end_date;
         }
 
-        if (isExport) {
-            baseParams.export_type = isExport;
-            baseParams.all = true;
-        } else {
-            baseParams.page = page;
-        }
+        baseParams.page = page;
         return baseParams;
-    }, [type, searchTerm, debouncedSearchTerm, filterType, filters]);
+
+    }, [type, debouncedSearchTerm, filterType, filters]);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
         setData([]);
         try {
-            const params = getApiParams(1, false);
+            const params = getApiParams(1);
             const res = await api.get('/reports/inventory/detailed', { params });
             setData(res.data.data);
             setPagination({
@@ -129,7 +114,16 @@ export default function DetailedReportPage({ type, title }) {
         else setExportingPdf(true);
 
         try {
-            const params = getApiParams(1, exportType);
+            const params = {
+                type,
+                search: searchTerm,
+                export_type: exportType,
+                all: true,
+                month: filterType === 'month' ? filters.month : '',
+                year: filterType === 'month' ? filters.year : '',
+                start_date: filterType === 'date_range' ? filters.start_date : '',
+                end_date: filterType === 'date_range' ? filters.end_date : '',
+            };
 
             const response = await api.get('/reports/inventory/export', {
                 params,

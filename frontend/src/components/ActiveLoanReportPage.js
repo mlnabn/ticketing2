@@ -35,10 +35,10 @@ export default function ActiveLoanReportPage() {
     const type = 'active_loans';
     const title = 'Laporan Peminjaman Aktif';
 
-    const getApiParams = useCallback((page = 1, isExport = false) => {
+    const getApiParams = useCallback((page = 1) => {
         const baseParams = {
             type,
-            search: isExport ? searchTerm : debouncedSearchTerm,
+            search: debouncedSearchTerm,
         };
 
         if (filterType === 'month') {
@@ -49,20 +49,15 @@ export default function ActiveLoanReportPage() {
             baseParams.end_date = filters.end_date;
         }
 
-        if (isExport) {
-            baseParams.export_type = isExport;
-            baseParams.all = true;
-        } else {
-            baseParams.page = page;
-        }
+        baseParams.page = page; 
         return baseParams;
-    }, [type, searchTerm, debouncedSearchTerm, filterType, filters]);
+    }, [type, debouncedSearchTerm, filterType, filters]);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
         setData([]);
         try {
-            const params = getApiParams(1, false);
+            const params = getApiParams(1);
             const res = await api.get('/reports/inventory/detailed', { params });
             setData(res.data.data);
             setPagination({
@@ -128,7 +123,16 @@ export default function ActiveLoanReportPage() {
         else setExportingPdf(true);
 
         try {
-            const params = getApiParams(1, exportType);
+            const params = {
+                type,
+                search: searchTerm,
+                export_type: exportType,
+                all: true,
+                month: filterType === 'month' ? filters.month : '',
+                year: filterType === 'month' ? filters.year : '',
+                start_date: filterType === 'date_range' ? filters.start_date : '',
+                end_date: filterType === 'date_range' ? filters.end_date : '',
+            };
 
             const response = await api.get('/reports/inventory/export', {
                 params,
