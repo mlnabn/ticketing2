@@ -2842,6 +2842,7 @@ body.dark-mode .user-table tbody tr:hover {
   border-bottom: 1px solid #4A5568;
   border-right: 1px solid #4A5568;
 }
+
 .user-history-table tr:last-child td {
   border-bottom: none;
 }
@@ -5254,31 +5255,33 @@ body.dark-mode .btn-scan:hover {
 
 
 .bulk-action-bar {
-    display: flex;
-    align-items: center;}
+  display: flex;
+  align-items: center;
+}
 
 .bulk-action-bar .btn-clear {
 
-    background-color: #FEE2E2;
-    color: #B91C1C;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    display: inline-flex;
-    align-items: center;
+  background-color: #FEE2E2;
+  color: #B91C1C;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
 }
+
 .bulk-action-bar .btn-clear:hover {
-    background-color: #FECACA;
-    color: #991B1B;
+  background-color: #FECACA;
+  color: #991B1B;
 }
 
 .bulk-action-bar .btn-clear:active {
-    background-color: #FCA5A5;
-    transform: scale(0.98);
+  background-color: #FCA5A5;
+  transform: scale(0.98);
 }
 
 
@@ -12406,20 +12409,21 @@ body.dark-mode .summary-card.expanded {
 
 .sku-detail-list-wrapper {
   padding: 0 1rem;
-  background-color: var(--detail-bg, #f8f9fa); 
+  background-color: var(--detail-bg, #f8f9fa);
   border-bottom: 1px solid var(--detail-border-color, #dee2e6);
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
+
 .dark-mode .sku-detail-list-wrapper {
-  background-color: #1f1f1f; 
+  background-color: #1f1f1f;
   border-bottom-color: #374151;
 }
 
 .sku-detail-list-header {
-  display: flex; 
-  padding: 0.6rem 0.5rem; 
-  background-color: var(--detail-header-bg, #e9ecef); 
+  display: flex;
+  padding: 0.6rem 0.5rem;
+  background-color: var(--detail-header-bg, #e9ecef);
   font-weight: 600;
   color: var(--detail-header-text, #495057);
   font-size: 0.8em;
@@ -12427,22 +12431,25 @@ body.dark-mode .summary-card.expanded {
   margin-bottom: 0.25rem;
   text-align: center;
 }
+
 .dark-mode .sku-detail-list-header {
-  background-color: #1f1f1f; 
-  color: #d1d5db; 
-  border-bottom-color: #374151; 
+  background-color: #1f1f1f;
+  color: #d1d5db;
+  border-bottom-color: #374151;
 }
 
 .sku-detail-row-div {
-  display: flex; 
-  border-bottom: 1px solid var(--detail-border-color, #e9ecef); 
-  padding: 0.6rem 0.5rem; 
+  display: flex;
+  border-bottom: 1px solid var(--detail-border-color, #e9ecef);
+  padding: 0.6rem 0.5rem;
   font-size: 0.85em;
-  align-items: center; 
+  align-items: center;
 }
+
 .sku-detail-row-div:last-child {
   border-bottom: none;
 }
+
 .dark-mode .sku-detail-row-div {
   border-bottom-color: #374151;
 }
@@ -12450,8 +12457,9 @@ body.dark-mode .summary-card.expanded {
 .sku-detail-row-div:hover {
   background-color: var(--detail-hover-bg, #e9ecef);
 }
+
 .dark-mode .sku-detail-row-div:hover {
-  background-color: #374151; 
+  background-color: #374151;
 }
 
 .sku-detail-list-header .detail-cell,
@@ -12470,20 +12478,20 @@ body.dark-mode .summary-card.expanded {
   justify-content: center;
 }
 
-.sku-detail-list-header .header-kode, 
-.sku-detail-row-div .cell-kode {   
-  flex: 1; 
+.sku-detail-list-header .header-kode,
+.sku-detail-row-div .cell-kode {
+  flex: 1;
   min-width: 150px;
-  justify-content: flex-start; 
+  justify-content: flex-start;
   text-align: left;
   padding-left: 1rem;
 }
 
-.sku-detail-list-header .header-stok{
+.sku-detail-list-header .header-stok {
   flex-basis: 90px;
   flex-grow: 0;
   flex-shrink: 0;
-  justify-content: center; 
+  justify-content: center;
   text-align: center;
 }
 
@@ -12491,11 +12499,11 @@ body.dark-mode .summary-card.expanded {
   flex-basis: 120px;
   flex-grow: 0;
   flex-shrink: 0;
-  justify-content: center; 
+  justify-content: center;
   text-align: center;
 }
 
-.sku-detail-list-header .header-aksi{
+.sku-detail-list-header .header-aksi {
   flex-basis: 180px;
   flex-grow: 0;
   flex-shrink: 0;
@@ -12510,7 +12518,7 @@ body.dark-mode .summary-card.expanded {
 }
 
 .sku-detail-row-div .cell-aksi .action-buttons-group {
-    justify-content: center;
+  justify-content: center;
 }
 
 /* ======================================= */
@@ -12795,4 +12803,21 @@ body.dark-mode .btn-soft-grey:hover:not(:disabled) {
   color: #F3F4F6;
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(75, 85, 99, 0.3);
+}
+
+.detail-list-footer-centered {
+  text-align: center;
+  display: flex;
+  padding: 0.6rem 1rem;
+  background-color: #B3BAC6;
+  color: #495057;
+  font-weight: 600;
+  font-size: 0.8em;
+  margin-bottom: 0.25rem;
+  justify-content: center;
+}
+
+body.dark-mode .detail-list-footer-centered {
+  background-color: #374151ff;
+  color: var(--detail-header-text-dark, #d1d5db);
 }

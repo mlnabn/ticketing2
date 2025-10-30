@@ -294,7 +294,7 @@ function StokBarangView() {
         });
     };
 
-    
+
     const isAllMasterSelected = (masterBarangId) => {
         const itemIds = detailItems[masterBarangId]?.items?.map(item => item.id) || [];
         if (itemIds.length === 0) return false;
@@ -364,7 +364,7 @@ function StokBarangView() {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleScanSearch, detailItem, editItem, qrModalItem, isAddStockOpen, isScannerOpen]);
-    
+
     const formatCurrency = (value) => {
         if (isNaN(value)) return 'Rp 0';
         return new Intl.NumberFormat('id-ID', {
@@ -450,7 +450,7 @@ function StokBarangView() {
                         <option value={tersediaStatusId}>Tersedia</option>
                     )}
                     {statusOptions
-                        .filter(status => status.id !== tersediaStatusId) // Hapus 'Tersedia' jika ada
+                        .filter(status => status.id !== tersediaStatusId)
                         .map(status => (
                             <option key={status.id} value={status.id}>{status.nama_status}</option>
                         ))}
@@ -614,13 +614,8 @@ function StokBarangView() {
                                                                 <div className="detail-loading" style={{ padding: '10px 0' }}>Memuat unit lainnya...</div>
                                                             )}
                                                             {!loading && !isLoadingMoreDetail && detailItems[masterItem.id_m_barang] && (
-                                                                <div className="detail-list-header" >
-                                                                    <div className="detail-cell" style={{ flex: 1, fontWeight: 'bold' }}>
-                                                                        Total Unit (SKU Ini)
-                                                                    </div>
-                                                                    <div className="detail-cell header-aksi" style={{ justifyContent: 'flex-end', fontWeight: 'bold' }}>
-                                                                        {detailItems[masterItem.id_m_barang].pagination.total} Data
-                                                                    </div>
+                                                                <div className="detail-list-footer-centered">
+                                                                    Total Stok: {detailItems[masterItem.id_m_barang].pagination.total} Unit
                                                                 </div>
                                                             )}
                                                         </div>
@@ -642,9 +637,11 @@ function StokBarangView() {
                         <table className="job-table">
                             <tfoot>
                                 <tr className="subtotal-row">
-                                    <td colSpan={6}>Total Tipe Barang</td>
-                                    <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
-                                        {pagination.total} Tipe Barang
+                                    <td colSpan="5" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>
+                                        Total Seluruh Unit (dari {pagination.total} Tipe Barang)
+                                    </td>
+                                    <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                                        {pagination.grand_total_units} Unit
                                     </td>
                                 </tr>
                             </tfoot>
