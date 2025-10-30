@@ -177,7 +177,7 @@ export default function WorkshopManagement() {
             className="workshop-list-mobile"
             ref={mobileListRef}
             onScroll={handleScroll}
-            style={{ maxHeight: '65vh', overflowY: 'auto' }} // Atur tinggi & scroll
+            style={{ maxHeight: '65vh', overflowY: 'auto' }}
           >
             {workshops.length > 0 ? (
               workshops.map((ws) => (

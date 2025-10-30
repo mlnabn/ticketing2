@@ -323,6 +323,7 @@ export default function ActiveLoanReportPage() {
                     className="job-list-mobile"
                     ref={mobileListRef}
                     onScroll={handleScroll}
+                    style={{ overflowY: 'auto', maxHeight: '65vh' }}
                 >
                     {loading && (
                         <p style={{ textAlign: 'center' }}>Memuat data...</p>

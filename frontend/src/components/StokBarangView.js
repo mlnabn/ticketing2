@@ -427,7 +427,7 @@ function StokBarangView() {
                         onClick={handlePreparePrint}
                         disabled={selectedItems.size === 0}
                     >
-                        <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
+                        <i className="fas fa-print" style={{ marginRight: '8px'}}></i>
                         Print QR ({selectedItems.size})
                     </button>
                     {selectedItems.size > 0 && (
@@ -741,10 +741,10 @@ function StokBarangView() {
                                                     <p className="detail-loading-mobile" style={{ padding: '10px 0' }}>Memuat unit lainnya...</p>
                                                 )}
                                                 {!loading && !isLoadingMoreDetail && detailItems[masterItem.id_m_barang] && detailItems[masterItem.id_m_barang].items.length > 0 && (
-                                                    <div className="subtotal-card-mobile acquisition-subtotal" style={{ margin: '10px 0 5px 0', padding: '10px', backgroundColor: '#2D3748' }}>
-                                                        <span className="subtotal-label">Total Unit (SKU Ini)</span>
-                                                        <span className="subtotal-value value-acquisition" style={{ fontSize: '1.0rem', fontWeight: 'bold' }}>
-                                                            {detailItems[masterItem.id_m_barang].pagination.total} Data
+                                                    <div className="subtotal-card-mobile " >
+                                                        <span className="subtotal-label">Total Stok</span>
+                                                        <span className="subtotal-value">
+                                                            {detailItems[masterItem.id_m_barang].pagination.total} Unit
                                                         </span>
                                                     </div>
                                                 )}

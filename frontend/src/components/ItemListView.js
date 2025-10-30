@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import SkuDetailModal from './SkuDetailModal';
 
-function ItemListView({ 
+function ItemListView({
     // Props Desktop
     items, loading, onScroll, isLoadingMore,
     // Props Mobile
@@ -37,7 +37,7 @@ function ItemListView({
     useEffect(() => {
         if (isInitialMount.current) {
             isInitialMount.current = false;
-            return; 
+            return;
         }
         const filters = {};
         if (selectedCategory) filters.id_kategori = selectedCategory;
@@ -104,7 +104,7 @@ function ItemListView({
                     <div
                         className="table-body-scroll"
                         ref={desktopListRef}
-                        onScroll={onScroll} 
+                        onScroll={onScroll}
                         style={{ overflowY: 'auto', maxHeight: '65vh' }}
                     >
                         <table className="job-table">
@@ -128,7 +128,7 @@ function ItemListView({
                                             <td>{item.nama_sub || '-'}</td>
                                             <td>{item.variations_count} VARIASI</td>
                                         </tr>
-                                        
+
                                         {/* --- CHILD VIEW (EXPANDED ROW) --- */}
                                         {expandedRows[item.kode_barang] && (
                                             <tr className="detail-rows-container">
@@ -146,42 +146,42 @@ function ItemListView({
                                                                         onChange={(e) => onSelectAll(e, item.kode_barang)}
                                                                     />
                                                                 </div>
-                                                                <div className="detail-cell header-kode" style={{fontSize: '15px'}}>Nama Barang (Variasi)</div>
-                                                                <div className="detail-cell header-stok" style={{fontSize: '15px'}}>Stok Tersedia</div>
-                                                                <div className="detail-cell header-aksi" style={{fontSize: '15px'}}>Aksi</div>
+                                                                <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Nama Barang (Variasi)</div>
+                                                                <div className="detail-cell header-stok" style={{ fontSize: '15px' }}>Stok Tersedia</div>
+                                                                <div className="detail-cell header-aksi" style={{ fontSize: '15px' }}>Aksi</div>
                                                             </div>
-                                                            <div 
+                                                            <div
                                                                 className="detail-rows-list-container"
                                                                 style={{ overflowY: 'auto', maxHeight: '300px' }}
                                                             >
-                                                                    {detailItems[item.kode_barang].map(detail => (
-                                                                        <div
-                                                                            key={detail.id_m_barang}
-                                                                            className={`sku-detail-row-div hoverable-row ${selectedIds.includes(detail.id_m_barang) ? 'selected-row' : ''}`}
-                                                                            onClick={(e) => {
-                                                                                handleRowClick(e, detail); 
-                                                                            }}
-                                                                        >
-                                                                            <div className="detail-cell cell-select">
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    checked={selectedIds.includes(detail.id_m_barang)}
-                                                                                    onChange={() => onSelectId(detail.id_m_barang)}
-                                                                                    onClick={(e) => e.stopPropagation()}
-                                                                                />
-                                                                            </div>
-                                                                            <div className="detail-cell cell-kode">{detail.nama_barang}</div>
-                                                                            <div className="detail-cell cell-stok">{detail.stok_tersedia_count}</div>
-                                                                            <div className="detail-cell cell-aksi action-buttons-group">
-                                                                                    <button onClick={(e) => { e.stopPropagation(); onEdit(detail); }} className="btn-user-action btn-detail">
-                                                                                        <i className="fas fa-edit" style={{ fontSize: '20px', marginRight: '5px' }}></i>
-                                                                                    </button>
-                                                                                    <button onClick={(e) => { e.stopPropagation(); onDelete(detail); }} className="btn-user-action btn-dlt">
-                                                                                        <i className="fas fa-trash-alt" style={{ fontSize: '20px', marginRight: '5px' }}></i>
-                                                                                    </button>
-                                                                            </div>
+                                                                {detailItems[item.kode_barang].map(detail => (
+                                                                    <div
+                                                                        key={detail.id_m_barang}
+                                                                        className={`sku-detail-row-div hoverable-row ${selectedIds.includes(detail.id_m_barang) ? 'selected-row' : ''}`}
+                                                                        onClick={(e) => {
+                                                                            handleRowClick(e, detail);
+                                                                        }}
+                                                                    >
+                                                                        <div className="detail-cell cell-select">
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                checked={selectedIds.includes(detail.id_m_barang)}
+                                                                                onChange={() => onSelectId(detail.id_m_barang)}
+                                                                                onClick={(e) => e.stopPropagation()}
+                                                                            />
                                                                         </div>
-                                                                    ))}
+                                                                        <div className="detail-cell cell-kode">{detail.nama_barang}</div>
+                                                                        <div className="detail-cell cell-stok">{detail.stok_tersedia_count}</div>
+                                                                        <div className="detail-cell cell-aksi action-buttons-group">
+                                                                            <button onClick={(e) => { e.stopPropagation(); onEdit(detail); }} className="btn-user-action btn-detail">
+                                                                                <i className="fas fa-edit" style={{ fontSize: '20px', marginRight: '5px' }}></i>
+                                                                            </button>
+                                                                            <button onClick={(e) => { e.stopPropagation(); onDelete(detail); }} className="btn-user-action btn-dlt">
+                                                                                <i className="fas fa-trash-alt" style={{ fontSize: '20px', marginRight: '5px' }}></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
                                                             </div>
                                                         </div>
                                                     ) : (
@@ -196,7 +196,7 @@ function ItemListView({
                                     <tr><td colSpan="4" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
                                 )}
                             </tbody>
-                            
+
                         </table>
                     </div>
                     {!loading && !isLoadingMore && items.length > 0 && (
@@ -205,7 +205,7 @@ function ItemListView({
                                 <tr className="subtotal-row">
                                     <td colSpan="5" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>Total SKU</td>
                                     <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
-                                        {totalItems} SKU
+                                        {totalItems} Item
                                     </td>
                                 </tr>
                             </tfoot>
@@ -255,8 +255,14 @@ function ItemListView({
                             </div>
                         </div>
                     ))}
-                    {isLoadingMoreMobile && ( 
-                        <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+                    {/* --- PERBAIKAN 3: Tambahkan Kartu Total untuk Mobile --- */}
+                    {!loading && !isLoadingMore && items.length > 0 && (
+                        <div className="subtotal-card-mobile">
+                            <span className="subtotal-label">Total SKU</span>
+                            <span className="subtotal-value">
+                                {totalItems} Item
+                            </span>
+                        </div>
                     )}
                 </div>
             </div>

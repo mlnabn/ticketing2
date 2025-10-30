@@ -136,7 +136,6 @@ class TicketController extends Controller
             })->values();
 
             return response()->json($sortedItems);
-
         } else {
             $ticketsData = $query->paginate($perPage);
             if ($ticketsData->items() && count($ticketsData->items()) > 0) {
@@ -416,7 +415,7 @@ class TicketController extends Controller
         if ($request->boolean('all')) {
             $ticketsResult = $paginatedQuery->latest()->get();
         } else {
-            $perPage = $request->query('per_page', 10);
+            $perPage = $request->query('per_page', 15);
             $ticketsResult = $paginatedQuery->latest()->paginate($perPage);
         }
 
@@ -491,7 +490,7 @@ class TicketController extends Controller
                     }
                 }
             });
-        } catch (\Exception $e) { 
+        } catch (\Exception $e) {
             return response()->json(['message' => 'Terjadi kesalahan saat menugaskan tiket: ' . $e->getMessage()], 500);
         }
 
@@ -510,7 +509,7 @@ class TicketController extends Controller
             return response()->json(['error' => 'Akses ditolak.'], 403);
         }
 
-        $perPage = $request->query('per_page', 10);
+        $perPage = $request->query('per_page', 15);
 
         $ticketsData = Ticket::with(['user', 'creator', 'workshop', 'masterBarangs'])
             ->where('user_id', $user->id)
@@ -773,18 +772,18 @@ class TicketController extends Controller
         $searchDescription = 'Dipinjam untuk tiket: ' . $ticket->kode_tiket;
 
         $borrowedItemIds = DB::table('stok_barang_histories')
-            ->where('status_id', $statusDipinjamId) 
-            ->where('deskripsi', $searchDescription) 
-            ->distinct() 
+            ->where('status_id', $statusDipinjamId)
+            ->where('deskripsi', $searchDescription)
+            ->distinct()
             ->pluck('stok_barang_id');
 
         if ($borrowedItemIds->isEmpty()) {
             return response()->json([]);
         }
 
-        $borrowedItems = StokBarang::with('masterBarang:id_m_barang,nama_barang') 
+        $borrowedItems = StokBarang::with('masterBarang:id_m_barang,nama_barang')
             ->whereIn('id', $borrowedItemIds)
-            ->select('id', 'master_barang_id', 'kode_unik') 
+            ->select('id', 'master_barang_id', 'kode_unik')
             ->get();
 
         return response()->json($borrowedItems);
@@ -792,6 +791,13 @@ class TicketController extends Controller
 
     public function processReturn(Request $request, Ticket $ticket)
     {
+        $user = auth()->user();
+        if ($user->role !== 'admin') {
+            return response()->json(['error' => 'Hanya admin yang bisa mengubah status.'], 403);
+        }
+        if ($ticket->user_id && $ticket->user_id !== $user->id) {
+            return response()->json(['error' => 'Anda tidak berhak menyelesaikan tiket yang sedang dikerjakan oleh admin lain.'], 403);
+        }
         $validated = $request->validate([
             'items' => 'present|array',
             'items.*.stok_barang_id' => 'required|exists:stok_barangs,id',
@@ -926,7 +932,7 @@ class TicketController extends Controller
             Log::error('Koneksi ke DeepSeek API gagal.', ['error' => $e->getMessage()]);
         } catch (RequestException $e) {
             Log::error('Request ke DeepSeek API error.', ['error' => $e->getMessage(), 'response' => $e->response?->body()]);
-        } catch (\Exception $e) { 
+        } catch (\Exception $e) {
             Log::error('Error saat klasifikasi urgensi dengan AI.', ['error' => $e->getMessage()]);
         }
 

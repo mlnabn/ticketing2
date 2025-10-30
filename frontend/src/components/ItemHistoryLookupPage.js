@@ -461,7 +461,7 @@ function ItemHistoryLookupPage() {
                                 className="job-list-mobile"
                                 ref={mobileListRef}
                                 onScroll={handleScroll}
-                                style={{ overflowY: 'auto', height: '65vh' }}
+                                style={{ overflowY: 'auto', maxHeight: '65vh' }}
                             >
                                 {loading ? (<p style={{ textAlign: 'center' }}>Memuat...</p>) : items.length > 0 ? (
                                     items.map(item => (

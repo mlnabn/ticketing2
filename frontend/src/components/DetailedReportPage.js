@@ -394,6 +394,7 @@ export default function DetailedReportPage({ type, title }) {
                     className="job-list-mobile"
                     ref={mobileListRef}
                     onScroll={handleScroll}
+                    style={{ overflowY: 'auto', maxHeight: '65vh' }}
                 >
                     {loading && (
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Memuat data...</p></div>

@@ -145,7 +145,7 @@ export default function ProblematicAssetsReport() {
 
 
                 {/* Mobile View */}
-                <div className="job-list-mobile">
+                <div className="job-list-mobile" style={{ overflowY: 'auto', maxHeight: '65vh' }}>
                     {isLoading ? (
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
                             <p>Memuat data...</p>

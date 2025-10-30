@@ -45,6 +45,12 @@ export default function JobList() {
   const desktopListRef = useRef(null);
   const mobileListRef = useRef(null);
 
+  const loadingStateRef = useRef({
+    isLoading,
+    isLoadingMore,
+    currentPage: ticketData ? ticketData.current_page : 1
+  });
+
   const ticketsOnPage = useMemo(() => ticketData?.data ?? [], [ticketData]);
 
   const fetchTickets = useCallback(async (isPoll = false) => {
@@ -105,7 +111,13 @@ export default function JobList() {
     const POLLING_INTERVAL = 30000;
 
     const intervalId = setInterval(() => {
-      console.log("Polling data tiket terbaru...");
+      const { isLoading, isLoadingMore, currentPage } = loadingStateRef.current;
+      if (isLoading || isLoadingMore || currentPage > 1) {
+        console.log(`Polling skipped: loading=${isLoading}, loadingMore=${isLoadingMore}, page=${currentPage}`);
+        return;
+      }
+
+      console.log("Polling data tiket terbaru (Halaman 1)...");
       fetchTickets(true);
     }, POLLING_INTERVAL);
 
@@ -117,6 +129,15 @@ export default function JobList() {
   useEffect(() => {
     setSelectedIds([]);
   }, [ticketsOnPage]);
+
+
+  useEffect(() => {
+    loadingStateRef.current = {
+      isLoading,
+      isLoadingMore,
+      currentPage: ticketData ? ticketData.current_page : 1
+    };
+  }, [isLoading, isLoadingMore, ticketData]);
 
   const loadMoreItems = async () => {
     if (isLoadingMore || !ticketData || ticketData.current_page >= ticketData.last_page) return;
@@ -150,6 +171,10 @@ export default function JobList() {
 
   const handleScroll = (e) => {
     const target = e.currentTarget;
+    if (target.scrollHeight <= target.clientHeight) {
+      return;
+    }
+
     const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
 
     if (nearBottom && ticketData && !isLoading && !isLoadingMore && ticketData.current_page < ticketData.last_page) {
@@ -158,15 +183,25 @@ export default function JobList() {
   };
 
   const updateTicketStatus = async (ticket, newStatus) => {
-    if (newStatus === 'Selesai' && ticket.master_barangs && ticket.master_barangs.length > 0) {
+
+    if (newStatus === 'Selesai') {
+      if (ticket.user_id && ticket.user_id !== user.id) {
+        showToast('Anda tidak berhak menyelesaikan tiket ini, hanya admin yang ditugaskan.', 'error');
+        return;
+      }
       setTicketToReturn(ticket);
+
     } else {
+      if (ticket.user_id && ticket.user_id !== user.id && (newStatus === 'Sedang Dikerjakan' || newStatus === 'Ditunda')) {
+        showToast('Anda tidak berhak mengubah status tiket ini.', 'error');
+        return;
+      }
       try {
-        await api.patch(`/tickets/${ticket.id}/status`, { status: newStatus });
+        await api.patch(`/tickets/${ticket.id}/status`, { status: newStatus }); //
         showToast('Status tiket berhasil diupdate.', 'success');
         fetchTickets();
       } catch (e) {
-        showToast(e.response?.data?.error || 'Gagal mengupdate status tiket.', 'error');
+        showToast(e.response?.data?.error || 'Gagal mengupdate status tiket.', 'error'); //
       }
     }
   };
@@ -383,7 +418,7 @@ export default function JobList() {
                       !isLoadingMore && <tr><td colSpan={9} style={{ textAlign: 'center', padding: '20px' }}>Tidak ada pekerjaan yang ditemukan.</td></tr> // <-- DIUBAH
                     )}
                     {isLoadingMore && (
-                      <tr><td colSpan={9} style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr> // <-- DIUBAH
+                      <tr><td colSpan={9} style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
                     )}
                   </tbody>
                 </table>
@@ -403,6 +438,7 @@ export default function JobList() {
                 </table>
               )}
 
+              {/* Mobile View */}
               <div
                 className="job-list-mobile"
                 ref={mobileListRef}
@@ -443,14 +479,14 @@ export default function JobList() {
                     </div>
                   ))
                 ) : (
-                  !isLoadingMore && <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Tidak ada pekerjaan yang ditemukan.</p></div> // <-- UBAH
+                  !isLoadingMore && <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Tidak ada pekerjaan yang ditemukan.</p></div>
                 )}
                 {isLoadingMore && (
                   <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
                 )}
 
                 {!isLoading && !isLoadingMore && ticketData && ticketData.total > 0 && (
-                  <div className="subtotal-card-mobile" style={{ marginTop: '1rem', backgroundColor: '#2d3748' }}>
+                  <div className="subtotal-card-mobile">
                     <span className="subtotal-label">Total Tiket</span>
                     <span className="subtotal-value">
                       {ticketData.total}
@@ -463,13 +499,55 @@ export default function JobList() {
         )
         }
 
-        {ticketToAssign && <AssignAdminModal ticket={ticketToAssign} admins={adminList} items={itemList} onAssign={handleConfirmAssign} onClose={() => setTicketToAssign(null)} showToast={showToast} />}
-        {ticketToReject && <RejectTicketModal ticket={ticketToReject} onReject={handleConfirmReject} onClose={() => setTicketToReject(null)} showToast={showToast} />}
-        {ticketForProof && <ProofModal ticket={ticketForProof} onSave={handleSaveProof} onClose={() => setTicketForProof(null)} />}
-        {ticketToDelete && <ConfirmationModal message={`Hapus pekerjaan "${ticketToDelete.title}"?`} onConfirm={confirmDelete} onCancel={() => setTicketToDelete(null)} />}
-        {selectedTicketForDetail && <TicketDetailModal ticket={selectedTicketForDetail} onClose={() => setSelectedTicketForDetail(null)} />}
-        {ticketToReturn && <ReturnItemsModal ticket={ticketToReturn} onSave={handleConfirmReturn} onClose={() => setTicketToReturn(null)} showToast={showToast} />}
-      </div >
+        {ticketToAssign &&
+          <AssignAdminModal
+            ticket={ticketToAssign}
+            admins={adminList}
+            items={itemList}
+            onAssign={handleConfirmAssign}
+            onClose={() => setTicketToAssign(null)}
+            showToast={showToast}
+          />
+        }
+        {ticketToReject &&
+          <RejectTicketModal
+            ticket={ticketToReject}
+            onReject={handleConfirmReject}
+            onClose={() => setTicketToReject(null)}
+            showToast={showToast}
+          />
+        }
+        {ticketForProof &&
+          <ProofModal
+            ticket={ticketForProof}
+            onSave={handleSaveProof}
+            onClose={() => setTicketForProof(null)}
+          />
+        }
+        {ticketToDelete &&
+          <ConfirmationModal
+            message={`Hapus pekerjaan "${ticketToDelete.title}"?`}
+            onConfirm={confirmDelete}
+            onCancel={() => setTicketToDelete(null)}
+          />
+        }
+
+        {selectedTicketForDetail &&
+          <TicketDetailModal
+            ticket={selectedTicketForDetail}
+            onClose={() => setSelectedTicketForDetail(null)}
+          />
+        }
+
+        {ticketToReturn &&
+          <ReturnItemsModal
+            ticket={ticketToReturn}
+            onSave={handleConfirmReturn}
+            onClose={() => setTicketToReturn(null)}
+            showToast={showToast}
+          />
+        }
+      </div>
     </>
   );
 }
