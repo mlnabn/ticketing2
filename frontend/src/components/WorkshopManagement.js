@@ -203,18 +203,21 @@ export default function WorkshopManagement() {
             ) : (
               !isLoadingMore && <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Belum ada workshop yang ditambahkan.</p></div> // <-- UBAH
             )}
-            {!loading && !isLoadingMore && workshops.length > 0 && pagination && (
-              <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
-                <span className="subtotal-label">Total Workshop</span>
-                <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
-                  {pagination.total} Data
-                </span>
-              </div>
-            )}
+
             {isLoadingMore && (
               <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
             )}
           </div>
+          {!loading && !isLoadingMore && workshops.length > 0 && pagination && (
+            <div className="workshop-list-mobile">
+              <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+                <span className="subtotal-label" style={{ fontSize: '13px', fontWeight: 'bold' }}>Total Workshop</span>
+                <span className="subtotal-value value-acquisition" style={{ fontSize: '13px', fontWeight: 'bold' }}>
+                  {pagination.total} Data
+                </span>
+              </div>
+            </div>
+          )}
         </>
       )}
 

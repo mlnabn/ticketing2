@@ -57,7 +57,7 @@ export default function ComprehensiveReportPage() {
   const desktopListRef = useRef(null);
   const mobileListRef = useRef(null);
 
- 
+
   useEffect(() => {
     if (dateFilters.start_date || dateFilters.end_date) {
       setFilterType('date_range');
@@ -254,7 +254,7 @@ export default function ComprehensiveReportPage() {
   const tickets = tableData ? tableData.data : [];
 
   return (
-    <div className="report-container">
+    <div className="user-management-container">
       <h2>{title}</h2>
 
       {!stats ? <p className="report-status-message">Memuat data statistik...</p> : (
@@ -489,20 +489,30 @@ export default function ComprehensiveReportPage() {
                   !isLoadingMore && <p style={{ textAlign: 'center' }}>Tidak ada tiket yang sesuai.</p>
                 )}
 
-                {/* BARU: Tambahkan total data card (Mobile) */}
-                {!loading && !isLoadingMore && tickets.length > 0 && tableData && (
-                  <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
-                    <span className="subtotal-label">Total Tiket</span>
-                    <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
-                      {tableData.total} Data
-                    </span>
-                  </div>
-                )}
+
 
                 {isLoadingMore && (
                   <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
                 )}
               </div>
+              {!loading && !isLoadingMore && tickets.length > 0 && tableData && (
+                <div className='job-list-mobile'>
+
+                  <div className="subtotal-card-mobile acquisition-subtotal"
+                    style={{ marginTop: '1rem', marginBottom: '1rem' }}
+                  >
+                    <span className="subtotal-label"
+                      style={{ fontSize: '13px', fontWeight: 'bold' }}
+                    >Total Tiket</span>
+                    <span className="subtotal-value value-acquisition"
+                      style={{ fontSize: '13px', fontWeight: 'bold' }}
+                    >
+                      {tableData.total} Data
+                    </span>
+                  </div>
+
+                </div>
+              )}
             </>
           )
           }

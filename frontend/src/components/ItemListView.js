@@ -256,15 +256,26 @@ function ItemListView({
                         </div>
                     ))}
                     {/* --- PERBAIKAN 3: Tambahkan Kartu Total untuk Mobile --- */}
-                    {!loading && !isLoadingMore && items.length > 0 && (
-                        <div className="subtotal-card-mobile">
-                            <span className="subtotal-label">Total SKU</span>
-                            <span className="subtotal-value">
+
+                </div>
+                {!loading && !isLoadingMore && items.length > 0 && (
+                    <div className='job-list-mobile'>
+
+                        <div className="subtotal-card-mobile"
+                            style={{ marginTop: '1rem', marginBottom: '1rem' }}
+                        >
+                            <span className="subtotal-label"
+                                style={{ fontSize: '13px', fontWeight: 'bold' }}
+                            >Total SKU</span>
+                            <span className="subtotal-value"
+                                style={{ fontSize: '13px', fontWeight: 'bold' }}
+                            >
                                 {totalItems} Item
                             </span>
                         </div>
-                    )}
-                </div>
+
+                    </div>
+                )}
             </div>
 
             {selectedItemForDetail && (

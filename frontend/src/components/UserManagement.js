@@ -255,7 +255,7 @@ export default function UserManagement() {
                                             Total Pengguna
                                         </td>
                                         <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                                            {userData.total}
+                                            {userData.total} Pengguna
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -267,7 +267,7 @@ export default function UserManagement() {
                         className="user-list-mobile"
                         ref={mobileListRef}
                         onScroll={handleScroll}
-                        style={{ overflowY: 'auto', maxHeight: '65vh' }}
+                        style={{ maxHeight: '65vh', overflowY: 'auto' }}
                     >
                         {users.length > 0 ? (
                             users.map((user) => (
@@ -299,10 +299,31 @@ export default function UserManagement() {
                         ) : (
                             !isLoadingMore && <p style={{ textAlign: 'center' }}>Tidak ada pengguna yang ditemukan.</p>
                         )}
+
                         {isLoadingMore && (
                             <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
                         )}
                     </div>
+                    {!isLoadingMore && userData && userData.total > 0 && (
+                        <div className='user-list-mobile'>
+
+                            <div
+                                className="subtotal-card-mobile"
+                                style={{ marginTop: '1rem', marginBottom: '1rem' }}
+                            >
+                                <span className="subtotal-label"
+                                    style={{ fontSize: '13px', fontWeight: 'bold' }}
+                                >Total Pengguna</span>
+                                <span
+                                    className="subtotal-value"
+                                    style={{ fontSize: '13px', fontWeight: 'bold' }}
+                                >
+                                    {userData.total} Pengguna
+                                </span>
+                            </div>
+
+                        </div>
+                    )}
                 </>
             )}
             {showUserFormModal && (

@@ -203,23 +203,23 @@ export default function DetailedReportPage({ type, title }) {
                 eventDate = item.tanggal_hilang || eventDate;
             } else if (currentStatus === 'Perbaikan' && item.teknisi_perbaikan) {
                 responsibleUser = item.teknisi_perbaikan.name;
-                 eventDate = item.tanggal_mulai_perbaikan || eventDate;
+                eventDate = item.tanggal_mulai_perbaikan || eventDate;
             }
 
-             return {
+            return {
                 kode_unik: item.kode_unik,
                 serial_number: item.serial_number || '-',
                 nama_barang: item.master_barang?.nama_barang || 'N/A',
                 // Kolom 'status' sekarang adalah status SAAT INI
-                status: currentStatus, 
+                status: currentStatus,
                 tanggal: eventDate, // Tanggal relevan dengan status
                 penanggung_jawab: responsibleUser,
                 workshop: item.workshop?.name || '-', // Mungkin relevan jika rusak/hilang saat dipinjam
                 current_status: currentStatus, // Sama dengan 'status'
-             };
+            };
         }
 
-        else{
+        else {
             const stokInfo = item.stok_barang || {};
             const masterInfo = stokInfo.master_barang || {};
             const historyDate = item.event_date || item.created_at;
@@ -267,29 +267,29 @@ export default function DetailedReportPage({ type, title }) {
     // const showStatusDari = type === 'in' || type === 'out' || type === 'accountability' || type === 'item_history';
 
     // Status Dari hanya untuk history
-    const showStatusDari = type === 'in' || type === 'out' || type === 'item_history'; 
+    const showStatusDari = type === 'in' || type === 'out' || type === 'item_history';
     // Status Kejadian hanya untuk history
-    const showStatusKejadian = type === 'in' || type === 'out' || type === 'item_history'; 
+    const showStatusKejadian = type === 'in' || type === 'out' || type === 'item_history';
     // Penanggung Jawab Kejadian hanya untuk history
-    const showPJKejadian = type === 'in' || type === 'out' || type === 'item_history'; 
+    const showPJKejadian = type === 'in' || type === 'out' || type === 'item_history';
 
     // Status Saat Ini & Penanggung Jawab Status hanya untuk list barang (bukan history)
     const showCurrentStatus = type === 'available' || type === 'active_loans' || type === 'accountability' || type === 'all_stock';
     const showPJStatus = type === 'available' || type === 'active_loans' || type === 'accountability' || type === 'all_stock';
-    
+
     // Workshop relevan untuk peminjaman dan history keluar/accountability
     const showWorkshop = type === 'out' || type === 'accountability' || type === 'active_loans';
 
     // const totalColSpan = 6 + (showWorkshop ? 1 : 0) + (showCurrentStatus ? 1 : 0) + (showStatusDari ? 1 : 0);
 
-    const totalColSpan = 3 
-                         + (showStatusDari ? 1 : 0) 
-                         + (showStatusKejadian ? 1 : 0) 
-                         + 1 
-                         + (showPJKejadian ? 1 : 0)
-                         + (showWorkshop ? 1 : 0) 
-                         + (showCurrentStatus ? 1 : 0)
-                         + (showPJStatus ? 1 : 0);
+    const totalColSpan = 3
+        + (showStatusDari ? 1 : 0)
+        + (showStatusKejadian ? 1 : 0)
+        + 1
+        + (showPJKejadian ? 1 : 0)
+        + (showWorkshop ? 1 : 0)
+        + (showCurrentStatus ? 1 : 0)
+        + (showPJStatus ? 1 : 0);
 
     const loadMoreItems = async () => {
         if (isLoadingMore || pagination.currentPage >= pagination.totalPages) return;
@@ -383,7 +383,7 @@ export default function DetailedReportPage({ type, title }) {
                                 <th>Kode Unik</th>
                                 <th>Serial Number</th>
                                 <th>Nama Barang</th>
-                                {showStatusDari && <th>Status Dari</th>} 
+                                {showStatusDari && <th>Status Dari</th>}
                                 {showStatusKejadian && <th>Status Perubahan</th>}
                                 <th>{dateHeaders[type] || 'Tanggal'}</th>
                                 {showPJKejadian && <th>Penanggung Jawab Kejadian</th>}
@@ -424,7 +424,7 @@ export default function DetailedReportPage({ type, title }) {
                                                     </span>
                                                 </td>
                                             )}
-                                             {showPJStatus && <td>{itemData.penanggung_jawab || '-'}</td>}
+                                            {showPJStatus && <td>{itemData.penanggung_jawab || '-'}</td>}
                                         </tr>
                                     )
                                 })}
@@ -516,14 +516,7 @@ export default function DetailedReportPage({ type, title }) {
                             </div>
                         );
                     })}
-                    {!loading && !isLoadingMore && data.length > 0 && (
-                        <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
-                            <span className="subtotal-label">Total Riwayat</span>
-                            <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
-                                {pagination.total} Data
-                            </span>
-                        </div>
-                    )}
+
 
                     {isLoadingMore && (
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Memuat lebih banyak...</p></div>
@@ -532,6 +525,16 @@ export default function DetailedReportPage({ type, title }) {
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Tidak ada data untuk ditampilkan.</p></div>
                     )}
                 </div>
+                {!loading && !isLoadingMore && data.length > 0 && (
+                    <div className='job-list-mobile'>
+                        <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+                            <span className="subtotal-label" style={{ fontSize: '13px', fontWeight: 'bold' }}>Total Riwayat</span>
+                            <span className="subtotal-value value-acquisition" style={{ fontSize: '13px', fontWeight: 'bold' }}>
+                                {pagination.total} Data
+                            </span>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {selectedItem && (

@@ -134,7 +134,7 @@ export default function ProblematicAssetsReport() {
 
                             <tfoot><tr className="subtotal-row">
                                 <td colSpan="5">Subtotal</td>
-                                <td style={{ textAlign: 'right'}}>
+                                <td style={{ textAlign: 'right' }}>
                                     ({formatCurrency(problematicAssetsSubtotal)})
                                 </td>
                             </tr></tfoot>
@@ -201,18 +201,21 @@ export default function ProblematicAssetsReport() {
                                 </div>
                             ))}
 
-                            <div className="subtotal-card-mobile">
-                                <span className="subtotal-label">Subtotal Potensi Kerugian</span>
-                                <span className="subtotal-value value-loss">
-                                    ({formatCurrency(problematicAssetsSubtotal)})
-                                </span>
-                            </div>
+
                         </>
                     ) : (
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
                             <p>Tidak ada aset bermasalah pada periode ini.</p>
                         </div>
                     )}
+                </div>
+                <div className='job-list-mobile'>
+                    <div className="subtotal-card-mobile" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+                        <span className="subtotal-label" style={{ fontSize: '13px', fontWeight: 'bold' }}>Subtotal Potensi Kerugian</span>
+                        <span className="subtotal-value value-loss" style={{ fontSize: '13px', fontWeight: 'bold' }}>
+                            ({formatCurrency(problematicAssetsSubtotal)})
+                        </span>
+                    </div>
                 </div>
             </div>
             {selectedItem && (

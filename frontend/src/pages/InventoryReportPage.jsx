@@ -92,10 +92,6 @@ export default function InventoryReportPage() {
                     <h3 className="card-value">{stats.barang_keluar}</h3>
                 </div>
             </div>
-
-            {/* HAPUS: Seluruh blok div untuk grafik telah dihapus */}
-
-            {/* Barang paling aktif */}
             <div className="dashboard-card most-active-widget" style={{ marginTop: '2rem' }}>
                 {/* BARU: Filter tahun dipindahkan ke sini */}
                 <div className="chart-header">

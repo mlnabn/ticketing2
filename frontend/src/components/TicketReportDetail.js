@@ -243,7 +243,7 @@ export default function TicketReportDetail() {
   const ticketsOnPage = (reportData && reportData.tickets) ? reportData.tickets.data : [];
 
   return (
-    <div className="report-container">
+    <div className="user-management-container">
       <h2>Laporan Penyelesaian - {admin.name}</h2>
 
       {!reportData ? <p>Memuat data statistik...</p> : (
@@ -459,19 +459,30 @@ export default function TicketReportDetail() {
             ) : (
               !isLoadingMore && <p style={{ textAlign: 'center' }}>Tidak ada tiket yang sesuai.</p>
             )}
-            {!loading && !isLoadingMore && ticketsOnPage.length > 0 && reportData && reportData.tickets && (
-              <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
-                <span className="subtotal-label">Total Tiket</span>
-                <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
-                  {reportData.tickets.total} Data
-                </span>
-              </div>
-            )}
+
 
             {isLoadingMore && (
               <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
             )}
           </div>
+          {!loading && !isLoadingMore && ticketsOnPage.length > 0 && reportData && reportData.tickets && (
+            <div className='job-list-mobile'>
+
+              <div className="subtotal-card-mobile acquisition-subtotal"
+                style={{ marginTop: '1rem', marginBottom: '1rem' }}
+              >
+                <span className="subtotal-label"
+                  style={{ fontSize: '13px', fontWeight: 'bold' }}
+                >Total Tiket</span>
+                <span className="subtotal-value value-acquisition"
+                  style={{ fontSize: '13px', fontWeight: 'bold' }}
+                >
+                  {reportData.tickets.total} Data
+                </span>
+              </div>
+
+            </div>
+          )}
         </>
       )}
       {selectedTicketForDetail && (

@@ -4,6 +4,23 @@ import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import { saveAs } from 'file-saver';
 import QrScannerModal from './QrScannerModal';
+import HistoryModal from './HistoryModal';
+
+function useMediaQuery(query) {
+    const [matches, setMatches] = React.useState(false);
+
+    React.useEffect(() => {
+        const media = window.matchMedia(query);
+        if (media.matches !== matches) {
+            setMatches(media.matches);
+        }
+        const listener = () => setMatches(media.matches);
+        window.addEventListener('resize', listener);
+        return () => window.removeEventListener('resize', listener);
+    }, [matches, query]);
+
+    return matches;
+}
 
 const months = [
     { value: 1, name: 'Januari' }, { value: 2, name: 'Februari' }, { value: 3, name: 'Maret' },
@@ -35,6 +52,9 @@ function ItemHistoryLookupPage() {
     const [historyFilters, setHistoryFilters] = useState({ start_date: '', end_date: '' });
     const [exportingHistoryExcel, setExportingHistoryExcel] = useState(false);
     const [exportingHistoryPdf, setExportingHistoryPdf] = useState(false);
+
+    const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+    const isMobile = useMediaQuery('(max-width: 1290px)');
 
     // --- PERBAIKAN 1: Tambahkan 'total: 0' ---
     const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 });
@@ -332,6 +352,12 @@ function ItemHistoryLookupPage() {
             loadMoreItems();
         }
     };
+    const handleItemClick = (item) => {
+        setSelectedItem(item);
+        if (isMobile) {
+            setIsHistoryModalOpen(true);
+        }
+    };
 
     return (
         <>
@@ -339,20 +365,42 @@ function ItemHistoryLookupPage() {
                 <h1 className="page-title">Lacak Riwayat Aset</h1>
                 <p className="page-description" style={{ textAlign: 'center' }}>Gunakan pencarian, klik item dari daftar, atau scan QR/Barcode untuk melihat riwayat lengkap sebuah aset.</p>
 
-                <div className="filters-container report-filters" style={{ marginTop: '1rem', paddingBottom: '0' }}>
+                {/* --- PERBAIKAN: Baris Search + Tombol Scan --- */}
+                <div
+                    className="filters-container report-filters"
+                    style={{
+                        marginTop: '1rem',
+                        paddingBottom: '0',
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: '0.5rem',        
+                        alignItems: 'center' 
+                    }}
+                >
                     <input
                         type="text"
                         placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
                         className="filter-search-input"
+                        style={{ flexGrow: 1, width: 'auto' }}
                     />
+                    {/* Tombol Scan QR dipindah ke sini */}
+                    <button className="btn-scan-qr-history" onClick={() => setIsScannerOpen(true)}>
+                        <span className="fa-stack" style={{ fontSize: '1.2em' }}>
+                            <i className="fas fa-qrcode fa-stack-2x"></i>
+                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </button>
                 </div>
-                <div className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+
+                {/* --- PERBAIKAN: Baris Filter (Tanpa Tombol Scan) --- */}
+                <div className="report-filters" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', alignItems: 'center' }}>
                     <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
                         <option value="month">Filter Riwayat per Bulan</option>
                         <option value="date_range">Filter Riwayat per Tanggal</option>
                     </select>
+
                     {filterType === 'month' && (
                         <>
                             <select name="month" value={filters.month} onChange={handleFilterChange} className="filter-select">
@@ -372,12 +420,7 @@ function ItemHistoryLookupPage() {
                             <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
                         </>
                     )}
-                    <button className="btn-scan-qr-history" onClick={() => setIsScannerOpen(true)} style={{ marginLeft: 'auto' }}>
-                        <span className="fa-stack" style={{ marginRight: '8px', fontSize: '1.2em' }}>
-                            <i className="fas fa-qrcode fa-stack-2x"></i>
-                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
-                        </span>
-                    </button>
+                    {/* Tombol Scan QR sudah dipindah dari sini */}
                 </div>
 
                 {/* === CONTAINER SPLIT VIEW === */}
@@ -413,7 +456,7 @@ function ItemHistoryLookupPage() {
                                             {!loading && items.map(item => (
                                                 <tr
                                                     key={item.id}
-                                                    onClick={() => setSelectedItem(item)}
+                                                    onClick={() => handleItemClick(item)}
                                                     style={{ cursor: 'pointer' }}
                                                     className={`hoverable-row ${selectedItem?.id === item.id ? 'selected-row' : ''}`}
                                                 >
@@ -468,7 +511,7 @@ function ItemHistoryLookupPage() {
                                         <div
                                             key={item.id}
                                             className={`ticket-card-mobile clickable-row ${selectedItem?.id === item.id ? 'selected-row' : ''}`}
-                                            onClick={() => setSelectedItem(item)}
+                                            onClick={() => handleItemClick(item)}
                                         >
                                             <div className="card-row">
                                                 <div className="data-group single">
@@ -505,24 +548,22 @@ function ItemHistoryLookupPage() {
                                         </div>
                                     ))
                                 ) : (<p style={{ textAlign: 'center' }}>Tidak ada data.</p>)}
-
-                                {/* --- PERBAIKAN 8: Tambahkan Kartu Total untuk Mobile --- */}
-                                {!loading && !isLoadingMore && items.length > 0 && (
-                                    <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-                                        <span className="subtotal-label">Total Aset</span>
-                                        <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
-                                            {pagination.total} Data
-                                        </span>
-                                    </div>
-                                )}
-
                                 {isLoadingMore && (<p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>)}
                             </div>
+                            {/* --- PERBAIKAN 8: Tambahkan Kartu Total untuk Mobile --- */}
+                            {!loading && !isLoadingMore && items.length > 0 && (
+                                <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+                                    <span className="subtotal-label">Total Aset</span>
+                                    <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                        {pagination.total} Data
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
                     {/* === PANEL KANAN: RIWAYAT ITEM === */}
-                    {selectedItem && (
+                    {selectedItem && !isMobile && (
                         <div className="history-panel">
                             <div className="history-panel-header">
                                 <h4>Riwayat Aset: {selectedItem.master_barang?.nama_barang} ({selectedItem.kode_unik})</h4>
@@ -621,6 +662,19 @@ function ItemHistoryLookupPage() {
                 <QrScannerModal
                     onClose={() => setIsScannerOpen(false)}
                     onScanSuccess={handleScanSuccess}
+                />
+            )}
+
+            {isHistoryModalOpen && selectedItem && isMobile && (
+                <HistoryModal
+                    item={selectedItem}
+                    showToast={showToast}
+                    startDate={historyFilters.start_date}
+                    endDate={historyFilters.end_date}
+                    onClose={() => {
+                        setIsHistoryModalOpen(false);
+                        closeHistoryPanel();
+                    }}
                 />
             )}
         </>

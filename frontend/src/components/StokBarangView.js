@@ -427,7 +427,7 @@ function StokBarangView() {
                         onClick={handlePreparePrint}
                         disabled={selectedItems.size === 0}
                     >
-                        <i className="fas fa-print" style={{ marginRight: '8px'}}></i>
+                        <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
                         Print QR ({selectedItems.size})
                     </button>
                     {selectedItems.size > 0 && (
@@ -740,30 +740,50 @@ function StokBarangView() {
                                                 {isLoadingMoreDetail === masterItem.id_m_barang && (
                                                     <p className="detail-loading-mobile" style={{ padding: '10px 0' }}>Memuat unit lainnya...</p>
                                                 )}
-                                                {!loading && !isLoadingMoreDetail && detailItems[masterItem.id_m_barang] && detailItems[masterItem.id_m_barang].items.length > 0 && (
-                                                    <div className="subtotal-card-mobile " >
-                                                        <span className="subtotal-label">Total Stok</span>
-                                                        <span className="subtotal-value">
-                                                            {detailItems[masterItem.id_m_barang].pagination.total} Unit
-                                                        </span>
-                                                    </div>
-                                                )}
+
+                                            </div>
+                                        )}
+                                        {!loading && !isLoadingMoreDetail && detailItems[masterItem.id_m_barang] && detailItems[masterItem.id_m_barang].items.length > 0 && (
+                                            <div className="job-list-mobile">
+
+                                                <div className="subtotal-card-mobile "
+                                                    style={{ marginTop: '1rem', marginBottom: '1rem' }}
+                                                >
+                                                    <span className="subtotal-label"
+                                                        style={{ fontSize: '13px', fontWeight: 'bold' }}
+                                                    >Total Stok</span>
+                                                    <span className="subtotal-value"
+                                                        style={{ fontSize: '13px', fontWeight: 'bold' }}
+                                                    >
+                                                        {detailItems[masterItem.id_m_barang].pagination.total} Unit
+                                                    </span>
+                                                </div>
+
                                             </div>
                                         )}
                                     </div>
                                 ))
                             )}
-                    {!loading && !isLoadingMore && masterItems.length > 0 && pagination && (
-                        <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-                            <span className="subtotal-label">Total Tipe Barang (SKU)</span>
-                            <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
-                                {pagination.total} Data
-                            </span>
-                        </div>
-                    )}
+
 
                     {isLoadingMore && (
                         <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+                    )}
+                </div>
+                <div className="job-list-mobile">
+                    {!loading && !isLoadingMore && masterItems.length > 0 && pagination && (
+                        <div className="subtotal-card-mobile acquisition-subtotal"
+                            style={{ marginTop: '1rem', marginBottom: '1rem' }}
+                        >
+                            <span className="subtotal-label"
+                                style={{ fontSize: '13px', fontWeight: 'bold' }}
+                            >Total Tipe Barang (SKU)</span>
+                            <span className="subtotal-value value-acquisition"
+                                style={{ fontSize: '13px', fontWeight: 'bold' }}
+                            >
+                                {pagination.total} Data
+                            </span>
+                        </div>
                     )}
                 </div>
             </div>

@@ -443,7 +443,7 @@ export default function JobList() {
                 className="job-list-mobile"
                 ref={mobileListRef}
                 onScroll={handleScroll}
-                style={{ overflowY: 'auto', maxHeight: '70vh' }}
+                style={{ maxHeight: '65vh', overflowY: 'auto' }}
               >
                 {ticketsOnPage.length > 0 ? (
                   ticketsOnPage.map(ticket => (
@@ -485,10 +485,20 @@ export default function JobList() {
                   <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
                 )}
 
+
+              </div>
+              <div className='job-list-mobile'>
                 {!isLoading && !isLoadingMore && ticketData && ticketData.total > 0 && (
-                  <div className="subtotal-card-mobile">
-                    <span className="subtotal-label">Total Tiket</span>
-                    <span className="subtotal-value">
+                  <div className="subtotal-card-mobile"
+                    style={{ marginTop: '1rem', marginBottom: '1rem' }}
+                  >
+                    <span className="subtotal-label"
+                      style={{ fontSize: '13px', fontWeight: 'bold' }}
+                    >Total Tiket</span>
+
+                    <span className="subtotal-value"
+                      style={{ fontSize: '13px', fontWeight: 'bold' }}
+                      >
                       {ticketData.total}
                     </span>
                   </div>

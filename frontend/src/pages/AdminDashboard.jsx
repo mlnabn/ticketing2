@@ -1,11 +1,34 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { FaUser } from 'react-icons/fa';
+import {
+  HiOutlineHome,
+  HiOutlineTicket,
+  HiOutlineArchiveBox,
+  HiOutlineCog6Tooth
+} from "react-icons/hi2"; // Versi Outline (default)
+import {
+  HiHome,
+  HiTicket,
+  HiArchiveBox,
+  HiCog6Tooth
+} from "react-icons/hi2"; // Versi Solid (aktif)
 
 import Toast from '../components/Toast';
 import yourLogok from '../Image/DTECH-Logo.png';
+
+const MobileNavLink = ({ to, end, icon, text, onClick }) => (
+  <NavLink
+    to={to}
+    end={end}
+    className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}
+    onClick={onClick}
+  >
+    <i className={`fas ${icon}`}></i><span className="nav-text">{text}</span>
+  </NavLink>
+);
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
@@ -14,6 +37,7 @@ export default function AdminDashboard() {
   const [darkMode, setDarkMode] = useState(false);
   const [isAdminDropdownOpen, setIsAdminDropdownOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
+  const [activeMobileMenu, setActiveMobileMenu] = useState(null);
 
   const showToast = useCallback((message, type = 'success') => {
     const id = Date.now() + Math.random();
@@ -165,6 +189,127 @@ export default function AdminDashboard() {
           <Outlet context={{ showToast }} />
         </div>
       </main>
+
+      {/* ---------------------------------------------------- */}
+      {/* --- TAMBAHKAN SEMUA KODE DI BAWAH INI --- */}
+      {/* ---------------------------------------------------- */}
+
+      {/* 1. OVERLAY (untuk menutup modal saat diklik di luar) */}
+      {activeMobileMenu && (
+        <div
+          className="mobile-nav-overlay"
+          onClick={() => setActiveMobileMenu(null)}
+        ></div>
+      )}
+
+      {/* 2. KARTU NAVIGASI (MODAL) */}
+      <AnimatePresence>
+        {activeMobileMenu && (
+          <motion.div
+            className="mobile-nav-card"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          >
+            <div className="mobile-nav-card-header">
+              <h3>{activeMobileMenu}</h3>
+              <button onClick={() => setActiveMobileMenu(null)}>&times;</button>
+            </div>
+            <nav className="mobile-nav-card-links">
+              {/* Gunakan helper MobileNavLink yang kita buat */}
+              {activeMobileMenu === 'Home' && (
+                <>
+                  <MobileNavLink to="/admin" end icon="fa-home" text="Home" onClick={() => setActiveMobileMenu(null)} />
+                  <MobileNavLink to="/admin/users" icon="fa-user-plus" text="Pengguna" onClick={() => setActiveMobileMenu(null)} />
+                  <MobileNavLink to="/admin/notifications" icon="fa-bell" text="Notifikasi" onClick={() => setActiveMobileMenu(null)} />
+                </>
+              )}
+              {activeMobileMenu === 'Ticketing' && (
+                <>
+                  <MobileNavLink to="/admin/tickets" icon="fa-ticket-alt" text="Daftar Tiket" onClick={() => setActiveMobileMenu(null)} />
+                  <MobileNavLink to="/admin/my-tickets" icon="fa-user-tag" text="Tiket Saya" onClick={() => setActiveMobileMenu(null)} />
+                  <MobileNavLink to="/admin/reports" icon="fa-file-alt" text="Laporan Tiket" onClick={() => setActiveMobileMenu(null)} />
+                </>
+              )}
+              {activeMobileMenu === 'Inventory' && (
+                <>
+                  <MobileNavLink to="/admin/inventory" icon="fa-warehouse" text="Tambah SKU" onClick={() => setActiveMobileMenu(null)} />
+                  <MobileNavLink to="/admin/stock" icon="fa-boxes" text="Stok Barang" onClick={() => setActiveMobileMenu(null)} />
+                  <MobileNavLink to="/admin/inventory-reports" icon="fa-chart-line" text="Laporan Inventory" onClick={() => setActiveMobileMenu(null)} />
+                  <MobileNavLink to="/admin/financial-report" icon="fa-file-invoice-dollar" text="Laporan Keuangan" onClick={() => setActiveMobileMenu(null)} />
+                </>
+              )}
+              {activeMobileMenu === 'Settings' && (
+                <>
+                  {/* Link Halaman Setting yang sudah ada */}
+                  <MobileNavLink to="/admin/templates" icon="fa-paste" text="Template Notif" onClick={() => setActiveMobileMenu(null)} />
+                  <MobileNavLink to="/admin/workshops" icon="fa-cogs" text="Daftar Workshop" onClick={() => setActiveMobileMenu(null)} />
+
+                  {/* Garis Pemisah */}
+                  <div className="mobile-modal-divider"></div>
+
+                  {/* Toggle Dark Mode */}
+                  <div className="mobile-modal-setting-item">
+                    <span>Mode Gelap</span>
+                    <label className="mobile-switch">
+                      <input type="checkbox" checked={darkMode} onChange={toggleDarkMode} />
+                      <span className="mobile-slider"></span>
+                    </label>
+                  </div>
+
+                  {/* Info Profil & Tombol Logout */}
+                  <div className="mobile-modal-setting-item user-profile-item">
+                    <div className="user-avatar"><FaUser /></div>
+                    <span><strong>{userName || "User"}</strong></span>
+
+                    {/* Tombol Logout langsung di sini */}
+                    <button onClick={handleLogout} className="mobile-logout-button">
+                      <i className="fas fa-sign-out-alt"></i>
+                    </button>
+                  </div>
+                </>
+              )}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 3. FOOTER NAVIGASI UTAMA (Tombol 4 icon) */}
+      <footer className="mobile-footer-nav">
+        <button
+          onClick={() => setActiveMobileMenu(activeMobileMenu === 'Home' ? null : 'Home')}
+          className={activeMobileMenu === 'Home' ? 'active' : ''}
+        >
+          {activeMobileMenu === 'Home' ? <HiHome /> : <HiOutlineHome />}
+          <span>Home</span>
+        </button>
+
+        <button
+          onClick={() => setActiveMobileMenu(activeMobileMenu === 'Ticketing' ? null : 'Ticketing')}
+          className={activeMobileMenu === 'Ticketing' ? 'active' : ''}
+        >
+          {activeMobileMenu === 'Ticketing' ? <HiTicket /> : <HiOutlineTicket />}
+          <span>Ticketing</span>
+        </button>
+
+        <button
+          onClick={() => setActiveMobileMenu(activeMobileMenu === 'Inventory' ? null : 'Inventory')}
+          className={activeMobileMenu === 'Inventory' ? 'active' : ''}
+        >
+          {activeMobileMenu === 'Inventory' ? <HiArchiveBox /> : <HiOutlineArchiveBox />}
+          <span>Inventory</span>
+        </button>
+
+        <button
+          onClick={() => setActiveMobileMenu(activeMobileMenu === 'Settings' ? null : 'Settings')}
+          className={activeMobileMenu === 'Settings' ? 'active' : ''}
+        >
+          {activeMobileMenu === 'Settings' ? <HiCog6Tooth /> : <HiOutlineCog6Tooth />}
+          <span>Setting</span>
+        </button>
+      </footer>
+
     </div>
   );
 }

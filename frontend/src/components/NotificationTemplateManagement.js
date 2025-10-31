@@ -31,7 +31,7 @@ export default function NotificationTemplateManagement() {
       setPagination({
         currentPage: response.data.current_page,
         totalPages: response.data.last_page,
-        total: response.data.total 
+        total: response.data.total
       });
     } catch (error) {
       console.error("Gagal mengambil data template:", error);
@@ -209,19 +209,22 @@ export default function NotificationTemplateManagement() {
             ) : (
               !isLoadingMore && <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Belum ada template yang dibuat.</p></div> // <-- UBAH
             )}
-            {!loading && !isLoadingMore && templates.length > 0 && pagination && (
-              <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
-                <span className="subtotal-label">Total Template</span>
-                <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
-                  {pagination.total} Data
-                </span>
-              </div>
-            )}
+
 
             {isLoadingMore && (
               <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
             )}
           </div>
+          {!loading && !isLoadingMore && templates.length > 0 && pagination && (
+            <div className='notification-template-list-mobile'>
+              <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+                <span className="subtotal-label" style={{ fontSize: '13px', fontWeight: 'bold' }}>Total Template</span>
+                <span className="subtotal-value value-acquisition" style={{ fontSize: '13px', fontWeight: 'bold' }}>
+                  {pagination.total} Data
+                </span>
+              </div>
+            </div>
+          )}
         </>
       )}
 

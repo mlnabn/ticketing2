@@ -376,14 +376,7 @@ export default function ActiveLoanReportPage() {
                             </div>
                         );
                     })}
-                    {!loading && !isLoadingMore && data.length > 0 && (
-                        <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
-                            <span className="subtotal-label">Total Peminjaman</span>
-                            <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
-                                {pagination.total} Data
-                            </span>
-                        </div>
-                    )}
+
 
                     {isLoadingMore && (
                         <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
@@ -395,6 +388,14 @@ export default function ActiveLoanReportPage() {
                         </div>
                     )}
                 </div>
+                {!loading && !isLoadingMore && data.length > 0 && (
+                    <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
+                        <span className="subtotal-label">Total Peminjaman</span>
+                        <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                            {pagination.total} Data
+                        </span>
+                    </div>
+                )}
             </div>
 
             {selectedItem && (

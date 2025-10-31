@@ -168,18 +168,21 @@ export default function NewAcquisitionsReport() {
                                     </div>
                                 </div>
                             ))}
-                            <div className="subtotal-card-mobile acquisition-subtotal">
-                                <span className="subtotal-label">Subtotal Pembelian</span>
-                                <span className="subtotal-value value-acquisition">
-                                    {formatCurrency(newAcquisitionsSubtotal)}
-                                </span>
-                            </div>
+
                         </>
                     ) : (
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
                             <p>Tidak ada pembelian baru pada periode ini.</p>
                         </div>
                     )}
+                </div>
+                <div className='job-list-mobile'>
+                    <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+                        <span className="subtotal-label" style={{ fontSize: '13px', fontWeight: 'bold' }}>Subtotal Pembelian</span>
+                        <span className="subtotal-value value-acquisition" style={{ fontSize: '13px', fontWeight: 'bold' }}>
+                            {formatCurrency(newAcquisitionsSubtotal)}
+                        </span>
+                    </div>
                 </div>
                 {selectedItem && (
                     <AcquisitionDetailModal
