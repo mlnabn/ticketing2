@@ -111,7 +111,7 @@ class TicketController extends Controller
      */
     public function index(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $perPage = $request->query('per_page', 15);
 
         $query = Ticket::with(['user', 'creator', 'masterBarangs', 'workshop']);
@@ -143,7 +143,7 @@ class TicketController extends Controller
      */
     public function allTickets()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $query = Ticket::with(['user', 'creator', 'workshop']);
 
         if ($user->role !== 'admin') {
@@ -419,7 +419,7 @@ class TicketController extends Controller
      */
     public function assign(Request $request, Ticket $ticket)
     {
-        if (auth()->user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin') {
             return response()->json(['error' => 'Hanya admin yang bisa menugaskan tiket.'], 403);
         }
 
@@ -519,7 +519,7 @@ class TicketController extends Controller
      */
     public function reject(Request $request, Ticket $ticket)
     {
-        if (auth()->user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin') {
             return response()->json(['error' => 'Hanya admin yang bisa menolak tiket.'], 403);
         }
 
@@ -553,7 +553,7 @@ class TicketController extends Controller
      */
     public function bulkDelete(Request $request)
     {
-        if (auth()->user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin') {
             return response()->json(['error' => 'Akses ditolak.'], 403);
         }
 
@@ -571,7 +571,7 @@ class TicketController extends Controller
      */
     public function destroy(Ticket $ticket)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $isAdmin = $user->role === 'admin';
         $isCreator = $user->id === $ticket->creator_id;
         $isAssigneeOfCompletedTicket = ($user->id === $ticket->user_id && $ticket->status === 'Selesai');
@@ -589,7 +589,7 @@ class TicketController extends Controller
      */
     public function updateStatus(Request $request, Ticket $ticket)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if ($user->role !== 'admin') {
             return response()->json(['error' => 'Hanya admin yang bisa mengubah status.'], 403);
@@ -623,7 +623,7 @@ class TicketController extends Controller
      */
     public function stats()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $query = Ticket::query();
 
         if ($user->role !== 'admin') {
@@ -670,7 +670,7 @@ class TicketController extends Controller
 
         $ticket = Ticket::findOrFail($id);
 
-        if (auth()->user()->id !== $ticket->user_id) {
+        if (Auth::user()->id !== $ticket->user_id) {
             return response()->json(['error' => 'Anda tidak berwenang untuk aksi ini.'], 403);
         }
 
@@ -786,7 +786,7 @@ class TicketController extends Controller
 
     public function processReturn(Request $request, Ticket $ticket)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         if ($user->role !== 'admin') {
             return response()->json(['error' => 'Hanya admin yang bisa mengubah status.'], 403);
         }

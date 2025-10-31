@@ -59,7 +59,7 @@ const BarChartComponent = ({ data, onBarClick }) => {
             onClick={(entry) =>
               onBarClick({
                 ...entry,
-                status: ["Sedang Dikerjakan", "Ditunda"],
+                status: "Sedang Dikerjakan",
               })
             }
           />
@@ -82,7 +82,7 @@ const BarChartComponent = ({ data, onBarClick }) => {
 
         <div
           className="legend-item2"
-          onClick={() => onBarClick({ status: ["Sedang Dikerjakan", "Ditunda"] })}
+          onClick={() => onBarClick({ status: "Sedang Dikerjakan" })}
           style={{ cursor: "pointer" }}
         >
           <span
