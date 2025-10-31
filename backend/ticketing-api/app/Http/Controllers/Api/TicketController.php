@@ -111,7 +111,7 @@ class TicketController extends Controller
      */
     public function index(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $perPage = $request->query('per_page', 15);
 
         $query = Ticket::with(['user', 'creator', 'masterBarangs', 'workshop']);
@@ -122,31 +122,18 @@ class TicketController extends Controller
 
         $query = $this->applyFilters($query, $request);
         $query->orderByRaw("CASE
-                                WHEN is_urgent = 1 AND status NOT IN ('Selesai', 'Ditolak') THEN 0
-                                ELSE 1
+                                WHEN is_urgent = 1 AND status = 'Belum Dikerjakan' THEN 0
+                                WHEN is_urgent = 1 AND status IN ('Sedang Dikerjakan', 'Ditunda') THEN 1
+                                WHEN (is_urgent = 0 OR is_urgent IS NULL) AND status = 'Belum Dikerjakan' THEN 2
+                                WHEN (is_urgent = 0 OR is_urgent IS NULL) AND status IN ('Sedang Dikerjakan', 'Ditunda') THEN 3
+                                ELSE 4
                              END ASC");
         $query->orderBy('created_at', 'DESC');
         if ($request->boolean('all')) {
             $ticketsResult = $query->get();
-            $sortedItems = $ticketsResult->sortByDesc(function ($ticket) {
-                if ($ticket->is_urgent && !in_array($ticket->status, ['Selesai', 'Ditolak'])) {
-                    return 2;
-                }
-                return 0;
-            })->values();
-
-            return response()->json($sortedItems);
+            return response()->json($ticketsResult);
         } else {
             $ticketsData = $query->paginate($perPage);
-            if ($ticketsData->items() && count($ticketsData->items()) > 0) {
-                $sortedItems = collect($ticketsData->items())->sortByDesc(function ($ticket) {
-                    if ($ticket->is_urgent && !in_array($ticket->status, ['Selesai', 'Ditolak'])) {
-                        return 2;
-                    }
-                    return 0;
-                })->values()->all();
-                $ticketsData->setCollection(collect($sortedItems));
-            }
             return response()->json($ticketsData);
         }
     }
@@ -156,7 +143,7 @@ class TicketController extends Controller
      */
     public function allTickets()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $query = Ticket::with(['user', 'creator', 'workshop']);
 
         if ($user->role !== 'admin') {
@@ -432,7 +419,7 @@ class TicketController extends Controller
      */
     public function assign(Request $request, Ticket $ticket)
     {
-        if (auth()->user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin') {
             return response()->json(['error' => 'Hanya admin yang bisa menugaskan tiket.'], 403);
         }
 
@@ -511,10 +498,18 @@ class TicketController extends Controller
 
         $perPage = $request->query('per_page', 15);
 
-        $ticketsData = Ticket::with(['user', 'creator', 'workshop', 'masterBarangs'])
-            ->where('user_id', $user->id)
-            ->latest()
-            ->paginate($perPage);
+       $query = Ticket::with(['user', 'creator', 'workshop', 'masterBarangs'])
+            ->where('user_id', $user->id);
+
+        // Logika pengurutan baru
+        $query->orderByRaw("CASE
+                                WHEN is_urgent = 1 AND status IN ('Sedang Dikerjakan', 'Ditunda') THEN 0
+                                WHEN (is_urgent = 0 OR is_urgent IS NULL) AND status IN ('Sedang Dikerjakan', 'Ditunda') THEN 1
+                                ELSE 2
+                             END ASC");
+        $query->orderBy('created_at', 'DESC');
+
+        $ticketsData = $query->paginate($perPage);
 
         return response()->json($ticketsData);
     }
@@ -524,7 +519,7 @@ class TicketController extends Controller
      */
     public function reject(Request $request, Ticket $ticket)
     {
-        if (auth()->user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin') {
             return response()->json(['error' => 'Hanya admin yang bisa menolak tiket.'], 403);
         }
 
@@ -558,7 +553,7 @@ class TicketController extends Controller
      */
     public function bulkDelete(Request $request)
     {
-        if (auth()->user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin') {
             return response()->json(['error' => 'Akses ditolak.'], 403);
         }
 
@@ -576,7 +571,7 @@ class TicketController extends Controller
      */
     public function destroy(Ticket $ticket)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $isAdmin = $user->role === 'admin';
         $isCreator = $user->id === $ticket->creator_id;
         $isAssigneeOfCompletedTicket = ($user->id === $ticket->user_id && $ticket->status === 'Selesai');
@@ -594,7 +589,7 @@ class TicketController extends Controller
      */
     public function updateStatus(Request $request, Ticket $ticket)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if ($user->role !== 'admin') {
             return response()->json(['error' => 'Hanya admin yang bisa mengubah status.'], 403);
@@ -628,7 +623,7 @@ class TicketController extends Controller
      */
     public function stats()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $query = Ticket::query();
 
         if ($user->role !== 'admin') {
@@ -675,7 +670,7 @@ class TicketController extends Controller
 
         $ticket = Ticket::findOrFail($id);
 
-        if (auth()->user()->id !== $ticket->user_id) {
+        if (Auth::user()->id !== $ticket->user_id) {
             return response()->json(['error' => 'Anda tidak berwenang untuk aksi ini.'], 403);
         }
 
@@ -791,7 +786,7 @@ class TicketController extends Controller
 
     public function processReturn(Request $request, Ticket $ticket)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         if ($user->role !== 'admin') {
             return response()->json(['error' => 'Hanya admin yang bisa mengubah status.'], 403);
         }
