@@ -122,31 +122,18 @@ class TicketController extends Controller
 
         $query = $this->applyFilters($query, $request);
         $query->orderByRaw("CASE
-                                WHEN is_urgent = 1 AND status NOT IN ('Selesai', 'Ditolak') THEN 0
-                                ELSE 1
+                                WHEN is_urgent = 1 AND status = 'Belum Dikerjakan' THEN 0
+                                WHEN is_urgent = 1 AND status IN ('Sedang Dikerjakan', 'Ditunda') THEN 1
+                                WHEN (is_urgent = 0 OR is_urgent IS NULL) AND status = 'Belum Dikerjakan' THEN 2
+                                WHEN (is_urgent = 0 OR is_urgent IS NULL) AND status IN ('Sedang Dikerjakan', 'Ditunda') THEN 3
+                                ELSE 4
                              END ASC");
         $query->orderBy('created_at', 'DESC');
         if ($request->boolean('all')) {
             $ticketsResult = $query->get();
-            $sortedItems = $ticketsResult->sortByDesc(function ($ticket) {
-                if ($ticket->is_urgent && !in_array($ticket->status, ['Selesai', 'Ditolak'])) {
-                    return 2;
-                }
-                return 0;
-            })->values();
-
-            return response()->json($sortedItems);
+            return response()->json($ticketsResult);
         } else {
             $ticketsData = $query->paginate($perPage);
-            if ($ticketsData->items() && count($ticketsData->items()) > 0) {
-                $sortedItems = collect($ticketsData->items())->sortByDesc(function ($ticket) {
-                    if ($ticket->is_urgent && !in_array($ticket->status, ['Selesai', 'Ditolak'])) {
-                        return 2;
-                    }
-                    return 0;
-                })->values()->all();
-                $ticketsData->setCollection(collect($sortedItems));
-            }
             return response()->json($ticketsData);
         }
     }
@@ -511,10 +498,18 @@ class TicketController extends Controller
 
         $perPage = $request->query('per_page', 15);
 
-        $ticketsData = Ticket::with(['user', 'creator', 'workshop', 'masterBarangs'])
-            ->where('user_id', $user->id)
-            ->latest()
-            ->paginate($perPage);
+       $query = Ticket::with(['user', 'creator', 'workshop', 'masterBarangs'])
+            ->where('user_id', $user->id);
+
+        // Logika pengurutan baru
+        $query->orderByRaw("CASE
+                                WHEN is_urgent = 1 AND status IN ('Sedang Dikerjakan', 'Ditunda') THEN 0
+                                WHEN (is_urgent = 0 OR is_urgent IS NULL) AND status IN ('Sedang Dikerjakan', 'Ditunda') THEN 1
+                                ELSE 2
+                             END ASC");
+        $query->orderBy('created_at', 'DESC');
+
+        $ticketsData = $query->paginate($perPage);
 
         return response()->json($ticketsData);
     }
