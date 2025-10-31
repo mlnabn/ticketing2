@@ -9431,11 +9431,36 @@ body.dark-mode .summary-cards .card h3 {
 
   /* Membuat daftar admin menjadi satu kolom agar tidak sempit */
   .admin-list-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    display: grid;
   }
 
   .report-header h2 {
     font-size: 1.3rem;
+  }
+
+  .admin-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .admin-card .avatar {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #e0e7ff;
+    color: #4338ca;
+    display: grid;
+    place-items: center;
+    font-weight: 600;
+  }
+
+  .admin-card .info {
+    flex-grow: 1;
+    overflow: hidden;
   }
 
   /* Perbaikan kecil pada kartu admin agar tidak terlalu lebar */
@@ -11313,11 +11338,49 @@ body.dark-mode .btn-dlt:hover {
   }
 
   .adminselect-card h1 {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 
   .user-management-container h1 {
     font-size: 1.5rem;
+  }
+
+  .user-management-container h2 {
+    font-size: 1.5rem;
+  }
+
+  .user-management-container h3 {
+    font-size: 1.5rem;
+  }
+
+  .summary-cards {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .summary-cards .card {
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: left;
+    transition: all 0.2s ease;
+  }
+
+  .summary-cards .card h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 0;
+    text-transform: none;
+  }
+
+  .summary-cards .card p {
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+
+  .summary-cards .card.active {
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 2px #3B82F6;
   }
 
   .user-management-header .btn-primary {
