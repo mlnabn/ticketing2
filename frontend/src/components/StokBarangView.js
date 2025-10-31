@@ -538,16 +538,16 @@ function StokBarangView() {
                                                                         onChange={(e) => handleSelectAllMaster(masterItem.id_m_barang, e.target.checked)}
                                                                     />
                                                                 </div>
-                                                                <div className="detail-cell header-kode">Kode Unik</div>
-                                                                <div className="detail-cell header-sn">S/N</div>
-                                                                <div className="detail-cell header-kondisi">Kondisi</div>
-                                                                <div className="detail-cell header-status">Status</div>
-                                                                <div className="detail-cell header-warna">Warna</div>
-                                                                <div className="detail-cell header-harga">Harga Beli</div>
-                                                                <div className="detail-cell header-tglbeli">Tgl Beli</div>
-                                                                <div className="detail-cell header-tanggal">Tgl Masuk</div>
-                                                                <div className="detail-cell header-creator">Ditambahkan</div>
-                                                                <div className="detail-cell header-aksi">Aksi</div>
+                                                                <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Kode Unik</div>
+                                                                <div className="detail-cell header-sn" style={{ fontSize: '15px' }}>S/N</div>
+                                                                <div className="detail-cell header-kondisi" style={{ fontSize: '15px' }}>Kondisi</div>
+                                                                <div className="detail-cell header-status" style={{ fontSize: '15px' }}>Status</div>
+                                                                <div className="detail-cell header-warna" style={{ fontSize: '15px' }}>Warna</div>
+                                                                <div className="detail-cell header-harga" style={{ fontSize: '15px' }}>Harga Beli</div>
+                                                                <div className="detail-cell header-tglbeli" style={{ fontSize: '15px' }}>Tgl Beli</div>
+                                                                <div className="detail-cell header-tanggal" style={{ fontSize: '15px' }}>Tgl Masuk</div>
+                                                                <div className="detail-cell header-creator" style={{ fontSize: '15px' }}>Ditambahkan</div>
+                                                                <div className="detail-cell header-aksi" style={{ fontSize: '15px' }}>Aksi</div>
                                                             </div>
 
                                                             <div
