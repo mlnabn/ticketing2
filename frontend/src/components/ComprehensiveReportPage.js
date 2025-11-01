@@ -286,7 +286,7 @@ export default function ComprehensiveReportPage() {
       {!stats ? <motion.p variants={staggerItem} className="report-status-message">Memuat data statistik...</motion.p> : (
         <>
           <motion.div variants={staggerItem} className="summary-cards">
-            <div className={`card ${filter === 'all' || filter === 'handled' ? 'active' : ''}`} onClick={() => handleFilterChange(filterType)}>
+            <div className={`card ${filter === 'all' || filter === 'handled' ? 'active' : ''}`} onClick={() => handleFilterChange(filterTypePath)}>
               <h3>{filterType === 'handled' ? 'Total Dikerjakan' : 'Total Tiket'}</h3>
               <p>{stats.total}</p>
             </div>
