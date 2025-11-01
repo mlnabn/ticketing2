@@ -9,7 +9,7 @@ import QrScannerModal from './QrScannerModal';
 import { createPortal } from 'react-dom';
 import QrPrintSheet from './QrPrintSheet';
 import QrCodeModal from './QrCodeModal';
-import { motion, AnimatePresence } from 'framer-motion'; 
+import { motion, AnimatePresence } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -767,7 +767,18 @@ function StokBarangView() {
                                                         {expandingId === masterItem.id_m_barang ? (<p className="detail-loading-mobile">Memuat unit...</p>)
                                                             : detailItems[masterItem.id_m_barang]?.items?.length > 0 ? (
                                                                 detailItems[masterItem.id_m_barang].items.map(detail => (
-                                                                    <div key={detail.id} className="ticket-card-mobile detail-card">
+                                                                    <div
+                                                                        key={detail.id}
+                                                                        className="ticket-card-mobile detail-card hoverable-row" /* <-- Tambah class */
+                                                                        onClick={(e) => { /* <-- TAMBAHKAN FUNGSI onClick INI */
+                                                                            // 1. Jangan buka modal jika kita klik tombol di dalam action-row
+                                                                            if (e.target.tagName === 'BUTTON' || e.target.closest('.action-row')) {
+                                                                                return;
+                                                                            }
+                                                                            // 2. Buka ItemDetailModal (ini yang Anda mau)
+                                                                            setDetailItem(detail);
+                                                                        }}
+                                                                    >
                                                                         <div className="card-header-detail">
                                                                             <span>{detail.kode_unik}</span>
                                                                             {detail.serial_number && <small>S/N: {detail.serial_number}</small>}
