@@ -3,6 +3,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import TicketDetailModal from './TicketDetailModal';
 import { saveAs } from 'file-saver';
+import { motion } from 'framer-motion';
 
 const formatDate = (dateString) => {
   if (!dateString) return '-';
@@ -31,6 +32,25 @@ const months = [
   { value: '9', label: 'September' }, { value: '10', label: 'Oktober' },
   { value: '11', label: 'November' }, { value: '12', label: 'Desember' },
 ];
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      when: "beforeChildren",
+      staggerChildren: 0.1,
+    },
+  },
+};
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" }
+  },
+};
+
 
 export default function ComprehensiveReportPage() {
   const location = useLocation();
@@ -254,13 +274,19 @@ export default function ComprehensiveReportPage() {
   const tickets = tableData ? tableData.data : [];
 
   return (
-    <div className="user-management-container">
-      <h2>{title}</h2>
+    // Ganti <div> dengan motion.div
+    <motion.div
+      className="user-management-container"
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.h2 variants={staggerItem}>{title}</motion.h2>
 
-      {!stats ? <p className="report-status-message">Memuat data statistik...</p> : (
+      {!stats ? <motion.p variants={staggerItem} className="report-status-message">Memuat data statistik...</motion.p> : (
         <>
-          <div className="summary-cards">
-            <div className={`card ${filter === 'all' || filter === 'handled' ? 'active' : ''}`} onClick={() => handleFilterChange(filterType)}>
+          <motion.div variants={staggerItem} className="summary-cards">
+            <div className={`card ${filter === 'all' || filter === 'handled' ? 'active' : ''}`} onClick={() => handleFilterChange(filterTypePath)}>
               <h3>{filterType === 'handled' ? 'Total Dikerjakan' : 'Total Tiket'}</h3>
               <p>{stats.total}</p>
             </div>
@@ -275,11 +301,11 @@ export default function ComprehensiveReportPage() {
                 <h3>Tiket Ditolak</h3><p>{stats.rejected}</p>
               </div>
             )}
-          </div>
+          </motion.div>
 
-          <h3>Filter Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</h3>
+          <motion.h3 variants={staggerItem}>Filter Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</motion.h3>
 
-          <div className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+          <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
             <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
               <option value="month">Filter per Bulan</option>
               <option value="date_range">Filter per Tanggal</option>
@@ -332,8 +358,8 @@ export default function ComprehensiveReportPage() {
                 />
               </>
             )}
-          </div>
-          <div className="download-buttons">
+          </motion.div>
+          <motion.div variants={staggerItem} className="download-buttons">
             <button className="btn-download pdf" onClick={() => handleDownload('pdf')} disabled={exportingPdf}>
               <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
               {exportingPdf ? 'Mengekspor...' : 'Download PDF'}
@@ -342,12 +368,12 @@ export default function ComprehensiveReportPage() {
               <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
               {exportingExcel ? 'Mengekspor...' : 'Download Excel'}
             </button>
-          </div>
+          </motion.div>
 
-          {loading && !tableData ? <p>Memuat data...</p> : (
+          {loading && !tableData ? <motion.p variants={staggerItem}>Memuat data...</motion.p> : (
             <>
               {/* --- Desktop Table --- */}
-              <div className="job-list-container">
+              <motion.div variants={staggerItem} className="job-list-container">
                 <div className="table-scroll-container">
                   <table className="job-table">
                     <thead>
@@ -399,8 +425,6 @@ export default function ComprehensiveReportPage() {
                       </tbody>
                     </table>
                   </div>
-
-                  {/* BARU: Tambahkan tfoot untuk total data (Desktop) */}
                   {!loading && tickets.length > 0 && tableData && (
                     <table className="job-table">
                       <tfoot>
@@ -415,10 +439,11 @@ export default function ComprehensiveReportPage() {
                   )}
 
                 </div>
-              </div>
+              </motion.div>
 
               {/* --- Mobile Card View --- */}
-              <div
+              <motion.div
+                variants={staggerItem}
                 className="job-list-mobile"
                 ref={mobileListRef}
                 onScroll={handleScroll}
@@ -494,9 +519,9 @@ export default function ComprehensiveReportPage() {
                 {isLoadingMore && (
                   <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
                 )}
-              </div>
+              </motion.div>
               {!loading && !isLoadingMore && tickets.length > 0 && tableData && (
-                <div className='job-list-mobile'>
+                <motion.div variants={staggerItem} className='job-list-mobile'>
 
                   <div className="subtotal-card-mobile acquisition-subtotal"
                     style={{ marginTop: '1rem', marginBottom: '1rem' }}
@@ -511,7 +536,7 @@ export default function ComprehensiveReportPage() {
                     </span>
                   </div>
 
-                </div>
+                </motion.div>
               )}
             </>
           )
@@ -523,6 +548,6 @@ export default function ComprehensiveReportPage() {
           ticket={selectedTicketForDetail}
           onClose={() => setSelectedTicketForDetail(null)}
       />
-    </div >
+    </motion.div >
   );
 }

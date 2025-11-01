@@ -11,6 +11,26 @@ import ProofModal from './ProofModal';
 import ConfirmationModal from './ConfirmationModal';
 import TicketDetailModal from './TicketDetailModal';
 import ReturnItemsModal from './ReturnItemsModal';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      when: "beforeChildren",
+      staggerChildren: 0.1, // Jeda antar item
+    },
+  },
+};
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" }
+  },
+};
 
 export default function JobList() {
   // --- 1. SETUP & STATE MANAGEMENT ---
@@ -345,32 +365,48 @@ export default function JobList() {
 
   return (
     <>
-      <div className="user-management-container">
-        <h1 className="page-title">{isMyTicketsPage ? 'Tiket yang Saya Kerjakan' : 'Daftar Semua Tiket'}</h1>
+      <motion.div
+        className="user-management-container"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.h1 variants={staggerItem} className="page-title">
+          {isMyTicketsPage ? 'Tiket yang Saya Kerjakan' : 'Daftar Semua Tiket'}
+        </motion.h1>
 
         {!isMyTicketsPage && isAdmin && (
-          <div className="filters-container report-filters" style={{ margin: '20px 0' }}>
-            <input
-              type="text"
-              placeholder="Cari tiket, deskripsi, nama, workshop..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="filter-search-input"
-            />
-          </div>
+          <motion.div variants={staggerItem}>
+            <div className="filters-container report-filters" style={{ margin: '20px 0' }}>
+              <input
+                type="text"
+                placeholder="Cari tiket, deskripsi, nama, workshop..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="filter-search-input"
+              />
+            </div>
+          </motion.div>
         )}
 
-        {selectedIds.length > 0 && (
-          <div className="bulk-action-bar">
-            <button onClick={handleBulkDelete} className="btn-clear">Hapus {selectedIds.length} Tiket yang Dipilih</button>
-          </div>
-        )}
+        <AnimatePresence>
+          {selectedIds.length > 0 && (
+            <motion.div
+              className="bulk-action-bar"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+            >
+              <button onClick={handleBulkDelete} className="btn-clear">Hapus {selectedIds.length} Tiket yang Dipilih</button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {isLoading && !ticketData ? (
-          <p>Memuat data tiket...</p>
+          <motion.p variants={staggerItem}>Memuat data tiket...</motion.p>
         ) : (
           <>
-            <div className="table-scroll-container" >
+            <motion.div variants={staggerItem} className="table-scroll-container" >
               <table className="job-table">
                 <thead>
                   <tr>
@@ -439,78 +475,83 @@ export default function JobList() {
               )}
 
               {/* Mobile View */}
-              <div
-                className="job-list-mobile"
-                ref={mobileListRef}
-                onScroll={handleScroll}
-                style={{ maxHeight: '65vh', overflowY: 'auto' }}
-              >
-                {ticketsOnPage.length > 0 ? (
-                  ticketsOnPage.map(ticket => (
-                    <div
-                      key={ticket.id}
-                      className={`ticket-card-mobile clickable-row ${(ticket.is_urgent && ticket.status !== 'Selesai' && ticket.status !== 'Ditolak') ? 'urgent-row' : ''}`}
-                      onClick={(e) => handleRowClick(e, ticket)}
-                    >
-                      <div className="card-row">
-                        <div className="data-group"><span className="label">Pengirim</span><span className="value">{ticket.creator ? ticket.creator.name : 'N/A'}</span></div>
-                        <div className="data-group"><span className="label">Dikerjakan Oleh</span><span className="value">{ticket.user ? ticket.user.name : '-'}</span></div>
-                      </div>
-                      <div className="card-row"><div className="data-group single"><span className="label">Workshop</span><span className="value">{ticket.workshop ? ticket.workshop.name : 'N/A'}</span></div></div>
-                      <div className="card-row">
-                        <div className="data-group single">
-                          <span className="label">Deskripsi</span>
-                          <span className="value description">
+
+              <motion.div variants={staggerItem}>
+                <div
+                  className="job-list-mobile"
+                  ref={mobileListRef}
+                  onScroll={handleScroll}
+                  style={{ maxHeight: '65vh', overflowY: 'auto' }}
+                >
+
+                  {ticketsOnPage.length > 0 ? (
+                    ticketsOnPage.map(ticket => (
+                      <div
+                        key={ticket.id}
+                        className={`ticket-card-mobile clickable-row ${(ticket.is_urgent && ticket.status !== 'Selesai' && ticket.status !== 'Ditolak') ? 'urgent-row' : ''}`}
+                        onClick={(e) => handleRowClick(e, ticket)}
+                      >
+                        <div className="card-row">
+                          <div className="data-group"><span className="label">Pengirim</span><span className="value">{ticket.creator ? ticket.creator.name : 'N/A'}</span></div>
+                          <div className="data-group"><span className="label">Dikerjakan Oleh</span><span className="value">{ticket.user ? ticket.user.name : '-'}</span></div>
+                        </div>
+                        <div className="card-row"><div className="data-group single"><span className="label">Workshop</span><span className="value">{ticket.workshop ? ticket.workshop.name : 'N/A'}</span></div></div>
+                        <div className="card-row">
+                          <div className="data-group single">
+                            <span className="label">Deskripsi</span>
                             <span className="value description">
-                              <span className="description-cell">
-                                {ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}
-                                {ticket.title}
+                              <span className="value description">
+                                <span className="description-cell">
+                                  {ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}
+                                  {ticket.title}
+                                </span>
                               </span>
                             </span>
-                          </span>
+                          </div>
                         </div>
+                        <div className="card-row">
+                          <div className="data-group"><span className="label">Tanggal Dibuat</span><span className="value">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</span></div>
+                          <div className="data-group"><span className="label">Waktu Pengerjaan</span><span className="value">{formatWorkTime(ticket)}</span></div>
+                        </div>
+                        <div className="card-row status-row"><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></div>
+                        <div className="card-row action-row"><div className="action-buttons-group">{renderActionButtons(ticket)}</div></div>
                       </div>
-                      <div className="card-row">
-                        <div className="data-group"><span className="label">Tanggal Dibuat</span><span className="value">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</span></div>
-                        <div className="data-group"><span className="label">Waktu Pengerjaan</span><span className="value">{formatWorkTime(ticket)}</span></div>
-                      </div>
-                      <div className="card-row status-row"><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></div>
-                      <div className="card-row action-row"><div className="action-buttons-group">{renderActionButtons(ticket)}</div></div>
-                    </div>
-                  ))
-                ) : (
-                  !isLoadingMore && <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Tidak ada pekerjaan yang ditemukan.</p></div>
-                )}
-                {isLoadingMore && (
-                  <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
-                )}
+                    ))
+                  ) : (
+                    !isLoadingMore && <div className="card" style={{ padding: '20px', textAlign: 'center' }}><p>Tidak ada pekerjaan yang ditemukan.</p></div>
+                  )}
+                  {isLoadingMore && (
+                    <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+                  )}
+                </div>
 
+                <div className='job-list-mobile'>
+                  {!isLoading && !isLoadingMore && ticketData && ticketData.total > 0 && (
+                    <div className="subtotal-card-mobile"
+                      style={{ marginTop: '1rem', marginBottom: '1rem' }}
+                    >
+                      <span className="subtotal-label"
+                        style={{ fontSize: '13px', fontWeight: 'bold' }}
+                      >Total Tiket</span>
 
-              </div>
-              <div className='job-list-mobile'>
-                {!isLoading && !isLoadingMore && ticketData && ticketData.total > 0 && (
-                  <div className="subtotal-card-mobile"
-                    style={{ marginTop: '1rem', marginBottom: '1rem' }}
-                  >
-                    <span className="subtotal-label"
-                      style={{ fontSize: '13px', fontWeight: 'bold' }}
-                    >Total Tiket</span>
-
-                    <span className="subtotal-value"
-                      style={{ fontSize: '13px', fontWeight: 'bold' }}
+                      <span className="subtotal-value"
+                        style={{ fontSize: '13px', fontWeight: 'bold' }}
                       >
-                      {ticketData.total}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
+                        {ticketData.total}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </motion.div>
           </>
         )
         }
+        <AnimatePresence>
 
         <AssignAdminModal
             show={Boolean(ticketToAssign)}
+            key="assignModal"
             ticket={ticketToAssign}
             admins={adminList}
             items={itemList}
@@ -521,6 +562,7 @@ export default function JobList() {
         
         <RejectTicketModal
             show={Boolean(ticketToReject)}
+            key="rejectModal"
             ticket={ticketToReject}
             onReject={handleConfirmReject}
             onClose={() => setTicketToReject(null)}
@@ -529,6 +571,7 @@ export default function JobList() {
         
         <ProofModal
             show={Boolean(ticketForProof)}
+            key="proofModal"
             ticket={ticketForProof}
             onSave={handleSaveProof}
             onClose={() => setTicketForProof(null)}
@@ -536,6 +579,7 @@ export default function JobList() {
         
         <ConfirmationModal
             show={Boolean(ticketToDelete)}
+            key="confirmDeleteModal"
             message={`Hapus pekerjaan "${ticketToDelete?.title}"?`}
             onConfirm={confirmDelete}
             onCancel={() => setTicketToDelete(null)}
@@ -543,18 +587,21 @@ export default function JobList() {
 
         <TicketDetailModal
             show={Boolean(selectedTicketForDetail)}
+            key="detailModal"
             ticket={selectedTicketForDetail}
             onClose={() => setSelectedTicketForDetail(null)}
         />
 
         <ReturnItemsModal
             show={Boolean(ticketToReturn)}
+            key="returnModal"
             ticket={ticketToReturn}
             onSave={handleConfirmReturn}
             onClose={() => setTicketToReturn(null)}
             showToast={showToast}
         />
-      </div>
+      </AnimatePresence>
+      </motion.div>
     </>
   );
 }

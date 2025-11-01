@@ -5,6 +5,26 @@ import api from '../services/api';
 import { saveAs } from 'file-saver';
 import QrScannerModal from './QrScannerModal';
 import HistoryModal from './HistoryModal';
+import { motion } from 'framer-motion';
+
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            when: "beforeChildren",
+            staggerChildren: 0.1,
+        },
+    },
+};
+const staggerItem = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.4, ease: "easeOut" }
+    },
+};
 
 function useMediaQuery(query) {
     const [matches, setMatches] = React.useState(false);
@@ -52,13 +72,9 @@ function ItemHistoryLookupPage() {
     const [historyFilters, setHistoryFilters] = useState({ start_date: '', end_date: '' });
     const [exportingHistoryExcel, setExportingHistoryExcel] = useState(false);
     const [exportingHistoryPdf, setExportingHistoryPdf] = useState(false);
-
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width: 1290px)');
-
-    // --- PERBAIKAN 1: Tambahkan 'total: 0' ---
     const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 });
-
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
@@ -86,7 +102,7 @@ function ItemHistoryLookupPage() {
     const getApiParams = useCallback((page = 1) => {
         const baseParams = {
             page: page,
-            type: 'all_stock', // <-- Ganti type ke 'all_stock' agar konsisten
+            type: 'all_stock',
             search: debouncedSearchTerm,
         };
 
@@ -104,18 +120,15 @@ function ItemHistoryLookupPage() {
         setLoading(true);
         setSelectedItem(null);
         setHistoryData([]);
-        setItems([]); // <-- BARU: Pastikan data dikosongkan
+        setItems([]);
         try {
             const params = getApiParams(1);
-            // --- PERBAIKAN 2: Ganti endpoint ke /detailed ---
             const res = await api.get('/reports/inventory/detailed', { params });
             setItems(res.data.data);
-
-            // --- PERBAIKAN 3: Simpan 'total' dari API ---
             setPagination({
                 currentPage: res.data.current_page,
                 totalPages: res.data.last_page,
-                total: res.data.total // <-- Simpan total data
+                total: res.data.total
             });
         } catch (error) {
             showToast('Gagal memuat data stok.', 'error');
@@ -201,13 +214,12 @@ function ItemHistoryLookupPage() {
         try {
             const res = await api.get(`/inventory/stock-items/by-serial/${code}`);
             setSelectedItem(res.data);
-            // Setel item yang dicari sebagai satu-satunya item di daftar kiri
             setItems([res.data]);
-            setPagination(prev => ({ ...prev, total: 1 })); // Set total jadi 1
+            setPagination(prev => ({ ...prev, total: 1 }));
         } catch (error) {
             showToast(`Aset dengan kode "${code}" tidak ditemukan.`, 'error');
-            setItems([]); // Kosongkan item jika tidak ketemu
-            setPagination(prev => ({ ...prev, total: 0 })); // Set total jadi 0
+            setItems([]);
+            setPagination(prev => ({ ...prev, total: 0 }));
         } finally {
             setLoading(false);
         }
@@ -222,7 +234,7 @@ function ItemHistoryLookupPage() {
         let barcode = '';
         let interval;
         const handleKeyDown = (e) => {
-            const isModalOpen = isScannerOpen; // <-- Hapus '!!selectedItem'
+            const isModalOpen = isScannerOpen;
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || isModalOpen) return;
             if (typeof e.key !== 'string') return;
 
@@ -241,7 +253,7 @@ function ItemHistoryLookupPage() {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [handleSearchAndShowHistory, isScannerOpen]); // <-- Hapus 'selectedItem'
+    }, [handleSearchAndShowHistory, isScannerOpen]);
 
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -313,26 +325,21 @@ function ItemHistoryLookupPage() {
         setSelectedItem(null);
         setHistoryData([]);
         setHistoryFilters({ start_date: '', end_date: '' });
-        // Muat ulang daftar item default
         fetchData();
     };
 
     const loadMoreItems = async () => {
-        // Hentikan jika sedang memuat atau sudah di halaman terakhir
         if (isLoadingMore || pagination.currentPage >= pagination.totalPages) return;
 
         setIsLoadingMore(true);
         try {
             const nextPage = pagination.currentPage + 1;
             const params = getApiParams(nextPage);
-            // --- PERBAIKAN 5: Ganti endpoint ke /detailed ---
             const res = await api.get('/reports/inventory/detailed', { params });
 
-            setItems(prevItems => [...prevItems, ...res.data.data]); // Tambahkan data baru
-
-            // --- PERBAIKAN 6: Gunakan 'prev' state ---
+            setItems(prevItems => [...prevItems, ...res.data.data]);
             setPagination(prev => ({
-                ...prev, // <- Pertahankan 'total'
+                ...prev,
                 currentPage: res.data.current_page,
                 totalPages: res.data.last_page
             }));
@@ -345,7 +352,6 @@ function ItemHistoryLookupPage() {
 
     const handleScroll = (e) => {
         const target = e.currentTarget;
-        // Cek jika scroll sudah mendekati 200px dari bawah
         const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
 
         if (nearBottom && !loading && !isLoadingMore && pagination.currentPage < pagination.totalPages) {
@@ -360,21 +366,25 @@ function ItemHistoryLookupPage() {
     };
 
     return (
-        <>
-            <div className="user-management-container">
+        // Ganti <> dengan motion.div
+        <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+        >
+            <motion.div variants={staggerItem} className="user-management-container">
                 <h1 className="page-title">Lacak Riwayat Aset</h1>
                 <p className="page-description" style={{ textAlign: 'center' }}>Gunakan pencarian, klik item dari daftar, atau scan QR/Barcode untuk melihat riwayat lengkap sebuah aset.</p>
-
-                {/* --- PERBAIKAN: Baris Search + Tombol Scan --- */}
-                <div
+                <motion.div
+                    variants={staggerItem}
                     className="filters-container report-filters"
                     style={{
                         marginTop: '1rem',
                         paddingBottom: '0',
                         display: 'flex',
                         flexDirection: 'row',
-                        gap: '0.5rem',        
-                        alignItems: 'center' 
+                        gap: '0.5rem',
+                        alignItems: 'center'
                     }}
                 >
                     <input
@@ -385,17 +395,14 @@ function ItemHistoryLookupPage() {
                         className="filter-search-input"
                         style={{ flexGrow: 1, width: 'auto' }}
                     />
-                    {/* Tombol Scan QR dipindah ke sini */}
                     <button className="btn-scan-qr-history" onClick={() => setIsScannerOpen(true)}>
                         <span className="fa-stack" style={{ fontSize: '1.2em' }}>
                             <i className="fas fa-qrcode fa-stack-2x"></i>
                             <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
                         </span>
                     </button>
-                </div>
-
-                {/* --- PERBAIKAN: Baris Filter (Tanpa Tombol Scan) --- */}
-                <div className="report-filters" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', alignItems: 'center' }}>
+                </motion.div>
+                <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', alignItems: 'center' }}>
                     <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
                         <option value="month">Filter Riwayat per Bulan</option>
                         <option value="date_range">Filter Riwayat per Tanggal</option>
@@ -420,13 +427,8 @@ function ItemHistoryLookupPage() {
                             <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
                         </>
                     )}
-                    {/* Tombol Scan QR sudah dipindah dari sini */}
-                </div>
-
-                {/* === CONTAINER SPLIT VIEW === */}
-                <div className={`split-view-container ${selectedItem ? 'split-view-active' : ''}`}>
-
-                    {/* === PANEL KIRI: DAFTAR ITEM === */}
+                </motion.div>
+                <motion.div variants={staggerItem} className={`split-view-container ${selectedItem ? 'split-view-active' : ''}`}>
                     <div className="list-panel">
                         <div className="job-list-container">
                             {/* Desktop View */}
@@ -482,13 +484,10 @@ function ItemHistoryLookupPage() {
                                         </tbody>
                                     </table>
                                 </div>
-
-                                {/* --- PERBAIKAN 7: Tambahkan tfoot untuk Total Aset --- */}
                                 {!loading && items.length > 0 && (
                                     <table className="job-table">
                                         <tfoot>
                                             <tr className="subtotal-row">
-                                                {/* Kolom span dinamis berdasarkan 'selectedItem' */}
                                                 <td colSpan={selectedItem ? 1 : 4}>Total Aset</td>
                                                 <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
                                                     {pagination.total} Data
@@ -550,15 +549,16 @@ function ItemHistoryLookupPage() {
                                 ) : (<p style={{ textAlign: 'center' }}>Tidak ada data.</p>)}
                                 {isLoadingMore && (<p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>)}
                             </div>
-                            {/* --- PERBAIKAN 8: Tambahkan Kartu Total untuk Mobile --- */}
-                            {!loading && !isLoadingMore && items.length > 0 && (
-                                <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-                                    <span className="subtotal-label">Total Aset</span>
-                                    <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
-                                        {pagination.total} Data
-                                    </span>
-                                </div>
-                            )}
+                            <div className='job-list-mobile'>
+                                {!loading && !isLoadingMore && items.length > 0 && (
+                                    <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+                                        <span className="subtotal-label" style={{ fontSize: '13px', fontWeight: 'bold' }}>Total Aset</span>
+                                        <span className="subtotal-value value-acquisition" style={{ fontSize: '13px', fontWeight: 'bold' }}>
+                                            {pagination.total} Data
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -631,6 +631,7 @@ function ItemHistoryLookupPage() {
                                                         <span className="info-label">Lokasi</span>
                                                         <span className="info-value-info">{log.workshop.name}</span>
                                                     </div>
+
                                                 )}
                                                 {log.deskripsi && (
                                                     <div className="info-row full-width">
@@ -645,19 +646,19 @@ function ItemHistoryLookupPage() {
                                     <p style={{ textAlign: 'center', padding: '2rem' }}>Tidak ada riwayat ditemukan untuk filter ini.</p>
                                 )}
                             </div>
+
                             {!historyLoading && historyData.length > 0 && (
-                                <div className="subtotal-card-mobile acquisition-subtotal" style={{ margin: '0.5rem', borderTop: '1px solid #4A5568', borderRadius: '0' }}>
-                                    <span className="subtotal-label">Total Riwayat (filter ini)</span>
-                                    <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', borderTop: '1px solid #4A5568', borderRadius: '12px' }}>
+                                    <span className="subtotal-label" style={{ fontSize: '13px', fontWeight: 'bold' }}>Total Riwayat (Barang ini)</span>
+                                    <span className="subtotal-value value-acquisition" style={{ fontSize: '13px', fontWeight: 'bold' }}>
                                         {historyData.length} Data
                                     </span>
                                 </div>
                             )}
                         </div>
                     )}
-                </div>
-            </div>
-
+                </motion.div>
+            </motion.div>
             <QrScannerModal
                 show={isScannerOpen}
                 onClose={() => setIsScannerOpen(false)}
@@ -675,7 +676,7 @@ function ItemHistoryLookupPage() {
                     closeHistoryPanel();
                 }}
             />
-        </>
+        </motion.div>
     );
 }
 

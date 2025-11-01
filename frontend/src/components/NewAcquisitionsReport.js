@@ -1,6 +1,26 @@
 import React, { useState } from 'react';
 import { useFinancialReport } from './useFinancialReport';
 import AcquisitionDetailModal from './AcquisitionDetailModal';
+import { motion } from 'framer-motion';
+
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            when: "beforeChildren",
+            staggerChildren: 0.1,
+        },
+    },
+};
+const staggerItem = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.4, ease: "easeOut" }
+    },
+};
 
 export default function NewAcquisitionsReport() {
     const {
@@ -40,11 +60,16 @@ export default function NewAcquisitionsReport() {
     };
 
     return (
-        <div className="user-management-container">
-            <div className="report-header-controls">
+        <motion.div
+            className="user-management-container"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+        >
+            <motion.div variants={staggerItem} className="report-header-controls">
                 <h1 className="page-title">Laporan Pembelian Baru (Aset Masuk)</h1>
-            </div>
-            <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+            </motion.div>
+            <motion.div variants={staggerItem} className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
                 <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
                     <option value="month">Filter per Bulan</option>
                     <option value="date_range">Filter per Tanggal</option>
@@ -68,8 +93,8 @@ export default function NewAcquisitionsReport() {
                         <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
                     </>
                 )}
-            </div>
-            <div className="download-buttons">
+            </motion.div>
+            <motion.div variants={staggerItem} className="download-buttons">
                 <button onClick={() => handleExportWrapper('excel')} disabled={exportingExcel} className="btn-download excel">
                     <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
                     {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
@@ -78,9 +103,9 @@ export default function NewAcquisitionsReport() {
                     <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
                     {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
                 </button>
-            </div>
+            </motion.div>
             {/* Tabel Pembelian Baru */}
-            <div className="job-list-container">
+            <motion.div variants={staggerItem} className="job-list-container">
                 {/* Desktop View */}
                 <div className="table-scroll-container">
                     <table className="job-table">
@@ -176,14 +201,14 @@ export default function NewAcquisitionsReport() {
                         </div>
                     )}
                 </div>
-                <div className='job-list-mobile'>
+                <motion.div variants={staggerItem} className='job-list-mobile'>
                     <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
                         <span className="subtotal-label" style={{ fontSize: '13px', fontWeight: 'bold' }}>Subtotal Pembelian</span>
                         <span className="subtotal-value value-acquisition" style={{ fontSize: '13px', fontWeight: 'bold' }}>
                             {formatCurrency(newAcquisitionsSubtotal)}
                         </span>
                     </div>
-                </div>
+                </motion.div>
                 <AcquisitionDetailModal
                     show={Boolean(selectedItem)}
                     item={selectedItem}
@@ -191,7 +216,7 @@ export default function NewAcquisitionsReport() {
                     formatCurrency={formatCurrency}
                     formatDate={formatDate}
                 />
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     );
 }

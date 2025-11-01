@@ -1,11 +1,32 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, Legend } from 'recharts';
 import { useFinancialReport } from '../components/useFinancialReport';
 
 // ================================================================
 // Komponen UI
 // ================================================================
+
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            when: "beforeChildren",
+            staggerChildren: 0.1,
+        },
+    },
+};
+const staggerItem = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.4, ease: "easeOut" }
+    },
+};
+
 const NavigationCard = ({ title, description, linkTo, icon }) => (
     <Link to={linkTo} className="nav-card-report">
         <div className="nav-card-report-icon">
@@ -63,19 +84,24 @@ export default function FinancialReportPage() {
     const tooltipFormatter = (value) => `${formatCurrency(value)}`;
 
     return (
-        <div className="user-management-container">
-            <h1>Laporan Keuangan Inventaris</h1>
+        <motion.div
+            className="user-management-container"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+        >
+            <motion.h1 variants={staggerItem}>Laporan Keuangan Inventaris</motion.h1>
 
             {/* 4. HUBUNGKAN KARTU KPI DENGAN DATA ASLI */}
-            <div className="info-cards-grid">
+            <motion.div variants={staggerItem} className="info-cards-grid">
                 <KpiCard title="Total Nilai Aset" value={isLoading ? '...' : formatCurrency(summaryData.total_asset_value)} iconClass="fas fa-landmark" colorClass="blue-card" />
                 <KpiCard title="Nilai Aset Bersih (Net)" value={isLoading ? '...' : formatCurrency(summaryData.net_asset_value)} iconClass="fas fa-shield-alt" colorClass="green-card" />
                 <KpiCard title="Pembelian (30 Hari Terakhir)" value={isLoading ? '...' : formatCurrency(summaryData.new_asset_value_30_days)} iconClass="fas fa-cart-plus" colorClass="yellow-card" />
                 <KpiCard title="Kerugian (Periode)" value={isLoading ? '...' : formatCurrency(summaryData.problematic_asset_value)} iconClass="fas fa-exclamation-triangle" colorClass="red-card" />
-            </div>
+            </motion.div>
 
             {/* 5. HUBUNGKAN CHART DENGAN DATA ASLI */}
-            <div className="dashboard-container-financial">
+            <motion.div variants={staggerItem} className="dashboard-container-financial">
                 <div className="dashboard-row-financial">
                     <div className="nilai-card kategori-card">
                         <h4>Top 10 Kategori Berdasarkan Nilai Aset</h4>
@@ -122,16 +148,16 @@ export default function FinancialReportPage() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Navigation Section (tidak berubah) */}
-            <div className="navigation-section" style={{ marginTop: '25px' }}>
-                <h1>Lihat Laporan Detail</h1>
+            <motion.div variants={staggerItem} className="navigation-section" style={{ marginTop: '25px' }}>
+                <motion.h1 variants={staggerItem}>Lihat Laporan Detail</motion.h1>
                 <div className="report-navigation-cards">
                     <NavigationCard title="Pembelian Baru (Aset Masuk)" description="Lihat semua data aset yang baru dibeli berdasarkan periode." linkTo="/admin/financial-report/new-acquisitions" icon="fa-dolly-flatbed" />
                     <NavigationCard title="Potensi Kerugian (Aset Rusak/Hilang)" description="Lacak semua aset yang berstatus rusak atau hilang." linkTo="/admin/financial-report/problematic-assets" icon="fa-heart-broken" />
                 </div>
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     );
 }

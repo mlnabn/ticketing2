@@ -1,8 +1,27 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-// Import InventoryLineChart tidak diperlukan lagi
-// import InventoryLineChart from '../components/InventoryLineChart';
+import { motion } from 'framer-motion';
+
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            when: "beforeChildren",
+            staggerChildren: 0.1,
+        },
+    },
+};
+const staggerItem = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.4, ease: "easeOut" }
+    },
+};
+
 
 const NavigationCard = ({ title, description, linkTo, icon }) => (
     <Link to={linkTo} className="nav-card-report">
@@ -55,11 +74,16 @@ export default function InventoryReportPage() {
     const availableYears = dashboardData?.availableYears || [selectedYear];
 
     return (
-        <div className="user-management-container">
-            <h1>Laporan Inventaris</h1>
+        <motion.div
+            className="user-management-container"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+        >
+            <motion.h1 variants={staggerItem}>Laporan Inventaris</motion.h1>
 
             {/* Kartu Statistik */}
-            <div className="info-cards-grid">
+            <motion.div variants={staggerItem} className="info-cards-grid">
                 <div className="info-card blue-card">
                     <div className="card-header">
                         <p className="card-label">Total Unit Barang</p>
@@ -91,8 +115,8 @@ export default function InventoryReportPage() {
                     </div>
                     <h3 className="card-value">{stats.barang_keluar}</h3>
                 </div>
-            </div>
-            <div className="dashboard-card most-active-widget" style={{ marginTop: '2rem' }}>
+            </motion.div>
+            <motion.div variants={staggerItem} className="dashboard-card most-active-widget" style={{ marginTop: '2rem' }}>
                 {/* BARU: Filter tahun dipindahkan ke sini */}
                 <div className="chart-header">
                     <h4>5 Barang Paling Sering Keluar</h4>
@@ -121,9 +145,9 @@ export default function InventoryReportPage() {
                         <p style={{ textAlign: 'center', padding: '1rem' }}>Belum ada data barang keluar tahun ini.</p>
                     )}
                 </ul>
-            </div>
+            </motion.div>
 
-            <div className="report-navigation-cards">
+            <motion.div variants={staggerItem} className="report-navigation-cards">
                 <NavigationCard
                     title="Laporan Barang Masuk"
                     description="Lacak semua barang yang kembali."
@@ -160,7 +184,7 @@ export default function InventoryReportPage() {
                     linkTo="/admin/inventory-reports/history"
                     icon="fa-history"
                 />
-            </div>
-        </div>
+            </motion.div>
+        </motion.div> 
     );
 }

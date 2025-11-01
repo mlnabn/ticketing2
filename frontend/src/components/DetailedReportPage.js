@@ -3,6 +3,26 @@ import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import { saveAs } from 'file-saver';
 import InventoryDetailModal from './InventoryDetailModal';
+import { motion } from 'framer-motion';
+
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            when: "beforeChildren",
+            staggerChildren: 0.1,
+        },
+    },
+};
+const staggerItem = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.4, ease: "easeOut" }
+    },
+};
 
 const months = [
     { value: 1, name: 'Januari' }, { value: 2, name: 'Februari' }, { value: 3, name: 'Maret' },
@@ -186,7 +206,7 @@ export default function DetailedReportPage({ type, title }) {
 
         else if (type === 'accountability') {
             let responsibleUser = '-';
-            let eventDate = item.updated_at; // Default ke tanggal update terakhir
+            let eventDate = item.updated_at;
             const currentStatus = item.status_detail?.nama_status || 'N/A';
 
             if (currentStatus === 'Rusak' && item.user_perusak) {
@@ -204,12 +224,11 @@ export default function DetailedReportPage({ type, title }) {
                 kode_unik: item.kode_unik,
                 serial_number: item.serial_number || '-',
                 nama_barang: item.master_barang?.nama_barang || 'N/A',
-                // Kolom 'status' sekarang adalah status SAAT INI
                 status: currentStatus,
-                tanggal: eventDate, // Tanggal relevan dengan status
+                tanggal: eventDate,
                 penanggung_jawab: responsibleUser,
-                workshop: item.workshop?.name || '-', // Mungkin relevan jika rusak/hilang saat dipinjam
-                current_status: currentStatus, // Sama dengan 'status'
+                workshop: item.workshop?.name || '-',
+                current_status: currentStatus,
             };
         }
 
@@ -259,23 +278,14 @@ export default function DetailedReportPage({ type, title }) {
     // const showWorkshop = type === 'out' || type === 'accountability';
     // const showCurrentStatus = type === 'out' || type === 'accountability';
     // const showStatusDari = type === 'in' || type === 'out' || type === 'accountability' || type === 'item_history';
-
-    // Status Dari hanya untuk history
     const showStatusDari = type === 'in' || type === 'out' || type === 'item_history';
-    // Status Kejadian hanya untuk history
     const showStatusKejadian = type === 'in' || type === 'out' || type === 'item_history';
     // Penanggung Jawab Kejadian hanya untuk history
     const showPJKejadian = type === 'in' || type === 'out' || type === 'item_history';
-
-    // Status Saat Ini & Penanggung Jawab Status hanya untuk list barang (bukan history)
     const showCurrentStatus = type === 'available' || type === 'active_loans' || type === 'accountability' || type === 'all_stock';
     const showPJStatus = type === 'available' || type === 'active_loans' || type === 'accountability' || type === 'all_stock';
-
-    // Workshop relevan untuk peminjaman dan history keluar/accountability
     const showWorkshop = type === 'out' || type === 'accountability' || type === 'active_loans';
-
     // const totalColSpan = 6 + (showWorkshop ? 1 : 0) + (showCurrentStatus ? 1 : 0) + (showStatusDari ? 1 : 0);
-
     const totalColSpan = 3
         + (showStatusDari ? 1 : 0)
         + (showStatusKejadian ? 1 : 0)
@@ -317,12 +327,17 @@ export default function DetailedReportPage({ type, title }) {
     };
 
     return (
-        <div className="user-management-container">
-            <div className="user-management-header-report">
+        <motion.div
+            className="user-management-container"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+        >
+            <motion.div variants={staggerItem} className="user-management-header-report">
                 <h1>{title}</h1>
-            </div>
+            </motion.div>
 
-            <div className="filters-container report-filters">
+            <motion.div variants={staggerItem} className="filters-container report-filters">
                 <input
                     type="text"
                     placeholder="Cari Kode Unik / Nama Barang..."
@@ -331,8 +346,8 @@ export default function DetailedReportPage({ type, title }) {
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
 
-            </div>
-            <div className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+            </motion.div>
+            <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
                 <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
                     <option value="month">Filter per Bulan</option>
                     <option value="date_range">Filter per Tanggal</option>
@@ -356,8 +371,8 @@ export default function DetailedReportPage({ type, title }) {
                         <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
                     </>
                 )}
-            </div>
-            <div className="download-buttons">
+            </motion.div>
+            <motion.div variants={staggerItem} className="download-buttons">
                 <button onClick={() => handleExport('excel')} disabled={exportingExcel} className="btn-download excel">
                     <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
                     {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
@@ -366,9 +381,9 @@ export default function DetailedReportPage({ type, title }) {
                     <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
                     {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
                 </button>
-            </div>
+            </motion.div>
 
-            <div className="job-list-container">
+            <motion.div variants={staggerItem} className="job-list-container">
                 {/*Desktop view*/}
                 <div className="table-scroll-container">
                     <table className="job-table">
@@ -529,7 +544,7 @@ export default function DetailedReportPage({ type, title }) {
                         </div>
                     </div>
                 )}
-            </div>
+            </motion.div>
 
             <InventoryDetailModal
                 show={Boolean(selectedItem)}
@@ -538,6 +553,6 @@ export default function DetailedReportPage({ type, title }) {
                 formatDate={formatDate}
                 formatCurrency={formatCurrency}
             />
-        </div>
+        </motion.div>
     );
 }
