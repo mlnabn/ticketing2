@@ -260,6 +260,6 @@ export default function WorkshopManagement() {
         onConfirm={confirmDelete}
         onCancel={() => setShowConfirmModal(false)}
       />
-    </div>
+    </motion.div>
   );
 }
