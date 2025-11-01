@@ -75,6 +75,14 @@ export default function WelcomeHome() {
     navigate(`/admin/tickets?${queryParams}`);
   };
 
+  const handleBarOrLegendClick = (data) => {
+    const filters = { status: data.status };
+    if (data.id) {
+      filters.adminId = data.id;
+    }
+    handleChartFilter(filters);
+  };
+
   return (
     <motion.div
       variants={staggerContainer}
@@ -88,36 +96,36 @@ export default function WelcomeHome() {
 
       {/* Kartu Statistik */}
       <motion.div variants={staggerItem}>
-      <div className="info-cards-grid">
-        <div className="info-card red-card" onClick={() => handleCardClick('Belum Selesai')}>
-          <div className="card-header">
-            <p className="card-label">Tiket Belum Selesai</p>
-            <div className="card-icon red-icon"><i className="fas fa-exclamation-triangle"></i></div>
+        <div className="info-cards-grid">
+          <div className="info-card red-card" onClick={() => handleCardClick('Belum Selesai')}>
+            <div className="card-header">
+              <p className="card-label">Tiket Belum Selesai</p>
+              <div className="card-icon red-icon"><i className="fas fa-exclamation-triangle"></i></div>
+            </div>
+            <h3 className="card-value">{stats ? stats.pending_tickets : '...'}</h3>
           </div>
-          <h3 className="card-value">{stats ? stats.pending_tickets : '...'}</h3>
-        </div>
-        <div className="info-card green-card" onClick={() => handleCardClick('Selesai')}>
-          <div className="card-header">
-            <p className="card-label">Tiket Selesai</p>
-            <div className="card-icon green-icon"><i className="fas fa-check-circle"></i></div>
+          <div className="info-card green-card" onClick={() => handleCardClick('Selesai')}>
+            <div className="card-header">
+              <p className="card-label">Tiket Selesai</p>
+              <div className="card-icon green-icon"><i className="fas fa-check-circle"></i></div>
+            </div>
+            <h3 className="card-value">{stats ? stats.completed_tickets : '...'}</h3>
           </div>
-          <h3 className="card-value">{stats ? stats.completed_tickets : '...'}</h3>
-        </div>
-        <div className="info-card yellow-card" onClick={() => navigate('/admin/tickets')}>
-          <div className="card-header">
-            <p className="card-label">Total Tiket</p>
-            <div className="card-icon yellow-icon"><i className="fas fa-tasks"></i></div>
+          <div className="info-card yellow-card" onClick={() => navigate('/admin/tickets')}>
+            <div className="card-header">
+              <p className="card-label">Total Tiket</p>
+              <div className="card-icon yellow-icon"><i className="fas fa-tasks"></i></div>
+            </div>
+            <h3 className="card-value">{stats ? stats.total_tickets : '...'}</h3>
           </div>
-          <h3 className="card-value">{stats ? stats.total_tickets : '...'}</h3>
-        </div>
-        <div className="info-card blue-card" onClick={() => navigate('/admin/users')}>
-          <div className="card-header">
-            <p className="card-label">Total Pengguna</p>
-            <div className="card-icon blue-icon"><i className="fas fa-users"></i></div>
+          <div className="info-card blue-card" onClick={() => navigate('/admin/users')}>
+            <div className="card-header">
+              <p className="card-label">Total Pengguna</p>
+              <div className="card-icon blue-icon"><i className="fas fa-users"></i></div>
+            </div>
+            <h3 className="card-value">{stats ? stats.total_users : '...'}</h3>
           </div>
-          <h3 className="card-value">{stats ? stats.total_users : '...'}</h3>
         </div>
-      </div>
       </motion.div>
 
       {/* Kontainer Chart */}
@@ -136,7 +144,7 @@ export default function WelcomeHome() {
         <motion.div variants={staggerItem} className="dashboard-row">
           <div className="dashboard-card bar-chart-card">
             <h4>Performa Admin</h4>
-            <BarChartComponent data={adminPerformanceData} onBarClick={(admin) => handleChartFilter({ status: admin.status, adminId: admin.id })} />
+            <BarChartComponent data={adminPerformanceData} onBarClick={handleBarOrLegendClick} />
           </div>
           <div className="dashboard-card map-chart-card">
             <h4>Geografi Traffic</h4>
