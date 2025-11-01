@@ -1630,6 +1630,12 @@ body.dark-mode .hamburger-menu-button:hover {
   background-color: var(--content-bg-light);
   transition: background-color 0.3s ease;
   width: 100%;
+  min-height: 0;
+}
+
+.page-transition-wrapper {
+  height: 100%;
+  width: 100%;
 }
 
 body.dark-mode .content-area {
@@ -6693,13 +6699,9 @@ body.dark-mode .welcome-title {
   width: 100%;
   max-width: 100%;
   margin-left: 0;
-  /* Hapus margin kiri */
   margin-right: 0;
-  /* Hapus margin kanan */
   padding-left: 0;
-  /* Hapus padding kiri jika ada */
   padding-right: 0;
-  /* Hapus padding kanan jika ada */
   box-sizing: border-box;
 }
 

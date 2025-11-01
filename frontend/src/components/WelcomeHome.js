@@ -4,16 +4,37 @@ import { useAuth } from '../AuthContext';
 import { useOutletContext } from 'react-router-dom';
 import api from '../services/api';
 
+import { motion } from 'framer-motion';
+
 import LineChartComponent from './LineChartComponent';
 import PieChartComponent from './PieChartComponent';
 import BarChartComponent from './BarChartComponent';
 import MapComponent from './MapComponent';
 import CalendarComponent from './CalendarComponent';
 
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      when: "beforeChildren",
+      staggerChildren: 0.1, // Jeda antar blok
+    },
+  },
+};
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" }
+  },
+};
+
 export default function WelcomeHome() {
   const { logout } = useAuth();
   const { showToast } = useOutletContext();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const [stats, setStats] = useState(null);
   const [analyticsData, setAnalyticsData] = useState([]);
@@ -55,13 +76,18 @@ export default function WelcomeHome() {
   };
 
   return (
-    <>
+    <motion.div
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+    >
       {/* <div className="welcome-header">
         <h1>Selamat Datang, {user?.name || 'Admin'}!</h1>
         <p>Berikut adalah ringkasan aktivitas sistem saat ini.</p>
       </div> */}
 
       {/* Kartu Statistik */}
+      <motion.div variants={staggerItem}>
       <div className="info-cards-grid">
         <div className="info-card red-card" onClick={() => handleCardClick('Belum Selesai')}>
           <div className="card-header">
@@ -92,10 +118,11 @@ export default function WelcomeHome() {
           <h3 className="card-value">{stats ? stats.total_users : '...'}</h3>
         </div>
       </div>
+      </motion.div>
 
       {/* Kontainer Chart */}
       <div className="dashboard-container2">
-        <div className="dashboard-row">
+        <motion.div variants={staggerItem} className="dashboard-row">
           <div className="dashboard-card line-chart-card">
             <h4>Tren Tiket (30 Hari Terakhir)</h4>
             <LineChartComponent data={analyticsData} onPointClick={(status, date) => handleChartFilter({ status, date })} onLegendClick={(status) => handleChartFilter({ status })} />
@@ -104,8 +131,9 @@ export default function WelcomeHome() {
             <h4>Status Tiket</h4>
             <PieChartComponent stats={stats} handleStatusFilterClick={(status) => handleChartFilter({ status })} />
           </div>
-        </div>
-        <div className="dashboard-row">
+        </motion.div>
+
+        <motion.div variants={staggerItem} className="dashboard-row">
           <div className="dashboard-card bar-chart-card">
             <h4>Performa Admin</h4>
             <BarChartComponent data={adminPerformanceData} onBarClick={(admin) => handleChartFilter({ status: admin.status, adminId: admin.id })} />
@@ -114,14 +142,14 @@ export default function WelcomeHome() {
             <h4>Geografi Traffic</h4>
             <MapComponent data={locationsData} />
           </div>
-        </div>
-        
-          <div className="dashboard-card calendar-card">
-            <h4>Kalender Tiket</h4>
-            <CalendarComponent tickets={allTickets} onTicketClick={(ticketId) => handleChartFilter({ ticketId })} />
-          
-        </div>
+        </motion.div>
+
+        <motion.div variants={staggerItem} className="dashboard-card calendar-card">
+          <h4>Kalender Tiket</h4>
+          <CalendarComponent tickets={allTickets} onTicketClick={(ticketId) => handleChartFilter({ ticketId })} />
+        </motion.div>
+
       </div>
-    </>
+    </motion.div>
   );
 }

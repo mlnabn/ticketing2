@@ -2,6 +2,26 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import ReportLineChart from './ReportLineChart';
+import { motion } from 'framer-motion';
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      when: "beforeChildren",
+      staggerChildren: 0.1,
+    },
+  },
+};
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" }
+  },
+};
 
 const generateYearOptions = () => {
   const currentYear = new Date().getFullYear();
@@ -65,8 +85,12 @@ export default function TicketReportAdminList() {
   const filterQueryString = `?year=${selectedYear}${selectedMonth ? `&month=${selectedMonth}` : ''}`;
 
   return (
-    <>
-      <div className="dashboard-card" style={{ marginBottom: '2rem' }}>
+    <motion.div
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div variants={staggerItem} className="dashboard-card" style={{ marginBottom: '2rem' }}>
         <div className="report-header">
           <h2>Laporan Tiket</h2>
           <div className="report-filters">
@@ -82,17 +106,20 @@ export default function TicketReportAdminList() {
           </div>
         </div>
         {loadingChart ? <p>Memuat data chart...</p> : <ReportLineChart data={chartData} />}
-      </div>
-      <div className="report-navigation-cards">
+      </motion.div>
+
+      <motion.div variants={staggerItem} className="report-navigation-cards">
         <Link to={`/admin/reports/all${filterQueryString}`} className="nav-card">
           <h3>Laporan Seluruh Tiket</h3><p>Lihat semua tiket sesuai filter di atas.</p>
         </Link>
         <Link to={`/admin/reports/handled${filterQueryString}`} className="nav-card">
           <h3>Laporan Tiket yang Dikerjakan</h3><p>Hanya tiket yang ditangani admin (sesuai filter).</p>
         </Link>
-      </div>
-      <hr className="report-divider" />
-      <div className="adminselect-card" style={{ marginBottom: '2rem' }}>
+      </motion.div>
+
+      <motion.hr variants={staggerItem} className="report-divider" />
+
+      <motion.div variants={staggerItem} className="adminselect-card" style={{ marginBottom: '2rem' }}>
         <h1 className="page-title">Pilih Admin Untuk Laporan Detail</h1>
         {loadingAdmins ? <p>Memuat data admin...</p> : (
           <div className="admin-list-grid">
@@ -107,7 +134,7 @@ export default function TicketReportAdminList() {
             ))}
           </div>
         )}
-      </div>
-    </>
+      </motion.div>
+    </motion.div> // 
   );
 }

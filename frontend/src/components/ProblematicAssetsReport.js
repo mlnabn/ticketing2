@@ -1,6 +1,28 @@
 import React, { useState } from 'react';
 import { useFinancialReport } from './useFinancialReport';
 import ProblematicAssetModal from './ProblematicAssetModal';
+// BARU: Impor motion
+import { motion } from 'framer-motion';
+
+// BARU: Tambahkan konstanta animasi
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            when: "beforeChildren",
+            staggerChildren: 0.1,
+        },
+    },
+};
+const staggerItem = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.4, ease: "easeOut" }
+    },
+};
 
 export default function ProblematicAssetsReport() {
     const {
@@ -43,11 +65,20 @@ export default function ProblematicAssetsReport() {
     };
 
     return (
-        <div className="user-management-container">
-            <div className="report-header-controls">
+        // UBAH: div menjadi motion.div
+        <motion.div
+            className="user-management-container"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+        >
+            {/* UBAH: Bungkus dengan motion.div */}
+            <motion.div variants={staggerItem} className="report-header-controls">
                 <h1 className="page-title">Laporan Potensi Kerugian (Aset Rusak/Hilang)</h1>
-            </div>
-            <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+            </motion.div>
+
+            {/* UBAH: Bungkus dengan motion.div */}
+            <motion.div variants={staggerItem} className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
                 <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
                     <option value="month">Filter per Bulan</option>
                     <option value="date_range">Filter per Tanggal</option>
@@ -71,9 +102,10 @@ export default function ProblematicAssetsReport() {
                         <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
                     </>
                 )}
-            </div>
+            </motion.div>
 
-            <div className="download-buttons">
+            {/* UBAH: Bungkus dengan motion.div */}
+            <motion.div variants={staggerItem} className="download-buttons">
                 <button onClick={() => handleExportWrapper('excel')} disabled={exportingExcel} className="btn-download excel">
                     <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
                     {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
@@ -82,8 +114,10 @@ export default function ProblematicAssetsReport() {
                     <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
                     {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
                 </button>
-            </div>
-            <div className="job-list-container">
+            </motion.div>
+
+            {/* UBAH: Bungkus dengan motion.div */}
+            <motion.div variants={staggerItem} className="job-list-container">
                 {/* Desktop View */}
                 <div className="table-scroll-container">
                     <table className="job-table">
@@ -217,7 +251,9 @@ export default function ProblematicAssetsReport() {
                         </span>
                     </div>
                 </div>
-            </div>
+            </motion.div>
+
+            {/* Modal tidak dianimasikan sebagai bagian dari stagger */}
             {selectedItem && (
                 <ProblematicAssetModal
                     item={selectedItem}
@@ -226,6 +262,6 @@ export default function ProblematicAssetsReport() {
                     formatDate={formatDate}
                 />
             )}
-        </div>
+        </motion.div>
     );
 }

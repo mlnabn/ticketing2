@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import TicketDetailModal from './TicketDetailModal';
 import { saveAs } from 'file-saver';
+import { motion } from 'framer-motion';
 
 const formatDate = (dateString) => {
   if (!dateString) return '-';
@@ -33,6 +34,25 @@ const months = [
   { value: '9', label: 'September' }, { value: '10', label: 'Oktober' },
   { value: '11', label: 'November' }, { value: '12', label: 'Desember' },
 ];
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      when: "beforeChildren",
+      staggerChildren: 0.1,
+    },
+  },
+};
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" }
+  },
+};
 
 export default function TicketReportDetail() {
   const { adminId } = useParams();
@@ -243,21 +263,27 @@ export default function TicketReportDetail() {
   const ticketsOnPage = (reportData && reportData.tickets) ? reportData.tickets.data : [];
 
   return (
-    <div className="user-management-container">
-      <h2>Laporan Penyelesaian - {admin.name}</h2>
+    // Ganti <div> dengan motion.div
+    <motion.div
+      className="user-management-container"
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.h2 variants={staggerItem}>Laporan Penyelesaian - {admin.name}</motion.h2>
 
-      {!reportData ? <p>Memuat data statistik...</p> : (
+      {!reportData ? <motion.p variants={staggerItem}>Memuat data statistik...</motion.p> : (
         <>
-          <div className="summary-cards">
+          <motion.div variants={staggerItem} className="summary-cards">
             <div className={`card ${filter === 'all' ? 'active' : ''}`} onClick={() => handleFilterClick('all')}><h3>Total Tiket</h3><p>{total}</p></div>
             <div className={`card ${filter === 'completed' ? 'active' : ''}`} onClick={() => handleFilterClick('completed')}><h3>Tiket Selesai</h3><p>{completed}</p></div>
             <div className={`card ${filter === 'in_progress' ? 'active' : ''}`} onClick={() => handleFilterClick('in_progress')}><h3>Tiket Belum Selesai</h3><p>{in_progress}</p></div>
             <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterClick('rejected')}><h3>Tiket Ditolak</h3><p>{rejected}</p></div>
-          </div>
+          </motion.div>
 
-          <h3>Filter Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</h3>
+          <motion.h3 variants={staggerItem}>Filter Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</motion.h3>
 
-          <div className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+          <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
             <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
               <option value="month">Filter per Bulan</option>
               <option value="date_range">Filter per Tanggal</option>
@@ -310,8 +336,8 @@ export default function TicketReportDetail() {
                 />
               </>
             )}
-          </div>
-          <div className="download-buttons">
+          </motion.div>
+          <motion.div variants={staggerItem} className="download-buttons">
             <button className="btn-download pdf" onClick={() => handleDownload('pdf')} disabled={exportingPdf}>
               <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
               {exportingPdf ? 'Mengekspor...' : 'Download PDF'}
@@ -320,10 +346,10 @@ export default function TicketReportDetail() {
               <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
               {exportingExcel ? 'Mengekspor...' : 'Download Excel'}
             </button>
-          </div>
+          </motion.div>
 
           {/* --- Desktop Table --- */}
-          <div className="job-list-container">
+          <motion.div variants={staggerItem} className="job-list-container">
             {(loading && !reportData.tickets) ? <p>Memuat tabel...</p> : (
               <div className="table-scroll-container">
                 <table className="job-table">
@@ -388,10 +414,11 @@ export default function TicketReportDetail() {
 
               </div>
             )}
-          </div>
+          </motion.div>
 
           {/* --- Mobile Card View --- */}
-          <div
+          <motion.div
+            variants={staggerItem}
             className="job-list-mobile"
             ref={mobileListRef}
             onScroll={handleScroll}
@@ -464,9 +491,9 @@ export default function TicketReportDetail() {
             {isLoadingMore && (
               <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
             )}
-          </div>
+          </motion.div>
           {!loading && !isLoadingMore && ticketsOnPage.length > 0 && reportData && reportData.tickets && (
-            <div className='job-list-mobile'>
+            <motion.div variants={staggerItem} className='job-list-mobile'>
 
               <div className="subtotal-card-mobile acquisition-subtotal"
                 style={{ marginTop: '1rem', marginBottom: '1rem' }}
@@ -481,7 +508,7 @@ export default function TicketReportDetail() {
                 </span>
               </div>
 
-            </div>
+            </motion.div>
           )}
         </>
       )}
@@ -491,6 +518,6 @@ export default function TicketReportDetail() {
           onClose={() => setSelectedTicketForDetail(null)}
         />
       )}
-    </div>
+    </motion.div>
   );
 }

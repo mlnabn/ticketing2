@@ -9,6 +9,39 @@ import AddStockModal from './AddStockModal';
 import QrScannerModal from './QrScannerModal';
 import { createPortal } from 'react-dom';
 import QrPrintSheet from './QrPrintSheet';
+import { motion, AnimatePresence } from 'framer-motion'; 
+
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            when: "beforeChildren",
+            staggerChildren: 0.1,
+        },
+    },
+};
+const staggerItem = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.4, ease: "easeOut" }
+    },
+};
+const expandVariants = {
+    hidden: {
+        opacity: 0,
+        height: 0,
+        transition: { duration: 0.3, ease: "easeInOut" }
+    },
+    visible: {
+        opacity: 1,
+        height: "auto",
+        transition: { duration: 0.3, ease: "easeInOut" }
+    }
+};
+
 
 function StokBarangView() {
     const { showToast } = useOutletContext();
@@ -407,386 +440,426 @@ function StokBarangView() {
 
     return (
         <>
-            <div className="user-management-container" style={{ marginBottom: '20px' }}>
-                <h1>Daftar Stok Barang</h1>
-                <div className="action-buttons-stok">
-                    <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>
-                        <i className="fas fa-plus" style={{ marginRight: '8px' }}>
-                        </i>Tambah Stok
-                    </button>
+            <motion.div
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+            >
 
-                    <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
-                        <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
-                            <i className="fas fa-qrcode fa-stack-2x"></i>
-                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
-                        </span>
-                        Scan QR
-                    </button>
-                    <button
-                        className="btn-primary-outline"
-                        onClick={handlePreparePrint}
-                        disabled={selectedItems.size === 0}
-                    >
-                        <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
-                        Print QR ({selectedItems.size})
-                    </button>
-                    {selectedItems.size > 0 && (
-                        <button
-                            className="btn-soft-grey"
-                            onClick={handleClearSelection}
-                            title="Hilangkan semua pilihan"
-                        >
-                            <i className="fas fa-times"></i>
+                <motion.div
+                    variants={staggerItem}
+                    className="user-management-container"
+                    style={{ marginBottom: '20px' }}
+                >
+                    <h1>Daftar Stok Barang</h1>
+                    <div className="action-buttons-stok">
+                        <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>
+                            <i className="fas fa-plus" style={{ marginRight: '8px' }}>
+                            </i>Tambah Stok
                         </button>
-                    )}
-                </div>
-            </div>
 
-            {/* Filter Section */}
-            <div className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                <select value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)} className="filter-select">
-                    <option value="ALL">Semua Status</option>
-                    {tersediaStatusId && (
-                        <option value={tersediaStatusId}>Tersedia</option>
-                    )}
-                    {statusOptions
-                        .filter(status => status.id !== tersediaStatusId)
-                        .map(status => (
-                            <option key={status.id} value={status.id}>{status.nama_status}</option>
-                        ))}
-                </select>
-                <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)} className="filter-select">
-                    <option value="">Semua Kategori</option>
-                    {categories.map(cat => (<option key={cat.id_kategori} value={cat.id_kategori}>{cat.nama_kategori}</option>))}
-                </select>
-                <select value={selectedSubCategory} onChange={e => setSelectedSubCategory(e.target.value)} disabled={!selectedCategory || subCategories.length === 0} className="filter-select">
-                    <option value="">Semua Sub-Kategori</option>
-                    {subCategories.map(sub => (<option key={sub.id_sub_kategori} value={sub.id_sub_kategori}>{sub.nama_sub}</option>))}
-                </select>
-                <select value={selectedColor} onChange={e => setSelectedColor(e.target.value)} className="filter-select">
-                    <option value="">Semua Warna</option>
-                    {colorOptions.map(color => (<option key={color.id_warna} value={color.id_warna}>{color.nama_warna}</option>))}
-                </select>
-            </div>
+                        <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
+                            <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
+                                <i className="fas fa-qrcode fa-stack-2x"></i>
+                                <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
+                            </span>
+                            Scan QR
+                        </button>
+                        <button
+                            className="btn-primary-outline"
+                            onClick={handlePreparePrint}
+                            disabled={selectedItems.size === 0}
+                        >
+                            <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
+                            Print QR ({selectedItems.size})
+                        </button>
+                        {selectedItems.size > 0 && (
+                            <button
+                                className="btn-soft-grey"
+                                onClick={handleClearSelection}
+                                title="Hilangkan semua pilihan"
+                            >
+                                <i className="fas fa-times"></i>
+                            </button>
+                        )}
+                    </div>
+                </motion.div>
 
-            <input
-                type="text"
-                placeholder="Cari Kode SKU / Nama Barang..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="filter-search-input"
-            />
-            <div className="job-list-container">
-                {/* Tampilan Tabel Desktop */}
-                <div className="table-scroll-container">
-                    <table className="job-table">
-                        <thead>
-                            <tr>
-                                <th>Kode SKU</th>
-                                <th>Nama Barang</th>
-                                <th>Kategori</th>
-                                <th>Sub-Kategori</th>
-                                <th>Stok Tersedia</th>
-                                <th>Total Unit</th>
-                                <th>Ditambahkan Oleh</th>
-                            </tr>
-                        </thead>
-                    </table>
+                <motion.div
+                    variants={staggerItem}
+                    className="filters-container"
+                    style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}
+                >
+                    <select value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)} className="filter-select">
+                        <option value="ALL">Semua Status</option>
+                        {tersediaStatusId && (
+                            <option value={tersediaStatusId}>Tersedia</option>
+                        )}
+                        {statusOptions
+                            .filter(status => status.id !== tersediaStatusId)
+                            .map(status => (
+                                <option key={status.id} value={status.id}>{status.nama_status}</option>
+                            ))}
+                    </select>
+                    <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)} className="filter-select">
+                        <option value="">Semua Kategori</option>
+                        {categories.map(cat => (<option key={cat.id_kategori} value={cat.id_kategori}>{cat.nama_kategori}</option>))}
+                    </select>
+                    <select value={selectedSubCategory} onChange={e => setSelectedSubCategory(e.target.value)} disabled={!selectedCategory || subCategories.length === 0} className="filter-select">
+                        <option value="">Semua Sub-Kategori</option>
+                        {subCategories.map(sub => (<option key={sub.id_sub_kategori} value={sub.id_sub_kategori}>{sub.nama_sub}</option>))}
+                    </select>
+                    <select value={selectedColor} onChange={e => setSelectedColor(e.target.value)} className="filter-select">
+                        <option value="">Semua Warna</option>
+                        {colorOptions.map(color => (<option key={color.id_warna} value={color.id_warna}>{color.nama_warna}</option>))}
+                    </select>
+                </motion.div>
+
+                <motion.input
+                    variants={staggerItem}
+                    type="text"
+                    placeholder="Cari Kode SKU / Nama Barang..."
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    className="filter-search-input"
+                />
+
+                <motion.div variants={staggerItem} className="job-list-container">
+                    {/* Tampilan Tabel Desktop */}
+                    <div className="table-scroll-container">
+                        <table className="job-table">
+                            <thead>
+                                <tr>
+                                    <th>Kode SKU</th>
+                                    <th>Nama Barang</th>
+                                    <th>Kategori</th>
+                                    <th>Sub-Kategori</th>
+                                    <th>Stok Tersedia</th>
+                                    <th>Total Unit</th>
+                                    <th>Ditambahkan Oleh</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div
+                            className="table-body-scroll"
+                            ref={desktopListRef}
+                            onScroll={handleScroll}
+                            style={{ overflowY: 'auto', maxHeight: '65vh' }}
+                        >
+                            <table className="job-table">
+                                <tbody>
+                                    {loading && masterItems.length === 0 && (
+                                        <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat data ringkasan...</td></tr>
+                                    )}
+                                    {!loading && masterItems.length === 0 && (
+                                        <tr><td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>
+                                            Tidak ada barang cocok dengan filter.
+                                        </td></tr>
+                                    )}
+                                    {!loading && masterItems.map(masterItem => (
+                                        <React.Fragment key={masterItem.id_m_barang}>
+                                            <tr
+                                                className={`summary-row hoverable-row ${expandedRows[masterItem.id_m_barang] ? 'expanded' : ''}`}
+                                                onClick={() => toggleExpand(masterItem.id_m_barang)}
+                                            >
+                                                <td>{masterItem.kode_barang}</td>
+                                                <td>{masterItem.nama_barang}</td>
+                                                <td>{masterItem.master_kategori?.nama_kategori || '-'}</td>
+                                                <td>{masterItem.sub_kategori?.nama_sub || '-'}</td>
+                                                <td>{masterItem.available_stock_count}</td>
+                                                <td>{masterItem.total_stock_count}</td>
+                                                <td>{masterItem.created_by?.name || 'N/A'}</td>
+                                            </tr>
+
+                                            <AnimatePresence initial={false}>
+                                                {expandedRows[masterItem.id_m_barang] && (
+                                                    <tr className="detail-rows-container-wrapper">
+                                                        <td colSpan="7" style={{ padding: '0', overflow: 'hidden' }}>
+                                                            <motion.div
+                                                                key={`content-${masterItem.id_m_barang}`}
+                                                                initial="hidden"
+                                                                animate="visible"
+                                                                exit="hidden"
+                                                                variants={expandVariants}
+                                                            >
+                                                                {expandingId === masterItem.id_m_barang ? (
+                                                                    <div className="detail-loading">Memuat detail unit...</div>
+                                                                ) : detailItems[masterItem.id_m_barang]?.items?.length > 0 ? (
+                                                                    <div className="detail-list-wrapper">
+                                                                        <div className="detail-list-header">
+                                                                            <div className="detail-cell header-select">
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    title="Pilih Semua di grup ini"
+                                                                                    checked={isAllMasterSelected(masterItem.id_m_barang)}
+                                                                                    onChange={(e) => handleSelectAllMaster(masterItem.id_m_barang, e.target.checked)}
+                                                                                />
+                                                                            </div>
+                                                                            <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Kode Unik</div>
+                                                                            <div className="detail-cell header-sn" style={{ fontSize: '15px' }}>S/N</div>
+                                                                            <div className="detail-cell header-kondisi" style={{ fontSize: '15px' }}>Kondisi</div>
+                                                                            <div className="detail-cell header-status" style={{ fontSize: '15px' }}>Status</div>
+                                                                            <div className="detail-cell header-warna" style={{ fontSize: '15px' }}>Warna</div>
+                                                                            <div className="detail-cell header-harga" style={{ fontSize: '15px' }}>Harga Beli</div>
+                                                                            <div className="detail-cell header-tglbeli" style={{ fontSize: '15px' }}>Tgl Beli</div>
+                                                                            <div className="detail-cell header-tanggal" style={{ fontSize: '15px' }}>Tgl Masuk</div>
+                                                                            <div className="detail-cell header-creator" style={{ fontSize: '15px' }}>Ditambahkan</div>
+                                                                            <div className="detail-cell header-aksi" style={{ fontSize: '15px' }}>Aksi</div>
+                                                                        </div>
+
+                                                                        <div
+                                                                            className="detail-rows-list-container"
+                                                                            style={{ overflowY: 'auto', maxHeight: '300px' }}
+                                                                            onScroll={(e) => handleDetailScroll(e, masterItem.id_m_barang)}
+                                                                        >
+                                                                            {detailItems[masterItem.id_m_barang].items.map(detail => (
+                                                                                <div
+                                                                                    key={detail.id}
+                                                                                    className="detail-row-div hoverable-row"
+                                                                                    onClick={(e) => {
+                                                                                        if (e.target.tagName === 'BUTTON' || e.target.closest('.action-buttons-group')) return;
+                                                                                        setDetailItem(detail);
+                                                                                    }}
+                                                                                >
+                                                                                    <div className="detail-cell cell-select">
+                                                                                        <input
+                                                                                            type="checkbox"
+                                                                                            checked={selectedItems.has(detail.id)}
+                                                                                            onChange={(e) => handleSelectItem(detail.id, e.target.checked)}
+                                                                                            onClick={(e) => e.stopPropagation()}
+                                                                                        />
+                                                                                    </div>
+                                                                                    <div className="detail-cell cell-kode">{detail.kode_unik}</div>
+                                                                                    <div className="detail-cell cell-sn">{detail.serial_number || '-'}</div>
+                                                                                    <div className="detail-cell cell-kondisi">{detail.kondisi}</div>
+                                                                                    <div className="detail-cell cell-status">
+                                                                                        <span className={`status-badge status-${(detail.status_detail?.nama_status || 'unknown').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                                                            {detail.status_detail?.nama_status || 'N/A'}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <div className="detail-cell cell-warna">
+                                                                                        {detail.color ? (
+                                                                                            <span title={detail.color.nama_warna} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                                                                                <span className="color-swatch" style={{ backgroundColor: detail.color.kode_hex }}></span>
+                                                                                            </span>
+                                                                                        ) : '-'}
+                                                                                    </div>
+                                                                                    <div className="detail-cell cell-harga">{formatCurrency(detail.harga_beli)}</div>
+                                                                                    <div className="detail-cell cell-tglbeli">{formatDate(detail.tanggal_pembelian)}</div>
+                                                                                    <div className="detail-cell cell-tanggal">{formatDate(detail.tanggal_masuk)}</div>
+                                                                                    <div className="detail-cell cell-creator">{detail.created_by?.name || '-'}</div>
+                                                                                    <div className="detail-cell cell-aksi action-buttons-group">
+                                                                                        <button
+                                                                                            onClick={(e) => { e.stopPropagation(); setDetailItem(detail); }}
+                                                                                            className="btn-user-action btn-detail"
+                                                                                        >
+                                                                                            <i className="fas fa-info-circle" style={{ fontSize: '20px', marginRight: '5px' }}></i>
+                                                                                        </button>
+
+                                                                                        {/* Button QR */}
+                                                                                        <button
+                                                                                            onClick={(e) => { e.stopPropagation(); setQrModalItem(detail); }}
+                                                                                            className="btn-user-action btn-qr"
+                                                                                        >
+                                                                                            <i className="fas fa-qrcode" style={{ fontSize: '20px', marginRight: '5px' }}></i>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                        {isLoadingMoreDetail === masterItem.id_m_barang && (
+                                                                            <div className="detail-loading" style={{ padding: '10px 0' }}>Memuat unit lainnya...</div>
+                                                                        )}
+                                                                        {!loading && !isLoadingMoreDetail && detailItems[masterItem.id_m_barang] && (
+                                                                            <div className="detail-list-footer-centered">
+                                                                                Total Stok: {detailItems[masterItem.id_m_barang].pagination.total} Unit
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="detail-nodata">{getNoDetailMessage()}</div>
+                                                                )}
+                                                            </motion.div>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </AnimatePresence>
+
+                                        </React.Fragment>
+                                    ))}
+                                    {isLoadingMore && (
+                                        <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                        {!loading && masterItems.length > 0 && pagination && (
+                            <table className="job-table">
+                                <tfoot>
+                                    <tr className="subtotal-row">
+                                        <td colSpan="5" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>
+                                            Total Seluruh Unit (dari {pagination.total} Tipe Barang)
+                                        </td>
+                                        <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                                            {pagination.grand_total_units} Unit
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        )}
+                    </div>
+
+                    {/* Tampilan Mobile */}
                     <div
-                        className="table-body-scroll"
-                        ref={desktopListRef}
+                        className="job-list-mobile"
+                        ref={mobileListRef}
                         onScroll={handleScroll}
                         style={{ overflowY: 'auto', maxHeight: '65vh' }}
                     >
-                        <table className="job-table">
-                            <tbody>
-                                {loading && masterItems.length === 0 && (
-                                    <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat data ringkasan...</td></tr>
-                                )}
-                                {!loading && masterItems.length === 0 && (
-                                    <tr><td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>
-                                        Tidak ada barang cocok dengan filter.
-                                    </td></tr>
-                                )}
-                                {!loading && masterItems.map(masterItem => (
-                                    <React.Fragment key={masterItem.id_m_barang}>
-                                        <tr
-                                            className={`summary-row hoverable-row ${expandedRows[masterItem.id_m_barang] ? 'expanded' : ''}`}
+                        {(loading && masterItems.length === 0) ? (<p style={{ textAlign: 'center' }}>Memuat data...</p>)
+                            : masterItems.length === 0 ? (<p style={{ textAlign: 'center', padding: '20px' }}>Tidak ada barang cocok filter.</p>)
+                                : (
+                                    masterItems.map(masterItem => (
+                                        <div
+                                            key={masterItem.id_m_barang}
                                             onClick={() => toggleExpand(masterItem.id_m_barang)}
+                                            className={`ticket-card-mobile summary-card hoverable-row ${expandedRows[masterItem.id_m_barang] ? 'expanded' : ''}`}
                                         >
-                                            <td>{masterItem.kode_barang}</td>
-                                            <td>{masterItem.nama_barang}</td>
-                                            <td>{masterItem.master_kategori?.nama_kategori || '-'}</td>
-                                            <td>{masterItem.sub_kategori?.nama_sub || '-'}</td>
-                                            <td>{masterItem.available_stock_count}</td>
-                                            <td>{masterItem.total_stock_count}</td>
-                                            <td>{masterItem.created_by?.name || 'N/A'}</td>
-                                        </tr>
-                                        {expandedRows[masterItem.id_m_barang] && (
-                                            <tr className="detail-rows-container">
-                                                <td colSpan="7">
-                                                    {expandingId === masterItem.id_m_barang ? (
-                                                        <div className="detail-loading">Memuat detail unit...</div>
-                                                    ) : detailItems[masterItem.id_m_barang]?.items?.length > 0 ? (
-                                                        <div className="detail-list-wrapper">
-                                                            <div className="detail-list-header">
-                                                                <div className="detail-cell header-select">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        title="Pilih Semua di grup ini"
-                                                                        checked={isAllMasterSelected(masterItem.id_m_barang)}
-                                                                        onChange={(e) => handleSelectAllMaster(masterItem.id_m_barang, e.target.checked)}
-                                                                    />
-                                                                </div>
-                                                                <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Kode Unik</div>
-                                                                <div className="detail-cell header-sn" style={{ fontSize: '15px' }}>S/N</div>
-                                                                <div className="detail-cell header-kondisi" style={{ fontSize: '15px' }}>Kondisi</div>
-                                                                <div className="detail-cell header-status" style={{ fontSize: '15px' }}>Status</div>
-                                                                <div className="detail-cell header-warna" style={{ fontSize: '15px' }}>Warna</div>
-                                                                <div className="detail-cell header-harga" style={{ fontSize: '15px' }}>Harga Beli</div>
-                                                                <div className="detail-cell header-tglbeli" style={{ fontSize: '15px' }}>Tgl Beli</div>
-                                                                <div className="detail-cell header-tanggal" style={{ fontSize: '15px' }}>Tgl Masuk</div>
-                                                                <div className="detail-cell header-creator" style={{ fontSize: '15px' }}>Ditambahkan</div>
-                                                                <div className="detail-cell header-aksi" style={{ fontSize: '15px' }}>Aksi</div>
-                                                            </div>
-
-                                                            <div
-                                                                className="detail-rows-list-container"
-                                                                style={{ overflowY: 'auto', maxHeight: '300px' }}
-                                                                onScroll={(e) => handleDetailScroll(e, masterItem.id_m_barang)}
-                                                            >
-                                                                {detailItems[masterItem.id_m_barang].items.map(detail => (
-                                                                    <div
-                                                                        key={detail.id}
-                                                                        className="detail-row-div hoverable-row"
-                                                                        onClick={(e) => {
-                                                                            if (e.target.tagName === 'BUTTON' || e.target.closest('.action-buttons-group')) return;
-                                                                            setDetailItem(detail);
-                                                                        }}
-                                                                    >
-                                                                        <div className="detail-cell cell-select">
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                checked={selectedItems.has(detail.id)}
-                                                                                onChange={(e) => handleSelectItem(detail.id, e.target.checked)}
-                                                                                onClick={(e) => e.stopPropagation()}
-                                                                            />
-                                                                        </div>
-                                                                        <div className="detail-cell cell-kode">{detail.kode_unik}</div>
-                                                                        <div className="detail-cell cell-sn">{detail.serial_number || '-'}</div>
-                                                                        <div className="detail-cell cell-kondisi">{detail.kondisi}</div>
-                                                                        <div className="detail-cell cell-status">
-                                                                            <span className={`status-badge status-${(detail.status_detail?.nama_status || 'unknown').toLowerCase().replace(/\s+/g, '-')}`}>
-                                                                                {detail.status_detail?.nama_status || 'N/A'}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div className="detail-cell cell-warna">
-                                                                            {detail.color ? (
-                                                                                <span title={detail.color.nama_warna} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                                                                                    <span className="color-swatch" style={{ backgroundColor: detail.color.kode_hex }}></span>
-                                                                                </span>
-                                                                            ) : '-'}
-                                                                        </div>
-                                                                        <div className="detail-cell cell-harga">{formatCurrency(detail.harga_beli)}</div>
-                                                                        <div className="detail-cell cell-tglbeli">{formatDate(detail.tanggal_pembelian)}</div>
-                                                                        <div className="detail-cell cell-tanggal">{formatDate(detail.tanggal_masuk)}</div>
-                                                                        <div className="detail-cell cell-creator">{detail.created_by?.name || '-'}</div>
-                                                                        <div className="detail-cell cell-aksi action-buttons-group">
-                                                                            <button
-                                                                                onClick={(e) => { e.stopPropagation(); setDetailItem(detail); }}
-                                                                                className="btn-user-action btn-detail"
-                                                                            >
-                                                                                <i className="fas fa-info-circle" style={{ fontSize: '20px', marginRight: '5px' }}></i>
-                                                                            </button>
-
-                                                                            {/* Button QR */}
-                                                                            <button
-                                                                                onClick={(e) => { e.stopPropagation(); setQrModalItem(detail); }}
-                                                                                className="btn-user-action btn-qr"
-                                                                            >
-                                                                                <i className="fas fa-qrcode" style={{ fontSize: '20px', marginRight: '5px' }}></i>
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                            {isLoadingMoreDetail === masterItem.id_m_barang && (
-                                                                <div className="detail-loading" style={{ padding: '10px 0' }}>Memuat unit lainnya...</div>
-                                                            )}
-                                                            {!loading && !isLoadingMoreDetail && detailItems[masterItem.id_m_barang] && (
-                                                                <div className="detail-list-footer-centered">
-                                                                    Total Stok: {detailItems[masterItem.id_m_barang].pagination.total} Unit
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    ) : (
-                                                        <div className="detail-nodata">{getNoDetailMessage()}</div>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </React.Fragment>
-                                ))}
-                                {isLoadingMore && (
-                                    <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                    {!loading && masterItems.length > 0 && pagination && (
-                        <table className="job-table">
-                            <tfoot>
-                                <tr className="subtotal-row">
-                                    <td colSpan="5" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>
-                                        Total Seluruh Unit (dari {pagination.total} Tipe Barang)
-                                    </td>
-                                    <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                                        {pagination.grand_total_units} Unit
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    )}
-                </div>
-                {/* Tampilan Mobile */}
-                <div
-                    className="job-list-mobile"
-                    ref={mobileListRef}
-                    onScroll={handleScroll}
-                    style={{ overflowY: 'auto', maxHeight: '65vh' }}
-                >
-                    {(loading && masterItems.length === 0) ? (<p style={{ textAlign: 'center' }}>Memuat data...</p>)
-                        : masterItems.length === 0 ? (<p style={{ textAlign: 'center', padding: '20px' }}>Tidak ada barang cocok filter.</p>)
-                            : (
-                                masterItems.map(masterItem => (
-                                    <div
-                                        key={masterItem.id_m_barang}
-                                        onClick={() => toggleExpand(masterItem.id_m_barang)}
-                                        className={`ticket-card-mobile summary-card hoverable-row ${expandedRows[masterItem.id_m_barang] ? 'expanded' : ''}`}
-                                    >
-                                        <div className="card-header">
-                                            <h4>{masterItem.nama_barang} ({masterItem.kode_barang})</h4>
-                                        </div>
-                                        <div className="card-body">
-                                            <div className="card-item-row">
-                                                <span className="label">Kategori</span>
-                                                <span className="value">{masterItem.master_kategori?.nama_kategori || '-'}</span>
+                                            <div className="card-header">
+                                                <h4>{masterItem.nama_barang} ({masterItem.kode_barang})</h4>
                                             </div>
-                                            <div className="card-separator"></div>
-                                            <div className="card-item-row">
-                                                <span className="label">Sub-Kategori</span>
-                                                <span className="value">{masterItem.sub_kategori?.nama_sub || '-'}</span>
-                                            </div>
-                                            <div className="card-separator"></div>
-                                            <div className="card-item-row">
-                                                <span className="label">Stok Tersedia</span>
-                                                <span className="value">{masterItem.available_stock_count}</span>
-                                            </div>
-                                            <div className="card-separator"></div>
-                                            <div className="card-item-row">
-                                                <span className="label">Total Unit</span>
-                                                <span className="value">{masterItem.total_stock_count}</span>
-                                            </div>
-                                        </div>
-
-                                        {expandedRows[masterItem.id_m_barang] && (
-                                            <div
-                                                className="detail-items-mobile-container"
-                                                style={{ overflowY: 'auto', maxHeight: '300px' }}
-                                                onScroll={(e) => handleDetailScroll(e, masterItem.id_m_barang)}
-                                            >
-                                                {expandingId === masterItem.id_m_barang ? (<p className="detail-loading-mobile">Memuat unit...</p>)
-                                                    : detailItems[masterItem.id_m_barang]?.items?.length > 0 ? (
-                                                        detailItems[masterItem.id_m_barang].items.map(detail => (
-                                                            <div key={detail.id} className="ticket-card-mobile detail-card">
-                                                                <div className="card-header-detail">
-                                                                    <span>{detail.kode_unik}</span>
-                                                                    {detail.serial_number && <small>S/N: {detail.serial_number}</small>}
-                                                                </div>
-                                                                <div className="card-body">
-                                                                    <div className="card-item-row">
-                                                                        <span className="label">Kondisi</span><span className="value">{detail.kondisi}</span>
-                                                                    </div>
-                                                                    <div className="card-separator"></div>
-                                                                    <div className="card-item-row">
-                                                                        <span className="label">Status</span>
-                                                                        <span className="value">
-                                                                            <span className={`status-badge status-${(detail.status_detail?.nama_status || 'unknown').toLowerCase().replace(/\s+/g, '-')}`}>
-                                                                                {detail.status_detail?.nama_status || 'N/A'}
-                                                                            </span>
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="card-separator"></div>
-                                                                    <div className="card-item-row">
-                                                                        <span className="label">Warna</span>
-                                                                        <span className="value">{detail.color ? detail.color.nama_warna : '-'}</span>
-                                                                    </div>
-                                                                    <div className="card-separator"></div>
-                                                                    <div className="card-item-row">
-                                                                        <span className="label">Harga</span>
-                                                                        <span className="value">{formatCurrency(detail.harga_beli)}</span>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="card-separator"></div>
-                                                                <div className="card-row action-row">
-                                                                    <button onClick={() => setDetailItem(detail)} className="btn-user-action btn-detail">Detail</button>
-                                                                    <button onClick={() => setQrModalItem(detail)} className="btn-user-action btn-qr">QR</button>
-                                                                </div>
-                                                            </div>
-                                                        ))
-                                                    ) : (
-                                                        <p className="detail-nodata-mobile">{getNoDetailMessage()}</p>
-                                                    )}
-                                                {isLoadingMoreDetail === masterItem.id_m_barang && (
-                                                    <p className="detail-loading-mobile" style={{ padding: '10px 0' }}>Memuat unit lainnya...</p>
-                                                )}
-
-                                            </div>
-                                        )}
-                                        {!loading && !isLoadingMoreDetail && detailItems[masterItem.id_m_barang] && detailItems[masterItem.id_m_barang].items.length > 0 && (
-                                            <div className="job-list-mobile">
-
-                                                <div className="subtotal-card-mobile "
-                                                    style={{ marginTop: '1rem', marginBottom: '1rem' }}
-                                                >
-                                                    <span className="subtotal-label"
-                                                        style={{ fontSize: '13px', fontWeight: 'bold' }}
-                                                    >Total Stok</span>
-                                                    <span className="subtotal-value"
-                                                        style={{ fontSize: '13px', fontWeight: 'bold' }}
-                                                    >
-                                                        {detailItems[masterItem.id_m_barang].pagination.total} Unit
-                                                    </span>
+                                            <div className="card-body">
+                                                <div className="card-item-row">
+                                                    <span className="label">Kategori</span>
+                                                    <span className="value">{masterItem.master_kategori?.nama_kategori || '-'}</span>
                                                 </div>
-
+                                                <div className="card-separator"></div>
+                                                <div className="card-item-row">
+                                                    <span className="label">Sub-Kategori</span>
+                                                    <span className="value">{masterItem.sub_kategori?.nama_sub || '-'}</span>
+                                                </div>
+                                                <div className="card-separator"></div>
+                                                <div className="card-item-row">
+                                                    <span className="label">Stok Tersedia</span>
+                                                    <span className="value">{masterItem.available_stock_count}</span>
+                                                </div>
+                                                <div className="card-separator"></div>
+                                                <div className="card-item-row">
+                                                    <span className="label">Total Unit</span>
+                                                    <span className="value">{masterItem.total_stock_count}</span>
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-                                ))
-                            )}
+
+                                            {/* --- IMPLEMENTASI ANIMASI EXPAND (MOBILE) --- */}
+                                            <AnimatePresence initial={false}>
+                                                {expandedRows[masterItem.id_m_barang] && (
+                                                    <motion.div
+                                                        key={`mobile-content-${masterItem.id_m_barang}`}
+                                                        className="detail-items-mobile-container"
+                                                        style={{ overflowY: 'auto', maxHeight: '300px' }}
+                                                        initial="hidden"
+                                                        animate="visible"
+                                                        exit="hidden"
+                                                        variants={expandVariants}
+                                                        onScroll={(e) => handleDetailScroll(e, masterItem.id_m_barang)}
+                                                        onClick={(e) => e.stopPropagation()} // Mencegah card menutup saat diklik
+                                                    >
+                                                        {expandingId === masterItem.id_m_barang ? (<p className="detail-loading-mobile">Memuat unit...</p>)
+                                                            : detailItems[masterItem.id_m_barang]?.items?.length > 0 ? (
+                                                                detailItems[masterItem.id_m_barang].items.map(detail => (
+                                                                    <div key={detail.id} className="ticket-card-mobile detail-card">
+                                                                        <div className="card-header-detail">
+                                                                            <span>{detail.kode_unik}</span>
+                                                                            {detail.serial_number && <small>S/N: {detail.serial_number}</small>}
+                                                                        </div>
+                                                                        <div className="card-body">
+                                                                            <div className="card-item-row">
+                                                                                <span className="label">Kondisi</span><span className="value">{detail.kondisi}</span>
+                                                                            </div>
+                                                                            <div className="card-separator"></div>
+                                                                            <div className="card-item-row">
+                                                                                <span className="label">Status</span>
+                                                                                <span className="value">
+                                                                                    <span className={`status-badge status-${(detail.status_detail?.nama_status || 'unknown').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                                                        {detail.status_detail?.nama_status || 'N/A'}
+                                                                                    </span>
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="card-separator"></div>
+                                                                            <div className="card-item-row">
+                                                                                <span className="label">Warna</span>
+                                                                                <span className="value">{detail.color ? detail.color.nama_warna : '-'}</span>
+                                                                            </div>
+                                                                            <div className="card-separator"></div>
+                                                                            <div className="card-item-row">
+                                                                                <span className="label">Harga</span>
+                                                                                <span className="value">{formatCurrency(detail.harga_beli)}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="card-separator"></div>
+                                                                        <div className="card-row action-row">
+                                                                            <button onClick={() => setDetailItem(detail)} className="btn-user-action btn-detail">Detail</button>
+                                                                            <button onClick={() => setQrModalItem(detail)} className="btn-user-action btn-qr">QR</button>
+                                                                        </div>
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <p className="detail-nodata-mobile">{getNoDetailMessage()}</p>
+                                                            )}
+                                                        {isLoadingMoreDetail === masterItem.id_m_barang && (
+                                                            <p className="detail-loading-mobile" style={{ padding: '10px 0' }}>Memuat unit lainnya...</p>
+                                                        )}
+
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+
+                                            {!loading && !isLoadingMoreDetail && detailItems[masterItem.id_m_barang] && detailItems[masterItem.id_m_barang].items.length > 0 && (
+                                                <div className="job-list-mobile">
+
+                                                    <div className="subtotal-card-mobile "
+                                                        style={{ marginTop: '1rem', marginBottom: '1rem' }}
+                                                    >
+                                                        <span className="subtotal-label"
+                                                            style={{ fontSize: '13px', fontWeight: 'bold' }}
+                                                        >Total Stok</span>
+                                                        <span className="subtotal-value"
+                                                            style={{ fontSize: '13px', fontWeight: 'bold' }}
+                                                        >
+                                                            {detailItems[masterItem.id_m_barang].pagination.total} Unit
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
 
 
-                    {isLoadingMore && (
-                        <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
-                    )}
-                </div>
-                <div className="job-list-mobile">
-                    {!loading && !isLoadingMore && masterItems.length > 0 && pagination && (
-                        <div className="subtotal-card-mobile acquisition-subtotal"
-                            style={{ marginTop: '1rem', marginBottom: '1rem' }}
-                        >
-                            <span className="subtotal-label"
-                                style={{ fontSize: '13px', fontWeight: 'bold' }}
-                            >Total Tipe Barang (SKU)</span>
-                            <span className="subtotal-value value-acquisition"
-                                style={{ fontSize: '13px', fontWeight: 'bold' }}
+                        {isLoadingMore && (
+                            <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+                        )}
+                    </div>
+                    <div className="job-list-mobile">
+                        {!loading && !isLoadingMore && masterItems.length > 0 && pagination && (
+                            <div className="subtotal-card-mobile acquisition-subtotal"
+                                style={{ marginTop: '1rem', marginBottom: '1rem' }}
                             >
-                                {pagination.total} Data
-                            </span>
-                        </div>
-                    )}
-                </div>
-            </div>
+                                <span className="subtotal-label"
+                                    style={{ fontSize: '13px', fontWeight: 'bold' }}
+                                >Total Tipe Barang (SKU)</span>
+                                <span className="subtotal-value value-acquisition"
+                                    style={{ fontSize: '13px', fontWeight: 'bold' }}
+                                >
+                                    {pagination.total} Data
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
+
+            </motion.div>
             {detailItem && (
                 <ItemDetailModal
                     item={detailItem}

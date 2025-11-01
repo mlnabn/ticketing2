@@ -5,6 +5,26 @@ import ItemListView from './ItemListView';
 import ItemFormModal from './ItemFormModal';
 import ConfirmationModal from './ConfirmationModal';
 import EditNamaBarangModal from './EditNamaBarangModal';
+import { motion } from 'framer-motion';
+
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            when: "beforeChildren",
+            staggerChildren: 0.1,
+        },
+    },
+};
+const staggerItem = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.4, ease: "easeOut" }
+    },
+};
 
 function ToolManagement() {
     const { showToast } = useOutletContext();
@@ -69,10 +89,10 @@ function ToolManagement() {
         }
     }, [showToast]);
 
-    useEffect(() => {
+useEffect(() => {
         fetchItems(1, currentFilters);
         fetchMobileItems(1, currentFilters);
-    }, [fetchItems, fetchMobileItems]);
+    }, [fetchItems, fetchMobileItems, currentFilters]);
 
     const loadMoreItems = async () => {
         if (isLoadingMore || !pagination || pagination.current_page >= pagination.last_page) return;
@@ -142,12 +162,12 @@ function ToolManagement() {
             const res = await api.get(`/inventory/items/variations/${kodeBarang}`);
             setDetailItems(prev => ({
                 ...prev,
-                [kodeBarang]: res.data 
+                [kodeBarang]: res.data
             }));
         } catch (error) {
             console.error("Fetch Detail Error:", error);
             showToast('Gagal memuat detail SKU.', 'error');
-            setExpandedRows(prev => ({ ...prev, [kodeBarang]: false })); 
+            setExpandedRows(prev => ({ ...prev, [kodeBarang]: false }));
         } finally {
             setExpandingId(null);
         }
@@ -186,7 +206,7 @@ function ToolManagement() {
         if (!itemToDelete) return;
         try {
             const response = await api.delete(`/inventory/items/${itemToDelete.id_m_barang}`);
-            
+
             if (response.status === 200 || response.status === 204) {
                 showToast(response.data?.message || "Barang berhasil dihapus.");
                 fetchItems(1, currentFilters);
@@ -219,7 +239,7 @@ function ToolManagement() {
 
     const handleSelectAll = (e, kodeBarang) => {
         const itemIds = detailItems[kodeBarang]?.map(item => item.id_m_barang) || [];
-        
+
         setSelectedIds(prev => {
             const newSet = new Set(prev);
             if (e.target.checked) {
@@ -239,9 +259,9 @@ function ToolManagement() {
         if (window.confirm(`Anda yakin ingin menghapus ${selectedIds.length} SKU yang dipilih?`)) {
             try {
                 const response = await api.post('/inventory/items/bulk-delete', { ids: selectedIds });
-                showToast(response.data.message, 'success'); 
-                fetchItems(1, currentFilters); 
-                setSelectedIds([]); 
+                showToast(response.data.message, 'success');
+                fetchItems(1, currentFilters);
+                setSelectedIds([]);
             } catch (e) {
                 console.error('Gagal menghapus SKU secara massal:', e);
                 showToast(e.response?.data?.message || 'Terjadi kesalahan saat mencoba menghapus SKU.', 'error');
@@ -256,10 +276,14 @@ function ToolManagement() {
     }, [fetchItems, fetchMobileItems]);
 
     return (
-        <>
-            <div className="user-management-container" style={{ marginBottom: '20px' }}>
+        <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+        >
+            <motion.div variants={staggerItem} className="user-management-container" style={{ marginBottom: '20px' }}>
                 <h1>Tambah SKU</h1>
-            </div>
+            </motion.div>
 
             <ItemListView
                 // Props Desktop
@@ -267,7 +291,7 @@ function ToolManagement() {
                 loading={loading}
                 onScroll={handleScroll}
                 isLoadingMore={isLoadingMore}
-                
+
                 // Props Mobile
                 mobileItems={mobileItems}
                 isMobileLoading={isMobileLoading}
@@ -313,7 +337,7 @@ function ToolManagement() {
                     onCancel={() => setIsConfirmModalOpen(false)}
                 />
             )}
-        </>
+        </motion.div>
     );
 }
 

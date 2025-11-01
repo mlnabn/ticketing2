@@ -3,6 +3,26 @@ import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import { saveAs } from 'file-saver';
 import ActiveLoanDetailModal from './ActiveLoanDetailModal';
+import { motion } from 'framer-motion';
+
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            when: "beforeChildren",
+            staggerChildren: 0.1,
+        },
+    },
+};
+const staggerItem = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.4, ease: "easeOut" }
+    },
+};
 
 
 const months = [
@@ -49,7 +69,7 @@ export default function ActiveLoanReportPage() {
             baseParams.end_date = filters.end_date;
         }
 
-        baseParams.page = page; 
+        baseParams.page = page;
         return baseParams;
     }, [type, debouncedSearchTerm, filterType, filters]);
 
@@ -208,12 +228,17 @@ export default function ActiveLoanReportPage() {
     };
 
     return (
-        <div className="user-management-container">
-            <div className="user-management-header-report">
+        <motion.div
+            className="user-management-container"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+        >
+            <motion.div variants={staggerItem} className="user-management-header-report">
                 <h1>{title}</h1>
-            </div>
+            </motion.div>
 
-            <div className="filters-container report-filters">
+            <motion.div variants={staggerItem} className="filters-container report-filters">
                 <input
                     type="text"
                     placeholder="Cari Kode Unik / Nama Barang / Peminjam..."
@@ -222,8 +247,8 @@ export default function ActiveLoanReportPage() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
 
-            </div>
-            <div className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+            </motion.div>
+            <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
                 <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
                     <option value="month">Filter per Bulan</option>
                     <option value="date_range">Filter per Tanggal</option>
@@ -247,8 +272,8 @@ export default function ActiveLoanReportPage() {
                         <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
                     </>
                 )}
-            </div>
-            <div className="download-buttons">
+            </motion.div>
+            <motion.div variants={staggerItem} className="download-buttons">
                 <button onClick={() => handleExport('excel')} disabled={exportingExcel} className="btn-download excel">
                     <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
                     {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
@@ -257,9 +282,9 @@ export default function ActiveLoanReportPage() {
                     <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
                     {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
                 </button>
-            </div>
+            </motion.div>
 
-            <div className="job-list-container">
+            <motion.div variants={staggerItem} className="job-list-container">
                 {/* Tampilan Desktop */}
                 <div className="table-scroll-container">
                     <table className="job-table">
@@ -392,15 +417,18 @@ export default function ActiveLoanReportPage() {
                         </div>
                     )}
                 </div>
+
+            </motion.div>
+            <motion.div className='job-list-mobile'>
                 {!loading && !isLoadingMore && data.length > 0 && (
-                    <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem' }}>
-                        <span className="subtotal-label">Total Peminjaman</span>
-                        <span className="subtotal-value value-acquisition" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+                    <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+                        <span className="subtotal-label" style={{ fontSize : '13px', fontWeight: 'bold'}}>Total Peminjaman</span>
+                        <span className="subtotal-value value-acquisition" style={{ fontSize: '13px', fontWeight: 'bold' }}>
                             {pagination.total} Data
                         </span>
                     </div>
                 )}
-            </div>
+            </motion.div>
 
             {selectedItem && (
                 <ActiveLoanDetailModal
@@ -410,6 +438,6 @@ export default function ActiveLoanReportPage() {
                     calculateDuration={calculateDuration}
                 />
             )}
-        </div>
+        </motion.div>
     );
 }

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FaUser } from 'react-icons/fa';
@@ -30,8 +30,15 @@ const MobileNavLink = ({ to, end, icon, text, onClick }) => (
   </NavLink>
 );
 
+const pageTransitionVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.3, ease: 'easeInOut' } },
+  exit: { opacity: 0, transition: { duration: 0.2, ease: 'easeInOut' } }
+};
+
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
+  const location = useLocation();
   const [userName, setUserName] = useState(user?.name || '');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
@@ -71,13 +78,19 @@ export default function AdminDashboard() {
           ))}
         </AnimatePresence>
       </div>
-      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+
+      <motion.aside
+        className={`sidebar ${isSidebarOpen ? 'open' : ''}`}
+        initial={{ x: '-100%' }}
+        animate={{ x: 0 }}
+        transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+      >
         <div className="sidebar-header">
           <img src={yourLogok} alt="Logo" className="sidebar-logo" />
         </div>
+
         <nav className="sidebar-nav">
           <ul>
-
             <li className="sidebar-nav-item">
               <NavLink to="/admin" end className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
                 <i className="fas fa-home"></i><span className="nav-text">Home</span>
@@ -157,12 +170,18 @@ export default function AdminDashboard() {
 
           </ul>
         </nav>
-      </aside>
+      </motion.aside>
 
       {isSidebarOpen && <div className="content-overlay" onClick={toggleSidebar}></div>}
 
       <main className="main-content">
-        <header className="main-header">
+
+        <motion.header
+          className="main-header"
+          initial={{ y: -80, opacity: 0 }} // Mulai dari atas dan transparan
+          animate={{ y: 0, opacity: 1 }}    // Selesai di posisi normal
+          transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.2 }}
+        >
           <div className="header-left-group">
             <button className="hamburger-menu-button" onClick={toggleSidebar}><span /><span /><span /></button>
             <h1 className="dashboard-header-title">Admin Dashboard</h1>
@@ -184,9 +203,20 @@ export default function AdminDashboard() {
               </>
             )}
           </div>
-        </header>
+        </motion.header>
         <div className="content-area">
-          <Outlet context={{ showToast }} />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              variants={pageTransitionVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="page-transition-wrapper"
+            >
+              <Outlet context={{ showToast }} />
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
 

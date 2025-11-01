@@ -6,6 +6,26 @@ import { useAuth } from '../AuthContext';
 import UserFormModal from './UserFormModal';
 import ConfirmationModal from './ConfirmationModal';
 import UserDetailModal from './UserDetailModal';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            when: "beforeChildren",
+            staggerChildren: 0.1,
+        },
+    },
+};
+const staggerItem = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.4, ease: "easeOut" }
+    },
+};
 
 export default function UserManagement() {
     const { showToast } = useOutletContext();
@@ -158,35 +178,44 @@ export default function UserManagement() {
     const isAllSelectedOnPage = users.length > 0 && selectedIds.length === users.length;
 
     return (
-        <div className="user-management-container">
-
-            <h1 className="page-title">Manajemen Pengguna</h1>
-
-            <button onClick={handleAddUserClick} className="btn-primary">
-                <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
-                Tambah Pengguna
-            </button>
-            <div className="filters-container report-filters" style={{ margin: '20px 0' }}>
-                <input
-                    type="text"
-                    placeholder="Cari nama, email, atau peran..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="filter-search-input"
-                />
-            </div>
-            {selectedIds.length > 0 && (
-                <div className="bulk-action-bar">
-                    <button onClick={handleBulkDelete} className="btn-clear">
-                        Hapus {selectedIds.length} Pengguna yang Dipilih
-                    </button>
+        <motion.div
+            className="user-management-container"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+        >
+            <motion.h1 variants={staggerItem} className="page-title">Manajemen Pengguna</motion.h1>
+            <motion.div variants={staggerItem}>
+                <button onClick={handleAddUserClick} className="btn-primary">
+                    <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
+                    Tambah Pengguna
+                </button>
+                <div className="filters-container report-filters" style={{ margin: '20px 0' }}>
+                    <input
+                        type="text"
+                        placeholder="Cari nama, email, atau peran..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="filter-search-input"
+                    />
                 </div>
-            )}
+            </motion.div>
+
+            <AnimatePresence>
+                {selectedIds.length > 0 && (
+                    <div className="bulk-action-bar">
+                        <button onClick={handleBulkDelete} className="btn-clear">
+                            Hapus {selectedIds.length} Pengguna yang Dipilih
+                        </button>
+                    </div>
+                )}
+            </AnimatePresence>
+            
             {!userData ? (
-                <p>Memuat data pengguna...</p>
+                <motion.p>Memuat data pengguna...</motion.p>
             ) : (
                 <>
-                    <div className="table-scroll-container">
+                    <motion.div variants={staggerItem} className="table-scroll-container">
                         <table className='job-table'>
                             <thead>
                                 <tr>
@@ -261,69 +290,70 @@ export default function UserManagement() {
                                 </tfoot>
                             </table>
                         )}
-                    </div>
-
-                    <div
-                        className="user-list-mobile"
-                        ref={mobileListRef}
-                        onScroll={handleScroll}
-                        style={{ maxHeight: '65vh', overflowY: 'auto' }}
-                    >
-                        {users.length > 0 ? (
-                            users.map((user) => (
-                                <div key={user.id} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, user)}>
-                                    <div className="card-row">
-                                        <div className="data-group">
-                                            <span className="label">NAMA</span>
-                                            <span className="value">{user.name}</span>
+                    </motion.div>
+                    <motion.div variants={staggerItem} className="table-scroll-container">
+                        <div
+                            className="user-list-mobile"
+                            ref={mobileListRef}
+                            onScroll={handleScroll}
+                            style={{ maxHeight: '65vh', overflowY: 'auto' }}
+                        >
+                            {users.length > 0 ? (
+                                users.map((user) => (
+                                    <div key={user.id} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, user)}>
+                                        <div className="card-row">
+                                            <div className="data-group">
+                                                <span className="label">NAMA</span>
+                                                <span className="value">{user.name}</span>
+                                            </div>
+                                            <div className="data-group">
+                                                <span className="label">EMAIL</span>
+                                                <span className="value">{user.email}</span>
+                                            </div>
                                         </div>
-                                        <div className="data-group">
-                                            <span className="label">EMAIL</span>
-                                            <span className="value">{user.email}</span>
+                                        <div className="card-row">
+                                            <div className="data-group single">
+                                                <span className="label">PERAN</span>
+                                                <span className="value" style={{ textTransform: 'capitalize' }}>{user.role}</span>
+                                            </div>
+                                        </div>
+                                        <div className="action-row">
+                                            <div className="action-buttons-group">
+                                                <button onClick={() => handleUserEditClick(user)} className="btn-edit">Edit</button>
+                                                <button onClick={() => handleUserDeleteClick(user)} className="btn-delete">Hapus</button>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="card-row">
-                                        <div className="data-group single">
-                                            <span className="label">PERAN</span>
-                                            <span className="value" style={{ textTransform: 'capitalize' }}>{user.role}</span>
-                                        </div>
-                                    </div>
-                                    <div className="action-row">
-                                        <div className="action-buttons-group">
-                                            <button onClick={() => handleUserEditClick(user)} className="btn-edit">Edit</button>
-                                            <button onClick={() => handleUserDeleteClick(user)} className="btn-delete">Hapus</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            !isLoadingMore && <p style={{ textAlign: 'center' }}>Tidak ada pengguna yang ditemukan.</p>
-                        )}
+                                ))
+                            ) : (
+                                !isLoadingMore && <p style={{ textAlign: 'center' }}>Tidak ada pengguna yang ditemukan.</p>
+                            )}
 
-                        {isLoadingMore && (
-                            <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
-                        )}
-                    </div>
-                    {!isLoadingMore && userData && userData.total > 0 && (
-                        <div className='user-list-mobile'>
-
-                            <div
-                                className="subtotal-card-mobile"
-                                style={{ marginTop: '1rem', marginBottom: '1rem' }}
-                            >
-                                <span className="subtotal-label"
-                                    style={{ fontSize: '13px', fontWeight: 'bold' }}
-                                >Total Pengguna</span>
-                                <span
-                                    className="subtotal-value"
-                                    style={{ fontSize: '13px', fontWeight: 'bold' }}
-                                >
-                                    {userData.total} Pengguna
-                                </span>
-                            </div>
-
+                            {isLoadingMore && (
+                                <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
+                            )}
                         </div>
-                    )}
+                        {!isLoadingMore && userData && userData.total > 0 && (
+                            <div className='user-list-mobile'>
+
+                                <div
+                                    className="subtotal-card-mobile"
+                                    style={{ marginTop: '1rem', marginBottom: '1rem' }}
+                                >
+                                    <span className="subtotal-label"
+                                        style={{ fontSize: '13px', fontWeight: 'bold' }}
+                                    >Total Pengguna</span>
+                                    <span
+                                        className="subtotal-value"
+                                        style={{ fontSize: '13px', fontWeight: 'bold' }}
+                                    >
+                                        {userData.total} Pengguna
+                                    </span>
+                                </div>
+
+                            </div>
+                        )}
+                    </motion.div>
                 </>
             )}
             {showUserFormModal && (
@@ -339,6 +369,6 @@ export default function UserManagement() {
                     onEditRequest={handleEditRequest}
                 />
             )}
-        </div>
+        </motion.div>
     );
 };
