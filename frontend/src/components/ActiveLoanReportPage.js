@@ -402,14 +402,13 @@ export default function ActiveLoanReportPage() {
                 )}
             </div>
 
-            {selectedItem && (
-                <ActiveLoanDetailModal
-                    item={selectedItem}
-                    onClose={() => setSelectedItem(null)}
-                    formatDate={formatDate}
-                    calculateDuration={calculateDuration}
-                />
-            )}
+            <ActiveLoanDetailModal
+                show={Boolean(selectedItem)}
+                item={selectedItem}
+                onClose={() => setSelectedItem(null)}
+                formatDate={formatDate}
+                calculateDuration={calculateDuration}
+            />
         </div>
     );
 }

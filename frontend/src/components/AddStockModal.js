@@ -126,7 +126,7 @@ const useScannerListener = (onScan, isOpen) => {
 /* ===========================================================
    Main Component
 =========================================================== */
-function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
+function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
     const [view, setView] = useState('form');
     const [newlyCreatedItems, setNewlyCreatedItems] = useState([]);
     const printRef = useRef();
@@ -135,9 +135,30 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
     const [masterBarangOptions, setMasterBarangOptions] = useState([]);
     const [colorOptions, setColorOptions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-
     const [activeSerialIndex, setActiveSerialIndex] = useState(0);
     const serialInputRefs = useRef([]);
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(show);
+
+    useEffect(() => {
+        if (show) {
+            setShouldRender(true);
+            setIsClosing(false); 
+        } else if (shouldRender && !isClosing) {
+            setIsClosing(true); 
+            const timer = setTimeout(() => {
+                setIsClosing(false);
+                setShouldRender(false); 
+                setView('form');
+                setFormData(initialFormState);
+                setDisplayHarga('');
+                setNewlyCreatedItems([]);
+                setActiveSerialIndex(0);
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, shouldRender]);
 
     /* ---------------- Barcode Scanner ---------------- */
     const handleScan = useCallback(
@@ -163,18 +184,18 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
         [activeSerialIndex, formData.serial_numbers, showToast]
     );
 
-    useScannerListener(handleScan, isOpen);
+    useScannerListener(handleScan, show);
 
     /* ---------------- Focus Handler ---------------- */
     useEffect(() => {
-        if (isOpen && serialInputRefs.current[activeSerialIndex]) {
+        if (show && serialInputRefs.current[activeSerialIndex]) {
             serialInputRefs.current[activeSerialIndex].focus();
         }
-    }, [isOpen, activeSerialIndex]);
+    }, [show, activeSerialIndex]);
 
     /* ---------------- Load Data ---------------- */
     useEffect(() => {
-        if (!isOpen) return;
+        if (!show) return;
         api.get('/inventory/items-flat?all=true').then((res) => {
             const data = res.data.data || res.data;
             const options = data.map((item) => ({
@@ -194,18 +215,12 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
         setDisplayHarga('');
         setFormData(initialFormState);
         setActiveSerialIndex(0);
-    }, [isOpen]);
+    }, [show]);
 
     const handleCloseAndReset = () => {
-        onClose();
-        // Reset state setelah modal tertutup untuk menghindari flicker
-        setTimeout(() => {
-            setView('form');
-            setFormData(initialFormState);
-            setDisplayHarga('');
-            setNewlyCreatedItems([]);
-            setActiveSerialIndex(0);
-        }, 300); // 300ms = durasi animasi fade-out
+        if (onClose) {
+            onClose();
+        }
     };
 
     useEffect(() => {
@@ -286,13 +301,19 @@ function AddStockModal({ isOpen, onClose, onSaveSuccess, showToast }) {
         }
     };
 
-    /* ---------------- Render ---------------- */
-    if (!isOpen) return null;
+    if (!shouldRender) return null;
+    const animationClass = isClosing ? 'closing' : '';
 
     return (
         <>
-            <div className="modal-backdrop-centered" onClick={handleCloseAndReset}>
-                <div className="modal-content-large" onClick={e => e.stopPropagation()}>
+            <div 
+                className={`modal-backdrop-centered ${animationClass}`}
+                onClick={handleCloseAndReset}
+            >
+                <div 
+                    className={`modal-content-large ${animationClass}`}
+                    onClick={e => e.stopPropagation()}
+                >
                     {view === 'form' && (
                         <>
                             <h3>Tambah Stok Barang</h3>

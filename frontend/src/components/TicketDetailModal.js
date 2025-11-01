@@ -9,12 +9,32 @@ const formatDateTime = (dateTimeString) => {
     return format(new Date(dateTimeString), 'dd MMM yyyy, HH:mm', { locale: id });
 };
 
-function TicketDetailModal({ ticket, onClose }) {
+function TicketDetailModal({ show, ticket, onClose }) {
     const [borrowedItems, setBorrowedItems] = useState([]);
     const [isLoadingItems, setIsLoadingItems] = useState(true);
 
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(show);
+    const [currentTicket, setCurrentTicket] = useState(ticket); 
+
     useEffect(() => {
-        if (ticket?.id) {
+        if (show) {
+            setCurrentTicket(ticket);
+            setShouldRender(true);
+            setIsClosing(false); 
+        } else if (shouldRender && !isClosing) {
+            setIsClosing(true); 
+            const timer = setTimeout(() => {
+                setIsClosing(false);
+                setShouldRender(false);
+            }, 300); 
+            return () => clearTimeout(timer);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, ticket, shouldRender]);
+
+    useEffect(() => {
+        if (show && ticket?.id) {
             setIsLoadingItems(true);
             api.get(`/tickets/${ticket.id}/borrowed-items`)
                 .then(response => {
@@ -28,28 +48,21 @@ function TicketDetailModal({ ticket, onClose }) {
                     setIsLoadingItems(false);
                 });
         }
-    }, [ticket]);
+    }, [show, ticket]);
 
-    if (!ticket) return null;
+    const handleCloseClick = () => {
+        if (onClose) {
+            onClose();
+        }
+    };
 
-    // const formatWorkTime = (t) => {
-    //     if (t.started_at && t.completed_at) {
-    //         return `${format(new Date(t.started_at), 'HH:mm')} - ${format(new Date(t.completed_at), 'HH:mm')}`;
-    //     }
-    //     if (t.started_at) {
-    //         return `Mulai: ${format(new Date(t.started_at), 'HH:mm')}`;
-    //     }
-    //     if (t.requested_date && t.requested_time) {
-    //         return `Diminta: ${format(new Date(t.requested_date), 'dd MMM')}, ${t.requested_time}`;
-    //     }
-    //     return 'Jadwal Fleksibel';
-    // };
+    if (!shouldRender) return null;
+    if (!currentTicket) return null;
 
     const handleWhatsAppChat = () => {
-        const phone = ticket.creator?.phone;
+        const phone = currentTicket.creator?.phone;
         if (!phone) return;
 
-        // Format nomor: hilangkan karakter non-digit, ganti '0' di depan dengan '62'
         let formattedPhone = phone.replace(/\D/g, '');
         if (formattedPhone.startsWith('0')) {
             formattedPhone = '62' + formattedPhone.substring(1);
@@ -59,11 +72,19 @@ function TicketDetailModal({ ticket, onClose }) {
         window.open(url, '_blank', 'noopener,noreferrer');
     };
 
+    const animationClass = isClosing ? 'closing' : '';
+
     return (
-        <div className="modal-backdrop-detail">
-            <div className="modal-content-detail">
+        <div 
+            className={`modal-backdrop-detail ${animationClass}`}
+            onClick={handleCloseClick}
+        >
+            <div 
+                className={`modal-content-detail ${animationClass}`}
+                onClick={e => e.stopPropagation()}
+            >
                 <div className="modal-header-detail">
-                    <h3><strong>Detail Tiket: </strong>{ticket.kode_tiket || 'N/A'}</h3>
+                    <h3><strong>Detail Tiket: </strong>{currentTicket.kode_tiket || 'N/A'}</h3>
                 </div>
 
                 <div className="modal-body-detail">
@@ -72,38 +93,38 @@ function TicketDetailModal({ ticket, onClose }) {
                     <div className="detail-grid-section">
                         <div className="detail-item-full">
                             <span className="label">Pengirim</span>
-                            <span className="value">{ticket.creator ? ticket.creator.name : 'N/A'}</span>
+                            <span className="value">{currentTicket.creator ? currentTicket.creator.name : 'N/A'}</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Dikerjakan Oleh</span>
-                            <span className="value">{ticket.user ? ticket.user.name : '-'}</span>
+                            <span className="value">{currentTicket.user ? currentTicket.user.name : '-'}</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Workshop</span>
-                            <span className="value">{ticket.workshop ? ticket.workshop.name : 'N/A'}</span>
+                            <span className="value">{currentTicket.workshop ? currentTicket.workshop.name : 'N/A'}</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Tanggal Dibuat</span>
-                            <span className="value">{formatDateTime(ticket.created_at)}</span>
+                            <span className="value">{formatDateTime(currentTicket.created_at)}</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Mulai Dikerjakan</span>
-                            <span className="value">{formatDateTime(ticket.started_at)}</span>
+                            <span className="value">{formatDateTime(currentTicket.started_at)}</span>
                         </div>
                         <div className="detail-item-full" data-span="2">
                             <span className="label">Selesai Dikerjakan</span>
-                            <span className="value">{formatDateTime(ticket.completed_at)}</span>
+                            <span className="value">{formatDateTime(currentTicket.completed_at)}</span>
                         </div>
                     </div>
 
-                    {ticket.status === 'Selesai' && ticket.proof_description && (
+                    {currentTicket.status === 'Selesai' && currentTicket.proof_description && (
                         <div className="detail-item-full" data-span="2">
                             <span className="label">Bukti Pekerjaan</span>
-                            <p className="value">{ticket.proof_description}</p>
-                            {ticket.proof_image_url && (
+                            <p className="value">{currentTicket.proof_description}</p>
+                            {currentTicket.proof_image_url && (
                                 <div className="proof-image-container">
-                                    <a href={ticket.proof_image_url} target="_blank" rel="noopener noreferrer">
-                                        <img src={ticket.proof_image_url} alt="Bukti Pengerjaan" />
+                                    <a href={currentTicket.proof_image_url} target="_blank" rel="noopener noreferrer">
+                                        <img src={currentTicket.proof_image_url} alt="Bukti Pengerjaan" />
                                     </a>
                                 </div>
                             )}
@@ -112,12 +133,12 @@ function TicketDetailModal({ ticket, onClose }) {
 
                     <div className="detail-item-full" data-span="2">
                         <span className="label">Status</span>
-                        <span className={`value status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span>
+                        <span className={`value status-badge status-${currentTicket.status.toLowerCase().replace(/\s+/g, '-')}`}>{currentTicket.status}</span>
                     </div>
 
                     <div className="detail-item-full" data-span="2">
                         <span className="label">Deskripsi Pekerjaan</span>
-                        <span className="value">{ticket.title}</span>
+                        <span className="value">{currentTicket.title}</span>
                     </div>
 
                     <div className="detail-item-full" data-span="2">
@@ -141,8 +162,8 @@ function TicketDetailModal({ ticket, onClose }) {
 
                 </div>
                 <div className="modal-footer-user" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                    <button onClick={onClose} className="btn-cancel">Tutup</button>
-                    {ticket.creator && ticket.creator.phone && (
+                    <button onClick={handleCloseClick} className="btn-cancel">Tutup</button>
+                    {currentTicket.creator && currentTicket.creator.phone && (
                         <button onClick={handleWhatsAppChat} className="btn-history">
                             <i className="fab fa-whatsapp" style={{ marginRight: '8px' }}></i>
                             Chat Pengirim

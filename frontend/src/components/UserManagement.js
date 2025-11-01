@@ -326,19 +326,26 @@ export default function UserManagement() {
                     )}
                 </>
             )}
-            {showUserFormModal && (
-                <UserFormModal userToEdit={userToEdit} onClose={() => { setShowUserFormModal(false); setUserToEdit(null); }} onSave={handleSaveUser} />
-            )}
-            {showUserConfirmModal && (
-                <ConfirmationModal message={`Anda yakin ingin menghapus pengguna "${userToDelete?.name}"?`} onConfirm={confirmUserDelete} onCancel={() => setShowUserConfirmModal(false)} />
-            )}
-            {detailUser && (
-                <UserDetailModal
-                    user={detailUser}
-                    onClose={() => setDetailUser(null)}
-                    onEditRequest={handleEditRequest}
-                />
-            )}
+            <UserFormModal
+                show={showUserFormModal}
+                userToEdit={userToEdit}
+                onClose={() => { setShowUserFormModal(false); setUserToEdit(null); }}
+                onSave={handleSaveUser}
+            />
+
+            <ConfirmationModal
+                show={showUserConfirmModal}
+                message={`Anda yakin ingin menghapus pengguna "${userToDelete?.name}"?`}
+                onConfirm={confirmUserDelete}
+                onCancel={() => setShowUserConfirmModal(false)}
+            />
+
+            <UserDetailModal
+                show={Boolean(detailUser)}
+                user={detailUser}
+                onClose={() => setDetailUser(null)}
+                onEditRequest={handleEditRequest}
+            />
         </div>
     );
 };

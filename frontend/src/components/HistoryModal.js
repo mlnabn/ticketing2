@@ -2,26 +2,44 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
-function HistoryModal({ item, onClose, showToast, startDate, endDate }) {
+function HistoryModal({ show, item, onClose, showToast, startDate, endDate }) {
     const [history, setHistory] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(show);
+    const [currentItem, setCurrentItem] = useState(item);
 
     useEffect(() => {
-        if (item?.id) {
+        if (show) {
+            setCurrentItem(item);
+            setShouldRender(true);
+            setIsClosing(false);
+        } else if (shouldRender && !isClosing) {
+            setIsClosing(true);
+            const timer = setTimeout(() => {
+                setIsClosing(false);
+                setShouldRender(false);
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, item, shouldRender]);
+
+    useEffect(() => {
+        if (show && currentItem?.id) {
             setIsLoading(true);
             const params = {
                 start_date: startDate,
                 end_date: endDate
             };
 
-            api.get(`/inventory/stock-items/${item.id}/history`, { params }) // <-- Tambahkan { params }
+            api.get(`/inventory/stock-items/${currentItem.id}/history`, { params })
                 .then(res => setHistory(res.data))
                 .catch(err => showToast('Gagal memuat riwayat', 'error'))
                 .finally(() => setIsLoading(false));
         }
-    }, [item, showToast, startDate, endDate]);
+    }, [show, currentItem, showToast, startDate, endDate]);
 
-    // Format untuk waktu pencatatan (dengan jam)
     const formatLogTime = (dateString) => {
         if (!dateString) return 'N/A';
         return new Date(dateString).toLocaleString('id-ID', {
@@ -30,22 +48,30 @@ function HistoryModal({ item, onClose, showToast, startDate, endDate }) {
         });
     };
 
-    // Format untuk tanggal kejadian (tanpa jam)
     const formatEventDate = (dateString) => {
         if (!dateString) return 'N/A';
-        // Tambahkan 'timeZone: UTC' untuk mencegah pergeseran tanggal
         return new Date(dateString).toLocaleDateString('id-ID', {
             day: '2-digit', month: 'long', year: 'numeric'
         });
     };
 
+    const handleCloseClick = () => {
+        if (onClose) {
+            onClose();
+        }
+    };
+
+    if (!shouldRender) return null;
+
+    const animationClass = isClosing ? 'closing' : '';
+
     return (
-        <div className="modal-backdrop-centered" onClick={onClose}>
-            <div className="modal-content-large" onClick={e => e.stopPropagation()}>
-                <button type="button" onClick={onClose} className="modal-close-btn">&times;</button>
-                <h3>Riwayat Aset: {item.master_barang?.nama_barang}</h3>
+        <div className={`modal-backdrop-centered ${animationClass}`} onClick={handleCloseClick}>
+            <div className={`modal-content-large ${animationClass}`} onClick={e => e.stopPropagation()}>
+                <button type="button" onClick={handleCloseClick} className="modal-close-btn">&times;</button>
+                <h3>Riwayat Aset: {currentItem.master_barang?.nama_barang}</h3>
                 <p style={{ textAlign: 'center', marginBottom: '20px' }}>
-                    Kode Unik: <strong>{item.kode_unik}</strong>
+                    Kode Unik: <strong>{currentItem.kode_unik}</strong>
                 </p>
 
                 <div className="item-detail-bottom-section" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
@@ -101,7 +127,7 @@ function HistoryModal({ item, onClose, showToast, startDate, endDate }) {
                 </div>
 
                 <div className="modal-actions">
-                    <button onClick={onClose} className="btn-cancel">Tutup</button>
+                    <button onClick={handleCloseClick} className="btn-cancel">Tutup</button>
                 </div>
             </div>
         </div>

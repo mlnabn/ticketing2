@@ -221,21 +221,19 @@ export default function WorkshopManagement() {
         </>
       )}
 
-      {showFormModal && (
-        <WorkshopFormModal
-          workshopToEdit={workshopToEdit}
-          onClose={() => setShowFormModal(false)}
-          onSave={handleSave}
-        />
-      )}
+      <WorkshopFormModal
+        show={showFormModal}
+        workshopToEdit={workshopToEdit}
+        onClose={() => setShowFormModal(false)}
+        onSave={handleSave}
+      />
 
-      {showConfirmModal && (
-        <ConfirmationModal
-          message={`Anda yakin ingin menghapus workshop "${workshopToDelete?.name}"?`}
-          onConfirm={confirmDelete}
-          onCancel={() => setShowConfirmModal(false)}
-        />
-      )}
+      <ConfirmationModal
+        show={showConfirmModal}
+        message={`Anda yakin ingin menghapus workshop "${workshopToDelete?.name}"?`}
+        onConfirm={confirmDelete}
+        onCancel={() => setShowConfirmModal(false)}
+      />
     </div>
   );
 }

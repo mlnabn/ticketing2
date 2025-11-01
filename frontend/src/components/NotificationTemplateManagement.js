@@ -228,21 +228,19 @@ export default function NotificationTemplateManagement() {
         </>
       )}
 
-      {showFormModal && (
-        <NotificationTemplateFormModal
-          templateToEdit={templateToEdit}
-          onClose={() => setShowFormModal(false)}
-          onSave={handleSave}
-        />
-      )}
+      <NotificationTemplateFormModal
+        show={showFormModal}
+        templateToEdit={templateToEdit}
+        onClose={() => setShowFormModal(false)}
+        onSave={handleSave}
+      />
 
-      {showConfirmModal && (
-        <ConfirmationModal
-          message={`Anda yakin ingin menghapus template "${templateToDelete?.title}"?`}
-          onConfirm={confirmDelete}
-          onCancel={() => setShowConfirmModal(false)}
-        />
-      )}
+      <ConfirmationModal
+        show={showConfirmModal}
+        message={`Anda yakin ingin menghapus template "${templateToDelete?.title}"?`}
+        onConfirm={confirmDelete}
+        onCancel={() => setShowConfirmModal(false)}
+      />
     </div>
   );
 }

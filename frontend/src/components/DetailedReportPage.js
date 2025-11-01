@@ -531,14 +531,13 @@ export default function DetailedReportPage({ type, title }) {
                 )}
             </div>
 
-            {selectedItem && (
-                <InventoryDetailModal
-                    kodeUnik={selectedItem}
-                    onClose={() => setSelectedItem(null)}
-                    formatDate={formatDate}
-                    formatCurrency={formatCurrency}
-                />
-            )}
+            <InventoryDetailModal
+                show={Boolean(selectedItem)}
+                kodeUnik={selectedItem}
+                onClose={() => setSelectedItem(null)}
+                formatDate={formatDate}
+                formatCurrency={formatCurrency}
+            />
         </div>
     );
 }

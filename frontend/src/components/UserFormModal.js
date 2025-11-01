@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../App.css';
 
-const UserFormModal = ({ userToEdit, onClose, onSave }) => {
+const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -12,6 +12,24 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const [isClosing, setIsClosing] = useState(false);
+  const [shouldRender, setShouldRender] = useState(show);
+
+  useEffect(() => {
+      if (show) {
+          setShouldRender(true);
+          setIsClosing(false); 
+      } else if (shouldRender && !isClosing) {
+          setIsClosing(true); 
+          const timer = setTimeout(() => {
+              setIsClosing(false);
+              setShouldRender(false); 
+          }, 300); 
+          return () => clearTimeout(timer);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [show, shouldRender]);
 
   const isEditMode = Boolean(userToEdit);
 
@@ -44,10 +62,26 @@ const UserFormModal = ({ userToEdit, onClose, onSave }) => {
     setShowPassword(!showPassword);
   };
 
+  const handleCloseClick = () => {
+      if (onClose) {
+          onClose(); 
+      }
+  };
+
+  if (!shouldRender) return null;
+
+  const animationClass = isClosing ? 'closing' : '';
+
   return (
     <>
-      <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-content" onClick={e => e.stopPropagation()}>
+      <div 
+        className={`modal-overlay ${animationClass}`} 
+        onClick={handleCloseClick}
+      >
+        <div 
+          className={`modal-content ${animationClass}`} 
+          onClick={e => e.stopPropagation()}
+        >
           <h1>{isEditMode ? 'Edit Pengguna' : 'Tambah Pengguna Baru'}</h1>
           <form onSubmit={handleSubmit}>
             <div>

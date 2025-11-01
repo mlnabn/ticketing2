@@ -485,12 +485,11 @@ export default function TicketReportDetail() {
           )}
         </>
       )}
-      {selectedTicketForDetail && (
-        <TicketDetailModal
+      <TicketDetailModal
+          show={Boolean(selectedTicketForDetail)}
           ticket={selectedTicketForDetail}
           onClose={() => setSelectedTicketForDetail(null)}
-        />
-      )}
+      />
     </div>
   );
 }

@@ -68,7 +68,7 @@ const parseRupiah = (rupiah) => {
 /* ===========================================================
    Komponen Utama
 =========================================================== */
-function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }) {
+function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showToast, colorOptions }) {
     const [formData, setFormData] = useState({
         serial_number: '',
         status_id: '',
@@ -80,39 +80,43 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
     });
     const [displayHarga, setDisplayHarga] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [statusOptions, setStatusOptions] = useState([]);
-    const [colorOptions, setColorOptions] = useState([]);
 
-    // --- Load data dropdown (statuses & colors) ---
+    const [currentItem, setCurrentItem] = useState(item);
+
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(show);
+
     useEffect(() => {
-        if (isOpen) {
-            api.get('/statuses').then(res => setStatusOptions(res.data));
-            api.get('/colors').then(res => {
-                const options = res.data.map(color => ({
-                    value: color.id_warna,
-                    label: color.nama_warna,
-                    hex: color.kode_hex
-                }));
-                setColorOptions(options);
-            });
+        if (show) {
+            setCurrentItem(item);
+            setShouldRender(true);
+            setIsClosing(false); 
+        } else if (shouldRender && !isClosing) {
+            setIsClosing(true); 
+            const timer = setTimeout(() => {
+                setIsClosing(false);
+                setShouldRender(false); 
+            }, 300); 
+            return () => clearTimeout(timer);
         }
-    }, [isOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, item, shouldRender]);
 
     // --- Isi form dengan data item yang akan diedit ---
     useEffect(() => {
-        if (item) {
+        if (currentItem) {
             setFormData({
-                serial_number: item.serial_number || '',
-                status_id: item.status_id || '',
-                tanggal_pembelian: item.tanggal_pembelian ? item.tanggal_pembelian.split('T')[0] : '',
-                tanggal_masuk: item.tanggal_masuk ? item.tanggal_masuk.split('T')[0] : '',
-                harga_beli: item.harga_beli || 0,
-                kondisi: item.kondisi || 'Baru',
-                id_warna: item.id_warna || null
+                serial_number: currentItem.serial_number || '',
+                status_id: currentItem.status_id || '',
+                tanggal_pembelian: currentItem.tanggal_pembelian ? currentItem.tanggal_pembelian.split('T')[0] : '',
+                tanggal_masuk: currentItem.tanggal_masuk ? currentItem.tanggal_masuk.split('T')[0] : '',
+                harga_beli: currentItem.harga_beli || 0,
+                kondisi: currentItem.kondisi || 'Baru',
+                id_warna: currentItem.id_warna || null
             });
-            setDisplayHarga(formatRupiah(item.harga_beli));
+            setDisplayHarga(formatRupiah(currentItem.harga_beli));
         }
-    }, [item]);
+    }, [currentItem]);
 
     // --- Handlers ---
     const handleChange = (e) => {
@@ -146,14 +150,34 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
         }
     };
 
-    if (!isOpen) return null;
+    const handleCloseClick = () => {
+        if (onClose) {
+            onClose();
+        }
+    };
+    
+    if (!shouldRender) return null;
+
+    const animationClass = isClosing ? 'closing' : '';
+    
+    const colorOptionsForSelect = colorOptions.map(color => ({
+        value: color.id_warna,
+        label: color.nama_warna,
+        hex: color.kode_hex
+    }));
 
     return (
-        <div className="modal-backdrop-centered">
-            <div className="modal-content-large">
-                <h3>Edit Detail Stok: {item?.kode_unik}</h3>
+        <div 
+            className={`modal-backdrop-centered ${animationClass}`}
+            onClick={handleCloseClick}
+        >
+            <div 
+                className={`modal-content-large ${animationClass}`}
+                onClick={e => e.stopPropagation()}
+            >
+                <h3>Edit Detail Stok: {currentItem?.kode_unik}</h3>
                 <p style={{ marginTop: '-1rem', marginBottom: '1.5rem', color: '#6c757d' }}>
-                    {item?.master_barang?.nama_barang}
+                    {currentItem?.master_barang?.nama_barang}
                 </p>
                 <form onSubmit={handleSave}>
                     <div className="form-row2">
@@ -187,8 +211,8 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
                             {/* UBAH: Ganti CreatableSelect dengan Select */}
                             <Select
                                 classNamePrefix="creatable-select"
-                                options={colorOptions}
-                                value={colorOptions.find((opt) => opt.value === formData.id_warna)}
+                                options={colorOptionsForSelect}
+                                value={colorOptionsForSelect.find((opt) => opt.value === formData.id_warna)}
                                 onChange={handleColorChange}
                                 placeholder="Pilih atau cari warna..." // Placeholder disesuaikan
                                 isClearable
@@ -200,16 +224,6 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
                                 }}
                             />
                         </div>
-                    </div>
-
-                    <div className="form-group full">
-                        <label>Status Stok</label>
-                        <select name="status_id" value={formData.status_id} onChange={handleChange}>
-                            <option value="">Pilih Status</option>
-                            {statusOptions.map(opt => (
-                                <option key={opt.id} value={opt.id}>{opt.nama_status}</option>
-                            ))}
-                        </select>
                     </div>
 
                     <div className="form-row2">
@@ -224,7 +238,7 @@ function EditStokBarangModal({ isOpen, onClose, item, onSaveSuccess, showToast }
                     </div>
 
                     <div className="confirmation-modal-actions">
-                        <button type="button" onClick={onClose} className="btn-cancel">Batal</button>
+                        <button type="button" onClick={handleCloseClick} className="btn-cancel">Batal</button>
                         <button type="submit" className="btn-confirm" disabled={isLoading}>Simpan</button>
                     </div>
                 </form>

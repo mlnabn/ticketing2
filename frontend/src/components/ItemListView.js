@@ -278,12 +278,11 @@ function ItemListView({
                 )}
             </div>
 
-            {selectedItemForDetail && (
-                <SkuDetailModal
-                    item={selectedItemForDetail}
-                    onClose={() => setSelectedItemForDetail(null)}
-                />
-            )}
+            <SkuDetailModal
+                show={Boolean(selectedItemForDetail)}
+                item={selectedItemForDetail}
+                onClose={() => setSelectedItemForDetail(null)}
+            />
         </>
     );
 }

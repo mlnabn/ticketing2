@@ -184,14 +184,13 @@ export default function NewAcquisitionsReport() {
                         </span>
                     </div>
                 </div>
-                {selectedItem && (
-                    <AcquisitionDetailModal
-                        item={selectedItem}
-                        onClose={() => setSelectedItem(null)}
-                        formatCurrency={formatCurrency}
-                        formatDate={formatDate}
-                    />
-                )}
+                <AcquisitionDetailModal
+                    show={Boolean(selectedItem)}
+                    item={selectedItem}
+                    onClose={() => setSelectedItem(null)}
+                    formatCurrency={formatCurrency}
+                    formatDate={formatDate}
+                />
             </div>
         </div>
     );

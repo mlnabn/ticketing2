@@ -4,7 +4,7 @@ import api from '../services/api';
 import EditStokBarangModal from './EditStokBarangModal';
 import HistoryModal from './HistoryModal';
 
-// --- State Awal (Tidak Berubah) ---
+// --- Inisialisasi Data Form ---
 const initialFormData = {
     status_id: '',
     deskripsi: '',
@@ -22,51 +22,70 @@ const initialFormData = {
 };
 
 // --- Komponen Utama ---
-function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick, fetchData, pagination, selectedCategory, selectedSubCategory }) {
+function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEditClick, statusOptions, colorOptions, fetchData, pagination, currentFilters }) {
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState(initialFormData);
     const [users, setUsers] = useState([]);
     const [workshops, setWorkshops] = useState([]);
-    const [statusOptions, setStatusOptions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [editItem, setEditItem] = useState(null);
     const [stockByColor, setStockByColor] = useState([]);
     const [showHistory, setShowHistory] = useState(false);
 
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(show);
+    const [currentItem, setCurrentItem] = useState(item);
+
+    useEffect(() => {
+        if (show) {
+            setCurrentItem(item);
+            setShouldRender(true);
+            setIsClosing(false);
+        } else if (shouldRender && !isClosing) {
+            setIsClosing(true);
+            const timer = setTimeout(() => {
+                setIsClosing(false);
+                setShouldRender(false);
+                setIsEditing(false); 
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, item, shouldRender]);
+
     // --- Efek untuk mengisi form & mengambil data ---
     useEffect(() => {
-        if (item) {
+        if (currentItem) {
             setFormData({
-                status_id: item.status_id || '',
-                deskripsi: item.deskripsi || '',
-                user_peminjam_id: item.user_peminjam_id || '',
-                workshop_id: item.workshop_id || '',
-                teknisi_perbaikan_id: item.teknisi_perbaikan_id || '',
-                tanggal_mulai_perbaikan: item.tanggal_mulai_perbaikan?.split(' ')[0] || '',
-                tanggal_selesai_perbaikan: item.tanggal_selesai_perbaikan?.split(' ')[0] || '',
-                user_perusak_id: item.user_perusak_id || '',
-                tanggal_rusak: item.tanggal_rusak?.split(' ')[0] || '',
-                user_penghilang_id: item.user_penghilang_id || '',
-                tanggal_hilang: item.tanggal_hilang?.split(' ')[0] || '',
-                tanggal_ketemu: item.tanggal_ketemu?.split(' ')[0] || '',
-                tanggal_keluar: item.tanggal_keluar?.split(' ')[0] || '',
+                status_id: currentItem.status_id || '',
+                deskripsi: currentItem.deskripsi || '',
+                user_peminjam_id: currentItem.user_peminjam_id || '',
+                workshop_id: currentItem.workshop_id || '',
+                teknisi_perbaikan_id: currentItem.teknisi_perbaikan_id || '',
+                tanggal_mulai_perbaikan: currentItem.tanggal_mulai_perbaikan?.split(' ')[0] || '',
+                tanggal_selesai_perbaikan: currentItem.tanggal_selesai_perbaikan?.split(' ')[0] || '',
+                user_perusak_id: currentItem.user_perusak_id || '',
+                tanggal_rusak: currentItem.tanggal_rusak?.split(' ')[0] || '',
+                user_penghilang_id: currentItem.user_penghilang_id || '',
+                tanggal_hilang: currentItem.tanggal_hilang?.split(' ')[0] || '',
+                tanggal_ketemu: currentItem.tanggal_ketemu?.split(' ')[0] || '',
+                tanggal_keluar: currentItem.tanggal_keluar?.split(' ')[0] || '',
             });
         }
-    }, [item, isEditing]);
+    }, [currentItem, isEditing]);
 
     useEffect(() => {
         if (isEditing) {
-            api.get('/statuses').then(res => setStatusOptions(res.data));
             api.get('/users?all=true').then(res => setUsers(res.data));
             api.get('/workshops').then(res => setWorkshops(res.data.data || res.data));
         }
     }, [isEditing]);
 
     useEffect(() => {
-        if (item?.master_barang_id) {
+        if (currentItem?.master_barang_id) {
             const fetchStockByColor = async () => {
                 try {
-                    const response = await api.get(`/inventory/items/${item.master_barang_id}/stock-by-color`);
+                    const response = await api.get(`/inventory/items/${currentItem.master_barang_id}/stock-by-color`);
                     setStockByColor(response.data);
                 } catch (error) {
                     console.error("Gagal mengambil rincian stok warna:", error);
@@ -74,30 +93,37 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
             };
             fetchStockByColor();
         }
-    }, [item]);
+    }, [currentItem]);
 
     const selectedStatusName = useMemo(() => {
         if (isEditing) {
             const selectedStatus = statusOptions.find(s => s.id === Number(formData.status_id));
             return selectedStatus ? selectedStatus.nama_status : '';
         }
-        return item?.status_detail?.nama_status;
-    }, [formData.status_id, statusOptions, isEditing, item]);
+        return currentItem?.status_detail?.nama_status;
+    }, [formData.status_id, statusOptions, isEditing, currentItem]);
 
-    if (!item) return null;
+    if (!shouldRender) return null;
+    if (!currentItem) return null;
 
     // --- Handlers ---
     const handleChange = (e) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
+    const handleCloseClick = () => {
+        if (onClose) {
+            onClose();
+        }
+    };
+
     const handleSave = async () => {
         setIsLoading(true);
         try {
-            await api.post(`/inventory/stock-items/${item.id}/update-status`, formData);
+            await api.post(`/inventory/stock-items/${currentItem.id}/update-status`, formData);
             showToast('Status barang berhasil diupdate.', 'success');
             onSaveSuccess();
-            onClose();
+            handleCloseClick();
         } catch (error) {
             const errorMsg = error.response?.data?.message || 'Gagal menyimpan.';
             showToast(errorMsg, 'error');
@@ -200,23 +226,31 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
         }
     };
 
-    return (
-        <div className="modal-backdrop-centered" onClick={onClose}>
-            <div className="modal-content-large" onClick={e => e.stopPropagation()}>
+    const animationClass = isClosing ? 'closing' : '';
 
-                <button type="button" onClick={onClose} className="modal-close-btn">&times;</button>
-                <h3>Detail Aset: {item.master_barang?.nama_barang}</h3>
+    return (
+        <div 
+            className={`modal-backdrop-centered ${animationClass}`}
+            onClick={handleCloseClick}
+        >
+            <div 
+                className={`modal-content-large ${animationClass}`}
+                onClick={e => e.stopPropagation()}
+            >
+
+                <button type="button" onClick={handleCloseClick} className="modal-close-btn">&times;</button>
+                <h3>Detail Aset: {currentItem.master_barang?.nama_barang}</h3>
 
                 <div className="item-detail-qr-top">
-                    <QRCode value={item.kode_unik} size={160} level="H" />
-                    <strong>{item.kode_unik}</strong>
+                    <QRCode value={currentItem.kode_unik} size={160} level="H" />
+                    <strong>{currentItem.kode_unik}</strong>
                 </div>
 
                 <div className="item-detail-bottom-section">
                     <div className="form-row2">
-                        <div className="info-row"><span className="info-label">Kondisi</span><span className="info-value-info">{item.kondisi}</span></div>
-                        <div className="info-row"><span className="info-label">Harga Beli</span><span className="info-value-info">{`Rp ${Number(item.harga_beli).toLocaleString('id-ID')}`}</span></div>
-                        <div className="info-row"><span className="info-label">Tanggal Pembelian</span><span className="info-value-info">{new Date(item.tanggal_pembelian).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>
+                        <div className="info-row"><span className="info-label">Kondisi</span><span className="info-value-info">{currentItem.kondisi}</span></div>
+                        <div className="info-row"><span className="info-label">Harga Beli</span><span className="info-value-info">{`Rp ${Number(currentItem.harga_beli).toLocaleString('id-ID')}`}</span></div>
+                        <div className="info-row"><span className="info-label">Tanggal Pembelian</span><span className="info-value-info">{new Date(currentItem.tanggal_pembelian).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>
 
                         <div className="info-row">
                             <span className="info-label">Status Stok</span>
@@ -226,7 +260,7 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                                         <option value="">Pilih Status</option>
                                         {statusOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.nama_status}</option>)}
                                     </select>
-                                ) : (item.status_detail?.nama_status || 'N/A')}
+                                ) : (currentItem.status_detail?.nama_status || 'N/A')}
                             </span>
                         </div>
 
@@ -246,34 +280,34 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
 
                         {!isEditing && (
                             <>
-                                {(item.status_detail?.nama_status === 'Digunakan' || item.status_detail?.nama_status === 'Dipinjam') && (
+                                {(currentItem.status_detail?.nama_status === 'Digunakan' || currentItem.status_detail?.nama_status === 'Dipinjam') && (
                                     <>
-                                        <div className="info-row"><span className="info-label">{item.status_detail.nama_status} Oleh</span><span className="info-value-info">{item.user_peminjam?.name || 'N/A'}</span></div>
-                                        <div className="info-row"><span className="info-label">Di Workshop</span><span className="info-value-info">{item.workshop?.name || 'N/A'}</span></div>
-                                        {item.tanggal_keluar && <div className="info-row"><span className="info-label">Tanggal Keluar</span><span className="info-value-info">{new Date(item.tanggal_keluar).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>}
-                                        {item.tanggal_masuk_pinjam && <div className="info-row"><span className="info-label">Estimasi Tgl Masuk</span><span className="info-value-info">{new Date(item.tanggal_masuk_pinjam).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>}
+                                        <div className="info-row"><span className="info-label">{currentItem.status_detail.nama_status} Oleh</span><span className="info-value-info">{currentItem.user_peminjam?.name || 'N/A'}</span></div>
+                                        <div className="info-row"><span className="info-label">Di Workshop</span><span className="info-value-info">{currentItem.workshop?.name || 'N/A'}</span></div>
+                                        {currentItem.tanggal_keluar && <div className="info-row"><span className="info-label">Tanggal Keluar</span><span className="info-value-info">{new Date(currentItem.tanggal_keluar).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>}
+                                        {currentItem.tanggal_masuk_pinjam && <div className="info-row"><span className="info-label">Estimasi Tgl Masuk</span><span className="info-value-info">{new Date(currentItem.tanggal_masuk_pinjam).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>}
                                     </>
                                 )}
-                                {item.status_detail?.nama_status === 'Perbaikan' && (
+                                {currentItem.status_detail?.nama_status === 'Perbaikan' && (
                                     <>
-                                        <div className="info-row"><span className="info-label">Teknisi</span><span className="info-value-info">{item.teknisi_perbaikan?.name || 'N/A'}</span></div>
-                                        {item.tanggal_mulai_perbaikan && <div className="info-row"><span className="info-label">Tgl Mulai</span><span className="info-value-info">{new Date(item.tanggal_mulai_perbaikan).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>}
+                                        <div className="info-row"><span className="info-label">Teknisi</span><span className="info-value-info">{currentItem.teknisi_perbaikan?.name || 'N/A'}</span></div>
+                                        {currentItem.tanggal_mulai_perbaikan && <div className="info-row"><span className="info-label">Tgl Mulai</span><span className="info-value-info">{new Date(currentItem.tanggal_mulai_perbaikan).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>}
                                     </>
                                 )}
-                                {item.status_detail?.nama_status === 'Rusak' && (
+                                {currentItem.status_detail?.nama_status === 'Rusak' && (
                                     <>
-                                        <div className="info-row"><span className="info-label">Dilaporkan Oleh</span><span className="info-value-info">{item.user_perusak?.name || 'N/A'}</span></div>
-                                        {item.tanggal_rusak && <div className="info-row"><span className="info-label">Tgl Rusak</span><span className="info-value-info">{new Date(item.tanggal_rusak).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>}
+                                        <div className="info-row"><span className="info-label">Dilaporkan Oleh</span><span className="info-value-info">{currentItem.user_perusak?.name || 'N/A'}</span></div>
+                                        {currentItem.tanggal_rusak && <div className="info-row"><span className="info-label">Tgl Rusak</span><span className="info-value-info">{new Date(currentItem.tanggal_rusak).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>}
                                     </>
                                 )}
-                                {item.status_detail?.nama_status === 'Hilang' && (
+                                {currentItem.status_detail?.nama_status === 'Hilang' && (
                                     <>
-                                        <div className="info-row"><span className="info-label">Terakhir Oleh</span><span className="info-value-info">{item.user_penghilang?.name || 'N/A'}</span></div>
-                                        {item.tanggal_hilang && <div className="info-row"><span className="info-label">Tgl Hilang</span><span className="info-value-info">{new Date(item.tanggal_hilang).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>}
+                                        <div className="info-row"><span className="info-label">Terakhir Oleh</span><span className="info-value-info">{currentItem.user_penghilang?.name || 'N/A'}</span></div>
+                                        {currentItem.tanggal_hilang && <div className="info-row"><span className="info-label">Tgl Hilang</span><span className="info-value-info">{new Date(currentItem.tanggal_hilang).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>}
                                     </>
                                 )}
-                                {item.deskripsi && (
-                                    <div className="info-row full-width"><span className="info-label">Deskripsi</span><span className="info-value-info">{item.deskripsi}</span></div>
+                                {currentItem.deskripsi && (
+                                    <div className="info-row full-width"><span className="info-label">Deskripsi</span><span className="info-value-info">{currentItem.deskripsi}</span></div>
                                 )}
                             </>
                         )}
@@ -293,30 +327,32 @@ function ItemDetailModal({ item, onClose, onSaveSuccess, showToast, onEditClick,
                         </>
                     ) : (
                         <>
-                            <button onClick={() => onEditClick(item)} className="btn-cancel">Edit Detail</button>
+                            <button onClick={() => onEditClick(currentItem)} className="btn-cancel">Edit Detail</button>
                             <button onClick={() => setIsEditing(true)} className="btn-confirm">Ubah Status</button>
                         </>
                     )}
                 </div>
             </div>
 
-            {editItem && (
-                <EditStokBarangModal
-                    isOpen={!!editItem}
-                    onClose={() => setEditItem(null)}
-                    item={editItem}
-                    showToast={showToast}
-                    onSaveSuccess={() => {
-                        setEditItem(null);
-                        fetchData(pagination?.current_page || 1, {
-                            id_kategori: selectedCategory,
-                            id_sub_kategori: selectedSubCategory
-                        });
-                    }}
-                />
-            )}
+            <EditStokBarangModal
+                show={Boolean(editItem)}
+                onClose={() => setEditItem(null)}
+                item={editItem}
+                showToast={showToast}
+                onSaveSuccess={() => {
+                    setEditItem(null);
+                    fetchData(pagination?.current_page || 1, currentFilters); 
+                }}
+                statusOptions={statusOptions}
+                colorOptions={colorOptions}
+            />
 
-            {showHistory && (<HistoryModal item={item} onClose={() => setShowHistory(false)} showToast={showToast} />)}
+            <HistoryModal
+                show={showHistory}
+                item={currentItem}
+                onClose={() => setShowHistory(false)}
+                showToast={showToast}
+            />
         </div>
     );
 }

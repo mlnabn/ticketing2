@@ -4303,6 +4303,11 @@ body.dark-mode .password-toggle-btn:hover {
   justify-content: center;
   z-index: 2000;
   animation: fadeIn 0.3s ease;
+  animation: fadeBackdrop 0.3s ease-out forwards;
+}
+
+.confirmation-modal-backdrop.closing {
+  animation: fadeBackdropOut 0.3s ease-out forwards;
 }
 
 /* --- Styling Konten Modal --- */
@@ -4316,6 +4321,11 @@ body.dark-mode .password-toggle-btn:hover {
   /* animation: slideUp 0.4s ease; */
   text-align: center;
   transition: all 0.3s ease;
+  animation: fadeInScale 0.3s ease-out forwards;
+}
+
+.confirmation-modal-content.closing {
+  animation: scaleOut 0.3s ease-out forwards;
 }
 
 /* Efek khusus untuk Dark Mode */
@@ -4753,6 +4763,10 @@ body.dark-mode .rejection-reason-display p {
   animation: fadeBackdrop 0.35s ease;
 }
 
+.modal-backdrop.closing {
+  animation: fadeBackdropOut 0.3s ease-out forwards;
+}
+
 .modal-backdrop-user {
   position: fixed;
   inset: 0;
@@ -4959,6 +4973,11 @@ body.dark-mode .rejection-reason-display p {
   }
 }
 
+@keyframes fadeBackdropOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
 @keyframes scaleIn {
   from {
     opacity: 0;
@@ -4968,6 +4987,17 @@ body.dark-mode .rejection-reason-display p {
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
   }
 }
 
@@ -7938,6 +7968,13 @@ html {
   color: hsl(210, 10%, 50%);
 }
 
+.modal-overlay {
+  animation: fadeBackdrop 0.3s ease-out forwards;
+}
+.modal-overlay.closing {
+  animation: fadeBackdropOut 0.3s ease-out forwards;
+}
+
 /* --- 6. Ticket Details Modal --- */
 .modal-overlay2 {
   position: fixed;
@@ -7950,6 +7987,11 @@ html {
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeBackdrop 0.3s ease-out forwards;
+}
+
+.modal-overlay2.closing {
+  animation: fadeBackdropOut 0.3s ease-out forwards;
 }
 
 .modal-content2 {
@@ -7963,6 +8005,11 @@ html {
   padding: 30px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease-in-out;
+  animation: fadeInScale 0.3s ease-out forwards;
+}
+
+.modal-content2.closing {
+  animation: scaleOut 0.3s ease-out forwards;
 }
 
 .modal-header {
@@ -9735,6 +9782,15 @@ body.dark-mode .btn-recover-small:hover {
   text-align: center;
 }
 
+.modal-content,
+.modal-content.user-form-modal {
+  animation: fadeInScale 0.3s ease-out forwards; 
+}
+.modal-content.closing,
+.modal-content.user-form-modal.closing {
+  animation: scaleOut 0.3s ease-out forwards;
+}
+
 /* Judul */
 .modal-content.user-form-modal h3 {
   margin-bottom: 8px;
@@ -9838,6 +9894,11 @@ body.dark-mode .form-group-recover textarea:focus {
   justify-content: center;
   z-index: 2000;
   padding: 1rem;
+  animation: fadeBackdrop 0.3s ease-out forwards;
+}
+
+.modal-backdrop-detail.closing {
+  animation: fadeBackdropOut 0.3s ease-out forwards;
 }
 
 .modal-content-detail {
@@ -9854,6 +9915,11 @@ body.dark-mode .form-group-recover textarea:focus {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  animation: fadeInScale 0.3s ease-out forwards;
+}
+
+.modal-content-detail.closing {
+  animation: scaleOut 0.3s ease-out forwards;
 }
 
 .dark-mode .modal-content-detail {
@@ -10565,6 +10631,11 @@ body.dark-mode .form-group-recover textarea:focus {
   align-items: center;
   z-index: 1000;
   padding: 20px;
+  animation: fadeBackdrop 0.3s ease-out forwards;
+}
+
+.modal-backdrop-centered.closing {
+  animation: fadeBackdropOut 0.3s ease-out forwards;
 }
 
 .modal-content-large {
@@ -10575,7 +10646,11 @@ body.dark-mode .form-group-recover textarea:focus {
   max-width: 650px;
   max-height: 90vh;
   overflow-y: auto;
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeInScale 0.3s ease-out forwards;
+}
+
+.modal-content-large.closing {
+  animation: scaleOut 0.3s ease-out forwards;
 }
 
 @keyframes fadeIn {
@@ -11072,7 +11147,11 @@ body {
   width: 90%;
   text-align: center;
   transform: scale(0.95);
-  animation: fadeIn 0.2s ease-out forwards;
+  animation: fadeInScale 0.3s ease-out forwards;
+}
+
+.modal-content-qr.closing {
+  animation: scaleOut 0.3s ease-out forwards;
 }
 
 .dark-mode .modal-content-qr {

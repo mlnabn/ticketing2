@@ -218,14 +218,13 @@ export default function ProblematicAssetsReport() {
                     </div>
                 </div>
             </div>
-            {selectedItem && (
-                <ProblematicAssetModal
-                    item={selectedItem}
-                    onClose={() => setSelectedItem(null)}
-                    formatCurrency={formatCurrency}
-                    formatDate={formatDate}
-                />
-            )}
+            <ProblematicAssetModal
+                show={Boolean(selectedItem)}
+                item={selectedItem}
+                onClose={() => setSelectedItem(null)}
+                formatCurrency={formatCurrency}
+                formatDate={formatDate}
+            />
         </div>
     );
 }

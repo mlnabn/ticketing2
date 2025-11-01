@@ -1,12 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
-function ActiveLoanDetailModal({ item, onClose, formatDate, calculateDuration }) {
+function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDuration }) {
     const [fullDetail, setFullDetail] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(show);
+    const [currentItem, setCurrentItem] = useState(item);
 
     useEffect(() => {
-        if (item?.kode_unik) {
+        if (show) {
+            setCurrentItem(item);
+            setShouldRender(true);
+            setIsClosing(false); 
+        } else if (shouldRender && !isClosing) {
+            setIsClosing(true); 
+            const timer = setTimeout(() => {
+                setIsClosing(false);
+                setShouldRender(false); 
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, item, shouldRender]);
+
+    useEffect(() => {
+        if (show && item?.kode_unik) {
             setIsLoading(true);
             api.get(`/inventory/stock-items/by-serial/${item.kode_unik}`)
                 .then(res => {
@@ -20,14 +39,24 @@ function ActiveLoanDetailModal({ item, onClose, formatDate, calculateDuration })
                     setIsLoading(false);
                 });
         }
-    }, [item]);
-    const duration = calculateDuration(item.tanggal_keluar);
+    }, [show, item]);
+
+    if (!shouldRender) return null;
+    if (!currentItem) return null;
+    const animationClass = isClosing ? 'closing' : '';
+    const duration = calculateDuration(currentItem.tanggal_keluar);
 
     return (
-        <div className="modal-backdrop-detail">
-            <div className="modal-content-detail">
+        <div 
+            className={`modal-backdrop-detail ${animationClass}`}
+            onClick={onClose}
+        >
+            <div 
+                className={`modal-content-detail ${animationClass}`}
+                onClick={e => e.stopPropagation()}
+            >
                 <div className="modal-header-detail">
-                    <h3><strong>Detail Peminjaman: </strong>{item.kode_unik}</h3>
+                    <h3><strong>Detail Peminjaman: </strong>{currentItem.kode_unik}</h3>
                 </div>
 
                 <div className="modal-body-detail">

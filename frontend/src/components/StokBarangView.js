@@ -3,12 +3,12 @@ import { useOutletContext } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import ItemDetailModal from './ItemDetailModal';
-import { QRCodeSVG as QRCode } from 'qrcode.react';
 import EditStokBarangModal from './EditStokBarangModal';
 import AddStockModal from './AddStockModal';
 import QrScannerModal from './QrScannerModal';
 import { createPortal } from 'react-dom';
 import QrPrintSheet from './QrPrintSheet';
+import QrCodeModal from './QrCodeModal';
 
 function StokBarangView() {
     const { showToast } = useOutletContext();
@@ -787,49 +787,44 @@ function StokBarangView() {
                     )}
                 </div>
             </div>
-            {detailItem && (
-                <ItemDetailModal
-                    item={detailItem}
-                    onClose={() => setDetailItem(null)}
-                    onEditClick={handleOpenEditModal}
-                    showToast={showToast}
-                    onSaveSuccess={handleSaveSuccess}
-                    formatDate={formatDate}
-                    formatCurrency={formatCurrency}
-                />
-            )}
-            {editItem && (
-                <EditStokBarangModal
-                    isOpen={!!editItem}
-                    onClose={() => setEditItem(null)}
-                    item={editItem}
-                    showToast={showToast}
-                    onSaveSuccess={handleSaveSuccess}
-                    statusOptions={statusOptions}
-                    colorOptions={colorOptions}
-                    userOptions={[]}
-                />
-            )}
-            {qrModalItem && (
-                <div className="modal-backdrop" onClick={() => setQrModalItem(null)}>
-                    <div className="modal-content-qr" onClick={e => e.stopPropagation()}>
-                        <h3>QR Code untuk {qrModalItem.kode_unik}</h3>
-                        <div className="qr-container">
-                            <QRCode value={qrModalItem.kode_unik} size={256} level="H" />
-                            <p className="item-name">{qrModalItem.master_barang?.nama_barang}</p>
-                            <p className="item-serial">S/N: {qrModalItem.serial_number || 'N/A'}</p>
-                        </div>
-                    </div>
-                </div>
-            )}
-            {isScannerOpen && (
-                <QrScannerModal
-                    onClose={() => setIsScannerOpen(false)}
-                    onScanSuccess={handleScanSuccess}
-                />
-            )}
+            <ItemDetailModal
+                show={Boolean(detailItem)}
+                item={detailItem}
+                onClose={() => setDetailItem(null)}
+                onEditClick={handleOpenEditModal}
+                showToast={showToast}
+                onSaveSuccess={handleSaveSuccess}
+                formatDate={formatDate}
+                formatCurrency={formatCurrency}
+                // Props tambahan untuk modal bersarang
+                statusOptions={statusOptions}
+                colorOptions={colorOptions}
+                fetchData={fetchData}
+                pagination={pagination}
+                currentFilters={currentFilters}
+            />
+            <EditStokBarangModal
+                show={Boolean(editItem)}
+                onClose={() => setEditItem(null)}
+                item={editItem}
+                showToast={showToast}
+                onSaveSuccess={handleSaveSuccess}
+                statusOptions={statusOptions}
+                colorOptions={colorOptions}
+                userOptions={[]}
+            />
+            <QrCodeModal
+                show={Boolean(qrModalItem)}
+                item={qrModalItem}
+                onClose={() => setQrModalItem(null)}
+            />
+            <QrScannerModal
+                show={isScannerOpen}
+                onClose={() => setIsScannerOpen(false)}
+                onScanSuccess={handleScanSuccess}
+            />
             <AddStockModal
-                isOpen={isAddStockOpen}
+                show={isAddStockOpen}
                 onClose={() => setIsAddStockOpen(false)}
                 onSaveSuccess={() => fetchData(1, {})}
                 showToast={showToast}

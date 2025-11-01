@@ -26,10 +26,32 @@ const useScannerListener = (onScan, isOpen) => {
     }, [onScan, isOpen]);
 };
 
-function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast }) {
+function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show }) {
     const [selectedAdminId, setSelectedAdminId] = useState(null);
     const [itemsToAssign, setItemsToAssign] = useState([]);
     const [selectKey, setSelectKey] = useState(Date.now());
+
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(show);
+    const [currentTicket, setCurrentTicket] = useState(ticket); 
+
+    useEffect(() => {
+        if (show) {
+            setCurrentTicket(ticket); 
+            setShouldRender(true);
+            setIsClosing(false); 
+        } else if (shouldRender && !isClosing) {
+            setIsClosing(true); 
+            const timer = setTimeout(() => {
+                setIsClosing(false);
+                setShouldRender(false); 
+                setSelectedAdminId(null);
+                setItemsToAssign([]);
+            }, 300); 
+            return () => clearTimeout(timer);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, ticket, shouldRender]);
 
     const isDarkMode = document.body.classList.contains('dark-mode');
     const selectStyles = {
@@ -76,11 +98,9 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast }) {
         setSelectKey(Date.now());
     }, [itemsToAssign, showToast]);
 
-    // Fungsi yang menangani pencarian via scan atau ketik manual
     const handleScan = useCallback(async (code) => {
         if (!code) return;
         try {
-            // Kita tetap menggunakan endpoint lama yang spesifik untuk hasil scan
             const res = await api.get(`/inventory/stock-items/find-available/${code}`);
             addItemToList(res.data);
         } catch (error) {
@@ -88,19 +108,18 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast }) {
         }
     }, [addItemToList, showToast]);
     
-    useScannerListener(handleScan, !!ticket);
+    useScannerListener(handleScan, show);
 
     const loadOptions = async (inputValue) => {
-        if (inputValue.length < 2) return []; // Jangan cari jika input terlalu pendek
+        if (inputValue.length < 2) return [];
 
         try {
             const response = await api.get('/inventory/stock-items/search-available', {
                 params: { search: inputValue }
             });
 
-            // Ubah format data agar sesuai dengan react-select
             return response.data.map(item => ({
-                value: item, // Simpan seluruh objek item di 'value'
+                value: item,
                 label: `${item.master_barang.nama_barang} (${item.kode_unik})`
             }));
         } catch (error) {
@@ -119,15 +138,32 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast }) {
             return;
         }
         const stokIds = itemsToAssign.map(item => item.id);
-        onAssign(ticket.id, selectedAdminId, stokIds);
+        onAssign(currentTicket.id, selectedAdminId, stokIds);
+    };
+
+    const handleCloseClick = () => {
+        if (onClose) {
+            onClose();
+        }
     };
     
     const adminOptions = admins.map(admin => ({ value: admin.id, label: admin.name }));
 
+    if (!shouldRender) return null;
+    if (!currentTicket) return null;
+
+    const animationClass = isClosing ? 'closing' : '';
+
     return (
-        <div className="confirmation-modal-backdrop">
-            <div className="confirmation-modal-content">
-                <h3>Ticket "{ticket.title}"</h3>
+        <div 
+            className={`confirmation-modal-backdrop ${animationClass}`}
+            onClick={handleCloseClick}
+        >
+            <div 
+                className={`confirmation-modal-content ${animationClass}`}
+                onClick={e => e.stopPropagation()}
+            >
+                <h3>Ticket "{currentTicket.title}"</h3>
                 <div className="form-group-AssignAdmin">
                     <label className="modal-label">Dikerjakan Oleh</label>
                     <Select
@@ -165,7 +201,7 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast }) {
                 </div>
 
                 <div className="confirmation-modal-actions">
-                    <button onClick={onClose} className="btn-cancel">Batal</button>
+                    <button onClick={handleCloseClick} className="btn-cancel">Batal</button>
                     <button onClick={handleSubmit} className="btn-confirm">Kerjakan</button>
                 </div>
             </div>

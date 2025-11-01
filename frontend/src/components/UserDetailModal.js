@@ -8,11 +8,31 @@ const formatSimpleDate = (dateTimeString) => {
     return format(new Date(dateTimeString), 'dd MMMM yyyy', { locale: id });
 };
 
-function UserDetailModal({ user, onClose, onEditRequest }) {
+function UserDetailModal({ show, user, onClose, onEditRequest }) {
     const [stats, setStats] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [currentUser, setCurrentUser] = useState(user);
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(show);
+
     useEffect(() => {
-        if (user?.id) {
+        if (show) {
+            setCurrentUser(user);
+            setShouldRender(true);
+            setIsClosing(false); 
+        } else if (shouldRender && !isClosing) {
+            setIsClosing(true); 
+            const timer = setTimeout(() => {
+                setIsClosing(false);
+                setShouldRender(false); 
+            }, 300); 
+            return () => clearTimeout(timer);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, user, shouldRender]);
+
+    useEffect(() => {
+        if (show && user?.id) { 
             setIsLoading(true);
             api.get(`/users/${user.id}/stats`)
                 .then(response => {
@@ -26,11 +46,19 @@ function UserDetailModal({ user, onClose, onEditRequest }) {
                     setIsLoading(false);
                 });
         }
-    }, [user]);
+    }, [show, user]);
 
-    if (!user) return null;
+    const handleCloseClick = () => {
+        if (onClose) {
+            onClose();
+        }
+    };
+
+    if (!shouldRender) return null;
+    if (!currentUser) return null;
+
     const handleWhatsAppChat = () => {
-        const phone = user.phone;
+        const phone = currentUser.phone;
         if (!phone) return;
 
         let formattedPhone = phone.replace(/\D/g, '');
@@ -42,11 +70,19 @@ function UserDetailModal({ user, onClose, onEditRequest }) {
         window.open(url, '_blank', 'noopener,noreferrer');
     };
 
+    const animationClass = isClosing ? 'closing' : '';
+
     return (
-        <div className="modal-backdrop-detail">
-            <div className="modal-content-detail">
+        <div 
+          className={`modal-backdrop-detail ${animationClass}`}
+          onClick={handleCloseClick}
+        >
+            <div 
+              className={`modal-content-detail ${animationClass}`}
+              onClick={(e) => e.stopPropagation()}
+            >
                 <div className="modal-header-detail">
-                    <h3><strong>Profil Pengguna: </strong>{user.name}</h3>
+                    <h3><strong>Profil Pengguna: </strong>{currentUser.name}</h3>
                 </div>
 
                 <div className="modal-body-detail">
@@ -54,19 +90,19 @@ function UserDetailModal({ user, onClose, onEditRequest }) {
                     <div className="detail-grid-section">
                         <div className="detail-item-full">
                             <span className="label">Nama Lengkap</span>
-                            <span className="value">{user.name}</span>
+                            <span className="value">{currentUser.name}</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Email</span>
-                            <span className="value">{user.email}</span>
+                            <span className="value">{currentUser.email}</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Nomor Telepon</span>
-                            <span className="value">{user.phone || '-'}</span>
+                            <span className="value">{currentUser.phone || '-'}</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Peran</span>
-                            <span className="value" style={{ textTransform: 'capitalize' }}>{user.role}</span>
+                            <span className="value" style={{ textTransform: 'capitalize' }}>{currentUser.role}</span>
                         </div>
                     </div>
 
@@ -77,7 +113,7 @@ function UserDetailModal({ user, onClose, onEditRequest }) {
                         <div className="detail-grid-section">
                             <div className="detail-item-full">
                                 <span className="label">Terdaftar Sejak</span>
-                                <span className="value">{formatSimpleDate(user.created_at)}</span>
+                                <span className="value">{formatSimpleDate(currentUser.created_at)}</span>
                             </div>
                             <div className="detail-item-full">
                                 <span className="label">Total Tiket Dibuat</span>
@@ -87,7 +123,7 @@ function UserDetailModal({ user, onClose, onEditRequest }) {
                                 <span className="label">Aset Sedang Dipinjam</span>
                                 <span className="value">{stats?.assets_currently_borrowed ?? '0'} Aset</span>
                             </div>
-                            {user.role === 'admin' && (
+                            {currentUser.role === 'admin' && (
                                 <>
                                     <div className="detail-item-full">
                                         <span className="label">Total Tiket Diselesaikan</span>
@@ -105,13 +141,13 @@ function UserDetailModal({ user, onClose, onEditRequest }) {
                     )}
 
                 </div>
-                <div className="modal-footer-user" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                    <button onClick={onClose} className="btn-cancel">Tutup</button>
-                    <button onClick={() => onEditRequest && onEditRequest(user)} className="btn-confirm">
+                <div className="modal-footer-user" style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                    <button onClick={handleCloseClick} className="btn-cancel">Tutup</button>
+                    <button onClick={() => onEditRequest && onEditRequest(currentUser)} className="btn-confirm">
                         <i className="fas fa-edit" style={{ marginRight: '8px' }}></i>
                         Edit Pengguna
                     </button>
-                    {user.phone && (
+                    {currentUser.phone && (
                         <button onClick={handleWhatsAppChat} className="btn-history">
                             <i className="fab fa-whatsapp" style={{ marginRight: '8px' }}></i>
                             Chat Pengguna

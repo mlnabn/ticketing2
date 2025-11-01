@@ -509,54 +509,51 @@ export default function JobList() {
         )
         }
 
-        {ticketToAssign &&
-          <AssignAdminModal
+        <AssignAdminModal
+            show={Boolean(ticketToAssign)}
             ticket={ticketToAssign}
             admins={adminList}
             items={itemList}
             onAssign={handleConfirmAssign}
             onClose={() => setTicketToAssign(null)}
             showToast={showToast}
-          />
-        }
-        {ticketToReject &&
-          <RejectTicketModal
+        />
+        
+        <RejectTicketModal
+            show={Boolean(ticketToReject)}
             ticket={ticketToReject}
             onReject={handleConfirmReject}
             onClose={() => setTicketToReject(null)}
             showToast={showToast}
-          />
-        }
-        {ticketForProof &&
-          <ProofModal
+        />
+        
+        <ProofModal
+            show={Boolean(ticketForProof)}
             ticket={ticketForProof}
             onSave={handleSaveProof}
             onClose={() => setTicketForProof(null)}
-          />
-        }
-        {ticketToDelete &&
-          <ConfirmationModal
-            message={`Hapus pekerjaan "${ticketToDelete.title}"?`}
+        />
+        
+        <ConfirmationModal
+            show={Boolean(ticketToDelete)}
+            message={`Hapus pekerjaan "${ticketToDelete?.title}"?`}
             onConfirm={confirmDelete}
             onCancel={() => setTicketToDelete(null)}
-          />
-        }
+        />
 
-        {selectedTicketForDetail &&
-          <TicketDetailModal
+        <TicketDetailModal
+            show={Boolean(selectedTicketForDetail)}
             ticket={selectedTicketForDetail}
             onClose={() => setSelectedTicketForDetail(null)}
-          />
-        }
+        />
 
-        {ticketToReturn &&
-          <ReturnItemsModal
+        <ReturnItemsModal
+            show={Boolean(ticketToReturn)}
             ticket={ticketToReturn}
             onSave={handleConfirmReturn}
             onClose={() => setTicketToReturn(null)}
             showToast={showToast}
-          />
-        }
+        />
       </div>
     </>
   );

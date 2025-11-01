@@ -9,7 +9,7 @@ const initialFormState = {
     nama_barang: '',
 };
 
-function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
+function ItemFormModal({ show, isOpen, onClose, onSave, itemToEdit, showToast }) {
     const [formData, setFormData] = useState(initialFormState);
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
@@ -19,6 +19,26 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
     const [debouncedNama] = useDebounce(formData.nama_barang, 500);
     const [debouncedSubKategori] = useDebounce(formData.id_sub_kategori, 500);
 
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(show);
+
+    useEffect(() => {
+        if (show) {
+            setShouldRender(true);
+            setIsClosing(false); 
+        } else if (shouldRender && !isClosing) {
+            setIsClosing(true); 
+            const timer = setTimeout(() => {
+                setIsClosing(false);
+                setShouldRender(false); 
+                setFormData(initialFormState);
+                setIsExisting(false);
+            }, 300); // Durasi animasi
+            return () => clearTimeout(timer);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, shouldRender]);
+
     const fetchCategories = useCallback(() => {
         api.get('/inventory/categories').then(res => {
             const options = res.data.map(c => ({ value: c.id_kategori, label: c.nama_kategori }));
@@ -27,7 +47,7 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
     }, []);
 
     useEffect(() => {
-        if (isOpen) {
+        if (show) {
             fetchCategories();
             if (itemToEdit) {
                 setFormData({
@@ -39,7 +59,7 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
                 setIsExisting(false);
             }
         }
-    }, [itemToEdit, isOpen, fetchCategories]);
+    }, [itemToEdit, show, fetchCategories]);
 
     useEffect(() => {
         if (formData.id_kategori) {
@@ -110,11 +130,25 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
         onSave(formData);
     };
 
-    if (!isOpen) return null;
+    const handleCloseClick = () => {
+        if (onClose) {
+            onClose();
+        }
+    };
+    
+    if (!shouldRender) return null;
+    
+    const animationClass = isClosing ? 'closing' : '';
 
     return (
-        <div className="modal-backdrop-centered">
-            <div className="modal-content-large">
+        <div 
+            className={`modal-backdrop-centered ${animationClass}`}
+            onClick={handleCloseClick}
+        >
+            <div 
+                className={`modal-content-large ${animationClass}`}
+                onClick={e => e.stopPropagation()}
+            >
                 <h3>{itemToEdit ? 'Edit Tipe Barang' : 'Daftarkan Tipe Barang Baru'}</h3>
                 <form onSubmit={handleSubmit}>
                     {/* ... (Input Kategori & Sub-Kategori tetap sama) ... */}
@@ -161,7 +195,7 @@ function ItemFormModal({ isOpen, onClose, onSave, itemToEdit, showToast }) {
                     )}
 
                     <div className="confirmation-modal-actions">
-                        <button type="button" onClick={onClose} className="btn-cancel">Batal</button>
+                        <button type="button" onClick={handleCloseClick} className="btn-cancel">Batal</button>
                         <button type="submit" className="btn-confirm" disabled={isLoading || (isExisting && !itemToEdit)}>
                             {isExisting && !itemToEdit ? 'Sudah Terdaftar' : 'Simpan'}
                         </button>

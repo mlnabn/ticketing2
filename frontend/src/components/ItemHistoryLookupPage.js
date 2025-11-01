@@ -658,25 +658,23 @@ function ItemHistoryLookupPage() {
                 </div>
             </div>
 
-            {isScannerOpen && (
-                <QrScannerModal
-                    onClose={() => setIsScannerOpen(false)}
-                    onScanSuccess={handleScanSuccess}
-                />
-            )}
+            <QrScannerModal
+                show={isScannerOpen}
+                onClose={() => setIsScannerOpen(false)}
+                onScanSuccess={handleScanSuccess}
+            />
 
-            {isHistoryModalOpen && selectedItem && isMobile && (
-                <HistoryModal
-                    item={selectedItem}
-                    showToast={showToast}
-                    startDate={historyFilters.start_date}
-                    endDate={historyFilters.end_date}
-                    onClose={() => {
-                        setIsHistoryModalOpen(false);
-                        closeHistoryPanel();
-                    }}
-                />
-            )}
+            <HistoryModal
+                show={isHistoryModalOpen && Boolean(selectedItem) && isMobile}
+                item={selectedItem}
+                showToast={showToast}
+                startDate={historyFilters.start_date}
+                endDate={historyFilters.end_date}
+                onClose={() => {
+                    setIsHistoryModalOpen(false);
+                    closeHistoryPanel();
+                }}
+            />
         </>
     );
 }

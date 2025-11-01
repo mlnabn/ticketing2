@@ -72,6 +72,7 @@ function ToolManagement() {
     useEffect(() => {
         fetchItems(1, currentFilters);
         fetchMobileItems(1, currentFilters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchItems, fetchMobileItems]);
 
     const loadMoreItems = async () => {
@@ -291,7 +292,7 @@ function ToolManagement() {
             />
 
             <ItemFormModal
-                isOpen={isItemModalOpen}
+                show={isItemModalOpen}
                 onClose={handleCloseItemModal}
                 onSave={handleSaveItem}
                 itemToEdit={itemToEdit}
@@ -299,20 +300,19 @@ function ToolManagement() {
             />
 
             <EditNamaBarangModal
-                isOpen={!!itemToEditName}
+                show={!!itemToEditName}
                 onClose={handleCloseEditNameModal}
                 item={itemToEditName}
                 showToast={showToast}
                 onSaveSuccess={() => fetchItems(pagination?.current_page || 1)}
             />
 
-            {isConfirmModalOpen && (
-                <ConfirmationModal
-                    message={`Anda yakin ingin menghapus "${itemToDelete?.nama_barang || 'item yang dipilih'}"?`}
-                    onConfirm={confirmDeleteItem}
-                    onCancel={() => setIsConfirmModalOpen(false)}
-                />
-            )}
+            <ConfirmationModal
+                show={isConfirmModalOpen}
+                message={`Anda yakin ingin menghapus "${itemToDelete?.nama_barang || 'item yang dipilih'}"?`}
+                onConfirm={confirmDeleteItem}
+                onCancel={() => setIsConfirmModalOpen(false)}
+            />
         </>
     );
 }

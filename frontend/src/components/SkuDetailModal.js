@@ -1,15 +1,35 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import api from '../services/api';
 
-function SkuDetailModal({ item, onClose }) {
+function SkuDetailModal({ show, item, onClose }) {
     const [stockBreakdown, setStockBreakdown] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(show);
+    const [currentItem, setCurrentItem] = useState(item);
+
     useEffect(() => {
-        if (!item?.id_m_barang) return;
+        if (show) {
+            setCurrentItem(item);
+            setShouldRender(true);
+            setIsClosing(false); 
+        } else if (shouldRender && !isClosing) {
+            setIsClosing(true); 
+            const timer = setTimeout(() => {
+                setIsClosing(false);
+                setShouldRender(false); 
+            }, 300); 
+            return () => clearTimeout(timer);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, item, shouldRender]);
+
+    useEffect(() => {
+        if (!currentItem?.id_m_barang) return;
         setIsLoading(true);
 
-        api.get(`/inventory/items/${item.id_m_barang}/stock-breakdown`)
+        api.get(`/inventory/items/${currentItem.id_m_barang}/stock-breakdown`)
             .then(response => {
                 setStockBreakdown(response.data);
             })
@@ -20,35 +40,50 @@ function SkuDetailModal({ item, onClose }) {
             .finally(() => {
                 setIsLoading(false);
             });
-    }, [item]);
+    }, [currentItem]);
 
     const totalOverallStock = useMemo(() => {
         if (!stockBreakdown || stockBreakdown.length === 0) return 0;
         return stockBreakdown.reduce((sum, currentItem) => sum + currentItem.total_stock, 0);
     }, [stockBreakdown]);
 
-    if (!item) return null;
+    const handleCloseClick = () => {
+        if (onClose) {
+            onClose();
+        }
+    };
+
+    if (!shouldRender) return null;
+    if (!currentItem) return null; 
+
+    const animationClass = isClosing ? 'closing' : '';
 
     return (
-        <div className="modal-backdrop-detail">
-            <div className="modal-content-detail">
+        <div 
+            className={`modal-backdrop-detail ${animationClass}`}
+            onClick={handleCloseClick}
+        >
+            <div 
+                className={`modal-content-detail ${animationClass}`}
+                onClick={e => e.stopPropagation()}
+            >
                 <div className="modal-header-detail">
-                    <h3><strong>Detail SKU: </strong>{item.master_kategori?.nama_kategori || item.nama_barang}</h3>
+                    <h3><strong>Detail SKU: </strong>{currentItem.master_kategori?.nama_kategori || currentItem.nama_barang}</h3>
                 </div>
 
                 <div className="modal-body-detail">
                     <div className="detail-grid-section">
                         <div className="detail-item-full" data-span="2">
                             <span className="label">Kode Barang (SKU)</span>
-                            <span className="value">{item.kode_barang}</span>
+                            <span className="value">{currentItem.kode_barang}</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Kategori</span>
-                            <span className="value">{item.master_kategori?.nama_kategori || '-'}</span>
+                            <span className="value">{currentItem.master_kategori?.nama_kategori || '-'}</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Sub-Kategori</span>
-                            <span className="value">{item.sub_kategori?.nama_sub || '-'}</span>
+                            <span className="value">{currentItem.sub_kategori?.nama_sub || '-'}</span>
                         </div>
                     </div>
 
@@ -85,7 +120,7 @@ function SkuDetailModal({ item, onClose }) {
                 </div>
 
                 <div className="modal-footer-user">
-                    <button onClick={onClose} className="btn-cancel">Tutup</button>
+                    <button onClick={handleCloseClick} className="btn-cancel">Tutup</button>
                 </div>
             </div>
         </div>

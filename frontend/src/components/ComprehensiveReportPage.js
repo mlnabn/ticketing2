@@ -518,14 +518,11 @@ export default function ComprehensiveReportPage() {
           }
         </>
       )}
-      {
-        selectedTicketForDetail && (
-          <TicketDetailModal
-            ticket={selectedTicketForDetail}
-            onClose={() => setSelectedTicketForDetail(null)}
-          />
-        )
-      }
+      <TicketDetailModal
+          show={Boolean(selectedTicketForDetail)}
+          ticket={selectedTicketForDetail}
+          onClose={() => setSelectedTicketForDetail(null)}
+      />
     </div >
   );
 }

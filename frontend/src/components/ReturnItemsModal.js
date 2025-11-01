@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
 const ConditionalUserInput = ({ item, statusName, users, onChange }) => {
-    // ... (Komponen ini tidak perlu diubah)
     switch (statusName) {
         case 'Digunakan':
             return (
@@ -48,14 +47,34 @@ const ConditionalUserInput = ({ item, statusName, users, onChange }) => {
     }
 };
 
-function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
+function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
     const [items, setItems] = useState([]);
     const [statusOptions, setStatusOptions] = useState([]);
     const [allUsers, setAllUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(show);
+    const [currentTicket, setCurrentTicket] = useState(ticket); 
+
     useEffect(() => {
-        if (ticket && ticket.id) {
+        if (show) {
+            setCurrentTicket(ticket);
+            setShouldRender(true);
+            setIsClosing(false); 
+        } else if (shouldRender && !isClosing) {
+            setIsClosing(true); 
+            const timer = setTimeout(() => {
+                setIsClosing(false);
+                setShouldRender(false);
+            }, 300); 
+            return () => clearTimeout(timer);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, ticket, shouldRender]);
+
+    useEffect(() => {
+        if (show && ticket && ticket.id) {
             setIsLoading(true);
             Promise.all([
                 api.get(`/tickets/${ticket.id}/borrowed-items`),
@@ -89,7 +108,7 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
                 setIsLoading(false);
             });
         }
-    }, [ticket, showToast]);
+    }, [show, ticket, showToast]);
 
     const handleItemChange = (stokId, field, value) => {
         setItems(prevItems =>
@@ -110,16 +129,31 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
                 user_hilang_id: item.user_hilang_id,
             }))
         };
-        onSave(ticket.id, payload.items);
+        onSave(currentTicket.id, payload.items);
     };
 
-    if (!ticket) return null;
+    const handleCloseClick = () => {
+        if (onClose) {
+            onClose();
+        }
+    };
+
+    if (!shouldRender) return null;
+    if (!currentTicket) return null;
+
+    const animationClass = isClosing ? 'closing' : '';
 
     return (
-        <div className="modal-backdrop-centered">
-            <div className="modal-content-large">
+        <div 
+            className={`modal-backdrop-centered ${animationClass}`}
+            onClick={handleCloseClick}
+        >
+            <div 
+                className={`modal-content-large ${animationClass}`}
+                onClick={e => e.stopPropagation()}
+            >
                 <h3>Form Pengembalian & Penyelesaian</h3>
-                <p>Tiket: "{ticket.title}"</p>
+                <p>Tiket: "{currentTicket.title}"</p>
 
                 {isLoading ? <p>Memuat...</p> : (
                     <div className="items-to-return-list">
@@ -172,7 +206,7 @@ function ReturnItemsModal({ ticket, onSave, onClose, showToast }) {
                 )}
 
                 <div className="modal-actions">
-                    <button onClick={onClose} className="btn-cancel">Batal</button>
+                    <button onClick={handleCloseClick} className="btn-cancel">Batal</button>
                     <button onClick={handleSubmit} className="btn-confirm" disabled={isLoading}>
                         Selesaikan Tiket
                     </button>

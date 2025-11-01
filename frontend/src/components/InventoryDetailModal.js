@@ -2,12 +2,31 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
 
-function InventoryDetailModal({ kodeUnik, onClose, formatDate, formatCurrency }) {
+function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurrency }) {
     const [fullDetail, setFullDetail] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(show);
+    const [currentKodeUnik, setCurrentKodeUnik] = useState(kodeUnik);
 
     useEffect(() => {
-        if (kodeUnik) {
+        if (show) {
+            setCurrentKodeUnik(kodeUnik);
+            setShouldRender(true);
+            setIsClosing(false); 
+        } else if (shouldRender && !isClosing) {
+            setIsClosing(true); 
+            const timer = setTimeout(() => {
+                setIsClosing(false);
+                setShouldRender(false); 
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, kodeUnik, shouldRender]);
+
+    useEffect(() => {
+        if (show && kodeUnik) {
             setIsLoading(true);
             api.get(`/inventory/stock-items/by-serial/${kodeUnik}`)
                 .then(res => {
@@ -21,7 +40,7 @@ function InventoryDetailModal({ kodeUnik, onClose, formatDate, formatCurrency })
                     setIsLoading(false);
                 });
         }
-    }, [kodeUnik]);
+    }, [show, kodeUnik]);
 
     // Helper untuk menampilkan warna
     const renderWarna = (color) => {
@@ -165,12 +184,16 @@ function InventoryDetailModal({ kodeUnik, onClose, formatDate, formatCurrency })
                 );
         }
     };
+
+    if (!shouldRender) return null;
+
+    const animationClass = isClosing ? 'closing' : '';
     
     return (
-        <div className="modal-backdrop-detail">
-            <div className="modal-content-detail">
+        <div className={`modal-backdrop-detail ${animationClass}`}>
+            <div className={`modal-content-detail ${animationClass}`}>
                 <div className="modal-header-detail">
-                    <h3><strong>Detail Aset: </strong>{kodeUnik}</h3>
+                    <h3><strong>Detail Aset: </strong>{currentKodeUnik}</h3>
                 </div>
 
                 <div className="modal-body-detail">

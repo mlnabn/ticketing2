@@ -1,11 +1,34 @@
 // src/components/ProofModal.js
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-function ProofModal({ ticket, onSave, onClose }) {
+function ProofModal({ show, ticket, onSave, onClose }) {
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
+
+  const [isClosing, setIsClosing] = useState(false);
+  const [shouldRender, setShouldRender] = useState(show);
+  const [currentTicket, setCurrentTicket] = useState(ticket);
+
+  useEffect(() => {
+      if (show) {
+          setCurrentTicket(ticket);
+          setShouldRender(true);
+          setIsClosing(false); 
+      } else if (shouldRender && !isClosing) {
+          setIsClosing(true); 
+          const timer = setTimeout(() => {
+              setIsClosing(false);
+              setShouldRender(false);
+              setDescription('');
+              setImage(null);
+              setPreview(null);
+          }, 300); 
+          return () => clearTimeout(timer);
+      }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [show, ticket, shouldRender]);
 
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -28,13 +51,30 @@ function ProofModal({ ticket, onSave, onClose }) {
       formData.append('proof_image', image);
     }
 
-    onSave(ticket.id, formData);
+    onSave(currentTicket.id, formData);
   };
 
+  const handleCloseClick = () => {
+      if (onClose) {
+          onClose();
+      }
+  };
+
+  if (!shouldRender) return null;
+  if (!currentTicket) return null;
+
+  const animationClass = isClosing ? 'closing' : '';
+
   return (
-    <div className="modal-backdrop">
-      <div className="modal-content">
-        <h2>Bukti Pengerjaan: {ticket.title}</h2>
+    <div 
+      className={`modal-backdrop ${animationClass}`}
+      onClick={handleCloseClick}
+    >
+      <div 
+        className={`modal-content ${animationClass}`}
+        onClick={e => e.stopPropagation()}
+      >
+        <h2>Bukti Pengerjaan: {currentTicket.title}</h2>
         <form onSubmit={handleSubmit}>
           <div className="proof-modal__group">
             <label htmlFor="proof_description">Deskripsi Pengerjaan</label>
@@ -62,7 +102,7 @@ function ProofModal({ ticket, onSave, onClose }) {
             </div>
           )}
           <div className="modal-actions">
-            <button type="button" onClick={onClose} className="btn-cancel">Batal</button>
+            <button type="button" onClick={handleCloseClick} className="btn-cancel">Batal</button>
             <button type="submit" className="btn-confirm">Simpan Bukti</button>
           </div>
         </form>
