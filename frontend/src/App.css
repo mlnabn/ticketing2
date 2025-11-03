@@ -13091,7 +13091,7 @@ body.dark-mode .detail-list-footer-centered {
    ATURAN RESPONSIVE (MOBILE) - (max-width: 768px)
 ====================================================================== */
 
-@media (max-width: 768px) {
+@media (max-width: 1290px) {
 
   /* --- 1. Sembunyikan Elemen Desktop --- */
   .sidebar,

@@ -64,9 +64,9 @@ function CalendarComponent({ tickets = [], onTicketClick }) {
           <div className="ticket-dot-wrapper">
             {hasCompleted && <span className="ticket-dot dot-green"></span>}
             {hasInProgress && <span className="ticket-dot dot-yellow"></span>}
-            {hasDelayed && <span className="ticket-dot dot-blue"></span>}
+            {hasDelayed && <span className="ticket-dot dot-gray"></span>}
             {hasRejected && <span className="ticket-dot dot-red"></span>}
-            {hasPending && <span className="ticket-dot dot-gray"></span>}
+            {hasPending && <span className="ticket-dot dot-blue"></span>}
           </div>
         );
       }
