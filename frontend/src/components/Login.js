@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import '../App.css';
 import bgImage2 from '../Image/Login.png';
 import GoogleLogo from "../Image/google.svg";
@@ -54,6 +55,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -78,7 +80,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
   };
 
   const handleForgotPassword = () => {
-    alert('Silakan hubungi admin atau reset melalui email.');
+    navigate('/forgot-password');
   };
 
   const handleGoogleLogin = () => {

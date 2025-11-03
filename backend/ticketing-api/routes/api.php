@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Api\OtpController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Api\WorkshopController;
 use App\Http\Controllers\Api\StokBarangController;
@@ -34,6 +35,8 @@ Route::post('/otp/verify', [OtpController::class, 'verifyOtp']);
 Route::post('/otp/resend', [AuthController::class, 'resendOtp']);
 Route::get('/auth/google/redirect', [AuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+Route::post('/auth/password/request-otp', [ForgotPasswordController::class, 'requestPasswordOtp']);
+Route::post('/auth/password/reset-with-otp', [ForgotPasswordController::class, 'resetPasswordWithOtp']);
 
 Route::post('/auth/refresh', [AuthController::class, 'refresh'])->middleware('jwt.refresh');
 

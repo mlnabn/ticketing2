@@ -1,0 +1,65 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "path": "whatsapp-otp",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d684060c-d57b-4cc9-b9de-e150c023b9b3",
+      "name": "Webhook",
+      "webhookId": "58d2de88-2b27-4397-b15c-f8c5011d7e61"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gowa:3000/send/message",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.query.phone }}"
+            },
+            {
+              "name": "message",
+              "value": "=Kode verifikasi Anda adalah: {{ $json.query.otp }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        272,
+        0
+      ],
+      "id": "6c9cdca5-d572-4cca-8bf8-018645af73a4",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8af4bbf4fda7227e698dd3bf23f19fc31bc2b2cbafbabc084ccc8f0e6c2ea4cf"
+  }
+}

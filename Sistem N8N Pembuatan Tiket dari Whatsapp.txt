@@ -1,0 +1,1156 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-tickets",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        32,
+        80
+      ],
+      "id": "49984eb2-1112-4bb8-b6da-f8fa84b9af4b",
+      "name": "Webhook",
+      "webhookId": "8d5c7ead-d8b9-4ea5-a6e3-cac85938b892"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Webhook').item.json.body.message.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "## 📌 Instruksi AI Agent untuk IT Support Ticketing\n\n### PERAN\n\nAnda adalah **TAI (Teknisi AI)**, asisten teknis level 1 yang cerdas, proaktif, dan sangat andal.\n\n### TUJUAN\n\nAnalisis pesan pengguna dan `chat_history`, lalu **hasilkan SELALU SATU JSON VALID** untuk mengontrol alur kerja.\n❌ Jangan pernah memberikan output selain JSON.\nJika ragu → tetap hasilkan JSON dengan nilai default.\n\n---\n\n### FORMAT JSON WAJIB\n\n```json\n{\n  \"intent\": \"CREATE_TICKET\" | \"CHECK_STATUS\" | \"PROVIDE_INFO\" | \"CONFIRM_TICKET\" | \"GREETING\" | \"DO_NOTHING\" | \"TALK_TO_HUMAN\",\n  \"title\": \"string atau null\",\n  \"workshop\": \"Canden\" | \"Nobo\" | \"Bener\" | \"Nusa Persada\" | \"Pelita\" | \"Muhasa\" | \"Karang Duwet\" | null,\n  \"kode_tiket\": \"string atau null\",\n  \"jawaban_untuk_user\": \"string atau null\"\n}\n```\n\n---\n\n### ATURAN WAJIB\n\n1. Jika tidak bisa mengisi field tertentu → gunakan `null`.\n2. Jika pesan tidak jelas →\n\n```json\n{\n  \"intent\": \"GREETING\",\n  \"title\": null,\n  \"workshop\": null,\n  \"kode_tiket\": null,\n  \"jawaban_untuk_user\": \"Maaf, saya belum paham. Bisa dijelaskan lebih jelas?\"\n}\n```\n\n3. Jika **semua data untuk intent sudah lengkap** (misalnya CREATE\\_TICKET dengan title & workshop terisi), tetap isi `jawaban_untuk_user` dengan pertolongan pertama (jika ada).\n4. Jika ada data yang kurang → isi `jawaban_untuk_user` dengan pertanyaan klarifikasi.\n5. Jangan pernah kirim teks di luar JSON.\n\n---\n\n### LOGIKA & SELF-HELP\n\n#### CREATE\\_TICKET\n\n* Ekstrak `title` & `workshop`.\n* Jika masalah umum (laptop hang, wifi mati, printer error, dsb) → berikan solusi singkat yang bisa dicoba user terlebih dahulu.\n* Setelah solusi, tanyakan apakah tetap ingin dibuatkan tiket.\n* Jika workshop kosong → `jawaban_untuk_user = \"Workshop mana yang dimaksud?\"`\n* Jika title kosong → `jawaban_untuk_user = \"Apa detail masalahnya?\"`\n\n#### CHECK\\_STATUS\n\n* Ekstrak `kode_tiket`.\n* Jika kosong → `jawaban_untuk_user = \"Tolong berikan kode tiket Anda.\"`\n\n#### PROVIDE\\_INFO\n\n* Gabungkan info baru dengan `chat_history`.\n\n#### CONFIRM\\_TICKET\n\n* Gunakan jika user menyetujui pembuatan tiket setelah diberikan solusi awal.\n\n#### GREETING\n\n* `jawaban_untuk_user = sapaan singkat.`\n\n#### DO\\_NOTHING\n\n* Jika masalah tidak terkait IT Support → berikan solusi singkat umum, lalu katakan:\n  \"Saya adalah AI IT Support. Masalah ini di luar layanan IT Support dan tidak dapat saya teruskan sebagai tiket.\"\n\n#### TALK_TO_HUMAN\n\n* Gunakan jika user secara eksplisit meminta untuk berbicara dengan teknisi, admin, atau manusia.\n* **PENTING: Jangan pernah membuat atau mencantumkan nomor telepon, email, atau informasi kontak apa pun dalam respons Anda.**\n* Nilai `jawaban_untuk_user` **HANYA BOLEH** berisi kalimat pengantar saja. Nomor telepon yang asli akan ditambahkan oleh sistem secara otomatis di langkah berikutnya.\n\n---\n\n### CONTOH OUTPUT JSON\n\n#### 1. Masalah umum IT\n\n**User**: \"Laptop saya lemot\"\n\n```json\n{\n  \"intent\": \"CREATE_TICKET\",\n  \"title\": \"Laptop lemot\",\n  \"workshop\": null,\n  \"kode_tiket\": null,\n  \"jawaban_untuk_user\": \"Coba restart laptop, tutup aplikasi yang tidak dipakai, dan periksa penggunaan RAM di Task Manager. Apakah tetap ingin dibuatkan tiket? Jika ya, mohon sertakan workshopnya.\"\n}\n```\n\n#### 2. Cek status tiket\n\n**User**: \"Saya mau cek status tiket\"\n\n```json\n{\n  \"intent\": \"CHECK_STATUS\",\n  \"title\": null,\n  \"workshop\": null,\n  \"kode_tiket\": null,\n  \"jawaban_untuk_user\": \"Tolong berikan kode tiket Anda.\"\n}\n```\n\n#### 3. Non-IT issue\n\n**User**: \"Motor saya mogok\"\n\n```json\n{\n  \"intent\": \"DO_NOTHING\",\n  \"title\": null,\n  \"workshop\": null,\n  \"kode_tiket\": null,\n  \"jawaban_untuk_user\": \"Coba periksa bensin dan aki motor Anda. Saya adalah AI IT Support, jadi masalah ini di luar layanan IT Support dan tidak dapat saya teruskan sebagai tiket.\"\n}\n```\n\n#### 4. Pesan tidak jelas\n\n**User**: \".....\"\n\n```json\n{\n  \"intent\": \"GREETING\",\n  \"title\": null,\n  \"workshop\": null,\n  \"kode_tiket\": null,\n  \"jawaban_untuk_user\": \"Maaf, saya belum paham. Bisa dijelaskan lebih jelas?\"\n}\n\n#### 5. Minta Kontak Teknisi\n\n**User**: \"Saya mau ngobrol langsung sama teknisi dong\"\n\n```json\n{\n  \"intent\": \"TALK_TO_HUMAN\",\n  \"title\": null,\n  \"workshop\": null,\n  \"kode_tiket\": null,\n  \"jawaban_untuk_user\": \"Baik, jika Anda ingin berbicara langsung dengan teknisi kami, Anda dapat menghubungi salah satu nomor di bawah ini:\"\n}\n```\n\nATURAN FORMAT: Saat membuat `jawaban_untuk_user`, selalu gunakan karakter `\\n` untuk membuat baris baru agar pesan lebih terstruktur dan mudah dibaca. Beri jeda antar paragraf atau poin-poin penting dengan `\\n\\n`.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        80
+      ],
+      "id": "41cc40a0-ccb2-4b9b-ac9d-e02ef1f6d750",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "deepseek-chat",
+          "mode": "list",
+          "cachedResultName": "deepseek-chat"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        272
+      ],
+      "id": "a1b60e0c-3ddc-446a-a80c-c7f8723951f6",
+      "name": "deepseek-chat",
+      "credentials": {
+        "openAiApi": {
+          "id": "JPbzfb6c5YILYPeR",
+          "name": "Deepseek API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.from }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        272
+      ],
+      "id": "fb4d1be4-de12-45e9-8ad7-93a9fe7c0569",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4c5928a2-8885-453c-a4bd-d2fb3a1a9539",
+              "leftValue": "={{ $('Validate JSON Output').item.json.title }}\n",
+              "rightValue": true,
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "6a598a3b-e2a7-49da-bc0a-b0bbad4bea6b",
+              "leftValue": "={{ $('Validate JSON Output').item.json.workshop }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1088,
+        -144
+      ],
+      "id": "e1245f2d-99af-45bf-8f79-5378606f6663",
+      "name": "Cek Info Lengkap"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Proses tiket telah selesai.",
+        "options": {
+          "systemMessage": "Balas hanya dengan kata:\nOK"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2560,
+        -224
+      ],
+      "id": "bb6c2155-8bbd-4a1e-bc5b-94d61ef10f52",
+      "name": "Reset Konteks Percakapan"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.from }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2800,
+        -64
+      ],
+      "id": "394a6384-e30a-4208-be5f-f2b9afc039ba",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/tickets/whatsapp",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "Kunc1R4has1aSuperPanjangDanAcak_n8n_WHATSAPP"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "={{ $('Validate JSON Output').item.json.title }}"
+            },
+            {
+              "name": "workshop_name",
+              "value": "={{ $('Validate JSON Output').item.json.workshop }}"
+            },
+            {
+              "name": "sender_name",
+              "value": "={{ $('Webhook').item.json.body.pushname }}"
+            },
+            {
+              "name": "sender_phone",
+              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1312,
+        -160
+      ],
+      "id": "d7b89974-4a63-4aea-b437-ae29095f9e8c",
+      "name": "Buat Tiket"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gowa:3000/send/message",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+            },
+            {
+              "name": "message",
+              "value": "=✅ Tiket Anda berhasil dibuat!\n\nKode Tiket: {{ $('Buat Tiket').item.json.kode_tiket }}\n\nKlik link di bawah untuk melihat statusnya di web:\nhttp://localhost:3000/history/{{ $('Buat Tiket').item.json.kode_tiket }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1632,
+        -240
+      ],
+      "id": "640a5ce8-e21e-40c4-81fd-10475c8236af",
+      "name": "Kirim Konfirmasi & Kode"
+    },
+    {
+      "parameters": {
+        "url": "=http://host.docker.internal:8000/api/tickets/by-code/{{ $('Ekstrak Kode Tiket').item.json.kode_tiket }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1488,
+        288
+      ],
+      "id": "1fe759d5-3247-4412-97cc-426774693970",
+      "name": "Ambil Status dari Laravel",
+      "retryOnFail": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "889ea1fb-8068-4ee3-8817-55c2d0f39236",
+              "leftValue": "={{ $('Ambil Status dari Laravel').item.json.error }}",
+              "rightValue": "=200",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1680,
+        288
+      ],
+      "id": "368dd6a2-6a98-4ca2-aa21-000094b1c9c7",
+      "name": "Tiket Ditemukan?"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Data Tiket: {{ JSON.stringify($('Ambil Status dari Laravel').item.json) }}",
+        "options": {
+          "systemMessage": "Anda adalah asisten yang membantu. Berdasarkan data tiket dalam format JSON ini, buatlah sebuah pesan balasan yang ringkas dan informatif untuk pengguna. Sebutkan deskripsi, status saat ini, dan tanggal tiket dibuat."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1936,
+        208
+      ],
+      "id": "5d93875d-a00c-4271-bcf5-75c1bef4f5aa",
+      "name": "Buat Pesan Status"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gowa:3000/send/message",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+            },
+            {
+              "name": "id",
+              "value": "default"
+            },
+            {
+              "name": "message",
+              "value": "={{ $('Buat Pesan Status').item.json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2288,
+        208
+      ],
+      "id": "05672021-9654-4f0b-8bf3-4bd7f36eefda",
+      "name": "Kirim Balasan Sukses"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gowa:3000/send/message",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "default"
+            },
+            {
+              "name": "phone",
+              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+            },
+            {
+              "name": "message",
+              "value": "=Maaf, tiket dengan kode *{{ $('Ambil Status dari Laravel').item.json.kode_tiket }}* tidak dapat ditemukan. Mohon periksa kembali kode Anda."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1936,
+        528
+      ],
+      "id": "63c4ff28-f0fa-41c9-8fdb-82c78124ac0b",
+      "name": "Kirim Pesan Gagal"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Validate JSON Output').item.json.intent }}",
+                    "rightValue": "CREATE_TICKET",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f7d06068-fb9e-4a15-91e9-5b2c079cf5fd"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Buat Tiket"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d9e9c1dc-172c-4ac2-9d3d-0adc12d18b7a",
+                    "leftValue": "={{ $('Validate JSON Output').item.json.intent }}",
+                    "rightValue": "CHECK_STATUS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Cek Status"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "41c102b7-ad0c-4145-b4de-f5cc9eef5cf4",
+                    "leftValue": "={{ $('Validate JSON Output').item.json.intent }}",
+                    "rightValue": "PROVIDE_INFO",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Lengkapi Info"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "19ab5968-bba7-4a47-b1e7-80eeb0dd0a2e",
+                    "leftValue": "={{ $('Validate JSON Output').item.json.intent }}",
+                    "rightValue": "CONFIRM_TICKET",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Konfirmasi Tiket"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8b2328a1-80ea-429b-a524-1ab466e02922",
+                    "leftValue": "={{ $('Validate JSON Output').item.json.intent }}",
+                    "rightValue": "TALK_TO_HUMAN",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Bicara Dengan Teknisi"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        816,
+        32
+      ],
+      "id": "8dc7a8c9-0b5a-4dd1-bfd1-c3ad204d24ec",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $('Webhook').item.json.body.message.text;\nconst words = text.split(' ');\n// Mengambil kata TERAKHIR dari pesan, yang seharusnya adalah kode tiket\nconst kodeTiket = words[words.length - 1];\n\nreturn { kode_tiket: kodeTiket };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1296,
+        288
+      ],
+      "id": "f0579d18-9dcc-418e-9820-2d9fb2f7aa9d",
+      "name": "Ekstrak Kode Tiket"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gowa:3000/send/message",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "default"
+            },
+            {
+              "name": "phone",
+              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $('Validate JSON Output').item.json.jawaban_untuk_user }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1424,
+        32
+      ],
+      "id": "fc912a68-0161-4c7a-8525-cf3a22bec529",
+      "name": "Kirim Pertanyaan Klarifikasi"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gowa:3000/send/message",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $('Validate JSON Output').item.json.jawaban_untuk_user }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1088,
+        64
+      ],
+      "id": "66e072d7-c11b-42f2-9191-49b51d66d152",
+      "name": "Kirim Balasan Bot"
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  // Ambil output mentah dari AI Agent\n  const rawAiOutput = $('AI Agent').item.json.output || \"{}\";\n  let dataFromAI = {}; // Siapkan objek kosong sebagai default\n\n  // Gunakan Regular Expression untuk mencari string yang diawali '{' dan diakhiri '}'\n  const jsonMatch = rawAiOutput.match(/{[\\s\\S]*}/);\n\n  // Jika ditemukan string yang cocok dengan format JSON\n  if (jsonMatch && jsonMatch[0]) {\n    try {\n      // Coba parse HANYA bagian string yang cocok tersebut\n      dataFromAI = JSON.parse(jsonMatch[0]);\n    } catch (e) {\n      // Jika parsing tetap gagal (JSON-nya cacat), biarkan dataFromAI tetap objek kosong\n      console.log(\"Gagal mem-parsing JSON yang diekstrak:\", e);\n    }\n  }\n  \n  // Ambil data asli dari node Set Variabel Global (berisi nomor admin)\n  const initialData = $('Set Variabel Global').item.json;\n  \n  // Gabungkan keduanya, utamakan data dari AI jika ada\n  const finalJson = {\n    intent: dataFromAI.intent ?? \"GREETING\",\n    title: dataFromAI.title ?? null,\n    workshop: dataFromAI.workshop ?? null,\n    kode_tiket: dataFromAI.kode_tiket ?? null,\n    jawaban_untuk_user: dataFromAI.jawaban_untuk_user || \"Maaf, saya tidak mengerti maksud anda. Mohon gunakan bahasa yang baik dan benar. Terima kasih.\",\n    \n    // Sisipkan kembali data nomor admin\n    admin_phone_numbers: initialData.admin_phone_numbers\n  };\n\n  return [{ json: finalJson }];\n\n} catch (e) {\n  // Fallback jika terjadi error tak terduga\n  const initialData = $('Set Variabel Global').item.json;\n  return [{\n    json: {\n      intent: \"GREETING\",\n      title: null,\n      workshop: null,\n      kode_tiket: null,\n      jawaban_untuk_user: \"Maaf, saya tidak mengerti maksud anda. Mohon gunakan bahasa yang baik dan benar. Terima kasih.\",\n      admin_phone_numbers: initialData.admin_phone_numbers\n    }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        80
+      ],
+      "id": "a34eb48f-17a2-4777-b5f5-cee531dba88e",
+      "name": "Validate JSON Output"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bfd4b60b-e409-4b0d-afc3-651b5a3a2787",
+              "leftValue": "={{ $('Validate JSON Output').item.json.kode_tiket }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1088,
+        304
+      ],
+      "id": "25aa5229-3e8a-42f6-9ced-768c43b18922",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gowa:3000/send/message",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "default"
+            },
+            {
+              "name": "phone",
+              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+            },
+            {
+              "name": "message",
+              "value": "Tolong berikan kode ticket anda"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1296,
+        448
+      ],
+      "id": "6313bd29-0df6-4f26-b643-f5c0ac9a94ff",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45098f65-acb5-45c1-841c-e114c808ec80",
+              "name": "admin_phone_numbers",
+              "value": "=[\"6285956399344\", \"62882005944805\"]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        80
+      ],
+      "id": "091e6c93-9e46-427c-b766-645f3a8d2df8",
+      "name": "Set Variabel Global"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gowa:3000/send/message",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "default"
+            },
+            {
+              "name": "phone",
+              "value": "={{ $json.admin_phone_numbers }}"
+            },
+            {
+              "name": "message",
+              "value": "=*🔔 Notifikasi Tiket Baru 🔔*\n\nSebuah tiket baru telah dibuat dan membutuhkan perhatian Anda.\n\n*Kode Tiket:* {{$json.kode_tiket}}\n*Pelapor:* {{$('Webhook').item.json.body.pushname || $('Webhook').item.json.body.from}}\n*Workshop:* {{ $('Validate JSON Output').item.json.workshop }}\n*Masalah:* {{$json.title}}\n\nSilakan cek dashboard admin untuk detail lebih lanjut."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2160,
+        -160
+      ],
+      "id": "821002e0-535e-476a-a5aa-905b8b185acb",
+      "name": "Kirim Notifikasi ke Admin",
+      "executeOnce": false
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2368,
+        -224
+      ],
+      "id": "a90ff414-8e6a-4f80-84b6-a1fc5f2503b3",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "admin_phone_numbers",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        -160
+      ],
+      "id": "532c6680-2b04-432c-8c99-a308a5461a3f",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "db0627a7-4563-47f5-a445-219947b501d7",
+              "name": "=admin_phone_numbers",
+              "value": "={{ $('Set Variabel Global').item.json.admin_phone_numbers }}",
+              "type": "array"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1632,
+        -80
+      ],
+      "id": "ba46e8a3-d735-41c7-9bb4-57fc87aef358",
+      "name": "set"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "deepseek-chat",
+          "mode": "list",
+          "cachedResultName": "deepseek-chat"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2512,
+        -64
+      ],
+      "id": "3b38ef2d-43ed-4f99-9905-8d5eb93dc554",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "JPbzfb6c5YILYPeR",
+          "name": "Deepseek API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "deepseek-chat",
+          "mode": "list",
+          "cachedResultName": "deepseek-chat"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1904,
+        384
+      ],
+      "id": "4e624cad-6c54-462c-9c5f-f8123592c2ef",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "JPbzfb6c5YILYPeR",
+          "name": "Deepseek API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gowa:3000/send/message",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "={{ $('Validate JSON Output').item.json.jawaban_untuk_user + \"\\n\\n\" }} +62 899-6271-122"
+            },
+            {
+              "name": "phone",
+              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1088,
+        528
+      ],
+      "id": "91964f2c-4d45-419e-8ee5-7fa795f35abe",
+      "name": "Kirim Balasan Bot1"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Variabel Global",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Validate JSON Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "deepseek-chat": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cek Info Lengkap": {
+      "main": [
+        [
+          {
+            "node": "Buat Tiket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Kirim Pertanyaan Klarifikasi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Reset Konteks Percakapan",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buat Tiket": {
+      "main": [
+        [
+          {
+            "node": "Kirim Konfirmasi & Kode",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kirim Konfirmasi & Kode": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Status dari Laravel": {
+      "main": [
+        [
+          {
+            "node": "Tiket Ditemukan?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tiket Ditemukan?": {
+      "main": [
+        [
+          {
+            "node": "Buat Pesan Status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Kirim Pesan Gagal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buat Pesan Status": {
+      "main": [
+        [
+          {
+            "node": "Kirim Balasan Sukses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Cek Info Lengkap",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cek Info Lengkap",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cek Info Lengkap",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Kirim Balasan Bot1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Kirim Balasan Bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ekstrak Kode Tiket": {
+      "main": [
+        [
+          {
+            "node": "Ambil Status dari Laravel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate JSON Output": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Ekstrak Kode Tiket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variabel Global": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kirim Notifikasi ke Admin": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Reset Konteks Percakapan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Kirim Notifikasi ke Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Reset Konteks Percakapan",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Buat Pesan Status",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kirim Balasan Bot1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8af4bbf4fda7227e698dd3bf23f19fc31bc2b2cbafbabc084ccc8f0e6c2ea4cf"
+  }
+}
