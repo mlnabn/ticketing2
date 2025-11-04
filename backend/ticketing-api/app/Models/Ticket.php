@@ -37,7 +37,7 @@ class Ticket extends Model
 
     public function workshop()
     {
-        return $this->belongsTo(Workshop::class);
+        return $this->belongsTo(Workshop::class, 'workshop_id');
     }
 
     public function creator()

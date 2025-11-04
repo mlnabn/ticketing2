@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Ticket;
+use App\Models\Workshop;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -51,6 +52,21 @@ class TicketsExport implements FromCollection, WithHeadings, WithMapping
      */
     public function map($ticket): array
     {
+        $workshopName = null;
+
+        if ($ticket->relationLoaded('workshop') && $ticket->workshop) {
+            $workshopName = $ticket->workshop->name ?? null;
+        }
+
+        // 2) Jika relasi tidak ada atau belum di-load, fallback ambil langsung dari DB
+        if (!$workshopName && $ticket->workshop_id) {
+            $ws = Workshop::find($ticket->workshop_id);
+            $workshopName = $ws ? $ws->name : null;
+        }
+
+        // 3) Default tampilan bila kosong
+        $workshopName = $workshopName ?: '-';
+
         $durationText = 'N/A'; // Default value diubah menjadi teks
 
         if ($ticket->started_at && $ticket->completed_at) {
@@ -78,7 +94,7 @@ class TicketsExport implements FromCollection, WithHeadings, WithMapping
             $ticket->kode_tiket ?? '-',
             Str::limit($ticket->title, 50, '...'),
             $ticket->status,
-            $ticket->workshop ?? '-',
+            $workshopName,
             $ticket->user->name ?? 'N/A',
             $ticket->creator->name ?? 'N/A',
             $ticket->created_at ? \Carbon\Carbon::parse($ticket->created_at)->format('d-m-Y H:i') : '-',

@@ -734,7 +734,7 @@ class TicketController extends Controller
             'type' => 'required|in:pdf,excel',
         ]);
 
-        $query = Ticket::with(['user', 'creator']);
+        $query = Ticket::with(['user', 'creator', 'workshop']);
         $query = $this->applyFilters($query, $request);
         $tickets = $query->latest()->get();
         $fileName = 'laporan-tiket-' . date('Y-m-d_H-i-s');

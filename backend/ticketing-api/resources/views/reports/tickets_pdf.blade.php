@@ -64,7 +64,27 @@
                 <td>{{ $ticket->kode_tiket ?? '-' }}</td>
                 <td>{{ \Illuminate\Support\Str::limit($ticket->title, 50, '...') }}</td>
                 <td>{{ $ticket->status }}</td>
-                <td>{{ $ticket->workshop ?? '-' }}</td>
+                <td>
+                    @php
+                        $workshopName = null;
+                        
+                        // 1. Cek relasi yang sudah di-load (seperti di TicketsExport)
+                        if ($ticket->relationLoaded('workshop') && $ticket->workshop) {
+                            $workshopName = $ticket->workshop->name;
+                        } 
+                        
+                        // 2. Fallback: Jika relasi tidak ada TAPI workshop_id ada, query manual
+                        // Ini persis seperti logika di TicketsExport.php
+                        if (!$workshopName && $ticket->workshop_id) {
+                            // Gunakan full namespace (\App\Models\Workshop) karena ini file Blade
+                            $ws = \App\Models\Workshop::find($ticket->workshop_id);
+                            $workshopName = $ws ? $ws->name : null;
+                        }
+                        
+                        // 3. Tampilkan hasil atau default '-' (e() berfungsi sama seperti {{ }})
+                        echo e($workshopName ?: '-');
+                    @endphp
+                </td>
                 <td>{{ $ticket->user->name ?? 'N/A' }}</td>
                 <td>{{ $ticket->creator->name ?? 'N/A' }}</td>
                 <td>{{ $ticket->created_at ? \Carbon\Carbon::parse($ticket->created_at)->format('d-m-y H:i') : '-' }}</td>
