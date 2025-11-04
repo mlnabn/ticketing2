@@ -16,7 +16,6 @@ class MasterBarangController extends Controller
 {
     /**
      * Menampilkan daftar tipe barang (MasterBarang).
-     * Stok dihitung secara real-time dari item individual.
      */
     public function index(Request $request)
     {
@@ -36,7 +35,6 @@ class MasterBarangController extends Controller
                 'sub_kategoris.nama_sub'
             );
 
-        // $query = MasterBarang::with(['masterKategori', 'subKategori', 'createdBy']);
         if ($request->filled('id_kategori')) {
             $query->where('master_barangs.id_kategori', $request->id_kategori);
         }
@@ -89,7 +87,6 @@ class MasterBarangController extends Controller
         return $query->paginate(10); 
     }
 
-    // Untuk mengecek apakah master barang sudah ada
     public function checkIfExists(Request $request)
     {
         $validated = $request->validate([
@@ -105,8 +102,7 @@ class MasterBarangController extends Controller
     }
 
     /**
-     * Menyimpan tipe barang baru (MasterBarang) dan membuat item fisiknya (InventoryItem).
-     * Jika nama barang sudah ada, hanya akan menambah stok item fisiknya.
+     * Menyimpan tipe barang baru (MasterBarang).
      */
     public function store(Request $request)
     {
@@ -124,16 +120,26 @@ class MasterBarangController extends Controller
             ],
         ]);
 
-        $kategori = MasterKategori::find($validated['id_kategori']);
-        $subKategori = SubKategori::find($validated['id_sub_kategori']);
+        $existingSkuFamily = MasterBarang::where('id_kategori', $validated['id_kategori'])
+            ->where('id_sub_kategori', $validated['id_sub_kategori'])
+            ->first();
 
-        $uniqueKodeBarang = $this->generateUniqueKodeBarang(
-            $kategori->nama_kategori,
-            $subKategori->nama_sub
-        );
+        $kodeBarang = null;
+
+        if ($existingSkuFamily) {
+            $kodeBarang = $existingSkuFamily->kode_barang;
+        } else {
+            $kategori = MasterKategori::find($validated['id_kategori']);
+            $subKategori = SubKategori::find($validated['id_sub_kategori']);
+
+            $kodeBarang = $this->generateUniqueKodeBarang(
+                $kategori->nama_kategori,
+                $subKategori->nama_sub
+            );
+        }
 
         $dataToCreate = array_merge($validated, [
-            'kode_barang' => $uniqueKodeBarang, 
+            'kode_barang' => $kodeBarang, 
             'created_by' => Auth::id(),
         ]);
 
@@ -142,29 +148,6 @@ class MasterBarangController extends Controller
         return response()->json($masterBarang->load(['masterKategori', 'subKategori']), 201);
     }
 
-    /**
-     * Generator kode unik sesuai dengan aturan yang kompleks.
-     */
-    private function generateUniqueStokCode(MasterBarang $masterBarang): string
-    {
-        $baseCode = $masterBarang->kode_barang;
-        $latestItem = StokBarang::where('kode_unik', 'LIKE', $baseCode . '%')
-            ->orderBy('kode_unik', 'desc')
-            ->first();
-
-        $sequence = 1;
-        if ($latestItem) {
-            $lastSequence = (int) substr($latestItem->kode_unik, -3);
-            $sequence = $lastSequence + 1;
-        }
-        $sequencePart = str_pad($sequence, 3, '0', STR_PAD_LEFT);
-        return $baseCode . $sequencePart;
-    }
-
-    /**
-     * Mengambil rincian stok berdasarkan nama barang lalu warna
-     * untuk semua item yang memiliki kode_barang (SKU) yang sama.
-     */
     public function getStockBreakdown(MasterBarang $masterBarang)
     {
         $statusTersediaId = \App\Models\Status::where('nama_status', 'Tersedia')->value('id');
@@ -209,9 +192,6 @@ class MasterBarangController extends Controller
         return response()->json(array_values($result));
     }
 
-    /**
-     * Menampilkan satu tipe barang (MasterBarang) spesifik.
-     */
     public function show(MasterBarang $masterBarang)
     {
         return $masterBarang->load(['masterKategori', 'subKategori']);
@@ -225,9 +205,7 @@ class MasterBarangController extends Controller
 
         $stockDetails = $masterBarang->stokBarangs()
             ->whereNotIn('stok_barangs.status_id', $excludedStatuses)
-            // Ganti dari 'join' menjadi 'leftJoin'
             ->leftJoin('colors', 'stok_barangs.id_warna', '=', 'colors.id_warna')
-            // Gunakan COALESCE untuk menangani warna NULL
             ->select(
                 DB::raw('COALESCE(colors.nama_warna, "Tanpa Warna") as nama_warna'),
                 DB::raw('count(*) as total')
@@ -238,49 +216,100 @@ class MasterBarangController extends Controller
         return response()->json($stockDetails);
     }
 
-    /**
-     * Generates a unique 4 or 5 character kode_barang based on category and subcategory names.
-     * Follows specific fallback rules to ensure uniqueness.
-     *
-     * @param string $kategoriNama
-     * @param string $subKategoriNama
-     * @return string The unique kode_barang.
-     * @throws \Exception If a unique code cannot be generated after extensive tries.
-     */
+    private function getUniqueChars(string $input): array
+    {
+        $cleaned = strtoupper(preg_replace('/[^a-zA-Z]/', '', $input));
+        if (empty($cleaned)) {
+            return ['X']; 
+        }
+        return array_values(array_unique(str_split($cleaned)));
+    }
+
+    private function getInisial(string $nama, int $char1Index, int $char2Index): string
+    {
+        $words = array_values(array_filter(explode(' ', strtoupper(preg_replace('/[^a-zA-Z\s]/', '', $nama)))));
+        if (count($words) == 0) {
+            return 'XX';
+        }
+
+        $word1Chars = $this->getUniqueChars($words[0]);
+        $char1 = $word1Chars[$char1Index % count($word1Chars)] ?? $word1Chars[0];
+        $char2 = 'X';
+        
+        if (count($words) > 1) {
+            $word2Chars = $this->getUniqueChars($words[1]);
+            $char2 = $word2Chars[$char2Index % count($word2Chars)] ?? $word2Chars[0];
+        } 
+        else {
+            $allChars = $this->getUniqueChars($words[0]);
+            $targetIndex = 2 + $char2Index;
+            
+            if (isset($allChars[$targetIndex])) {
+                 $char2 = $allChars[$targetIndex];
+            } else {
+                 $char2 = $allChars[($targetIndex % count($allChars))] ?? $allChars[min(1, count($allChars) - 1)];
+            }
+        }
+        
+        return $char1 . $char2;
+    }
+
     private function generateUniqueKodeBarang(string $kategoriNama, string $subKategoriNama): string
     {
-        $catNameClean = strtoupper(preg_replace('/[^a-zA-Z]/', '', $kategoriNama));
-        $subCatNameClean = strtoupper(preg_replace('/[^a-zA-Z]/', '', $subKategoriNama));
+        $catChars1 = $this->getUniqueChars(explode(' ', $kategoriNama)[0] ?? '');
+        $subChars1 = $this->getUniqueChars(explode(' ', $subKategoriNama)[0] ?? '');
 
-        $catLen = strlen($catNameClean);
-        $subCatLen = strlen($subCatNameClean);
+        $catWords = array_values(array_filter(explode(' ', $kategoriNama)));
+        $catChars2 = (count($catWords) > 1) 
+            ? $this->getUniqueChars($catWords[1]) 
+            : $this->getUniqueChars($catWords[0] ?? '');
+        
+        $subWords = array_values(array_filter(explode(' ', $subKategoriNama)));
+        $subChars2 = (count($subWords) > 1) 
+            ? $this->getUniqueChars($subWords[1]) 
+            : $this->getUniqueChars($subWords[0] ?? '');
+            
+        $maxCat1 = count($catChars1);
+        $maxCat2 = (count($catWords) > 1) ? count($catChars2) : count($catChars2) - 2;
+        $maxSub1 = count($subChars1);
+        $maxSub2 = (count($subWords) > 1) ? count($subChars2) : count($subChars2) - 2; 
 
-        $preferredCode = $this->getCodeLetters($catNameClean, 0, 2) . $this->getCodeLetters($subCatNameClean, 0, 2);
-        if (!$this->checkCodeExists($preferredCode)) {
-            return $preferredCode;
+        $maxCat2 = max(1, $maxCat2);
+        $maxSub2 = max(1, $maxSub2); 
+
+        $baseCode = '';
+        for ($s2 = 0; $s2 < $maxSub2; $s2++) {
+            $catInisial = $this->getInisial($kategoriNama, 0, 0);
+            $subInisial = $this->getInisial($subKategoriNama, 0, $s2);
+            $code = $catInisial . $subInisial;
+            if ($s2 == 0) $baseCode = $code; 
+            if (!$this->checkCodeExists($code)) return $code;
         }
 
-        for ($j = 3; $j < $subCatLen; $j++) {
-            $code = $this->getCodeLetters($catNameClean, 0, 2) . $this->getCodeLetters($subCatNameClean, 0, $j);
-            if (!$this->checkCodeExists($code)) {
-                return $code;
+        for ($s1 = 1; $s1 < $maxSub1; $s1++) {
+            for ($s2 = 0; $s2 < $maxSub2; $s2++) {
+                $catInisial = $this->getInisial($kategoriNama, 0, 0);
+                $subInisial = $this->getInisial($subKategoriNama, $s1, $s2);
+                $code = $catInisial . $subInisial;
+                if (!$this->checkCodeExists($code)) return $code;
             }
         }
-
-        for ($i = 3; $i < $catLen; $i++) {
-            $codeRule3 = $this->getCodeLetters($catNameClean, 0, $i) . $this->getCodeLetters($subCatNameClean, 0, 2);
-            if (!$this->checkCodeExists($codeRule3)) {
-                return $codeRule3;
-            }
-
-            for ($j = 3; $j < $subCatLen; $j++) {
-                $codeRule4 = $this->getCodeLetters($catNameClean, 0, $i) . $this->getCodeLetters($subCatNameClean, 0, $j);
-                if (!$this->checkCodeExists($codeRule4)) {
-                    return $codeRule4;
+        
+        for ($c1 = 1; $c1 < $maxCat1; $c1++) {
+            for ($c2 = 0; $c2 < $maxCat2; $c2++) {
+                for ($s1 = 0; $s1 < $maxSub1; $s1++) {
+                    for ($s2 = 0; $s2 < $maxSub2; $s2++) {
+                        $catInisial = $this->getInisial($kategoriNama, $c1, $c2);
+                        $subInisial = $this->getInisial($subKategoriNama, $s1, $s2);
+                        $code = $catInisial . $subInisial;
+                        if (!$this->checkCodeExists($code)) return $code;
+                    }
                 }
             }
         }
 
+        $preferredCode = $baseCode ?: ($this->getInisial($kategoriNama, 0, 0) . $this->getInisial($subKategoriNama, 0, 0));
+        
         for ($charCode = ord('A'); $charCode <= ord('Z'); $charCode++) {
             $appendedChar = chr($charCode);
             $code5 = $preferredCode . $appendedChar;
@@ -295,54 +324,15 @@ class MasterBarangController extends Controller
                 return $code6;
             }
         }
+        
         throw new \Exception("Could not generate a unique kode_barang for $kategoriNama / $subKategoriNama after extensive tries.");
     }
 
-    /**
-     * Helper to safely get two letters from a string at given indices.
-     * Returns 'X' if index is out of bounds or character is not available.
-     *
-     * @param string $str The cleaned uppercase string.
-     * @param int $index1 First index (0-based).
-     * @param int $index2 Second index (0-based).
-     * @return string Two uppercase letters or 'X' placeholders.
-     */
-    private function getCodeLetters(string $str, int $index1, int $index2): string
-    {
-        $len = strlen($str);
-        $char1 = ($index1 >= 0 && $index1 < $len) ? $str[$index1] : 'X';
-        $char2 = ($index2 >= 0 && $index2 < $len && $index2 !== $index1) ? $str[$index2] : 'X'; 
-        
-        if ($char2 === 'X' || $index2 === $index1) {
-             $nextIndex = $index2 + 1;
-             $char2 = ($nextIndex >= 0 && $nextIndex < $len && $nextIndex !== $index1) ? $str[$nextIndex] : 'X';
-        }
-        if ($char2 === 'X') {
-             $prevIndex = $index2 -1;
-             if ($prevIndex >= 0 && $prevIndex !== $index1) {
-                 $char2 = ($prevIndex < $len) ? $str[$prevIndex] : 'X';
-             }
-        }
-
-
-        return $char1 . $char2;
-    }
-
-    /**
-     * Helper to check if a kode_barang already exists in the master_barangs table.
-     *
-     * @param string $code The code to check.
-     * @return bool True if the code exists, false otherwise.
-     */
     private function checkCodeExists(string $code): bool
     {
         return DB::table('master_barangs')->where('kode_barang', $code)->exists();
     }
 
-    /**
-     * Memperbarui data dari sebuah tipe barang (MasterBarang).
-     * Tidak mempengaruhi item individual yang sudah ada.
-     */
     public function update(Request $request, MasterBarang $masterBarang)
     {
         $validated = $request->validate([
@@ -354,7 +344,6 @@ class MasterBarangController extends Controller
 
     public function bulkDelete(Request $request)
     {
-        // 1. Validasi input
         $validated = $request->validate([
             'ids' => 'required|array|min:1',
             'ids.*' => 'integer|exists:master_barangs,id_m_barang',
@@ -383,10 +372,6 @@ class MasterBarangController extends Controller
         return response()->json(['message' => $message]);
     }
 
-    /**
-     * Menghapus sebuah tipe barang (MasterBarang).
-     * Hanya bisa dilakukan jika tidak ada lagi item fisik yang tercatat.
-     */
     public function destroy(MasterBarang $masterBarang)
     {
         if ($masterBarang->stokBarangs()->exists()) {
