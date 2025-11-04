@@ -283,7 +283,7 @@ function StokBarangView() {
     };
 
     const handleSaveSuccess = () => {
-        fetchData(pagination?.current_page || 1, currentFilters);
+        fetchData(1, currentFilters);
     };
 
     const handleScanSearch = useCallback(async (code) => {
