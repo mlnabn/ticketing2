@@ -350,15 +350,20 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
                                 <div className="form-row2">
                                     <div className="form-group-half">
                                         <label>Kondisi</label>
-                                        <select
-                                            name="kondisi"
-                                            value={formData.kondisi}
-                                            onChange={handleChange}
-                                            className="select-kondisi"
-                                        >
-                                            <option value="Baru">Baru</option>
-                                            <option value="Bekas">Bekas</option>
-                                        </select>
+                                        <Select
+                                            classNamePrefix="custom-select-kondisi"
+                                            options={[
+                                                { value: 'Baru', label: 'Baru' },
+                                                { value: 'Bekas', label: 'Bekas' }
+                                            ]}
+                                            value={{ value: formData.kondisi, label: formData.kondisi }}
+                                            onChange={(selectedOption) => {
+                                                handleChange({ target: { name: 'kondisi', value: selectedOption.value } });
+                                            }}
+                                            placeholder="Pilih Kondisi"
+                                            isSearchable={false}
+                                        />
+
                                     </div>
                                     <div className="form-group-half">
                                         <label>Warna</label>
