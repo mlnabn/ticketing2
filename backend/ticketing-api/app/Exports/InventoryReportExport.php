@@ -27,14 +27,15 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
     {
         switch ($this->type) {
             case 'in':
-                return [ 'Kode Unik', 'Serial Number', 'Nama Barang', 'Status Kejadian', 'Tgl Jadi Tersedia', 'Diubah Oleh', 'Workshop (Saat Kejadian)', ];
+                return [ 'Kode Unik', 'Serial Number', 'Nama Barang', 'Status Dari', 'Status Perubahan', 'Tgl Jadi Tersedia', 'Diubah Oleh', ];
             case 'out': 
+                 return [ 'Kode Unik', 'Serial Number', 'Nama Barang', 'Status Dari', 'Status Perubahan', 'Tgl Kejadian', 'Pengguna/Penanggung Jawab', 'Workshop (Saat Kejadian)', 'Deskripsi', ];
             case 'accountability': 
-                 return [ 'Kode Unik', 'Serial Number', 'Nama Barang', 'Status Kejadian', 'Tgl Kejadian', 'Pengguna/Penanggung Jawab', 'Workshop (Saat Kejadian)', 'Deskripsi', ]; // <-- Tambah Deskripsi
+                 return [ 'Kode Unik', 'Serial Number', 'Nama Barang', 'Status Kejadian', 'Tgl Kejadian', 'Pengguna/Penanggung Jawab', 'Deskripsi', ];
             case 'item_history':
                  return [ 'Kode Unik', 'Serial Number', 'Nama Barang', 'Status Kejadian', 'Tgl Kejadian', 'Pengguna/Penanggung Jawab', 'Workshop (Saat Kejadian)', 'Deskripsi', ];
             case 'available':
-                return [ 'Kode Unik', 'Serial Number', 'Nama Barang', 'Status', 'Tgl Masuk Awal', 'Ditambahkan Oleh', 'Kondisi', 'Harga Beli', ];
+                return [ 'Kode Unik', 'Serial Number', 'Nama Barang', 'Status', 'Tgl Masuk Awal', 'Ditambahkan Oleh',];
             case 'active_loans':
                 return [ 'Kode Unik', 'Serial Number', 'Nama Barang', 'Status', 'Peminjam', 'Lokasi', 'Tgl Pinjam/Keluar', ];
             case 'all_stock':
@@ -54,13 +55,12 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
                     $stokInfo->kode_unik ?? '-',
                     $stokInfo->serial_number ?? '-',
                     $stokInfo->masterBarang->nama_barang ?? '-',
+                    $item->previousStatusDetail->nama_status ?? '-', 
                     $item->statusDetail->nama_status ?? '-', 
                     $historyDate ? Carbon::parse($historyDate)->format('d M Y H:i') : '-', 
                     $item->triggeredByUser->name ?? '-', 
-                    $item->workshop->name ?? '-',
                 ];
             case 'out':
-            case 'accountability': 
                 $stokInfo = $item->stokBarang;
                 $historyDate = $item->event_date ?? $item->created_at;
                 $responsibleUser = $item->relatedUser->name ?? $item->triggeredByUser->name ?? '-';
@@ -68,10 +68,36 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
                     $stokInfo->kode_unik ?? '-',
                     $stokInfo->serial_number ?? '-', 
                     $stokInfo->masterBarang->nama_barang ?? '-',
+                    $item->previousStatusDetail->nama_status ?? '-',
                     $item->statusDetail->nama_status ?? '-', 
                     $historyDate ? Carbon::parse($historyDate)->format('d M Y H:i') : '-', 
                     $responsibleUser,
                     $item->workshop->name ?? '-', 
+                    $item->deskripsi ?? '-',
+                ];
+            case 'accountability': 
+                $stokInfo = $item->stokBarang;
+                $historyDate = $item->event_date ?? $item->created_at;
+                $responsibleUser = $item->relatedUser->name ?? $item->triggeredByUser->name ?? '-';
+                return [
+                    'Kode Unik' => $item->kode_unik 
+                        ?? $item->stokBarang->kode_unik 
+                        ?? '-',
+                    'Serial Number' => $item->serial_number 
+                        ?? $item->stokBarang->serial_number 
+                        ?? '-',
+                    'Nama Barang' => optional($item->masterBarang)->nama_barang 
+                        ?? optional(optional($item->stokBarang)->masterBarang)->nama_barang 
+                        ?? '-',
+                    $item->statusDetail->nama_status ?? '-', 
+                    $historyDate ? Carbon::parse($historyDate)->format('d M Y H:i') : '-', 
+                    'Pengguna/PJ' => optional($item->userPerusak)->name 
+                        ?? optional($item->userPenghilang)->name 
+                        ?? optional($item->teknisiPerbaikan)->name 
+                        ?? optional($item->userPeminjam)->name 
+                        ?? optional($item->triggeredByUser)->name 
+                        ?? optional(optional($item->stokBarang)->userPeminjam)->name 
+                        ?? '-',
                     $item->deskripsi ?? '-',
                 ];
             case 'item_history':
@@ -96,8 +122,6 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
                     $item->statusDetail->nama_status ?? '-', 
                     $item->tanggal_masuk ? Carbon::parse($item->tanggal_masuk)->format('d M Y') : '-', 
                     $item->createdBy->name ?? '-',
-                    $item->kondisi ?? '-',
-                    $item->harga_beli ?? '-',
                 ];
             case 'active_loans':
                 return [
@@ -110,30 +134,22 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
                     $item->tanggal_keluar ? Carbon::parse($item->tanggal_keluar)->format('d M Y') : '-', 
                 ];
             
-            // --- PERBAIKAN ---
             case 'all_stock':
                 return [
                     $item->kode_unik,
                     $item->serial_number ?? '-', 
                     $item->masterBarang->nama_barang ?? '-',
                     $item->statusDetail->nama_status ?? '-', 
-                    
-                    // Ganti baris ini:
-                    // $item->userPeminjam->name ?? $item->workshop->name ?? ($item->statusDetail->nama_status == 'Tersedia' ? 'Stok Gudang' : '-'),
-                    
-                    // Menjadi ini:
                     $this->getResponsiblePerson($item),
 
                     $item->tanggal_masuk ? Carbon::parse($item->tanggal_masuk)->format('d M Y') : '-',
                 ];
-            // --- AKHIR PERBAIKAN ---
                 
             default:
                 return [];
         }
     }
 
-    // Helper function ini (sudah ada) digunakan oleh 'all_stock'
     private function getResponsiblePerson($item)
     {
         if (!$item->statusDetail) {
@@ -151,7 +167,7 @@ class InventoryReportExport implements FromCollection, WithHeadings, WithMapping
             case 'Perbaikan':
                 return $item->teknisiPerbaikan->name ?? '-';
             default:
-                return '-'; // Untuk status 'Tersedia', 'Diservis', dll.
+                return '-'; 
         }
     }
 }
