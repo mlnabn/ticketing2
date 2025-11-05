@@ -283,7 +283,7 @@ function ItemListView({
                                     <h4>{item.nama_barang}</h4>
                                     <small>Kode: {item.kode_barang}</small>
                                 </div>
-                                <div className="card-body">
+                                {/* <div className="card-body">
                                     <div className="card-item-row">
                                         <span className="label">Kategori:</span>
                                         <span className="value">{item.master_kategori?.nama_kategori || '-'}</span>
@@ -293,8 +293,8 @@ function ItemListView({
                                         <span className="label">Sub-Kategori:</span>
                                         <span className="value">{item.sub_kategori?.nama_sub || '-'}</span>
                                     </div>
-                                </div>
-                                <div className="card-separator"></div>
+                                </div> */}
+                                {/* <div className="card-separator"></div> */}
                                 <div className="card-row action-row">
                                     <button onClick={(e) => { e.stopPropagation(); onEdit(item); }} className="action-buttons-group btn-edit">Edit</button>
                                     <button onClick={(e) => { e.stopPropagation(); onDelete(item); }} className="action-buttons-group btn-delete">Hapus</button>
