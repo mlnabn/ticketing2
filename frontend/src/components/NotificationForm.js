@@ -170,7 +170,12 @@ export default function NotificationForm() {
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="target">Kirim Ke:</label>
-              <select id="target" value={target} onChange={(e) => setTarget(e.target.value)}>
+              <select
+                id="target"
+                value={target}
+                onChange={(e) => setTarget(e.target.value)}
+                className="select-notif"
+              >
                 <option value="all">Semua Pengguna</option>
                 {users.filter((u) => u.role === 'user').map((user) => (
                   <option key={user.id} value={user.id}>{user.name}</option>
