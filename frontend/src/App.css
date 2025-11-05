@@ -9878,8 +9878,7 @@ body.dark-mode .btn-recover-small:hover {
   font-size: 14px;
 }
 
-.detail-edit-select,
-.detail-edit-input {
+.detail-edit-select{
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
@@ -9892,8 +9891,7 @@ body.dark-mode .btn-recover-small:hover {
   background-size: 1px 60%, 0.75em auto;
 }
 
-.dark-mode .detail-edit-select,
-.dark-mode .detail-edit-input {
+.dark-mode .detail-edit-select{
   background-image:
     linear-gradient(to right, #888 1px, transparent 1px),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
