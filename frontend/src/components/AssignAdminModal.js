@@ -57,6 +57,7 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show }
     const selectStyles = {
         control: (provided, state) => ({
             ...provided,
+            cursor: 'text',
             backgroundColor: isDarkMode ? 'rgba(26, 32, 44, 0.7)' : '#fff',
             borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : '#ccc',
             borderRadius: "10px",
@@ -71,12 +72,14 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show }
         singleValue: (provided) => ({ ...provided, color: isDarkMode ? '#e2e8f0' : '#333' }),
         menu: (provided) => ({
             ...provided,
+            cursor: 'pointer',
             backgroundColor: isDarkMode ? '#2d3748' : '#fff',
             border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #ccc',
             borderRadius: "10px",
         }),
         option: (provided, state) => ({
             ...provided,
+            cursor: 'pointer',
             color: isDarkMode ? '#e2e8f0' : '#333',
             backgroundColor: state.isFocused ? (isDarkMode ? 'rgba(59, 130, 246, 0.5)' : '#e9f2ff') : 'transparent',
             '&:active': {

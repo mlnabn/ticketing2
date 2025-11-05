@@ -17,7 +17,7 @@ const ReportLineChart = ({ data }) => {
   useEffect(() => {
     const savedMode = localStorage.getItem("darkMode") === 'true';
     setIsDarkMode(savedMode);
-    
+
     const handleStorageChange = () => {
       setIsDarkMode(localStorage.getItem("darkMode") === 'true');
     };
@@ -46,7 +46,7 @@ const ReportLineChart = ({ data }) => {
 
   // (DIUBAH) Kunci data untuk sumbu-X juga dinamis
   const xAxisDataKey = isMonthlyData ? "month" : "date";
-  
+
 
   return (
     <div className="linechart-wrapper">
@@ -57,8 +57,7 @@ const ReportLineChart = ({ data }) => {
         >
           <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#444" : "#ddd"} />
           <XAxis
-            dataKey={xAxisDataKey} // Dinamis: 'month' atau 'date'
-            // (DIUBAH) Terapkan formatter yang sesuai berdasarkan tipe data
+            dataKey={xAxisDataKey}
             tickFormatter={(tick) => isMonthlyData ? tick : dayjs(tick).format("DD")}
             tick={{ fontSize: 11 }}
             tickMargin={10}
@@ -75,8 +74,8 @@ const ReportLineChart = ({ data }) => {
           <Tooltip
             // (DIUBAH) Label pada tooltip juga dibuat dinamis
             labelFormatter={(label) => {
-                if (isMonthlyData) return `Bulan ${label}`; // Tampilkan nama bulan jika data bulanan
-                return dayjs(label).format("DD MMM YYYY"); // Format tanggal lengkap jika harian
+              if (isMonthlyData) return `Bulan ${label}`; // Tampilkan nama bulan jika data bulanan
+              return dayjs(label).format("DD MMM YYYY"); // Format tanggal lengkap jika harian
             }}
             contentStyle={{
               backgroundColor: isDarkMode ? "#2c2c2c" : "#fff",
@@ -88,14 +87,26 @@ const ReportLineChart = ({ data }) => {
 
           {/* Render Line secara kondisional berdasarkan state visibleLines */}
           {visibleLines.includes("Total Tiket") && (
-            <Line type="monotone" dataKey="total" stroke="#2196f3" name="Total Tiket" dot={false} />
+            <Line
+              type="monotone"
+              dataKey="total"
+              stroke="#2196f3"
+              name="Total Tiket"
+              
+            />
           )}
           {visibleLines.includes("Tiket Dikerjakan") && (
-            <Line type="monotone" dataKey="dikerjakan" stroke="#FFBB28" name="Tiket Dikerjakan" dot={false} />
+            <Line
+              type="monotone"
+              dataKey="dikerjakan"
+              stroke="#FFBB28"
+              name="Tiket Dikerjakan"
+               
+            />
           )}
         </LineChart>
       </ResponsiveContainer>
-      
+
       {/* Legend custom yang interaktif */}
       <div className="chart-legend">
         <div

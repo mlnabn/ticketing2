@@ -2423,14 +2423,11 @@ button:hover {
 
 button.btn-pause {
   background-color: #e5e2e2;
-  /* soft gray */
   color: #383d41;
   border-color: #d6d8db;
   padding: 8px 12px;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
   transition: background-color 0.2s;
   box-shadow: 0 4px 12px rgba(56, 61, 65, 0.25);
 }
@@ -2949,6 +2946,8 @@ body.dark-mode .job-filter select {
   border-color: var(--status-belum-bg-light);
   /* Box shadow diubah menjadi biru tua (RGB 0, 123, 255) */
   box-shadow: 0 4px 12px rgba(0, 123, 255, 0.35);
+  font-size: 10px;
+  font-weight: 600;
 }
 
 body.dark-mode .status-belum-dikerjakan {
@@ -2967,6 +2966,8 @@ body.dark-mode .status-belum-dikerjakan {
   color: var(--status-sedang-text-light);
   border-color: var(--status-sedang-bg-light);
   box-shadow: 0 4px 12px rgba(133, 100, 4, 0.35);
+  font-size: 10px;
+  font-weight: 600;
 }
 
 body.dark-mode .status-sedang-dikerjakan {
@@ -2984,6 +2985,8 @@ body.dark-mode .status-sedang-dikerjakan {
   color: var(--status-ditunda-text-light);
   border-color: var(--status-ditunda-bg-light);
   box-shadow: 0 4px 12px rgba(108, 117, 125, 0.35);
+  font-size: 10px;
+  font-weight: 600;
 }
 
 body.dark-mode .status-ditunda {
@@ -3001,6 +3004,8 @@ body.dark-mode .status-ditunda {
   color: var(--status-selesai-text-light);
   border-color: var(--status-selesai-bg-light);
   box-shadow: 0 4px 12px rgba(15, 81, 50, 0.35);
+  font-size: 10px;
+  font-weight: 600;
 }
 
 body.dark-mode .status-selesai {
@@ -3018,6 +3023,8 @@ body.dark-mode .status-selesai {
   color: var(--status-belum-text-light);
   border-color: var(--status-tolak-bg-light);
   box-shadow: 0 4px 12px rgba(114, 28, 36, 0.35);
+  font-size: 10px;
+  font-weight: 600;
 }
 
 body.dark-mode .status-ditolak {
@@ -3097,7 +3104,7 @@ body.dark-mode .form-label {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-
+  cursor: pointer;
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--border-color-light);
@@ -5166,6 +5173,7 @@ body.dark-mode .rejection-reason-display p {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  cursor: pointer;
   background-image:
     linear-gradient(to right, #ccc 1px, transparent 1px),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
@@ -5868,10 +5876,10 @@ body.dark-mode .history-item-content small {
 
 /* --- Class Dasar untuk Semua Tombol Aksi --- */
 .btn-action {
-  padding: 6px 14px;
+  padding: 2px 10px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 12px;
   font-weight: 500;
   transition: all 0.2s ease-in-out;
   border: none;
@@ -9874,7 +9882,7 @@ body.dark-mode .btn-recover-small:hover {
   font-size: 14px;
 }
 
-.detail-edit-select{
+.detail-edit-select {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
@@ -9887,7 +9895,7 @@ body.dark-mode .btn-recover-small:hover {
   background-size: 1px 60%, 0.75em auto;
 }
 
-.dark-mode .detail-edit-select{
+.dark-mode .detail-edit-select {
   background-image:
     linear-gradient(to right, #888 1px, transparent 1px),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
@@ -10804,6 +10812,7 @@ body.dark-mode .return-item-row {
   -moz-appearance: none;
   appearance: none;
 
+  cursor: pointer;
   /* garis vertikal + panah ▼ */
   background-repeat: no-repeat, no-repeat;
   background-position: right 2rem center, right 0.75rem center;
@@ -11127,6 +11136,90 @@ input:disabled {
   color: #6c757d;
 }
 
+.custom-select-kondisi__control {
+  background-color: #FFFFFF !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 48px !important;
+  cursor: pointer !important;
+}
+
+.custom-select-kondisi__control--is-focused {
+  border-color: #86b7fe !important;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25) !important;
+}
+
+.custom-select-kondisi__value-container {
+  padding: 2px 12px !important;
+}
+
+.custom-select-kondisi__menu {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E0E0E0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+.custom-select-kondisi__option {
+  color: #212529 !important;
+}
+.custom-select-kondisi__option--is-focused {
+  background-color: rgba(13, 110, 253, 0.15) !important;
+}
+.custom-select-kondisi__option--is-selected {
+  background-color: #0d6efd !important;
+  color: #FFFFFF !important;
+}
+.custom-select-kondisi__placeholder {
+  color: #6c757d !important;
+  /* KUNCI KESEIMBANGAN: Samakan ukuran font */
+  font-size: 1rem !important;
+}
+.custom-select-kondisi__input-container,
+/* .custom-select-kondisi__placeholder, */
+.custom-select-kondisi__single-value {
+  color: #212529 !important;
+}
+
+/* --- React-Select Dark Mode --- */
+.dark-mode .custom-select-kondisi__control {
+  background-color: #3a3f44 !important;
+  border: 1px solid #495057 !important;
+}
+
+.dark-mode .custom-select-kondisi__control--is-focused {
+  border-color: #0d6efd !important;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25) !important;
+}
+
+.dark-mode .custom-select-kondisi__menu {
+  background-color: #2c2f33 !important;
+  border: 1px solid #495057 !important;
+}
+
+.dark-mode .custom-select-kondisi__option {
+  color: #FFFFFF !important;
+}
+
+.dark-mode .custom-select-kondisi__option--is-focused {
+  background-color: rgba(13, 110, 253, 0.15) !important;
+}
+
+.dark-mode .custom-select-kondisi__option--is-selected {
+  background-color: #0d6efd !important;
+  color: #FFFFFF !important;
+}
+
+.dark-mode .custom-select-kondisi__input-container,
+.dark-mode .custom-select-kondisi__placeholder,
+.dark-mode .custom-select-kondisi__single-value {
+  color: #FFFFFF !important;
+}
+/* ========================================================== */
+/* 2. REACT-SELECT LIGHT MODE OVERRIDES                        */
+/* ========================================================== */
 /* --- React-Select Light Mode --- */
 .creatable-select__control {
   background-color: #FFFFFF !important;
@@ -11135,6 +11228,7 @@ input:disabled {
   box-shadow: none !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   min-height: 48px !important;
+  cursor: pointer !important;
 }
 
 .creatable-select__control--is-focused {
@@ -12481,6 +12575,7 @@ body.dark-mode .btn-dlt:hover {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--detail-border-color, #dee2e6);
+  
 }
 
 .detail-list-header {
@@ -12493,6 +12588,7 @@ body.dark-mode .btn-dlt:hover {
   margin-bottom: 0.25rem;
   text-align: center;
   border-top: 1px solid #4A5568;
+  
 }
 
 body.dark-mode .detail-list-header {
@@ -12517,6 +12613,7 @@ body.dark-mode .detail-list-header {
   padding: 0.6rem 1rem;
   font-size: 0.85em;
   align-items: center;
+  cursor: pointer;
 }
 
 .detail-row-div:last-child {
@@ -12776,6 +12873,7 @@ body.dark-mode .summary-card.expanded {
   padding: 0.6rem 0.5rem;
   font-size: 0.85em;
   align-items: center;
+  cursor: pointer;
 }
 
 .sku-detail-row-div:last-child {
