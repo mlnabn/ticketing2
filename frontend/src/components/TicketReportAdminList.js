@@ -33,7 +33,7 @@ const generateYearOptions = () => {
 export default function TicketReportAdminList() {
 
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [selectedMonth] = useState(null);
   const [admins, setAdmins] = useState([]);
   const [loadingAdmins, setLoadingAdmins] = useState(false);
   const [chartData, setChartData] = useState([]);
@@ -75,12 +75,12 @@ export default function TicketReportAdminList() {
   }, [selectedYear, selectedMonth, fetchChartData]);
 
   const yearOptions = generateYearOptions();
-  const monthOptions = [
-    { value: 1, label: 'Januari' }, { value: 2, label: 'Februari' }, { value: 3, label: 'Maret' },
-    { value: 4, label: 'April' }, { value: 5, label: 'Mei' }, { value: 6, label: 'Juni' },
-    { value: 7, label: 'Juli' }, { value: 8, label: 'Agustus' }, { value: 9, label: 'September' },
-    { value: 10, label: 'Oktober' }, { value: 11, label: 'November' }, { value: 12, label: 'Desember' }
-  ];
+  // const monthOptions = [
+  //   { value: 1, label: 'Januari' }, { value: 2, label: 'Februari' }, { value: 3, label: 'Maret' },
+  //   { value: 4, label: 'April' }, { value: 5, label: 'Mei' }, { value: 6, label: 'Juni' },
+  //   { value: 7, label: 'Juli' }, { value: 8, label: 'Agustus' }, { value: 9, label: 'September' },
+  //   { value: 10, label: 'Oktober' }, { value: 11, label: 'November' }, { value: 12, label: 'Desember' }
+  // ];
 
   const filterQueryString = `?year=${selectedYear}${selectedMonth ? `&month=${selectedMonth}` : ''}`;
 
@@ -95,10 +95,10 @@ export default function TicketReportAdminList() {
           <h2>Laporan Tiket</h2>
           <div className="report-filters">
             <div className="filter-group">
-              <select id="month-selector" value={selectedMonth || ''} onChange={(e) => setSelectedMonth(e.target.value ? parseInt(e.target.value) : null)} className="month-input">
+              {/* <select id="month-selector" value={selectedMonth || ''} onChange={(e) => setSelectedMonth(e.target.value ? parseInt(e.target.value) : null)} className="month-input">
                 <option value="">Semua Bulan</option>
                 {monthOptions.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-              </select>
+              </select> */}
               <select id="year-selector" value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="month-input">
                 {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
               </select>

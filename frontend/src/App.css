@@ -3104,7 +3104,7 @@ body.dark-mode .form-label {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-
+  cursor: pointer;
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--border-color-light);
@@ -5173,6 +5173,7 @@ body.dark-mode .rejection-reason-display p {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  cursor: pointer;
   background-image:
     linear-gradient(to right, #ccc 1px, transparent 1px),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
@@ -10813,6 +10814,7 @@ body.dark-mode .return-item-row {
   -moz-appearance: none;
   appearance: none;
 
+  cursor: pointer;
   /* garis vertikal + panah ▼ */
   background-repeat: no-repeat, no-repeat;
   background-position: right 2rem center, right 0.75rem center;
@@ -12575,6 +12577,7 @@ body.dark-mode .btn-dlt:hover {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--detail-border-color, #dee2e6);
+  
 }
 
 .detail-list-header {
@@ -12587,6 +12590,7 @@ body.dark-mode .btn-dlt:hover {
   margin-bottom: 0.25rem;
   text-align: center;
   border-top: 1px solid #4A5568;
+  
 }
 
 body.dark-mode .detail-list-header {
@@ -12611,6 +12615,7 @@ body.dark-mode .detail-list-header {
   padding: 0.6rem 1rem;
   font-size: 0.85em;
   align-items: center;
+  cursor: pointer;
 }
 
 .detail-row-div:last-child {
@@ -12870,6 +12875,7 @@ body.dark-mode .summary-card.expanded {
   padding: 0.6rem 0.5rem;
   font-size: 0.85em;
   align-items: center;
+  cursor: pointer;
 }
 
 .sku-detail-row-div:last-child {
