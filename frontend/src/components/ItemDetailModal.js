@@ -46,11 +46,11 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
             const timer = setTimeout(() => {
                 setIsClosing(false);
                 setShouldRender(false);
-                setIsEditing(false); 
+                setIsEditing(false);
             }, 300);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, item, shouldRender]);
 
     // --- Efek untuk mengisi form & mengambil data ---
@@ -229,11 +229,11 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
     const animationClass = isClosing ? 'closing' : '';
 
     return (
-        <div 
+        <div
             className={`modal-backdrop-centered ${animationClass}`}
             onClick={handleCloseClick}
         >
-            <div 
+            <div
                 className={`modal-content-large ${animationClass}`}
                 onClick={e => e.stopPropagation()}
             >
@@ -282,8 +282,21 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
                             <>
                                 {(currentItem.status_detail?.nama_status === 'Digunakan' || currentItem.status_detail?.nama_status === 'Dipinjam') && (
                                     <>
-                                        <div className="info-row"><span className="info-label">{currentItem.status_detail.nama_status} Oleh</span><span className="info-value-info">{currentItem.user_peminjam?.name || 'N/A'}</span></div>
-                                        <div className="info-row"><span className="info-label">Di Workshop</span><span className="info-value-info">{currentItem.workshop?.name || 'N/A'}</span></div>
+                                        <div className="info-row">
+                                            <span className="info-label">
+                                                {currentItem.status_detail.nama_status} Oleh
+                                            </span>
+                                            <span className="info-value-info">
+                                                {currentItem.user_peminjam?.name || 'N/A'}
+                                            </span>
+                                        </div>
+                                        <div className="info-row">
+                                            <span className="info-label">Di Workshop
+                                            </span>
+                                            <span className="info-value-info">
+                                                {currentItem.workshop?.name || 'N/A'}
+                                            </span>
+                                        </div>
                                         {currentItem.tanggal_keluar && <div className="info-row"><span className="info-label">Tanggal Keluar</span><span className="info-value-info">{new Date(currentItem.tanggal_keluar).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>}
                                         {currentItem.tanggal_masuk_pinjam && <div className="info-row"><span className="info-label">Estimasi Tgl Masuk</span><span className="info-value-info">{new Date(currentItem.tanggal_masuk_pinjam).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>}
                                     </>
@@ -341,7 +354,7 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
                 showToast={showToast}
                 onSaveSuccess={() => {
                     setEditItem(null);
-                    fetchData(pagination?.current_page || 1, currentFilters); 
+                    fetchData(pagination?.current_page || 1, currentFilters);
                 }}
                 statusOptions={statusOptions}
                 colorOptions={colorOptions}

@@ -143,12 +143,12 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
     useEffect(() => {
         if (show) {
             setShouldRender(true);
-            setIsClosing(false); 
+            setIsClosing(false);
         } else if (shouldRender && !isClosing) {
-            setIsClosing(true); 
+            setIsClosing(true);
             const timer = setTimeout(() => {
                 setIsClosing(false);
-                setShouldRender(false); 
+                setShouldRender(false);
                 setView('form');
                 setFormData(initialFormState);
                 setDisplayHarga('');
@@ -157,7 +157,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
             }, 300);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, shouldRender]);
 
     /* ---------------- Barcode Scanner ---------------- */
@@ -293,7 +293,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
             setNewlyCreatedItems(response.data);
             setView('success');
             showToast('Stok baru berhasil ditambahkan.', 'success');
-            onSaveSuccess(); 
+            onSaveSuccess();
         } catch (error) {
             showToast(error.response?.data?.message || 'Gagal menambah stok.', 'error');
         } finally {
@@ -306,11 +306,11 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
 
     return (
         <>
-            <div 
+            <div
                 className={`modal-backdrop-centered ${animationClass}`}
                 onClick={handleCloseAndReset}
             >
-                <div 
+                <div
                     className={`modal-content-large ${animationClass}`}
                     onClick={e => e.stopPropagation()}
                 >
@@ -320,81 +320,87 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
                             <form onSubmit={handleSubmit}>
                                 <div className="form-group-half">
                                     <label>Pilih Barang (SKU)</label>
-                                    <Select classNamePrefix="creatable-select" 
-                                    options={masterBarangOptions} 
-                                    onChange={handleSelectChange} 
-                                    placeholder="Cari nama atau kode barang..." 
-                                    isClearable 
+                                    <Select classNamePrefix="creatable-select"
+                                        options={masterBarangOptions}
+                                        onChange={handleSelectChange}
+                                        placeholder="Cari nama atau kode barang..."
+                                        isClearable
                                     />
                                 </div>
                                 <div className="form-row2">
-                                    <div className="form-group-half"> 
-                                        <label>Jumlah</label> 
-                                        <input type="number" name="jumlah" 
-                                            value={formData.jumlah} 
-                                            onChange={handleChange} 
-                                            min="1" 
-                                            required 
-                                        /> 
+                                    <div className="form-group-half">
+                                        <label>Jumlah</label>
+                                        <input type="number" name="jumlah"
+                                            value={formData.jumlah}
+                                            onChange={handleChange}
+                                            min="1"
+                                            required
+                                        />
                                     </div>
-                                    <div className="form-group-half"> 
-                                        <label>Harga Beli Satuan (Rp)</label> 
-                                        <input type="text" name="harga_beli" 
-                                            value={displayHarga} 
-                                            onChange={handleChange} 
-                                            placeholder="Contoh: 1500000" 
-                                            required 
-                                        /> 
+                                    <div className="form-group-half">
+                                        <label>Harga Beli Satuan (Rp)</label>
+                                        <input type="text" name="harga_beli"
+                                            value={displayHarga}
+                                            onChange={handleChange}
+                                            placeholder="Contoh: 1500000"
+                                            required
+                                        />
                                     </div>
                                 </div>
                                 <div className="form-row2">
-                                    <div className="form-group-half"> 
-                                        <label>Kondisi</label> 
-                                        <select name="kondisi" value={formData.kondisi} onChange={handleChange}> 
-                                            <option value="Baru">Baru</option> <option value="Bekas">Bekas</option> 
-                                        </select> 
+                                    <div className="form-group-half">
+                                        <label>Kondisi</label>
+                                        <select
+                                            name="kondisi"
+                                            value={formData.kondisi}
+                                            onChange={handleChange}
+                                            className="select-kondisi"
+                                        >
+                                            <option value="Baru">Baru</option>
+                                            <option value="Bekas">Bekas</option>
+                                        </select>
                                     </div>
-                                    <div className="form-group-half"> 
-                                        <label>Warna</label> 
-                                        <Select classNamePrefix="creatable-select" 
-                                            options={colorOptions} 
-                                            value={colorOptions.find((opt) => opt.value === formData.id_warna)} 
-                                            onChange={handleColorChange} 
-                                            placeholder="Cari warna..." 
-                                            isClearable 
-                                            isSearchable 
+                                    <div className="form-group-half">
+                                        <label>Warna</label>
+                                        <Select classNamePrefix="creatable-select"
+                                            options={colorOptions}
+                                            value={colorOptions.find((opt) => opt.value === formData.id_warna)}
+                                            onChange={handleColorChange}
+                                            placeholder="Cari warna..."
+                                            isClearable
+                                            isSearchable
                                             components={{ Option: ColorOption, SingleValue: ColorSingleValue }}
-                                         /> 
+                                        />
                                     </div>
                                 </div>
                                 <div className="form-row2">
-                                    <div className="form-group-half"> 
-                                        <label>Tanggal Pembelian</label> 
-                                        <input type="date" name="tanggal_pembelian" 
-                                            value={formData.tanggal_pembelian} 
-                                            onChange={handleChange} 
-                                        /> 
+                                    <div className="form-group-half">
+                                        <label>Tanggal Pembelian</label>
+                                        <input type="date" name="tanggal_pembelian"
+                                            value={formData.tanggal_pembelian}
+                                            onChange={handleChange}
+                                        />
                                     </div>
-                                    <div className="form-group-half"> 
-                                        <label>Tanggal Masuk</label> 
-                                        <input type="date" name="tanggal_masuk" 
-                                            value={formData.tanggal_masuk} 
-                                            onChange={handleChange} 
-                                            required 
-                                        /> 
+                                    <div className="form-group-half">
+                                        <label>Tanggal Masuk</label>
+                                        <input type="date" name="tanggal_masuk"
+                                            value={formData.tanggal_masuk}
+                                            onChange={handleChange}
+                                            required
+                                        />
                                     </div>
                                 </div>
                                 <div className="form-group full">
                                     <label>Serial Number (Bisa di-scan)</label>
                                     <div className="serial-number-container">
-                                        {formData.serial_numbers.map((sn, index) => ( 
-                                            <input key={index} ref={(el) => (serialInputRefs.current[index] = el)} 
-                                                type="text" placeholder={`S/N #${index + 1}`} 
-                                                value={sn} 
-                                                onChange={(e) => handleSerialChange(index, e.target.value)} 
-                                                onClick={() => setActiveSerialIndex(index)} 
-                                                className={`serial-number-input ${index === activeSerialIndex ? 'active-scan' : ''}`} 
-                                            /> 
+                                        {formData.serial_numbers.map((sn, index) => (
+                                            <input key={index} ref={(el) => (serialInputRefs.current[index] = el)}
+                                                type="text" placeholder={`S/N #${index + 1}`}
+                                                value={sn}
+                                                onChange={(e) => handleSerialChange(index, e.target.value)}
+                                                onClick={() => setActiveSerialIndex(index)}
+                                                className={`serial-number-input ${index === activeSerialIndex ? 'active-scan' : ''}`}
+                                            />
                                         ))}
                                     </div>
                                 </div>
@@ -411,7 +417,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
                             <h3>Stok Berhasil Ditambahkan!</h3>
                             <p>{newlyCreatedItems.length} unit barang baru telah ditambahkan ke inventaris.</p>
                             <p style={{ marginTop: '20px' }}>Anda bisa langsung mencetak label QR Code untuk ditempelkan pada unit barang.</p>
-                            
+
                             <div className="confirmation-modal-actions" style={{ marginTop: '30px' }}>
                                 <button onClick={handleCloseAndReset} className="btn-cancel">Tutup</button>
                                 <button onClick={handlePrint} className="btn-confirm">

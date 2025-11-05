@@ -11,7 +11,7 @@ const ColorOption = (props) => (
         className={`color-select__option ${props.isFocused ? 'color-select__option--is-focused' : ''} ${props.isSelected ? 'color-select__option--is-selected' : ''}`}
         style={{
             display: 'flex',
-            alignItems: 'center', 
+            alignItems: 'center',
             padding: '8px 12px',
             cursor: 'pointer',
         }}
@@ -24,7 +24,7 @@ const ColorOption = (props) => (
                 backgroundColor: props.data.hex,
                 border: '1px solid #ccc',
                 borderRadius: '4px',
-                marginRight: '10px', 
+                marginRight: '10px',
             }}
         ></span>
         <span className="color-select__label">{props.data.label}</span>
@@ -90,16 +90,16 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
         if (show) {
             setCurrentItem(item);
             setShouldRender(true);
-            setIsClosing(false); 
+            setIsClosing(false);
         } else if (shouldRender && !isClosing) {
-            setIsClosing(true); 
+            setIsClosing(true);
             const timer = setTimeout(() => {
                 setIsClosing(false);
-                setShouldRender(false); 
-            }, 300); 
+                setShouldRender(false);
+            }, 300);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, item, shouldRender]);
 
     // --- Isi form dengan data item yang akan diedit ---
@@ -155,11 +155,11 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
             onClose();
         }
     };
-    
+
     if (!shouldRender) return null;
 
     const animationClass = isClosing ? 'closing' : '';
-    
+
     const colorOptionsForSelect = colorOptions.map(color => ({
         value: color.id_warna,
         label: color.nama_warna,
@@ -167,11 +167,11 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
     }));
 
     return (
-        <div 
+        <div
             className={`modal-backdrop-centered ${animationClass}`}
             onClick={handleCloseClick}
         >
-            <div 
+            <div
                 className={`modal-content-large ${animationClass}`}
                 onClick={e => e.stopPropagation()}
             >
@@ -201,7 +201,12 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
                     <div className="form-row2">
                         <div className="form-group-half">
                             <label>Kondisi Barang</label>
-                            <select name="kondisi" value={formData.kondisi} onChange={handleChange}>
+                            <select
+                                name="kondisi"
+                                value={formData.kondisi}
+                                onChange={handleChange}
+                                className="select-kondisi"
+                            >
                                 <option value="Baru">Baru</option>
                                 <option value="Bekas">Bekas</option>
                             </select>

@@ -3094,20 +3094,38 @@ body.dark-mode .form-label {
 }
 
 .form-input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--border-color-light);
   border-radius: 6px;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
-  background-color: var(--input-bg-light);
+  background-color: var(--input-bg);
   color: var(--text-color-light);
   transition: border-color 0.2s, background-color 0.3s, color 0.3s, box-shadow 0.2s;
+
+  background-image:
+    linear-gradient(to right, #ccc 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 2rem center, right 0.75rem center;
+  background-size: 1px 60%, 0.75em auto;
 }
 
 body.dark-mode .form-input {
-  background-color: #374151;
+  background-color: #3a3f44;
   border-color: #4b5563;
   color: #f9fafb;
+
+  background-image:
+    linear-gradient(to right, #888 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 2rem center, right 0.75rem center;
+  background-size: 1px 60%, 0.75em auto;
 }
 
 .form-input:focus {
@@ -4024,14 +4042,15 @@ body.dark-mode .btn-submit:hover {
 .user-avatar2-container {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
   position: relative;
 }
 
 .user-avatar2 {
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  height: 38px;
+  font-size: 1.25;
   border-radius: 50%;
   background: linear-gradient(135deg, #4a90e2, #1c3b70);
   display: flex;
@@ -4472,7 +4491,41 @@ body.dark-mode .password-toggle-btn:hover {
   color: var(--secondary-text-color-dark);
 }
 
-/* ===== Assign Admin Section ===== */
+/* ====================================================== */
+/* GARIS VERTIKAL UNTUK REACT-SELECT                     */
+/* ====================================================== */
+
+/* Wrapper umum react-select */
+.admin-select,
+.scan-input-group {
+  position: relative;
+}
+
+
+/* Garis tegak di dalam react-select */
+.admin-select::after,
+.scan-input-group::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 2.3rem;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 55%;
+  background-color: var(--border-color-light, #ccc);
+  pointer-events: none;
+}
+
+body.dark-mode .admin-select::after,
+body.dark-mode .scan-input-group::after {
+  background-color: #6b7280;
+}
+
+.admin-select .css-1okebmr-indicatorSeparator,
+.scan-input-group .css-1okebmr-indicatorSeparator {
+  display: none !important;
+}
+
 .form-group-AssignAdmin {
   margin-bottom: 1.25rem;
   text-align: center;
@@ -4980,8 +5033,13 @@ body.dark-mode .rejection-reason-display p {
 }
 
 @keyframes fadeBackdropOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes scaleIn {
@@ -5001,6 +5059,7 @@ body.dark-mode .rejection-reason-display p {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
+
   to {
     opacity: 0;
     transform: scale(0.95) translateY(20px);
@@ -5103,6 +5162,27 @@ body.dark-mode .rejection-reason-display p {
 .notification-form-container .form-row .form-group {
   flex: 1;
   /* Setiap grup akan mengambil ruang yang sama */
+}
+
+.form-group select.select-notif {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image:
+    linear-gradient(to right, #ccc 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 2rem center, right 0.75rem center;
+  background-size: 1px 60%, 0.75em auto;
+}
+
+body.dark-mode .form-group select.select-notif {
+  background-image:
+    linear-gradient(to right, #888 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 2rem center, right 0.75rem center;
+  background-size: 1px 60%, 0.75em auto;
 }
 
 /* =========================================== */
@@ -5533,7 +5613,8 @@ body.dark-mode .feedback-message {
   font-size: 1.5rem;
   color: #f9fafb;
   transition: transform 0.2s ease, color 0.3s ease;
-  flex-shrink: 0
+  flex-shrink: 0;
+
 }
 
 .notification-button:hover {
@@ -6104,6 +6185,14 @@ body.dark-mode .welcome-title {
   transform: translateY(1px);
 }
 
+/* Kontrol Header */
+.main-header-controls-user {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
 /* Animation effect */
 @keyframes fadeInUp {
   from {
@@ -6154,7 +6243,6 @@ body.dark-mode .welcome-title {
   .welcome-content {
     padding: 100px 10px;
     gap: 20px;
-    /* lebih rapat lagi */
     border-radius: 15px;
   }
 
@@ -6189,18 +6277,13 @@ body.dark-mode .welcome-title {
     align-items: center;
     justify-content: center;
     background: none;
-    /* biar transparan */
     border: none;
     cursor: pointer;
     color: #fff;
-    /* warna icon */
-    font-size: 1.3rem;
-    /* ukuran icon */
-    width: 32px;
-    /* area klik lebih luas */
-    height: 32px;
+    font-size: 1.5rem;
+    width: 38px;
+    height: 38px;
     position: relative;
-    /* penting untuk badge */
   }
 
   /* Badge posisi relatif terhadap icon */
@@ -6225,7 +6308,6 @@ body.dark-mode .welcome-title {
     overflow-y: auto;
     border-radius: 12px;
     padding: 10px;
-
     z-index: 2000;
   }
 
@@ -6236,12 +6318,9 @@ body.dark-mode .welcome-title {
     width: 100vw;
     height: 100vh;
     background: rgba(15, 23, 42, 0.4);
-    /* semi transparan */
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    /* Safari */
     z-index: 999;
-    /* lebih rendah dari panel */
   }
 
 
@@ -6249,15 +6328,12 @@ body.dark-mode .welcome-title {
   .main-header-user {
     width: 100%;
     padding: 0.5rem 1rem;
-    /* padding lebih kecil */
     display: flex;
     flex-direction: column;
-    /* header jadi vertikal */
     align-items: center;
     gap: 0.6rem;
     margin: 0;
     position: relative;
-    /* penting untuk badge */
   }
 
   .header-logo {
@@ -6270,34 +6346,34 @@ body.dark-mode .welcome-title {
 
   /* Control button (notif + logout) */
   .main-header-controls-user {
-
-
-
     width: auto;
     display: flex;
     justify-content: flex-end;
-    /* tetap kanan */
     align-items: center;
     gap: 10px;
     z-index: 20;
     position: relative;
-    /* supaya ikut flow, tidak numpuk */
     top: unset;
     right: unset;
     margin-top: 10px;
     justify-content: center;
-    /* rata tengah */
-    gap: 15px;
+    gap: 20px;
   }
+
+  .main-header-controls-user .notification-button {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
 
   .main-header-controls-user .breadcrump {
     display: none;
   }
 
   .main-header-user .notification-button {
-    font-size: 1rem;
-    width: 24px;
-    height: 24px;
+    font-size: 1.5rem;
+    width: 38px;
+    height: 38px;
   }
 
   .logout-buttonuser {
@@ -6482,14 +6558,9 @@ body.dark-mode .welcome-title {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 15px;
+    gap: 20px;
     position: static;
     /* hilangkan absolute dari mobile */
-  }
-
-  .main-header-controls-user .breadcrump {
-    display: inline-block;
-    font-size: 0.95rem;
   }
 
   /* Container content */
@@ -7975,6 +8046,7 @@ html {
   backdrop-filter: blur(8px);
   z-index: 1500;
 }
+
 .modal-overlay.closing {
   animation: fadeBackdropOut 0.3s ease-out forwards;
 }
@@ -8045,7 +8117,7 @@ html {
   border-left: 5px solid transparent;
   border-radius: 10px;
   background-color: hsl(210, 20%, 96%);
-  /* Warna lebih lembut */
+  cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -9535,62 +9607,84 @@ body.dark-mode .summary-cards .card h3 {
 
 
 /* ======================================================= */
-/* ===      7. STYLING UNTUK FILTER BULAN & TAHUN
-  (DROPDOWN)      === */
+/* === 7. STYLING UNTUK FILTER BULAN & TAHUN (DROPDOWN) === */
+/* ======================================================= */
 
+/* --- Wrapper untuk kedua dropdown --- */
 .filter-group {
   display: flex;
   gap: 1rem;
   align-items: center;
 }
 
-/* Style utama untuk kedua dropdown <select> */
+/* --- Style utama untuk dropdown bulan & tahun --- */
 .month-input {
-  /* 1. Reset tampilan bawaan browser */
-  appearance: none;
+  /* Reset tampilan bawaan browser */
   -webkit-appearance: none;
   -moz-appearance: none;
+  appearance: none;
 
-  /* 2. Ukuran dan Spasi */
+  /* Ukuran dan spasi */
+  height: 44px;
   padding: 0.5rem 2.5rem 0.5rem 0.75rem;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  color: var(--text-primary);
 
-  /* 3. Border dan Latar Belakang */
-  background-color: var(--bg-color);
-  border: 1px solid #ced4da;
-  border-radius: 0.5rem;
-  /* 8px */
+  /* Warna & tampilan dasar */
+  color: var(--text-primary, #212529);
+  background-color: var(--bg-color, #ffffff);
+  border: 1px solid var(--input-border, #ced4da);
+  border-radius: 8px;
   cursor: pointer;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 16px 12px;
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  /* Transisi halus */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  /* === Garis vertikal + panah custom ▼ === */
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 2rem center, right 0.75rem center;
+  background-size: 1px 60%, 0.75em auto;
+  background-image:
+    linear-gradient(to right, #bcbcbc 1px, transparent 1px),
+    /* garis vertikal */
+    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
 }
 
-/* Efek saat kursor mouse di atas dropdown */
+/* --- Hover --- */
 .month-input:hover {
   border-color: #888;
 }
 
-/* Efek saat dropdown dipilih/fokus (penting untuk aksesibilitas) */
+/* --- Fokus (saat aktif diklik/tab) --- */
 .month-input:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
+  border-color: var(--primary-color, #2563eb);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
 
+/* ======================================================= */
+/* ===                 DARK MODE                        === */
+/* ======================================================= */
+.dark-mode .month-input {
+  background-color: #3a3f44;
+  color: #f9fafb;
+  border-color: #4b5563;
+
+  background-image:
+    linear-gradient(to right, #6b7280 1px, transparent 1px),
+    /* garis vertikal */
+    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d1d5db' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+}
+
+.dark-mode .month-input:hover {
+  border-color: #818cf8;
 }
 
 .dark-mode .month-input:focus {
-  box-shadow: 0 0 0 3px rgba(108, 136, 255, 0.2);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
-
-.dark-mode .month-input {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d1d5db' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-}
-
 
 .btn-recover-small {
   display: inline-flex;
@@ -9784,11 +9878,35 @@ body.dark-mode .btn-recover-small:hover {
   font-size: 14px;
 }
 
+.detail-edit-select,
+.detail-edit-input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  background-image:
+    linear-gradient(to right, #ccc 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 2rem center, right 0.75rem center;
+  background-size: 1px 60%, 0.75em auto;
+}
+
+.dark-mode .detail-edit-select,
+.dark-mode .detail-edit-input {
+  background-image:
+    linear-gradient(to right, #888 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 2rem center, right 0.75rem center;
+  background-size: 1px 60%, 0.75em auto;
+}
+
 .dark-mode .detail-edit-select,
 .dark-mode .detail-edit-input,
 .dark-mode .detail-edit-textarea {
-  background-color: #2d3748;
-  border-color: #4a5568;
+  background-color: #3a3f44;
+  border-color: #fff;
   color: #e2e8f0;
 }
 
@@ -9815,8 +9933,9 @@ body.dark-mode .btn-recover-small:hover {
 
 .modal-content,
 .modal-content.user-form-modal {
-  animation: fadeInScale 0.3s ease-out forwards; 
+  animation: fadeInScale 0.3s ease-out forwards;
 }
+
 .modal-content.closing,
 .modal-content.user-form-modal.closing {
   animation: scaleOut 0.3s ease-out forwards;
@@ -10283,13 +10402,11 @@ body.dark-mode .form-group-recover textarea:focus {
 ==========================================================================
 */
 
-/*
-==========================================================================
-  1. Dropdown Styling (.filter-select)
-==========================================================================
-*/
+/* ==========================================================================
+   1. Dropdown Styling (.filter-select)
+   ========================================================================== */
 
-/* --- Base --- */
+/* --- Base Style --- */
 .filter-select {
   position: relative;
   height: 44px;
@@ -10302,35 +10419,38 @@ body.dark-mode .form-group-recover textarea:focus {
   font-family: inherit;
   color: var(--text-primary, #212529);
   background-color: var(--input-bg, #FFFFFF);
+  cursor: pointer;
 
   /* Remove default appearance */
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  cursor: pointer;
 
-  /* Custom Arrow Icon (Light) */
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1.2em 1.2em;
+  /* Custom divider line + arrow */
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 2rem center, right 0.50rem center;
+  background-size: 1px 60%, 1.2em 1.2em;
+  background-image:
+    linear-gradient(to right, #bcbcbc 1px, transparent 1px),
+    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
 
-  /* Transitions */
+  /* Smooth transitions */
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* --- States (Hover, Focus) --- */
+/* --- Hover State --- */
 .filter-select:hover {
   border-color: #3b82f6;
 }
 
+/* --- Focus State --- */
 .filter-select:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 
-/* --- State (Disabled) --- */
+/* --- Disabled State --- */
 .filter-select:disabled {
   cursor: not-allowed;
   opacity: 0.6;
@@ -10340,14 +10460,28 @@ body.dark-mode .form-group-recover textarea:focus {
   border-color: var(--input-border, #ced4da);
 }
 
-/* --- Dark Mode --- */
+/* ==========================================================================
+   2. Dark Mode Styling
+   ========================================================================== */
+
 .dark-mode .filter-select {
   background-color: #3a3f44;
   color: #e2e8f0;
   border-color: #4a5568;
 
-  /* Custom Arrow Icon (Dark) */
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23e2e8f0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  /* Custom divider + arrow (Dark) */
+  background-image:
+    linear-gradient(to right, #6b7280 1px, transparent 1px),
+    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23e2e8f0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+}
+
+.dark-mode .filter-select:hover {
+  border-color: #818cf8;
+}
+
+.dark-mode .filter-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 
 .dark-mode .filter-select:disabled {
@@ -10358,144 +10492,12 @@ body.dark-mode .form-group-recover textarea:focus {
   border-color: #4a5568;
 }
 
-/*
-==========================================================================
-  2. Date Input Styling (.filter-select-date)
-==========================================================================
-*/
-
-/* --- Base --- */
-.filter-select-date {
-  /* Box Model & Layout */
-  position: relative;
-  height: 44px;
-  /* Fixed height for alignment */
-  width: 100%;
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--input-border, #ced4da);
-  border-radius: 8px;
-
-  /* Typography & Appearance */
-  font-size: 0.9rem;
-  line-height: 1.5;
-  font-family: inherit;
-  color: var(--text-primary, #212529);
-  background-color: var(--input-bg, #FFFFFF);
-
-  /* Remove default appearance */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  cursor: text;
-
-  /* Transitions */
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-/* --- Remove unwanted webkit elements --- */
-.filter-select-date::-webkit-inner-spin-button,
-.filter-select-date::-webkit-clear-button {
-  display: none;
-}
-
-/* --- Custom Calendar Icon (Picker Indicator) --- */
-.filter-select-date::-webkit-calendar-picker-indicator {
-  /* Position over the input padding */
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-
-  /* Reset appearance */
-  -webkit-appearance: none;
-  appearance: none;
-
-  /* Use SVG as a mask */
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-calendar-event' viewBox='0 0 16 16'%3E%3Cpath d='M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z'/%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-1h12a1 1 0 0 1 1 1v1H0V4a1 1 0 0 1 1-1z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: center;
-
-  /* Icon Color (Light) & Transition */
-  background-color: #6c757d;
-  transition: background-color 0.2s;
-}
-
-.filter-select-date::-webkit-calendar-picker-indicator:hover {
-  background-color: #343a40;
-  /* Icon hover color (Light) */
-}
-
-/* --- States (Focus) --- */
-.filter-select-date:focus {
-  outline: none;
-  border-color: var(--input-focus-border, #86b7fe);
-  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
-}
-
-/* --- State (Disabled) --- */
-.filter-select-date:disabled {
-  background-color: var(--input-disabled-bg, #e9ecef);
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* --- Dark Mode --- */
-.dark-mode .filter-select-date {
-  background-color: #3a3f44 !important;
-  color: #e2e8f0;
-  border: 1px solid #4a5568;
-  color-scheme: dark;
-}
-
-.dark-mode .filter-select-date:focus {
-  border-color: #0d6efd;
-}
-
-.dark-mode .filter-select-date:disabled {
-  background-color: #343a40;
-}
-
-/* Icon Color (Dark) */
-.dark-mode .filter-select-date::-webkit-calendar-picker-indicator {
-  background-color: #adb5bd !important;
-}
-
-.dark-mode .filter-select-date::-webkit-calendar-picker-indicator:hover {
-  background-color: #e9ecef !important;
-}
-
 
 /* ============================================= */
 /* STYLING UNTUK FILTER INVENTARIS                 */
 /* ============================================= */
 
-/* --- Gaya dasar untuk setiap dropdown filter --- */
-.filter-select-invent {
-  /* Reset tampilan default browser */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
 
-  /* Ukuran dan Jarak */
-  height: 44px;
-  padding: 0.5rem 2.5rem 0.5rem 1rem;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  width: 200px;
-
-  /* Tampilan Kotak */
-  border-radius: 8px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
-
-  /* Panah Kustom (Custom Arrow) */
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1em;
-}
 
 .qr-scanner-modal #qr-reader {
   border: 2px solid var(--border-color);
@@ -10598,51 +10600,91 @@ body.dark-mode .form-group-recover textarea:focus {
   }
 }
 
-/* --- Gaya saat dropdown difokuskan --- */
+/* ============================================= */
+/* STYLING UNTUK FILTER INVENTARIS (LIGHT & DARK) */
+/* ============================================= */
+
+/* --- Gaya dasar dropdown --- */
+.filter-select-invent {
+  /* Reset tampilan default browser */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* Ukuran & tata letak */
+  height: 44px;
+  padding: 0.5rem 2.5rem 0.5rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  width: 200px;
+
+  /* Tampilan kotak */
+  border-radius: 8px;
+  border: 1px solid var(--input-border, #ced4da);
+  background-color: var(--input-bg, #ffffff);
+  color: var(--text-primary, #212529);
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  /* Dua background layer:
+     1️⃣ Garis vertikal
+     2️⃣ Panah ▼ kustom (SVG inline)
+  */
+  background-image:
+    linear-gradient(to right, #ccc 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 2rem center, right 0.75rem center;
+  background-size: 1px 60%, 0.75em auto;
+}
+
+/* --- Efek fokus --- */
 .filter-select-invent:focus {
   outline: none;
-}
-
-/* ============================================= */
-/* WARNA UNTUK LIGHT & DARK MODE                   */
-/* ============================================= */
-
-/* --- Light Mode --- */
-.filter-select-invent {
-  background-color: var(--input-bg, #FFFFFF);
-  color: var(--text-primary, #212529);
-  border: 1px solid var(--input-border, #ced4da);
-  /* Panah untuk background terang */
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-}
-
-.filter-select-invent:focus {
   border-color: var(--input-focus-border, #86b7fe);
   box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
 }
 
+/* --- Efek hover --- */
+.filter-select-invent:hover {
+  border-color: #999;
+}
+
+/* --- Saat dropdown dinonaktifkan --- */
 .filter-select-invent:disabled {
   background-color: var(--input-disabled-bg, #e9ecef);
   opacity: 0.7;
   cursor: not-allowed;
 }
 
-/* --- Dark Mode --- */
+/* ============================================= */
+/* DARK MODE                                     */
+/* ============================================= */
 .dark-mode .filter-select-invent {
   background-color: #3a3f44;
-  color: var(--text-primary, #FFFFFF);
+  color: var(--text-primary, #ffffff);
   border: 1px solid var(--input-border, #495057);
-  /* Panah untuk background gelap */
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+
+  /* Garis dan panah untuk tema gelap */
+  background-image:
+    linear-gradient(to right, #888 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 2rem center, right 0.75rem center;
+  background-size: 1px 60%, 0.75em auto;
 }
 
+/* --- Fokus di Dark Mode --- */
 .dark-mode .filter-select-invent:focus {
   border-color: var(--input-focus-border, #0d6efd);
   box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
 }
 
+/* --- Disabled di Dark Mode --- */
 .dark-mode .filter-select-invent:disabled {
   background-color: var(--input-disabled-bg, #343a40);
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 
@@ -10697,6 +10739,8 @@ body.dark-mode .form-group-recover textarea:focus {
   }
 }
 
+
+
 .modal-content-large h3 {
   margin-top: 0;
   margin-bottom: 1.5rem;
@@ -10704,6 +10748,104 @@ body.dark-mode .form-group-recover textarea:focus {
   font-size: 1.5rem;
   font-weight: 600;
 }
+
+/* ====================================================== */
+/*                DAFTAR BARANG YANG DIKEMBALIKAN         */
+/* ====================================================== */
+.items-to-return-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.return-item-row {
+  border: 1px solid var(--border-color-light, #e5e7eb);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  background-color: var(--input-bg-light, #fafafa);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .return-item-row {
+  background-color: #2d2f32;
+  border-color: #3b3b3b;
+}
+
+/* ====================================================== */
+/*               INPUT & SELECT DI DALAM FORM             */
+/* ====================================================== */
+.item-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* --- Style inline untuk dropdown --- */
+.form-group-inline2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-group-inline2 label {
+  font-size: 0.9rem;
+  color: var(--text-color, #333);
+  white-space: nowrap;
+  min-width: 110px;
+}
+
+/* --- Gaya dropdown (Status Akhir & dropdown lain) --- */
+.form-group-inline2 select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* garis vertikal + panah ▼ */
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 2rem center, right 0.75rem center;
+  background-size: 1px 60%, 0.75em auto;
+  background-image:
+    linear-gradient(to right, var(--border-color-light, #ccc) 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23444' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.form-group-inline2 select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* --- Untuk dark mode --- */
+body.dark-mode .form-group-inline2 select {
+
+  background-image:
+    linear-gradient(to right, #6b7280 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23d1d5db' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* Select Kondisi */
+.select-kondisi {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* garis vertikal + panah ▼ */
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 2rem center, right 0.75rem center;
+  background-size: 1px 60%, 0.75em auto;
+  background-image:
+    linear-gradient(to right, var(--border-color-light, #ccc) 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23444' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* Dark Mode */
+body.dark-mode .select-kondisi {
+  background-image:
+    linear-gradient(to right, #6b7280 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23d1d5db' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+}
+
 
 /* --- Layout Form --- */
 .form-group,
@@ -11644,6 +11786,7 @@ body.dark-mode .btn-dlt:hover {
   display: flex;
   align-items: center;
   gap: 15px;
+  margin-bottom: 10px;
 }
 
 .item-rank {
@@ -12236,6 +12379,18 @@ body.dark-mode .btn-dlt:hover {
 
 
 @media (max-width: 1920px) {
+
+  /* .detail-cell.header-select {
+    display: flex !important;
+    width: 40px !important;
+    min-width: 40px !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header-select input[type="checkbox"] {
+    display: inline-block !important;
+  } */
 
   .keyword-form {
     flex-direction: column;
