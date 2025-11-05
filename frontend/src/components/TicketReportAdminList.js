@@ -23,17 +23,7 @@ const staggerItem = {
   },
 };
 
-const generateYearOptions = () => {
-  const currentYear = new Date().getFullYear();
-  const years = [];
-  for (let i = 0; i < 5; i++) years.push(currentYear - i);
-  return years;
-};
-
 export default function TicketReportAdminList() {
-
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState(null);
   const [admins, setAdmins] = useState([]);
   const [loadingAdmins, setLoadingAdmins] = useState(false);
   const [chartData, setChartData] = useState([]);
@@ -51,13 +41,10 @@ export default function TicketReportAdminList() {
     }
   }, []);
 
-  const fetchChartData = useCallback(async (year, month) => {
-    if (!year) return;
+  const fetchChartData = useCallback(async () => {
     setLoadingChart(true);
     try {
-      const params = { year };
-      if (month) params.month = month;
-      const res = await api.get('/tickets/report-analytics', { params });
+      const res = await api.get('/tickets/report-analytics');
       setChartData(res.data);
     } catch (err) {
       console.error('Gagal mengambil data chart:', err);
@@ -71,18 +58,10 @@ export default function TicketReportAdminList() {
   }, [fetchAdmins]);
 
   useEffect(() => {
-    fetchChartData(selectedYear, selectedMonth);
-  }, [selectedYear, selectedMonth, fetchChartData]);
+    fetchChartData();
+  }, [fetchChartData]);
 
-  const yearOptions = generateYearOptions();
-  const monthOptions = [
-    { value: 1, label: 'Januari' }, { value: 2, label: 'Februari' }, { value: 3, label: 'Maret' },
-    { value: 4, label: 'April' }, { value: 5, label: 'Mei' }, { value: 6, label: 'Juni' },
-    { value: 7, label: 'Juli' }, { value: 8, label: 'Agustus' }, { value: 9, label: 'September' },
-    { value: 10, label: 'Oktober' }, { value: 11, label: 'November' }, { value: 12, label: 'Desember' }
-  ];
-
-  const filterQueryString = `?year=${selectedYear}${selectedMonth ? `&month=${selectedMonth}` : ''}`;
+  const filterQueryString = '';
 
   return (
     <motion.div
@@ -93,17 +72,6 @@ export default function TicketReportAdminList() {
       <motion.div variants={staggerItem} className="dashboard-card" style={{ marginBottom: '2rem' }}>
         <div className="report-header">
           <h2>Laporan Tiket</h2>
-          <div className="report-filters">
-            <div className="filter-group">
-              <select id="month-selector" value={selectedMonth || ''} onChange={(e) => setSelectedMonth(e.target.value ? parseInt(e.target.value) : null)} className="month-input">
-                <option value="">Semua Bulan</option>
-                {monthOptions.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-              </select>
-              <select id="year-selector" value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="month-input">
-                {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
-              </select>
-            </div>
-          </div>
         </div>
         {loadingChart ? <p>Memuat data chart...</p> : <ReportLineChart data={chartData} />}
       </motion.div>
@@ -113,7 +81,7 @@ export default function TicketReportAdminList() {
           <h3>Laporan Seluruh Tiket</h3><p>Lihat semua tiket sesuai filter di atas.</p>
         </Link>
         <Link to={`/admin/reports/handled${filterQueryString}`} className="nav-card">
-          <h3>Laporan Tiket yang Dikerjakan</h3><p>Hanya tiket yang ditangani admin (sesuai filter).</p>
+          <h3>Laporan Tiket yang Dikerjakan</h3><p>Hanya tiket yang ditangani admin.</p>
         </Link>
       </motion.div>
 
