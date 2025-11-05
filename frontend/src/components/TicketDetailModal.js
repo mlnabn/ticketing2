@@ -9,6 +9,15 @@ const formatDateTime = (dateTimeString) => {
     return format(new Date(dateTimeString), 'dd MMM yyyy, HH:mm', { locale: id });
 };
 
+const formatWorkTime = (ticket) => {
+    if (ticket.started_at && ticket.completed_at) return `${format(new Date(ticket.started_at), 'HH:mm')} - ${format(new Date(ticket.completed_at), 'HH:mm')}`;
+    // if (ticket.started_at) return `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}`;
+    if (ticket.requested_date && ticket.requested_time) return `Diminta: ${format(new Date(ticket.requested_date), 'dd MMM')}, ${ticket.requested_time}`;
+    if (ticket.requested_date) return `Tgl Diminta: ${format(new Date(ticket.requested_date), 'dd MMM yyyy')}`;
+    if (ticket.requested_time) return `Waktu Diminta: ${ticket.requested_time}`;
+    return 'Jadwal Fleksibel';
+};
+
 function TicketDetailModal({ show, ticket, onClose }) {
     const [borrowedItems, setBorrowedItems] = useState([]);
     const [isLoadingItems, setIsLoadingItems] = useState(true);
@@ -83,8 +92,11 @@ function TicketDetailModal({ show, ticket, onClose }) {
                 className={`modal-content-detail ${animationClass}`}
                 onClick={e => e.stopPropagation()}
             >
-                <div className="modal-header-detail">
+                <div className="modal-header-detail">   
                     <h3><strong>Detail Tiket: </strong>{currentTicket.kode_tiket || 'N/A'}</h3>
+                    <p className="modal-creation-date">
+                        {formatDateTime(currentTicket.created_at)}
+                    </p>
                 </div>
 
                 <div className="modal-body-detail">
@@ -104,8 +116,8 @@ function TicketDetailModal({ show, ticket, onClose }) {
                             <span className="value">{currentTicket.workshop ? currentTicket.workshop.name : 'N/A'}</span>
                         </div>
                         <div className="detail-item-full">
-                            <span className="label">Tanggal Dibuat</span>
-                            <span className="value">{formatDateTime(currentTicket.created_at)}</span>
+                            <span className="label">Waktu Pengerjaan</span>
+                            <span className="value">{formatWorkTime(currentTicket)}</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Mulai Dikerjakan</span>

@@ -729,7 +729,7 @@ function StokBarangView() {
                                                 <h4>{masterItem.nama_barang} ({masterItem.kode_barang})</h4>
                                             </div>
                                             <div className="card-body">
-                                                <div className="card-item-row">
+                                                {/* <div className="card-item-row">
                                                     <span className="label">Kategori</span>
                                                     <span className="value">{masterItem.master_kategori?.nama_kategori || '-'}</span>
                                                 </div>
@@ -738,7 +738,7 @@ function StokBarangView() {
                                                     <span className="label">Sub-Kategori</span>
                                                     <span className="value">{masterItem.sub_kategori?.nama_sub || '-'}</span>
                                                 </div>
-                                                <div className="card-separator"></div>
+                                                <div className="card-separator"></div> */}
                                                 <div className="card-item-row">
                                                     <span className="label">Stok Tersedia</span>
                                                     <span className="value">{masterItem.available_stock_count}</span>

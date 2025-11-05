@@ -3493,8 +3493,6 @@ body.dark-mode .content-area p {
   font-size: 1.9rem;
   /* Ukuran judul h3 lebih besar */
   font-weight: 700;
-  /* Lebih tebal */
-  margin-bottom: 1.5rem;
   /* Margin bawah lebih besar */
   color: var(--add-ticket-title-color-light);
   transition: color 0.3s ease;
@@ -9963,17 +9961,26 @@ body.dark-mode .form-group-recover textarea:focus {
 /* --- Header --- */
 .modal-header-detail {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid var(--border-color);
 }
 
 .modal-header-detail h3 {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: var(--text-color-primary);
+}
+
+.modal-creation-date {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #6B7280;
+  /* margin: 4px 0 0 0; */
+}
+
+.dark-mode .modal-creation-date {
+  color: #94a3b8;
 }
 
 .modal-close-button-detail {
@@ -11328,10 +11335,8 @@ body.dark-mode .btn-dlt:hover {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  /* Garis Pembatas Bawaan Header */
   border-bottom: 1px solid #6c757d;
   padding-bottom: 1rem;
-  margin-bottom: 1rem;
 }
 
 .ticket-card-mobile .card-body .card-item-row {
@@ -11345,8 +11350,6 @@ body.dark-mode .btn-dlt:hover {
 .ticket-card-mobile .action-row {
   display: flex;
   gap: 1rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
 }
 
 
