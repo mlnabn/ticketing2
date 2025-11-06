@@ -375,33 +375,7 @@ function ItemHistoryLookupPage() {
             <motion.div variants={staggerItem} className="user-management-container">
                 <h1 className="page-title">Lacak Riwayat Aset</h1>
                 <p className="page-description" style={{ textAlign: 'center' }}>Gunakan pencarian, klik item dari daftar, atau scan QR/Barcode untuk melihat riwayat lengkap sebuah aset.</p>
-                <motion.div
-                    variants={staggerItem}
-                    className="filters-container report-filters"
-                    style={{
-                        marginTop: '1rem',
-                        paddingBottom: '0',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        gap: '0.5rem',
-                        alignItems: 'center'
-                    }}
-                >
-                    <input
-                        type="text"
-                        placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
-                        value={searchTerm}
-                        onChange={e => setSearchTerm(e.target.value)}
-                        className="filter-search-input"
-                        style={{ flexGrow: 1, width: 'auto' }}
-                    />
-                    <button className="btn-scan-qr-history" onClick={() => setIsScannerOpen(true)}>
-                        <span className="fa-stack" style={{ fontSize: '1.2em' }}>
-                            <i className="fas fa-qrcode fa-stack-2x"></i>
-                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
-                        </span>
-                    </button>
-                </motion.div>
+                
                 <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', alignItems: 'center' }}>
                     <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
                         <option value="month">Filter Riwayat per Bulan</option>
@@ -427,6 +401,31 @@ function ItemHistoryLookupPage() {
                             <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
                         </>
                     )}
+                </motion.div>
+                <motion.div
+                    variants={staggerItem}
+                    className="filters-container report-filters"
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: '0.5rem',
+                        alignItems: 'center'
+                    }}
+                >
+                    <input
+                        type="text"
+                        placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="filter-search-input"
+                        style={{ flexGrow: 1, width: 'auto' }}
+                    />
+                    <button className="btn-scan-qr-history" onClick={() => setIsScannerOpen(true)}>
+                        <span className="fa-stack" style={{ fontSize: '1.2em' }}>
+                            <i className="fas fa-qrcode fa-stack-2x"></i>
+                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </button>
                 </motion.div>
                 <motion.div variants={staggerItem} className={`split-view-container ${selectedItem ? 'split-view-active' : ''}`}>
                     <div className="list-panel">

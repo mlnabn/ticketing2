@@ -337,16 +337,6 @@ export default function DetailedReportPage({ type, title }) {
                 <h1>{title}</h1>
             </motion.div>
 
-            <motion.div variants={staggerItem} className="filters-container report-filters">
-                <input
-                    type="text"
-                    placeholder="Cari Kode Unik / Nama Barang..."
-                    className="filter-search-input"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-
-            </motion.div>
             <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
                 <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
                     <option value="month">Filter per Bulan</option>
@@ -372,7 +362,16 @@ export default function DetailedReportPage({ type, title }) {
                     </>
                 )}
             </motion.div>
+
             <motion.div variants={staggerItem} className="download-buttons">
+                <motion.input
+                    type="text"
+                    placeholder="Cari Kode Unik / Nama Barang..."
+                    className="filter-search-input-invReport"
+                    value={searchTerm}
+                    variants={staggerItem}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
                 <button onClick={() => handleExport('excel')} disabled={exportingExcel} className="btn-download excel">
                     <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
                     {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
