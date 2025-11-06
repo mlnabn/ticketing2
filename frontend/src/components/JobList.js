@@ -363,6 +363,27 @@ export default function JobList() {
     return 'Jadwal Fleksibel';
   };
 
+  const columnStyles = {
+    // 1. Checkbox
+    col1: { width: '40px' },
+    // 2. Pengirim
+    col2: { width: '100px' },
+    // 3. Dikerjakan Oleh
+    col3: { width: '120px' },
+    // 4. Workshop
+    col4: { width: '120px' },
+    // 5. Deskripsi (Lebar Otomatis dengan batas minimum)
+    col5: { width: '250px' },
+    // 6. Tanggal Dibuat
+    col6: { width: '110px' },
+    // 7. Waktu Pengerjaan (Tengahkan teks)
+    col7: { width: '120px', textAlign: 'center' },
+    // 8. Status (Tengahkan teks)
+    col8: { width: '170px', textAlign: 'center' },
+    // 9. Aksi (PENTING: Beri ruang cukup)
+    col9: { width: '250px', paddingRight: '5px' }
+  };
+
   return (
     <>
       <motion.div
@@ -407,18 +428,18 @@ export default function JobList() {
         ) : (
           <>
             <motion.div variants={staggerItem} className="table-scroll-container" >
-              <table className="job-table">
+              <table className="job-table" style={{ tableLayout: 'fixed', minWidth: '1200px' }}>
                 <thead>
                   <tr>
-                    <th style={{ width: '40px' }}><input type="checkbox" onChange={handleSelectAll} checked={ticketsOnPage.length > 0 && selectedIds.length === ticketsOnPage.length} /></th>
-                    <th>Pengirim</th>
-                    <th>Dikerjakan Oleh</th>
-                    <th>Workshop</th>
-                    <th>Deskripsi</th>
-                    <th>Tanggal Dibuat</th>
-                    <th>Waktu Pengerjaan</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
+                    <th style={columnStyles.col1}><input type="checkbox" onChange={handleSelectAll} checked={ticketsOnPage.length > 0 && selectedIds.length === ticketsOnPage.length} /></th>
+                    <th style={columnStyles.col2}>Pengirim</th>
+                    <th style={columnStyles.col3}>Dikerjakan Oleh</th>
+                    <th style={columnStyles.col4}>Workshop</th>
+                    <th style={columnStyles.col5}>Deskripsi</th>
+                    <th style={columnStyles.col6}>Tanggal Dibuat</th>
+                    <th style={columnStyles.col7}>Waktu Pengerjaan</th>
+                    <th style={columnStyles.col8}>Status</th>
+                    <th style={columnStyles.col9}>Aksi</th>
                   </tr>
                 </thead>
               </table>
@@ -428,7 +449,7 @@ export default function JobList() {
                 onScroll={handleScroll}
                 style={{ overflowY: 'auto', maxHeight: '70vh' }}
               >
-                <table className="job-table">
+                <table className="job-table" style={{ tableLayout: 'fixed', minWidth: '1200px' }}>
                   <tbody>
                     {ticketsOnPage.length > 0 ? (
                       ticketsOnPage.map(ticket => (
@@ -439,15 +460,15 @@ export default function JobList() {
                         clickable-row`}
                           onClick={(e) => handleRowClick(e, ticket)}
                         >
-                          <td style={{ width: '40px' }}><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>
-                          <td>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
-                          <td>{ticket.user ? ticket.user.name : '-'}</td>
-                          <td>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
-                          <td><span className="description-cell">{ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}{ticket.title}</span></td>
-                          <td>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
-                          <td>{formatWorkTime(ticket)}</td>
-                          <td><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></td>
-                          <td><div className="action-buttons-group">{renderActionButtons(ticket)}</div></td>
+                          <td style={columnStyles.col1}><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>
+                          <td style={columnStyles.col2}>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
+                          <td style={columnStyles.col3}>{ticket.user ? ticket.user.name : '-'}</td>
+                          <td style={columnStyles.col4}>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
+                          <td style={columnStyles.col5}><span className="description-cell">{ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}{ticket.title}</span></td>
+                          <td style={columnStyles.col6}>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
+                          <td style={columnStyles.col7}>{formatWorkTime(ticket)}</td>
+                          <td style={columnStyles.col8}><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></td>
+                          <td style={columnStyles.col9}><div className="action-buttons-group">{renderActionButtons(ticket)}</div></td>
                         </tr>
                       ))
                     ) : (
@@ -460,7 +481,7 @@ export default function JobList() {
                 </table>
               </div>
               {!isLoading && ticketData && ticketData.total > 0 && (
-                <table className="job-table">
+                <table className="job-table" style={{ tableLayout: 'fixed', minWidth: '1200px' }}>
                   <tfoot>
                     <tr className="subtotal-row">
                       <td colSpan={8} style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>
@@ -549,7 +570,7 @@ export default function JobList() {
         }
         <AnimatePresence>
 
-        <AssignAdminModal
+          <AssignAdminModal
             show={Boolean(ticketToAssign)}
             key="assignModal"
             ticket={ticketToAssign}
@@ -558,49 +579,49 @@ export default function JobList() {
             onAssign={handleConfirmAssign}
             onClose={() => setTicketToAssign(null)}
             showToast={showToast}
-        />
-        
-        <RejectTicketModal
+          />
+
+          <RejectTicketModal
             show={Boolean(ticketToReject)}
             key="rejectModal"
             ticket={ticketToReject}
             onReject={handleConfirmReject}
             onClose={() => setTicketToReject(null)}
             showToast={showToast}
-        />
-        
-        <ProofModal
+          />
+
+          <ProofModal
             show={Boolean(ticketForProof)}
             key="proofModal"
             ticket={ticketForProof}
             onSave={handleSaveProof}
             onClose={() => setTicketForProof(null)}
-        />
-        
-        <ConfirmationModal
+          />
+
+          <ConfirmationModal
             show={Boolean(ticketToDelete)}
             key="confirmDeleteModal"
             message={`Hapus pekerjaan "${ticketToDelete?.title}"?`}
             onConfirm={confirmDelete}
             onCancel={() => setTicketToDelete(null)}
-        />
+          />
 
-        <TicketDetailModal
+          <TicketDetailModal
             show={Boolean(selectedTicketForDetail)}
             key="detailModal"
             ticket={selectedTicketForDetail}
             onClose={() => setSelectedTicketForDetail(null)}
-        />
+          />
 
-        <ReturnItemsModal
+          <ReturnItemsModal
             show={Boolean(ticketToReturn)}
             key="returnModal"
             ticket={ticketToReturn}
             onSave={handleConfirmReturn}
             onClose={() => setTicketToReturn(null)}
             showToast={showToast}
-        />
-      </AnimatePresence>
+          />
+        </AnimatePresence>
       </motion.div>
     </>
   );

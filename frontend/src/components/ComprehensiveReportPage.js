@@ -303,7 +303,7 @@ export default function ComprehensiveReportPage() {
             )}
           </motion.div>
 
-          <motion.h3 variants={staggerItem}>Filter Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</motion.h3>
+          {/* <motion.h3 variants={staggerItem}>Filter Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</motion.h3> */}
 
           <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
             <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
