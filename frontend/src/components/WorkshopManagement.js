@@ -245,14 +245,12 @@ export default function WorkshopManagement() {
           </>
         )}
       </motion.div>
-      {showFormModal && (
-        <WorkshopFormModal
-          show={showFormModal}
-          workshopToEdit={workshopToEdit}
-          onClose={() => setShowFormModal(false)}
-          onSave={handleSave}
-        />
-      )}
+      <WorkshopFormModal
+        show={showFormModal}
+        workshopToEdit={workshopToEdit}
+        onClose={() => setShowFormModal(false)}
+        onSave={handleSave}
+      />
 
       <ConfirmationModal
         show={showConfirmModal}
