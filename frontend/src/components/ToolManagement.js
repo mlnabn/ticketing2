@@ -5,7 +5,7 @@ import ItemListView from './ItemListView';
 import ItemFormModal from './ItemFormModal';
 import ConfirmationModal from './ConfirmationModal';
 import EditNamaBarangModal from './EditNamaBarangModal';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -28,7 +28,7 @@ const staggerItem = {
 
 function ToolManagement() {
     const { showToast } = useOutletContext();
-
+    const isPresent = useIsPresent();
     const [items, setItems] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [itemToEdit, setItemToEdit] = useState(null);
@@ -90,9 +90,10 @@ function ToolManagement() {
     }, [showToast]);
 
     useEffect(() => {
+        if (!isPresent) return;
         fetchItems(1, currentFilters);
         fetchMobileItems(1, currentFilters);
-    }, [fetchItems, fetchMobileItems, currentFilters]);
+    }, [fetchItems, fetchMobileItems, currentFilters, isPresent]);
 
     const loadMoreItems = async () => {
         if (isLoadingMore || !pagination || pagination.current_page >= pagination.last_page) return;

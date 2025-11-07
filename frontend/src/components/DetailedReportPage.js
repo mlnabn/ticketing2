@@ -3,7 +3,7 @@ import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import { saveAs } from 'file-saver';
 import InventoryDetailModal from './InventoryDetailModal';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -32,6 +32,7 @@ const months = [
 ];
 
 export default function DetailedReportPage({ type, title }) {
+    const isPresent = useIsPresent();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filterType, setFilterType] = useState('month');
@@ -92,6 +93,7 @@ export default function DetailedReportPage({ type, title }) {
     }, [getApiParams, type]);
 
     useEffect(() => {
+        if (!isPresent) return;
         api.get('/reports/inventory/dashboard')
             .then(res => {
                 if (res.data.availableYears && res.data.availableYears.length > 0) {
@@ -109,11 +111,12 @@ export default function DetailedReportPage({ type, title }) {
                 const currentYear = new Date().getFullYear().toString();
                 setYears([currentYear]);
             });
-    }, [filters.year]);
+    }, [filters.year, isPresent]);
 
     useEffect(() => {
+        if (!isPresent) return;
         fetchData();
-    }, [fetchData]);
+    }, [fetchData, isPresent]);
 
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -275,17 +278,12 @@ export default function DetailedReportPage({ type, title }) {
         accountability: 'Tgl Status',
         active_loans: 'Tgl Keluar'
     };
-    // const showWorkshop = type === 'out' || type === 'accountability';
-    // const showCurrentStatus = type === 'out' || type === 'accountability';
-    // const showStatusDari = type === 'in' || type === 'out' || type === 'accountability' || type === 'item_history';
     const showStatusDari = type === 'in' || type === 'out' || type === 'item_history';
     const showStatusKejadian = type === 'in' || type === 'out' || type === 'item_history';
-    // Penanggung Jawab Kejadian hanya untuk history
     const showPJKejadian = type === 'in' || type === 'out' || type === 'item_history';
     const showCurrentStatus = type === 'available' || type === 'active_loans' || type === 'accountability' || type === 'all_stock';
     const showPJStatus = type === 'available' || type === 'active_loans' || type === 'accountability' || type === 'all_stock';
     const showWorkshop = type === 'out' || type === 'accountability' || type === 'active_loans';
-    // const totalColSpan = 6 + (showWorkshop ? 1 : 0) + (showCurrentStatus ? 1 : 0) + (showStatusDari ? 1 : 0);
     const totalColSpan = 3
         + (showStatusDari ? 1 : 0)
         + (showStatusKejadian ? 1 : 0)

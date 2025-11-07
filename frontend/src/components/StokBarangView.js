@@ -10,7 +10,7 @@ import { createPortal } from 'react-dom';
 import QrPrintSheet from './QrPrintSheet';
 import QrCodeModal from './QrCodeModal';
 import DeleteStockItemModal from './DeleteStockItemModal';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -46,6 +46,7 @@ const expandVariants = {
 
 function StokBarangView() {
     const { showToast } = useOutletContext();
+    const isPresent = useIsPresent();
     const printRef = useRef();
     // State utama untuk Master Barang (SKU)
     const [masterItems, setMasterItems] = useState([]);
@@ -121,6 +122,7 @@ function StokBarangView() {
     }, [showToast, setSelectedItems]); // dependensi tetap
 
     useEffect(() => {
+        if (!isPresent) return;
         api.get('/inventory/categories').then(res => setCategories(res.data));
         api.get('/statuses').then(res => {
             setStatusOptions(res.data);
@@ -133,7 +135,7 @@ function StokBarangView() {
             }
         });
         api.get('/colors').then(res => setColorOptions(res.data));
-    }, [showToast, setTersediaStatusId]);
+    }, [showToast, setTersediaStatusId, isPresent]);
 
     useEffect(() => {
         if (selectedCategory) {
@@ -145,6 +147,7 @@ function StokBarangView() {
     }, [selectedCategory]);
 
     useEffect(() => {
+        if (!isPresent) return;
         const filters = {
             id_kategori: selectedCategory,
             id_sub_kategori: selectedSubCategory,
@@ -153,7 +156,7 @@ function StokBarangView() {
             search: debouncedSearchTerm,
         };
         fetchData(1, filters);
-    }, [selectedCategory, selectedSubCategory, selectedStatus, selectedColor, debouncedSearchTerm, fetchData]);
+    }, [selectedCategory, selectedSubCategory, selectedStatus, selectedColor, debouncedSearchTerm, fetchData, isPresent]);
 
     const loadMoreItems = async () => {
         if (isLoadingMore || !pagination || pagination.current_page >= pagination.last_page) return;

@@ -5,7 +5,7 @@ import api from '../services/api';
 import { saveAs } from 'file-saver';
 import QrScannerModal from './QrScannerModal';
 import HistoryModal from './HistoryModal';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -51,6 +51,7 @@ const months = [
 
 
 function ItemHistoryLookupPage() {
+    const isPresent = useIsPresent();
     const { showToast } = useOutletContext();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -139,6 +140,7 @@ function ItemHistoryLookupPage() {
     }, [showToast, getApiParams]);
 
     useEffect(() => {
+        if (!isPresent) return;
         api.get('/reports/inventory/dashboard')
             .then(res => {
                 if (res.data.availableYears && res.data.availableYears.length > 0) {
@@ -156,11 +158,12 @@ function ItemHistoryLookupPage() {
                 const currentYear = new Date().getFullYear().toString();
                 setYears([currentYear]);
             });
-    }, [filters.year]);
+    }, [filters.year, isPresent]);
 
     useEffect(() => {
+        if (!isPresent) return;
         fetchData();
-    }, [fetchData]);
+    }, [fetchData, isPresent]);
 
     const getRelevantDate = (item) => {
         const latestHistoryRecord = item.latest_history;
@@ -288,8 +291,9 @@ function ItemHistoryLookupPage() {
     }, [selectedItem, historyFilters, showToast]);
 
     useEffect(() => {
+        if (!isPresent) return;
         fetchHistory();
-    }, [fetchHistory]);
+    }, [fetchHistory, isPresent]);
 
     const handleHistoryFilterChange = (e) => {
         setHistoryFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));

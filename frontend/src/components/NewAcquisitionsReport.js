@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useFinancialReport } from './useFinancialReport';
 import AcquisitionDetailModal from './AcquisitionDetailModal';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -23,12 +23,12 @@ const staggerItem = {
 };
 
 export default function NewAcquisitionsReport() {
+    const isPresent = useIsPresent();
     const {
         detailedData,
         filters,
         filterType,
         isLoading,
-        // isExporting,
         handleFilterChange,
         handleFilterTypeChange,
         handleExport,
@@ -36,7 +36,7 @@ export default function NewAcquisitionsReport() {
         formatDate,
         years,
         months
-    } = useFinancialReport();
+    } = useFinancialReport(isPresent);
 
     const [exportingPdf, setExportingPdf] = useState(false);
     const [exportingExcel, setExportingExcel] = useState(false);

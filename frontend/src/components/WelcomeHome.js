@@ -4,7 +4,7 @@ import { useAuth } from '../AuthContext';
 import { useOutletContext } from 'react-router-dom';
 import api from '../services/api';
 
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 import LineChartComponent from './LineChartComponent';
 import PieChartComponent from './PieChartComponent';
@@ -32,6 +32,7 @@ const staggerItem = {
 };
 
 export default function WelcomeHome() {
+  const isPresent = useIsPresent();
   const { logout } = useAuth();
   const { showToast } = useOutletContext();
   const navigate = useNavigate();
@@ -63,8 +64,9 @@ export default function WelcomeHome() {
   }, [logout, showToast]);
 
   useEffect(() => {
+    if (!isPresent) return;
     fetchDashboardData();
-  }, [fetchDashboardData]);
+  }, [fetchDashboardData, isPresent]);
 
   const handleCardClick = (status) => {
     navigate(`/admin/tickets?status=${status}`);

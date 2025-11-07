@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useFinancialReport } from './useFinancialReport';
 import ProblematicAssetModal from './ProblematicAssetModal';
-// BARU: Impor motion
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
-// BARU: Tambahkan konstanta animasi
 const staggerContainer = {
     hidden: { opacity: 0 },
     visible: {
@@ -25,12 +23,12 @@ const staggerItem = {
 };
 
 export default function ProblematicAssetsReport() {
+    const isPresent = useIsPresent();
     const {
         detailedData,
         filters,
         filterType,
         isLoading,
-        // isExporting,
         handleFilterChange,
         handleFilterTypeChange,
         handleExport,
@@ -38,7 +36,7 @@ export default function ProblematicAssetsReport() {
         formatDate,
         years,
         months
-    } = useFinancialReport();
+    } = useFinancialReport(isPresent);
 
     const [exportingPdf, setExportingPdf] = useState(false);
     const [exportingExcel, setExportingExcel] = useState(false);

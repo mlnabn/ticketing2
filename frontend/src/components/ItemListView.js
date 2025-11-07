@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import SkuDetailModal from './SkuDetailModal';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -44,6 +44,7 @@ function ItemListView({
     expandingId, onToggleExpand, totalItems,
     showArchived, onToggleArchived, onRestore, onBulkRestore, currentFilters
 }) {
+    const isPresent = useIsPresent();
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -54,10 +55,12 @@ function ItemListView({
     const [selectedItemForDetail, setSelectedItemForDetail] = useState(null);
 
     useEffect(() => {
+        if (!isPresent) return;
         api.get('/inventory/categories').then(res => setCategories(res.data));
-    }, []);
+    }, [isPresent]);
 
     useEffect(() => {
+        if (!isPresent) return;
         if (selectedCategory) {
             api.get(`/inventory/sub-categories?id_kategori=${selectedCategory}`)
                 .then(res => setSubCategories(res.data));
@@ -65,16 +68,18 @@ function ItemListView({
             setSubCategories([]);
         }
         setSelectedSubCategory('');
-    }, [selectedCategory]);
+    }, [selectedCategory, isPresent]);
 
     useEffect(() => {
+        if (!isPresent) return;
         if (currentFilters) {
             setSelectedCategory(currentFilters.id_kategori || '');
             setSelectedSubCategory(currentFilters.id_sub_kategori || '');
         }
-    }, [currentFilters]);
+    }, [currentFilters, isPresent]);
 
     useEffect(() => {
+        if (!isPresent) return;
         if (isInitialMount.current) {
             isInitialMount.current = false;
             return;
@@ -83,7 +88,7 @@ function ItemListView({
         if (selectedCategory) filters.id_kategori = selectedCategory;
         if (selectedSubCategory) filters.id_sub_kategori = selectedSubCategory;
         onFilterChange(1, filters);
-    }, [selectedCategory, selectedSubCategory, onFilterChange]);
+    }, [selectedCategory, selectedSubCategory, onFilterChange, isPresent]);
 
     const handleRowClick = (e, item) => {
         if (e.target.tagName === 'BUTTON' || e.target.closest('.action-buttons-group') || e.target.type === 'checkbox') {

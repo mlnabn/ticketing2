@@ -6,7 +6,7 @@ import { useAuth } from '../AuthContext';
 import UserFormModal from './UserFormModal';
 import ConfirmationModal from './ConfirmationModal';
 import UserDetailModal from './UserDetailModal';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -28,6 +28,7 @@ const staggerItem = {
 };
 
 export default function UserManagement() {
+    const isPresent = useIsPresent();
     const { showToast } = useOutletContext();
     const { logout } = useAuth();
     const [userData, setUserData] = useState(null);
@@ -54,8 +55,9 @@ export default function UserManagement() {
     }, [logout]);
 
     useEffect(() => {
+        if (!isPresent) return;
         fetchUsers(debouncedSearchTerm);
-    }, [debouncedSearchTerm, fetchUsers]);
+    }, [debouncedSearchTerm, fetchUsers, isPresent]);
 
     const loadMoreItems = async () => {
         if (isLoadingMore || !userData || userData.current_page >= userData.last_page) return;

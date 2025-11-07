@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import api from '../services/api';
 import WorkshopFormModal from './WorkshopFormModal';
 import ConfirmationModal from './ConfirmationModal';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -25,6 +25,7 @@ const staggerItem = {
 };
 
 export default function WorkshopManagement() {
+  const isPresent = useIsPresent();
   const { showToast } = useOutletContext();
   const [workshops, setWorkshops] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,8 +62,9 @@ export default function WorkshopManagement() {
   }, [showToast]);
 
   useEffect(() => {
+    if (!isPresent) return;
     fetchWorkshops(1);
-  }, [fetchWorkshops]);
+  }, [fetchWorkshops, isPresent]);
 
   const handleAddClick = () => {
     setWorkshopToEdit(null);

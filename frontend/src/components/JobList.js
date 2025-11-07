@@ -11,7 +11,7 @@ import ProofModal from './ProofModal';
 import ConfirmationModal from './ConfirmationModal';
 import TicketDetailModal from './TicketDetailModal';
 import ReturnItemsModal from './ReturnItemsModal';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -34,6 +34,7 @@ const staggerItem = {
 
 export default function JobList() {
   // --- 1. SETUP & STATE MANAGEMENT ---
+  const isPresent = useIsPresent();
   const { showToast } = useOutletContext();
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -120,12 +121,14 @@ export default function JobList() {
   }, [isAdmin, showToast]);
 
   useEffect(() => {
+    if (!isPresent) return;
     fetchTickets(false);
-  }, [fetchTickets]);
+  }, [fetchTickets, isPresent]);
 
   useEffect(() => {
+    if (!isPresent) return;
     fetchPrerequisites();
-  }, [fetchPrerequisites]);
+  }, [fetchPrerequisites, isPresent]);
 
   useEffect(() => {
     const POLLING_INTERVAL = 30000;

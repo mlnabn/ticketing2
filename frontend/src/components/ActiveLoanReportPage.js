@@ -3,7 +3,7 @@ import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import { saveAs } from 'file-saver';
 import ActiveLoanDetailModal from './ActiveLoanDetailModal';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -33,6 +33,7 @@ const months = [
 ];
 
 export default function ActiveLoanReportPage() {
+    const isPresent = useIsPresent();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filterType, setFilterType] = useState('month');
@@ -94,6 +95,7 @@ export default function ActiveLoanReportPage() {
     }, [getApiParams, type]);
 
     useEffect(() => {
+        if (!isPresent) return;
         api.get('/reports/inventory/dashboard')
             .then(res => {
                 if (res.data.availableYears && res.data.availableYears.length > 0) {
@@ -111,11 +113,12 @@ export default function ActiveLoanReportPage() {
                 const currentYear = new Date().getFullYear().toString();
                 setYears([currentYear]);
             });
-    }, [filters.year]);
+    }, [filters.year, isPresent]);
 
     useEffect(() => {
+        if (!isPresent) return;
         fetchData();
-    }, [fetchData]);
+    }, [fetchData, isPresent]);
 
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import api from '../services/api';
 import { format } from 'date-fns';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -25,7 +25,7 @@ const staggerItem = {
 
 export default function NotificationForm() {
   const { showToast } = useOutletContext();
-
+  const isPresent = useIsPresent();
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [target, setTarget] = useState('all');
@@ -34,7 +34,7 @@ export default function NotificationForm() {
   const [users, setUsers] = useState([]);
   const [globalNotifications, setGlobalNotifications] = useState([]);
   const [templates, setTemplates] = useState([]);
-  const [globalNotifPagination, setGlobalNotifPagination] = useState(null); // Menyimpan info paginasi
+  const [globalNotifPagination, setGlobalNotifPagination] = useState(null);
   const [isLoadingMoreGlobal, setIsLoadingMoreGlobal] = useState(false);
   const historyListRef = useRef(null);
 
@@ -81,10 +81,11 @@ export default function NotificationForm() {
   }, [showToast]);
 
   useEffect(() => {
+    if (!isPresent) return;
     fetchAllUsers();
     fetchGlobalNotifications();
     fetchTemplates();
-  }, [fetchAllUsers, fetchGlobalNotifications, fetchTemplates]);
+  }, [fetchAllUsers, fetchGlobalNotifications, fetchTemplates, isPresent]);
 
   const handleDelete = async (id) => {
     if (!window.confirm('Anda yakin ingin menghapus pengumuman ini secara permanen?')) {
