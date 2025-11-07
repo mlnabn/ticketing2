@@ -16,9 +16,6 @@ class StokBarangController extends Controller
 {
     public function index(Request $request)
     {
-        // $startDate = $request->input('start_date');
-        // $endDate = $request->input('end_date');
-
         $excludedStatuses = DB::table('status_barang')
             ->whereIn('nama_status', ['Hilang', 'Rusak', 'Digunakan'])
             ->pluck('id');
@@ -78,12 +75,8 @@ class StokBarangController extends Controller
         }
         $query->when($request->boolean('has_history') || $request->filled('start_date') || $request->filled('end_date') || $request->filled('month') || $request->filled('year'), function ($q) use ($request) {
             $q->whereHas('histories', function ($historyQuery) use ($request) {
-
-                // Tambahkan filter month/year
                 $historyQuery->when($request->filled('month'), fn($hq) => $hq->whereMonth('event_date', $request->month));
                 $historyQuery->when($request->filled('year'), fn($hq) => $hq->whereYear('event_date', $request->year));
-
-                // Filter start/end date
                 $historyQuery->when($request->filled('start_date'), fn($hq) => $hq->whereDate('event_date', '>=', $request->start_date));
                 $historyQuery->when($request->filled('end_date'), fn($hq) => $hq->whereDate('event_date', '<=', $request->end_date));
             });
@@ -91,10 +84,6 @@ class StokBarangController extends Controller
         if ($request->filled('master_barang_id')) {
             $query->where('master_barang_id', $request->master_barang_id);
         }
-
-        // if ($request->filled('master_barang_id')) {
-        //     return $query->latest()->get();
-        // }
 
         $statusFilter = $request->input('status_id');
         $colorFilter = $request->input('id_warna');
@@ -104,12 +93,7 @@ class StokBarangController extends Controller
         if ($colorFilter) {
             $query->where('id_warna', $colorFilter);
         }
-
-        // if ($request->filled('master_barang_id')) {
-        //     return $query->latest('id')->get();
-        // }
         if ($request->boolean('all')) {
-            // .get() akan mengembalikan array biasa: [ ... ]
             return $query->latest()->get();
         }
 
@@ -451,19 +435,25 @@ class StokBarangController extends Controller
             return response()->json(['error' => 'Status "Tersedia" tidak ditemukan.'], 500);
         }
 
+        $endOfLifeStatuses = DB::table('status_barang')
+            ->whereIn('nama_status', ['Rusak', 'Hilang', 'Non-Aktif'])
+            ->pluck('id');
+
         $query = MasterBarang::with(['masterKategori', 'subKategori', 'createdBy'])
+            ->active()
+            ->has('stokBarangs')
             ->withCount(['stokBarangs as available_stock_count' => function ($q) use ($request, $tersediaStatusId) {
                 $q->where('status_id', $tersediaStatusId);
                 if ($request->filled('id_warna')) {
                     $q->where('id_warna', $request->id_warna);
                 }
             }])
-            ->withCount(['stokBarangs as total_stock_count' => function ($q) use ($request) {
+            ->withCount(['stokBarangs as total_stock_count' => function ($q) use ($request, $endOfLifeStatuses) {
+                $q->whereNotIn('status_id', $endOfLifeStatuses);
                 if ($request->filled('id_warna')) {
                     $q->where('id_warna', $request->id_warna);
                 }
-            }])
-            ->having('total_stock_count', '>', 0);
+            }]);
 
         if ($request->filled('id_kategori')) {
             $query->where('id_kategori', $request->id_kategori);
@@ -486,21 +476,31 @@ class StokBarangController extends Controller
 
         $statusFilter = $request->input('status_id');
         $colorFilter = $request->input('id_warna');
+        $isFilteringEndOfLife = $statusFilter && $statusFilter !== 'ALL' && $endOfLifeStatuses->contains($statusFilter);
 
-        if (($statusFilter && $statusFilter !== 'ALL') || $colorFilter) {
-            $query->whereHas('stokBarangs', function ($q) use ($statusFilter, $colorFilter, $tersediaStatusId) {
-                $targetStatusId = ($statusFilter && $statusFilter !== 'ALL')
-                    ? $statusFilter
-                    : (($statusFilter === 'ALL') ? null : $tersediaStatusId);
+        if ($statusFilter && $statusFilter !== 'ALL') {
+             $query->whereHas('stokBarangs', function ($q) use ($statusFilter) {
+                $q->where('status_id', $statusFilter);
+            });
+        } 
+        else if ( ($statusFilter === null || $statusFilter === '') && $tersediaStatusId ) { 
+             $query->having('available_stock_count', '>', 0);
+        }
 
-                if ($targetStatusId) {
-                    $q->where('status_id', $targetStatusId);
-                }
-                if ($colorFilter) {
-                    $q->where('id_warna', $colorFilter);
-                }
+        if ($statusFilter !== 'ALL' && !$isFilteringEndOfLife) {
+            if ($statusFilter === null || $statusFilter === '') {
+                 $query->having('available_stock_count', '>', 0);
+            } 
+            else if ($statusFilter && $statusFilter !== 'ALL') {
+                $query->having('total_stock_count', '>', 0);
+            }
+        }
+        if ($colorFilter) {
+            $query->whereHas('stokBarangs', function ($q) use ($colorFilter) {
+                $q->where('id_warna', $colorFilter);
             });
         }
+
         $allItems = $query->latest('id_m_barang')->get();
         $grandTotalUnits = $allItems->sum('total_stock_count');
         $perPage = 15;

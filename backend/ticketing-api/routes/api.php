@@ -114,6 +114,9 @@ Route::middleware('jwt')->group(function () {
     Route::get('/inventory/items-flat', [MasterBarangController::class, 'indexFlat']);
     Route::post('/inventory/items/bulk-delete', [MasterBarangController::class, 'bulkDelete']);
     Route::post('/inventory/items/check-exists', [MasterBarangController::class, 'checkIfExists']);
+    Route::post('/inventory/items/{masterBarang}/archive', [MasterBarangController::class, 'archive']);
+    Route::post('/inventory/items/{masterBarang}/restore', [MasterBarangController::class, 'restore']);
+    Route::post('/inventory/items/bulk-restore', [MasterBarangController::class, 'bulkRestore']);
     Route::post('/inventory/items/{masterBarang}', [MasterBarangController::class, 'update']);
     Route::get('/inventory/items/search/{query}', [MasterBarangController::class, 'searchByName']);
     Route::get('/inventory/items/code/{kode_barang}', [MasterBarangController::class, 'showByCode']);
