@@ -36,7 +36,7 @@ const months = [
   { value: '11', label: 'November' }, { value: '12', label: 'Desember' },
 ];
 
-// Opsi untuk Filter Type (diperlukan untuk react-select)
+ 
 const filterTypeOptions = [
   { value: 'month', label: 'Filter per Bulan' },
   { value: 'date_range', label: 'Filter per Tanggal' },
@@ -86,13 +86,13 @@ export default function TicketReportDetail() {
   const desktopListRef = useRef(null);
   const mobileListRef = useRef(null);
 
-  // Opsi Tahun untuk react-select
+  
   const yearOptions = years.map(y => ({ value: y.toString(), label: y.toString() }));
 
-  // Opsi Bulan untuk react-select, dengan tambahan 'Semua Bulan'
+ 
   const monthOptions = [{ value: '', label: 'Semua Bulan' }, ...months];
 
-  // Mendapatkan nilai aktif yang dipilih untuk react-select
+ 
   const activeYear = yearOptions.find(y => y.value === dateFilters.year);
   const activeMonth = monthOptions.find(m => m.value === dateFilters.month);
   const activeFilterType = filterTypeOptions.find(opt => opt.value === filterType);
@@ -108,10 +108,10 @@ export default function TicketReportDetail() {
   const handleDateFilterChange = (selectedOptionOrEvent, action) => {
     let name, value;
 
-    if (action && action.name) { // Dari react-select
+    if (action && action.name) { 
       name = action.name;
       value = selectedOptionOrEvent ? selectedOptionOrEvent.value : '';
-    } else { // Dari native input (e.target)
+    } else {  
       name = selectedOptionOrEvent.target.name;
       value = selectedOptionOrEvent.target.value;
     }
@@ -127,7 +127,7 @@ export default function TicketReportDetail() {
   };
 
   const handleFilterTypeChange = (selectedOption) => {
-    const newType = selectedOption.value; // Dari react-select
+    const newType = selectedOption.value;  
     setFilterType(newType);
     const newParams = new URLSearchParams(searchParams);
 
@@ -318,7 +318,7 @@ export default function TicketReportDetail() {
               gap: '1rem',
               marginBottom: '1rem',
               alignItems: 'center',
-              width: '100%', // Memastikan kontainer mengambil lebar penuh
+              width: '100%',  
             }}>
 
             {/* Filter Type Select */}
@@ -357,7 +357,7 @@ export default function TicketReportDetail() {
               </>
             )}
 
-            {/* Filter per Rentang Tanggal (Tetap menggunakan native input) */}
+            {/* Filter per Rentang Tanggal */}
             {filterType === 'date_range' && (
               <>
                 <input

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import Select from 'react-select'; // 💡 NEW: Import Select
+import Select from 'react-select'; 
 import { useFinancialReport } from './useFinancialReport';
 import AcquisitionDetailModal from './AcquisitionDetailModal';
 import { motion, useIsPresent } from 'framer-motion';
@@ -43,28 +43,19 @@ export default function NewAcquisitionsReport() {
     const [exportingExcel, setExportingExcel] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const newAcquisitionsSubtotal = detailedData.new_acquisitions.reduce((sum, item) => sum + parseFloat(item.harga_beli), 0);
-
-    // 💡 NEW: Opsi untuk Select Filter Type
     const filterTypeOptions = useMemo(() => ([
         { value: 'month', label: 'Filter per Bulan' },
         { value: 'date_range', label: 'Filter per Tanggal' },
     ]), []);
-
-    // 💡 NEW: Mengubah array months ke format react-select
     const monthOptions = useMemo(() => ([
         { value: '', label: 'Semua Bulan' },
         ...months.map(m => ({ value: m.value.toString(), label: m.name })),
     ]), [months]);
-
-    // 💡 NEW: Mengubah array years ke format react-select
     const yearOptions = useMemo(() => ([
         { value: '', label: 'Semua Tahun' },
         ...years.map(y => ({ value: y.toString(), label: y.toString() })),
     ]), [years]);
-
-    // 💡 NEW: Wrapper handler untuk Select Bulan/Tahun (Memanggil handleFilterChange asli)
     const handleSelectFilterChange = useCallback((selectedOption, name) => {
-        // Mimic the native event object structure for the hook
         const mockEvent = {
             target: {
                 name: name,
@@ -73,10 +64,7 @@ export default function NewAcquisitionsReport() {
         };
         handleFilterChange(mockEvent);
     }, [handleFilterChange]);
-
-    // 💡 NEW: Wrapper handler untuk Select Filter Type (Memanggil handleFilterTypeChange asli)
     const handleSelectFilterTypeChange = useCallback((selectedOption) => {
-        // Mimic the native event object structure for the hook
         const mockEvent = {
             target: {
                 value: selectedOption.value,
@@ -115,7 +103,6 @@ export default function NewAcquisitionsReport() {
             </motion.div>
             <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
 
-                {/* 1. Filter Tipe: Select (Menggantikan native select) */}
                 <Select
                     classNamePrefix="report-filter-select"
                     options={filterTypeOptions}
@@ -123,12 +110,11 @@ export default function NewAcquisitionsReport() {
                     onChange={handleSelectFilterTypeChange}
                     isSearchable={false}
                     placeholder="Filter Laporan"
-                    styles={{ container: (base) => ({ ...base, flex: 1 }) }} // Agar fleksibel dan responsif
+                    styles={{ container: (base) => ({ ...base, flex: 1 }) }}
                 />
 
                 {filterType === 'month' && (
                     <>
-                        {/* 2. Filter Bulan: Select (Menggantikan native select) */}
                         <Select
                             classNamePrefix="report-filter-select"
                             name="month"
@@ -137,10 +123,8 @@ export default function NewAcquisitionsReport() {
                             onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
                             placeholder="Semua Bulan"
                             isSearchable={false}
-                            styles={{ container: (base) => ({ ...base, flex: 1 }) }} // Agar fleksibel dan responsif
+                            styles={{ container: (base) => ({ ...base, flex: 1 }) }}
                         />
-
-                        {/* 3. Filter Tahun: Select (Menggantikan native select) */}
                         <Select
                             classNamePrefix="report-filter-select"
                             name="year"
@@ -149,13 +133,12 @@ export default function NewAcquisitionsReport() {
                             onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
                             placeholder="Semua Tahun"
                             isSearchable={false}
-                            styles={{ container: (base) => ({ ...base, flex: 1 }) }} // Agar fleksibel dan responsif
+                            styles={{ container: (base) => ({ ...base, flex: 1 }) }}
                         />
                     </>
                 )}
                 {filterType === 'date_range' && (
                     <>
-                        {/* Ditambahkan style={{ flex: 1 }} untuk input date */}
                         <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
                         <span style={{ alignSelf: 'center' }}>-</span>
                         <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
@@ -172,7 +155,6 @@ export default function NewAcquisitionsReport() {
                     {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
                 </button>
             </motion.div>
-            {/* Tabel Pembelian Baru */}
             <motion.div variants={staggerItem} className="job-list-container">
                 {/* Desktop View */}
                 <div className="table-scroll-container">

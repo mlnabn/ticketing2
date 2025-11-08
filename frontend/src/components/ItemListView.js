@@ -373,7 +373,7 @@ function ItemListView({
                                     {showArchived ? (
                                         <button 
                                             onClick={(e) => { e.stopPropagation(); onRestore(item); }} 
-                                            className="action-buttons-group btn-restore" // Anda mungkin perlu menambahkan style untuk .btn-restore
+                                            className="action-buttons-group btn-restore"
                                             title="Pulihkan SKU ini"
                                             style={{ color: '#28a745', fontWeight: 'bold' }}
                                         >

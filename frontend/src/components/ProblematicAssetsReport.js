@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import Select from 'react-select'; // 💡 NEW: Import Select
+import Select from 'react-select'; 
 import { useFinancialReport } from './useFinancialReport';
 import ProblematicAssetModal from './ProblematicAssetModal';
 import { motion, useIsPresent } from 'framer-motion';
@@ -78,7 +78,6 @@ export default function ProblematicAssetsReport() {
     ]), [years]);
 
     const handleSelectFilterChange = useCallback((selectedOption, name) => {
-        // Mimic the native event object structure for the hook
         const mockEvent = {
             target: {
                 name: name,
@@ -164,7 +163,6 @@ export default function ProblematicAssetsReport() {
                     {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
                 </button>
             </motion.div>
-            {/* Tabel Aset Bermasalah */}
             <motion.div variants={staggerItem} className="job-list-container">
                 {/* Desktop View */}
                 <div className="table-scroll-container">
@@ -293,8 +291,6 @@ export default function ProblematicAssetsReport() {
                     </div>
                 </div>
             </motion.div>
-
-            {/* Modal tidak dianimasikan sebagai bagian dari stagger */}
             <ProblematicAssetModal
                 show={Boolean(selectedItem)}
                 item={selectedItem}
