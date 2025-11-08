@@ -5,7 +5,7 @@ import ItemListView from './ItemListView';
 import ItemFormModal from './ItemFormModal';
 import ConfirmationModal from './ConfirmationModal';
 import EditNamaBarangModal from './EditNamaBarangModal';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -28,7 +28,7 @@ const staggerItem = {
 
 function ToolManagement() {
     const { showToast } = useOutletContext();
-
+    const isPresent = useIsPresent();
     const [items, setItems] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [itemToEdit, setItemToEdit] = useState(null);
@@ -37,7 +37,7 @@ function ToolManagement() {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [itemToEditName, setItemToEditName] = useState(null);
-    const [currentFilters, setCurrentFilters] = useState({});
+    const [currentFilters, setCurrentFilters] = useState({ is_active: 'true' });
     const [mobileItems, setMobileItems] = useState([]);
     const [mobilePagination, setMobilePagination] = useState(null);
     const [isMobileLoading, setIsMobileLoading] = useState(true);
@@ -89,11 +89,11 @@ function ToolManagement() {
         }
     }, [showToast]);
 
-useEffect(() => {
+    useEffect(() => {
+        if (!isPresent) return;
         fetchItems(1, currentFilters);
         fetchMobileItems(1, currentFilters);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fetchItems, fetchMobileItems]);
+    }, [fetchItems, fetchMobileItems, currentFilters, isPresent]);
 
     const loadMoreItems = async () => {
         if (isLoadingMore || !pagination || pagination.current_page >= pagination.last_page) return;
@@ -158,19 +158,24 @@ useEffect(() => {
             return;
         }
 
-        setExpandingId(kodeBarang);
-        try {
-            const res = await api.get(`/inventory/items/variations/${kodeBarang}`);
+        if (detailItems[kodeBarang]) {
+            return; // Data sudah ada, jangan lakukan apa-apa
+        }
+
+        // Ambil data variasi dari item yang di-klik
+        const summaryItem = items.find(i => i.kode_barang === kodeBarang);
+
+        if (summaryItem && summaryItem.variations) {
+            // Masukkan data variasi ke state detailItems
             setDetailItems(prev => ({
                 ...prev,
-                [kodeBarang]: res.data
+                [kodeBarang]: summaryItem.variations
             }));
-        } catch (error) {
-            console.error("Fetch Detail Error:", error);
+        } else {
+            // Fallback jika terjadi error (seharusnya tidak terjadi)
+            console.error("Data variasi tidak ditemukan di item summary.");
             showToast('Gagal memuat detail SKU.', 'error');
             setExpandedRows(prev => ({ ...prev, [kodeBarang]: false }));
-        } finally {
-            setExpandingId(null);
         }
     };
 
@@ -206,11 +211,12 @@ useEffect(() => {
     const confirmDeleteItem = async () => {
         if (!itemToDelete) return;
         try {
-            const response = await api.delete(`/inventory/items/${itemToDelete.id_m_barang}`);
+            const response = await api.post(`/inventory/items/${itemToDelete.id_m_barang}/archive`);
 
             if (response.status === 200 || response.status === 204) {
-                showToast(response.data?.message || "Barang berhasil dihapus.");
+                showToast(response.data?.message || "Barang berhasil diarsipkan.");
                 fetchItems(1, currentFilters);
+                fetchMobileItems(1, currentFilters);
                 setDetailItems(prev => {
                     const newDetails = { ...prev };
                     if (newDetails[itemToDelete.kode_barang]) {
@@ -221,14 +227,41 @@ useEffect(() => {
                     return newDetails;
                 });
             } else {
-                showToast(response.data?.message || "Gagal menghapus barang.", "error");
+                showToast(response.data?.message || "Gagal mengarsipkan barang.", "error");
             }
         } catch (error) {
-            console.error("Gagal menghapus barang:", error);
-            showToast(error.response?.data?.message || "Gagal menghapus barang.", "error");
+            console.error("Gagal mengarsipkan barang:", error);
+            showToast(error.response?.data?.message || "Gagal mengarsipkan barang.", "error");
         } finally {
             setIsConfirmModalOpen(false);
             setItemToDelete(null);
+        }
+    };
+
+    const handleRestoreClick = async (item) => {
+        if (!item || !item.id_m_barang) {
+            console.error("Attempted to restore an invalid item:", item);
+            showToast("Gagal memulai proses pulihkan: item tidak valid.", "error");
+            return;
+        }
+        try {
+            const response = await api.post(`/inventory/items/${item.id_m_barang}/restore`);
+            showToast(response.data?.message || "SKU berhasil dipulihkan.");
+            fetchItems(1, currentFilters);
+            fetchMobileItems(1, currentFilters);
+            setDetailItems(prev => {
+                const newDetails = { ...prev };
+                if (newDetails[item.kode_barang]) {
+                    newDetails[item.kode_barang] = newDetails[item.kode_barang].filter(
+                        it => it.id_m_barang !== item.id_m_barang
+                    );
+                }
+                return newDetails;
+            });
+
+        } catch (error) {
+            console.error("Gagal memulihkan barang:", error);
+            showToast(error.response?.data?.message || "Gagal memulihkan barang.", "error");
         }
     };
 
@@ -239,7 +272,8 @@ useEffect(() => {
     };
 
     const handleSelectAll = (e, kodeBarang) => {
-        const itemIds = detailItems[kodeBarang]?.map(item => item.id_m_barang) || [];
+        const summaryItem = items.find(i => i.kode_barang === kodeBarang);
+        const itemIds = summaryItem?.variations?.map(item => item.id_m_barang) || [];
 
         setSelectedIds(prev => {
             const newSet = new Set(prev);
@@ -270,11 +304,40 @@ useEffect(() => {
         }
     };
 
+    const handleBulkRestore = async () => {
+        if (selectedIds.length === 0) {
+            showToast('Pilih setidaknya satu SKU untuk dipulihkan.', 'info');
+            return;
+        }
+        if (window.confirm(`Anda yakin ingin memulihkan ${selectedIds.length} SKU yang dipilih?`)) {
+            try {
+                const response = await api.post('/inventory/items/bulk-restore', { ids: selectedIds });
+                showToast(response.data.message, 'success');
+                fetchItems(1, currentFilters);
+                fetchMobileItems(1, currentFilters);
+                setSelectedIds([]);
+            } catch (e) {
+                console.error('Gagal memulihkan SKU secara massal:', e);
+                showToast(e.response?.data?.message || 'Terjadi kesalahan saat mencoba memulihkan SKU.', 'error');
+            }
+        }
+    };
+
     const handleFilterChange = useCallback((page, filters) => {
-        setCurrentFilters(filters);
-        fetchItems(1, filters);
-        fetchMobileItems(1, filters);
-    }, [fetchItems, fetchMobileItems]);
+        setCurrentFilters(prevFilters => ({
+            ...prevFilters,
+            ...filters
+        }));
+    }, [])
+
+    const handleToggleArchived = (isArchived) => {
+        const newFilters = { 
+            is_active: isArchived ? 'false' : 'true',
+            id_kategori: '',
+            id_sub_kategori: ''
+        };
+        setCurrentFilters(newFilters);
+    };
 
     return (
         <motion.div
@@ -283,7 +346,7 @@ useEffect(() => {
             animate="visible"
         >
             <motion.div variants={staggerItem} className="user-management-container" style={{ marginBottom: '20px' }}>
-                <h1>Tambah SKU</h1>
+                <h1>{currentFilters.is_active === 'true' ? 'Tambah SKU' : 'Arsip SKU'}</h1>
             </motion.div>
 
             <ItemListView
@@ -300,7 +363,7 @@ useEffect(() => {
                 isLoadingMoreMobile={isLoadingMoreMobile}
 
                 // Props Bersama
-                totalItems={pagination?.total || 0} // <-- TAMBAHKAN BARIS INI
+                totalItems={pagination?.total || 0}
                 onAdd={handleOpenAddModal}
                 onEdit={handleOpenEditNameModal}
                 onDelete={handleDeleteClick}
@@ -313,6 +376,11 @@ useEffect(() => {
                 detailItems={detailItems}
                 expandingId={expandingId}
                 onToggleExpand={toggleExpand}
+                showArchived={currentFilters.is_active === 'false'}
+                onToggleArchived={handleToggleArchived}
+                onRestore={handleRestoreClick}
+                onBulkRestore={handleBulkRestore}
+                currentFilters={currentFilters}
             />
 
             <ItemFormModal
@@ -333,7 +401,7 @@ useEffect(() => {
 
             <ConfirmationModal
                 show={isConfirmModalOpen}
-                message={`Anda yakin ingin menghapus "${itemToDelete?.nama_barang || 'item yang dipilih'}"?`}
+                message={`Anda yakin ingin mengarsipkan "${itemToDelete?.nama_barang || 'item yang dipilih'}"? SKU ini tidak akan bisa digunakan lagi.`}
                 onConfirm={confirmDeleteItem}
                 onCancel={() => setIsConfirmModalOpen(false)}
             />

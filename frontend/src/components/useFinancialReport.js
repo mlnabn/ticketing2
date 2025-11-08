@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
+import { useIsPresent } from 'framer-motion';
 
 // Custom hook untuk menampung state dan logika yang berulang
-export const useFinancialReport = () => {
+export const useFinancialReport = (isPresent) => {
     const [summaryData, setSummaryData] = useState({
         total_asset_value: 0,
         net_asset_value: 0,
@@ -51,10 +52,10 @@ export const useFinancialReport = () => {
         }
     }, [filters, filterType]);
 
-    // Jalankan fetch setiap kali filter berubah
     useEffect(() => {
+        if (!isPresent) return;
         fetchData();
-    }, [fetchData]);
+    }, [fetchData, isPresent]);
 
     // --- Handlers ---
     const handleFilterChange = (e) => {

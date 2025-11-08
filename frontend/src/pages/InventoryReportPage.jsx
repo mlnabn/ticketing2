@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -34,6 +34,7 @@ const NavigationCard = ({ title, description, linkTo, icon }) => (
 );
 
 export default function InventoryReportPage() {
+    const isPresent = useIsPresent();
     const [dashboardData, setDashboardData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -53,8 +54,9 @@ export default function InventoryReportPage() {
     }, []);
 
     useEffect(() => {
+        if (!isPresent) return;
         fetchData(selectedYear);
-    }, [selectedYear, fetchData]);
+    }, [selectedYear, fetchData, isPresent]);
 
     const handleYearChange = (e) => {
         setSelectedYear(e.target.value);

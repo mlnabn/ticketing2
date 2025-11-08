@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import Select from 'react-select'; // 💡 NEW: Import Select
 import { useFinancialReport } from './useFinancialReport';
 import AcquisitionDetailModal from './AcquisitionDetailModal';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -24,19 +24,20 @@ const staggerItem = {
 };
 
 export default function NewAcquisitionsReport() {
+    const isPresent = useIsPresent();
     const {
         detailedData,
         filters,
         filterType,
         isLoading,
-        handleFilterChange, // Hook handler for native inputs
-        handleFilterTypeChange, // Hook handler for native select
+        handleFilterChange,
+        handleFilterTypeChange,
         handleExport,
         formatCurrency,
         formatDate,
-        years, // e.g., [2024, 2023]
-        months // e.g., [{ value: 1, name: 'Januari' }]
-    } = useFinancialReport();
+        years,
+        months
+    } = useFinancialReport(isPresent);
 
     const [exportingPdf, setExportingPdf] = useState(false);
     const [exportingExcel, setExportingExcel] = useState(false);

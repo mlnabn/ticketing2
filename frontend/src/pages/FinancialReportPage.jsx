@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, Legend } from 'recharts';
 import { useFinancialReport } from '../components/useFinancialReport';
 
@@ -55,13 +55,13 @@ const KpiCard = ({ title, value, iconClass, colorClass }) => (
 // KOMPONEN UTAMA
 // ================================================================
 export default function FinancialReportPage() {
-    // 1. PANGGIL HOOK UNTUK MENDAPATKAN SEMUA DATA & FUNGSI
+    const isPresent = useIsPresent();
+
     const {
         summaryData, chartData, isLoading,
         formatCurrency
-    } = useFinancialReport();
+    } = useFinancialReport(isPresent);
 
-    // 2. HAPUS SEMUA MOCK DATA & GUNAKAN DATA ASLI DARI HOOK
     const transformedBarData = useMemo(() => {
         if (!chartData.bar?.data) return [];
         const initialData = chartData.bar.labels.map((label, index) => ({

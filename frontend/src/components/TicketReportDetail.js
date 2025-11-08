@@ -3,8 +3,8 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import TicketDetailModal from './TicketDetailModal';
 import { saveAs } from 'file-saver';
-import { motion } from 'framer-motion';
-import Select from 'react-select'; // <-- Import react-select
+import { motion, useIsPresent } from 'framer-motion';
+import Select from 'react-select';
 
 const formatDate = (dateString) => {
   if (!dateString) return '-';
@@ -62,6 +62,7 @@ const staggerItem = {
 };
 
 export default function TicketReportDetail() {
+  const isPresent = useIsPresent();
   const { adminId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -144,6 +145,7 @@ export default function TicketReportDetail() {
   };
 
   useEffect(() => {
+    if (!isPresent) return;
     const fetchAdminDetails = async () => {
       if (!adminId) return;
       try {
@@ -154,7 +156,7 @@ export default function TicketReportDetail() {
       }
     };
     fetchAdminDetails();
-  }, [adminId]);
+  }, [adminId, isPresent]);
 
   const fetchAdminReport = useCallback(async (statusFilter, page = 1) => {
     if (!adminId) return;
@@ -184,8 +186,9 @@ export default function TicketReportDetail() {
   }, [adminId, dateFilters.year, dateFilters.month, dateFilters.start_date, dateFilters.end_date, filterType]);
 
   useEffect(() => {
+    if (!isPresent) return;
     fetchAdminReport(filter, 1);
-  }, [fetchAdminReport, filter]);
+  }, [fetchAdminReport, filter, isPresent]);
 
   const handleFilterClick = (newFilter) => {
     setFilter(newFilter);

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import ReportLineChart from './ReportLineChart';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -24,6 +24,7 @@ const staggerItem = {
 };
 
 export default function TicketReportAdminList() {
+  const isPresent = useIsPresent();
   const [admins, setAdmins] = useState([]);
   const [loadingAdmins, setLoadingAdmins] = useState(false);
   const [chartData, setChartData] = useState([]);
@@ -54,12 +55,14 @@ export default function TicketReportAdminList() {
   }, []);
 
   useEffect(() => {
+    if (!isPresent) return;
     fetchAdmins();
-  }, [fetchAdmins]);
+  }, [fetchAdmins, isPresent]);
 
   useEffect(() => {
+    if (!isPresent) return;
     fetchChartData();
-  }, [fetchChartData]);
+  }, [fetchChartData, isPresent]);
 
   const filterQueryString = '';
 

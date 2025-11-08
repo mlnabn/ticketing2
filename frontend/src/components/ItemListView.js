@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import SkuDetailModal from './SkuDetailModal';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useIsPresent } from 'framer-motion';
 import Select from 'react-select';
 
 const staggerContainer = {
@@ -42,8 +42,10 @@ function ItemListView({
     mobileItems, isMobileLoading, onMobileScroll, isLoadingMoreMobile,
     onAdd, onEdit, onDelete, onFilterChange,
     selectedIds, onSelectId, onSelectAll, onBulkDelete, expandedRows, detailItems,
-    expandingId, onToggleExpand, totalItems
+    expandingId, onToggleExpand, totalItems,
+    showArchived, onToggleArchived, onRestore, onBulkRestore, currentFilters
 }) {
+    const isPresent = useIsPresent();
     const [categoryOptions, setCategoryOptions] = useState([]);
     const [subCategoryOptions, setSubCategoryOptions] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -55,6 +57,7 @@ function ItemListView({
 
     // --- Efek untuk mengambil data Kategori (LOGIC SUDAH BENAR) ---
     useEffect(() => {
+        if (!isPresent) return;
         api.get('/inventory/categories').then(res => {
             const options = res.data.map(cat => ({
                 value: cat.id_kategori,
@@ -65,10 +68,11 @@ function ItemListView({
             setCategoryOptions([allOption, ...options]);
             setSelectedCategory(allOption);
         });
-    }, []);
+    }, [isPresent]);
 
     // --- Efek untuk mengambil data Sub Kategori (LOGIC SUDAH BENAR) ---
     useEffect(() => {
+        if (!isPresent) return;
         const categoryId = selectedCategory?.value;
 
         if (categoryId) {
@@ -87,10 +91,19 @@ function ItemListView({
             setSubCategoryOptions([allSubOption]);
             setSelectedSubCategory(allSubOption);
         }
-    }, [selectedCategory]);
+    }, [selectedCategory, isPresent]);
+
+    useEffect(() => {
+        if (!isPresent) return;
+        if (currentFilters) {
+            setSelectedCategory(currentFilters.id_kategori || '');
+            setSelectedSubCategory(currentFilters.id_sub_kategori || '');
+        }
+    }, [currentFilters, isPresent]);
 
     // --- Efek untuk memanggil onFilterChange (LOGIC SUDAH BENAR) ---
     useEffect(() => {
+        if (!isPresent) return;
         if (isInitialMount.current) {
             isInitialMount.current = false;
             return;
@@ -103,7 +116,7 @@ function ItemListView({
         if (subCategoryId) filters.id_sub_kategori = subCategoryId;
 
         onFilterChange(1, filters);
-    }, [selectedCategory, selectedSubCategory, onFilterChange]);
+    }, [selectedCategory, selectedSubCategory, onFilterChange, isPresent]);
 
     const handleRowClick = (e, item) => {
         if (e.target.tagName === 'BUTTON' || e.target.closest('.action-buttons-group') || e.target.type === 'checkbox') {
@@ -120,7 +133,12 @@ function ItemListView({
                 animate="visible"
             >
                 <motion.div variants={staggerItem} className="user-management-container">
-                    <button className="btn-primary" onClick={onAdd}><i className="fas fa-plus" style={{ marginRight: '8px' }}></i>Daftarkan SKU Baru</button>
+                    {!showArchived && (
+                        <button className="btn-primary" onClick={onAdd}>
+                            <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
+                            Daftarkan SKU Baru
+                        </button>
+                    )}
                 </motion.div>
                 <motion.div variants={staggerItem} className="filters-container" style={{ display: 'flex', gap: '1rem', marginTop: '1rem', marginBottom: '1rem' }}>
                     <Select
@@ -142,11 +160,27 @@ function ItemListView({
                         isSearchable={false}
                         placeholder="Semua Sub-Kategori"
                     />
+                    <button 
+                        onClick={() => onToggleArchived(!showArchived)} 
+                        className={`btn-archive ${showArchived ? 'active' : ''}`}
+                        title={showArchived ? 'Kembali ke daftar SKU aktif' : 'Lihat SKU yang diarsipkan'}
+                    >
+                        <i className={`fas ${showArchived ? 'fa-box' : 'fa-archive'}`} style={{ marginRight: '8px' }}></i>
+                        {showArchived ? 'SKU Aktif' : 'Lihat Arsip'}
+                    </button>
                     {selectedIds.length > 0 && (
                         <div className="bulk-action-bar" >
-                            <button onClick={onBulkDelete} className="btn-clear">
-                                Hapus {selectedIds.length} SKU yang Dipilih
-                            </button>
+                            {showArchived ? (
+                                <button onClick={onBulkRestore} className="btn-clear" style={{ color: '#28a745', fontWeight: 'bold' }}>
+                                    <i className="fas fa-undo" style={{ marginRight: '5px' }}></i>
+                                    Pulihkan {selectedIds.length} SKU
+                                </button>
+                            ) : (
+                                <button onClick={onBulkDelete} className="btn-clear">
+                                    <i className="fas fa-archive" style={{ marginRight: '5px' }}></i>
+                                    Arsipkan {selectedIds.length} SKU
+                                </button>
+                            )}
                         </div>
                     )}
                 </motion.div>
@@ -177,7 +211,9 @@ function ItemListView({
                                     )}
 
                                     {!loading && items.length === 0 && (
-                                        <tr><td colSpan="4" style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</td></tr>
+                                        <tr><td colSpan="4" style={{ textAlign: 'center' }}>
+                                            {showArchived ? 'Tidak ada SKU yang diarsipkan.' : 'Belum ada tipe barang yang didaftarkan.'}
+                                        </td></tr>
                                     )}
 
                                     {items.map(item => (
@@ -242,12 +278,30 @@ function ItemListView({
                                                                                     <div className="detail-cell cell-kode">{detail.nama_barang}</div>
                                                                                     <div className="detail-cell cell-stok">{detail.stok_tersedia_count}</div>
                                                                                     <div className="detail-cell cell-aksi action-buttons-group">
-                                                                                        <button onClick={(e) => { e.stopPropagation(); onEdit(detail); }} className="btn-user-action btn-detail">
-                                                                                            <i className="fas fa-edit" style={{ fontSize: '20px', marginRight: '5px' }}></i>
-                                                                                        </button>
-                                                                                        <button onClick={(e) => { e.stopPropagation(); onDelete(detail); }} className="btn-user-action btn-dlt">
-                                                                                            <i className="fas fa-trash-alt" style={{ fontSize: '20px', marginRight: '5px' }}></i>
-                                                                                        </button>
+                                                                                        {!showArchived && (
+                                                                                            <button onClick={(e) => { e.stopPropagation(); onEdit(detail); }} className="btn-user-action btn-detail">
+                                                                                                <i className="fas fa-edit" style={{ fontSize: '20px', marginRight: '5px' }}></i>
+                                                                                            </button>
+                                                                                        )}
+
+                                                                                        {showArchived ? (
+                                                                                            <button 
+                                                                                                onClick={(e) => { e.stopPropagation(); onRestore(detail); }} 
+                                                                                                className="btn-user-action btn-restore"
+                                                                                                title="Pulihkan SKU ini"
+                                                                                            >
+                                                                                                <i className="fas fa-undo" style={{ fontSize: '20px', marginRight: '5px', color: '#28a745' }}></i>
+                                                                                            </button>
+                                                                                        ) : (
+                                                                                            <button 
+                                                                                                onClick={(e) => { e.stopPropagation(); onDelete(detail); }} 
+                                                                                                className="btn-user-action btn-dlt"
+                                                                                                disabled={detail.total_active_stock > 0} 
+                                                                                                title={detail.total_active_stock > 0 ? 'SKU tidak bisa diarsipkan jika masih ada stok aktif (Tersedia, Dipinjam, dll)' : 'Arsipkan SKU ini'}
+                                                                                            >
+                                                                                                <i className="fas fa-archive" style={{ fontSize: '20px', marginRight: '5px' }}></i>
+                                                                                            </button>
+                                                                                        )}
                                                                                     </div>
                                                                                 </div>
                                                                             ))}
@@ -296,7 +350,9 @@ function ItemListView({
                             <p style={{ textAlign: 'center' }}>Memuat data barang...</p>
                         )}
                         {!isMobileLoading && mobileItems.length === 0 && (
-                            <p style={{ textAlign: 'center' }}>Belum ada tipe barang yang didaftarkan.</p>
+                            <p style={{ textAlign: 'center' }}>
+                                {showArchived ? 'Tidak ada SKU yang diarsipkan.' : 'Belum ada tipe barang yang didaftarkan.'}
+                            </p>
                         )}
 
                         {mobileItems.map(item => (
@@ -309,21 +365,30 @@ function ItemListView({
                                     <h4>{item.nama_barang}</h4>
                                     <small>Kode: {item.kode_barang}</small>
                                 </div>
-                                {/* <div className="card-body">
-                                    <div className="card-item-row">
-                                        <span className="label">Kategori:</span>
-                                        <span className="value">{item.master_kategori?.nama_kategori || '-'}</span>
-                                    </div>
-                                    <div className="card-separator"></div>
-                                    <div className="card-item-row">
-                                        <span className="label">Sub-Kategori:</span>
-                                        <span className="value">{item.sub_kategori?.nama_sub || '-'}</span>
-                                    </div>
-                                </div> */}
-                                {/* <div className="card-separator"></div> */}
                                 <div className="card-row action-row">
-                                    <button onClick={(e) => { e.stopPropagation(); onEdit(item); }} className="action-buttons-group btn-edit">Edit</button>
-                                    <button onClick={(e) => { e.stopPropagation(); onDelete(item); }} className="action-buttons-group btn-delete">Hapus</button>
+                                    {!showArchived && (
+                                        <button onClick={(e) => { e.stopPropagation(); onEdit(item); }} className="action-buttons-group btn-edit">Edit</button>
+                                    )}
+
+                                    {showArchived ? (
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); onRestore(item); }} 
+                                            className="action-buttons-group btn-restore" // Anda mungkin perlu menambahkan style untuk .btn-restore
+                                            title="Pulihkan SKU ini"
+                                            style={{ color: '#28a745', fontWeight: 'bold' }}
+                                        >
+                                            Pulihkan
+                                        </button>
+                                    ) : (
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); onDelete(item); }} 
+                                            className="action-buttons-group btn-delete"
+                                            disabled={item.total_active_stock > 0}
+                                            title={item.total_active_stock > 0 ? 'SKU tidak bisa diarsipkan jika masih ada stok aktif' : 'Arsipkan SKU ini'}
+                                        >
+                                            Arsipkan
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}

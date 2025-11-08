@@ -4,7 +4,7 @@ import Select from 'react-select'; // Select component sudah diimpor
 import api from '../services/api';
 import { saveAs } from 'file-saver';
 import InventoryDetailModal from './InventoryDetailModal';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -45,6 +45,7 @@ const monthOptions = [
 ];
 
 export default function DetailedReportPage({ type, title }) {
+    const isPresent = useIsPresent();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filterType, setFilterType] = useState('month');
@@ -109,6 +110,7 @@ export default function DetailedReportPage({ type, title }) {
     }, [getApiParams, type]);
 
     useEffect(() => {
+        if (!isPresent) return;
         api.get('/reports/inventory/dashboard')
             .then(res => {
                 if (res.data.availableYears && res.data.availableYears.length > 0) {
@@ -126,11 +128,12 @@ export default function DetailedReportPage({ type, title }) {
                 const currentYear = new Date().getFullYear().toString();
                 setYears([currentYear]);
             });
-    }, [filters.year]);
+    }, [filters.year, isPresent]);
 
     useEffect(() => {
+        if (!isPresent) return;
         fetchData();
-    }, [fetchData]);
+    }, [fetchData, isPresent]);
 
     // Handler untuk input native (date range)
     const handleFilterChange = (e) => {
@@ -301,17 +304,12 @@ export default function DetailedReportPage({ type, title }) {
         accountability: 'Tgl Status',
         active_loans: 'Tgl Keluar'
     };
-    // const showWorkshop = type === 'out' || type === 'accountability';
-    // const showCurrentStatus = type === 'out' || type === 'accountability';
-    // const showStatusDari = type === 'in' || type === 'out' || type === 'accountability' || type === 'item_history';
     const showStatusDari = type === 'in' || type === 'out' || type === 'item_history';
     const showStatusKejadian = type === 'in' || type === 'out' || type === 'item_history';
-    // Penanggung Jawab Kejadian hanya untuk history
     const showPJKejadian = type === 'in' || type === 'out' || type === 'item_history';
     const showCurrentStatus = type === 'available' || type === 'active_loans' || type === 'accountability' || type === 'all_stock';
     const showPJStatus = type === 'available' || type === 'active_loans' || type === 'accountability' || type === 'all_stock';
     const showWorkshop = type === 'out' || type === 'accountability' || type === 'active_loans';
-    // const totalColSpan = 6 + (showWorkshop ? 1 : 0) + (showCurrentStatus ? 1 : 0) + (showStatusDari ? 1 : 0);
     const totalColSpan = 3
         + (showStatusDari ? 1 : 0)
         + (showStatusKejadian ? 1 : 0)
@@ -363,16 +361,6 @@ export default function DetailedReportPage({ type, title }) {
                 <h1>{title}</h1>
             </motion.div>
 
-            <motion.div variants={staggerItem} className="filters-container report-filters">
-                <input
-                    type="text"
-                    placeholder="Cari Kode Unik / Nama Barang..."
-                    className="filter-search-input"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-
-            </motion.div>
             <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
 
                 {/* 1. Filter Tipe: Select */}
@@ -433,7 +421,16 @@ export default function DetailedReportPage({ type, title }) {
                     </>
                 )}
             </motion.div>
+
             <motion.div variants={staggerItem} className="download-buttons">
+                <motion.input
+                    type="text"
+                    placeholder="Cari Kode Unik / Nama Barang..."
+                    className="filter-search-input-invReport"
+                    value={searchTerm}
+                    variants={staggerItem}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
                 <button onClick={() => handleExport('excel')} disabled={exportingExcel} className="btn-download excel">
                     <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
                     {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}

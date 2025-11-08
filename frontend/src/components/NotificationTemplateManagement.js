@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import api from '../services/api';
 import NotificationTemplateFormModal from './NotificationTemplateFormModal';
 import ConfirmationModal from './ConfirmationModal';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -26,7 +26,7 @@ const staggerItem = {
 
 export default function NotificationTemplateManagement() {
   const { showToast } = useOutletContext();
-
+  const isPresent = useIsPresent();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showFormModal, setShowFormModal] = useState(false);
@@ -38,7 +38,6 @@ export default function NotificationTemplateManagement() {
   const desktopListRef = useRef(null);
   const mobileListRef = useRef(null);
 
-  // ... (Semua fungsi hook dan handler tetap sama) ...
   const fetchTemplates = useCallback(async (page = 1) => {
     if (page === 1) setLoading(true);
 
@@ -63,8 +62,9 @@ export default function NotificationTemplateManagement() {
   }, [showToast]);
 
   useEffect(() => {
+    if (!isPresent) return;
     fetchTemplates(1);
-  }, [fetchTemplates]);
+  }, [fetchTemplates, isPresent]);
 
   const handleAddClick = () => {
     setTemplateToEdit(null);

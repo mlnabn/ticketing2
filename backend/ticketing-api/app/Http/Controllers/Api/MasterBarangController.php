@@ -7,6 +7,7 @@ use App\Models\MasterBarang;
 use App\Models\StokBarang;
 use App\Models\MasterKategori;
 use App\Models\SubKategori;
+use App\Models\Status;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -19,16 +20,18 @@ class MasterBarangController extends Controller
      */
     public function index(Request $request)
     {
+        $isActive = $request->input('is_active', 'true') === 'true';
+
         $query = MasterBarang::query()
             ->join('master_kategoris', 'master_barangs.id_kategori', '=', 'master_kategoris.id_kategori')
             ->join('sub_kategoris', 'master_barangs.id_sub_kategori', '=', 'sub_kategoris.id_sub_kategori')
-            
             ->select(
                 'master_barangs.kode_barang',
                 'master_kategoris.nama_kategori',
                 'sub_kategoris.nama_sub',
                 DB::raw('COUNT(master_barangs.id_m_barang) as variations_count') 
             )
+            ->where('master_barangs.is_active', $isActive)
             ->groupBy(
                 'master_barangs.kode_barang',
                 'master_kategoris.nama_kategori',
@@ -41,6 +44,7 @@ class MasterBarangController extends Controller
         if ($request->filled('id_sub_kategori')) {
             $query->where('master_barangs.id_sub_kategori', $request->id_sub_kategori);
         }
+
         if ($request->has('with_stock')) {
             $query->withCount(['stokBarangs as stok_tersedia' => function ($q) {
                 $q->where('status_id', 1);
@@ -50,26 +54,50 @@ class MasterBarangController extends Controller
         if ($request->has('all')) {
             return $query->get();
         }
-        return $query->paginate(15);
+
+        $paginator = $query->paginate(15);
+        $paginator->getCollection()->each(function ($item) use ($isActive) {
+            $item->variations = $this->getVariationsData($item->kode_barang, $isActive);
+        });
+
+        return $paginator;
     }
 
-    public function getVariations($kode_barang)
+    private function getVariationsData($kode_barang, $isActive = true)
     {
         $tersediaStatusId = 1;
+        $endOfLifeStatuses = Status::whereIn('nama_status', ['Rusak', 'Hilang', 'Non-Aktif'])->pluck('id');
+
         $items = MasterBarang::where('kode_barang', $kode_barang)
+                    ->where('is_active', $isActive)
                     ->with(['masterKategori', 'subKategori'])
                     ->withCount(['stokBarangs as stok_tersedia_count' => function ($query) use ($tersediaStatusId) {
                         $query->where('status_id', $tersediaStatusId);
                     }])
+                    ->withCount(['activeStokBarangs as total_active_stock'])
                     ->orderBy('nama_barang', 'asc')
                     ->get();
         
+        return $items;
+    }
+
+    public function getVariations($kode_barang, Request $request)
+    {
+        $isActive = $request->input('is_active', 'true') === 'true';
+        $items = $this->getVariationsData($kode_barang, $isActive);
         return response()->json($items);
     }
 
     public function indexFlat(Request $request)
     {
-        $query = MasterBarang::with(['masterKategori', 'subKategori', 'createdBy']);
+        $query = MasterBarang::with(['masterKategori', 'subKategori', 'createdBy'])
+                    ->withCount('activeStokBarangs as total_active_stock');
+
+        $query->when($request->filled('is_active'), function ($q) use ($request) {
+            $q->where('is_active', $request->input('is_active') === 'true');
+        }, function ($q) {
+            $q->where('is_active', true);
+        });
 
         if ($request->filled('id_kategori')) {
             $query->where('id_kategori', $request->id_kategori);
@@ -141,6 +169,7 @@ class MasterBarangController extends Controller
         $dataToCreate = array_merge($validated, [
             'kode_barang' => $kodeBarang, 
             'created_by' => Auth::id(),
+            'is_active' => true,
         ]);
 
         $masterBarang = MasterBarang::create($dataToCreate);
@@ -200,7 +229,7 @@ class MasterBarangController extends Controller
     public function getStockByColor(MasterBarang $masterBarang)
     {
         $excludedStatuses = DB::table('status_barang')
-            ->whereIn('nama_status', ['Hilang', 'Rusak', 'Digunakan'])
+            ->whereIn('nama_status', ['Hilang', 'Rusak', 'Digunakan', 'Non-Aktif'])
             ->pluck('id');
 
         $stockDetails = $masterBarang->stokBarangs()
@@ -342,6 +371,22 @@ class MasterBarangController extends Controller
         return response()->json($masterBarang);
     }
 
+    public function archive(MasterBarang $masterBarang)
+    {
+        if ($masterBarang->activeStokBarangs()->exists()) {
+            return response()->json(['message' => 'SKU tidak dapat diarsipkan. Masih ada unit yang berstatus Tersedia, Dipinjam, Digunakan, atau Perbaikan.'], 422);
+        }
+
+        $masterBarang->update(['is_active' => false]);
+        return response()->json(['message' => 'SKU berhasil diarsipkan.']);
+    }
+
+    public function restore(MasterBarang $masterBarang)
+    {
+        $masterBarang->update(['is_active' => true]);
+        return response()->json(['message' => 'SKU berhasil dipulihkan.']);
+    }
+
     public function bulkDelete(Request $request)
     {
         $validated = $request->validate([
@@ -351,33 +396,48 @@ class MasterBarangController extends Controller
 
         $allIds = $validated['ids'];
 
-        $idsWithStock = MasterBarang::whereIn('id_m_barang', $allIds)
-                                  ->has('stokBarangs') 
+        $idsWithActiveStock = MasterBarang::whereIn('id_m_barang', $allIds)
+                                  ->has('activeStokBarangs')
                                   ->pluck('id_m_barang')
                                   ->all();
 
-        $idsToDelete = array_diff($allIds, $idsWithStock);
+        $idsToArchive = array_diff($allIds, $idsWithActiveStock);
 
-        $deletedCount = 0;
-        if (count($idsToDelete) > 0) {
-            $deletedCount = MasterBarang::whereIn('id_m_barang', $idsToDelete)->delete();
+        $archivedCount = 0;
+        if (count($idsToArchive) > 0) {
+            $archivedCount = MasterBarang::whereIn('id_m_barang', $idsToArchive)
+                                         ->update(['is_active' => false]);
         }
 
-        $skippedCount = count($allIds) - $deletedCount;
-        $message = $deletedCount . ' SKU berhasil dihapus.';
+        $skippedCount = count($allIds) - $archivedCount;
+        $message = $archivedCount . ' SKU berhasil diarsipkan.';
         if ($skippedCount > 0) {
-            $message .= ' ' . $skippedCount . ' SKU tidak dapat dihapus karena masih memiliki stok fisik terkait.';
+            $message .= ' ' . $skippedCount . ' SKU tidak dapat diarsipkan karena masih memiliki stok aktif (Tersedia, Dipinjam, dll).';
         }
 
         return response()->json(['message' => $message]);
     }
 
+    public function bulkRestore(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:master_barangs,id_m_barang',
+        ]);
+
+        $restoredCount = MasterBarang::whereIn('id_m_barang', $validated['ids'])
+                                     ->update(['is_active' => true]);
+
+        return response()->json(['message' => $restoredCount . ' SKU berhasil dipulihkan.']);
+    }
+
     public function destroy(MasterBarang $masterBarang)
     {
-        if ($masterBarang->stokBarangs()->exists()) {
-            return response()->json(['message' => 'SKU barang tidak dapat dihapus karena masih ada stok fisiknya.'], 422);
+        if ($masterBarang->activeStokBarangs()->exists()) {
+            return response()->json(['message' => 'SKU tidak dapat diarsipkan. Masih ada unit yang berstatus Tersedia, Dipinjam, Digunakan, atau Perbaikan.'], 422);
         }
-        $masterBarang->delete();
-        return response()->json(['message' => 'SKU barang berhasil dihapus.'], 200);
+        
+        $masterBarang->update(['is_active' => false]);
+        return response()->json(['message' => 'SKU barang berhasil diarsipkan.'], 200);
     }
 }

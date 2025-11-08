@@ -4,7 +4,7 @@ import Select from 'react-select';
 import api from '../services/api';
 import TicketDetailModal from './TicketDetailModal';
 import { saveAs } from 'file-saver';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const formatDate = (dateString) => {
   if (!dateString) return '-';
@@ -63,6 +63,7 @@ const staggerItem = {
 
 
 export default function ComprehensiveReportPage() {
+  const isPresent = useIsPresent();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -158,10 +159,12 @@ export default function ComprehensiveReportPage() {
   }, [dateFilters.year, dateFilters.month, dateFilters.start_date, dateFilters.end_date, filterType]);
 
   useEffect(() => {
+    if (!isPresent) return;
     fetchTableData(filter, 1);
-  }, [filter, fetchTableData]);
+  }, [filter, fetchTableData, isPresent]);
 
   useEffect(() => {
+    if (!isPresent) return;
     const fetchStats = async () => {
       try {
         const params = {};
@@ -182,7 +185,7 @@ export default function ComprehensiveReportPage() {
       }
     };
     fetchStats();
-  }, [dateFilters.year, dateFilters.month, dateFilters.start_date, dateFilters.end_date, filterType, filterTypePath]);
+  }, [dateFilters.year, dateFilters.month, dateFilters.start_date, dateFilters.end_date, filterType, filterTypePath, isPresent]);
 
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);

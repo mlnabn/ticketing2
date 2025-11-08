@@ -794,6 +794,11 @@ body.dark-mode .hamburger-menu-button span {
     margin-bottom: 15px;
   }
 
+  .btn-archive {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
   .btn-primary-outline {
     width: 100%;
     margin-bottom: 15px;
@@ -5376,6 +5381,43 @@ body.dark-mode .notification-form-container label {
 .btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.btn-archive {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border-color: transparent;
+
+}
+
+.btn-archive:hover {
+  background-color: #bce3c9;
+  transform: translateY(-2px);
+
+}
+
+.btn-archive:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+body.dark-mode .btn-archive {
+  background-color: #22c55e;
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(34, 197, 94, 0.25);
+}
+
+body.dark-mode .btn-archive:hover {
+  background-color: #16a34a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
 }
 
 .btn-scan {
@@ -12400,6 +12442,18 @@ body.dark-mode .btn-dlt:hover {
   width: 100%;
 }
 
+.filter-search-input-invReport {
+  padding: 8px 12px;
+  border-radius: 6px;
+  min-width: 250px;
+  flex-grow: 1;
+
+  background-color: var(--input-bg, #FFFFFF);
+  color: var(--text-primary, #212529);
+  border: 1px solid var(--input-border, #ced4da);
+  width: 50%;
+}
+
 .filter-row-bottom {
   display: flex;
   justify-content: space-between;
@@ -12618,6 +12672,11 @@ body.dark-mode .btn-dlt:hover {
 
 @media (max-width: 1290px) {
   .filter-search-input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .filter-search-input-stok {
     width: 100%;
     margin-bottom: 10px;
   }
@@ -12947,18 +13006,6 @@ body.dark-mode .btn-dlt:hover {
 .dark-mode .btn-delete-icon:hover {
   background-color: #4b1d1d;
 }
-
-/* .filter-search-input-key {
-  padding: 8px 12px;
-  border-radius: 6px;
-  min-width: 250px;
-  margin-bottom: 18px;
-  background-color: var(--input-bg, #FFFFFF);
-  color: var(--text-primary, #212529);
-  border: 1px solid var(--input-border, #ced4da);
-  flex-grow: 1;
-  margin: 0;
-} */
 
 /* =========================================== */
 /* ===         Versi Mobile                ===== */

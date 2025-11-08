@@ -10,7 +10,8 @@ import QrScannerModal from './QrScannerModal';
 import { createPortal } from 'react-dom';
 import QrPrintSheet from './QrPrintSheet';
 import QrCodeModal from './QrCodeModal';
-import { motion, AnimatePresence } from 'framer-motion';
+import DeleteStockItemModal from './DeleteStockItemModal';
+import { motion, AnimatePresence, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -46,6 +47,7 @@ const expandVariants = {
 
 function StokBarangView() {
     const { showToast } = useOutletContext();
+    const isPresent = useIsPresent();
     const printRef = useRef();
     // State utama untuk Master Barang (SKU)
     const [masterItems, setMasterItems] = useState([]);
@@ -70,6 +72,7 @@ function StokBarangView() {
     const [qrModalItem, setQrModalItem] = useState(null);
     const [isAddStockOpen, setIsAddStockOpen] = useState(false);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
+    const [itemToSoftDelete, setItemToSoftDelete] = useState(null);
 
     // State untuk expand/collapse
     const [expandedRows, setExpandedRows] = useState({});
@@ -191,6 +194,7 @@ function StokBarangView() {
     }, [showToast, setSelectedItems]); // dependensi tetap
 
     useEffect(() => {
+        if (!isPresent) return;
         api.get('/inventory/categories').then(res => setCategories(res.data));
         api.get('/statuses').then(res => {
             setStatusOptions(res.data);
@@ -203,7 +207,7 @@ function StokBarangView() {
             }
         });
         api.get('/colors').then(res => setColorOptions(res.data));
-    }, [showToast, setTersediaStatusId]);
+    }, [showToast, setTersediaStatusId, isPresent]);
 
     useEffect(() => {
         if (selectedCategory) {
@@ -215,6 +219,7 @@ function StokBarangView() {
     }, [selectedCategory]);
 
     useEffect(() => {
+        if (!isPresent) return;
         const filters = {
             id_kategori: selectedCategory,
             id_sub_kategori: selectedSubCategory,
@@ -223,7 +228,7 @@ function StokBarangView() {
             search: debouncedSearchTerm,
         };
         fetchData(1, filters);
-    }, [selectedCategory, selectedSubCategory, selectedStatus, selectedColor, debouncedSearchTerm, fetchData]);
+    }, [selectedCategory, selectedSubCategory, selectedStatus, selectedColor, debouncedSearchTerm, fetchData, isPresent]);
 
     const loadMoreItems = async () => {
         if (isLoadingMore || !pagination || pagination.current_page >= pagination.last_page) return;
@@ -356,6 +361,7 @@ function StokBarangView() {
 
     const handleSaveSuccess = () => {
         fetchData(1, currentFilters);
+        setItemToSoftDelete(null);
     };
 
     const handleScanSearch = useCallback(async (code) => {
@@ -523,38 +529,7 @@ function StokBarangView() {
                     className="user-management-container"
                     style={{ marginBottom: '20px' }}
                 >
-                    <h1>Daftar Stok Barang</h1>
-                    <div className="action-buttons-stok">
-                        <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>
-                            <i className="fas fa-plus" style={{ marginRight: '8px' }}>
-                            </i>Tambah Stok
-                        </button>
-
-                        <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
-                            <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
-                                <i className="fas fa-qrcode fa-stack-2x"></i>
-                                <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
-                            </span>
-                            Scan QR
-                        </button>
-                        <button
-                            className="btn-primary-outline"
-                            onClick={handlePreparePrint}
-                            disabled={selectedItems.size === 0}
-                        >
-                            <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
-                            Print QR ({selectedItems.size})
-                        </button>
-                        {selectedItems.size > 0 && (
-                            <button
-                                className="btn-soft-grey"
-                                onClick={handleClearSelection}
-                                title="Hilangkan semua pilihan"
-                            >
-                                <i className="fas fa-times"></i>
-                            </button>
-                        )}
-                    </div>
+                    <h1>Daftar Stok Barang</h1>          
                 </motion.div>
 
                 <motion.div
@@ -604,14 +579,45 @@ function StokBarangView() {
                     />
                 </motion.div>
 
-                <motion.input
-                    variants={staggerItem}
-                    type="text"
-                    placeholder="Cari Kode SKU / Nama Barang..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className="filter-search-input"
-                />
+                <motion.div variants={staggerItem} className="action-buttons-stok">
+                    <motion.input
+                        variants={staggerItem}
+                        type="text"
+                        placeholder="Cari Kode SKU / Nama Barang..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="filter-search-input-invReport"
+                    />
+                    <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>
+                        <i className="fas fa-plus" style={{ marginRight: '8px' }}>
+                        </i>Tambah Stok
+                    </button>
+
+                    <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
+                        <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
+                            <i className="fas fa-qrcode fa-stack-2x"></i>
+                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
+                        </span>
+                        Scan QR
+                    </button>
+                    <button
+                        className="btn-primary-outline"
+                        onClick={handlePreparePrint}
+                        disabled={selectedItems.size === 0}
+                    >
+                        <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
+                        Print QR ({selectedItems.size})
+                    </button>
+                    {selectedItems.size > 0 && (
+                        <button
+                            className="btn-soft-grey"
+                            onClick={handleClearSelection}
+                            title="Hilangkan semua pilihan"
+                        >
+                            <i className="fas fa-times"></i>
+                        </button>
+                    )}
+                    </motion.div>
 
                 <motion.div variants={staggerItem} className="job-list-container">
                     {/* Tampilan Tabel Desktop */}
@@ -623,8 +629,8 @@ function StokBarangView() {
                                     <th>Nama Barang</th>
                                     <th>Kategori</th>
                                     <th>Sub-Kategori</th>
-                                    <th>Stok Tersedia</th>
-                                    <th>Total Unit</th>
+                                    <th>Unit Tersedia</th>
+                                    <th>Unit Aktif</th>
                                     <th>Ditambahkan Oleh</th>
                                 </tr>
                             </thead>
@@ -741,16 +747,23 @@ function StokBarangView() {
                                                                                         <button
                                                                                             onClick={(e) => { e.stopPropagation(); setDetailItem(detail); }}
                                                                                             className="btn-user-action btn-detail"
+                                                                                            title="Lihat Detail"
                                                                                         >
                                                                                             <i className="fas fa-info-circle" style={{ fontSize: '20px', marginRight: '5px' }}></i>
                                                                                         </button>
-
-                                                                                        {/* Button QR */}
                                                                                         <button
                                                                                             onClick={(e) => { e.stopPropagation(); setQrModalItem(detail); }}
                                                                                             className="btn-user-action btn-qr"
+                                                                                            title="Tampilkan QR Code"
                                                                                         >
                                                                                             <i className="fas fa-qrcode" style={{ fontSize: '20px', marginRight: '5px' }}></i>
+                                                                                        </button>
+                                                                                        <button
+                                                                                            onClick={(e) => { e.stopPropagation(); setItemToSoftDelete(detail); }}
+                                                                                            className="btn-user-action btn-dlt"
+                                                                                            title="Hapus / Non-Aktifkan Unit"
+                                                                                        >
+                                                                                            <i className="fas fa-trash-alt" style={{ fontSize: '20px', marginRight: '5px' }}></i>
                                                                                         </button>
                                                                                     </div>
                                                                                 </div>
@@ -761,7 +774,7 @@ function StokBarangView() {
                                                                         )}
                                                                         {!loading && !isLoadingMoreDetail && detailItems[masterItem.id_m_barang] && (
                                                                             <div className="detail-list-footer-centered">
-                                                                                Total Stok: {detailItems[masterItem.id_m_barang].pagination.total} Unit
+                                                                                Total Unit: {detailItems[masterItem.id_m_barang].pagination.total} Unit
                                                                             </div>
                                                                         )}
                                                                     </div>
@@ -787,7 +800,7 @@ function StokBarangView() {
                                 <tfoot>
                                     <tr className="subtotal-row">
                                         <td colSpan="5" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>
-                                            Total Seluruh Unit (dari {pagination.total} Tipe Barang)
+                                            Total Unit Aktif (dari {pagination.total} Tipe Barang)
                                         </td>
                                         <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
                                             {pagination.grand_total_units} Unit
@@ -829,7 +842,7 @@ function StokBarangView() {
                                                 </div>
                                                 <div className="card-separator"></div> */}
                                                 <div className="card-item-row">
-                                                    <span className="label">Stok Tersedia</span>
+                                                    <span className="label">Unit Tersedia</span>
                                                     <span className="value">{masterItem.available_stock_count}</span>
                                                 </div>
                                                 <div className="card-separator"></div>
@@ -922,7 +935,7 @@ function StokBarangView() {
                                                     >
                                                         <span className="subtotal-label"
                                                             style={{ fontSize: '13px', fontWeight: 'bold' }}
-                                                        >Total Stok</span>
+                                                        >Total Unit</span>
                                                         <span className="subtotal-value"
                                                             style={{ fontSize: '13px', fontWeight: 'bold' }}
                                                         >
@@ -1001,6 +1014,14 @@ function StokBarangView() {
                 onClose={() => setIsAddStockOpen(false)}
                 onSaveSuccess={() => fetchData(1, {})}
                 showToast={showToast}
+            />
+            <DeleteStockItemModal
+                show={Boolean(itemToSoftDelete)}
+                item={itemToSoftDelete}
+                onClose={() => setItemToSoftDelete(null)}
+                onSaveSuccess={handleSaveSuccess}
+                showToast={showToast}
+                statusOptions={statusOptions} // <-- Kirim status options
             />
             {createPortal(
                 <QrPrintSheet ref={printRef} items={itemsToPrint} />,

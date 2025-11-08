@@ -6,7 +6,7 @@ import api from '../services/api';
 import { saveAs } from 'file-saver';
 import QrScannerModal from './QrScannerModal';
 import HistoryModal from './HistoryModal';
-import { motion } from 'framer-motion';
+import { motion, useIsPresent } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -64,6 +64,7 @@ const monthOptions = [
 
 
 function ItemHistoryLookupPage() {
+    const isPresent = useIsPresent();
     const { showToast } = useOutletContext();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -156,6 +157,7 @@ function ItemHistoryLookupPage() {
     }, [showToast, getApiParams]);
 
     useEffect(() => {
+        if (!isPresent) return;
         api.get('/reports/inventory/dashboard')
             .then(res => {
                 if (res.data.availableYears && res.data.availableYears.length > 0) {
@@ -173,11 +175,12 @@ function ItemHistoryLookupPage() {
                 const currentYear = new Date().getFullYear().toString();
                 setYears([currentYear]);
             });
-    }, [filters.year]);
+    }, [filters.year, isPresent]);
 
     useEffect(() => {
+        if (!isPresent) return;
         fetchData();
-    }, [fetchData]);
+    }, [fetchData, isPresent]);
 
     const getRelevantDate = (item) => {
         const latestHistoryRecord = item.latest_history;
@@ -313,8 +316,9 @@ function ItemHistoryLookupPage() {
     }, [selectedItem, historyFilters, showToast]);
 
     useEffect(() => {
+        if (!isPresent) return;
         fetchHistory();
-    }, [fetchHistory]);
+    }, [fetchHistory, isPresent]);
 
     const handleHistoryFilterChange = (e) => {
         setHistoryFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -400,33 +404,7 @@ function ItemHistoryLookupPage() {
             <motion.div variants={staggerItem} className="user-management-container">
                 <h1 className="page-title">Lacak Riwayat Aset</h1>
                 <p className="page-description" style={{ textAlign: 'center' }}>Gunakan pencarian, klik item dari daftar, atau scan QR/Barcode untuk melihat riwayat lengkap sebuah aset.</p>
-                <motion.div
-                    variants={staggerItem}
-                    className="filters-container report-filters"
-                    style={{
-                        marginTop: '1rem',
-                        paddingBottom: '0',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        gap: '0.5rem',
-                        alignItems: 'center'
-                    }}
-                >
-                    <input
-                        type="text"
-                        placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
-                        value={searchTerm}
-                        onChange={e => setSearchTerm(e.target.value)}
-                        className="filter-search-input"
-                        style={{ flexGrow: 1, width: 'auto' }}
-                    />
-                    <button className="btn-scan-qr-history" onClick={() => setIsScannerOpen(true)}>
-                        <span className="fa-stack" style={{ fontSize: '1.2em' }}>
-                            <i className="fas fa-qrcode fa-stack-2x"></i>
-                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
-                        </span>
-                    </button>
-                </motion.div>
+                
                 <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', alignItems: 'center' }}>
                     
                     {/* 1. Filter Tipe: Select */}
@@ -486,6 +464,31 @@ function ItemHistoryLookupPage() {
                             <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
                         </>
                     )}
+                </motion.div>
+                <motion.div
+                    variants={staggerItem}
+                    className="filters-container report-filters"
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: '0.5rem',
+                        alignItems: 'center'
+                    }}
+                >
+                    <input
+                        type="text"
+                        placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="filter-search-input"
+                        style={{ flexGrow: 1, width: 'auto' }}
+                    />
+                    <button className="btn-scan-qr-history" onClick={() => setIsScannerOpen(true)}>
+                        <span className="fa-stack" style={{ fontSize: '1.2em' }}>
+                            <i className="fas fa-qrcode fa-stack-2x"></i>
+                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </button>
                 </motion.div>
                 <motion.div variants={staggerItem} className={`split-view-container ${selectedItem ? 'split-view-active' : ''}`}>
                     <div className="list-panel">
