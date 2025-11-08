@@ -5423,6 +5423,7 @@ body.dark-mode .btn-scan:hover {
   display: flex;
   gap: 10px;
   margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 /* ===== Feedback Message ===== */
@@ -6268,6 +6269,10 @@ body.dark-mode .welcome-title {
 
 /* Responsive untuk tablet */
 @media (max-width: 768px) {
+  .action-buttons-stok {
+    flex-wrap: wrap;
+  }
+
   .welcome-content {
     padding: 30px 25px;
     gap: 15px;
@@ -11810,6 +11815,11 @@ body.dark-mode .btn-dlt:hover {
 
 @media (max-width: 1200px) {
 
+  .filter-search-input-invReport {
+    min-width: 100%;
+    margin-bottom: 15px;
+  }
+  
   .user-management-header-report h1 {
     font-size: 1.5rem;
   }
@@ -12103,13 +12113,14 @@ body.dark-mode .btn-dlt:hover {
 .filter-search-input-invReport {
   padding: 8px 12px;
   border-radius: 6px;
-  min-width: 250px;
   flex-grow: 1;
-
+  display: flex;
   background-color: var(--input-bg, #FFFFFF);
   color: var(--text-primary, #212529);
   border: 1px solid var(--input-border, #ced4da);
   width: 50%;
+  max-height: 45px;
+
 }
 
 .filter-row-bottom {
@@ -12329,12 +12340,12 @@ body.dark-mode .btn-dlt:hover {
 }
 
 @media (max-width: 1290px) {
-  .filter-search-input {
-    width: 100%;
+  .filter-search-input-invReport {
+    min-width: 50%;
     margin-bottom: 10px;
   }
 
-  .filter-search-input-stok {
+  .filter-search-input {
     width: 100%;
     margin-bottom: 10px;
   }
