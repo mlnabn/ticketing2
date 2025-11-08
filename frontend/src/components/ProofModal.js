@@ -1,5 +1,3 @@
-// src/components/ProofModal.js
-
 import React, { useState, useEffect } from 'react';
 
 function ProofModal({ show, ticket, onSave, onClose }) {
@@ -71,10 +69,10 @@ function ProofModal({ show, ticket, onSave, onClose }) {
       onClick={handleCloseClick}
     >
       <div 
-        className={`modal-content ${animationClass}`}
+        className={`modal-content-detail ${animationClass}`}
         onClick={e => e.stopPropagation()}
       >
-        <h2>Bukti Pengerjaan: {currentTicket.title}</h2>
+        <h2 style={{fontSize:'2rem'}}>Bukti Pengerjaan: {currentTicket.title}</h2>
         <form onSubmit={handleSubmit}>
           <div className="proof-modal__group">
             <label htmlFor="proof_description">Deskripsi Pengerjaan</label>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDebounce } from 'use-debounce';
-import Select from 'react-select'; // 💡 NEW: Import Select
+import Select from 'react-select';
 import api from '../services/api';
 import { saveAs } from 'file-saver';
 import ActiveLoanDetailModal from './ActiveLoanDetailModal';
@@ -32,14 +32,10 @@ const months = [
     { value: 7, name: 'Juli' }, { value: 8, name: 'Agustus' }, { value: 9, name: 'September' },
     { value: 10, name: 'Oktober' }, { value: 11, name: 'November' }, { value: 12, name: 'Desember' }
 ];
-
-// 💡 NEW: Opsi untuk Select Filter Type
 const filterTypeOptions = [
     { value: 'month', label: 'Filter per Bulan' },
     { value: 'date_range', label: 'Filter per Tanggal' },
 ];
-
-// 💡 NEW: Mengubah array months ke format react-select
 const monthOptions = [
     { value: '', label: 'Semua Bulan' },
     ...months.map(m => ({ value: m.value.toString(), label: m.name })),
@@ -68,10 +64,7 @@ export default function ActiveLoanReportPage() {
     const mobileListRef = useRef(null);
     const type = 'active_loans';
     const title = 'Laporan Peminjaman Aktif';
-
-    // 💡 NEW: Opsi tahun yang diubah ke format react-select
     const yearOptions = years.map(y => ({ value: y.toString(), label: y.toString() }));
-    // Tambahkan opsi default "Semua Tahun" jika diperlukan
     const yearSelectOptions = [{ value: '', label: 'Semua Tahun' }, ...yearOptions];
 
 
@@ -143,12 +136,10 @@ export default function ActiveLoanReportPage() {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    // 💡 NEW: Handler untuk Select Bulan/Tahun
+   
     const handleSelectFilterChange = (selectedOption, name) => {
         setFilters(prev => ({ ...prev, [name]: selectedOption ? selectedOption.value : '' }));
-    };
-
-    // 💡 NEW: Handler untuk Select Filter Type
+    }; 
     const handleSelectFilterTypeChange = (selectedOption) => {
         const newType = selectedOption.value;
         setFilterType(newType);
@@ -158,9 +149,7 @@ export default function ActiveLoanReportPage() {
             end_date: '',
             month: '',
         }));
-    };
-
-    // Fungsi handleFilterTypeChange yang lama dihapus/diganti
+    }; 
 
     const handleRowClick = (e, item) => {
         if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('.action-buttons-group')) {

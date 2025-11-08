@@ -86,7 +86,7 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
         onClick={handleCloseClick}
       >
         <div
-          className={`modal-content ${animationClass}`}
+          className={`modal-content-detail ${animationClass}`}
           onClick={e => e.stopPropagation()}
         >
           <h1 style={{ fontSize: '2rem' }}>{isEditMode ? 'Edit Pengguna' : 'Tambah Pengguna Baru'}</h1>
@@ -157,9 +157,9 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                 </button>
               </div>
             </div>
-            <div className="form-actions">
-              <button type="button" onClick={onClose} className="btn btn-cancel">Batal</button>
-              <button type="submit" className="btn btn-confirm">Simpan</button>
+            <div className="modal-actions">
+              <button type="button" onClick={onClose} className="btn-cancel">Batal</button>
+              <button type="submit" className="btn-confirm">Simpan</button>
             </div>
           </form>
         </div>
