@@ -61,7 +61,6 @@ function ItemListView({
 
         if (name === 'category') {
             setSelectedCategory(value);
-            // Saat kategori di-clear, clear juga sub-kategori
             if (value === '') {
                 setSelectedSubCategory('');
             }

@@ -5187,6 +5187,18 @@ body.dark-mode .rejection-reason-display p {
   background-color: #ffffff;
   color: #111827;
   border-color: #f9fafb;
+  cursor: pointer !important;
+}
+
+.custom-select-notif__option--is-focused {
+  background-color: #f0f0f0 !important;
+  color: #333333 !important;
+}
+
+.custom-select-notif__option--is-selected {
+  background-color: #d6eaf8 !important;
+  color: #154360 !important;
+
 }
 
 .dark-mode .custom-select-notif__control {
@@ -5212,12 +5224,15 @@ body.dark-mode .rejection-reason-display p {
 }
 
 .dark-mode .custom-select-notif__option--is-focused {
-  background-color: rgba(13, 110, 253, 0.15) !important;
+  background-color: #4a5568 !important;
+  color: #e2e8f0 !important;
+
 }
 
 .dark-mode .custom-select-notif__option--is-selected {
-  background-color: #0d6efd !important;
-  color: #FFFFFF !important;
+  background-color: #2b6cb0 !important;
+  color: #ffffff !important;
+
 }
 
 
@@ -5949,29 +5964,29 @@ body.dark-mode .history-item-content small {
   min-height: 40px;
   padding: 3.4px 0px 3.4px 10px !important;
   background-color: #FFFFFF !important;
+  cursor: pointer !important;
 }
 
-.custom-filter-select-menu {
+.custom-select-role__menu {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.custom-filter-select-option {
+.custom-select-role__option {
   padding: 10px 12px;
 }
 
-.custom-filter-select__option--is-focused {
-  background-color: #f0f0f0;
+.custom-select-role__option--is-focused {
+  background-color: #f0f0f0 !important;
+  color: #333333 !important;
+
 }
 
-.custom-filter-select__option--is-selected {
-  background-color: #3f51b5;
-  color: white;
-}
-.custom-select-role__value-container {
-  color:#000 !important;
-  background-color: #FFFFFF !important;
+.custom-select-role__option--is-selected {
+  background-color: #d6eaf8 !important;
+  color: #154360 !important;
+
 }
 
 .dark-mode .custom-select-role__control {
@@ -5990,12 +6005,15 @@ body.dark-mode .history-item-content small {
 }
 
 .dark-mode .custom-select-role__option--is-focused {
-  background-color: #4a5568 ;
+  background-color: #4a5568 !important;
+  color: #e2e8f0 !important;
+
 }
 
 .dark-mode .custom-select-role__option--is-selected {
-  background-color: #a0a0a0;
-  color: white;
+  background-color: #2b6cb0 !important;
+  color: #ffffff !important;
+
 }
 
 .dark-mode .custom-select-role__single-value {
@@ -10197,7 +10215,7 @@ body.dark-mode .form-group-recover textarea:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1500;
+  z-index: 10000;
   padding: 1rem;
   animation: fadeBackdrop 0.3s ease-out forwards;
 }
@@ -10566,17 +10584,16 @@ body.dark-mode .form-group-recover textarea:focus {
   - .filter-select-control dll
 ==========================================================================
 */
-/* Anda bisa menempatkan ini di file CSS atau styling global Anda */
 
 /* 1. Kontrol Utama (kotak yang terlihat) */
 .report-filter-select__control {
   border: 1px solid #ccc !important;
   border-radius: 8px !important;
-  /* Menghilangkan shadow default */
   box-shadow: none !important;
   min-height: 40px;
   padding: 3.4px 0px 3.4px 10px !important;
   background-color: var(--input-bg, #FFFFFF) !important;
+  cursor: pointer !important;
 }
 
 /* 2. Menu Dropdown (daftar pilihan yang muncul) */
@@ -10592,17 +10609,21 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .report-filter-select__option--is-focused {
-  background-color: #f0f0f0;
+  background-color: #f0f0f0 !important;
+  color: #333333 !important;
+
 }
 
 .report-filter-select__option--is-selected {
-  background-color: #3f51b5;
-  color: white;
+  background-color: #d6eaf8 !important;
+  color: #154360 !important;
+
 }
 
 .dark-mode .report-filter-select__control {
-  background-color: #3a3f44 !important;
-  border-color: #4a5568 !important;
+  background-color: rgba(71, 85, 105, 0.25) !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
   color: #e2e8f0 !important;
 }
 
@@ -10616,12 +10637,13 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .dark-mode .report-filter-select__option--is-focused {
-  background-color: #4a5568;
+  background-color: #4a5568 !important;
+  color: #e2e8f0 !important;
 }
 
 .dark-mode .report-filter-select__option--is-selected {
-  background-color: #6366f1;
-  color: white;
+  background-color: #2b6cb0 !important;
+  color: #ffffff !important;
 }
 
 .dark-mode .report-filter-select__single-value {
@@ -10758,7 +10780,7 @@ body.dark-mode .form-group-recover textarea:focus {
   padding: 3.4px 0px 3.4px 10px !important;
   background-color: var(--input-bg, #FFFFFF) !important;
   box-shadow: none !important;
-  cursor: pointer;
+  cursor: pointer !important;
 }
 
 /* Hover State (Light Mode) */
@@ -10776,8 +10798,9 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* --- B. STYLING KONTROL UTAMA (Dark Mode) --- */
 .dark-mode .filter-select-invent__control {
-  background-color: #3a3f44 !important;
-  border-color: #4a5568 !important;
+  background-color: rgba(71, 85, 105, 0.25) !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
 }
 
 /* Dark Mode - Focus State */
@@ -10808,14 +10831,19 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* Option Selected State (Light Mode) */
 .filter-select-invent__option--is-selected {
-  background-color: #4299e1 !important;
-  color: white !important;
+  background-color: #d6eaf8 !important;
+  color: #154360 !important;
 }
 
 /* Option Hover/Focus State (Dark Mode) */
 .dark-mode .filter-select-invent__option--is-focused {
   background-color: #4a5568 !important;
   color: #e2e8f0 !important;
+}
+
+.dark-mode .filter-select-invent__option--is-selected {
+  background-color: #2b6cb0 !important;
+  color: #ffffff !important;
 }
 
 
@@ -11175,7 +11203,7 @@ body.dark-mode .form-group-recover textarea:focus {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1500;
+  z-index: 2000;
   padding: 20px;
   backdrop-filter: blur(8px);
   animation: fadeBackdrop 0.3s ease-out forwards;
@@ -11232,6 +11260,7 @@ body.dark-mode .form-group-recover textarea:focus {
   min-height: 40px;
   padding: 3.4px 0px 3.4px 10px !important;
   background-color: #FFFFFF !important;
+  cursor: pointer !important;
 }
 
 .custom-select-return__menu {
@@ -11245,12 +11274,15 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .custom-select-return__option--is-focused {
-  background-color: #f0f0f0;
+  background-color: #f0f0f0 !important;
+  color: #333333 !important;
+
 }
 
 .custom-select-return__option--is-selected {
-  background-color: #3f51b5;
-  color: white;
+  background-color: #d6eaf8 !important;
+  color: #154360 !important;
+
 }
 
 .dark-mode .custom-select-return__control {
@@ -11269,12 +11301,15 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .dark-mode .custom-select-return__option--is-focused {
-  background-color: #4a5568;
+  background-color: #4a5568 !important;
+  color: #e2e8f0 !important;
+
 }
 
 .dark-mode .custom-select-return__option--is-selected {
-  background-color: #6366f1;
-  color: white;
+  background-color: #2b6cb0 !important;
+  color: #ffffff !important;
+
 }
 
 .dark-mode .custom-select-return__single-value {
@@ -12192,7 +12227,7 @@ body.dark-mode .btn-dlt:hover {
     min-width: 100%;
     margin-bottom: 15px;
   }
-  
+
   .user-management-header-report h1 {
     font-size: 1.5rem;
   }
@@ -12488,7 +12523,13 @@ body.dark-mode .btn-dlt:hover {
   border: 1px solid var(--input-border, #ced4da);
   width: 50%;
   max-height: 45px;
+}
 
+.dark-mode .filter-search-input,
+.dark-mode .filter-search-input-invReport {
+  background-color: rgba(71, 85, 105, 0.25);
+  box-shadow: none;
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .filter-row-bottom {
@@ -14283,57 +14324,59 @@ body.dark-mode .detail-list-footer-centered {
 /* Filter Inventory */
 
 .filters-container {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    transition: all 0.3s ease-in-out;
-    overflow: visible;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease-in-out;
+  overflow: visible;
 }
 
 .btn-toggle-filters {
-    display: none;
+  display: none;
 }
 
 @media (max-width: 768px) {
 
-    .btn-toggle-filters {
-        display: block;
-        background: none;
-        border: none;
-        border-bottom: 1px solid var(--border-color-light); /* Garis tipis */
-        padding: 12px 8px;
-        width: 100%;
-        text-align: left;
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: #94a3b8;
-        cursor: pointer;
-        transition: color 0.2s ease, background-color 0.2s ease;
-        margin-bottom: 1rem;
-    }
+  .btn-toggle-filters {
+    display: block;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border-color-light);
+    /* Garis tipis */
+    padding: 12px 8px;
+    width: 100%;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease;
+    margin-bottom: 1rem;
+  }
 
-    .btn-toggle-filters:hover {
-        color: #334155;
-        background-color: #f8f9fa;
-    }
+  .btn-toggle-filters:hover {
+    color: #334155;
+    background-color: #f8f9fa;
+  }
 
-    body.dark-mode .btn-toggle-filters {
-        color: #64748B;
-        border-bottom: 1px solid var(--border-color-dark);
-    }
-    body.dark-mode .btn-toggle-filters:hover {
-        color: #cbd5e1;
-        background-color: #1f2937;
-    }
+  body.dark-mode .btn-toggle-filters {
+    color: #64748B;
+    border-bottom: 1px solid var(--border-color-dark);
+  }
 
-    .filters-container {
-        display: none; 
-        flex-direction: column; 
-        gap: 0.75rem; 
-        margin-bottom: 1rem;
-    }
+  body.dark-mode .btn-toggle-filters:hover {
+    color: #cbd5e1;
+    background-color: #1f2937;
+  }
 
-    .filters-container.mobile-visible {
-        display: flex;
-    }
+  .filters-container {
+    display: none;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .filters-container.mobile-visible {
+    display: flex;
+  }
 }
