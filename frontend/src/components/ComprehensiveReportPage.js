@@ -333,7 +333,8 @@ export default function ComprehensiveReportPage() {
               value={filterTypeOptions.find(opt => opt.value === filterType)}
               onChange={handleFilterTypeChange} 
               isSearchable={false}
-              styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+              menuPortalTarget={document.body}
+              styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }} 
             />
 
             {/* Filter per Bulan */}
@@ -348,7 +349,8 @@ export default function ComprehensiveReportPage() {
                   onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'month', value: selectedOption.value } })}
                   placeholder="Semua Bulan"
                   isSearchable={false}
-                  styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+                  menuPortalTarget={document.body}
+                  styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                 />
                 {/* 3. Filter Tahun */}
                 <Select
@@ -358,7 +360,8 @@ export default function ComprehensiveReportPage() {
                   value={yearOptions.find(y => y.value === dateFilters.year)}
                   onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'year', value: selectedOption.value } })}
                   isSearchable={false}
-                  styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+                  menuPortalTarget={document.body}
+                  styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999   }) }} // width: 100%
                 />
               </>
             )}

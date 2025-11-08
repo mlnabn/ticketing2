@@ -268,9 +268,9 @@ export default function ActiveLoanReportPage() {
                     onChange={handleSelectFilterTypeChange}
                     isSearchable={false}
                     placeholder="Filter Laporan"
-                    styles={{ container: (base) => ({ ...base, flex: 1 }) }} 
+                    menuPortalTarget={document.body}
+                    styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }} 
                 />
-                 
 
                 {filterType === 'month' && (
                     <>
@@ -283,11 +283,10 @@ export default function ActiveLoanReportPage() {
                             onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
                             placeholder="Semua Bulan"
                             isSearchable={false}
-                            styles={{ container: (base) => ({ ...base, flex: 1 }) }}  
+                            menuPortalTarget={document.body}
+                            styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                         />
-                         
 
-                        {/* 3. Filter Tahun: Select */}
                         <Select
                             classNamePrefix="report-filter-select"
                             name="year"
@@ -296,9 +295,9 @@ export default function ActiveLoanReportPage() {
                             onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
                             placeholder="Semua Tahun"
                             isSearchable={false}
-                            styles={{ container: (base) => ({ ...base, flex: 1 }) }}  
+                            menuPortalTarget={document.body}
+                            styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                         />
-                         
                     </>
                 )}
                 {filterType === 'date_range' && (

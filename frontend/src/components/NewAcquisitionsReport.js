@@ -110,7 +110,8 @@ export default function NewAcquisitionsReport() {
                     onChange={handleSelectFilterTypeChange}
                     isSearchable={false}
                     placeholder="Filter Laporan"
-                    styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+                    menuPortalTarget={document.body}
+                    styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                 />
 
                 {filterType === 'month' && (
@@ -123,7 +124,8 @@ export default function NewAcquisitionsReport() {
                             onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
                             placeholder="Semua Bulan"
                             isSearchable={false}
-                            styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+                            menuPortalTarget={document.body}
+                            styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                         />
                         <Select
                             classNamePrefix="report-filter-select"
@@ -133,7 +135,8 @@ export default function NewAcquisitionsReport() {
                             onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
                             placeholder="Semua Tahun"
                             isSearchable={false}
-                            styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+                            menuPortalTarget={document.body}
+                            styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                         />
                     </>
                 )}

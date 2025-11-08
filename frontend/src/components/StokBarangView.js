@@ -65,6 +65,7 @@ function StokBarangView() {
     const [selectedStatus, setSelectedStatus] = useState('ALL');
     const [colorOptions, setColorOptions] = useState([]);
     const [selectedColor, setSelectedColor] = useState('');
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
     // State untuk modal
     const [detailItem, setDetailItem] = useState(null);
@@ -90,11 +91,6 @@ function StokBarangView() {
     const mobileListRef = useRef(null);
     const [isLoadingMoreDetail, setIsLoadingMoreDetail] = useState(null);
 
-    // ==========================================================
-    // Tambahan: Derived Options & Handler untuk REACT-SELECT
-    // ==========================================================
-
-    // 1. Definisikan Options dalam format { value, label } untuk react-select
     const filterStatusOptions = useMemo(() => {
         const allStatus = { value: 'ALL', label: 'Semua Status' };
         let options = [];
@@ -139,16 +135,12 @@ function StokBarangView() {
     ], [colorOptions]);
 
 
-    // 2. Definisikan Handler untuk memproses output react-select (yang berupa objek)
     const handleFilterChange = (name, selectedOption) => {
-        // react-select mengembalikan object, kita ambil 'value'. Jika clear, selectedOption adalah null
         const value = selectedOption ? selectedOption.value : '';
 
-        // Berdasarkan 'name' filter, update state yang sesuai
         if (name === 'status') {
             setSelectedStatus(value);
         } else if (name === 'category') {
-            // Ketika kategori berubah, reset sub kategori
             setSelectedCategory(value);
             if (value === '') {
                 setSelectedSubCategory('');
@@ -159,9 +151,7 @@ function StokBarangView() {
             setSelectedColor(value);
         }
     };
-    // ==========================================================
 
-    // fetchData mengambil data summary
     const fetchData = useCallback(async (page = 1, filters = {}) => {
         setLoading(true);
         setCurrentFilters(filters);
@@ -191,7 +181,7 @@ function StokBarangView() {
         } finally {
             setLoading(false);
         }
-    }, [showToast, setSelectedItems]); // dependensi tetap
+    }, [showToast, setSelectedItems]); 
 
     useEffect(() => {
         if (!isPresent) return;
@@ -532,22 +522,29 @@ function StokBarangView() {
                     <h1>Daftar Stok Barang</h1>          
                 </motion.div>
 
+                <motion.button
+                    variants={staggerItem}
+                    className="btn-toggle-filters"
+                    onClick={() => setIsMobileFilterOpen(prev => !prev)}
+                >
+                    <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+                    {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+                </motion.button>
+
                 <motion.div
                     variants={staggerItem}
-                    className="filters-container"
-                    style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}
+                    className={`filters-container ${isMobileFilterOpen ? 'mobile-visible' : ''}`}
                 >
-                    {/* Mengganti <select> dengan Select dari react-select untuk Status */}
                     <Select
-                    className='filter-select-inventory'
+                        className='filter-select-inventory'
                         classNamePrefix="filter-select-invent"
                         options={filterStatusOptions}
                         value={filterStatusOptions.find(option => option.value === selectedStatus)}
                         onChange={(selectedOption) => handleFilterChange('status', selectedOption)}
                         isClearable={false}
+                        menuPortalTarget={document.body}
+                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     />
-
-                    {/* Mengganti <select> dengan Select dari react-select untuk Kategori */}
                     <Select
                         className="filter-select-inventory"
                         classNamePrefix="filter-select-invent"
@@ -555,9 +552,9 @@ function StokBarangView() {
                         value={filterCategoryOptions.find(option => option.value === selectedCategory)}
                         onChange={(selectedOption) => handleFilterChange('category', selectedOption)}
                         isClearable={true}
+                        menuPortalTarget={document.body}
+                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     />
-
-                    {/* Mengganti <select> dengan Select dari react-select untuk Sub-Kategori */}
                     <Select
                         className="filter-select-inventory"
                         classNamePrefix="filter-select-invent"
@@ -566,9 +563,9 @@ function StokBarangView() {
                         onChange={(selectedOption) => handleFilterChange('subCategory', selectedOption)}
                         isDisabled={!selectedCategory || subCategories.length === 0}
                         isClearable={true}
+                        menuPortalTarget={document.body}
+                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     />
-
-                    {/* Mengganti <select> dengan Select dari react-select untuk Warna */}
                     <Select
                         className="filter-select-inventory"
                         classNamePrefix="filter-select-invent"
@@ -576,6 +573,8 @@ function StokBarangView() {
                         value={filterColorOptions.find(option => option.value === selectedColor)}
                         onChange={(selectedOption) => handleFilterChange('color', selectedOption)}
                         isClearable={true}
+                        menuPortalTarget={document.body}
+                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     />
                 </motion.div>
 
