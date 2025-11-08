@@ -5182,7 +5182,7 @@ body.dark-mode .rejection-reason-display p {
 
 .custom-select-notif__control {
   border-radius: 8px !important;
-  padding: 3px 8px;
+  padding: 3.4px 0px 3.4px 10px !important;
   font-size: 14px;
   background-color: #ffffff;
   color: #111827;
@@ -5947,7 +5947,7 @@ body.dark-mode .history-item-content small {
   border-radius: 8px !important;
   box-shadow: none !important;
   min-height: 40px;
-  padding: 3.4px 10px;
+  padding: 3.4px 0px 3.4px 10px !important;
   background-color: #FFFFFF !important;
 }
 
@@ -10575,7 +10575,7 @@ body.dark-mode .form-group-recover textarea:focus {
   /* Menghilangkan shadow default */
   box-shadow: none !important;
   min-height: 40px;
-  padding: 3.4px 10px;
+  padding: 3.4px 0px 3.4px 10px !important;
   background-color: var(--input-bg, #FFFFFF) !important;
 }
 
@@ -10753,13 +10753,10 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* --- A. STYLING KONTROL UTAMA (Light Mode) --- */
 .filter-select-invent__control {
-  /* Styling Border & Radius dasar */
   border: 1px solid #ccc !important;
   border-radius: 8px !important;
   min-height: 40px;
-  padding: 3.5px 10px;
-
-  /* Background & Shadow default */
+  padding: 3.4px 0px 3.4px 10px !important;
   background-color: var(--input-bg, #FFFFFF) !important;
   box-shadow: none !important;
   cursor: pointer;
@@ -11234,7 +11231,7 @@ body.dark-mode .form-group-recover textarea:focus {
   border-radius: 8px !important;
   box-shadow: none !important;
   min-height: 40px;
-  padding: 3.4px 10px;
+  padding: 3.4px 0px 3.4px 10px !important;
   background-color: #FFFFFF !important;
 }
 
