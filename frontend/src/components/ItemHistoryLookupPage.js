@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import Select from 'react-select'; // 💡 NEW: Import Select
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import { saveAs } from 'file-saver';
@@ -49,6 +50,18 @@ const months = [
     { value: 10, name: 'Oktober' }, { value: 11, name: 'November' }, { value: 12, name: 'Desember' }
 ];
 
+// 💡 NEW: Opsi untuk Select Filter Type
+const filterTypeOptions = [
+    { value: 'month', label: 'Filter Riwayat per Bulan' },
+    { value: 'date_range', label: 'Filter Riwayat per Tanggal' },
+];
+
+// 💡 NEW: Mengubah array months ke format react-select
+const monthOptions = [
+    { value: '', label: 'Semua Bulan' },
+    ...months.map(m => ({ value: m.value.toString(), label: m.name })),
+];
+
 
 function ItemHistoryLookupPage() {
     const { showToast } = useOutletContext();
@@ -78,6 +91,10 @@ function ItemHistoryLookupPage() {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
+    
+    // 💡 NEW: Opsi tahun yang diubah ke format react-select
+    const yearSelectOptions = [{ value: '', label: 'Semua Tahun' }, ...years.map(y => ({ value: y.toString(), label: y.toString() }))];
+
 
     const formatDate = (dateString) => {
         if (!dateString) return '-';
@@ -255,12 +272,20 @@ function ItemHistoryLookupPage() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleSearchAndShowHistory, isScannerOpen]);
 
+    // 💡 KEEP: Handler untuk input native (tanggal)
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    const handleFilterTypeChange = (e) => {
-        setFilterType(e.target.value);
+    // 💡 NEW: Handler untuk Select Bulan/Tahun
+    const handleSelectFilterChange = (selectedOption, name) => {
+        setFilters(prev => ({ ...prev, [name]: selectedOption ? selectedOption.value : '' }));
+    };
+
+    // 💡 NEW: Handler untuk Select Filter Type (menggantikan handleFilterTypeChange lama)
+    const handleSelectFilterTypeChange = (selectedOption) => {
+        const newType = selectedOption.value;
+        setFilterType(newType);
         setFilters(prev => ({
             ...prev,
             start_date: '',
@@ -403,28 +428,62 @@ function ItemHistoryLookupPage() {
                     </button>
                 </motion.div>
                 <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', alignItems: 'center' }}>
-                    <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
-                        <option value="month">Filter Riwayat per Bulan</option>
-                        <option value="date_range">Filter Riwayat per Tanggal</option>
-                    </select>
+                    
+                    {/* 1. Filter Tipe: Select */}
+                    <Select
+                        classNamePrefix="report-filter-select"
+                        options={filterTypeOptions}
+                        value={filterTypeOptions.find(opt => opt.value === filterType)}
+                        onChange={handleSelectFilterTypeChange}
+                        isSearchable={false}
+                        placeholder="Filter Riwayat"
+                        styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                    />
+                    {/* <select value={filterType} onChange={handleFilterTypeChange} className="filter-select"> KODE LAMA */}
+                    {/* <option value="month">Filter Riwayat per Bulan</option> */}
+                    {/* <option value="date_range">Filter Riwayat per Tanggal</option> */}
+                    {/* </select> */}
 
                     {filterType === 'month' && (
                         <>
-                            <select name="month" value={filters.month} onChange={handleFilterChange} className="filter-select">
-                                <option value="">Semua Bulan</option>
-                                {months.map(m => <option key={m.value} value={m.value}>{m.name}</option>)}
-                            </select>
-                            <select name="year" value={filters.year} onChange={handleFilterChange} className="filter-select">
-                                <option value="">Semua Tahun</option>
-                                {years.map(y => <option key={y} value={y}>{y}</option>)}
-                            </select>
+                            {/* 2. Filter Bulan: Select */}
+                            <Select
+                                classNamePrefix="report-filter-select"
+                                name="month"
+                                options={monthOptions}
+                                value={monthOptions.find(m => m.value === filters.month)}
+                                onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
+                                placeholder="Semua Bulan"
+                                isSearchable={false}
+                                styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                            />
+                            {/* <select name="month" value={filters.month} onChange={handleFilterChange} className="filter-select"> KODE LAMA */}
+                            {/* <option value="">Semua Bulan</option> */}
+                            {/* {months.map(m => <option key={m.value} value={m.value}>{m.name}</option>)} */}
+                            {/* </select> */}
+
+                            {/* 3. Filter Tahun: Select */}
+                            <Select
+                                classNamePrefix="report-filter-select"
+                                name="year"
+                                options={yearSelectOptions}
+                                value={yearSelectOptions.find(y => y.value === filters.year)}
+                                onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
+                                placeholder="Semua Tahun"
+                                isSearchable={false}
+                                styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                            />
+                            {/* <select name="year" value={filters.year} onChange={handleFilterChange} className="filter-select"> KODE LAMA */}
+                            {/* <option value="">Semua Tahun</option> */}
+                            {/* {years.map(y => <option key={y} value={y}>{y}</option>)} */}
+                            {/* </select> */}
                         </>
                     )}
                     {filterType === 'date_range' && (
                         <>
-                            <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" />
+                            <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
                             <span style={{ alignSelf: 'center' }}>-</span>
-                            <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
+                            <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
                         </>
                     )}
                 </motion.div>

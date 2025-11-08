@@ -4,6 +4,7 @@ import api from '../services/api';
 import TicketDetailModal from './TicketDetailModal';
 import { saveAs } from 'file-saver';
 import { motion } from 'framer-motion';
+import Select from 'react-select'; // <-- Import react-select
 
 const formatDate = (dateString) => {
   if (!dateString) return '-';
@@ -33,6 +34,12 @@ const months = [
   { value: '7', label: 'Juli' }, { value: '8', label: 'Agustus' },
   { value: '9', label: 'September' }, { value: '10', label: 'Oktober' },
   { value: '11', label: 'November' }, { value: '12', label: 'Desember' },
+];
+
+// Opsi untuk Filter Type (diperlukan untuk react-select)
+const filterTypeOptions = [
+  { value: 'month', label: 'Filter per Bulan' },
+  { value: 'date_range', label: 'Filter per Tanggal' },
 ];
 
 const staggerContainer = {
@@ -78,6 +85,17 @@ export default function TicketReportDetail() {
   const desktopListRef = useRef(null);
   const mobileListRef = useRef(null);
 
+  // Opsi Tahun untuk react-select
+  const yearOptions = years.map(y => ({ value: y.toString(), label: y.toString() }));
+
+  // Opsi Bulan untuk react-select, dengan tambahan 'Semua Bulan'
+  const monthOptions = [{ value: '', label: 'Semua Bulan' }, ...months];
+
+  // Mendapatkan nilai aktif yang dipilih untuk react-select
+  const activeYear = yearOptions.find(y => y.value === dateFilters.year);
+  const activeMonth = monthOptions.find(m => m.value === dateFilters.month);
+  const activeFilterType = filterTypeOptions.find(opt => opt.value === filterType);
+
   useEffect(() => {
     if (dateFilters.start_date || dateFilters.end_date) {
       setFilterType('date_range');
@@ -86,8 +104,17 @@ export default function TicketReportDetail() {
     }
   }, [dateFilters.start_date, dateFilters.end_date]);
 
-  const handleDateFilterChange = (e) => {
-    const { name, value } = e.target;
+  const handleDateFilterChange = (selectedOptionOrEvent, action) => {
+    let name, value;
+
+    if (action && action.name) { // Dari react-select
+      name = action.name;
+      value = selectedOptionOrEvent ? selectedOptionOrEvent.value : '';
+    } else { // Dari native input (e.target)
+      name = selectedOptionOrEvent.target.name;
+      value = selectedOptionOrEvent.target.value;
+    }
+
     const newParams = new URLSearchParams(searchParams);
 
     if (value === 'all' || value === '') {
@@ -98,8 +125,8 @@ export default function TicketReportDetail() {
     setSearchParams(newParams);
   };
 
-  const handleFilterTypeChange = (e) => {
-    const newType = e.target.value;
+  const handleFilterTypeChange = (selectedOption) => {
+    const newType = selectedOption.value; // Dari react-select
     setFilterType(newType);
     const newParams = new URLSearchParams(searchParams);
 
@@ -281,42 +308,53 @@ export default function TicketReportDetail() {
             <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterClick('rejected')}><h3>Tiket Ditolak</h3><p>{rejected}</p></div>
           </motion.div>
 
-          {/* <motion.h3 variants={staggerItem}>Filter Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</motion.h3> */}
+          <motion.div variants={staggerItem}
+            className="report-filters"
+            style={{
+              display: 'flex',
+              gap: '1rem',
+              marginBottom: '1rem',
+              alignItems: 'center',
+              width: '100%', // Memastikan kontainer mengambil lebar penuh
+            }}>
 
-          <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
-            <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
-              <option value="month">Filter per Bulan</option>
-              <option value="date_range">Filter per Tanggal</option>
-            </select>
+            {/* Filter Type Select */}
+            <Select
+              value={activeFilterType}
+              onChange={handleFilterTypeChange}
+              options={filterTypeOptions}
+              classNamePrefix="report-filter-select"
+              isSearchable={false}
+              styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+            />
 
             {/* Filter per Bulan */}
             {filterType === 'month' && (
               <>
-                <select
+                {/* Month Select */}
+                <Select
                   name="month"
-                  value={dateFilters.month}
+                  value={activeMonth}
                   onChange={handleDateFilterChange}
-                  className="filter-select"
-                >
-                  <option value="">Semua Bulan</option>
-                  {months.map(m => (
-                    <option key={m.value} value={m.value}>{m.label}</option>
-                  ))}
-                </select>
-                <select
+                  options={monthOptions}
+                  classNamePrefix="report-filter-select"
+                  isSearchable={false}
+                  styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+                />
+                {/* Year Select */}
+                <Select
                   name="year"
-                  value={dateFilters.year}
+                  value={activeYear}
                   onChange={handleDateFilterChange}
-                  className="filter-select"
-                >
-                  {years.map(y => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
-                </select>
+                  options={yearOptions}
+                  classNamePrefix="report-filter-select"
+                  isSearchable={false}
+                  styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+                />
               </>
             )}
 
-            {/* Filter per Rentang Tanggal */}
+            {/* Filter per Rentang Tanggal (Tetap menggunakan native input) */}
             {filterType === 'date_range' && (
               <>
                 <input
@@ -325,6 +363,7 @@ export default function TicketReportDetail() {
                   value={dateFilters.start_date}
                   onChange={handleDateFilterChange}
                   className="filter-select-date"
+                  style={{ flex: 1 }}
                 />
                 <span style={{ alignSelf: 'center' }}>-</span>
                 <input
@@ -333,6 +372,7 @@ export default function TicketReportDetail() {
                   value={dateFilters.end_date}
                   onChange={handleDateFilterChange}
                   className="filter-select-date"
+                  style={{ flex: 1 }}
                 />
               </>
             )}
@@ -513,9 +553,9 @@ export default function TicketReportDetail() {
         </>
       )}
       <TicketDetailModal
-          show={Boolean(selectedTicketForDetail)}
-          ticket={selectedTicketForDetail}
-          onClose={() => setSelectedTicketForDetail(null)}
+        show={Boolean(selectedTicketForDetail)}
+        ticket={selectedTicketForDetail}
+        onClose={() => setSelectedTicketForDetail(null)}
       />
     </motion.div>
   );

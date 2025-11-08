@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
+import Select from 'react-select'; // 💡 NEW: Import Select
 import { useFinancialReport } from './useFinancialReport';
 import ProblematicAssetModal from './ProblematicAssetModal';
-// BARU: Impor motion
 import { motion } from 'framer-motion';
 
-// BARU: Tambahkan konstanta animasi
 const staggerContainer = {
     hidden: { opacity: 0 },
     visible: {
@@ -46,7 +45,6 @@ export default function ProblematicAssetsReport() {
     const [selectedItem, setSelectedItem] = useState(null);
 
     const problematicAssetsSubtotal = detailedData.problematic_assets.reduce((sum, item) => sum + parseFloat(item.harga_beli), 0);
-
     const handleExportWrapper = async (type) => {
         if (type === 'pdf') setExportingPdf(true);
         else setExportingExcel(true);
@@ -64,47 +62,98 @@ export default function ProblematicAssetsReport() {
         setSelectedItem(item);
     };
 
+    const filterTypeOptions = useMemo(() => ([
+        { value: 'month', label: 'Filter per Bulan' },
+        { value: 'date_range', label: 'Filter per Tanggal' },
+    ]), []);
+
+    const monthOptions = useMemo(() => ([
+        { value: '', label: 'Semua Bulan' },
+        ...months.map(m => ({ value: m.value.toString(), label: m.name })),
+    ]), [months]);
+
+    const yearOptions = useMemo(() => ([
+        { value: '', label: 'Semua Tahun' },
+        ...years.map(y => ({ value: y.toString(), label: y.toString() })),
+    ]), [years]);
+
+    const handleSelectFilterChange = useCallback((selectedOption, name) => {
+        // Mimic the native event object structure for the hook
+        const mockEvent = {
+            target: {
+                name: name,
+                value: selectedOption ? selectedOption.value : '',
+            }
+        };
+        handleFilterChange(mockEvent);
+    }, [handleFilterChange]);
+
+    const handleSelectFilterTypeChange = useCallback((selectedOption) => {
+        const mockEvent = {
+            target: {
+                value: selectedOption.value,
+            }
+        };
+        handleFilterTypeChange(mockEvent);
+    }, [handleFilterTypeChange]);
+
+
     return (
-        // UBAH: div menjadi motion.div
         <motion.div
             className="user-management-container"
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
         >
-            {/* UBAH: Bungkus dengan motion.div */}
             <motion.div variants={staggerItem} className="report-header-controls">
-                <h1 className="page-title">Laporan Potensi Kerugian (Aset Rusak/Hilang)</h1>
+                <h1 className="page-title">Laporan Aset Bermasalah (Rusak/Hilang)</h1>
             </motion.div>
 
-            {/* UBAH: Bungkus dengan motion.div */}
-            <motion.div variants={staggerItem} className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
-                <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
-                    <option value="month">Filter per Bulan</option>
-                    <option value="date_range">Filter per Tanggal</option>
-                </select>
+            <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+
+                <Select
+                    classNamePrefix="report-filter-select"
+                    options={filterTypeOptions}
+                    value={filterTypeOptions.find(opt => opt.value === filterType)}
+                    onChange={handleSelectFilterTypeChange}
+                    isSearchable={false}
+                    placeholder="Filter Laporan"
+                    styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+                />
+
                 {filterType === 'month' && (
                     <>
-                        <select name="month" value={filters.month} onChange={handleFilterChange} className="filter-select">
-                            <option value="">Semua Bulan</option>
-                            {months.map(m => <option key={m.value} value={m.value}>{m.name}</option>)}
-                        </select>
-                        <select name="year" value={filters.year} onChange={handleFilterChange} className="filter-select">
-                            <option value="">Semua Tahun</option>
-                            {years.map(y => <option key={y} value={y}>{y}</option>)}
-                        </select>
+                        <Select
+                            classNamePrefix="report-filter-select"
+                            name="month"
+                            options={monthOptions}
+                            value={monthOptions.find(m => m.value === filters.month)}
+                            onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
+                            placeholder="Semua Bulan"
+                            isSearchable={false}
+                            styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+                        />
+                        <Select
+                            classNamePrefix="report-filter-select"
+                            name="year"
+                            options={yearOptions}
+                            value={yearOptions.find(y => y.value === filters.year)}
+                            onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
+                            placeholder="Semua Tahun"
+                            isSearchable={false}
+                            styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+                        />
                     </>
                 )}
                 {filterType === 'date_range' && (
                     <>
-                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" />
+                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
                         <span style={{ alignSelf: 'center' }}>-</span>
-                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
+                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
                     </>
                 )}
             </motion.div>
 
-            {/* UBAH: Bungkus dengan motion.div */}
             <motion.div variants={staggerItem} className="download-buttons">
                 <button onClick={() => handleExportWrapper('excel')} disabled={exportingExcel} className="btn-download excel">
                     <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
@@ -115,24 +164,22 @@ export default function ProblematicAssetsReport() {
                     {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
                 </button>
             </motion.div>
-
-            {/* UBAH: Bungkus dengan motion.div */}
+            {/* Tabel Aset Bermasalah */}
             <motion.div variants={staggerItem} className="job-list-container">
                 {/* Desktop View */}
                 <div className="table-scroll-container">
                     <table className="job-table">
                         <thead>
                             <tr>
-                                <th>Tanggal</th>
+                                <th>Tanggal Kejadian</th>
+                                <th>Status</th>
                                 <th>Kode Unik</th>
                                 <th>Nama Barang</th>
-                                <th>Status</th>
-                                <th>User Terkait</th>
-                                <th style={{ textAlign: 'right' }}>Nilai</th>
+                                <th>PJ/Lokasi</th>
+                                <th style={{ textAlign: 'right' }}>Nilai Aset</th>
                             </tr>
                         </thead>
                     </table>
-
                     <div className="table-body-scroll">
                         <table className="job-table">
                             <tbody>
@@ -142,18 +189,16 @@ export default function ProblematicAssetsReport() {
                                     <>
                                         {detailedData.problematic_assets.map(item => (
                                             <tr key={`prob-${item.kode_unik}`} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
-                                                <td>{formatDate(item.tanggal_rusak || item.tanggal_hilang)}</td>
-                                                <td>{item.kode_unik}</td>
-                                                <td>{item.master_barang.nama_barang}</td>
+                                                <td>{formatDate(item.tanggal_hilang || item.tanggal_rusak)}</td>
                                                 <td>
-                                                    <span className={`status-badge status-${item.status_detail?.nama_status.toLowerCase()}`}>
-                                                        {item.status_detail?.nama_status}
+                                                    <span className={`badge-status status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                        {item.status_detail?.nama_status || 'N/A'}
                                                     </span>
                                                 </td>
-                                                <td>{item.user_perusak?.name || item.user_penghilang?.name || 'N/A'}</td>
-                                                <td style={{ textAlign: 'right', color: 'var(--red-color)' }}>
-                                                    ({formatCurrency(parseFloat(item.harga_beli))})
-                                                </td>
+                                                <td>{item.kode_unik}</td>
+                                                <td>{item.master_barang.nama_barang}</td>
+                                                <td>{item.user_penghilang?.name || item.user_perusak?.name || item.workshop?.name || '-'}</td>
+                                                <td style={{ textAlign: 'right' }}>{formatCurrency(parseFloat(item.harga_beli))}</td>
                                             </tr>
                                         ))}
                                     </>
@@ -165,21 +210,21 @@ export default function ProblematicAssetsReport() {
                     </div>
                     {detailedData.problematic_assets.length > 0 && (
                         <table className="job-table">
-
-                            <tfoot><tr className="subtotal-row">
-                                <td colSpan="5">Subtotal</td>
-                                <td style={{ textAlign: 'right' }}>
+                            <tfoot><tr className="subtotal-row loss-row">
+                                <td colSpan="5">Subtotal Potensi Kerugian</td>
+                                <td style={{ textAlign: 'right', fontWeight: 'bold' }}>
                                     ({formatCurrency(problematicAssetsSubtotal)})
                                 </td>
                             </tr></tfoot>
-
                         </table>
                     )}
                 </div>
 
-
-                {/* Mobile View */}
-                <div className="job-list-mobile" style={{ overflowY: 'auto', maxHeight: '65vh' }}>
+                {/* Mobile View  */}
+                <div
+                    className='job-list-mobile'
+                    style={{ overflowY: 'auto', maxHeight: '65vh' }}
+                >
                     {isLoading ? (
                         <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
                             <p>Memuat data...</p>
@@ -188,7 +233,6 @@ export default function ProblematicAssetsReport() {
                         <>
                             {detailedData.problematic_assets.map(item => (
                                 <div key={`mobile-prob-${item.kode_unik}`} className="ticket-card-mobile hoverable-row" onClick={(e) => handleRowClick(e, item)}>
-
                                     <div className="card-row">
                                         <div className="data-group single">
                                             <span className="label">Nama Barang</span>
@@ -197,36 +241,33 @@ export default function ProblematicAssetsReport() {
                                             </span>
                                         </div>
                                     </div>
-
                                     <div className="card-row">
                                         <div className="data-group">
                                             <span className="label">Kode Unik</span>
                                             <span className="value">{item.kode_unik}</span>
                                         </div>
                                         <div className="data-group">
-                                            <span className="label">User Terkait</span>
-                                            <span className="value">{item.user_perusak?.name || item.user_penghilang?.name || 'N/A'}</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="card-row">
-                                        <div className="data-group">
-                                            <span className="label">Tanggal</span>
-                                            <span className="value">{formatDate(item.tanggal_rusak || item.tanggal_hilang)}</span>
-                                        </div>
-                                        <div className="data-group">
                                             <span className="label">Status</span>
                                             <span className="value">
-                                                <span className={`status-badge status-${item.status_detail?.nama_status.toLowerCase()}`}>
-                                                    {item.status_detail?.nama_status}
+                                                <span className={`status-badge status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                    {item.status_detail?.nama_status || 'N/A'}
                                                 </span>
                                             </span>
                                         </div>
                                     </div>
-
+                                    <div className="card-row">
+                                        <div className="data-group">
+                                            <span className="label">Tanggal Kejadian</span>
+                                            <span className="value">{formatDate(item.tanggal_hilang || item.tanggal_rusak)}</span>
+                                        </div>
+                                        <div className="data-group">
+                                            <span className="label">PJ/Lokasi</span>
+                                            <span className="value">{item.user_penghilang?.name || item.user_perusak?.name || item.workshop?.name || '-'}</span>
+                                        </div>
+                                    </div>
                                     <div className="card-row value-row-financial">
                                         <div className="data-group single" style={{ textAlign: 'right' }}>
-                                            <span className="label">Nilai Kerugian</span>
+                                            <span className="label">Nilai Aset</span>
                                             <span className="value value-loss">
                                                 ({formatCurrency(parseFloat(item.harga_beli))})
                                             </span>

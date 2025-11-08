@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import Select from 'react-select';
 import '../App.css';
+
+const roleOptions = [
+  { value: 'user', label: 'User' },
+  { value: 'admin', label: 'Admin' },
+];
+
 
 const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -82,15 +89,15 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
           className={`modal-content ${animationClass}`}
           onClick={e => e.stopPropagation()}
         >
-          <h1>{isEditMode ? 'Edit Pengguna' : 'Tambah Pengguna Baru'}</h1>
+          <h1 style={{ fontSize: '2rem' }}>{isEditMode ? 'Edit Pengguna' : 'Tambah Pengguna Baru'}</h1>
           <form onSubmit={handleSubmit}>
             <div>
               <label htmlFor="name">Nama:</label>
-              <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
+              <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required style={{ borderRadius: '10px' }} />
             </div>
             <div>
               <label htmlFor="email">Email:</label>
-              <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
+              <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required style={{ borderRadius: '10px' }} />
             </div>
             <div>
               <label htmlFor="phone">Nomor Telepon:</label>
@@ -101,21 +108,21 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : ''}
+                style={{ borderRadius: '10px' }}
               />
             </div>
 
             <div>
               <label htmlFor="role">Peran:</label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                required className="form-input"
-              >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </select>
+              <Select
+                classNamePrefix="custom-select-role"
+                options={roleOptions}
+                value={roleOptions.find(option => option.value === formData.role)}
+                onChange={(selectedOption) => {
+                  setFormData(prev => ({ ...prev, role: selectedOption.value }));
+                }}
+                isSearchable={false}
+              />
             </div>
             <div>
               <label htmlFor="password">Password:</label>
@@ -127,6 +134,7 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : ''}
+                  style={{ borderRadius: '10px' }}
                 />
                 <button type="button" onClick={togglePasswordVisibility} className="password-toggle-btn">
                   <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
@@ -142,6 +150,7 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                   name="password_confirmation"
                   value={formData.password_confirmation}
                   onChange={handleChange}
+                  style={{ borderRadius: '10px' }}
                 />
                 <button type="button" onClick={togglePasswordVisibility} className="password-toggle-btn">
                   <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
+import Select from 'react-select'; // 💡 NEW: Import Select
 import { useFinancialReport } from './useFinancialReport';
 import AcquisitionDetailModal from './AcquisitionDetailModal';
 import { motion } from 'framer-motion';
@@ -28,20 +29,62 @@ export default function NewAcquisitionsReport() {
         filters,
         filterType,
         isLoading,
-        // isExporting,
-        handleFilterChange,
-        handleFilterTypeChange,
+        handleFilterChange, // Hook handler for native inputs
+        handleFilterTypeChange, // Hook handler for native select
         handleExport,
         formatCurrency,
         formatDate,
-        years,
-        months
+        years, // e.g., [2024, 2023]
+        months // e.g., [{ value: 1, name: 'Januari' }]
     } = useFinancialReport();
 
     const [exportingPdf, setExportingPdf] = useState(false);
     const [exportingExcel, setExportingExcel] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const newAcquisitionsSubtotal = detailedData.new_acquisitions.reduce((sum, item) => sum + parseFloat(item.harga_beli), 0);
+
+    // 💡 NEW: Opsi untuk Select Filter Type
+    const filterTypeOptions = useMemo(() => ([
+        { value: 'month', label: 'Filter per Bulan' },
+        { value: 'date_range', label: 'Filter per Tanggal' },
+    ]), []);
+
+    // 💡 NEW: Mengubah array months ke format react-select
+    const monthOptions = useMemo(() => ([
+        { value: '', label: 'Semua Bulan' },
+        ...months.map(m => ({ value: m.value.toString(), label: m.name })),
+    ]), [months]);
+
+    // 💡 NEW: Mengubah array years ke format react-select
+    const yearOptions = useMemo(() => ([
+        { value: '', label: 'Semua Tahun' },
+        ...years.map(y => ({ value: y.toString(), label: y.toString() })),
+    ]), [years]);
+
+    // 💡 NEW: Wrapper handler untuk Select Bulan/Tahun (Memanggil handleFilterChange asli)
+    const handleSelectFilterChange = useCallback((selectedOption, name) => {
+        // Mimic the native event object structure for the hook
+        const mockEvent = {
+            target: {
+                name: name,
+                value: selectedOption ? selectedOption.value : '',
+            }
+        };
+        handleFilterChange(mockEvent);
+    }, [handleFilterChange]);
+
+    // 💡 NEW: Wrapper handler untuk Select Filter Type (Memanggil handleFilterTypeChange asli)
+    const handleSelectFilterTypeChange = useCallback((selectedOption) => {
+        // Mimic the native event object structure for the hook
+        const mockEvent = {
+            target: {
+                value: selectedOption.value,
+            }
+        };
+        handleFilterTypeChange(mockEvent);
+    }, [handleFilterTypeChange]);
+
+
     const handleExportWrapper = async (type) => {
         if (type === 'pdf') setExportingPdf(true);
         else setExportingExcel(true);
@@ -69,28 +112,52 @@ export default function NewAcquisitionsReport() {
             <motion.div variants={staggerItem} className="report-header-controls">
                 <h1 className="page-title">Laporan Pembelian Baru (Aset Masuk)</h1>
             </motion.div>
-            <motion.div variants={staggerItem} className="filters-container" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
-                <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
-                    <option value="month">Filter per Bulan</option>
-                    <option value="date_range">Filter per Tanggal</option>
-                </select>
+            <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+
+                {/* 1. Filter Tipe: Select (Menggantikan native select) */}
+                <Select
+                    classNamePrefix="report-filter-select"
+                    options={filterTypeOptions}
+                    value={filterTypeOptions.find(opt => opt.value === filterType)}
+                    onChange={handleSelectFilterTypeChange}
+                    isSearchable={false}
+                    placeholder="Filter Laporan"
+                    styles={{ container: (base) => ({ ...base, flex: 1 }) }} // Agar fleksibel dan responsif
+                />
+
                 {filterType === 'month' && (
                     <>
-                        <select name="month" value={filters.month} onChange={handleFilterChange} className="filter-select">
-                            <option value="">Semua Bulan</option>
-                            {months.map(m => <option key={m.value} value={m.value}>{m.name}</option>)}
-                        </select>
-                        <select name="year" value={filters.year} onChange={handleFilterChange} className="filter-select">
-                            <option value="">Semua Tahun</option>
-                            {years.map(y => <option key={y} value={y}>{y}</option>)}
-                        </select>
+                        {/* 2. Filter Bulan: Select (Menggantikan native select) */}
+                        <Select
+                            classNamePrefix="report-filter-select"
+                            name="month"
+                            options={monthOptions}
+                            value={monthOptions.find(m => m.value === filters.month)}
+                            onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
+                            placeholder="Semua Bulan"
+                            isSearchable={false}
+                            styles={{ container: (base) => ({ ...base, flex: 1 }) }} // Agar fleksibel dan responsif
+                        />
+
+                        {/* 3. Filter Tahun: Select (Menggantikan native select) */}
+                        <Select
+                            classNamePrefix="report-filter-select"
+                            name="year"
+                            options={yearOptions}
+                            value={yearOptions.find(y => y.value === filters.year)}
+                            onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
+                            placeholder="Semua Tahun"
+                            isSearchable={false}
+                            styles={{ container: (base) => ({ ...base, flex: 1 }) }} // Agar fleksibel dan responsif
+                        />
                     </>
                 )}
                 {filterType === 'date_range' && (
                     <>
-                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" />
+                        {/* Ditambahkan style={{ flex: 1 }} untuk input date */}
+                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
                         <span style={{ alignSelf: 'center' }}>-</span>
-                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
+                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
                     </>
                 )}
             </motion.div>
