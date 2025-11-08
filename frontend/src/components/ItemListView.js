@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import SkuDetailModal from './SkuDetailModal';
 import { motion, AnimatePresence, useIsPresent } from 'framer-motion';
+import Select from 'react-select';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -45,29 +46,51 @@ function ItemListView({
     showArchived, onToggleArchived, onRestore, onBulkRestore, currentFilters
 }) {
     const isPresent = useIsPresent();
-    const [categories, setCategories] = useState([]);
-    const [subCategories, setSubCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [selectedSubCategory, setSelectedSubCategory] = useState('');
+    const [categoryOptions, setCategoryOptions] = useState([]);
+    const [subCategoryOptions, setSubCategoryOptions] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedSubCategory, setSelectedSubCategory] = useState(null);
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
     const isInitialMount = useRef(true);
     const [selectedItemForDetail, setSelectedItemForDetail] = useState(null);
 
+    // --- Efek untuk mengambil data Kategori (LOGIC SUDAH BENAR) ---
     useEffect(() => {
         if (!isPresent) return;
-        api.get('/inventory/categories').then(res => setCategories(res.data));
+        api.get('/inventory/categories').then(res => {
+            const options = res.data.map(cat => ({
+                value: cat.id_kategori,
+                label: cat.nama_kategori
+            }));
+            const allOption = { value: '', label: 'Semua Kategori' };
+
+            setCategoryOptions([allOption, ...options]);
+            setSelectedCategory(allOption);
+        });
     }, [isPresent]);
 
+    // --- Efek untuk mengambil data Sub Kategori (LOGIC SUDAH BENAR) ---
     useEffect(() => {
         if (!isPresent) return;
-        if (selectedCategory) {
-            api.get(`/inventory/sub-categories?id_kategori=${selectedCategory}`)
-                .then(res => setSubCategories(res.data));
+        const categoryId = selectedCategory?.value;
+
+        if (categoryId) {
+            api.get(`/inventory/sub-categories?id_kategori=${categoryId}`)
+                .then(res => {
+                    const options = res.data.map(sub => ({
+                        value: sub.id_sub_kategori,
+                        label: sub.nama_sub
+                    }));
+                    const allSubOption = { value: '', label: 'Semua Sub-Kategori' };
+                    setSubCategoryOptions([allSubOption, ...options]);
+                    setSelectedSubCategory(allSubOption);
+                });
         } else {
-            setSubCategories([]);
+            const allSubOption = { value: '', label: 'Semua Sub-Kategori' };
+            setSubCategoryOptions([allSubOption]);
+            setSelectedSubCategory(allSubOption);
         }
-        setSelectedSubCategory('');
     }, [selectedCategory, isPresent]);
 
     useEffect(() => {
@@ -78,6 +101,7 @@ function ItemListView({
         }
     }, [currentFilters, isPresent]);
 
+    // --- Efek untuk memanggil onFilterChange (LOGIC SUDAH BENAR) ---
     useEffect(() => {
         if (!isPresent) return;
         if (isInitialMount.current) {
@@ -85,8 +109,12 @@ function ItemListView({
             return;
         }
         const filters = {};
-        if (selectedCategory) filters.id_kategori = selectedCategory;
-        if (selectedSubCategory) filters.id_sub_kategori = selectedSubCategory;
+        const categoryId = selectedCategory?.value;
+        const subCategoryId = selectedSubCategory?.value;
+
+        if (categoryId) filters.id_kategori = categoryId;
+        if (subCategoryId) filters.id_sub_kategori = subCategoryId;
+
         onFilterChange(1, filters);
     }, [selectedCategory, selectedSubCategory, onFilterChange, isPresent]);
 
@@ -113,27 +141,25 @@ function ItemListView({
                     )}
                 </motion.div>
                 <motion.div variants={staggerItem} className="filters-container" style={{ display: 'flex', gap: '1rem', marginTop: '1rem', marginBottom: '1rem' }}>
-                    <select
+                    <Select
+                        className='filter-select-inventory-item'
+                        classNamePrefix="filter-select-invent"
                         value={selectedCategory}
-                        onChange={e => setSelectedCategory(e.target.value)}
-                        className="filter-select-invent"
-                    >
-                        <option value="">Semua Kategori</option>
-                        {categories.map(cat => (
-                            <option key={cat.id_kategori} value={cat.id_kategori}>{cat.nama_kategori}</option>
-                        ))}
-                    </select>
-                    <select
+                        onChange={setSelectedCategory}
+                        options={categoryOptions}
+                        isSearchable={false}
+                        placeholder="Semua Kategori"
+                    />
+                    <Select
+                        className='filter-select-inventory-item'
+                        classNamePrefix="filter-select-invent"
                         value={selectedSubCategory}
-                        onChange={e => setSelectedSubCategory(e.target.value)}
-                        disabled={!selectedCategory || subCategories.length === 0}
-                        className="filter-select-invent"
-                    >
-                        <option value="">Semua Sub-Kategori</option>
-                        {subCategories.map(sub => (
-                            <option key={sub.id_sub_kategori} value={sub.id_sub_kategori}>{sub.nama_sub}</option>
-                        ))}
-                    </select>
+                        onChange={setSelectedSubCategory}
+                        options={subCategoryOptions}
+                        isDisabled={!selectedCategory?.value || subCategoryOptions.length <= 1}
+                        isSearchable={false}
+                        placeholder="Semua Sub-Kategori"
+                    />
                     <button 
                         onClick={() => onToggleArchived(!showArchived)} 
                         className={`btn-archive ${showArchived ? 'active' : ''}`}
@@ -347,7 +373,7 @@ function ItemListView({
                                     {showArchived ? (
                                         <button 
                                             onClick={(e) => { e.stopPropagation(); onRestore(item); }} 
-                                            className="action-buttons-group btn-restore" // Anda mungkin perlu menambahkan style untuk .btn-restore
+                                            className="action-buttons-group btn-restore"
                                             title="Pulihkan SKU ini"
                                             style={{ color: '#28a745', fontWeight: 'bold' }}
                                         >

@@ -307,11 +307,11 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
     return (
         <>
             <div
-                className={`modal-backdrop-centered ${animationClass}`}
+                className={`modal-backdrop-detail ${animationClass}`}
                 onClick={handleCloseAndReset}
             >
                 <div
-                    className={`modal-content-large ${animationClass}`}
+                    className={`modal-content-detail ${animationClass}`}
                     onClick={e => e.stopPropagation()}
                 >
                     {view === 'form' && (

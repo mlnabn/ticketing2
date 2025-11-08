@@ -42,7 +42,7 @@
   --form-input-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.05) inset;
 
   /* Ikon Hamburger */
-  --hamburger-icon-color-light: #64748B;
+  --hamburger-icon-color-light: #64748bad;
   --hamburger-hover-color-light: #334155;
 
   /* Login Page Background */
@@ -2473,6 +2473,7 @@ button.btn-pause {
   color: #1e293b;
   transition: background-color 0.2s ease, color 0.2s ease;
   font-size: 15px;
+  vertical-align: middle;
 }
 
 .job-table td:nth-child(5) {
@@ -3554,11 +3555,7 @@ body.dark-mode .content-area h3 {
 .action-buttons-group {
   display: flex;
   gap: 5px;
-  /* Jarak antar tombol */
-  flex-wrap: wrap;
-  /* Biarkan tombol wrap jika perlu */
   justify-content: center;
-  align-items: center;
 }
 
 /* --- [BARU] Class Dasar untuk Tombol Edit & Hapus --- */
@@ -5203,6 +5200,47 @@ body.dark-mode .form-group select.select-notif {
   background-size: 1px 60%, 0.75em auto;
 }
 
+.custom-select-notif__control {
+  border-radius: 10px !important;
+  padding: 3px 8px;
+  font-size: 14px;
+  background-color: #ffffff;
+  color: #111827;
+  border-color: #f9fafb;
+}
+
+.dark-mode .custom-select-notif__control {
+  background-color: #3a3f44;
+  color: #f9fafb;
+  border-color: #374151 !important;
+}
+
+.dark-mode .custom-select-notif__input-container,
+.dark-mode .custom-select-notif__placeholder,
+.dark-mode .custom-select-notif__single-value {
+  color: #FFFFFF !important;
+}
+
+/* --- 4. Menu Dropdown --- */
+.dark-mode .custom-select-notif__menu {
+  background-color: #2c2f33 !important;
+  border: 1px solid #495057 !important;
+}
+
+.dark-mode .custom-select-notif__option {
+  color: #FFFFFF !important;
+}
+
+.dark-mode .custom-select-notif__option--is-focused {
+  background-color: rgba(13, 110, 253, 0.15) !important;
+}
+
+.dark-mode .custom-select-notif__option--is-selected {
+  background-color: #0d6efd !important;
+  color: #FFFFFF !important;
+}
+
+
 /* =========================================== */
 /* ===       DARK MODE (FORM NOTIFIKASI)     === */
 /* =========================================== */
@@ -5918,6 +5956,89 @@ body.dark-mode .history-item-content p {
 
 body.dark-mode .history-item-content small {
   color: #888;
+}
+
+/* ======================================================= */
+/* --- CUSTOM SELECT ROLE (Berdasarkan Gaya KONDISI) --- */
+/* ======================================================= */
+
+
+
+.custom-select-role__control {
+  background-color: var(--input-bg) !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 38px !important;
+  height: 38px !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+}
+
+.custom-select-role__control--is-focused {
+  border-color: #86b7fe !important;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25) !important;
+}
+
+.custom-select-role__value-container {
+  padding: 2px 12px !important;
+  text-align: left !important;
+}
+
+.custom-select-role__single-value {
+  color: #212529 !important;
+}
+
+.custom-select-role__menu {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E0E0E0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.custom-select-role_menu-list {
+  max-height: 200px !important;
+  overflow-y: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.custom-select-role__indicator-separator {
+  margin-bottom: 20px !important;
+}
+
+.custom-select-role__option--is-focused {
+  background-color: rgba(13, 110, 253, 0.15) !important;
+}
+
+.custom-select-role__option--is-selected {
+  background-color: #0d6efd !important;
+  color: #FFFFFF !important;
+}
+
+.dark-mode .custom-select-role__control {
+  background-color: #3a3f44 !important;
+  border: 1px solid #495057 !important;
+}
+
+.dark-mode .custom-select-role__option {
+  color: #FFFFFF !important;
+}
+
+.custom-select-role__option {
+  padding: 8px 12px !important;
+  line-height: 1.2 !important;
+
+  margin: 0 !important;
+}
+
+.dark-mode .custom-select-role__placeholder,
+.dark-mode .custom-select-role__single-value {
+  color: #FFFFFF !important;
 }
 
 /* ============================================= */
@@ -10108,7 +10229,7 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .modal-content-detail {
-  background: rgba(255, 255, 255, 0.92);
+  background: #FFFFFF;
   /* Latar terang */
   backdrop-filter: blur(10px);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
@@ -10464,8 +10585,85 @@ body.dark-mode .form-group-recover textarea:focus {
   Filter Component Styling
   - .filter-select (Dropdown)
   - .filter-select-date (Date Input)
+  - .filter-select-control dll
 ==========================================================================
 */
+/* Anda bisa menempatkan ini di file CSS atau styling global Anda */
+
+/* 1. Kontrol Utama (kotak yang terlihat) */
+.report-filter-select__control {
+  border: 1px solid #ccc !important;
+  border-radius: 8px !important;
+  /* Menghilangkan shadow default */
+  box-shadow: none !important;
+  min-height: 40px;
+  padding: 3.4px 10px;
+  background-color: var(--input-bg, #FFFFFF) !important;
+}
+
+/* 2. Menu Dropdown (daftar pilihan yang muncul) */
+.report-filter-select__menu {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 3. Opsi di dalam Dropdown (opsional, untuk tampilan lebih rapi) */
+.report-filter-select__option {
+  padding: 10px 12px;
+}
+
+.report-filter-select__option--is-focused {
+  background-color: #f0f0f0;
+}
+
+.report-filter-select__option--is-selected {
+  background-color: #3f51b5;
+  color: white;
+}
+
+.dark-mode .report-filter-select__control {
+  background-color: #3a3f44 !important;
+  border-color: #4a5568 !important;
+  color: #e2e8f0 !important;
+}
+
+.dark-mode .report-filter-select__menu {
+  background-color: #2d3748;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .report-filter-select__option {
+  color: #e2e8f0;
+}
+
+.dark-mode .report-filter-select__option--is-focused {
+  background-color: #4a5568;
+}
+
+.dark-mode .report-filter-select__option--is-selected {
+  background-color: #6366f1;
+  color: white;
+}
+
+.dark-mode .report-filter-select__single-value {
+  color: #eeeeee !important;
+}
+
+/* Warna ikon panah (dropdown indicator) */
+.dark-mode .report-filter-select__indicator-separator {
+  background-color: #555555 !important;
+}
+
+.dark-mode .report-filter-select__dropdown-indicator svg {
+  fill: #bbbbbb !important;
+  /* Warna ikon panah */
+}
+
+/* Warna placeholder (teks "Semua Kategori") */
+.dark-mode .report-filter-select__placeholder {
+  color: #999999 !important;
+}
 
 /*
 ==========================================================================
@@ -10473,31 +10671,22 @@ body.dark-mode .form-group-recover textarea:focus {
 ==========================================================================
 */
 
-/* --- Base --- */
 .filter-select-date {
-  /* Box Model & Layout */
   position: relative;
   height: 44px;
-  /* Fixed height for alignment */
   width: 100%;
   padding: 0.5rem 1rem;
   border: 1px solid var(--input-border, #ced4da);
   border-radius: 8px;
-
-  /* Typography & Appearance */
   font-size: 0.9rem;
   line-height: 1.5;
   font-family: inherit;
   color: var(--text-primary, #212529);
   background-color: var(--input-bg, #FFFFFF);
-
-  /* Remove default appearance */
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
   cursor: text;
-
-  /* Transitions */
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -10509,7 +10698,6 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* --- Custom Calendar Icon (Picker Indicator) --- */
 .filter-select-date::-webkit-calendar-picker-indicator {
-  /* Position over the input padding */
   position: absolute;
   right: 12px;
   top: 50%;
@@ -10517,24 +10705,17 @@ body.dark-mode .form-group-recover textarea:focus {
   width: 16px;
   height: 16px;
   cursor: pointer;
-
-  /* Reset appearance */
   -webkit-appearance: none;
   appearance: none;
-
-  /* Use SVG as a mask */
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-calendar-event' viewBox='0 0 16 16'%3E%3Cpath d='M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z'/%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-1h12a1 1 0 0 1 1 1v1H0V4a1 1 0 0 1 1-1z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
-
-  /* Icon Color (Light) & Transition */
   background-color: #6c757d;
   transition: background-color 0.2s;
 }
 
 .filter-select-date::-webkit-calendar-picker-indicator:hover {
   background-color: #343a40;
-  /* Icon hover color (Light) */
 }
 
 /* --- States (Focus) --- */
@@ -10575,6 +10756,147 @@ body.dark-mode .form-group-recover textarea:focus {
 .dark-mode .filter-select-date::-webkit-calendar-picker-indicator:hover {
   background-color: #e9ecef !important;
 }
+
+
+/* ===========================================================
+   3. Dropdown Styling (.filter-select-invent)
+   Menggunakan react-select
+   =========================================================== */
+.filter-select-inventory-item {
+  flex-grow: 0 1 auto;
+  min-width: 250px;
+  
+}
+.filter-select-inventory {
+  flex-grow: 1;
+  min-width: 150px;
+}
+
+/* --- A. STYLING KONTROL UTAMA (Light Mode) --- */
+.filter-select-invent__control {
+  /* Styling Border & Radius dasar */
+  border: 1px solid #ccc !important;
+  border-radius: 8px !important;
+  min-height: 40px;
+  padding: 3.5px 10px;
+
+  /* Background & Shadow default */
+  background-color: var(--input-bg, #FFFFFF) !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+/* Hover State (Light Mode) */
+.filter-select-invent__control:hover {
+  border-color: #a0a0a0 !important;
+}
+
+/* Focus State (Light Mode) */
+.filter-select-invent__control--is-focused {
+  border-color: #4299e1 !important;
+  box-shadow: 0 0 0 1px #4299e1 !important;
+}
+
+/* --- B. STYLING KONTROL UTAMA (Dark Mode) --- */
+.dark-mode .filter-select-invent__control {
+  background-color: #3a3f44 !important;
+  border-color: #4a5568 !important;
+}
+
+/* Dark Mode - Focus State */
+.dark-mode .filter-select-invent__control--is-focused {
+  border-color: #63b3ed !important;
+  box-shadow: 0 0 0 1px #63b3ed !important;
+}
+
+/* --- C. STYLING MENU DROPDOWN & OPTIONS --- */
+
+/* Menu Dropdown */
+.filter-select-invent__menu {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dark-mode .filter-select-invent__menu {
+  background-color: #2d3748;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Option Hover/Focus State (Light Mode) */
+.filter-select-invent__option--is-focused {
+  background-color: #f0f0f0 !important;
+  color: #333333 !important;
+}
+
+/* Option Selected State (Light Mode) */
+.filter-select-invent__option--is-selected {
+  background-color: #4299e1 !important;
+  color: white !important;
+}
+
+/* Option Hover/Focus State (Dark Mode) */
+.dark-mode .filter-select-invent__option--is-focused {
+  background-color: #4a5568 !important;
+  color: #e2e8f0 !important;
+}
+
+
+/* Light Mode - Active: Hitam Jelas */
+.filter-select-invent__placeholder,
+.filter-select-invent__single-value {
+  color: #333333 !important;
+  opacity: 1 !important;
+}
+
+/* Dark Mode - Active: Putih Terang */
+.dark-mode .filter-select-invent__placeholder,
+.dark-mode .filter-select-invent__single-value {
+  color: #e2e8f0 !important;
+  opacity: 1 !important;
+}
+
+/* =========================================================
+   E. KONDISI DISABLED (Filter Sub-Kategori)
+   ========================================================= */
+
+/* Light Mode - Disabled: Background dan Border */
+.filter-select-invent__control--is-disabled {
+  background-color: #f3f4f6 !important;
+  border-color: #dddddd !important;
+  cursor: not-allowed;
+}
+
+/* Light Mode - Disabled: Teks Hitam Redup/Abu-abu */
+.filter-select-invent__control--is-disabled .filter-select-invent__placeholder,
+.filter-select-invent__control--is-disabled .filter-select-invent__single-value {
+  color: #a0a0a0 !important;
+  opacity: 0.7 !important;
+}
+
+.filter-select-invent__control--is-disabled .filter-select-invent__dropdown-indicator svg {
+  fill: #a0a0a0 !important;
+  opacity: 0.7 !important;
+}
+
+/* Dark Mode - Disabled: Background dan Border */
+.dark-mode .filter-select-invent__control--is-disabled {
+  background-color: #3a3f44 !important;
+  border-color: #4a5568 !important;
+}
+
+/* Dark Mode - Disabled: Teks Putih Redup/Abu-abu Pudar */
+.dark-mode .filter-select-invent__control--is-disabled .filter-select-invent__placeholder,
+.dark-mode .filter-select-invent__control--is-disabled .filter-select-invent__single-value {
+  color: #a0aec0 !important;
+  opacity: 0.7 !important;
+}
+
+.dark-mode .filter-select-invent__control--is-disabled .filter-select-invent__dropdown-indicator svg {
+  fill: #a0aec0 !important;
+  opacity: 0.7 !important;
+}
+
 
 /* ==========================================================================
    1. Dropdown Styling (.filter-select)
@@ -10921,6 +11243,26 @@ body.dark-mode .form-group-recover textarea:focus {
   padding-bottom: 1rem;
   font-size: 1.5rem;
   font-weight: 600;
+}
+
+/* ====================================================== */
+/*                Return Status Akhir                     */
+/* ====================================================== */
+.custom-select-return__control {
+  padding: 0 10px !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  border-radius: 8px !important;
+}
+
+.custom-select-return__value-container {
+  padding: 0 8px !important;
+}
+
+/* Mengatur tinggi elemen di dalam control */
+.custom-select-return__indicators {
+  height: 38px !important;
+  /* Agar panah dan separator memiliki tinggi yang sama */
 }
 
 /* ====================================================== */
@@ -11322,7 +11664,7 @@ input:disabled {
   background-color: #FFFFFF !important;
   border: 1px solid #E0E0E0 !important;
   border-radius: 8px !important;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   z-index: 10;
 }
 
@@ -12479,6 +12821,36 @@ body.dark-mode .btn-dlt:hover {
 
   .user-management-container p {
     font-size: 0.9rem;
+  }
+
+  .report-filters {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    /* Atur gap vertikal di mobile */
+    gap: 0.5rem 1rem;
+  }
+
+  .strip {
+    display: none;
+  }
+
+  /* 2. Style untuk Dropdown Filter */
+  .filter-select,
+  .filter-select-date {
+    width: fit-content;
+    min-width: 100px;
+    max-width: 100%;
+    flex-basis: calc(50% - 0.5rem);
+  }
+
+  .filter-select {
+    padding-right: 25px;
+  }
+
+  .filter-select option {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 

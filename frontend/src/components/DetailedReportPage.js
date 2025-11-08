@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDebounce } from 'use-debounce';
+import Select from 'react-select'; // Select component sudah diimpor
 import api from '../services/api';
 import { saveAs } from 'file-saver';
 import InventoryDetailModal from './InventoryDetailModal';
@@ -31,6 +32,18 @@ const months = [
     { value: 10, name: 'Oktober' }, { value: 11, name: 'November' }, { value: 12, name: 'Desember' }
 ];
 
+// Opsi untuk Select Filter Type
+const filterTypeOptions = [
+    { value: 'month', label: 'Filter per Bulan' },
+    { value: 'date_range', label: 'Filter per Tanggal' },
+];
+
+// Mengubah array months ke format react-select
+const monthOptions = [
+    { value: '', label: 'Semua Bulan' },
+    ...months.map(m => ({ value: m.value.toString(), label: m.name })),
+];
+
 export default function DetailedReportPage({ type, title }) {
     const isPresent = useIsPresent();
     const [data, setData] = useState([]);
@@ -52,6 +65,10 @@ export default function DetailedReportPage({ type, title }) {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
+
+    // Opsi tahun yang diubah ke format react-select
+    const yearOptions = years.map(y => ({ value: y.toString(), label: y.toString() }));
+
 
     const getApiParams = useCallback((page = 1) => {
         const baseParams = {
@@ -118,12 +135,20 @@ export default function DetailedReportPage({ type, title }) {
         fetchData();
     }, [fetchData, isPresent]);
 
+    // Handler untuk input native (date range)
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    const handleFilterTypeChange = (e) => {
-        setFilterType(e.target.value);
+    // 💡 NEW: Handler untuk Select Bulan/Tahun
+    const handleSelectFilterChange = (selectedOption, name) => {
+        setFilters(prev => ({ ...prev, [name]: selectedOption ? selectedOption.value : '' }));
+    };
+
+    // 💡 NEW: Handler untuk Select Filter Type
+    const handleSelectFilterTypeChange = (selectedOption) => {
+        const newType = selectedOption.value;
+        setFilterType(newType);
         setFilters(prev => ({
             ...prev,
             start_date: '',
@@ -131,6 +156,7 @@ export default function DetailedReportPage({ type, title }) {
             month: '',
         }));
     };
+
 
     const handleExport = async (exportType) => {
         if (exportType === 'excel') setExportingExcel(true);
@@ -336,27 +362,62 @@ export default function DetailedReportPage({ type, title }) {
             </motion.div>
 
             <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
-                <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
-                    <option value="month">Filter per Bulan</option>
-                    <option value="date_range">Filter per Tanggal</option>
-                </select>
+
+                {/* 1. Filter Tipe: Select */}
+                <Select
+                    classNamePrefix="report-filter-select"
+                    options={filterTypeOptions}
+                    value={filterTypeOptions.find(opt => opt.value === filterType)}
+                    onChange={handleSelectFilterTypeChange}
+                    isSearchable={false}
+                    styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                />
+
                 {filterType === 'month' && (
                     <>
-                        <select name="month" value={filters.month} onChange={handleFilterChange} className="filter-select">
-                            <option value="">Semua Bulan</option>
-                            {months.map(m => <option key={m.value} value={m.value}>{m.name}</option>)}
-                        </select>
-                        <select name="year" value={filters.year} onChange={handleFilterChange} className="filter-select">
-                            <option value="">Semua Tahun</option>
-                            {years.map(y => <option key={y} value={y}>{y}</option>)}
-                        </select>
+                        {/* 2. Filter Bulan: Select */}
+                        <Select
+                            classNamePrefix="report-filter-select"
+                            name="month"
+                            options={monthOptions}
+                            value={monthOptions.find(m => m.value === filters.month)}
+                            onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
+                            placeholder="Semua Bulan"
+                            isSearchable={false}
+                            styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                        />
+                        {/* 3. Filter Tahun: Select */}
+                        <Select
+                            classNamePrefix="report-filter-select"
+                            name="year"
+                            options={yearOptions}
+                            value={yearOptions.find(y => y.value === filters.year)}
+                            onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
+                            placeholder="Semua Tahun"
+                            isSearchable={false}
+                            styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                        />
                     </>
                 )}
                 {filterType === 'date_range' && (
                     <>
-                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" />
+                        <input
+                            type="date"
+                            name="start_date"
+                            value={filters.start_date}
+                            onChange={handleFilterChange}
+                            className="filter-select-date"
+                            style={{ flex: 1 }} // width: 100%
+                        />
                         <span style={{ alignSelf: 'center' }}>-</span>
-                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
+                        <input
+                            type="date"
+                            name="end_date"
+                            value={filters.end_date}
+                            onChange={handleFilterChange}
+                            className="filter-select-date"
+                            style={{ flex: 1 }} // width: 100%
+                        />
                     </>
                 )}
             </motion.div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDebounce } from 'use-debounce';
+import Select from 'react-select'; // 💡 NEW: Import Select
 import api from '../services/api';
 import { saveAs } from 'file-saver';
 import ActiveLoanDetailModal from './ActiveLoanDetailModal';
@@ -32,6 +33,18 @@ const months = [
     { value: 10, name: 'Oktober' }, { value: 11, name: 'November' }, { value: 12, name: 'Desember' }
 ];
 
+// 💡 NEW: Opsi untuk Select Filter Type
+const filterTypeOptions = [
+    { value: 'month', label: 'Filter per Bulan' },
+    { value: 'date_range', label: 'Filter per Tanggal' },
+];
+
+// 💡 NEW: Mengubah array months ke format react-select
+const monthOptions = [
+    { value: '', label: 'Semua Bulan' },
+    ...months.map(m => ({ value: m.value.toString(), label: m.name })),
+];
+
 export default function ActiveLoanReportPage() {
     const isPresent = useIsPresent();
     const [data, setData] = useState([]);
@@ -55,6 +68,12 @@ export default function ActiveLoanReportPage() {
     const mobileListRef = useRef(null);
     const type = 'active_loans';
     const title = 'Laporan Peminjaman Aktif';
+
+    // 💡 NEW: Opsi tahun yang diubah ke format react-select
+    const yearOptions = years.map(y => ({ value: y.toString(), label: y.toString() }));
+    // Tambahkan opsi default "Semua Tahun" jika diperlukan
+    const yearSelectOptions = [{ value: '', label: 'Semua Tahun' }, ...yearOptions];
+
 
     const getApiParams = useCallback((page = 1) => {
         const baseParams = {
@@ -124,8 +143,15 @@ export default function ActiveLoanReportPage() {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    const handleFilterTypeChange = (e) => {
-        setFilterType(e.target.value);
+    // 💡 NEW: Handler untuk Select Bulan/Tahun
+    const handleSelectFilterChange = (selectedOption, name) => {
+        setFilters(prev => ({ ...prev, [name]: selectedOption ? selectedOption.value : '' }));
+    };
+
+    // 💡 NEW: Handler untuk Select Filter Type
+    const handleSelectFilterTypeChange = (selectedOption) => {
+        const newType = selectedOption.value;
+        setFilterType(newType);
         setFilters(prev => ({
             ...prev,
             start_date: '',
@@ -133,6 +159,8 @@ export default function ActiveLoanReportPage() {
             month: '',
         }));
     };
+
+    // Fungsi handleFilterTypeChange yang lama dihapus/diganti
 
     const handleRowClick = (e, item) => {
         if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('.action-buttons-group')) {
@@ -242,27 +270,62 @@ export default function ActiveLoanReportPage() {
             </motion.div>
 
             <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
-                <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
+
+                {/* 1. Filter Tipe: Select */}
+                <Select
+                    classNamePrefix="report-filter-select"
+                    options={filterTypeOptions}
+                    value={filterTypeOptions.find(opt => opt.value === filterType)}
+                    onChange={handleSelectFilterTypeChange}
+                    isSearchable={false}
+                    placeholder="Filter Laporan"
+                    styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                />
+                {/* <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
                     <option value="month">Filter per Bulan</option>
                     <option value="date_range">Filter per Tanggal</option>
-                </select>
+                </select> KODE LAMA */}
+
                 {filterType === 'month' && (
                     <>
-                        <select name="month" value={filters.month} onChange={handleFilterChange} className="filter-select">
+                        {/* 2. Filter Bulan: Select */}
+                        <Select
+                            classNamePrefix="report-filter-select"
+                            name="month"
+                            options={monthOptions}
+                            value={monthOptions.find(m => m.value === filters.month)}
+                            onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
+                            placeholder="Semua Bulan"
+                            isSearchable={false}
+                            styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                        />
+                        {/* <select name="month" value={filters.month} onChange={handleFilterChange} className="filter-select">
                             <option value="">Semua Bulan</option>
                             {months.map(m => <option key={m.value} value={m.value}>{m.name}</option>)}
-                        </select>
-                        <select name="year" value={filters.year} onChange={handleFilterChange} className="filter-select">
+                        </select> KODE LAMA */}
+
+                        {/* 3. Filter Tahun: Select */}
+                        <Select
+                            classNamePrefix="report-filter-select"
+                            name="year"
+                            options={yearSelectOptions}
+                            value={yearSelectOptions.find(y => y.value === filters.year)}
+                            onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
+                            placeholder="Semua Tahun"
+                            isSearchable={false}
+                            styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                        />
+                        {/* <select name="year" value={filters.year} onChange={handleFilterChange} className="filter-select">
                             <option value="">Semua Tahun</option>
                             {years.map(y => <option key={y} value={y}>{y}</option>)}
-                        </select>
+                        </select> KODE LAMA */}
                     </>
                 )}
                 {filterType === 'date_range' && (
                     <>
-                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" />
+                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
                         <span style={{ alignSelf: 'center' }}>-</span>
-                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" />
+                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
                     </>
                 )}
             </motion.div>
@@ -423,7 +486,7 @@ export default function ActiveLoanReportPage() {
             <motion.div className='job-list-mobile'>
                 {!loading && !isLoadingMore && data.length > 0 && (
                     <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-                        <span className="subtotal-label" style={{ fontSize : '13px', fontWeight: 'bold'}}>Total Peminjaman</span>
+                        <span className="subtotal-label" style={{ fontSize: '13px', fontWeight: 'bold' }}>Total Peminjaman</span>
                         <span className="subtotal-value value-acquisition" style={{ fontSize: '13px', fontWeight: 'bold' }}>
                             {pagination.total} Data
                         </span>

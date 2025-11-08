@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import Select from 'react-select';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import ItemDetailModal from './ItemDetailModal';
@@ -88,6 +89,77 @@ function StokBarangView() {
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
     const [isLoadingMoreDetail, setIsLoadingMoreDetail] = useState(null);
+
+    // ==========================================================
+    // Tambahan: Derived Options & Handler untuk REACT-SELECT
+    // ==========================================================
+
+    // 1. Definisikan Options dalam format { value, label } untuk react-select
+    const filterStatusOptions = useMemo(() => {
+        const allStatus = { value: 'ALL', label: 'Semua Status' };
+        let options = [];
+
+        if (tersediaStatusId) {
+            options.push({ value: tersediaStatusId.toString(), label: 'Tersedia' });
+        }
+
+        const otherStatuses = statusOptions
+            .filter(status => status.id !== tersediaStatusId)
+            .map(status => ({
+                value: status.id.toString(),
+                label: status.nama_status
+            }));
+
+        options = [allStatus, ...options, ...otherStatuses];
+        return options;
+    }, [statusOptions, tersediaStatusId]);
+
+    const filterCategoryOptions = useMemo(() => [
+        { value: '', label: 'Semua Kategori' },
+        ...categories.map(cat => ({
+            value: cat.id_kategori.toString(),
+            label: cat.nama_kategori
+        }))
+    ], [categories]);
+
+    const filterSubCategoryOptions = useMemo(() => [
+        { value: '', label: 'Semua Sub Kategori' },
+        ...subCategories.map(sub => ({
+            value: sub.id_sub_kategori.toString(),
+            label: sub.nama_sub
+        }))
+    ], [subCategories]);
+
+    const filterColorOptions = useMemo(() => [
+        { value: '', label: 'Semua Warna' },
+        ...colorOptions.map(color => ({
+            value: color.id_warna.toString(),
+            label: color.nama_warna
+        }))
+    ], [colorOptions]);
+
+
+    // 2. Definisikan Handler untuk memproses output react-select (yang berupa objek)
+    const handleFilterChange = (name, selectedOption) => {
+        // react-select mengembalikan object, kita ambil 'value'. Jika clear, selectedOption adalah null
+        const value = selectedOption ? selectedOption.value : '';
+
+        // Berdasarkan 'name' filter, update state yang sesuai
+        if (name === 'status') {
+            setSelectedStatus(value);
+        } else if (name === 'category') {
+            // Ketika kategori berubah, reset sub kategori
+            setSelectedCategory(value);
+            if (value === '') {
+                setSelectedSubCategory('');
+            }
+        } else if (name === 'subCategory') {
+            setSelectedSubCategory(value);
+        } else if (name === 'color') {
+            setSelectedColor(value);
+        }
+    };
+    // ==========================================================
 
     // fetchData mengambil data summary
     const fetchData = useCallback(async (page = 1, filters = {}) => {
@@ -465,29 +537,46 @@ function StokBarangView() {
                     className="filters-container"
                     style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}
                 >
-                    <select value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)} className="filter-select">
-                        <option value="ALL">Semua Status</option>
-                        {tersediaStatusId && (
-                            <option value={tersediaStatusId}>Tersedia</option>
-                        )}
-                        {statusOptions
-                            .filter(status => status.id !== tersediaStatusId)
-                            .map(status => (
-                                <option key={status.id} value={status.id}>{status.nama_status}</option>
-                            ))}
-                    </select>
-                    <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)} className="filter-select">
-                        <option value="">Semua Kategori</option>
-                        {categories.map(cat => (<option key={cat.id_kategori} value={cat.id_kategori}>{cat.nama_kategori}</option>))}
-                    </select>
-                    <select value={selectedSubCategory} onChange={e => setSelectedSubCategory(e.target.value)} disabled={!selectedCategory || subCategories.length === 0} className="filter-select">
-                        <option value="">Semua Sub-Kategori</option>
-                        {subCategories.map(sub => (<option key={sub.id_sub_kategori} value={sub.id_sub_kategori}>{sub.nama_sub}</option>))}
-                    </select>
-                    <select value={selectedColor} onChange={e => setSelectedColor(e.target.value)} className="filter-select">
-                        <option value="">Semua Warna</option>
-                        {colorOptions.map(color => (<option key={color.id_warna} value={color.id_warna}>{color.nama_warna}</option>))}
-                    </select>
+                    {/* Mengganti <select> dengan Select dari react-select untuk Status */}
+                    <Select
+                    className='filter-select-inventory'
+                        classNamePrefix="filter-select-invent"
+                        options={filterStatusOptions}
+                        value={filterStatusOptions.find(option => option.value === selectedStatus)}
+                        onChange={(selectedOption) => handleFilterChange('status', selectedOption)}
+                        isClearable={false}
+                    />
+
+                    {/* Mengganti <select> dengan Select dari react-select untuk Kategori */}
+                    <Select
+                        className="filter-select-inventory"
+                        classNamePrefix="filter-select-invent"
+                        options={filterCategoryOptions}
+                        value={filterCategoryOptions.find(option => option.value === selectedCategory)}
+                        onChange={(selectedOption) => handleFilterChange('category', selectedOption)}
+                        isClearable={true}
+                    />
+
+                    {/* Mengganti <select> dengan Select dari react-select untuk Sub-Kategori */}
+                    <Select
+                        className="filter-select-inventory"
+                        classNamePrefix="filter-select-invent"
+                        options={filterSubCategoryOptions}
+                        value={filterSubCategoryOptions.find(option => option.value === selectedSubCategory)}
+                        onChange={(selectedOption) => handleFilterChange('subCategory', selectedOption)}
+                        isDisabled={!selectedCategory || subCategories.length === 0}
+                        isClearable={true}
+                    />
+
+                    {/* Mengganti <select> dengan Select dari react-select untuk Warna */}
+                    <Select
+                        className="filter-select-inventory"
+                        classNamePrefix="filter-select-invent"
+                        options={filterColorOptions}
+                        value={filterColorOptions.find(option => option.value === selectedColor)}
+                        onChange={(selectedOption) => handleFilterChange('color', selectedOption)}
+                        isClearable={true}
+                    />
                 </motion.div>
 
                 <motion.div variants={staggerItem} className="action-buttons-stok">

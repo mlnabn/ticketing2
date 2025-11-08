@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import Select from 'react-select';
 import api from '../services/api';
 import { format } from 'date-fns';
 import { motion, useIsPresent } from 'framer-motion';
@@ -37,6 +38,16 @@ export default function NotificationForm() {
   const [globalNotifPagination, setGlobalNotifPagination] = useState(null);
   const [isLoadingMoreGlobal, setIsLoadingMoreGlobal] = useState(false);
   const historyListRef = useRef(null);
+
+  const userOptions = users.filter((u) => u.role === 'user').map((user) => ({
+    value: user.id,
+    label: user.name,
+  }));
+
+  const targetOptions = [
+    { value: 'all', label: 'Semua Pengguna' },
+    ...userOptions,
+  ];
 
   const fetchAllUsers = useCallback(async () => {
     try {
@@ -171,17 +182,16 @@ export default function NotificationForm() {
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="target">Kirim Ke:</label>
-              <select
-                id="target"
-                value={target}
-                onChange={(e) => setTarget(e.target.value)}
-                className="select-notif"
-              >
-                <option value="all">Semua Pengguna</option>
-                {users.filter((u) => u.role === 'user').map((user) => (
-                  <option key={user.id} value={user.id}>{user.name}</option>
-                ))}
-              </select>
+              <Select
+                classNamePrefix="custom-select-notif"
+                options={targetOptions}
+                value={targetOptions.find(option => option.value === target) || null}
+                onChange={(selectedOption) => {
+                  setTarget(selectedOption.value);
+                }}
+                isSearchable={true}
+                placeholder="Pilih Penerima..."
+              />
             </div>
             <div className="form-group">
               <label htmlFor="title">Judul Notifikasi</label>

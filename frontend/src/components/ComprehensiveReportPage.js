@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
+import Select from 'react-select';
 import api from '../services/api';
 import TicketDetailModal from './TicketDetailModal';
 import { saveAs } from 'file-saver';
@@ -25,6 +26,7 @@ const calculateDuration = (startedAt, completedAt) => {
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
 const months = [
+  { value: '', label: 'Semua Bulan' },
   { value: '1', label: 'Januari' }, { value: '2', label: 'Februari' },
   { value: '3', label: 'Maret' }, { value: '4', label: 'April' },
   { value: '5', label: 'Mei' }, { value: '6', label: 'Juni' },
@@ -32,6 +34,14 @@ const months = [
   { value: '9', label: 'September' }, { value: '10', label: 'Oktober' },
   { value: '11', label: 'November' }, { value: '12', label: 'Desember' },
 ];
+
+const yearOptions = years.map(y => ({ value: y.toString(), label: y.toString() }));
+
+const filterTypeOptions = [
+  { value: 'month', label: 'Filter per Bulan' },
+  { value: 'date_range', label: 'Filter per Tanggal' },
+];
+
 const staggerContainer = {
   hidden: { opacity: 0 },
   visible: {
@@ -99,8 +109,8 @@ export default function ComprehensiveReportPage() {
     setSearchParams(newParams);
   };
 
-  const handleFilterTypeChange = (e) => {
-    const newType = e.target.value;
+  const handleFilterTypeChange = (selectedOption) => {
+    const newType = selectedOption.value;
     setFilterType(newType);
     const newParams = new URLSearchParams(searchParams);
 
@@ -290,7 +300,7 @@ export default function ComprehensiveReportPage() {
         <>
           <motion.div variants={staggerItem} className="summary-cards">
             <div className={`card ${filter === 'all' || filter === 'handled' ? 'active' : ''}`} onClick={() => handleFilterChange(filterTypePath)}>
-              <h3>{filterType === 'handled' ? 'Total Dikerjakan' : 'Total Tiket'}</h3>
+              <h3>{filterTypePath === 'handled' ? 'Total Dikerjakan' : 'Total Tiket'}</h3>
               <p>{stats.total}</p>
             </div>
             <div className={`card ${filter === 'completed' ? 'active' : ''}`} onClick={() => handleFilterChange('completed')}>
@@ -299,45 +309,60 @@ export default function ComprehensiveReportPage() {
             <div className={`card ${filter === 'in_progress' ? 'active' : ''}`} onClick={() => handleFilterChange('in_progress')}>
               <h3>Sedang Dikerjakan</h3><p>{stats.in_progress}</p>
             </div>
-            {filterType === 'all' && (
+            {filterTypePath === 'all' && (
               <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterChange('rejected')}>
                 <h3>Tiket Ditolak</h3><p>{stats.rejected}</p>
               </div>
             )}
           </motion.div>
 
-          {/* <motion.h3 variants={staggerItem}>Filter Tiket {filter !== 'all' ? `(${filter.replace('_', ' ')})` : ''}</motion.h3> */}
+          <motion.div
+            variants={staggerItem}
+            className="report-filters"
+            style={{
+              display: 'flex',
+              gap: '1rem',
+              marginBottom: '1rem',
+              alignItems: 'center',
+              width: '100%', // Memastikan kontainer mengambil lebar penuh
+            }}>
 
-          <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
-            <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
-              <option value="month">Filter per Bulan</option>
-              <option value="date_range">Filter per Tanggal</option>
-            </select>
+            {/* 1. Filter Tipe: Filter per Bulan / Filter per Tanggal (Menggunakan handler yang menerima selectedOption) */}
+            <Select
+              classNamePrefix="report-filter-select"
+              options={filterTypeOptions}
+              value={filterTypeOptions.find(opt => opt.value === filterType)}
+              onChange={handleFilterTypeChange} // Langsung panggil handler (handleFilterTypeChange sudah menerima selectedOption)
+              isSearchable={false}
+              styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+            />
 
             {/* Filter per Bulan */}
             {filterType === 'month' && (
               <>
-                <select
+                {/* 2. Filter Bulan */}
+                <Select
+                  classNamePrefix="report-filter-select"
                   name="month"
-                  value={dateFilters.month}
-                  onChange={handleDateFilterChange}
-                  className="filter-select"
-                >
-                  <option value="">Semua Bulan</option>
-                  {months.map(m => (
-                    <option key={m.value} value={m.value}>{m.label}</option>
-                  ))}
-                </select>
-                <select
+                  options={months}
+                  value={months.find(m => m.value === dateFilters.month) || months[0]}
+                  // Dibungkus agar outputnya menyerupai event native (e.target) untuk handleDateFilterChange
+                  onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'month', value: selectedOption.value } })}
+                  placeholder="Semua Bulan"
+                  isSearchable={false}
+                  styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                />
+                {/* 3. Filter Tahun */}
+                <Select
+                  classNamePrefix="report-filter-select"
                   name="year"
-                  value={dateFilters.year}
-                  onChange={handleDateFilterChange}
-                  className="filter-select"
-                >
-                  {years.map(y => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
-                </select>
+                  options={yearOptions}
+                  value={yearOptions.find(y => y.value === dateFilters.year)}
+                  // Dibungkus agar outputnya menyerupai event native (e.target) untuk handleDateFilterChange
+                  onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'year', value: selectedOption.value } })}
+                  isSearchable={false}
+                  styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                />
               </>
             )}
 
@@ -350,18 +375,21 @@ export default function ComprehensiveReportPage() {
                   value={dateFilters.start_date}
                   onChange={handleDateFilterChange}
                   className="filter-select-date"
+                  style={{ flex: 1 }} // width: 100%
                 />
-                <span style={{ alignSelf: 'center' }}>-</span>
+                <span className='strip' style={{ alignSelf: 'center' }}>-</span>
                 <input
                   type="date"
                   name="end_date"
                   value={dateFilters.end_date}
                   onChange={handleDateFilterChange}
                   className="filter-select-date"
+                  style={{ flex: 1 }} // width: 100%
                 />
               </>
             )}
           </motion.div>
+
           <motion.div variants={staggerItem} className="download-buttons">
             <button className="btn-download pdf" onClick={() => handleDownload('pdf')} disabled={exportingPdf}>
               <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
@@ -420,7 +448,7 @@ export default function ComprehensiveReportPage() {
                             </tr>
                           ))
                         ) : (
-                          !isLoadingMore && <tr><td colSpan="10" style={{ textAlign: 'center' }}>Tidak ada tiket yang sesuai dengan filter ini.</td></tr> // <-- UBAH
+                          !isLoadingMore && <tr><td colSpan="10" style={{ textAlign: 'center' }}>Tidak ada tiket yang sesuai dengan filter ini.</td></tr>
                         )}
                         {isLoadingMore && (
                           <tr><td colSpan="10" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
@@ -518,7 +546,6 @@ export default function ComprehensiveReportPage() {
                 )}
 
 
-
                 {isLoadingMore && (
                   <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
                 )}
@@ -547,9 +574,9 @@ export default function ComprehensiveReportPage() {
         </>
       )}
       <TicketDetailModal
-          show={Boolean(selectedTicketForDetail)}
-          ticket={selectedTicketForDetail}
-          onClose={() => setSelectedTicketForDetail(null)}
+        show={Boolean(selectedTicketForDetail)}
+        ticket={selectedTicketForDetail}
+        onClose={() => setSelectedTicketForDetail(null)}
       />
     </motion.div >
   );
