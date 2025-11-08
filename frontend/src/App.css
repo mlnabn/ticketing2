@@ -5178,30 +5178,10 @@ body.dark-mode .rejection-reason-display p {
   /* Setiap grup akan mengambil ruang yang sama */
 }
 
-.form-group select.select-notif {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  cursor: pointer;
-  background-image:
-    linear-gradient(to right, #ccc 1px, transparent 1px),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat, no-repeat;
-  background-position: right 2rem center, right 0.75rem center;
-  background-size: 1px 60%, 0.75em auto;
-}
 
-body.dark-mode .form-group select.select-notif {
-  background-image:
-    linear-gradient(to right, #888 1px, transparent 1px),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat, no-repeat;
-  background-position: right 2rem center, right 0.75rem center;
-  background-size: 1px 60%, 0.75em auto;
-}
 
 .custom-select-notif__control {
-  border-radius: 10px !important;
+  border-radius: 8px !important;
   padding: 3px 8px;
   font-size: 14px;
   background-color: #ffffff;
@@ -5961,84 +5941,82 @@ body.dark-mode .history-item-content small {
 /* --- CUSTOM SELECT ROLE (Berdasarkan Gaya KONDISI) --- */
 /* ======================================================= */
 
-
-
 .custom-select-role__control {
-  background-color: var(--input-bg) !important;
-  border: 1px solid #ced4da !important;
-  border-radius: 6px !important;
-  box-shadow: none !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  min-height: 38px !important;
-  height: 38px !important;
-  padding: 0 !important;
-  cursor: pointer !important;
-}
-
-.custom-select-role__control--is-focused {
-  border-color: #86b7fe !important;
-  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25) !important;
-}
-
-.custom-select-role__value-container {
-  padding: 2px 12px !important;
-  text-align: left !important;
-}
-
-.custom-select-role__single-value {
-  color: #212529 !important;
-}
-
-.custom-select-role__menu {
-  background-color: #FFFFFF !important;
-  border: 1px solid #E0E0E0 !important;
+  border: 1px solid #ccc !important;
   border-radius: 8px !important;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  z-index: 10;
-  padding: 0 !important;
-  margin: 0 !important;
+  box-shadow: none !important;
+  min-height: 40px;
+  padding: 3.4px 10px;
+  background-color: #FFFFFF !important;
 }
 
-.custom-select-role_menu-list {
-  max-height: 200px !important;
-  overflow-y: auto !important;
-  padding: 0 !important;
-  margin: 0 !important;
+.custom-filter-select-menu {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.custom-select-role__indicator-separator {
-  margin-bottom: 20px !important;
+.custom-filter-select-option {
+  padding: 10px 12px;
 }
 
-.custom-select-role__option--is-focused {
-  background-color: rgba(13, 110, 253, 0.15) !important;
+.custom-filter-select__option--is-focused {
+  background-color: #f0f0f0;
 }
 
-.custom-select-role__option--is-selected {
-  background-color: #0d6efd !important;
-  color: #FFFFFF !important;
+.custom-filter-select__option--is-selected {
+  background-color: #3f51b5;
+  color: white;
+}
+.custom-select-role__value-container {
+  color:#000 !important;
+  background-color: #FFFFFF !important;
 }
 
 .dark-mode .custom-select-role__control {
   background-color: #3a3f44 !important;
+  border-color: #4b5563 !important;
+  color: #f9fafb !important;
+}
+
+.dark-mode .custom-select-role__menu {
+  background-color: #2c2f33 !important;
   border: 1px solid #495057 !important;
 }
 
 .dark-mode .custom-select-role__option {
-  color: #FFFFFF !important;
+  color: #e2e8f0;
 }
 
-.custom-select-role__option {
-  padding: 8px 12px !important;
-  line-height: 1.2 !important;
-
-  margin: 0 !important;
+.dark-mode .custom-select-role__option--is-focused {
+  background-color: #4a5568 ;
 }
 
-.dark-mode .custom-select-role__placeholder,
+.dark-mode .custom-select-role__option--is-selected {
+  background-color: #a0a0a0;
+  color: white;
+}
+
 .dark-mode .custom-select-role__single-value {
-  color: #FFFFFF !important;
+  color: #eeeeee !important;
 }
+
+/* Warna ikon panah (dropdown indicator) */
+.dark-mode .custom-select-role__indicator-separator {
+  background-color: #555555 !important;
+}
+
+.dark-mode .custom-select-role__dropdown-indicator svg {
+  fill: #bbbbbb !important;
+  /* Warna ikon panah */
+}
+
+/* Warna placeholder (teks "Semua Kategori") */
+.dark-mode .custom-select-role__placeholder {
+  color: #999999 !important;
+}
+
+
 
 /* ============================================= */
 /* GAYA TOMBOL AKSI JOB LIST                     */
@@ -10760,8 +10738,9 @@ body.dark-mode .form-group-recover textarea:focus {
 .filter-select-inventory-item {
   flex-grow: 0 1 auto;
   min-width: 250px;
-  
+
 }
+
 .filter-select-inventory {
   flex-grow: 1;
   min-width: 150px;
@@ -10791,6 +10770,8 @@ body.dark-mode .form-group-recover textarea:focus {
   border-color: #4299e1 !important;
   box-shadow: 0 0 0 1px #4299e1 !important;
 }
+
+
 
 /* --- B. STYLING KONTROL UTAMA (Dark Mode) --- */
 .dark-mode .filter-select-invent__control {
@@ -11244,20 +11225,74 @@ body.dark-mode .form-group-recover textarea:focus {
 /*                Return Status Akhir                     */
 /* ====================================================== */
 .custom-select-return__control {
-  padding: 0 10px !important;
-  box-sizing: border-box !important;
-  width: 100% !important;
+  border: 1px solid #ccc !important;
   border-radius: 8px !important;
+  box-shadow: none !important;
+  min-height: 40px;
+  padding: 3.4px 10px;
+  background-color: #FFFFFF !important;
 }
 
-.custom-select-return__value-container {
-  padding: 0 8px !important;
+.custom-select-return__menu {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Mengatur tinggi elemen di dalam control */
-.custom-select-return__indicators {
-  height: 38px !important;
-  /* Agar panah dan separator memiliki tinggi yang sama */
+.custom-select-return__option {
+  padding: 10px 12px;
+}
+
+.custom-select-return__option--is-focused {
+  background-color: #f0f0f0;
+}
+
+.custom-select-return__option--is-selected {
+  background-color: #3f51b5;
+  color: white;
+}
+
+.dark-mode .custom-select-return__control {
+  background-color: #3a3f44 !important;
+  border-color: #4b5563 !important;
+  color: #f9fafb !important;
+}
+
+.dark-mode .custom-select-return__menu {
+  background-color: #2c2f33 !important;
+  border: 1px solid #495057 !important;
+}
+
+.dark-mode .custom-select-return__option {
+  color: #e2e8f0;
+}
+
+.dark-mode .custom-select-return__option--is-focused {
+  background-color: #4a5568;
+}
+
+.dark-mode .custom-select-return__option--is-selected {
+  background-color: #6366f1;
+  color: white;
+}
+
+.dark-mode .custom-select-return__single-value {
+  color: #eeeeee !important;
+}
+
+/* Warna ikon panah (dropdown indicator) */
+.dark-mode .custom-select-return__indicator-separator {
+  background-color: #555555 !important;
+}
+
+.dark-mode .custom-select-return__dropdown-indicator svg {
+  fill: #bbbbbb !important;
+  /* Warna ikon panah */
+}
+
+/* Warna placeholder (teks "Semua Kategori") */
+.dark-mode .custom-select-return__placeholder {
+  color: #999999 !important;
 }
 
 /* ====================================================== */

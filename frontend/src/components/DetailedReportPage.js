@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDebounce } from 'use-debounce';
-import Select from 'react-select'; // Select component sudah diimpor
+import Select from 'react-select';
 import api from '../services/api';
 import { saveAs } from 'file-saver';
 import InventoryDetailModal from './InventoryDetailModal';
@@ -30,15 +30,11 @@ const months = [
     { value: 4, name: 'April' }, { value: 5, name: 'Mei' }, { value: 6, name: 'Juni' },
     { value: 7, name: 'Juli' }, { value: 8, name: 'Agustus' }, { value: 9, name: 'September' },
     { value: 10, name: 'Oktober' }, { value: 11, name: 'November' }, { value: 12, name: 'Desember' }
-];
-
-// Opsi untuk Select Filter Type
+]; 
 const filterTypeOptions = [
     { value: 'month', label: 'Filter per Bulan' },
     { value: 'date_range', label: 'Filter per Tanggal' },
-];
-
-// Mengubah array months ke format react-select
+]; 
 const monthOptions = [
     { value: '', label: 'Semua Bulan' },
     ...months.map(m => ({ value: m.value.toString(), label: m.name })),
@@ -65,8 +61,7 @@ export default function DetailedReportPage({ type, title }) {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
-
-    // Opsi tahun yang diubah ke format react-select
+  
     const yearOptions = years.map(y => ({ value: y.toString(), label: y.toString() }));
 
 
@@ -134,18 +129,15 @@ export default function DetailedReportPage({ type, title }) {
         if (!isPresent) return;
         fetchData();
     }, [fetchData, isPresent]);
-
-    // Handler untuk input native (date range)
+ 
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
-
-    // 💡 NEW: Handler untuk Select Bulan/Tahun
+ 
     const handleSelectFilterChange = (selectedOption, name) => {
         setFilters(prev => ({ ...prev, [name]: selectedOption ? selectedOption.value : '' }));
     };
-
-    // 💡 NEW: Handler untuk Select Filter Type
+ 
     const handleSelectFilterTypeChange = (selectedOption) => {
         const newType = selectedOption.value;
         setFilterType(newType);
@@ -370,7 +362,7 @@ export default function DetailedReportPage({ type, title }) {
                     value={filterTypeOptions.find(opt => opt.value === filterType)}
                     onChange={handleSelectFilterTypeChange}
                     isSearchable={false}
-                    styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                    styles={{ container: (base) => ({ ...base, flex: 1 }) }}  
                 />
 
                 {filterType === 'month' && (
@@ -384,7 +376,7 @@ export default function DetailedReportPage({ type, title }) {
                             onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
                             placeholder="Semua Bulan"
                             isSearchable={false}
-                            styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                            styles={{ container: (base) => ({ ...base, flex: 1 }) }} 
                         />
                         {/* 3. Filter Tahun: Select */}
                         <Select
@@ -407,7 +399,7 @@ export default function DetailedReportPage({ type, title }) {
                             value={filters.start_date}
                             onChange={handleFilterChange}
                             className="filter-select-date"
-                            style={{ flex: 1 }} // width: 100%
+                            style={{ flex: 1 }}  
                         />
                         <span style={{ alignSelf: 'center' }}>-</span>
                         <input
@@ -416,7 +408,7 @@ export default function DetailedReportPage({ type, title }) {
                             value={filters.end_date}
                             onChange={handleFilterChange}
                             className="filter-select-date"
-                            style={{ flex: 1 }} // width: 100%
+                            style={{ flex: 1 }}  
                         />
                     </>
                 )}

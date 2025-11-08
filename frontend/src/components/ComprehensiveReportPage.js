@@ -324,17 +324,16 @@ export default function ComprehensiveReportPage() {
               gap: '1rem',
               marginBottom: '1rem',
               alignItems: 'center',
-              width: '100%', // Memastikan kontainer mengambil lebar penuh
+              width: '100%',
             }}>
 
-            {/* 1. Filter Tipe: Filter per Bulan / Filter per Tanggal (Menggunakan handler yang menerima selectedOption) */}
             <Select
               classNamePrefix="report-filter-select"
               options={filterTypeOptions}
               value={filterTypeOptions.find(opt => opt.value === filterType)}
-              onChange={handleFilterTypeChange} // Langsung panggil handler (handleFilterTypeChange sudah menerima selectedOption)
+              onChange={handleFilterTypeChange} 
               isSearchable={false}
-              styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+              styles={{ container: (base) => ({ ...base, flex: 1 }) }}
             />
 
             {/* Filter per Bulan */}
@@ -346,11 +345,10 @@ export default function ComprehensiveReportPage() {
                   name="month"
                   options={months}
                   value={months.find(m => m.value === dateFilters.month) || months[0]}
-                  // Dibungkus agar outputnya menyerupai event native (e.target) untuk handleDateFilterChange
                   onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'month', value: selectedOption.value } })}
                   placeholder="Semua Bulan"
                   isSearchable={false}
-                  styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                  styles={{ container: (base) => ({ ...base, flex: 1 }) }}
                 />
                 {/* 3. Filter Tahun */}
                 <Select
@@ -358,10 +356,9 @@ export default function ComprehensiveReportPage() {
                   name="year"
                   options={yearOptions}
                   value={yearOptions.find(y => y.value === dateFilters.year)}
-                  // Dibungkus agar outputnya menyerupai event native (e.target) untuk handleDateFilterChange
                   onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'year', value: selectedOption.value } })}
                   isSearchable={false}
-                  styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                  styles={{ container: (base) => ({ ...base, flex: 1 }) }}
                 />
               </>
             )}
@@ -375,7 +372,7 @@ export default function ComprehensiveReportPage() {
                   value={dateFilters.start_date}
                   onChange={handleDateFilterChange}
                   className="filter-select-date"
-                  style={{ flex: 1 }} // width: 100%
+                  style={{ flex: 1 }} 
                 />
                 <span className='strip' style={{ alignSelf: 'center' }}>-</span>
                 <input
@@ -384,7 +381,7 @@ export default function ComprehensiveReportPage() {
                   value={dateFilters.end_date}
                   onChange={handleDateFilterChange}
                   className="filter-select-date"
-                  style={{ flex: 1 }} // width: 100%
+                  style={{ flex: 1 }}
                 />
               </>
             )}

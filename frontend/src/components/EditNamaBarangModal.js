@@ -68,7 +68,7 @@ function EditNamaBarangModal({ show, onClose, item, onSaveSuccess, showToast }) 
             onClick={handleCloseClick}
         >
             <div 
-                className={`modal-content ${animationClass}`}
+                className={`modal-content-detail ${animationClass}`}
                 onClick={e => e.stopPropagation()}
             >
                 <h3>Edit Nama Barang</h3>
