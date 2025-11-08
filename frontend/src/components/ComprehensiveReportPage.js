@@ -332,9 +332,10 @@ export default function ComprehensiveReportPage() {
               classNamePrefix="report-filter-select"
               options={filterTypeOptions}
               value={filterTypeOptions.find(opt => opt.value === filterType)}
-              onChange={handleFilterTypeChange} // Langsung panggil handler (handleFilterTypeChange sudah menerima selectedOption)
+              onChange={handleFilterTypeChange} 
               isSearchable={false}
-              styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+              menuPortalTarget={document.body}
+              styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }} 
             />
 
             {/* Filter per Bulan */}
@@ -350,7 +351,8 @@ export default function ComprehensiveReportPage() {
                   onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'month', value: selectedOption.value } })}
                   placeholder="Semua Bulan"
                   isSearchable={false}
-                  styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                  menuPortalTarget={document.body}
+                  styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                 />
                 {/* 3. Filter Tahun */}
                 <Select
@@ -361,7 +363,8 @@ export default function ComprehensiveReportPage() {
                   // Dibungkus agar outputnya menyerupai event native (e.target) untuk handleDateFilterChange
                   onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'year', value: selectedOption.value } })}
                   isSearchable={false}
-                  styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                  menuPortalTarget={document.body}
+                  styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999   }) }} // width: 100%
                 />
               </>
             )}

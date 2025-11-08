@@ -48,14 +48,28 @@ function ItemListView({
     const isPresent = useIsPresent();
     const [categoryOptions, setCategoryOptions] = useState([]);
     const [subCategoryOptions, setSubCategoryOptions] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState(null);
-    const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState();
+    const [selectedSubCategory, setSelectedSubCategory] = useState();
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
     const isInitialMount = useRef(true);
     const [selectedItemForDetail, setSelectedItemForDetail] = useState(null);
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
-    // --- Efek untuk mengambil data Kategori (LOGIC SUDAH BENAR) ---
+    const handleFilterChange = (name, selectedOption) => {
+        const value = selectedOption ? selectedOption.value : '';
+
+        if (name === 'category') {
+            setSelectedCategory(value);
+            // Saat kategori di-clear, clear juga sub-kategori
+            if (value === '') {
+                setSelectedSubCategory('');
+            }
+        } else if (name === 'subCategory') {
+            setSelectedSubCategory(value);
+        }
+    };
+
     useEffect(() => {
         if (!isPresent) return;
         api.get('/inventory/categories').then(res => {
@@ -66,14 +80,13 @@ function ItemListView({
             const allOption = { value: '', label: 'Semua Kategori' };
 
             setCategoryOptions([allOption, ...options]);
-            setSelectedCategory(allOption);
+            setSelectedCategory('');
         });
     }, [isPresent]);
 
-    // --- Efek untuk mengambil data Sub Kategori (LOGIC SUDAH BENAR) ---
     useEffect(() => {
         if (!isPresent) return;
-        const categoryId = selectedCategory?.value;
+        const categoryId = selectedCategory;
 
         if (categoryId) {
             api.get(`/inventory/sub-categories?id_kategori=${categoryId}`)
@@ -84,24 +97,26 @@ function ItemListView({
                     }));
                     const allSubOption = { value: '', label: 'Semua Sub-Kategori' };
                     setSubCategoryOptions([allSubOption, ...options]);
-                    setSelectedSubCategory(allSubOption);
+                    setSelectedSubCategory('');
                 });
         } else {
             const allSubOption = { value: '', label: 'Semua Sub-Kategori' };
             setSubCategoryOptions([allSubOption]);
-            setSelectedSubCategory(allSubOption);
+            setSelectedSubCategory('');
         }
     }, [selectedCategory, isPresent]);
 
     useEffect(() => {
         if (!isPresent) return;
         if (currentFilters) {
-            setSelectedCategory(currentFilters.id_kategori || '');
-            setSelectedSubCategory(currentFilters.id_sub_kategori || '');
+            const newCat = currentFilters.id_kategori || '';
+            const newSub = currentFilters.id_sub_kategori || '';
+
+            setSelectedCategory(prev => (newCat !== prev ? newCat : prev));
+            setSelectedSubCategory(prev => (newSub !== prev ? newSub : prev));
         }
     }, [currentFilters, isPresent]);
 
-    // --- Efek untuk memanggil onFilterChange (LOGIC SUDAH BENAR) ---
     useEffect(() => {
         if (!isPresent) return;
         if (isInitialMount.current) {
@@ -109,8 +124,8 @@ function ItemListView({
             return;
         }
         const filters = {};
-        const categoryId = selectedCategory?.value;
-        const subCategoryId = selectedSubCategory?.value;
+        const categoryId = selectedCategory;
+        const subCategoryId = selectedSubCategory;
 
         if (categoryId) filters.id_kategori = categoryId;
         if (subCategoryId) filters.id_sub_kategori = subCategoryId;
@@ -132,7 +147,7 @@ function ItemListView({
                 initial="hidden"
                 animate="visible"
             >
-                <motion.div variants={staggerItem} className="user-management-container">
+                <motion.div variants={staggerItem} className="user-management-container" style={{ marginBottom: '10px' }}>
                     {!showArchived && (
                         <button className="btn-primary" onClick={onAdd}>
                             <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
@@ -140,25 +155,33 @@ function ItemListView({
                         </button>
                     )}
                 </motion.div>
-                <motion.div variants={staggerItem} className="filters-container" style={{ display: 'flex', gap: '1rem', marginTop: '1rem', marginBottom: '1rem' }}>
+
+                <motion.div 
+                    variants={staggerItem} 
+                    className={`filters-container ${isMobileFilterOpen ? 'mobile-visible' : ''}`}
+                >
                     <Select
                         className='filter-select-inventory-item'
                         classNamePrefix="filter-select-invent"
-                        value={selectedCategory}
-                        onChange={setSelectedCategory}
+                        value={categoryOptions.find(option => option.value === selectedCategory)}
+                        onChange={(option) => handleFilterChange('category', option)}
                         options={categoryOptions}
                         isSearchable={false}
                         placeholder="Semua Kategori"
+                        menuPortalTarget={document.body}
+                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     />
                     <Select
                         className='filter-select-inventory-item'
                         classNamePrefix="filter-select-invent"
-                        value={selectedSubCategory}
-                        onChange={setSelectedSubCategory}
+                        value={subCategoryOptions.find(option => option.value === selectedSubCategory)}
+                        onChange={(option) => handleFilterChange('subCategory', option)}
                         options={subCategoryOptions}
-                        isDisabled={!selectedCategory?.value || subCategoryOptions.length <= 1}
+                        isDisabled={!selectedCategory || subCategoryOptions.length <= 1}
                         isSearchable={false}
                         placeholder="Semua Sub-Kategori"
+                        menuPortalTarget={document.body}
+                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     />
                     <button 
                         onClick={() => onToggleArchived(!showArchived)} 
@@ -184,6 +207,15 @@ function ItemListView({
                         </div>
                     )}
                 </motion.div>
+                
+                <motion.button
+                    variants={staggerItem}
+                    className="btn-toggle-filters"
+                    onClick={() => setIsMobileFilterOpen(prev => !prev)}
+                >
+                    <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+                    {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+                </motion.button>
 
                 <motion.div variants={staggerItem} className="job-list-container">
                     <div className="table-scroll-container">
@@ -205,18 +237,25 @@ function ItemListView({
                             style={{ overflowY: 'auto', maxHeight: '65vh' }}
                         >
                             <table className="job-table">
-                                <tbody>
-                                    {loading && items.length === 0 && (
-                                        <tr><td colSpan="4" style={{ textAlign: 'center' }}>Memuat data barang...</td></tr>
+                                <tbody
+                                    style={{    
+                                        minHeight: loading ? '150px' : 'auto', 
+                                        display: 'table-row-group' 
+                                    }}
+                                >
+                                    {loading && !isLoadingMore && (
+                                        <tr><td colSpan="4" style={{ textAlign: 'center', padding: '20px' }}>
+                                            Memuat data barang...
+                                        </td></tr>
                                     )}
 
-                                    {!loading && items.length === 0 && (
-                                        <tr><td colSpan="4" style={{ textAlign: 'center' }}>
+                                    {!loading && !isLoadingMore && items.length === 0 && (
+                                        <tr><td colSpan="4" style={{ textAlign: 'center', padding: '20px' }}>
                                             {showArchived ? 'Tidak ada SKU yang diarsipkan.' : 'Belum ada tipe barang yang didaftarkan.'}
                                         </td></tr>
                                     )}
 
-                                    {items.map(item => (
+                                    {(!loading || isLoadingMore) && items.map(item => (
                                         <React.Fragment key={item.kode_barang}>
                                             <tr
                                                 className={`summary-row hoverable-row ${expandedRows[item.kode_barang] ? 'expanded' : ''}`}
@@ -319,7 +358,7 @@ function ItemListView({
                                         </React.Fragment>
                                     ))}
                                     {isLoadingMore && (
-                                        <tr><td colSpan="4" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                                        <tr><td colSpan="4" style={{ textAlign: 'center', padding: '10px' }}>Memuat lebih banyak...</td></tr>
                                     )}
                                 </tbody>
 
@@ -344,18 +383,19 @@ function ItemListView({
                         className="job-list-mobile"
                         ref={mobileListRef}
                         onScroll={onMobileScroll}
-                        style={{ overflowY: 'auto', maxHeight: '65vh' }}
+                        style={{ overflowY: 'auto', maxHeight: '65vh', minHeight: '150px' }}
                     >
-                        {isMobileLoading && mobileItems.length === 0 && (
-                            <p style={{ textAlign: 'center' }}>Memuat data barang...</p>
+                        {isMobileLoading && !isLoadingMoreMobile && (
+                            <p style={{ textAlign: 'center', padding: '20px' }}>Memuat data barang...</p>
                         )}
-                        {!isMobileLoading && mobileItems.length === 0 && (
-                            <p style={{ textAlign: 'center' }}>
+
+                        {!isMobileLoading && !isLoadingMoreMobile && mobileItems.length === 0 && (
+                            <p style={{ textAlign: 'center', padding: '20px' }}>
                                 {showArchived ? 'Tidak ada SKU yang diarsipkan.' : 'Belum ada tipe barang yang didaftarkan.'}
                             </p>
                         )}
 
-                        {mobileItems.map(item => (
+                        {(!isMobileLoading || isLoadingMoreMobile) && mobileItems.map(item => (
                             <div
                                 key={item.id_m_barang}
                                 className="ticket-card-mobile clickable-row"
@@ -392,7 +432,9 @@ function ItemListView({
                                 </div>
                             </div>
                         ))}
-
+                        {isLoadingMoreMobile && (
+                            <p style={{ textAlign: 'center', padding: '10px' }}>Memuat lebih banyak...</p>
+                        )}
                     </div>
                     {!loading && !isLoadingMore && items.length > 0 && (
                         <div className='job-list-mobile'>

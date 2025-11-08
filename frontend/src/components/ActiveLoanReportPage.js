@@ -279,12 +279,9 @@ export default function ActiveLoanReportPage() {
                     onChange={handleSelectFilterTypeChange}
                     isSearchable={false}
                     placeholder="Filter Laporan"
-                    styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                    menuPortalTarget={document.body}
+                    styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }} 
                 />
-                {/* <select value={filterType} onChange={handleFilterTypeChange} className="filter-select">
-                    <option value="month">Filter per Bulan</option>
-                    <option value="date_range">Filter per Tanggal</option>
-                </select> KODE LAMA */}
 
                 {filterType === 'month' && (
                     <>
@@ -297,14 +294,10 @@ export default function ActiveLoanReportPage() {
                             onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
                             placeholder="Semua Bulan"
                             isSearchable={false}
-                            styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                            menuPortalTarget={document.body}
+                            styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                         />
-                        {/* <select name="month" value={filters.month} onChange={handleFilterChange} className="filter-select">
-                            <option value="">Semua Bulan</option>
-                            {months.map(m => <option key={m.value} value={m.value}>{m.name}</option>)}
-                        </select> KODE LAMA */}
 
-                        {/* 3. Filter Tahun: Select */}
                         <Select
                             classNamePrefix="report-filter-select"
                             name="year"
@@ -313,12 +306,9 @@ export default function ActiveLoanReportPage() {
                             onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
                             placeholder="Semua Tahun"
                             isSearchable={false}
-                            styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                            menuPortalTarget={document.body}
+                            styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                         />
-                        {/* <select name="year" value={filters.year} onChange={handleFilterChange} className="filter-select">
-                            <option value="">Semua Tahun</option>
-                            {years.map(y => <option key={y} value={y}>{y}</option>)}
-                        </select> KODE LAMA */}
                     </>
                 )}
                 {filterType === 'date_range' && (

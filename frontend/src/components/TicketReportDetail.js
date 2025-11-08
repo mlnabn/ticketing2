@@ -328,7 +328,8 @@ export default function TicketReportDetail() {
               options={filterTypeOptions}
               classNamePrefix="report-filter-select"
               isSearchable={false}
-              styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+              menuPortalTarget={document.body}
+              styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
             />
 
             {/* Filter per Bulan */}
@@ -342,7 +343,8 @@ export default function TicketReportDetail() {
                   options={monthOptions}
                   classNamePrefix="report-filter-select"
                   isSearchable={false}
-                  styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+                  menuPortalTarget={document.body}
+                  styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                 />
                 {/* Year Select */}
                 <Select
@@ -352,7 +354,8 @@ export default function TicketReportDetail() {
                   options={yearOptions}
                   classNamePrefix="report-filter-select"
                   isSearchable={false}
-                  styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+                  menuPortalTarget={document.body}
+                  styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                 />
               </>
             )}

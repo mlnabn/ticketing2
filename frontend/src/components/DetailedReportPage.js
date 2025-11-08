@@ -370,7 +370,8 @@ export default function DetailedReportPage({ type, title }) {
                     value={filterTypeOptions.find(opt => opt.value === filterType)}
                     onChange={handleSelectFilterTypeChange}
                     isSearchable={false}
-                    styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                    menuPortalTarget={document.body}
+                    styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                 />
 
                 {filterType === 'month' && (
@@ -384,7 +385,8 @@ export default function DetailedReportPage({ type, title }) {
                             onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
                             placeholder="Semua Bulan"
                             isSearchable={false}
-                            styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                            menuPortalTarget={document.body}
+                            styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                         />
                         {/* 3. Filter Tahun: Select */}
                         <Select
@@ -395,7 +397,8 @@ export default function DetailedReportPage({ type, title }) {
                             onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
                             placeholder="Semua Tahun"
                             isSearchable={false}
-                            styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                            menuPortalTarget={document.body}
+                            styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                         />
                     </>
                 )}

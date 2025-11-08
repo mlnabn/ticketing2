@@ -48,51 +48,69 @@ function ToolManagement() {
     const [detailItems, setDetailItems] = useState({});
     const [expandingId, setExpandingId] = useState(null);
 
-    const fetchItems = useCallback(async (page = 1, filters = {}) => {
+    const fetchItems = useCallback(async (page = 1, filters = {}, getIsActive = () => true) => {
         if (page === 1) setLoading(true);
         try {
             const params = { page, ...filters };
             const response = await api.get('/inventory/items', { params });
-            if (page === 1) {
-                setItems(response.data.data);
-                setExpandedRows({});
-                setDetailItems({});
-                setSelectedIds([]);
-            } else {
-                setItems(prev => [...prev, ...response.data.data]);
+
+            if (getIsActive()) {
+                if (page === 1) {
+                    setItems(response.data.data);
+                    setExpandedRows({});
+                    setDetailItems({});
+                    setSelectedIds([]);
+                } else {
+                    setItems(prev => [...prev, ...response.data.data]);
+                }
+                setPagination(response.data);
             }
-            setPagination(response.data);
         } catch (error) {
-            console.error("Gagal mengambil data inventaris:", error);
-            showToast("Gagal mengambil data inventaris.", "error");
+            if (getIsActive()) {
+                console.error("Gagal mengambil data inventaris:", error);
+                showToast("Gagal mengambil data inventaris.", "error");
+            }
         } finally {
-            if (page === 1) setLoading(false);
+            if (getIsActive()) {
+                if (page === 1) setLoading(false);
+            }
         }
     }, [showToast]);
 
-    const fetchMobileItems = useCallback(async (page = 1, filters = {}) => {
+    const fetchMobileItems = useCallback(async (page = 1, filters = {}, getIsActive = () => true) => {
         if (page === 1) setIsMobileLoading(true);
         try {
             const params = { page, ...filters };
             const response = await api.get('/inventory/items-flat', { params });
-            if (page === 1) {
-                setMobileItems(response.data.data);
-            } else {
-                setMobileItems(prev => [...prev, ...response.data.data]);
+            
+            if (getIsActive()) {
+                if (page === 1) {
+                    setMobileItems(response.data.data);
+                } else {
+                    setMobileItems(prev => [...prev, ...response.data.data]);
+                }
+                setMobilePagination(response.data);
             }
-            setMobilePagination(response.data);
         } catch (error) {
-            console.error("Gagal mengambil data mobile:", error);
-            showToast("Gagal mengambil data inventaris (mobile).", "error");
+            if (getIsActive()) {
+                console.error("Gagal mengambil data mobile:", error);
+                showToast("Gagal mengambil data inventaris (mobile).", "error");
+            }
         } finally {
-            if (page === 1) setIsMobileLoading(false);
+            if (getIsActive()) {
+                if (page === 1) setIsMobileLoading(false);
+            }
         }
     }, [showToast]);
 
     useEffect(() => {
         if (!isPresent) return;
-        fetchItems(1, currentFilters);
-        fetchMobileItems(1, currentFilters);
+        let isActive = true;
+        fetchItems(1, currentFilters, () => isActive);
+        fetchMobileItems(1, currentFilters, () => isActive);
+        return () => {
+            isActive = false;
+        };
     }, [fetchItems, fetchMobileItems, currentFilters, isPresent]);
 
     const loadMoreItems = async () => {
@@ -325,8 +343,9 @@ function ToolManagement() {
 
     const handleFilterChange = useCallback((page, filters) => {
         setCurrentFilters(prevFilters => ({
-            ...prevFilters,
-            ...filters
+            is_active: prevFilters.is_active,
+            id_kategori: filters.id_kategori || '',
+            id_sub_kategori: filters.id_sub_kategori || ''
         }));
     }, [])
 

@@ -415,12 +415,9 @@ function ItemHistoryLookupPage() {
                         onChange={handleSelectFilterTypeChange}
                         isSearchable={false}
                         placeholder="Filter Riwayat"
-                        styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                        menuPortalTarget={document.body}
+                        styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
                     />
-                    {/* <select value={filterType} onChange={handleFilterTypeChange} className="filter-select"> KODE LAMA */}
-                    {/* <option value="month">Filter Riwayat per Bulan</option> */}
-                    {/* <option value="date_range">Filter Riwayat per Tanggal</option> */}
-                    {/* </select> */}
 
                     {filterType === 'month' && (
                         <>
@@ -433,12 +430,9 @@ function ItemHistoryLookupPage() {
                                 onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
                                 placeholder="Semua Bulan"
                                 isSearchable={false}
-                                styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                                menuPortalTarget={document.body}
+                                styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }} 
                             />
-                            {/* <select name="month" value={filters.month} onChange={handleFilterChange} className="filter-select"> KODE LAMA */}
-                            {/* <option value="">Semua Bulan</option> */}
-                            {/* {months.map(m => <option key={m.value} value={m.value}>{m.name}</option>)} */}
-                            {/* </select> */}
 
                             {/* 3. Filter Tahun: Select */}
                             <Select
@@ -449,11 +443,9 @@ function ItemHistoryLookupPage() {
                                 onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
                                 placeholder="Semua Tahun"
                                 isSearchable={false}
-                                styles={{ container: (base) => ({ ...base, flex: 1 }) }} // width: 100%
+                                menuPortalTarget={document.body}
+                                styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }} 
                             />
-                            {/* <select name="year" value={filters.year} onChange={handleFilterChange} className="filter-select"> KODE LAMA */}
-                            {/* <option value="">Semua Tahun</option> */}
-                            {/* {years.map(y => <option key={y} value={y}>{y}</option>)} */}
                             {/* </select> */}
                         </>
                     )}

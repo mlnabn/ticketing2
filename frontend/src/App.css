@@ -10765,7 +10765,6 @@ body.dark-mode .form-group-recover textarea:focus {
 .filter-select-inventory-item {
   flex-grow: 0 1 auto;
   min-width: 250px;
-  
 }
 .filter-select-inventory {
   flex-grow: 1;
@@ -12223,11 +12222,6 @@ body.dark-mode .btn-dlt:hover {
   .user-management-header .btn-primary {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
-  }
-
-
-  .filters-container {
-    flex-direction: column;
   }
 
   .filter-select-invent {
@@ -14252,4 +14246,62 @@ body.dark-mode .detail-list-footer-centered {
     transform: translateX(22px);
   }
 
+}
+
+/* Filter Inventory */
+
+.filters-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease-in-out;
+    overflow: visible;
+}
+
+.btn-toggle-filters {
+    display: none;
+}
+
+@media (max-width: 768px) {
+
+    .btn-toggle-filters {
+        display: block;
+        background: none;
+        border: none;
+        border-bottom: 1px solid var(--border-color-light); /* Garis tipis */
+        padding: 12px 8px;
+        width: 100%;
+        text-align: left;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #94a3b8;
+        cursor: pointer;
+        transition: color 0.2s ease, background-color 0.2s ease;
+        margin-bottom: 1rem;
+    }
+
+    .btn-toggle-filters:hover {
+        color: #334155;
+        background-color: #f8f9fa;
+    }
+
+    body.dark-mode .btn-toggle-filters {
+        color: #64748B;
+        border-bottom: 1px solid var(--border-color-dark);
+    }
+    body.dark-mode .btn-toggle-filters:hover {
+        color: #cbd5e1;
+        background-color: #1f2937;
+    }
+
+    .filters-container {
+        display: none; 
+        flex-direction: column; 
+        gap: 0.75rem; 
+        margin-bottom: 1rem;
+    }
+
+    .filters-container.mobile-visible {
+        display: flex;
+    }
 }
