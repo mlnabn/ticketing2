@@ -39,7 +39,6 @@ const expandVariants = {
 
 function ItemListView({
     items, loading, onScroll, isLoadingMore,
-    mobileItems, isMobileLoading, onMobileScroll, isLoadingMoreMobile,
     onAdd, onEdit, onDelete, onFilterChange,
     selectedIds, onSelectId, onSelectAll, onBulkDelete, expandedRows, detailItems,
     expandingId, onToggleExpand, totalItems,
@@ -51,7 +50,7 @@ function ItemListView({
     const [selectedCategory, setSelectedCategory] = useState();
     const [selectedSubCategory, setSelectedSubCategory] = useState();
     const desktopListRef = useRef(null);
-    const mobileListRef = useRef(null);
+    const mobileListRef = useRef(null); 
     const isInitialMount = useRef(true);
     const [selectedItemForDetail, setSelectedItemForDetail] = useState(null);
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
@@ -61,7 +60,6 @@ function ItemListView({
 
         if (name === 'category') {
             setSelectedCategory(value);
-            // Saat kategori di-clear, clear juga sub-kategori
             if (value === '') {
                 setSelectedSubCategory('');
             }
@@ -156,6 +154,15 @@ function ItemListView({
                     )}
                 </motion.div>
 
+                <motion.button
+                    variants={staggerItem}
+                    className="btn-toggle-filters"
+                    onClick={() => setIsMobileFilterOpen(prev => !prev)}
+                >
+                    <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+                    {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+                </motion.button>
+                
                 <motion.div 
                     variants={staggerItem} 
                     className={`filters-container ${isMobileFilterOpen ? 'mobile-visible' : ''}`}
@@ -207,19 +214,9 @@ function ItemListView({
                         </div>
                     )}
                 </motion.div>
-                
-                <motion.button
-                    variants={staggerItem}
-                    className="btn-toggle-filters"
-                    onClick={() => setIsMobileFilterOpen(prev => !prev)}
-                >
-                    <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
-                    {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
-                </motion.button>
 
                 <motion.div variants={staggerItem} className="job-list-container">
                     <div className="table-scroll-container">
-
                         <table className="job-table">
                             <thead>
                                 <tr>
@@ -237,24 +234,17 @@ function ItemListView({
                             style={{ overflowY: 'auto', maxHeight: '65vh' }}
                         >
                             <table className="job-table">
-                                <tbody
-                                    style={{    
-                                        minHeight: loading ? '150px' : 'auto', 
-                                        display: 'table-row-group' 
-                                    }}
-                                >
+                                <tbody style={{ minHeight: loading ? '150px' : 'auto', display: 'table-row-group' }}>
                                     {loading && !isLoadingMore && (
                                         <tr><td colSpan="4" style={{ textAlign: 'center', padding: '20px' }}>
                                             Memuat data barang...
                                         </td></tr>
                                     )}
-
                                     {!loading && !isLoadingMore && items.length === 0 && (
                                         <tr><td colSpan="4" style={{ textAlign: 'center', padding: '20px' }}>
                                             {showArchived ? 'Tidak ada SKU yang diarsipkan.' : 'Belum ada tipe barang yang didaftarkan.'}
                                         </td></tr>
                                     )}
-
                                     {(!loading || isLoadingMore) && items.map(item => (
                                         <React.Fragment key={item.kode_barang}>
                                             <tr
@@ -322,7 +312,6 @@ function ItemListView({
                                                                                                 <i className="fas fa-edit" style={{ fontSize: '20px', marginRight: '5px' }}></i>
                                                                                             </button>
                                                                                         )}
-
                                                                                         {showArchived ? (
                                                                                             <button 
                                                                                                 onClick={(e) => { e.stopPropagation(); onRestore(detail); }} 
@@ -354,22 +343,20 @@ function ItemListView({
                                                     </tr>
                                                 )}
                                             </AnimatePresence>
-
                                         </React.Fragment>
                                     ))}
                                     {isLoadingMore && (
                                         <tr><td colSpan="4" style={{ textAlign: 'center', padding: '10px' }}>Memuat lebih banyak...</td></tr>
                                     )}
                                 </tbody>
-
                             </table>
                         </div>
                         {!loading && !isLoadingMore && items.length > 0 && (
                             <table className="job-table">
                                 <tfoot>
                                     <tr className="subtotal-row">
-                                        <td colSpan="5" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>Total SKU</td>
-                                        <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
+                                        <td colSpan="3" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>Total SKU</td>
+                                        <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
                                             {totalItems} Item
                                         </td>
                                     </tr>
@@ -378,67 +365,121 @@ function ItemListView({
                         )}
                     </div>
 
-                    {/* === TAMPILAN KARTU UNTUK MOBILE === */}
                     <div
                         className="job-list-mobile"
                         ref={mobileListRef}
-                        onScroll={onMobileScroll}
+                        onScroll={onScroll} 
                         style={{ overflowY: 'auto', maxHeight: '65vh', minHeight: '150px' }}
                     >
-                        {isMobileLoading && !isLoadingMoreMobile && (
+                        {loading && !isLoadingMore && (
                             <p style={{ textAlign: 'center', padding: '20px' }}>Memuat data barang...</p>
                         )}
 
-                        {!isMobileLoading && !isLoadingMoreMobile && mobileItems.length === 0 && (
+                        {!loading && !isLoadingMore && items.length === 0 && (
                             <p style={{ textAlign: 'center', padding: '20px' }}>
                                 {showArchived ? 'Tidak ada SKU yang diarsipkan.' : 'Belum ada tipe barang yang didaftarkan.'}
                             </p>
                         )}
 
-                        {(!isMobileLoading || isLoadingMoreMobile) && mobileItems.map(item => (
+                        {(!loading || isLoadingMore) && items.map(item => (
                             <div
-                                key={item.id_m_barang}
-                                className="ticket-card-mobile clickable-row"
-                                onClick={(e) => handleRowClick(e, item)}
+                                key={item.kode_barang}
+                                className={`ticket-card-mobile summary-card hoverable-row ${expandedRows[item.kode_barang] ? 'expanded' : ''}`}
+                                onClick={() => onToggleExpand(item.kode_barang)} 
                             >
                                 <div className="card-header">
-                                    <h4>{item.nama_barang}</h4>
-                                    <small>Kode: {item.kode_barang}</small>
+                                    <h4>{item.kode_barang}</h4>
                                 </div>
-                                <div className="card-row action-row">
-                                    {!showArchived && (
-                                        <button onClick={(e) => { e.stopPropagation(); onEdit(item); }} className="action-buttons-group btn-edit">Edit</button>
-                                    )}
+                                <div className="card-body">
+                                    <div className="card-item-row">
+                                        <span className="label">Kategori</span>
+                                        <span className="value">{item.nama_kategori || '-'}</span>
+                                    </div>
+                                    <div className="card-separator"></div>
+                                    <div className="card-item-row">
+                                        <span className="label">Sub-Kategori</span>
+                                        <span className="value">{item.nama_sub || '-'}</span>
+                                    </div>
+                                    <div className="card-separator"></div>
+                                    <div className="card-item-row">
+                                        <span className="label">Jumlah Variasi</span>
+                                        <span className="value">{item.variations_count}</span>
+                                    </div>
+                                </div>
 
-                                    {showArchived ? (
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); onRestore(item); }} 
-                                            className="action-buttons-group btn-restore"
-                                            title="Pulihkan SKU ini"
-                                            style={{ color: '#28a745', fontWeight: 'bold' }}
+                                <AnimatePresence initial={false}>
+                                    {expandedRows[item.kode_barang] && (
+                                        <motion.div
+                                            key={`mobile-content-${item.kode_barang}`}
+                                            className="detail-items-mobile-container"
+                                            style={{ overflowY: 'auto', maxHeight: '300px' }}
+                                            initial="hidden"
+                                            animate="visible"
+                                            exit="hidden"
+                                            variants={expandVariants}
+                                            onClick={(e) => e.stopPropagation()} 
                                         >
-                                            Pulihkan
-                                        </button>
-                                    ) : (
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); onDelete(item); }} 
-                                            className="action-buttons-group btn-delete"
-                                            disabled={item.total_active_stock > 0}
-                                            title={item.total_active_stock > 0 ? 'SKU tidak bisa diarsipkan jika masih ada stok aktif' : 'Arsipkan SKU ini'}
-                                        >
-                                            Arsipkan
-                                        </button>
+                                            {expandingId === item.kode_barang ? (
+                                                <p className="detail-loading-mobile">Memuat variasi...</p>
+                                            ) : detailItems[item.kode_barang]?.length > 0 ? (
+                                                detailItems[item.kode_barang].map(detail => (
+                                                    <div
+                                                        key={detail.id_m_barang}
+                                                        className="ticket-card-mobile detail-card hoverable-row"
+                                                        onClick={(e) => handleRowClick(e, detail)}
+                                                    >
+                                                        <div className="card-header-detail">
+                                                            <span>{detail.nama_barang}</span>
+                                                        </div>
+                                                        <div className="card-body">
+                                                            <div className="card-item-row">
+                                                                <span className="label">Stok Tersedia</span>
+                                                                <span className="value">{detail.stok_tersedia_count}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="card-separator"></div>
+                                                        <div className="card-row action-row">
+                                                            {!showArchived && (
+                                                                <button onClick={(e) => { e.stopPropagation(); onEdit(detail); }} className="btn-user-action btn-detail">Edit</button>
+                                                            )}
+                                                            {showArchived ? (
+                                                                <button 
+                                                                    onClick={(e) => { e.stopPropagation(); onRestore(detail); }} 
+                                                                    className="btn-user-action btn-restore"
+                                                                    title="Pulihkan SKU ini"
+                                                                    style={{ color: '#28a745', fontWeight: 'bold' }}
+                                                                >
+                                                                    Pulihkan
+                                                                </button>
+                                                            ) : (
+                                                                <button 
+                                                                    onClick={(e) => { e.stopPropagation(); onDelete(detail); }} 
+                                                                    className="btn-user-action btn-dlt"
+                                                                    disabled={detail.total_active_stock > 0} 
+                                                                    title={detail.total_active_stock > 0 ? 'SKU tidak bisa diarsipkan jika masih ada stok aktif' : 'Arsipkan SKU ini'}
+                                                                >
+                                                                    Arsipkan
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <p className="detail-nodata-mobile">Tidak ada variasi SKU untuk kode ini.</p>
+                                            )}
+                                        </motion.div>
                                     )}
-                                </div>
+                                </AnimatePresence>
                             </div>
                         ))}
-                        {isLoadingMoreMobile && (
+
+                        {isLoadingMore && (
                             <p style={{ textAlign: 'center', padding: '10px' }}>Memuat lebih banyak...</p>
                         )}
                     </div>
+
                     {!loading && !isLoadingMore && items.length > 0 && (
                         <div className='job-list-mobile'>
-
                             <div className="subtotal-card-mobile"
                                 style={{ marginTop: '1rem', marginBottom: '1rem' }}
                             >
@@ -451,13 +492,11 @@ function ItemListView({
                                     {totalItems} Item
                                 </span>
                             </div>
-
                         </div>
                     )}
                 </motion.div>
 
             </motion.div>
-
 
             <SkuDetailModal
                 show={Boolean(selectedItemForDetail)}
