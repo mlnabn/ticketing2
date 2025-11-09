@@ -12,10 +12,9 @@ const ConditionalUserInput = ({ item, statusName, users, onChange }) => {
             return (
                 <div className="form-group-inline2 conditional">
                     <label>Pengguna:</label>
-                    <Select // <-- Ganti Select Bawaan
+                    <Select 
                         classNamePrefix="custom-select-return"
                         options={optionsWithDefault}
-                        // Pastikan perbandingan menggunakan string (value dari select adalah string)
                         value={optionsWithDefault.find(opt => opt.value === String(item.user_digunakan_id)) || null}
                         onChange={(selectedOption) => onChange(item.stok_barang_id, 'user_digunakan_id', selectedOption.value)}
                         isSearchable={true}
@@ -27,7 +26,7 @@ const ConditionalUserInput = ({ item, statusName, users, onChange }) => {
             return (
                 <div className="form-group-inline2 conditional">
                     <label>Dilaporkan oleh:</label>
-                    <Select // <-- Ganti Select Bawaan
+                    <Select
                         classNamePrefix="custom-select-return"
                         options={optionsWithDefault}
                         value={optionsWithDefault.find(opt => opt.value === String(item.user_rusak_id)) || null}
@@ -41,7 +40,7 @@ const ConditionalUserInput = ({ item, statusName, users, onChange }) => {
             return (
                 <div className="form-group-inline2 conditional">
                     <label>Terakhir diketahui:</label>
-                    <Select // <-- Ganti Select Bawaan
+                    <Select
                         classNamePrefix="custom-select-return"
                         options={optionsWithDefault}
                         value={optionsWithDefault.find(opt => opt.value === String(item.user_hilang_id)) || null}
