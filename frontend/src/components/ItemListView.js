@@ -165,7 +165,8 @@ function ItemListView({
                         value={categoryOptions.find(option => option.value === selectedCategory)}
                         onChange={(option) => handleFilterChange('category', option)}
                         options={categoryOptions}
-                        isSearchable={false}
+                        isClearable={true}
+                        isSearchable={true}
                         placeholder="Semua Kategori"
                         menuPortalTarget={document.body}
                         styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
@@ -176,8 +177,9 @@ function ItemListView({
                         value={subCategoryOptions.find(option => option.value === selectedSubCategory)}
                         onChange={(option) => handleFilterChange('subCategory', option)}
                         options={subCategoryOptions}
+                        isClearable={true}
                         isDisabled={!selectedCategory || subCategoryOptions.length <= 1}
-                        isSearchable={false}
+                        isSearchable={true}
                         placeholder="Semua Sub-Kategori"
                         menuPortalTarget={document.body}
                         styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
