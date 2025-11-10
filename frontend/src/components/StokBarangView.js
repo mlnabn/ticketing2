@@ -522,6 +522,46 @@ function StokBarangView() {
                     <h1>Daftar Stok Barang</h1>          
                 </motion.div>
 
+                <motion.div variants={staggerItem} className="action-buttons-stok">
+                    <motion.input
+                        variants={staggerItem}
+                        type="text"
+                        placeholder="Cari Kode SKU / Nama Barang..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="filter-search-input-invReport"
+                    />
+                    <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>
+                        <i className="fas fa-plus" style={{ marginRight: '8px' }}>
+                        </i>Tambah Stok
+                    </button>
+
+                    <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
+                        <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
+                            <i className="fas fa-qrcode fa-stack-2x"></i>
+                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
+                        </span>
+                        Scan QR
+                    </button>
+                    <button
+                        className="btn-primary-outline"
+                        onClick={handlePreparePrint}
+                        disabled={selectedItems.size === 0}
+                    >
+                        <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
+                        Print QR ({selectedItems.size})
+                    </button>
+                    {selectedItems.size > 0 && (
+                        <button
+                            className="btn-soft-grey"
+                            onClick={handleClearSelection}
+                            title="Hilangkan semua pilihan"
+                        >
+                            <i className="fas fa-times"></i>
+                        </button>
+                    )}
+                </motion.div>
+
                 <motion.button
                     variants={staggerItem}
                     className="btn-toggle-filters"
@@ -577,46 +617,6 @@ function StokBarangView() {
                         styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     />
                 </motion.div>
-
-                <motion.div variants={staggerItem} className="action-buttons-stok">
-                    <motion.input
-                        variants={staggerItem}
-                        type="text"
-                        placeholder="Cari Kode SKU / Nama Barang..."
-                        value={searchTerm}
-                        onChange={e => setSearchTerm(e.target.value)}
-                        className="filter-search-input-invReport"
-                    />
-                    <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>
-                        <i className="fas fa-plus" style={{ marginRight: '8px' }}>
-                        </i>Tambah Stok
-                    </button>
-
-                    <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
-                        <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
-                            <i className="fas fa-qrcode fa-stack-2x"></i>
-                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
-                        </span>
-                        Scan QR
-                    </button>
-                    <button
-                        className="btn-primary-outline"
-                        onClick={handlePreparePrint}
-                        disabled={selectedItems.size === 0}
-                    >
-                        <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
-                        Print QR ({selectedItems.size})
-                    </button>
-                    {selectedItems.size > 0 && (
-                        <button
-                            className="btn-soft-grey"
-                            onClick={handleClearSelection}
-                            title="Hilangkan semua pilihan"
-                        >
-                            <i className="fas fa-times"></i>
-                        </button>
-                    )}
-                    </motion.div>
 
                 <motion.div variants={staggerItem} className="job-list-container">
                     {/* Tampilan Tabel Desktop */}

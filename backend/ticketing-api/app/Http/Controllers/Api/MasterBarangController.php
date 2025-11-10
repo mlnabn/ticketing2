@@ -56,9 +56,9 @@ class MasterBarangController extends Controller
         }
 
         $paginator = $query->paginate(15);
-        $paginator->getCollection()->each(function ($item) use ($isActive) {
-            $item->variations = $this->getVariationsData($item->kode_barang, $isActive);
-        });
+        // $paginator->getCollection()->each(function ($item) use ($isActive) {
+        //     $item->variations = $this->getVariationsData($item->kode_barang, $isActive);
+        // });
 
         return $paginator;
     }

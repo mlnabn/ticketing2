@@ -14351,20 +14351,19 @@ body.dark-mode .detail-list-footer-centered {
         margin-bottom: 1rem;
     }
 
-  .btn-toggle-filters:hover {
+  /* .btn-toggle-filters:hover {
     color: #334155;
     background-color: #f8f9fa;
-  }
+  } */
 
   body.dark-mode .btn-toggle-filters {
     color: #64748B;
-    border-bottom: 1px solid var(--border-color-dark);
   }
 
-  body.dark-mode .btn-toggle-filters:hover {
+  /* body.dark-mode .btn-toggle-filters:hover {
     color: #cbd5e1;
     background-color: #1f2937;
-  }
+  } */
 
   .filters-container {
     display: none;
