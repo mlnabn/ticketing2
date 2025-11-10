@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\MasterBarangController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\InventoryReportController;
+use App\Http\Controllers\Api\PurchaseProposalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -97,6 +98,8 @@ Route::middleware('jwt')->group(function () {
     Route::post('/tickets/{ticket}/process-return', [TicketController::class, 'processReturn']);
 
     // --- Rute untuk Manajemen Inventaris ---
+    Route::apiResource('purchase-proposals', PurchaseProposalController::class);
+    Route::get('/purchase-proposals/{purchaseProposal}/export', [PurchaseProposalController::class, 'export']);
     Route::get('/inventory/items/{masterBarang}/stock-breakdown', [MasterBarangController::class, 'getStockBreakdown']);
     Route::get('/inventory/items/{masterBarang}/stock-by-color', [MasterBarangController::class, 'getStockByColor']);
     Route::get('/inventory/stock-items/search-available', [StokBarangController::class, 'searchAvailable']);

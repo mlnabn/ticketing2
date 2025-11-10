@@ -154,8 +154,24 @@ export default function FinancialReportPage() {
             <motion.div variants={staggerItem} className="navigation-section" style={{ marginTop: '25px' }}>
                 <motion.h1 variants={staggerItem}>Lihat Laporan Detail</motion.h1>
                 <div className="report-navigation-cards">
-                    <NavigationCard title="Pembelian Baru (Aset Masuk)" description="Lihat semua data aset yang baru dibeli berdasarkan periode." linkTo="/admin/financial-report/new-acquisitions" icon="fa-dolly-flatbed" />
-                    <NavigationCard title="Potensi Kerugian (Aset Rusak/Hilang)" description="Lacak semua aset yang berstatus rusak atau hilang." linkTo="/admin/financial-report/problematic-assets" icon="fa-heart-broken" />
+                    <NavigationCard 
+                        title="Pembelian Baru (Aset Masuk)" 
+                        description="Lihat semua data aset yang baru dibeli berdasarkan periode." 
+                        linkTo="/admin/financial-report/new-acquisitions" 
+                        icon="fa-dolly-flatbed" 
+                    />
+                    <NavigationCard 
+                        title="Potensi Kerugian (Aset Rusak/Hilang)" 
+                        description="Lacak semua aset yang berstatus rusak atau hilang." 
+                        linkTo="/admin/financial-report/problematic-assets" 
+                        icon="fa-heart-broken" 
+                    />
+                    <NavigationCard 
+                        title="Catatan Pengajuan" 
+                        description="Buat dan lacak catatan pengajuan pembelian barang internal." 
+                        linkTo="/admin/financial-report/purchase-proposals" 
+                        icon="fa-file-invoice-dollar" 
+                    />
                 </div>
             </motion.div>
         </motion.div>
