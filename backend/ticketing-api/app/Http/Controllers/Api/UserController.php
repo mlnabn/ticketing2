@@ -40,6 +40,23 @@ class UserController extends Controller
         return response()->json($admins);
     }
 
+    public function getAdminsForReport(Request $request)
+    {
+        $getAll = $request->query('all');
+
+        $query = User::where('role', 'admin')
+            ->orderBy('name', 'asc');
+
+        if ($getAll) {
+            $admins = $query->get();
+            return response()->json($admins);
+        } else {
+            $perPage = $request->query('per_page', 5);
+            $admins = $query->paginate($perPage);
+            return response()->json($admins);
+        }
+    }
+
     public function all()
     {
         $users = User::where('role', 'user')
@@ -101,7 +118,7 @@ class UserController extends Controller
         $user->save();
         return response()->json($user);
     }
-    
+
     public function destroy(User $user)
     {
         if (auth()->user()->role !== 'admin') {
