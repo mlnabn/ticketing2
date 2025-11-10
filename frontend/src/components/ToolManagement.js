@@ -128,21 +128,24 @@ function ToolManagement() {
             return;
         }
 
-        if (detailItems[kodeBarang]) {
-            return;
-        }
+        setExpandingId(kodeBarang); 
+        try {
+            const isActive = currentFilters.is_active === 'true';
+            const res = await api.get(`/inventory/items/variations/${kodeBarang}`, {
+                params: { is_active: isActive }
+            });
 
-        const summaryItem = items.find(i => i.kode_barang === kodeBarang);
-
-        if (summaryItem && summaryItem.variations) {
             setDetailItems(prev => ({
                 ...prev,
-                [kodeBarang]: summaryItem.variations
+                [kodeBarang]: res.data 
             }));
-        } else {
-            console.error("Data variasi tidak ditemukan di item summary.");
-            showToast('Gagal memuat detail SKU.', 'error');
+
+        } catch (error) {
+            console.error("Gagal memuat variasi SKU:", error);
+            showToast('Gagal memuat variasi SKU.', 'error');
             setExpandedRows(prev => ({ ...prev, [kodeBarang]: false }));
+        } finally {
+            setExpandingId(null);
         }
     };
 
