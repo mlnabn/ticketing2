@@ -29,20 +29,22 @@ const staggerItem = {
 function ToolManagement() {
     const { showToast } = useOutletContext();
     const isPresent = useIsPresent();
+    
+    // HANYA state untuk desktop/data utama
     const [items, setItems] = useState([]);
     const [pagination, setPagination] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+    // State modal & filter (tetap sama)
     const [itemToEdit, setItemToEdit] = useState(null);
     const [isItemModalOpen, setIsItemModalOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
     const [itemToEditName, setItemToEditName] = useState(null);
     const [currentFilters, setCurrentFilters] = useState({ is_active: 'true' });
-    const [mobileItems, setMobileItems] = useState([]);
-    const [mobilePagination, setMobilePagination] = useState(null);
-    const [isMobileLoading, setIsMobileLoading] = useState(true);
-    const [isLoadingMoreMobile, setIsLoadingMoreMobile] = useState(false);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    
+    // State expand/detail (tetap sama)
     const [selectedIds, setSelectedIds] = useState([]);
     const [expandedRows, setExpandedRows] = useState({});
     const [detailItems, setDetailItems] = useState({});
@@ -77,41 +79,14 @@ function ToolManagement() {
         }
     }, [showToast]);
 
-    const fetchMobileItems = useCallback(async (page = 1, filters = {}, getIsActive = () => true) => {
-        if (page === 1) setIsMobileLoading(true);
-        try {
-            const params = { page, ...filters };
-            const response = await api.get('/inventory/items-flat', { params });
-            
-            if (getIsActive()) {
-                if (page === 1) {
-                    setMobileItems(response.data.data);
-                } else {
-                    setMobileItems(prev => [...prev, ...response.data.data]);
-                }
-                setMobilePagination(response.data);
-            }
-        } catch (error) {
-            if (getIsActive()) {
-                console.error("Gagal mengambil data mobile:", error);
-                showToast("Gagal mengambil data inventaris (mobile).", "error");
-            }
-        } finally {
-            if (getIsActive()) {
-                if (page === 1) setIsMobileLoading(false);
-            }
-        }
-    }, [showToast]);
-
     useEffect(() => {
         if (!isPresent) return;
         let isActive = true;
         fetchItems(1, currentFilters, () => isActive);
-        fetchMobileItems(1, currentFilters, () => isActive);
         return () => {
             isActive = false;
         };
-    }, [fetchItems, fetchMobileItems, currentFilters, isPresent]);
+    }, [fetchItems, currentFilters, isPresent]);
 
     const loadMoreItems = async () => {
         if (isLoadingMore || !pagination || pagination.current_page >= pagination.last_page) return;
@@ -140,30 +115,7 @@ function ToolManagement() {
             loadMoreItems();
         }
     };
-
-    const loadMoreMobileItems = async () => {
-        if (isLoadingMoreMobile || !mobilePagination || mobilePagination.current_page >= mobilePagination.last_page) return;
-        setIsLoadingMoreMobile(true);
-        try {
-            const nextPage = mobilePagination.current_page + 1;
-            const params = { page: nextPage, ...currentFilters };
-            const response = await api.get('/inventory/items-flat', { params });
-            setMobileItems(prev => [...prev, ...response.data.data]);
-            setMobilePagination(response.data);
-        } catch (error) {
-            showToast('Gagal memuat lebih banyak (mobile).', 'error');
-        } finally {
-            setIsLoadingMoreMobile(false);
-        }
-    };
-    const handleMobileScroll = (e) => {
-        const target = e.currentTarget;
-        const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
-        if (nearBottom && !isMobileLoading && !isLoadingMoreMobile) {
-            loadMoreMobileItems();
-        }
-    };
-
+    
     const toggleExpand = async (kodeBarang) => {
         const isCurrentlyExpanded = !!expandedRows[kodeBarang];
         if (isCurrentlyExpanded) {
@@ -177,20 +129,17 @@ function ToolManagement() {
         }
 
         if (detailItems[kodeBarang]) {
-            return; // Data sudah ada, jangan lakukan apa-apa
+            return;
         }
 
-        // Ambil data variasi dari item yang di-klik
         const summaryItem = items.find(i => i.kode_barang === kodeBarang);
 
         if (summaryItem && summaryItem.variations) {
-            // Masukkan data variasi ke state detailItems
             setDetailItems(prev => ({
                 ...prev,
                 [kodeBarang]: summaryItem.variations
             }));
         } else {
-            // Fallback jika terjadi error (seharusnya tidak terjadi)
             console.error("Data variasi tidak ditemukan di item summary.");
             showToast('Gagal memuat detail SKU.', 'error');
             setExpandedRows(prev => ({ ...prev, [kodeBarang]: false }));
@@ -234,7 +183,6 @@ function ToolManagement() {
             if (response.status === 200 || response.status === 204) {
                 showToast(response.data?.message || "Barang berhasil diarsipkan.");
                 fetchItems(1, currentFilters);
-                fetchMobileItems(1, currentFilters);
                 setDetailItems(prev => {
                     const newDetails = { ...prev };
                     if (newDetails[itemToDelete.kode_barang]) {
@@ -266,7 +214,6 @@ function ToolManagement() {
             const response = await api.post(`/inventory/items/${item.id_m_barang}/restore`);
             showToast(response.data?.message || "SKU berhasil dipulihkan.");
             fetchItems(1, currentFilters);
-            fetchMobileItems(1, currentFilters);
             setDetailItems(prev => {
                 const newDetails = { ...prev };
                 if (newDetails[item.kode_barang]) {
@@ -332,7 +279,6 @@ function ToolManagement() {
                 const response = await api.post('/inventory/items/bulk-restore', { ids: selectedIds });
                 showToast(response.data.message, 'success');
                 fetchItems(1, currentFilters);
-                fetchMobileItems(1, currentFilters);
                 setSelectedIds([]);
             } catch (e) {
                 console.error('Gagal memulihkan SKU secara massal:', e);
@@ -369,19 +315,10 @@ function ToolManagement() {
             </motion.div>
 
             <ItemListView
-                // Props Desktop
                 items={items}
                 loading={loading}
                 onScroll={handleScroll}
                 isLoadingMore={isLoadingMore}
-
-                // Props Mobile
-                mobileItems={mobileItems}
-                isMobileLoading={isMobileLoading}
-                onMobileScroll={handleMobileScroll}
-                isLoadingMoreMobile={isLoadingMoreMobile}
-
-                // Props Bersama
                 totalItems={pagination?.total || 0}
                 onAdd={handleOpenAddModal}
                 onEdit={handleOpenEditNameModal}

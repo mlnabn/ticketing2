@@ -14337,22 +14337,19 @@ body.dark-mode .detail-list-footer-centered {
 
 @media (max-width: 768px) {
 
-  .btn-toggle-filters {
-    display: block;
-    background: none;
-    border: none;
-    border-bottom: 1px solid var(--border-color-light);
-    /* Garis tipis */
-    padding: 12px 8px;
-    width: 100%;
-    text-align: left;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #94a3b8;
-    cursor: pointer;
-    transition: color 0.2s ease, background-color 0.2s ease;
-    margin-bottom: 1rem;
-  }
+    .btn-toggle-filters {
+        display: block;
+        background: none;
+        border: none;
+        padding: 12px 8px;
+        width: 100%;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #94a3b8;
+        cursor: pointer;
+        transition: color 0.2s ease, background-color 0.2s ease;
+        margin-bottom: 1rem;
+    }
 
   .btn-toggle-filters:hover {
     color: #334155;
