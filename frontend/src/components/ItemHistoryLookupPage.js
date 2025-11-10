@@ -65,6 +65,7 @@ const monthOptions = [
 
 function ItemHistoryLookupPage() {
     const isPresent = useIsPresent();
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
     const { showToast } = useOutletContext();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -92,7 +93,7 @@ function ItemHistoryLookupPage() {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
-    
+
     // 💡 NEW: Opsi tahun yang diubah ke format react-select
     const yearSelectOptions = [{ value: '', label: 'Semua Tahun' }, ...years.map(y => ({ value: y.toString(), label: y.toString() }))];
 
@@ -395,18 +396,53 @@ function ItemHistoryLookupPage() {
     };
 
     return (
-        // Ganti <> dengan motion.div
         <motion.div
+            className="user-management-container"
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
         >
-            <motion.div variants={staggerItem} className="user-management-container">
+            <motion.div
+                variants={staggerItem}
+                className="user-management-header-report"
+                style={{ marginBottom: '20px' }}
+            >
                 <h1 className="page-title">Lacak Riwayat Aset</h1>
                 <p className="page-description" style={{ textAlign: 'center' }}>Gunakan pencarian, klik item dari daftar, atau scan QR/Barcode untuk melihat riwayat lengkap sebuah aset.</p>
-                
-                <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', alignItems: 'center' }}>
-                    
+
+                <motion.div
+                    variants={staggerItem}
+                    className="action-buttons-stok">
+                    <motion.input
+                        variants={staggerItem}
+                        type="text"
+                        placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="filter-search-input-invReport"
+                    />
+                    <button className="btn-scan-qr-history" onClick={() => setIsScannerOpen(true)}>
+                        <span className="fa-stack">
+                            <i className="fas fa-qrcode fa-stack-2x"></i>
+                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </button>
+                </motion.div>
+
+                <motion.button
+                    variants={staggerItem}
+                    className="btn-toggle-filters"
+                    onClick={() => setIsMobileFilterOpen(prev => !prev)}
+                >
+                    <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+                    {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+                </motion.button>
+
+                <motion.div 
+                    variants={staggerItem}
+                    className={`filters-container ${isMobileFilterOpen ? 'mobile-visible' : ''}`}
+                >
+
                     {/* 1. Filter Tipe: Select */}
                     <Select
                         classNamePrefix="report-filter-select"
@@ -416,7 +452,10 @@ function ItemHistoryLookupPage() {
                         isSearchable={false}
                         placeholder="Filter Riwayat"
                         menuPortalTarget={document.body}
-                        styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
+                        styles={{
+                            container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                            menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                        }}
                     />
 
                     {filterType === 'month' && (
@@ -431,7 +470,10 @@ function ItemHistoryLookupPage() {
                                 placeholder="Semua Bulan"
                                 isSearchable={false}
                                 menuPortalTarget={document.body}
-                                styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }} 
+                                styles={{
+                                    container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                                }}
                             />
 
                             {/* 3. Filter Tahun: Select */}
@@ -444,44 +486,26 @@ function ItemHistoryLookupPage() {
                                 placeholder="Semua Tahun"
                                 isSearchable={false}
                                 menuPortalTarget={document.body}
-                                styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }} 
+                                styles={{
+                                    container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                                }}
                             />
                             {/* </select> */}
                         </>
                     )}
                     {filterType === 'date_range' && (
-                        <>
+                        <motion.div
+                            variants={staggerItem}
+                            className='date-range-container'                       
+                        >
                             <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
                             <span style={{ alignSelf: 'center' }}>-</span>
                             <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
-                        </>
+                        </motion.div>
                     )}
                 </motion.div>
-                <motion.div
-                    variants={staggerItem}
-                    className="filters-container report-filters"
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        gap: '0.5rem',
-                        alignItems: 'center'
-                    }}
-                >
-                    <input
-                        type="text"
-                        placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
-                        value={searchTerm}
-                        onChange={e => setSearchTerm(e.target.value)}
-                        className="filter-search-input"
-                        style={{ flexGrow: 1, width: 'auto' }}
-                    />
-                    <button className="btn-scan-qr-history" onClick={() => setIsScannerOpen(true)}>
-                        <span className="fa-stack" style={{ fontSize: '1.2em' }}>
-                            <i className="fas fa-qrcode fa-stack-2x"></i>
-                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
-                        </span>
-                    </button>
-                </motion.div>
+
                 <motion.div variants={staggerItem} className={`split-view-container ${selectedItem ? 'split-view-active' : ''}`}>
                     <div className="list-panel">
                         <div className="job-list-container">

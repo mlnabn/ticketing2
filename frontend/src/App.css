@@ -9593,8 +9593,10 @@ body.dark-mode .summary-cards .card h3 {
 
 .download-buttons {
   display: flex;
-  gap: 1rem;
+  gap: 10px;
   justify-content: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .btn-download.pdf {
@@ -13743,6 +13745,7 @@ body.dark-mode .summary-card.expanded {
 
 .btn-scan-qr-history {
   color: #00b341;
+  font-size: 1.2em;
 }
 
 .btn-scan-qr-history .fa-inverse {
@@ -14335,35 +14338,41 @@ body.dark-mode .detail-list-footer-centered {
   display: none;
 }
 
+.date-range-container {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex: 1;
+}
+
+.date-range-container .filter-select-date {
+  flex: 1;
+  width: auto;
+}
+
+.date-separator {
+  flex-shrink: 0;
+}
+
 @media (max-width: 768px) {
 
-    .btn-toggle-filters {
-        display: block;
-        background: none;
-        border: none;
-        padding: 12px 8px;
-        width: 100%;
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: #94a3b8;
-        cursor: pointer;
-        transition: color 0.2s ease, background-color 0.2s ease;
-        margin-bottom: 1rem;
-    }
-
-  /* .btn-toggle-filters:hover {
-    color: #334155;
-    background-color: #f8f9fa;
-  } */
+  .btn-toggle-filters {
+    display: block;
+    background: none;
+    border: none;
+    padding: 12px 8px;
+    width: 100%;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease;
+    margin-bottom: 1rem;
+  }
 
   body.dark-mode .btn-toggle-filters {
     color: #64748B;
   }
-
-  /* body.dark-mode .btn-toggle-filters:hover {
-    color: #cbd5e1;
-    background-color: #1f2937;
-  } */
 
   .filters-container {
     display: none;
@@ -14374,5 +14383,17 @@ body.dark-mode .detail-list-footer-centered {
 
   .filters-container.mobile-visible {
     display: flex;
+  }
+
+  .date-range-container {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    width: 100%;
+  }
+
+  .date-range-container .filter-select-date {
+    flex: 1;
+    width: auto;
   }
 }

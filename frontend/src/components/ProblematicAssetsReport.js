@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import Select from 'react-select'; 
+import Select from 'react-select';
 import { useFinancialReport } from './useFinancialReport';
 import ProblematicAssetModal from './ProblematicAssetModal';
 import { motion, useIsPresent } from 'framer-motion';
@@ -25,6 +25,7 @@ const staggerItem = {
 
 export default function ProblematicAssetsReport() {
     const isPresent = useIsPresent();
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
     const {
         detailedData,
         filters,
@@ -108,7 +109,30 @@ export default function ProblematicAssetsReport() {
                 <h1 className="page-title">Laporan Aset Bermasalah (Rusak/Hilang)</h1>
             </motion.div>
 
-            <motion.div variants={staggerItem} className="report-filters" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+            <motion.div variants={staggerItem} className="download-buttons">
+                <button onClick={() => handleExportWrapper('excel')} disabled={exportingExcel} className="btn-download excel">
+                    <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
+                    {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
+                </button>
+                <button onClick={() => handleExportWrapper('pdf')} disabled={exportingPdf} className="btn-download pdf">
+                    <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
+                    {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
+                </button>
+            </motion.div>
+
+            <motion.button
+                variants={staggerItem}
+                className="btn-toggle-filters"
+                onClick={() => setIsMobileFilterOpen(prev => !prev)}
+            >
+                <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+                {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+            </motion.button>
+
+            <motion.div
+                variants={staggerItem}
+                className={`filters-container ${isMobileFilterOpen ? 'mobile-visible' : ''}`}
+            >
 
                 <Select
                     classNamePrefix="report-filter-select"
@@ -118,7 +142,10 @@ export default function ProblematicAssetsReport() {
                     isSearchable={false}
                     placeholder="Filter Laporan"
                     menuPortalTarget={document.body}
-                    styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
+                    styles={{
+                        container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                        menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                    }}
                 />
 
                 {filterType === 'month' && (
@@ -132,7 +159,10 @@ export default function ProblematicAssetsReport() {
                             placeholder="Semua Bulan"
                             isSearchable={false}
                             menuPortalTarget={document.body}
-                            styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
+                            styles={{
+                                container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                                menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                            }}
                         />
                         <Select
                             classNamePrefix="report-filter-select"
@@ -143,29 +173,25 @@ export default function ProblematicAssetsReport() {
                             placeholder="Semua Tahun"
                             isSearchable={false}
                             menuPortalTarget={document.body}
-                            styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
+                            styles={{
+                                container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                                menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                            }}
                         />
                     </>
                 )}
                 {filterType === 'date_range' && (
-                    <>
+                    <motion.div
+                        variants={staggerItem}
+                        className='date-range-container'
+                    >
                         <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
                         <span style={{ alignSelf: 'center' }}>-</span>
                         <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
-                    </>
+                    </motion.div>
                 )}
             </motion.div>
 
-            <motion.div variants={staggerItem} className="download-buttons">
-                <button onClick={() => handleExportWrapper('excel')} disabled={exportingExcel} className="btn-download excel">
-                    <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
-                    {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
-                </button>
-                <button onClick={() => handleExportWrapper('pdf')} disabled={exportingPdf} className="btn-download pdf">
-                    <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
-                    {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
-                </button>
-            </motion.div>
             <motion.div variants={staggerItem} className="job-list-container">
                 {/* Desktop View */}
                 <div className="table-scroll-container">
