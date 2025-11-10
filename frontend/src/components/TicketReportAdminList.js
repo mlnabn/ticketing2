@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import ReportLineChart from './ReportLineChart';
@@ -25,22 +25,79 @@ const staggerItem = {
 
 export default function TicketReportAdminList() {
   const isPresent = useIsPresent();
+  const scrollRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
   const [admins, setAdmins] = useState([]);
   const [loadingAdmins, setLoadingAdmins] = useState(false);
   const [chartData, setChartData] = useState([]);
   const [loadingChart, setLoadingChart] = useState(false);
+  const [pagination, setPagination] = useState(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const fetchAdmins = useCallback(async () => {
-    setLoadingAdmins(true);
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  
+  const fetchAdmins = useCallback(async (page = 1) => {
+    const isDesktopInitialLoad = (page === 1) && !isMobile;
+
+    if (page === 1) setLoadingAdmins(true);
+    if (page > 1) setIsLoadingMore(true);
+
     try {
-      const res = await api.get('/admins');
-      setAdmins(res.data);
+      const params = { page: page };
+      if (isDesktopInitialLoad) {
+        params.all = true;
+      }
+
+      const res = await api.get('/admins-for-report', { params });
+
+      if (page === 1) {
+        setAdmins(res.data.data || res.data);
+      } else {
+        setAdmins(prev => [...prev, ...res.data.data]);
+      }
+      if (!isDesktopInitialLoad) {
+        setPagination(res.data);
+      } else {
+        setPagination(null);
+      }
+
     } catch (err) {
       console.error('Gagal mengambil daftar admin:', err);
     } finally {
       setLoadingAdmins(false);
+      if (page > 1) setIsLoadingMore(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+
+  const loadMoreAdmins = useCallback(async () => {
+    if (isLoadingMore || !pagination || pagination.current_page >= pagination.last_page) return;
+
+    const nextPage = pagination.current_page + 1;
+    fetchAdmins(nextPage);
+  }, [isLoadingMore, pagination, fetchAdmins]);
+
+  const handleScroll = useCallback(() => {
+    const element = scrollRef.current;
+    if (!element) return;
+
+    const nearBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - 200;
+
+    if (nearBottom && !loadingAdmins && !isLoadingMore && pagination && pagination.current_page < pagination.last_page) {
+      loadMoreAdmins();
+    }
+  }, [loadingAdmins, isLoadingMore, pagination, loadMoreAdmins]);
 
   const fetchChartData = useCallback(async () => {
     setLoadingChart(true);
@@ -56,7 +113,7 @@ export default function TicketReportAdminList() {
 
   useEffect(() => {
     if (!isPresent) return;
-    fetchAdmins();
+    fetchAdmins(1);
   }, [fetchAdmins, isPresent]);
 
   useEffect(() => {
@@ -90,7 +147,19 @@ export default function TicketReportAdminList() {
 
       <motion.hr variants={staggerItem} className="report-divider" />
 
-      <motion.div variants={staggerItem} className="adminselect-card" style={{ marginBottom: '2rem' }}>
+      <motion.div
+        variants={staggerItem}
+        className="adminselect-card"
+        style={
+
+          isMobile ?
+            { marginBottom: '2rem', maxHeight: '500px', overflowY: 'auto' } :
+            { marginBottom: '2rem' }
+        }
+
+        ref={isMobile ? scrollRef : null}
+        onScroll={isMobile ? handleScroll : null}
+      >
         <h1 className="page-title">Pilih Admin Untuk Laporan Detail</h1>
         {loadingAdmins ? <p>Memuat data admin...</p> : (
           <div className="admin-list-grid">
@@ -103,9 +172,16 @@ export default function TicketReportAdminList() {
                 </div>
               </Link>
             ))}
+
+            {isMobile && isLoadingMore && (
+              <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '10px' }}>
+                Memuat lebih banyak admin...
+              </div>
+            )}
           </div>
         )}
+        {!loadingAdmins && admins.length === 0 && <p style={{ textAlign: 'center' }}>Tidak ada data admin.</p>}
       </motion.div>
-    </motion.div> // 
+    </motion.div>
   );
 }

@@ -58,6 +58,7 @@ Route::middleware('jwt')->group(function () {
     Route::post('/users/{user}', [UserController::class, 'update']);
     Route::get('/users/{user}/stats', [UserController::class, 'activityStats']);
     Route::apiResource('users', UserController::class)->except(['create', 'edit', 'update']);
+    Route::get('/admins-for-report', [UserController::class, 'getAdminsForReport']);
 
     // // --- Rute untuk Tiket ---
     // Route::apiResource('urgency-keywords', UrgencyKeywordController::class)->only(['index', 'store', 'destroy']);
