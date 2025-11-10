@@ -43,6 +43,7 @@ import NotificationTemplateManagement from './components/NotificationTemplateMan
 
 import NewAcquisitionsReport from './components/NewAcquisitionsReport';
 import ProblematicAssetsReport from './components/ProblematicAssetsReport';
+import PurchaseProposalPage from './components/PurchaseProposalPage';
 
 // Route Guards
 import RequireAuth from './routes/RequireAuth';
@@ -115,6 +116,7 @@ export default function RootApp() {
             <Route path="financial-report" element={<FinancialReportPage />} />
             <Route path="financial-report/new-acquisitions" element={<NewAcquisitionsReport />} />
             <Route path="financial-report/problematic-assets" element={<ProblematicAssetsReport />} />
+            <Route path="financial-report/purchase-proposals" element={<PurchaseProposalPage />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

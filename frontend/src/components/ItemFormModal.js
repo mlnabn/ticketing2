@@ -9,7 +9,7 @@ const initialFormState = {
     nama_barang: '',
 };
 
-function ItemFormModal({ show, isOpen, onClose, onSave, itemToEdit, showToast }) {
+function ItemFormModal({ show, isOpen, onClose, onSave, itemToEdit, showToast, initialData = {} }) {
     const [formData, setFormData] = useState(initialFormState);
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
@@ -55,11 +55,11 @@ function ItemFormModal({ show, isOpen, onClose, onSave, itemToEdit, showToast })
                     ...itemToEdit,
                 });
             } else {
-                setFormData(initialFormState);
+                setFormData({ ...initialFormState, ...initialData });
                 setIsExisting(false);
             }
         }
-    }, [itemToEdit, show, fetchCategories]);
+    }, [itemToEdit, show, fetchCategories, initialData]);
 
     useEffect(() => {
         if (formData.id_kategori) {
