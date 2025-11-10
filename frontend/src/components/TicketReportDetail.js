@@ -36,7 +36,7 @@ const months = [
   { value: '11', label: 'November' }, { value: '12', label: 'Desember' },
 ];
 
- 
+
 const filterTypeOptions = [
   { value: 'month', label: 'Filter per Bulan' },
   { value: 'date_range', label: 'Filter per Tanggal' },
@@ -63,6 +63,7 @@ const staggerItem = {
 
 export default function TicketReportDetail() {
   const isPresent = useIsPresent();
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const { adminId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -86,13 +87,13 @@ export default function TicketReportDetail() {
   const desktopListRef = useRef(null);
   const mobileListRef = useRef(null);
 
-  
+
   const yearOptions = years.map(y => ({ value: y.toString(), label: y.toString() }));
 
- 
+
   const monthOptions = [{ value: '', label: 'Semua Bulan' }, ...months];
 
- 
+
   const activeYear = yearOptions.find(y => y.value === dateFilters.year);
   const activeMonth = monthOptions.find(m => m.value === dateFilters.month);
   const activeFilterType = filterTypeOptions.find(opt => opt.value === filterType);
@@ -108,10 +109,10 @@ export default function TicketReportDetail() {
   const handleDateFilterChange = (selectedOptionOrEvent, action) => {
     let name, value;
 
-    if (action && action.name) { 
+    if (action && action.name) {
       name = action.name;
       value = selectedOptionOrEvent ? selectedOptionOrEvent.value : '';
-    } else {  
+    } else {
       name = selectedOptionOrEvent.target.name;
       value = selectedOptionOrEvent.target.value;
     }
@@ -127,7 +128,7 @@ export default function TicketReportDetail() {
   };
 
   const handleFilterTypeChange = (selectedOption) => {
-    const newType = selectedOption.value;  
+    const newType = selectedOption.value;
     setFilterType(newType);
     const newParams = new URLSearchParams(searchParams);
 
@@ -300,7 +301,13 @@ export default function TicketReportDetail() {
       initial="hidden"
       animate="visible"
     >
-      <motion.h2 variants={staggerItem}>Laporan Penyelesaian - {admin.name}</motion.h2>
+      <motion.div
+        variants={staggerItem}
+        className="user-management-header-report"
+        style={{ marginBottom: '20px' }}
+      >
+        <h2 variants={staggerItem}>Laporan Penyelesaian - {admin.name}</h2>
+      </motion.div>
 
       {!reportData ? <motion.p variants={staggerItem}>Memuat data statistik...</motion.p> : (
         <>
@@ -311,15 +318,20 @@ export default function TicketReportDetail() {
             <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterClick('rejected')}><h3>Tiket Ditolak</h3><p>{rejected}</p></div>
           </motion.div>
 
+
+
+          <motion.button
+            variants={staggerItem}
+            className="btn-toggle-filters"
+            onClick={() => setIsMobileFilterOpen(prev => !prev)}
+          >
+            <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+            {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+          </motion.button>
+
           <motion.div variants={staggerItem}
-            className="report-filters"
-            style={{
-              display: 'flex',
-              gap: '1rem',
-              marginBottom: '1rem',
-              alignItems: 'center',
-              width: '100%',  
-            }}>
+            className={`filters-container ${isMobileFilterOpen ? 'mobile-visible' : ''}`}
+          >
 
             {/* Filter Type Select */}
             <Select
@@ -329,7 +341,10 @@ export default function TicketReportDetail() {
               classNamePrefix="report-filter-select"
               isSearchable={false}
               menuPortalTarget={document.body}
-              styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
+              styles={{
+                container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                menuPortal: (base) => ({ ...base, zIndex: 9999 })
+              }}
             />
 
             {/* Filter per Bulan */}
@@ -344,7 +359,10 @@ export default function TicketReportDetail() {
                   classNamePrefix="report-filter-select"
                   isSearchable={false}
                   menuPortalTarget={document.body}
-                  styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
+                  styles={{
+                    container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                  }}
                 />
                 {/* Year Select */}
                 <Select
@@ -355,21 +373,27 @@ export default function TicketReportDetail() {
                   classNamePrefix="report-filter-select"
                   isSearchable={false}
                   menuPortalTarget={document.body}
-                  styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
+                  styles={{
+                    container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                  }}
                 />
               </>
             )}
 
             {/* Filter per Rentang Tanggal */}
             {filterType === 'date_range' && (
-              <>
+              <motion.div
+                variants={staggerItem}
+                className='date-range-container'
+              >
+
                 <input
                   type="date"
                   name="start_date"
                   value={dateFilters.start_date}
                   onChange={handleDateFilterChange}
                   className="filter-select-date"
-                  style={{ flex: 1 }}
                 />
                 <span style={{ alignSelf: 'center' }}>-</span>
                 <input
@@ -378,21 +402,23 @@ export default function TicketReportDetail() {
                   value={dateFilters.end_date}
                   onChange={handleDateFilterChange}
                   className="filter-select-date"
-                  style={{ flex: 1 }}
                 />
-              </>
+              </motion.div>
             )}
+
           </motion.div>
+
           <motion.div variants={staggerItem} className="download-buttons">
-            <button className="btn-download pdf" onClick={() => handleDownload('pdf')} disabled={exportingPdf}>
-              <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
-              {exportingPdf ? 'Mengekspor...' : 'Download PDF'}
-            </button>
-            <button className="btn-download excel" onClick={() => handleDownload('excel')} disabled={exportingExcel}>
-              <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
-              {exportingExcel ? 'Mengekspor...' : 'Download Excel'}
-            </button>
-          </motion.div>
+              <button className="btn-download pdf" onClick={() => handleDownload('pdf')} disabled={exportingPdf}>
+                <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
+                {exportingPdf ? 'Mengekspor...' : 'Download PDF'}
+              </button>
+              <button className="btn-download excel" onClick={() => handleDownload('excel')} disabled={exportingExcel}>
+                <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
+                {exportingExcel ? 'Mengekspor...' : 'Download Excel'}
+              </button>
+            </motion.div>
+
 
           {/* --- Desktop Table --- */}
           <motion.div variants={staggerItem} className="job-list-container">
@@ -557,12 +583,13 @@ export default function TicketReportDetail() {
             </motion.div>
           )}
         </>
-      )}
+      )
+      }
       <TicketDetailModal
         show={Boolean(selectedTicketForDetail)}
         ticket={selectedTicketForDetail}
         onClose={() => setSelectedTicketForDetail(null)}
       />
-    </motion.div>
+    </motion.div >
   );
 }

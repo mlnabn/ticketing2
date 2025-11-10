@@ -64,6 +64,7 @@ const staggerItem = {
 
 export default function ComprehensiveReportPage() {
   const isPresent = useIsPresent();
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -294,7 +295,12 @@ export default function ComprehensiveReportPage() {
       initial="hidden"
       animate="visible"
     >
-      <motion.h2 variants={staggerItem}>{title}</motion.h2>
+      <motion.div
+        variants={staggerItem}
+        className="user-management-header-report"
+        style={{ marginBottom: '20px' }}
+      >
+        <motion.h2 variants={staggerItem}>{title}</motion.h2> </motion.div>
 
       {!stats ? <motion.p variants={staggerItem} className="report-status-message">Memuat data statistik...</motion.p> : (
         <>
@@ -316,25 +322,32 @@ export default function ComprehensiveReportPage() {
             )}
           </motion.div>
 
+          <motion.button
+            variants={staggerItem}
+            className="btn-toggle-filters"
+            onClick={() => setIsMobileFilterOpen(prev => !prev)}
+          >
+            <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+            {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+          </motion.button>
+
+
           <motion.div
             variants={staggerItem}
-            className="report-filters"
-            style={{
-              display: 'flex',
-              gap: '1rem',
-              marginBottom: '1rem',
-              alignItems: 'center',
-              width: '100%',
-            }}>
+            className={`filters-container ${isMobileFilterOpen ? 'mobile-visible' : ''}`}
+          >
 
             <Select
               classNamePrefix="report-filter-select"
               options={filterTypeOptions}
               value={filterTypeOptions.find(opt => opt.value === filterType)}
-              onChange={handleFilterTypeChange} 
+              onChange={handleFilterTypeChange}
               isSearchable={false}
               menuPortalTarget={document.body}
-              styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }} 
+              styles={{
+                container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                menuPortal: (base) => ({ ...base, zIndex: 9999 })
+              }}
             />
 
             {/* Filter per Bulan */}
@@ -350,7 +363,10 @@ export default function ComprehensiveReportPage() {
                   placeholder="Semua Bulan"
                   isSearchable={false}
                   menuPortalTarget={document.body}
-                  styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999 }) }}
+                  styles={{
+                    container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                  }}
                 />
                 {/* 3. Filter Tahun */}
                 <Select
@@ -361,21 +377,28 @@ export default function ComprehensiveReportPage() {
                   onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'year', value: selectedOption.value } })}
                   isSearchable={false}
                   menuPortalTarget={document.body}
-                  styles={{ container: (base) => ({ ...base, flex: 1, zIndex: 9999   }) }} // width: 100%
+                  styles={{
+                    container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                  }}
                 />
               </>
             )}
 
             {/* Filter per Rentang Tanggal */}
             {filterType === 'date_range' && (
-              <>
+              <motion.div
+                variants={staggerItem}
+                className='date-range-container'
+              >
+
                 <input
                   type="date"
                   name="start_date"
                   value={dateFilters.start_date}
                   onChange={handleDateFilterChange}
                   className="filter-select-date"
-                  style={{ flex: 1 }} 
+                  style={{ flex: 1 }}
                 />
                 <span className='strip' style={{ alignSelf: 'center' }}>-</span>
                 <input
@@ -386,7 +409,7 @@ export default function ComprehensiveReportPage() {
                   className="filter-select-date"
                   style={{ flex: 1 }}
                 />
-              </>
+              </motion.div>
             )}
           </motion.div>
 
