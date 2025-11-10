@@ -48,8 +48,7 @@ function ToolManagement() {
     const [selectedIds, setSelectedIds] = useState([]);
     const [expandedRows, setExpandedRows] = useState({});
     const [detailItems, setDetailItems] = useState({});
-    const [expandingId] = useState(null);
-    // const [expandingId, setExpandingId] = useState(null);
+    const [expandingId, setExpandingId] = useState(null);
 
     const fetchItems = useCallback(async (page = 1, filters = {}, getIsActive = () => true) => {
         if (page === 1) setLoading(true);
