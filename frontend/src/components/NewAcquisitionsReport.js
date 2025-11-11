@@ -103,17 +103,6 @@ export default function NewAcquisitionsReport() {
                 <h1 className="page-title">Laporan Pembelian Baru (Aset Masuk)</h1>
             </motion.div>
 
-            <motion.div variants={staggerItem} className="download-buttons">
-                <button onClick={() => handleExportWrapper('excel')} disabled={exportingExcel} className="btn-download excel">
-                    <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
-                    {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
-                </button>
-                <button onClick={() => handleExportWrapper('pdf')} disabled={exportingPdf} className="btn-download pdf">
-                    <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
-                    {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
-                </button>
-            </motion.div>
-
             <motion.button
                 variants={staggerItem}
                 className="btn-toggle-filters"
@@ -184,6 +173,17 @@ export default function NewAcquisitionsReport() {
                         <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
                     </motion.div>
                 )}
+            </motion.div>
+
+            <motion.div variants={staggerItem} className="download-buttons">
+                <button onClick={() => handleExportWrapper('excel')} disabled={exportingExcel} className="btn-download excel">
+                    <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
+                    {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
+                </button>
+                <button onClick={() => handleExportWrapper('pdf')} disabled={exportingPdf} className="btn-download pdf">
+                    <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
+                    {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
+                </button>
             </motion.div>
 
             <motion.div variants={staggerItem} className="job-list-container">

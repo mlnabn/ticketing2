@@ -9594,7 +9594,9 @@ body.dark-mode .summary-cards .card h3 {
     transform: translateY(0);
   }
 }
-
+.download{
+  flex-direction: row;
+}
 .download-buttons {
   display: flex;
   gap: 10px;
