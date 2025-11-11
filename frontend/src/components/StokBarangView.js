@@ -523,14 +523,6 @@ function StokBarangView() {
                 </motion.div>
 
                 <motion.div variants={staggerItem} className="action-buttons-stok">
-                    <motion.input
-                        variants={staggerItem}
-                        type="text"
-                        placeholder="Cari Kode SKU / Nama Barang..."
-                        value={searchTerm}
-                        onChange={e => setSearchTerm(e.target.value)}
-                        className="filter-search-input-invReport"
-                    />
                     <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>
                         <i className="fas fa-plus" style={{ marginRight: '8px' }}>
                         </i>Tambah Stok
@@ -560,6 +552,14 @@ function StokBarangView() {
                             <i className="fas fa-times"></i>
                         </button>
                     )}
+                    <motion.input
+                        variants={staggerItem}
+                        type="text"
+                        placeholder="Cari Kode SKU / Nama Barang..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="filter-search-input-invReport"
+                    />
                 </motion.div>
 
                 <motion.button

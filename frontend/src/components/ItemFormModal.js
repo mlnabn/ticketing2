@@ -21,6 +21,7 @@ function ItemFormModal({ show, isOpen, onClose, onSave, itemToEdit, showToast, i
 
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
+    const initialDataString = JSON.stringify(initialData);
 
     useEffect(() => {
         if (show) {
@@ -59,7 +60,8 @@ function ItemFormModal({ show, isOpen, onClose, onSave, itemToEdit, showToast, i
                 setIsExisting(false);
             }
         }
-    }, [itemToEdit, show, fetchCategories, initialData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [itemToEdit, show, fetchCategories, initialDataString]);
 
     useEffect(() => {
         if (formData.id_kategori) {

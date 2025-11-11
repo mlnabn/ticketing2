@@ -90,7 +90,6 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
   return (
     <div className="auth-page-container">
       <div className="split-card">
-        {/* Kiri - Form Login */}
         <div className="login-card">
           <motion.form
             onSubmit={handleSubmit}
@@ -186,7 +185,6 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
           </motion.form>
         </div>
 
-        {/* Kanan - Gambar */}
         <div className="login-background-side">
           <motion.img
             src={bgImage2}

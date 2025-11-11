@@ -145,7 +145,7 @@ function ItemListView({
                 initial="hidden"
                 animate="visible"
             >
-                <motion.div variants={staggerItem} className="user-management-container" style={{ marginBottom: '10px' }}>
+                <motion.div variants={staggerItem} className="sku-add-button-container">
                     {!showArchived && (
                         <button className="btn-primary" onClick={onAdd}>
                             <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
