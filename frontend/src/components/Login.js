@@ -6,7 +6,7 @@ import '../App.css';
 import bgImage2 from '../Image/Login.png';
 import GoogleLogo from "../Image/google.svg";
 
-const API_URL = 'http://127.0.0.1:8000/api';
+const API_URL = 'http://10.10.2.194:8000/api';
 
 const imageVariants = {
   hidden: {

@@ -160,12 +160,13 @@ function ToolManagement() {
             showToast('Tipe barang baru berhasil didaftarkan.');
             handleCloseItemModal();
             fetchItems(pagination?.current_page || 1);
+            fetchItems(1, currentFilters); 
+
         } catch (e) {
             console.error('Gagal menyimpan barang:', e);
             const errorMsg = e.response?.data?.message || 'Gagal menyimpan data barang.';
             showToast(errorMsg, 'error');
         }
-        fetchItems(1, currentFilters);
     };
 
     const handleDeleteClick = (item) => {
