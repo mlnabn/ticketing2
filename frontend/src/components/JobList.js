@@ -367,23 +367,14 @@ export default function JobList() {
   };
 
   const columnStyles = {
-    // 1. Checkbox
     col1: { width: '40px' },
-    // 2. Pengirim
     col2: { width: '100px' },
-    // 3. Dikerjakan Oleh
     col3: { width: '120px' },
-    // 4. Workshop
     col4: { width: '120px' },
-    // 5. Deskripsi (Lebar Otomatis dengan batas minimum)
     col5: { width: '250px' },
-    // 6. Tanggal Dibuat
     col6: { width: '110px' },
-    // 7. Waktu Pengerjaan (Tengahkan teks)
     col7: { width: '120px', textAlign: 'center' },
-    // 8. Status (Tengahkan teks)
     col8: { width: '170px', textAlign: 'center' },
-    // 9. Aksi (PENTING: Beri ruang cukup)
     col9: { width: '250px', paddingRight: '5px' }
   };
 
@@ -399,19 +390,17 @@ export default function JobList() {
           {isMyTicketsPage ? 'Tiket yang Saya Kerjakan' : 'Daftar Semua Tiket'}
         </motion.h1>
 
-        {!isMyTicketsPage && isAdmin && (
-          <motion.div variants={staggerItem}>
-            <div className="filters-container report-filters" style={{ margin: '20px 0' }}>
-              <input
-                type="text"
-                placeholder="Cari tiket, deskripsi, nama, workshop..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="filter-search-input"
-              />
-            </div>
-          </motion.div>
-        )}
+        <motion.div variants={staggerItem}>
+          <div className="filters-container report-filters" style={{ margin: '20px 0' }}>
+            <input
+              type="text"
+              placeholder="Cari tiket, deskripsi, nama, workshop..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="filter-search-input"
+            />
+          </div>
+        </motion.div>
 
         <AnimatePresence>
           {selectedIds.length > 0 && (

@@ -5688,6 +5688,10 @@ body.dark-mode .feedback-message {
   color: #34d399;
 }
 
+.sku-add-button-container {
+  margin-bottom: 10px;
+}
+
 /* ===============================
    NOTIFICATION BELL - NIGHT SKY
    =============================== */
@@ -12254,6 +12258,7 @@ body.dark-mode .btn-dlt:hover {
 
   .user-management-container h1 {
     font-size: 1.5rem;
+    margin-bottom: 0;
   }
 
   .user-management-container h2 {
@@ -13999,7 +14004,7 @@ body.dark-mode .detail-list-footer-centered {
     right: 1rem;
     padding: 0.5rem 0;
     border-radius: 24px;
-    z-index: 1000;
+    z-index: 1030;
     background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(15px) saturate(180%);
     -webkit-backdrop-filter: blur(15px) saturate(180%);
@@ -14063,7 +14068,7 @@ body.dark-mode .detail-list-footer-centered {
   .mobile-nav-card {
     display: block;
     position: fixed;
-    bottom: 80px;
+    bottom: 110px;
     left: 1rem;
     right: 1rem;
     background: rgba(255, 255, 255, 0.3);
@@ -14400,5 +14405,13 @@ body.dark-mode .detail-list-footer-centered {
   .date-range-container .filter-select-date {
     flex: 1;
     width: auto;
+  }
+
+  .login-background-side {
+    display: none;
+  }
+
+  .sku-add-button-container {
+    margin-bottom: 0;
   }
 }

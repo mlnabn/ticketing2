@@ -236,10 +236,11 @@ export default function AdminDashboard() {
       <AnimatePresence>
         {activeMobileMenu && (
           <motion.div
+            key={activeMobileMenu}
             className="mobile-nav-card"
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "100%", opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             <div className="mobile-nav-card-header">

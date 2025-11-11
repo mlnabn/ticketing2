@@ -8,7 +8,6 @@ return [
 
     'allowed_origins' => [
         env('FRONTEND_URL', 'http://localhost:3000'),
-        'http://10.10.2.194:3000',
     ],
 
     'allowed_origins_patterns' => [],
