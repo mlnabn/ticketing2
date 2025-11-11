@@ -159,9 +159,9 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
 
     return (
         <>
-            <div className={`modal-backdrop-centered ${animationClass}`} onClick={onClose}>
+            <div className={`modal-backdrop-detail ${animationClass}`} onClick={onClose}>
                 <div className={`modal-content-large ${animationClass}`} onClick={e => e.stopPropagation()}>
-                    <button onClick={onClose} className="modal-close-btn">&times;</button>
+                    {/* <button onClick={onClose} className="modal-close-btn">&times;</button> */}
                     <h3>Buat Catatan Pengajuan Baru</h3>
 
                     <div className="form-group full">
@@ -241,7 +241,7 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
                     <div className="confirmation-modal-actions">
                         <button type="button" onClick={onClose} className="btn-cancel">Batal</button>
                         <button type="button" onClick={handleSubmitProposal} className="btn-confirm" disabled={isLoading || items.length === 0}>
-                            {isLoading ? 'Menyimpan...' : 'Simpan Catatan Pengajuan'}
+                            {isLoading ? 'Menyimpan...' : 'Simpan'}
                         </button>
                     </div>
                 </div>

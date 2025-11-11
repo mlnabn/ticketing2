@@ -1,4 +1,3 @@
-// src/components/HistoryModal.js
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
@@ -84,7 +83,6 @@ function HistoryModal({ show, item, onClose, showToast, startDate, endDate }) {
                                     <span className="info-label" style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>Dicatat pada: {formatLogTime(log.created_at)}</span>
                                 </div>
 
-                                {/* GRID DETAIL KEJADIAN */}
                                 <div className="form-row2">
                                     <div className="info-row">
                                         <span className="info-label">Status</span>

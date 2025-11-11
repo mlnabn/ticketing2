@@ -91,10 +91,10 @@ const LineChartComponent = ({ data, onPointClick }) => {
 
   return (
     <div className="linechart-wrapper">
-      <ResponsiveContainer width="100%" height={220}>
+      <ResponsiveContainer width="100%" height={210}>
         <LineChart
           data={formattedData}
-          margin={{ top: 10, right: 30, left: -10, bottom: 30 }}
+          margin={{ top: 10, right: 30, left: -30, bottom: 0 }}
         >
           <CartesianGrid
             strokeDasharray="3 3"
@@ -183,11 +183,11 @@ const LineChartComponent = ({ data, onPointClick }) => {
       </ResponsiveContainer>
 
       {/* Legend custom */}
-      <div className="chart-legend">
+      <div className="chart-legend" style={{ justifyContent: 'center', marginTop: '10px' }}>
         {[
           { status: "Belum Dikerjakan", color: "dot-blue" },
-          { status: "Sedang Dikerjakan", color: "dot-yellow" },
           { status: "Selesai", color: "dot-green" },
+          { status: "Sedang Dikerjakan", color: "dot-yellow" },    
           { status: "Ditolak", color: "dot-red" },
         ].map((item) => (
           <div

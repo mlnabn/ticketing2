@@ -1,9 +1,7 @@
-// src/components/ProposalDetailModal.js
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { saveAs } from 'file-saver';
 
-// Helper functions (diambil dari PurchaseProposalPage)
 const formatCurrency = (value) => {
     if (typeof value !== 'number') return 'Rp 0';
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
@@ -19,7 +17,6 @@ function ProposalDetailModal({ show, proposal, onClose, showToast }) {
     const [shouldRender, setShouldRender] = useState(show);
     const [currentProposal, setCurrentProposal] = useState(proposal);
 
-    // Logic Animasi Modal (Mirip HistoryModal)
     useEffect(() => {
         let timer;
         if (show) {
@@ -28,7 +25,6 @@ function ProposalDetailModal({ show, proposal, onClose, showToast }) {
             setIsClosing(false);
         } else {
             setIsClosing(true);
-            // pastikan timer selalu jalan walaupun sedang closing
             timer = setTimeout(() => {
                 setShouldRender(false);
                 setIsClosing(false);
@@ -37,11 +33,10 @@ function ProposalDetailModal({ show, proposal, onClose, showToast }) {
         return () => clearTimeout(timer);
     }, [show, proposal]);
 
-    // Logic Ambil Detail Proposal
     useEffect(() => {
         if (show && currentProposal?.id) {
             setDetailLoading(true);
-            setProposalDetails(null); // Clear previous details
+            setProposalDetails(null);
 
             api.get(`/purchase-proposals/${currentProposal.id}`)
                 .then(res => {
@@ -61,7 +56,6 @@ function ProposalDetailModal({ show, proposal, onClose, showToast }) {
         setIsClosing(true);
     };   
 
-// Logic Export (Dipindahkan dari PurchaseProposalPage)
 const handleExport = async (exportType) => {
     if (!currentProposal) return;
 
@@ -92,9 +86,9 @@ const animationClass = isClosing ? 'closing' : '';
 const items = proposalDetails?.items || [];
 
 return (
-    <div className={`modal-backdrop-centered ${animationClass}`} onClick={handleCloseClick}>
+    <div className={`modal-backdrop-detail ${animationClass}`} onClick={handleCloseClick}>
         <div className={`modal-content-large ${animationClass}`} onClick={e => e.stopPropagation()}>
-            <button type="button" onClick={handleCloseClick} className="modal-close-btn">&times;</button>
+            {/* <button type="button" onClick={handleCloseClick} className="modal-close-btn">&times;</button> */}
             <h3>Detail: {currentProposal?.title || 'Memuat...'}</h3>
 
             {/* --- Kontrol Panel (Download Buttons) --- */}
@@ -169,7 +163,9 @@ return (
                     </p>
                 )}
 
-                {/* Total Riwayat Item */}
+                
+            </div>
+            {/* Total Riwayat Item */}
                 {!detailLoading && items.length > 0 && (
                     <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', borderTop: '1px solid #4A5568', borderRadius: '12px' }}>
                         <span className="subtotal-label" style={{ fontSize: '13px', fontWeight: 'bold' }}>Total Barang dalam Catatan</span>
@@ -178,7 +174,6 @@ return (
                         </span>
                     </div>
                 )}
-            </div>
 
             <div className="modal-actions">
                 <button onClick={handleCloseClick} className="btn-cancel">Tutup</button>

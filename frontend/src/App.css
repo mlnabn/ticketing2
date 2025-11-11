@@ -8404,10 +8404,10 @@ html {
 .chart-legend {
   display: flex;
   justify-content: center;
-  align-items: center;
   gap: 10px;
   margin-top: 5px;
   flex-wrap: wrap;
+  text-overflow: ellipsis;
 }
 
 /* ========================================================= */
@@ -8542,10 +8542,16 @@ html {
   }
 }
 
+
 /* === Responsiveness (Unchanged) === */
 @media (max-width: 768px) {
   .linechart-wrapper {
-    padding: 10px;
+    padding: 0px;
+  }
+
+  .barchart-wrapper {
+    padding: 0px;
+    margin-left: 0px;
   }
 
   .chart-legend {
