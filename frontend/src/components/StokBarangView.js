@@ -875,53 +875,63 @@ function StokBarangView() {
                                                         exit="hidden"
                                                         variants={expandVariants}
                                                         onScroll={(e) => handleDetailScroll(e, masterItem.id_m_barang)}
-                                                        onClick={(e) => e.stopPropagation()} // Mencegah card menutup saat diklik
+                                                        onClick={(e) => e.stopPropagation()} 
                                                     >
                                                         {expandingId === masterItem.id_m_barang ? (<p className="detail-loading-mobile">Memuat unit...</p>)
                                                             : detailItems[masterItem.id_m_barang]?.items?.length > 0 ? (
                                                                 detailItems[masterItem.id_m_barang].items.map(detail => (
                                                                     <div
                                                                         key={detail.id}
-                                                                        className="ticket-card-mobile detail-card hoverable-row"
-                                                                        onClick={(e) => {
-                                                                            if (e.target.tagName === 'BUTTON' || e.target.closest('.action-row')) {
-                                                                                return;
-                                                                            }
-                                                                            setDetailItem(detail);
-                                                                        }}
+                                                                        className="ticket-card-mobile detail-card"
                                                                     >
-                                                                        <div className="card-header-detail">
-                                                                            <span>{detail.kode_unik}</span>
-                                                                            {detail.serial_number && <small>S/N: {detail.serial_number}</small>}
+                                                                        <div className="card-select-col">
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                checked={selectedItems.has(detail.id)}
+                                                                                onChange={(e) => handleSelectItem(detail.id, e.target.checked)}
+                                                                                onClick={(e) => e.stopPropagation()} 
+                                                                            />
                                                                         </div>
-                                                                        <div className="card-body">
-                                                                            <div className="card-item-row">
-                                                                                <span className="label">Kondisi</span><span className="value">{detail.kondisi}</span>
+                                                                        <div
+                                                                            className="card-content-col hoverable-row" 
+                                                                            onClick={(e) => {
+                                                                                if (e.target.tagName === 'BUTTON' || e.target.closest('.action-row') || e.target.closest('.card-select-col') || e.target.type === 'checkbox') {
+                                                                                    return;
+                                                                                }
+                                                                                setDetailItem(detail);
+                                                                            }}
+                                                                        >
+                                                                            <div className="card-header-detail">
+                                                                                <span>{detail.kode_unik}</span>
+                                                                                {detail.serial_number && <small>S/N: {detail.serial_number}</small>}
                                                                             </div>
-                                                                            <div className="card-separator"></div>
-                                                                            <div className="card-item-row">
-                                                                                <span className="label">Status</span>
-                                                                                <span className="value">
-                                                                                    <span className={`status-badge status-${(detail.status_detail?.nama_status || 'unknown').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                                            <div className="card-body">
+                                                                                <div className="card-item-row">
+                                                                                    <span className="label">Kondisi</span><span className="value">{detail.kondisi}</span>
+                                                                                </div>
+                                                                                <div className="card-separator"></div>
+                                                                                <div className="card-item-row">
+                                                                                    <span className="label">Status</span>
+                                                                                    <span className="value">
                                                                                         {detail.status_detail?.nama_status || 'N/A'}
                                                                                     </span>
-                                                                                </span>
+                                                                                </div>
+                                                                                <div className="card-separator"></div>
+                                                                                <div className="card-item-row">
+                                                                                    <span className="label">Warna</span>
+                                                                                    <span className="value">{detail.color ? detail.color.nama_warna : '-'}</span>
+                                                                                </div>
+                                                                                <div className="card-separator"></div>
+                                                                                <div className="card-item-row">
+                                                                                    <span className="label">Harga</span>
+                                                                                    <span className="value">{formatCurrency(detail.harga_beli)}</span>
+                                                                                </div>
                                                                             </div>
                                                                             <div className="card-separator"></div>
-                                                                            <div className="card-item-row">
-                                                                                <span className="label">Warna</span>
-                                                                                <span className="value">{detail.color ? detail.color.nama_warna : '-'}</span>
+                                                                            <div className="card-row action-row">
+                                                                                <button onClick={() => setDetailItem(detail)} className="btn-user-action btn-detail">Detail</button>
+                                                                                <button onClick={() => setQrModalItem(detail)} className="btn-user-action btn-qr">QR</button>
                                                                             </div>
-                                                                            <div className="card-separator"></div>
-                                                                            <div className="card-item-row">
-                                                                                <span className="label">Harga</span>
-                                                                                <span className="value">{formatCurrency(detail.harga_beli)}</span>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="card-separator"></div>
-                                                                        <div className="card-row action-row">
-                                                                            <button onClick={() => setDetailItem(detail)} className="btn-user-action btn-detail">Detail</button>
-                                                                            <button onClick={() => setQrModalItem(detail)} className="btn-user-action btn-qr">QR</button>
                                                                         </div>
                                                                     </div>
                                                                 ))

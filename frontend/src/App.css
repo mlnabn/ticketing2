@@ -14521,3 +14521,78 @@ body.dark-mode .detail-list-footer-centered {
     flex: 1;
   }
 }
+
+.ticket-card-mobile.detail-card {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  padding: 0;
+  gap: 0;
+}
+
+.card-select-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 10px 15px 15px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-color-light);
+  transition: background-color 0.2s;
+}
+
+.dark-mode .card-select-col {
+  border-right: 1px solid var(--border-color-dark);
+}
+
+.card-content-col.hoverable-row:hover + .card-select-col,
+.card-select-col:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.dark-mode .card-content-col.hoverable-row:hover + .card-select-col,
+.dark-mode .card-select-col:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.card-content-col {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 15px;
+}
+
+.card-select-col input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.card-header-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.card-header-detail span {
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-header-detail small {
+  font-size: 0.8rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  color: #94a3b8;
+}
+
+body:not(.dark-mode) .card-header-detail small {
+  color: #6c757d;
+}
