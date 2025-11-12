@@ -97,8 +97,7 @@ return (
             <button type="button" onClick={handleCloseClick} className="modal-close-btn">&times;</button>
             <h3>Detail: {currentProposal?.title || 'Memuat...'}</h3>
 
-            {/* --- Kontrol Panel (Download Buttons) --- */}
-            <div className="history-panel-controls" style={{ padding: '0 0 10px 0', borderBottom: '1px solid #333' }}>
+            <div className="download-butttons" style={{ padding: '0 0 10px 0', borderBottom: '1px solid #333' }}>
                 <div className="download-buttons">
                     <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
                         <i className="fas fa-file-excel"></i> {exportingExcel ? '...' : 'Ekspor Excel'}

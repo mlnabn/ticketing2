@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Select from 'react-select';
 import AsyncSelect from 'react-select/async';
 import api from '../services/api';
+import QrScannerModal from './QrScannerModal';
 
 
 const useScannerListener = (onScan, isOpen) => {
@@ -30,7 +31,7 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show }
     const [selectedAdminId, setSelectedAdminId] = useState(null);
     const [itemsToAssign, setItemsToAssign] = useState([]);
     const [selectKey, setSelectKey] = useState(Date.now());
-
+    const [isCameraScannerOpen, setIsCameraScannerOpen] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const [currentTicket, setCurrentTicket] = useState(ticket); 
@@ -113,6 +114,11 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show }
     
     useScannerListener(handleScan, show);
 
+    const handleCameraScanSuccess = (decodedText) => {
+        setIsCameraScannerOpen(false);
+        handleScan(decodedText);  
+    };
+
     const loadOptions = async (inputValue) => {
         if (inputValue.length < 2) return [];
 
@@ -180,17 +186,27 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show }
 
                 <div className="form-group-AssignAdmin">
                     <label className="modal-label">Barang yang Dibawa (Scan atau Ketik Kode)</label>
-                    <AsyncSelect className="scan-input-group"
-                        key={selectKey}
-                        cacheOptions
-                        loadOptions={loadOptions}
-                        defaultOptions
-                        placeholder="Ketik nama, kode unik, atau S/N..."
-                        onChange={(selectedOption) => addItemToList(selectedOption.value)}
-                        styles={selectStyles}
-                        noOptionsMessage={() => 'Ketik untuk mencari barang...'}
-                        loadingMessage={() => 'Mencari...'}
-                    />
+                    <div className="input-with-button-wrapper">
+                        <AsyncSelect className="async-select-main"
+                            key={selectKey}
+                            cacheOptions
+                            loadOptions={loadOptions}
+                            defaultOptions
+                            placeholder="Ketik nama, kode unik, atau S/N..."
+                            onChange={(selectedOption) => addItemToList(selectedOption.value)}
+                            styles={selectStyles}
+                            noOptionsMessage={() => 'Ketik untuk mencari barang...'}
+                            loadingMessage={() => 'Mencari...'}
+                        />
+                        <button 
+                            type="button" 
+                            className="btn-icon-only btn-scan-camera"
+                            onClick={() => setIsCameraScannerOpen(true)}
+                            title="Pindai dengan Kamera"
+                        >
+                            <i className="fas fa-qrcode"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div className="assigned-items-list-scan">
@@ -208,6 +224,11 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show }
                     <button onClick={handleSubmit} className="btn-confirm">Kerjakan</button>
                 </div>
             </div>
+            <QrScannerModal
+                show={isCameraScannerOpen}
+                onClose={() => setIsCameraScannerOpen(false)}
+                onScanSuccess={handleCameraScanSuccess}
+            />
         </div>
     );
 }

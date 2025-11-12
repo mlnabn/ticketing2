@@ -170,7 +170,7 @@ function ItemFormModal({ show, isOpen, onClose, onSave, itemToEdit, showToast, i
                                 placeholder="Pilih atau ketik kategori baru..."
                             />
 
-                            <label>Sub-Kategori</label>
+                            <label>Sub-Kategori / Merk</label>
                             <CreatableSelect
                                 classNamePrefix="creatable-select"
                                 isClearable
