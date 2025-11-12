@@ -132,7 +132,7 @@ export default function WelcomeHome() {
 
       {/* Kontainer Chart */}
       <div className="dashboard-container2">
-        <motion.div variants={staggerItem} className="dashboard-row">
+        <motion.div variants={staggerItem} className="dashboard-row2">
           <div className="dashboard-card line-chart-card">
             <h4>Tren Tiket (30 Hari Terakhir)</h4>
             <LineChartComponent data={analyticsData} onPointClick={(status, date) => handleChartFilter({ status, date })} onLegendClick={(status) => handleChartFilter({ status })} />
@@ -158,6 +158,32 @@ export default function WelcomeHome() {
           <h4>Kalender Tiket</h4>
           <CalendarComponent tickets={allTickets} onTicketClick={(ticketId) => handleChartFilter({ ticketId })} />
         </motion.div>
+
+       
+
+          <div className="ticket-legend" style={{ marginTop: "10px", fontSize: "13px" }}>
+            <div className="legend-item legend-green">
+              <span className="legend-dot dot-green"></span>
+              <span>Selesai</span>
+            </div>
+            <div className="legend-item legend-yellow">
+              <span className="legend-dot dot-yellow"></span>
+              <span>Sedang Dikerjakan</span>
+            </div>
+            <div className="legend-item legend-blue">
+              <span className="legend-dot dot-blue"></span>
+              <span>Belum Dikerjakan</span>
+            </div>
+            <div className="legend-item legend-gray">
+              <span className="legend-dot dot-gray"></span>
+              <span>Ditunda</span>
+            </div>
+            <div className="legend-item legend-red">
+              <span className="legend-dot dot-red"></span>
+              <span>Ditolak</span>
+            </div>
+          </div>
+       
 
       </div>
     </motion.div>

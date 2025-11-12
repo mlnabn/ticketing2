@@ -18,11 +18,9 @@ let DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 const MapComponent = ({ data }) => {
-  // Koordinat pusat peta default
-  const defaultPosition = [-7.330, 110.500]; // Contoh: Koordinat Jawa Tengah
+  const defaultPosition = [-7.330, 110.500]; 
 
   const handleMarkerClick = (url) => {
-    // Membuka URL di tab baru
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
@@ -43,7 +41,6 @@ const MapComponent = ({ data }) => {
         <Marker 
           key={index} 
           position={[location.lat, location.lng]}
-          // Tambahkan event onClick di sini
           eventHandlers={{
             click: () => {
               if (location.url) {
@@ -62,5 +59,7 @@ const MapComponent = ({ data }) => {
     </div>
   );
 };
+
+
 
 export default React.memo(MapComponent);

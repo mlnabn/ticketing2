@@ -939,7 +939,7 @@ body.dark-mode .hamburger-menu-button span {
     flex-direction: column;
     gap: 2px;
     min-width: 0;
-    flex-basis: 0; 
+    flex-basis: 0;
     flex-grow: 1;
   }
 
@@ -3470,7 +3470,6 @@ body.dark-mode .page-item.disabled .page-link:hover {
   transition: color 0.3s ease;
   text-align: center;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-  /* background: linear-gradient(45deg, #007bff, #8a2be2, #00c6ff); */
   background: black;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -3490,55 +3489,38 @@ body.dark-mode .page-item.disabled .page-link:hover {
 
 body.dark-mode .content-area h2 {
   color: var(--add-ticket-title-color-dark);
-  /* Fallback jika gradien tidak didukung */
   text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.08);
-  /* Bayangan teks di dark mode */
-  /* Untuk dark mode, kita bisa mengubah gradien atau membiarkannya sama */
-  /* background: linear-gradient(45deg, #6a00ff, #00c6ff, #0056b3); */
   background: white;
-  /* Ungu gelap, biru muda, biru tua */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .content-area p {
   font-size: 1.15rem;
-  /* Ukuran teks paragraf sedikit lebih besar */
   color: var(--add-ticket-text-color-light);
   margin-bottom: 0rem;
-  /* Margin bawah lebih besar */
   transition: color 0.3s ease;
   text-align: center;
-  /* Teks di tengah */
   line-height: 1.6;
-  /* Spasi baris untuk keterbacaan yang lebih baik */
   max-width: 800px;
-  /* Batasi lebar paragraf untuk keterbacaan di layar lebar */
   margin-left: auto;
   margin-right: auto;
   font-weight: 400;
-  /* Pastikan tidak terlalu tebal atau tipis */
   opacity: 0.9;
-  /* Sedikit transparan untuk efek yang lebih lembut */
 }
 
 body.dark-mode .content-area p {
   color: var(--add-ticket-text-color-dark);
   opacity: 0.8;
-  /* Sedikit lebih transparan di dark mode */
 }
 
 .content-area h3 {
   font-size: 1.9rem;
-  /* Ukuran judul h3 lebih besar */
   font-weight: 700;
-  /* Margin bawah lebih besar */
   color: var(--add-ticket-title-color-light);
   transition: color 0.3s ease;
   text-align: center;
-  /* Teks di tengah */
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
-  /* Sedikit bayangan teks */
 }
 
 body.dark-mode .content-area h3 {
@@ -3551,10 +3533,6 @@ body.dark-mode .content-area h3 {
  TOMBOL UTAMA (Tambah Pengguna Baru)
  ---------------------------------------------------
 */
-
-/* ======================================================= */
-/* GAYA TOMBOL AKSI MANAJEMEN PENGGUNA (TEMA BARU)      */
-/* ======================================================= */
 
 /* --- Grup Tombol --- */
 .action-buttons-group {
@@ -3604,19 +3582,16 @@ body.dark-mode .btn-edit:hover {
 /* --- Tema Tombol Hapus (Merah) --- */
 .btn-delete {
   background-color: #f8d7da;
-  /* Warna ini sudah sesuai */
   color: #721c24;
   border-color: #f5c6cb;
 }
 
 .btn-delete:hover {
   background-color: #f1b0b7;
-  /* [DIUBAH] Warna dari JobList */
   border-color: #f1b0b7;
   transform: translateY(-1px);
 }
 
-/* [DIUBAH] Dark Mode untuk Tombol Hapus (Solid) */
 body.dark-mode .btn-delete {
   background-color: #e53e3e;
   color: #ffffff;
@@ -3629,19 +3604,15 @@ body.dark-mode .btn-delete:hover {
 }
 
 /* =================================================================
-   PERUBAHAN UTAMA: TATA LETAK UNTUK USER (TANPA SIDEBAR)
-   Tambahkan ini untuk mengatur layout utama saat user login.
+   USER VIEW: DASHBOARD TANPA SIDEBAR
+   Gaya khusus untuk tampilan user tanpa sidebar.
 ================================================================= */
-
-/* Layout untuk user (tanpa sidebar) */
 .dashboard-container.no-sidebar {
   display: block;
-  /* Mengubah dari grid ke block agar tidak ada kolom sidebar */
 }
 
 .dashboard-container.no-sidebar {
   background-color: transparent;
-  /* Sembunyikan sidebar untuk user */
 }
 
 .dashboard-container.no-sidebar {
@@ -3652,21 +3623,6 @@ body.dark-mode .btn-delete:hover {
   background: transparent;
 }
 
-/* .job-form-user {
-  border-color:#000000;
-  backdrop-filter: blur(10px); 
-  border: 1px solid rgba(255, 252, 252, 0.3); 
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.dark .job-form-user {
-  background-color: transparent; 
-  border: 1px solid rgba(255, 255, 255, 0.2);
-} */
-
-/* Di layout no-sidebar, main-content tidak perlu margin-left */
 .dashboard-container.no-sidebar .main-content {
   margin-left: 0;
 }
@@ -3706,7 +3662,6 @@ body.dark-mode .btn-delete:hover {
 
 .tab-button:hover {
   color: var(--primary-color, #3b82f6);
-  /* Menggunakan variabel primary color Anda */
 }
 
 .tab-button.active {
@@ -3718,7 +3673,6 @@ body.dark-mode .btn-delete:hover {
   content: '';
   position: absolute;
   bottom: -4px;
-  /* Disesuaikan agar pas dengan padding */
   left: 1rem;
   right: 1rem;
   height: 3px;
@@ -3731,7 +3685,6 @@ body.dark-mode .btn-delete:hover {
    Gaya untuk membungkus konten di dalam tab Request & History.
 ================================================================= */
 .user-view-container {
-  /* padding-top: 50px; */
   max-width: 1000px;
   margin: 2rem auto;
   width: 100%;
@@ -3740,9 +3693,7 @@ body.dark-mode .btn-delete:hover {
 .request-tab,
 .history-tab {
   background-color: rgba(255, 255, 255, 0.2);
-  /* putih transparan */
   backdrop-filter: blur(10px);
-  /* efek blur kaca */
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0px 0px 100px 0px rgba(83, 83, 83, 1);
@@ -7057,6 +7008,15 @@ body.dark-mode .welcome-title {
   box-sizing: border-box;
 }
 
+.dashboard-row2 {
+  display: grid;
+  grid-template-columns: 68% 30%;
+  /* ⬅️ Ini kuncinya */
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* Card dasar */
 .dashboard-card {
   background: #ffffff;
@@ -7078,11 +7038,13 @@ body.dark-mode .welcome-title {
 /* Khusus ukuran tinggi */
 .line-chart-card {
   height: 350px;
+  flex: 0 0 70%;
   /* contoh tinggi */
 }
 
 .pie-chart-card {
   height: 350px;
+  flex: 0 0 30%;
 }
 
 .bar-chart-card {
@@ -7122,6 +7084,10 @@ body.dark-mode .custom-tooltip {
 /* Responsive: jadi 1 kolom di layar kecil */
 @media (max-width: 1024px) {
   .dashboard-row {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-row2 {
     grid-template-columns: 1fr;
   }
 }
@@ -8466,10 +8432,10 @@ html {
 .chart-legend {
   display: flex;
   justify-content: center;
-  align-items: center;
   gap: 10px;
   margin-top: 5px;
   flex-wrap: wrap;
+  text-overflow: ellipsis;
 }
 
 /* ========================================================= */
@@ -8578,36 +8544,89 @@ html {
 /* ========================================================= */
 
 @media (max-width: 768px) {
-  .react-calendar__tile {
-    height: 45px;
-    font-size: 14px;
+
+  .content-area h3 {
+    font-size: 25px;
+    font-weight: 600;
   }
 
+  .ticket-modal-card {
+    padding: 10px;
+
+  }
+
+  /* === Kalender utama === */
+  .react-calendar {
+    width: 100%;
+    font-size: 12px;
+    padding: 6px;
+    box-sizing: border-box;
+  }
+
+  /* === Header navigasi (bulan, tahun, tombol panah) === */
+  .react-calendar__navigation {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* ⬅️ biar tombol kiri-kanan tidak memaksa posisi */
+    margin-bottom: 4px;
+    gap: 0;
+  }
+
+  /* Tombol panah kiri/kanan */
+  .react-calendar__navigation button {
+    font-size: 12px;
+    min-width: 25px;
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+  }
+
+  /* Label bulan/tahun (tengah dan rapi) */
+  .react-calendar__navigation__label {
+    position: absolute;
+    /* ⬅️ taruh di tengah navigasi */
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    max-width: 70%;
+    /* ⬅️ batasi agar tidak menabrak tombol */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* === Nama hari (Sen, Sel, Rab...) === */
+  .react-calendar__month-view__weekdays {
+    font-size: 10px;
+  }
+
+  /* === Kotak tanggal === */
+  .react-calendar__tile {
+    height: 40px;
+    font-size: 13px;
+  }
+
+  /* === Modal (jika muncul di tampilan yang sama) === */
   .modal-content {
     padding: 20px;
   }
 }
 
-@media (max-width: 480px) {
-  .react-calendar__navigation button {
-    font-size: 12px;
-    min-width: 25px;
-  }
 
-  .react-calendar__month-view__weekdays {
-    font-size: 10px;
-  }
-
-  .react-calendar__tile {
-    height: 35px;
-    font-size: 12px;
-  }
-}
 
 /* === Responsiveness (Unchanged) === */
 @media (max-width: 768px) {
   .linechart-wrapper {
-    padding: 10px;
+    padding: 0px;
+  }
+
+  .barchart-wrapper {
+    padding: 0px;
+    margin-left: 0px;
   }
 
   .chart-legend {
@@ -9652,9 +9671,11 @@ body.dark-mode .summary-cards .card h3 {
     transform: translateY(0);
   }
 }
-.download{
+
+.download {
   flex-direction: row;
 }
+
 .download-buttons {
   display: flex;
   gap: 10px;

@@ -29,13 +29,13 @@ const CustomTooltip = ({ active, payload, label }) => {
 const BarChartComponent = ({ data, onBarClick }) => {
   return (
     <div className="barchart-wrapper">
-      <ResponsiveContainer width="100%" height={280}>
+      <ResponsiveContainer width="100%" height={300}>
         <BarChart
           data={data}
-          margin={{ top: 40, right: 30, left: 20, bottom: 20 }}
+          margin={{ top: 20, right: 8, left:-20, bottom: -10 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
+          <XAxis dataKey="name" style={{fontSize: '13px', overflow: 'ellipsis'}}/>
           <YAxis allowDecimals={false} />
            <Tooltip content={<CustomTooltip />} />
 
@@ -67,7 +67,7 @@ const BarChartComponent = ({ data, onBarClick }) => {
       </ResponsiveContainer>
 
       {/* ✅ Custom Legend (konsisten dengan Line & Pie) */}
-      <div className="chart-legend">
+      {/* <div className="chart-legend" style={{ justifyContent: 'center', marginTop: '-10px' }}>
         <div
           className="legend-item2"
           onClick={() => onBarClick({ status: "Selesai" })}
@@ -91,7 +91,7 @@ const BarChartComponent = ({ data, onBarClick }) => {
           ></span>
           <span className="legend-text">Sedang Dikerjakan</span>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
