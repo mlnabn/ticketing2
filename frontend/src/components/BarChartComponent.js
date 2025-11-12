@@ -32,7 +32,7 @@ const BarChartComponent = ({ data, onBarClick }) => {
       <ResponsiveContainer width="100%" height={300}>
         <BarChart
           data={data}
-          margin={{ top: 20, right: 8, left:-20, bottom: 20 }}
+          margin={{ top: 20, right: 8, left:-20, bottom: -10 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" style={{fontSize: '13px', overflow: 'ellipsis'}}/>
@@ -67,7 +67,7 @@ const BarChartComponent = ({ data, onBarClick }) => {
       </ResponsiveContainer>
 
       {/* ✅ Custom Legend (konsisten dengan Line & Pie) */}
-      <div className="chart-legend" style={{ justifyContent: 'center', marginTop: '-10px' }}>
+      {/* <div className="chart-legend" style={{ justifyContent: 'center', marginTop: '-10px' }}>
         <div
           className="legend-item2"
           onClick={() => onBarClick({ status: "Selesai" })}
@@ -91,7 +91,7 @@ const BarChartComponent = ({ data, onBarClick }) => {
           ></span>
           <span className="legend-text">Sedang Dikerjakan</span>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

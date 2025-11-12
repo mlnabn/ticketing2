@@ -49,9 +49,9 @@ const PieChartComponent = ({ stats, handleStatusFilterClick, statusFilter }) => 
             <Pie
               data={dataWithPercent}
               cx="50%"
-              cy="45%"
-              innerRadius={40}
-              outerRadius={70}
+              cy="40%"
+              innerRadius={60}
+              outerRadius={90}
               paddingAngle={0}
               dataKey="value"
               onClick={(entry) => onPieClick(entry.payload)}
@@ -83,7 +83,7 @@ const PieChartComponent = ({ stats, handleStatusFilterClick, statusFilter }) => 
         </ResponsiveContainer>
       </div>
 
-      <div className="chart-legend"style={{ justifyContent: 'center', marginTop: '-10px' }}>
+      <div className="chart-legend"style={{ justifyContent: 'center', marginTop: '-30px' }}>
         {dataWithPercent.map((entry, index) => (
           <div
             key={index}
