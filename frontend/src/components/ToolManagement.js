@@ -241,8 +241,7 @@ function ToolManagement() {
     };
 
     const handleSelectAll = (e, kodeBarang) => {
-        const summaryItem = items.find(i => i.kode_barang === kodeBarang);
-        const itemIds = summaryItem?.variations?.map(item => item.id_m_barang) || [];
+        const itemIds = detailItems[kodeBarang]?.map(item => item.id_m_barang) || [];
 
         setSelectedIds(prev => {
             const newSet = new Set(prev);

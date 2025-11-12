@@ -12161,7 +12161,6 @@ body {
 .btn-detail {
   color: #084298;
   border-color: #b6d4fe;
-  ;
 }
 
 .btn-detail:hover {
@@ -13016,7 +13015,7 @@ body.dark-mode .btn-dlt:hover {
   }
 
   .bulk-action-bar {
-    margin-bottom: 10px;
+    margin-bottom: 25px;
   }
 }
 
@@ -14520,12 +14519,32 @@ body.dark-mode .detail-list-footer-centered {
   .bulk-action-bar .btn-soft-grey {
     flex: 1;
   }
+
+  .bulk-action-bar .btn-clear {
+    width: 100%;
+    flex-grow: 1;
+    justify-content: center;
+  }
+
+  .btn-user-action .btn-detail {
+    width: 100%;
+    flex-grow: 1;
+    justify-content: center;
+  }
 }
 
 .ticket-card-mobile.detail-card {
   display: flex;
   flex-direction: row;
   align-items: stretch;
+  padding: 0;
+  gap: 0;
+}
+
+.ticket-card-mobile.card-with-select {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch; 
   padding: 0;
   gap: 0;
 }
@@ -14538,6 +14557,19 @@ body.dark-mode .detail-list-footer-centered {
   flex-shrink: 0;
   border-right: 1px solid var(--border-color-light);
   transition: background-color 0.2s;
+}
+
+.data-group.horizontal {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline; /* Menyejajarkan teks label dan angka */
+  width: 100%; /* Ambil lebar penuh baris */
+}
+
+/* Pastikan value-nya rata kanan */
+.data-group.horizontal .value {
+  text-align: right;
+  white-space: normal;
 }
 
 .dark-mode .card-select-col {
