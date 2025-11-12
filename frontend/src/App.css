@@ -828,9 +828,11 @@ body.dark-mode .hamburger-menu-button span {
   .ticket-card-mobile,
   .user-card-mobile {
     background: #edeef091;
-    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25);
+    /* box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.25); */
+    border: 1px solid #e0e0e0;
+    border-bottom: 3px solid #b0b0b0;
     border-radius: 12px;
-    border: 1px solid var(--border-color);
+    /* border: 1px solid var(--border-color); */
     padding: 15px;
     margin-bottom: 15px;
     display: flex;
@@ -901,9 +903,10 @@ body.dark-mode .hamburger-menu-button span {
 
   body.dark-mode .ticket-card-mobile,
   body.dark-mode .user-card-mobile {
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-    background-color: #1f1f1f;
-    border: 1px solid #333;
+    /* box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); */
+      background-color: #1f1f1f;
+      border: 1px solid var(--border-color-dark);
+      border-bottom: 5px solid #555;
   }
 
   body.dark-mode .user-email {
@@ -986,14 +989,14 @@ body.dark-mode .hamburger-menu-button span {
     padding-top: 5px;
   }
 
-  body.dark-mode .ticket-card-mobile,
+  /* body.dark-mode .ticket-card-mobile,
   body.dark-mode .user-card-mobile {
     box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
     -webkit-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
     background-color: #111111;
     border: 1px solid var(--border-color-dark);
-  }
+  } */
 
   body.dark-mode .card-row,
   body.dark-mode .user-card-row {
@@ -4321,7 +4324,7 @@ body.dark-mode .password-toggle-btn:hover {
 
 /* Efek khusus untuk Dark Mode */
 .dark-mode .confirmation-modal-content {
-  background: var(--modal-bg-dark);
+  background: #1f1f1f;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   --input-bg: rgba(26, 32, 44, 0.7);
   --input-border: rgba(255, 255, 255, 0.2);
@@ -10279,7 +10282,7 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .dark-mode .modal-content-detail {
-  background: #111111;
+  background: #1f1f1f;
   /* Latar gelap */
   border: 1px solid rgba(148, 163, 184, 0.25);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
@@ -11273,8 +11276,6 @@ body.dark-mode .form-group-recover textarea:focus {
   }
 }
 
-
-
 .modal-content-large h3 {
   margin-top: 0;
   margin-bottom: 1.5rem;
@@ -11892,7 +11893,7 @@ input:disabled {
 }
 
 .dark-mode .modal-content-large {
-  background-color: #111111;
+  background-color: #1f1f1f;
   color: #FFFFFF;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
 }
@@ -13423,7 +13424,6 @@ body.dark-mode .detail-list-header {
 /* =========================================== */
 /* ===        Warna Dark Mode            ===== */
 /* =========================================== */
-
 body.dark-mode .stok-summary-table thead th {
   background-color: #1f1f1f;
   color: #e5e7eb;
@@ -13434,7 +13434,7 @@ body.dark-mode .summary-row {
 }
 
 .dark-mode .summary-row:hover {
-  background-color: #1f1f1f;
+  background-color: #111111;
 }
 
 body.dark-mode .summary-row.expanded {
@@ -13480,7 +13480,7 @@ body.dark-mode .cell-warna .color-swatch {
 }
 
 body.dark-mode .summary-card.expanded {
-  background-color: #1f1f1f;
+  background-color: #111111;
   border-left-color: #3b82f6;
 }
 
@@ -13514,7 +13514,7 @@ body.dark-mode .summary-card.expanded {
 }
 
 .dark-mode .sku-detail-list-header {
-  background-color: #1f1f1f;
+  background-color: #374151;
   color: #d1d5db;
   border-bottom-color: #374151;
 }
