@@ -70,8 +70,6 @@ export default function InventoryReportPage() {
         barang_keluar: '...',
     };
 
-    // HAPUS: Variabel chartData tidak diperlukan lagi
-    // const chartData = dashboardData?.chartData || [];
     const mostActiveItems = dashboardData?.mostActiveItems || [];
     const availableYears = dashboardData?.availableYears || [selectedYear];
 
@@ -84,7 +82,6 @@ export default function InventoryReportPage() {
         >
             <motion.h1 variants={staggerItem}>Laporan Inventaris</motion.h1>
 
-            {/* Kartu Statistik */}
             <motion.div variants={staggerItem} className="info-cards-grid">
                 <div className="info-card blue-card">
                     <div className="card-header">
@@ -119,7 +116,6 @@ export default function InventoryReportPage() {
                 </div>
             </motion.div>
             <motion.div variants={staggerItem} className="dashboard-card most-active-widget" style={{ marginTop: '2rem' }}>
-                {/* BARU: Filter tahun dipindahkan ke sini */}
                 <div className="chart-header">
                     <h4>5 Barang Paling Sering Keluar</h4>
                     <select className="year-filter" value={selectedYear} onChange={handleYearChange}>

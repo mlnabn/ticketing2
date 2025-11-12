@@ -513,7 +513,6 @@ function StokBarangView() {
                 initial="hidden"
                 animate="visible"
             >
-
                 <motion.div
                     variants={staggerItem}
                     className="user-management-container"
@@ -523,35 +522,20 @@ function StokBarangView() {
                 </motion.div>
 
                 <motion.div variants={staggerItem} className="action-buttons-stok">
-                    <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>
-                        <i className="fas fa-plus" style={{ marginRight: '8px' }}>
-                        </i>Tambah Stok
-                    </button>
-
-                    <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
-                        <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
-                            <i className="fas fa-qrcode fa-stack-2x"></i>
-                            <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
-                        </span>
-                        Scan QR
-                    </button>
-                    <button
-                        className="btn-primary-outline"
-                        onClick={handlePreparePrint}
-                        disabled={selectedItems.size === 0}
-                    >
-                        <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
-                        Print QR ({selectedItems.size})
-                    </button>
-                    {selectedItems.size > 0 && (
-                        <button
-                            className="btn-soft-grey"
-                            onClick={handleClearSelection}
-                            title="Hilangkan semua pilihan"
-                        >
-                            <i className="fas fa-times"></i>
+                    <div className='stock-action-group'>
+                        <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>
+                            <i className="fas fa-plus" style={{ marginRight: '8px' }}>
+                            </i>Tambah Stok
                         </button>
-                    )}
+
+                        <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
+                            <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
+                                <i className="fas fa-qrcode fa-stack-2x"></i>
+                                <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
+                            </span>
+                            Scan QR
+                        </button>
+                    </div>
                     <motion.input
                         variants={staggerItem}
                         type="text"
@@ -617,6 +601,34 @@ function StokBarangView() {
                         styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     />
                 </motion.div>
+
+                <AnimatePresence>
+                    {selectedItems.size > 0 && (
+                        <motion.div
+                            className="bulk-action-bar" // Kita akan gunakan kelas ini untuk styling
+                            initial="hidden"
+                            animate="visible"
+                            exit="hidden"
+                            variants={expandVariants} // Menggunakan variants yang sudah ada di file Anda
+                        >
+                            <button
+                                className="btn-primary-outline"
+                                onClick={handlePreparePrint}
+                            >
+                                <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
+                                Print QR Terpilih ({selectedItems.size})
+                            </button>
+                            <button
+                                className="btn-soft-grey btn-clear" // Tambah kelas btn-clear
+                                onClick={handleClearSelection}
+                                title="Hilangkan semua pilihan"
+                            >
+                                <i className="fas fa-times" style={{ marginRight: '8px' }}></i>
+                                Hapus Pilihan
+                            </button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 <motion.div variants={staggerItem} className="job-list-container">
                     {/* Tampilan Tabel Desktop */}
@@ -863,55 +875,63 @@ function StokBarangView() {
                                                         exit="hidden"
                                                         variants={expandVariants}
                                                         onScroll={(e) => handleDetailScroll(e, masterItem.id_m_barang)}
-                                                        onClick={(e) => e.stopPropagation()} // Mencegah card menutup saat diklik
+                                                        onClick={(e) => e.stopPropagation()} 
                                                     >
                                                         {expandingId === masterItem.id_m_barang ? (<p className="detail-loading-mobile">Memuat unit...</p>)
                                                             : detailItems[masterItem.id_m_barang]?.items?.length > 0 ? (
                                                                 detailItems[masterItem.id_m_barang].items.map(detail => (
                                                                     <div
                                                                         key={detail.id}
-                                                                        className="ticket-card-mobile detail-card hoverable-row" /* <-- Tambah class */
-                                                                        onClick={(e) => { /* <-- TAMBAHKAN FUNGSI onClick INI */
-                                                                            // 1. Jangan buka modal jika kita klik tombol di dalam action-row
-                                                                            if (e.target.tagName === 'BUTTON' || e.target.closest('.action-row')) {
-                                                                                return;
-                                                                            }
-                                                                            // 2. Buka ItemDetailModal (ini yang Anda mau)
-                                                                            setDetailItem(detail);
-                                                                        }}
+                                                                        className="ticket-card-mobile detail-card"
                                                                     >
-                                                                        <div className="card-header-detail">
-                                                                            <span>{detail.kode_unik}</span>
-                                                                            {detail.serial_number && <small>S/N: {detail.serial_number}</small>}
+                                                                        <div className="card-select-col">
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                checked={selectedItems.has(detail.id)}
+                                                                                onChange={(e) => handleSelectItem(detail.id, e.target.checked)}
+                                                                                onClick={(e) => e.stopPropagation()} 
+                                                                            />
                                                                         </div>
-                                                                        <div className="card-body">
-                                                                            <div className="card-item-row">
-                                                                                <span className="label">Kondisi</span><span className="value">{detail.kondisi}</span>
+                                                                        <div
+                                                                            className="card-content-col hoverable-row" 
+                                                                            onClick={(e) => {
+                                                                                if (e.target.tagName === 'BUTTON' || e.target.closest('.action-row') || e.target.closest('.card-select-col') || e.target.type === 'checkbox') {
+                                                                                    return;
+                                                                                }
+                                                                                setDetailItem(detail);
+                                                                            }}
+                                                                        >
+                                                                            <div className="card-header-detail">
+                                                                                <span>{detail.kode_unik}</span>
+                                                                                {detail.serial_number && <small>S/N: {detail.serial_number}</small>}
                                                                             </div>
-                                                                            <div className="card-separator"></div>
-                                                                            <div className="card-item-row">
-                                                                                <span className="label">Status</span>
-                                                                                <span className="value">
-                                                                                    <span className={`status-badge status-${(detail.status_detail?.nama_status || 'unknown').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                                            <div className="card-body">
+                                                                                <div className="card-item-row">
+                                                                                    <span className="label">Kondisi</span><span className="value">{detail.kondisi}</span>
+                                                                                </div>
+                                                                                <div className="card-separator"></div>
+                                                                                <div className="card-item-row">
+                                                                                    <span className="label">Status</span>
+                                                                                    <span className="value">
                                                                                         {detail.status_detail?.nama_status || 'N/A'}
                                                                                     </span>
-                                                                                </span>
+                                                                                </div>
+                                                                                <div className="card-separator"></div>
+                                                                                <div className="card-item-row">
+                                                                                    <span className="label">Warna</span>
+                                                                                    <span className="value">{detail.color ? detail.color.nama_warna : '-'}</span>
+                                                                                </div>
+                                                                                <div className="card-separator"></div>
+                                                                                <div className="card-item-row">
+                                                                                    <span className="label">Harga</span>
+                                                                                    <span className="value">{formatCurrency(detail.harga_beli)}</span>
+                                                                                </div>
                                                                             </div>
                                                                             <div className="card-separator"></div>
-                                                                            <div className="card-item-row">
-                                                                                <span className="label">Warna</span>
-                                                                                <span className="value">{detail.color ? detail.color.nama_warna : '-'}</span>
+                                                                            <div className="card-row action-row">
+                                                                                <button onClick={() => setDetailItem(detail)} className="btn-user-action btn-detail">Detail</button>
+                                                                                <button onClick={() => setQrModalItem(detail)} className="btn-user-action btn-qr">QR</button>
                                                                             </div>
-                                                                            <div className="card-separator"></div>
-                                                                            <div className="card-item-row">
-                                                                                <span className="label">Harga</span>
-                                                                                <span className="value">{formatCurrency(detail.harga_beli)}</span>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="card-separator"></div>
-                                                                        <div className="card-row action-row">
-                                                                            <button onClick={() => setDetailItem(detail)} className="btn-user-action btn-detail">Detail</button>
-                                                                            <button onClick={() => setQrModalItem(detail)} className="btn-user-action btn-qr">QR</button>
                                                                         </div>
                                                                     </div>
                                                                 ))

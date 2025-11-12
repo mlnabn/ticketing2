@@ -416,11 +416,11 @@ export default function ComprehensiveReportPage() {
           <motion.div variants={staggerItem} className="download-buttons">
             <button className="btn-download pdf" onClick={() => handleDownload('pdf')} disabled={exportingPdf}>
               <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
-              {exportingPdf ? 'Mengekspor...' : 'Download PDF'}
+              {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
             </button>
             <button className="btn-download excel" onClick={() => handleDownload('excel')} disabled={exportingExcel}>
               <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
-              {exportingExcel ? 'Mengekspor...' : 'Download Excel'}
+              {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
             </button>
           </motion.div>
 

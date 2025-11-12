@@ -36,7 +36,7 @@ const formatDate = (dateString) => {
 function PurchaseProposalPage() {
     const isPresent = useIsPresent();
     const { showToast } = useOutletContext();
-    const isMobile = useMediaQuery('(max-width: 768px)');
+    const isMobile = useMediaQuery('(max-width: 1290px)');
     const [proposals, setProposals] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedProposal, setSelectedProposal] = useState(null);

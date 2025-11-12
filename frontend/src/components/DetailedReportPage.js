@@ -360,7 +360,8 @@ export default function DetailedReportPage({ type, title }) {
 
             <motion.div 
                 variants={staggerItem} 
-                className="action-buttons-stok">
+                className="action-buttons-stok"
+            >
                 <motion.input
                     type="text"
                     placeholder="Cari Kode Unik / Nama Barang..."
@@ -369,14 +370,16 @@ export default function DetailedReportPage({ type, title }) {
                     variants={staggerItem}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <button onClick={() => handleExport('excel')} disabled={exportingExcel} className="btn-download excel">
-                    <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
-                    {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
-                </button>
-                <button onClick={() => handleExport('pdf')} disabled={exportingPdf} className="btn-download pdf">
-                    <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
-                    {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
-                </button>
+                <div className="download-button-group">
+                    <button onClick={() => handleExport('excel')} disabled={exportingExcel} className="btn-download excel">
+                        <i className="fas fa-file-excel" style={{ marginRight: '8px' }}></i>
+                        {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
+                    </button>
+                    <button onClick={() => handleExport('pdf')} disabled={exportingPdf} className="btn-download pdf">
+                        <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
+                        {exportingPdf ? 'Mengekspor...' : 'Ekspor PDF'}
+                    </button>
+                </div>
             </motion.div>
 
             <motion.button
