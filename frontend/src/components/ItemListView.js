@@ -149,9 +149,17 @@ function ItemListView({
                     {!showArchived && (
                         <button className="btn-primary" onClick={onAdd}>
                             <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
-                            Daftarkan SKU Baru
+                            SKU Baru
                         </button>
                     )}
+                    <button 
+                        onClick={() => onToggleArchived(!showArchived)} 
+                        className={`btn-archive ${showArchived ? 'active' : ''}`}
+                        title={showArchived ? 'Kembali ke daftar SKU aktif' : 'Lihat SKU yang diarsipkan'}
+                    >
+                        <i className={`fas ${showArchived ? 'fa-box' : 'fa-archive'}`} style={{ marginRight: '8px' }}></i>
+                        {showArchived ? 'SKU Aktif' : 'Lihat Arsip'}
+                    </button>
                 </motion.div>
 
                 <motion.button
@@ -192,14 +200,7 @@ function ItemListView({
                         menuPortalTarget={document.body}
                         styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     />
-                    <button 
-                        onClick={() => onToggleArchived(!showArchived)} 
-                        className={`btn-archive ${showArchived ? 'active' : ''}`}
-                        title={showArchived ? 'Kembali ke daftar SKU aktif' : 'Lihat SKU yang diarsipkan'}
-                    >
-                        <i className={`fas ${showArchived ? 'fa-box' : 'fa-archive'}`} style={{ marginRight: '8px' }}></i>
-                        {showArchived ? 'SKU Aktif' : 'Lihat Arsip'}
-                    </button>
+                    
                 </motion.div>
 
                 {selectedIds.length > 0 && (
