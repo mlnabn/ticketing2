@@ -50,8 +50,8 @@ const PieChartComponent = ({ stats, handleStatusFilterClick, statusFilter }) => 
               data={dataWithPercent}
               cx="50%"
               cy="40%"
-              innerRadius={60}
-              outerRadius={90}
+              innerRadius={50}
+              outerRadius={80}
               paddingAngle={0}
               dataKey="value"
               onClick={(entry) => onPieClick(entry.payload)}

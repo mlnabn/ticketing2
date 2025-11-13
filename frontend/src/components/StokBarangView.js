@@ -60,8 +60,21 @@ const expandVariants = {
 };
 
 const filterExpandVariants = {
-    closed: { height: 0, opacity: 0, overflow: 'hidden', marginTop: 0, marginBottom: 0 },
-    open: { height: 'auto', opacity: 1, overflow: 'visible', marginTop: '0.75rem', marginBottom: '0.75rem' }
+    closed: {
+        height: 0,
+        opacity: 0,
+        overflow: 'hidden',
+        marginTop: 0,
+        marginBottom: 0
+    },
+    open: {
+        height: 'auto',
+        opacity: 1,
+        overflow: 'visible',
+        marginTop: '0.75rem',
+        marginBottom: '0.75rem',
+        y: 0
+    }
 };
 const filterExpandTransition = {
     type: "spring",
@@ -580,32 +593,47 @@ function StokBarangView() {
                     />
                 </motion.div>
 
-                {isMobile && (
-                    <motion.button
-                        variants={staggerItem}
-                        className="btn-toggle-filters"
-                        onClick={() => setIsMobileFilterOpen(prev => !prev)}
-                    >
-                        <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
-                        {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
-                    </motion.button>
-                )}
+                <AnimatePresence>
+                    {isMobile && (
+                        <motion.div
+                            key="toggle-filter-button"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <motion.button
+                                className="btn-toggle-filters"
+                                onClick={() => setIsMobileFilterOpen(prev => !prev)}
+                            >
+                                <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+                                {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+                            </motion.button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 <AnimatePresence initial={false}>
                     {isMobileFilterOpen && (
                         <motion.div
-                            variants={staggerItem} // Ini adalah wrapper luar untuk staggerItem
+                            variants={staggerItem}
                             className="filters-container"
                         >
                             <motion.div
                                 key="mobile-filters-content"
-                                // Matikan animasi di desktop, hanya aktifkan di mobile
-                                initial={isMobile ? "closed" : false}
+                                initial={isMobile ? {
+                                    height: 0,
+                                    opacity: 0,
+                                    y: -20,
+                                    marginTop: 0,
+                                    marginBottom: 0,
+                                    overflow: 'hidden'
+                                } : false}
                                 animate="open"
                                 exit="closed"
-                                transition={filterExpandTransition} // Spring transition
-                                variants={filterExpandVariants} // Height/opacity variants
-                                className="filters-content-wrapper" // Wrapper untuk konten select
+                                transition={filterExpandTransition} 
+                                variants={filterExpandVariants} 
+                                className="filters-content-wrapper" 
                             >
                                 {/* === KONTEN FILTER LAMA DI SINI === */}
                                 <Select

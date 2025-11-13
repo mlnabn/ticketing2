@@ -52,8 +52,21 @@ const expandVariants = {
 };
 
 const filterExpandVariants = {
-    closed: { height: 0, opacity: 0, overflow: 'hidden', marginTop: 0, marginBottom: 0 },
-    open: { height: 'auto', opacity: 1, overflow: 'visible', marginTop: '0.75rem', marginBottom: '0.75rem' }
+    closed: {
+        height: 0,
+        opacity: 0,
+        overflow: 'hidden',
+        marginTop: 0,
+        marginBottom: 0
+    },
+    open: {
+        height: 'auto',
+        opacity: 1,
+        overflow: 'visible',
+        marginTop: '0.75rem',
+        marginBottom: '0.75rem',
+        y: 0
+    }
 };
 const filterExpandTransition = {
     type: "spring",
@@ -186,8 +199,8 @@ function ItemListView({
                             SKU Baru
                         </button>
                     )}
-                    <button 
-                        onClick={() => onToggleArchived(!showArchived)} 
+                    <button
+                        onClick={() => onToggleArchived(!showArchived)}
                         className={`btn-archive ${showArchived ? 'active' : ''}`}
                         title={showArchived ? 'Kembali ke daftar SKU aktif' : 'Lihat SKU yang diarsipkan'}
                     >
@@ -196,16 +209,25 @@ function ItemListView({
                     </button>
                 </motion.div>
 
-                {isMobile && (
-                    <motion.button
-                        variants={staggerItem}
-                        className="btn-toggle-filters"
-                        onClick={() => setIsMobileFilterOpen(prev => !prev)}
-                    >
-                        <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
-                        {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
-                    </motion.button>
-                )}
+                <AnimatePresence>
+                    {isMobile && (
+                        <motion.div
+                            key="toggle-filter-button"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <motion.button
+                                className="btn-toggle-filters"
+                                onClick={() => setIsMobileFilterOpen(prev => !prev)}
+                            >
+                                <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+                                {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+                            </motion.button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 <AnimatePresence initial={false}>
                     {isMobileFilterOpen && (
@@ -215,7 +237,14 @@ function ItemListView({
                         >
                             <motion.div
                                 key="mobile-filters-content"
-                                initial={isMobile ? "closed" : false} // Matikan animasi di desktop
+                                initial={isMobile ? {
+                                    height: 0,
+                                    opacity: 0,
+                                    y: -20,
+                                    marginTop: 0,
+                                    marginBottom: 0,
+                                    overflow: 'hidden'
+                                } : false}
                                 animate="open"
                                 exit="closed"
                                 transition={filterExpandTransition}
@@ -511,7 +540,7 @@ function ItemListView({
                                                             </div>
                                                             <div className="card-row">
                                                                 <div className="data-group horizontal">
-                                                                    <span className="label" style={{fontSize: '13px', fontWeight: '600'}}>Stok Tersedia</span>
+                                                                    <span className="label" style={{ fontSize: '13px', fontWeight: '600' }}>Stok Tersedia</span>
                                                                     <span className="value">{detail.stok_tersedia_count}</span>
                                                                 </div>
                                                             </div>
