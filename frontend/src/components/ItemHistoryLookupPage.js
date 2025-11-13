@@ -430,11 +430,12 @@ function ItemHistoryLookupPage() {
                         onChange={e => setSearchTerm(e.target.value)}
                         className="filter-search-input-invReport"
                     />
-                    <button className="btn-scan-qr-history" onClick={() => setIsScannerOpen(true)}>
-                        <span className="fa-stack">
+                    <button className="btn-scan history" onClick={() => setIsScannerOpen(true)}>
+                        <span className="fa-stack" style={{fontSize: '0.8rem'}}>
                             <i className="fas fa-qrcode fa-stack-2x"></i>
                             <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
                         </span>
+                        Scan QR
                     </button>
                 </motion.div>
                 {isMobile && (

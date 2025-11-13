@@ -556,7 +556,7 @@ function StokBarangView() {
                 </motion.div>
 
                 <motion.div variants={staggerItem} className="action-buttons-stok">
-                    <div className='stock-action-group'>
+                    <div className='download-button-group'>
                         <button className="btn-primary" onClick={() => setIsAddStockOpen(true)}>
                             <i className="fas fa-plus" style={{ marginRight: '8px' }}>
                             </i>Tambah Stok
@@ -669,7 +669,7 @@ function StokBarangView() {
                                 onClick={handlePreparePrint}
                             >
                                 <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
-                                Print QR Terpilih ({selectedItems.size})
+                                Print QR ({selectedItems.size})
                             </button>
                             <button
                                 className="btn-soft-grey btn-clear" // Tambah kelas btn-clear

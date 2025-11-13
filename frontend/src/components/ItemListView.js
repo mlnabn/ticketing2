@@ -183,9 +183,17 @@ function ItemListView({
                     {!showArchived && (
                         <button className="btn-primary" onClick={onAdd}>
                             <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
-                            Daftarkan SKU Baru
+                            SKU Baru
                         </button>
                     )}
+                    <button 
+                        onClick={() => onToggleArchived(!showArchived)} 
+                        className={`btn-archive ${showArchived ? 'active' : ''}`}
+                        title={showArchived ? 'Kembali ke daftar SKU aktif' : 'Lihat SKU yang diarsipkan'}
+                    >
+                        <i className={`fas ${showArchived ? 'fa-box' : 'fa-archive'}`} style={{ marginRight: '8px' }}></i>
+                        {showArchived ? 'SKU Aktif' : 'Lihat Arsip'}
+                    </button>
                 </motion.div>
 
                 {isMobile && (
@@ -478,41 +486,59 @@ function ItemListView({
                                                     <div
                                                         key={detail.id_m_barang}
                                                         className="ticket-card-mobile detail-card hoverable-row"
-                                                        onClick={(e) => handleRowClick(e, detail)}
                                                     >
-                                                        <div className="card-header-detail">
-                                                            <span>{detail.nama_barang}</span>
+                                                        <div className="card-select-col">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectedIds.includes(detail.id_m_barang)}
+                                                                onChange={() => onSelectId(detail.id_m_barang)}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            />
                                                         </div>
-                                                        <div className="card-body">
-                                                            <div className="card-item-row">
-                                                                <span className="label">Stok Tersedia</span>
-                                                                <span className="value">{detail.stok_tersedia_count}</span>
+                                                        <div
+                                                            className="card-content-col hoverable-row"
+                                                            onClick={(e) => {
+                                                                if (e.target.tagName === 'BUTTON' || e.target.closest('.action-row') || e.target.closest('.card-select-col') || e.target.type === 'checkbox') {
+                                                                    return;
+                                                                }
+                                                                handleRowClick(e, detail);
+                                                            }}
+                                                        >
+                                                            <div className="card-row">
+                                                                <div>
+                                                                    <span className='value description'>{detail.nama_barang}</span>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div className="card-separator"></div>
-                                                        <div className="card-row action-row">
-                                                            {!showArchived && (
-                                                                <button onClick={(e) => { e.stopPropagation(); onEdit(detail); }} className="btn-user-action btn-detail">Edit</button>
-                                                            )}
-                                                            {showArchived ? (
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); onRestore(detail); }}
-                                                                    className="btn-user-action btn-restore"
-                                                                    title="Pulihkan SKU ini"
-                                                                    style={{ color: '#28a745', fontWeight: 'bold' }}
-                                                                >
-                                                                    Pulihkan
-                                                                </button>
-                                                            ) : (
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); onDelete(detail); }}
-                                                                    className="btn-user-action btn-dlt"
-                                                                    disabled={detail.total_active_stock > 0}
-                                                                    title={detail.total_active_stock > 0 ? 'SKU tidak bisa diarsipkan jika masih ada stok aktif' : 'Arsipkan SKU ini'}
-                                                                >
-                                                                    Arsipkan
-                                                                </button>
-                                                            )}
+                                                            <div className="card-row">
+                                                                <div className="data-group horizontal">
+                                                                    <span className="label" style={{fontSize: '13px', fontWeight: '600'}}>Stok Tersedia</span>
+                                                                    <span className="value">{detail.stok_tersedia_count}</span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="card-row action-row">
+                                                                {!showArchived && (
+                                                                    <button onClick={(e) => { e.stopPropagation(); onEdit(detail); }} className="btn-user-action btn-detail">Edit</button>
+                                                                )}
+                                                                {showArchived ? (
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); onRestore(detail); }}
+                                                                        className="btn-user-action btn-restore"
+                                                                        title="Pulihkan SKU ini"
+                                                                        style={{ color: '#28a745', fontWeight: 'bold' }}
+                                                                    >
+                                                                        Pulihkan
+                                                                    </button>
+                                                                ) : (
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); onDelete(detail); }}
+                                                                        className="btn-user-action btn-dlt"
+                                                                        disabled={detail.total_active_stock > 0}
+                                                                        title={detail.total_active_stock > 0 ? 'SKU tidak bisa diarsipkan jika masih ada stok aktif' : 'Arsipkan SKU ini'}
+                                                                    >
+                                                                        Arsipkan
+                                                                    </button>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 ))
