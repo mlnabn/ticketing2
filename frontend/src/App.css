@@ -1012,15 +1012,6 @@ body.dark-mode .hamburger-menu-button span {
     padding-top: 5px;
   }
 
-  /* body.dark-mode .ticket-card-mobile,
-  body.dark-mode .user-card-mobile {
-    box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-    -webkit-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-    -moz-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-    background-color: #111111;
-    border: 1px solid var(--border-color-dark);
-  } */
-
   body.dark-mode .card-row,
   body.dark-mode .user-card-row {
     border-bottom-color: var(--border-color-dark);
@@ -3972,39 +3963,6 @@ body.dark-mode .theme-toggle-button:hover {
   box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-
-
-
-/* ====== DARK MODE ====== */
-/* body.dark-mode .job-form-user {
-  background: rgba(30, 30, 30, 0.85);
-}
-
-body.dark-mode .react-select__control,
-body.dark-mode .input-like-select {
-  background-color: #2a2a2a;
-  color: #f0f0f0;
-}
-
-body.dark-mode .input-like-select::placeholder {
-  color: #bbb;
-}
-
-body.dark-mode .btn-submit {
-  background-color: #4285f4;
-}
-
-body.dark-mode .btn-submit:hover {
-  background-color: #3367d6;
-} */
-
-/* =================================================================
-   Gaya untuk Tombol Logout (Mode Terang)
-   ================================================================= */
-/* ===================================================================
-   UserHeader.css
-   =================================================================== */
-
 /* Kontainer utama header user */
 .user-header {
   display: flex;
@@ -4024,9 +3982,9 @@ body.dark-mode .btn-submit:hover {
 }
 
 .user-avatar2 {
-  width: 38px;
-  height: 38px;
-  font-size: 1.25;
+  width: 33px;
+  height: 33px;
+  font-size: 1.2rem;
   border-radius: 50%;
   background: linear-gradient(135deg, #4a90e2, #1c3b70);
   display: flex;
@@ -4563,21 +4521,24 @@ body.dark-mode .scan-input-group::after {
 }
 
 .input-with-button-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+
 .async-select-main {
-    flex-grow: 1;
+  flex-grow: 1;
 }
+
 .btn-scan-camera {
-    padding: 0px 8px;
-    font-size: 30px;
-    flex-shrink: 0;
-    color: #1e40af;
+  padding: 0px 8px;
+  font-size: 30px;
+  flex-shrink: 0;
+  color: #1e40af;
 }
+
 .dark-mode .btn-scan-camera {
-    color: #f3f4f6;
+  color: #f3f4f6;
 }
 
 /* ===== Proof Description Box ===== */
@@ -5713,11 +5674,10 @@ body.dark-mode .feedback-message {
   background: transparent;
   border: none;
   cursor: pointer;
-  font-size: 1.5rem;
+  font-size: 1rem;
   color: #f9fafb;
   transition: transform 0.2s ease, color 0.3s ease;
   flex-shrink: 0;
-
 }
 
 .notification-button:hover {
@@ -6440,9 +6400,9 @@ body.dark-mode .welcome-title {
     border: none;
     cursor: pointer;
     color: #fff;
-    font-size: 1.5rem;
-    width: 38px;
-    height: 38px;
+    font-size: 15px;
+    width: 33px;
+    height: 33px;
     position: relative;
   }
 
@@ -6520,20 +6480,8 @@ body.dark-mode .welcome-title {
     gap: 20px;
   }
 
-  .main-header-controls-user .notification-button {
-    margin: 0;
-    font-size: 1.25rem;
-  }
-
-
   .main-header-controls-user .breadcrump {
     display: none;
-  }
-
-  .main-header-user .notification-button {
-    font-size: 1.5rem;
-    width: 38px;
-    height: 38px;
   }
 
   .logout-buttonuser {
@@ -7274,7 +7222,7 @@ html {
 
 /* Logo kiri */
 .header-left-group .header-logo {
-  height: 42px;
+  height: 35px;
   object-fit: contain;
   transition: transform 0.3s ease;
 }
@@ -7283,9 +7231,7 @@ html {
   transform: scale(1.05);
 }
 
-/* Navigasi (Tengah) - (Style duplikat dihapus) */
 .header-nav {
-  /* Hapus 'position: absolute' agar rapi */
   display: flex;
   gap: 2rem;
 }
@@ -7322,7 +7268,6 @@ html {
   width: 70%;
 }
 
-/* Login button kanan - (Style duplikat dihapus) */
 .header-right-group .btn-btn2 {
   display: flex;
   align-items: center;
@@ -12964,7 +12909,7 @@ body.dark-mode .btn-dlt:hover {
   .download-button-group .btn-download {
     flex: 1;
     width: auto;
-    margin-bottom: 0 !important; 
+    margin-bottom: 0 !important;
   }
 
   .filter-select-cal {
@@ -13937,9 +13882,9 @@ body.dark-mode .summary-card.expanded {
 /* --- Dark Mode --- */
 body.dark-mode .btn-primary-outline {
   background-color: #4F46E5;
-    color: #ffffff;
-    border-color: transparent;
-    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
 }
 
 body.dark-mode .btn-primary-outline:hover:not(:disabled) {
@@ -14467,11 +14412,19 @@ body.dark-mode .detail-list-footer-centered {
 /* Filter Inventory */
 
 .filters-container {
-  display: flex;
+  display: block;
   gap: 1rem;
   margin-bottom: 1rem;
   transition: all 0.3s ease-in-out;
   overflow: visible;
+}
+
+.filters-content-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .btn-toggle-filters {
@@ -14514,15 +14467,25 @@ body.dark-mode .detail-list-footer-centered {
     color: #64748B;
   }
 
+  body.dark-mode .btn-toggle-filters {
+    color: #64748B;
+  }
+
   .filters-container {
-    display: none;
+    /* display: none; */
     flex-direction: column;
     gap: 0.75rem;
     margin-bottom: 1rem;
   }
 
+  .filters-content-wrapper {
+    flex-direction: column; 
+    gap: 0.75rem;
+    display:flex;
+  }
+
   .filters-container.mobile-visible {
-    display: flex;
+    /* display: flex; */
   }
 
   .date-range-container {
@@ -14614,12 +14577,12 @@ body.dark-mode .detail-list-footer-centered {
   border-right: 1px solid var(--border-color-dark);
 }
 
-.card-content-col.hoverable-row:hover + .card-select-col,
+.card-content-col.hoverable-row:hover+.card-select-col,
 .card-select-col:hover {
   background-color: rgba(0, 0, 0, 0.02);
 }
 
-.dark-mode .card-content-col.hoverable-row:hover + .card-select-col,
+.dark-mode .card-content-col.hoverable-row:hover+.card-select-col,
 .dark-mode .card-select-col:hover {
   background-color: rgba(255, 255, 255, 0.02);
 }

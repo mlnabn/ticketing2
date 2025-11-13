@@ -4,7 +4,7 @@ import Select from 'react-select';
 import api from '../services/api';
 import { saveAs } from 'file-saver';
 import ActiveLoanDetailModal from './ActiveLoanDetailModal';
-import { motion, useIsPresent } from 'framer-motion';
+import { motion, useIsPresent, AnimatePresence } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -24,8 +24,6 @@ const staggerItem = {
         transition: { duration: 0.4, ease: "easeOut" }
     },
 };
-
-
 const months = [
     { value: 1, name: 'Januari' }, { value: 2, name: 'Februari' }, { value: 3, name: 'Maret' },
     { value: 4, name: 'April' }, { value: 5, name: 'Mei' }, { value: 6, name: 'Juni' },
@@ -41,9 +39,14 @@ const monthOptions = [
     ...months.map(m => ({ value: m.value.toString(), label: m.name })),
 ];
 
+const isMobileDevice = () => typeof window !== 'undefined' && window.innerWidth < 768;
+
 export default function ActiveLoanReportPage() {
     const isPresent = useIsPresent();
-    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+    const type = 'active_loans';
+    const title = 'Laporan Peminjaman Aktif';
+    const [isMobile, setIsMobile] = useState(isMobileDevice());
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(!isMobileDevice());
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filterType, setFilterType] = useState('month');
@@ -63,11 +66,35 @@ export default function ActiveLoanReportPage() {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
-    const type = 'active_loans';
-    const title = 'Laporan Peminjaman Aktif';
     const yearOptions = years.map(y => ({ value: y.toString(), label: y.toString() }));
     const yearSelectOptions = [{ value: '', label: 'Semua Tahun' }, ...yearOptions];
 
+
+    // --- Helper Functions ---
+    const formatDate = (dateString) => {
+        if (!dateString) return '-';
+        return new Date(dateString).toLocaleDateString('id-ID', {
+            day: '2-digit', month: 'long', year: 'numeric'
+        });
+    };
+
+    const calculateDuration = (startDate) => {
+        if (!startDate) return { text: '-', days: 0 };
+        const start = new Date(startDate);
+        const now = new Date();
+        const diffTime = Math.abs(now - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays <= 0) return { text: 'Hari ini', days: 0 };
+        if (diffDays === 1) return { text: '1 hari', days: 1 };
+        return { text: `${diffDays} hari`, days: diffDays };
+    };
+
+    const getDurationStyle = (days) => {
+        if (days > 30) return { color: '#ef4444', fontWeight: 'bold' };
+        if (days > 7) return { color: '#f97316' };
+        return {};
+    };
 
     const getApiParams = useCallback((page = 1) => {
         const baseParams = {
@@ -107,36 +134,31 @@ export default function ActiveLoanReportPage() {
         }
     }, [getApiParams, type]);
 
-    useEffect(() => {
-        if (!isPresent) return;
-        api.get('/reports/inventory/dashboard')
-            .then(res => {
-                if (res.data.availableYears && res.data.availableYears.length > 0) {
-                    setYears(res.data.availableYears);
-                    if (!filters.year) {
-                        setFilters(prev => ({ ...prev, year: res.data.availableYears[0] }));
-                    }
-                } else {
-                    const currentYear = new Date().getFullYear().toString();
-                    setYears([currentYear]);
-                }
-            })
-            .catch(err => {
-                console.error("Gagal memuat data tahun", err);
-                const currentYear = new Date().getFullYear().toString();
-                setYears([currentYear]);
-            });
-    }, [filters.year, isPresent]);
+    const loadMoreItems = async () => {
+        if (isLoadingMore || pagination.currentPage >= pagination.totalPages) return;
 
-    useEffect(() => {
-        if (!isPresent) return;
-        fetchData();
-    }, [fetchData, isPresent]);
+        setIsLoadingMore(true);
+        try {
+            const nextPage = pagination.currentPage + 1;
+            const params = getApiParams(nextPage, false);
+            const res = await api.get('/reports/inventory/detailed', { params });
+
+            setData(prevData => [...prevData, ...res.data.data]);
+            setPagination(prev => ({
+                ...prev,
+                currentPage: res.data.current_page,
+                totalPages: res.data.last_page
+            }));
+        } catch (error) {
+            console.error('Gagal memuat data tambahan', error);
+        } finally {
+            setIsLoadingMore(false);
+        }
+    };
 
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
-
 
     const handleSelectFilterChange = (selectedOption, name) => {
         setFilters(prev => ({ ...prev, [name]: selectedOption ? selectedOption.value : '' }));
@@ -157,6 +179,15 @@ export default function ActiveLoanReportPage() {
             return;
         }
         setSelectedItem(item);
+    };
+
+    const handleScroll = (e) => {
+        const target = e.currentTarget;
+        const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
+
+        if (nearBottom && !loading && !isLoadingMore && pagination.currentPage < pagination.totalPages) {
+            loadMoreItems();
+        }
     };
 
     const handleExport = async (exportType) => {
@@ -193,60 +224,50 @@ export default function ActiveLoanReportPage() {
         }
     };
 
-    const formatDate = (dateString) => {
-        if (!dateString) return '-';
-        return new Date(dateString).toLocaleDateString('id-ID', {
-            day: '2-digit', month: 'long', year: 'numeric'
-        });
-    };
-    const calculateDuration = (startDate) => {
-        if (!startDate) return { text: '-', days: 0 };
-        const start = new Date(startDate);
-        const now = new Date();
-        const diffTime = Math.abs(now - start);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    useEffect(() => {
+        const handleResize = () => {
+            const isCurrentlyDesktop = window.innerWidth >= 768;
+            setIsMobile(!isCurrentlyDesktop);
+            if (isCurrentlyDesktop) {
+                setIsMobileFilterOpen(true);
+            }
+            else {
+                setIsMobileFilterOpen(false);
+            }
+        };
 
-        if (diffDays <= 0) return { text: 'Hari ini', days: 0 };
-        if (diffDays === 1) return { text: '1 hari', days: 1 };
-        return { text: `${diffDays} hari`, days: diffDays };
-    };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
-    const getDurationStyle = (days) => {
-        if (days > 30) return { color: '#ef4444', fontWeight: 'bold' };
-        if (days > 7) return { color: '#f97316' };
-        return {};
-    };
+    useEffect(() => {
+        if (!isPresent) return;
+        api.get('/reports/inventory/dashboard')
+            .then(res => {
+                const availableYears = res.data.availableYears || [];
+                setYears(availableYears);
+                if (availableYears.length > 0 && !filters.year) {
+                    setFilters(prev => ({ ...prev, year: availableYears[0] }));
+                } else if (availableYears.length === 0) {
+                    const currentYear = new Date().getFullYear().toString();
+                    setYears([currentYear]);
+                }
+            })
+            .catch(err => {
+                console.error("Gagal memuat data tahun", err);
+                const currentYear = new Date().getFullYear().toString();
+                setYears([currentYear]);
+            });
+    }, [filters.year, isPresent]);
 
-    const loadMoreItems = async () => {
-        if (isLoadingMore || pagination.currentPage >= pagination.totalPages) return;
+    // Efek untuk memuat data laporan
+    useEffect(() => {
+        if (!isPresent) return;
+        fetchData();
+    }, [fetchData, isPresent]);
+    // --- End Effects ---
 
-        setIsLoadingMore(true);
-        try {
-            const nextPage = pagination.currentPage + 1;
-            const params = getApiParams(nextPage, false);
-            const res = await api.get('/reports/inventory/detailed', { params });
-
-            setData(prevData => [...prevData, ...res.data.data]);
-            setPagination(prev => ({
-                ...prev,
-                currentPage: res.data.current_page,
-                totalPages: res.data.last_page
-            }));
-        } catch (error) {
-            console.error('Gagal memuat data tambahan', error);
-        } finally {
-            setIsLoadingMore(false);
-        }
-    };
-
-    const handleScroll = (e) => {
-        const target = e.currentTarget;
-        const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
-
-        if (nearBottom && !loading && !isLoadingMore && pagination.currentPage < pagination.totalPages) {
-            loadMoreItems();
-        }
-    };
 
     return (
         <motion.div
@@ -255,7 +276,8 @@ export default function ActiveLoanReportPage() {
             initial="hidden"
             animate="visible"
         >
-            <motion.div variants={staggerItem}
+            <motion.div
+                variants={staggerItem}
                 className="user-management-header-report"
                 style={{ marginBottom: '20px' }}
             >
@@ -283,92 +305,114 @@ export default function ActiveLoanReportPage() {
                 </div>
             </motion.div>
 
-            <motion.button
-                variants={staggerItem}
-                className="btn-toggle-filters"
-                onClick={() => setIsMobileFilterOpen(prev => !prev)}
-            >
-                <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
-                {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
-            </motion.button>
+            {isMobile && (
+                <motion.button
+                    variants={staggerItem}
+                    className="btn-toggle-filters"
+                    onClick={() => setIsMobileFilterOpen(prev => !prev)}
+                >
+                    <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+                    {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+                </motion.button>
+            )}
 
-            <motion.div
-                variants={staggerItem}
-                className={`filters-container ${isMobileFilterOpen ? 'mobile-visible' : ''}`}
-            >
-
-                {/* 1. Filter Tipe: Select */}
-                <Select
-                    classNamePrefix="report-filter-select"
-                    options={filterTypeOptions}
-                    value={filterTypeOptions.find(opt => opt.value === filterType)}
-                    onChange={handleSelectFilterTypeChange}
-                    isSearchable={false}
-                    placeholder="Filter Laporan"
-                    menuPortalTarget={document.body}
-                    styles={{
-                        container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
-                        menuPortal: (base) => ({ ...base, zIndex: 9999 })
-                    }}
-                />
-
-                {filterType === 'month' && (
-                    <>
-                        {/* 2. Filter Bulan: Select */}
-                        <Select
-                            classNamePrefix="report-filter-select"
-                            name="month"
-                            options={monthOptions}
-                            value={monthOptions.find(m => m.value === filters.month)}
-                            onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
-                            placeholder="Semua Bulan"
-                            isSearchable={false}
-                            menuPortalTarget={document.body}
-                            styles={{
-                                container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
-                                menuPortal: (base) => ({ ...base, zIndex: 9999 })
-                            }}
-                        />
-
-                        <Select
-                            classNamePrefix="report-filter-select"
-                            name="year"
-                            options={yearSelectOptions}
-                            value={yearSelectOptions.find(y => y.value === filters.year)}
-                            onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
-                            placeholder="Semua Tahun"
-                            isSearchable={false}
-                            menuPortalTarget={document.body}
-                            styles={{
-                                container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
-                                menuPortal: (base) => ({ ...base, zIndex: 9999 })
-                            }}
-                        />
-                    </>
-                )}
-                {filterType === 'date_range' && (
+            <AnimatePresence initial={false}>
+                {isMobileFilterOpen && (
                     <motion.div
                         variants={staggerItem}
-                        className="date-range-container"
+                        className="filters-container"
                     >
-                        <input
-                            type="date"
-                            name="start_date"
-                            value={filters.start_date}
-                            onChange={handleFilterChange}
-                            className="filter-select-date"
-                        />
-                        <span style={{ alignSelf: 'center' }}>-</span>
-                        <input
-                            type="date"
-                            name="end_date"
-                            value={filters.end_date}
-                            onChange={handleFilterChange}
-                            className="filter-select-date"
-                        />
+                        <motion.div
+                            key="mobile-filters-content"
+                            initial={isMobile ? "closed" : false}
+                            animate="open"
+                            exit="closed"
+                            transition={{
+                                type: "spring",
+                                stiffness: 150,
+                                damping: 25
+                            }}
+                            variants={{
+                                closed: { height: 0, opacity: 0, overflow: 'hidden', marginTop: 0, marginBottom: 0 },
+                                open: { height: 'auto', opacity: 1, overflow: 'visible', marginTop: '0.75rem', marginBottom: '0.75rem' }
+                            }}
+                            className="filters-content-wrapper"
+                        >
+
+                            {/* 1. Filter Tipe: Select */}
+                            <Select
+                                classNamePrefix="report-filter-select"
+                                options={filterTypeOptions}
+                                value={filterTypeOptions.find(opt => opt.value === filterType)}
+                                onChange={handleSelectFilterTypeChange}
+                                isSearchable={false}
+                                placeholder="Filter Laporan"
+                                menuPortalTarget={document.body}
+                                styles={{
+                                    container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                                }}
+                            />
+
+                            {filterType === 'month' && (
+                                <>
+                                    {/* 2. Filter Bulan: Select */}
+                                    <Select
+                                        classNamePrefix="report-filter-select"
+                                        name="month"
+                                        options={monthOptions}
+                                        value={monthOptions.find(m => m.value === filters.month)}
+                                        onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
+                                        placeholder="Semua Bulan"
+                                        isSearchable={false}
+                                        menuPortalTarget={document.body}
+                                        styles={{
+                                            container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                                            menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                                        }}
+                                    />
+                                    <Select
+                                        classNamePrefix="report-filter-select"
+                                        name="year"
+                                        options={yearSelectOptions}
+                                        value={yearSelectOptions.find(y => y.value === filters.year)}
+                                        onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
+                                        placeholder="Semua Tahun"
+                                        isSearchable={false}
+                                        menuPortalTarget={document.body}
+                                        styles={{
+                                            container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                                            menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                                        }}
+                                    />
+                                </>
+                            )}
+                            {filterType === 'date_range' && (
+                                <motion.div
+                                    variants={staggerItem}
+                                    className="date-range-container"
+                                >
+                                    <input
+                                        type="date"
+                                        name="start_date"
+                                        value={filters.start_date}
+                                        onChange={handleFilterChange}
+                                        className="filter-select-date"
+                                    />
+                                    <span style={{ alignSelf: 'center' }}>-</span>
+                                    <input
+                                        type="date"
+                                        name="end_date"
+                                        value={filters.end_date}
+                                        onChange={handleFilterChange}
+                                        className="filter-select-date"
+                                    />
+                                </motion.div>
+                            )}
+                        </motion.div>
                     </motion.div>
                 )}
-            </motion.div>
+            </AnimatePresence>
 
             <motion.div variants={staggerItem} className="job-list-container">
                 {/* Tampilan Desktop */}
@@ -413,7 +457,6 @@ export default function ActiveLoanReportPage() {
                                 {isLoadingMore && (
                                     <tr><td colSpan="7" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
                                 )}
-
                                 {!loading && !isLoadingMore && data.length === 0 && (
                                     <tr><td colSpan="7" style={{ textAlign: 'center' }}>Tidak ada data peminjaman aktif.</td></tr>
                                 )}
@@ -433,7 +476,8 @@ export default function ActiveLoanReportPage() {
                         </table>
                     )}
                 </div>
-                {/*Tampilan Mobile */}
+
+                {/* Tampilan Mobile */}
                 <div
                     className="job-list-mobile"
                     ref={mobileListRef}
@@ -492,7 +536,6 @@ export default function ActiveLoanReportPage() {
                         );
                     })}
 
-
                     {isLoadingMore && (
                         <p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>
                     )}
@@ -505,6 +548,8 @@ export default function ActiveLoanReportPage() {
                 </div>
 
             </motion.div>
+
+            {/* Total Peminjaman untuk Mobile */}
             <motion.div className='job-list-mobile'>
                 {!loading && !isLoadingMore && data.length > 0 && (
                     <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', marginBottom: '1rem' }}>

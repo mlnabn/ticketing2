@@ -13,6 +13,21 @@ import QrCodeModal from './QrCodeModal';
 import DeleteStockItemModal from './DeleteStockItemModal';
 import { motion, AnimatePresence, useIsPresent } from 'framer-motion';
 
+function useMediaQuery(query) {
+    const [matches, setMatches] = React.useState(false);
+
+    React.useEffect(() => {
+        const media = window.matchMedia(query);
+        if (media.matches !== matches) {
+            setMatches(media.matches);
+        }
+        const listener = () => setMatches(media.matches);
+        window.addEventListener('resize', listener);
+        return () => window.removeEventListener('resize', listener);
+    }, [matches, query]);
+    return matches;
+}
+
 const staggerContainer = {
     hidden: { opacity: 0 },
     visible: {
@@ -44,10 +59,34 @@ const expandVariants = {
     }
 };
 
+const filterExpandVariants = {
+    closed: {
+        height: 0,
+        opacity: 0,
+        overflow: 'hidden',
+        marginTop: 0,
+        marginBottom: 0
+    },
+    open: {
+        height: 'auto',
+        opacity: 1,
+        overflow: 'visible',
+        marginTop: '0.75rem',
+        marginBottom: '0.75rem',
+        y: 0
+    }
+};
+const filterExpandTransition = {
+    type: "spring",
+    stiffness: 150,
+    damping: 25
+};
 
 function StokBarangView() {
     const { showToast } = useOutletContext();
     const isPresent = useIsPresent();
+    const isMobile = useMediaQuery('(max-width: 768px)');
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
     const printRef = useRef();
     // State utama untuk Master Barang (SKU)
     const [masterItems, setMasterItems] = useState([]);
@@ -65,7 +104,6 @@ function StokBarangView() {
     const [selectedStatus, setSelectedStatus] = useState('ALL');
     const [colorOptions, setColorOptions] = useState([]);
     const [selectedColor, setSelectedColor] = useState('');
-    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
     // State untuk modal
     const [detailItem, setDetailItem] = useState(null);
@@ -181,7 +219,7 @@ function StokBarangView() {
         } finally {
             setLoading(false);
         }
-    }, [showToast, setSelectedItems]); 
+    }, [showToast, setSelectedItems]);
 
     useEffect(() => {
         if (!isPresent) return;
@@ -219,6 +257,15 @@ function StokBarangView() {
         };
         fetchData(1, filters);
     }, [selectedCategory, selectedSubCategory, selectedStatus, selectedColor, debouncedSearchTerm, fetchData, isPresent]);
+
+    useEffect(() => {
+        if (!isMobile) {
+            setIsMobileFilterOpen(true);
+        }
+        else {
+            setIsMobileFilterOpen(false);
+        }
+    }, [isMobile]);
 
     const loadMoreItems = async () => {
         if (isLoadingMore || !pagination || pagination.current_page >= pagination.last_page) return;
@@ -518,7 +565,7 @@ function StokBarangView() {
                     className="user-management-container"
                     style={{ marginBottom: '20px' }}
                 >
-                    <h1>Daftar Stok Barang</h1>          
+                    <h1>Daftar Stok Barang</h1>
                 </motion.div>
 
                 <motion.div variants={staggerItem} className="action-buttons-stok">
@@ -546,61 +593,95 @@ function StokBarangView() {
                     />
                 </motion.div>
 
-                <motion.button
-                    variants={staggerItem}
-                    className="btn-toggle-filters"
-                    onClick={() => setIsMobileFilterOpen(prev => !prev)}
-                >
-                    <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
-                    {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
-                </motion.button>
+                <AnimatePresence>
+                    {isMobile && (
+                        <motion.div
+                            key="toggle-filter-button"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <motion.button
+                                className="btn-toggle-filters"
+                                onClick={() => setIsMobileFilterOpen(prev => !prev)}
+                            >
+                                <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+                                {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+                            </motion.button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-                <motion.div
-                    variants={staggerItem}
-                    className={`filters-container ${isMobileFilterOpen ? 'mobile-visible' : ''}`}
-                >
-                    <Select
-                        className='filter-select-inventory'
-                        classNamePrefix="filter-select-invent"
-                        options={filterStatusOptions}
-                        value={filterStatusOptions.find(option => option.value === selectedStatus)}
-                        onChange={(selectedOption) => handleFilterChange('status', selectedOption)}
-                        isClearable={false}
-                        menuPortalTarget={document.body}
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                    />
-                    <Select
-                        className="filter-select-inventory"
-                        classNamePrefix="filter-select-invent"
-                        options={filterCategoryOptions}
-                        value={filterCategoryOptions.find(option => option.value === selectedCategory)}
-                        onChange={(selectedOption) => handleFilterChange('category', selectedOption)}
-                        isClearable={true}
-                        menuPortalTarget={document.body}
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                    />
-                    <Select
-                        className="filter-select-inventory"
-                        classNamePrefix="filter-select-invent"
-                        options={filterSubCategoryOptions}
-                        value={filterSubCategoryOptions.find(option => option.value === selectedSubCategory)}
-                        onChange={(selectedOption) => handleFilterChange('subCategory', selectedOption)}
-                        isDisabled={!selectedCategory || subCategories.length === 0}
-                        isClearable={true}
-                        menuPortalTarget={document.body}
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                    />
-                    <Select
-                        className="filter-select-inventory"
-                        classNamePrefix="filter-select-invent"
-                        options={filterColorOptions}
-                        value={filterColorOptions.find(option => option.value === selectedColor)}
-                        onChange={(selectedOption) => handleFilterChange('color', selectedOption)}
-                        isClearable={true}
-                        menuPortalTarget={document.body}
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                    />
-                </motion.div>
+                <AnimatePresence initial={false}>
+                    {isMobileFilterOpen && (
+                        <motion.div
+                            variants={staggerItem}
+                            className="filters-container"
+                        >
+                            <motion.div
+                                key="mobile-filters-content"
+                                initial={isMobile ? {
+                                    height: 0,
+                                    opacity: 0,
+                                    y: -20,
+                                    marginTop: 0,
+                                    marginBottom: 0,
+                                    overflow: 'hidden'
+                                } : false}
+                                animate="open"
+                                exit="closed"
+                                transition={filterExpandTransition} 
+                                variants={filterExpandVariants} 
+                                className="filters-content-wrapper" 
+                            >
+                                {/* === KONTEN FILTER LAMA DI SINI === */}
+                                <Select
+                                    className='filter-select-inventory'
+                                    classNamePrefix="filter-select-invent"
+                                    options={filterStatusOptions}
+                                    value={filterStatusOptions.find(option => option.value === selectedStatus)}
+                                    onChange={(selectedOption) => handleFilterChange('status', selectedOption)}
+                                    isClearable={false}
+                                    menuPortalTarget={document.body}
+                                    styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                />
+                                <Select
+                                    className="filter-select-inventory"
+                                    classNamePrefix="filter-select-invent"
+                                    options={filterCategoryOptions}
+                                    value={filterCategoryOptions.find(option => option.value === selectedCategory)}
+                                    onChange={(selectedOption) => handleFilterChange('category', selectedOption)}
+                                    isClearable={true}
+                                    menuPortalTarget={document.body}
+                                    styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                />
+                                <Select
+                                    className="filter-select-inventory"
+                                    classNamePrefix="filter-select-invent"
+                                    options={filterSubCategoryOptions}
+                                    value={filterSubCategoryOptions.find(option => option.value === selectedSubCategory)}
+                                    onChange={(selectedOption) => handleFilterChange('subCategory', selectedOption)}
+                                    isDisabled={!selectedCategory || subCategories.length === 0}
+                                    isClearable={true}
+                                    menuPortalTarget={document.body}
+                                    styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                />
+                                <Select
+                                    className="filter-select-inventory"
+                                    classNamePrefix="filter-select-invent"
+                                    options={filterColorOptions}
+                                    value={filterColorOptions.find(option => option.value === selectedColor)}
+                                    onChange={(selectedOption) => handleFilterChange('color', selectedOption)}
+                                    isClearable={true}
+                                    menuPortalTarget={document.body}
+                                    styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                />
+                                {/* === AKHIR KONTEN FILTER LAMA === */}
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 <AnimatePresence>
                     {selectedItems.size > 0 && (
@@ -875,7 +956,7 @@ function StokBarangView() {
                                                         exit="hidden"
                                                         variants={expandVariants}
                                                         onScroll={(e) => handleDetailScroll(e, masterItem.id_m_barang)}
-                                                        onClick={(e) => e.stopPropagation()} 
+                                                        onClick={(e) => e.stopPropagation()}
                                                     >
                                                         {expandingId === masterItem.id_m_barang ? (<p className="detail-loading-mobile">Memuat unit...</p>)
                                                             : detailItems[masterItem.id_m_barang]?.items?.length > 0 ? (
@@ -889,11 +970,11 @@ function StokBarangView() {
                                                                                 type="checkbox"
                                                                                 checked={selectedItems.has(detail.id)}
                                                                                 onChange={(e) => handleSelectItem(detail.id, e.target.checked)}
-                                                                                onClick={(e) => e.stopPropagation()} 
+                                                                                onClick={(e) => e.stopPropagation()}
                                                                             />
                                                                         </div>
                                                                         <div
-                                                                            className="card-content-col hoverable-row" 
+                                                                            className="card-content-col hoverable-row"
                                                                             onClick={(e) => {
                                                                                 if (e.target.tagName === 'BUTTON' || e.target.closest('.action-row') || e.target.closest('.card-select-col') || e.target.type === 'checkbox') {
                                                                                     return;

@@ -4,7 +4,22 @@ import Select from 'react-select';
 import api from '../services/api';
 import TicketDetailModal from './TicketDetailModal';
 import { saveAs } from 'file-saver';
-import { motion, useIsPresent } from 'framer-motion';
+import { motion, useIsPresent, AnimatePresence } from 'framer-motion';
+
+function useMediaQuery(query) {
+  const [matches, setMatches] = React.useState(false);
+
+  React.useEffect(() => {
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
+    }
+    const listener = () => setMatches(media.matches);
+    window.addEventListener('resize', listener);
+    return () => window.removeEventListener('resize', listener);
+  }, [matches, query]);
+  return matches;
+}
 
 const formatDate = (dateString) => {
   if (!dateString) return '-';
@@ -61,9 +76,33 @@ const staggerItem = {
   },
 };
 
+const filterExpandVariants = {
+  closed: {
+    height: 0,
+    opacity: 0,
+    overflow: 'hidden',
+    marginTop: 0,
+    marginBottom: 0
+  },
+  open: {
+    height: 'auto',
+    opacity: 1,
+    overflow: 'visible',
+    marginTop: '0.75rem',
+    marginBottom: '0.75rem',
+    y: 0
+  }
+};
+const filterExpandTransition = {
+  type: "spring",
+  stiffness: 150,
+  damping: 25
+};
+
 
 export default function ComprehensiveReportPage() {
   const isPresent = useIsPresent();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -187,6 +226,15 @@ export default function ComprehensiveReportPage() {
     };
     fetchStats();
   }, [dateFilters.year, dateFilters.month, dateFilters.start_date, dateFilters.end_date, filterType, filterTypePath, isPresent]);
+
+  useEffect(() => {
+    if (!isMobile) {
+      setIsMobileFilterOpen(true);
+    }
+    else {
+      setIsMobileFilterOpen(false);
+    }
+  }, [isMobile]);
 
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);
@@ -322,96 +370,129 @@ export default function ComprehensiveReportPage() {
             )}
           </motion.div>
 
-          <motion.button
-            variants={staggerItem}
-            className="btn-toggle-filters"
-            onClick={() => setIsMobileFilterOpen(prev => !prev)}
-          >
-            <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
-            {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
-          </motion.button>
-
-
-          <motion.div
-            variants={staggerItem}
-            className={`filters-container ${isMobileFilterOpen ? 'mobile-visible' : ''}`}
-          >
-
-            <Select
-              classNamePrefix="report-filter-select"
-              options={filterTypeOptions}
-              value={filterTypeOptions.find(opt => opt.value === filterType)}
-              onChange={handleFilterTypeChange}
-              isSearchable={false}
-              menuPortalTarget={document.body}
-              styles={{
-                container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
-                menuPortal: (base) => ({ ...base, zIndex: 9999 })
-              }}
-            />
-
-            {/* Filter per Bulan */}
-            {filterType === 'month' && (
-              <>
-                {/* 2. Filter Bulan */}
-                <Select
-                  classNamePrefix="report-filter-select"
-                  name="month"
-                  options={months}
-                  value={months.find(m => m.value === dateFilters.month) || months[0]}
-                  onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'month', value: selectedOption.value } })}
-                  placeholder="Semua Bulan"
-                  isSearchable={false}
-                  menuPortalTarget={document.body}
-                  styles={{
-                    container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
-                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
-                  }}
-                />
-                {/* 3. Filter Tahun */}
-                <Select
-                  classNamePrefix="report-filter-select"
-                  name="year"
-                  options={yearOptions}
-                  value={yearOptions.find(y => y.value === dateFilters.year)}
-                  onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'year', value: selectedOption.value } })}
-                  isSearchable={false}
-                  menuPortalTarget={document.body}
-                  styles={{
-                    container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
-                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
-                  }}
-                />
-              </>
-            )}
-
-            {/* Filter per Rentang Tanggal */}
-            {filterType === 'date_range' && (
+          <AnimatePresence>
+            {isMobile && ( 
               <motion.div
-                variants={staggerItem}
-                className='date-range-container'
+                key="toggle-filter-button" 
+                initial={{ opacity: 0, y: -10 }} 
+                animate={{ opacity: 1, y: 0 }}   
+                exit={{ opacity: 0, y: -10 }}     
+                transition={{ duration: 0.2 }} 
               >
-
-                <input
-                  type="date"
-                  name="start_date"
-                  value={dateFilters.start_date}
-                  onChange={handleDateFilterChange}
-                  className="filter-select-date"
-                  style={{ flex: 1 }}
-                />
-                <span className='strip' style={{ alignSelf: 'center' }}>-</span>
-                <input
-                  type="date"
-                  name="end_date"
-                  value={dateFilters.end_date}
-                  onChange={handleDateFilterChange}
-                  className="filter-select-date"
-                  style={{ flex: 1 }}
-                />
+                <motion.button
+                  className="btn-toggle-filters"
+                  onClick={() => setIsMobileFilterOpen(prev => !prev)}
+                >
+                  <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+                  {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+                </motion.button>
               </motion.div>
             )}
-          </motion.div>
+          </AnimatePresence>
+
+
+          <AnimatePresence initial={false}>
+            {isMobileFilterOpen && (
+              <motion.div
+                variants={staggerItem}
+                className="filters-container"
+              >
+                <motion.div
+                  key="mobile-filters-content"
+                  initial={isMobile ? {
+                    height: 0,
+                    opacity: 0,
+                    y: -20,
+                    marginTop: 0,
+                    marginBottom: 0,
+                    overflow: 'hidden'
+                  } : false}
+                  animate="open"
+                  exit="closed"
+                  transition={filterExpandTransition}
+                  variants={filterExpandVariants}
+                  className="filters-content-wrapper" // Ini yang mengontrol layout filter
+                >
+
+                  <Select
+                    classNamePrefix="report-filter-select"
+                    options={filterTypeOptions}
+                    value={filterTypeOptions.find(opt => opt.value === filterType)}
+                    onChange={handleFilterTypeChange}
+                    isSearchable={false}
+                    menuPortalTarget={document.body}
+                    styles={{
+                      container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                      menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                    }}
+                  />
+
+                  {/* Filter per Bulan */}
+                  {filterType === 'month' && (
+                    <>
+                      {/* 2. Filter Bulan */}
+                      <Select
+                        classNamePrefix="report-filter-select"
+                        name="month"
+                        options={months}
+                        value={months.find(m => m.value === dateFilters.month) || months[0]}
+                        onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'month', value: selectedOption.value } })}
+                        placeholder="Semua Bulan"
+                        isSearchable={false}
+                        menuPortalTarget={document.body}
+                        styles={{
+                          container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                        }}
+                      />
+                      {/* 3. Filter Tahun */}
+                      <Select
+                        classNamePrefix="report-filter-select"
+                        name="year"
+                        options={yearOptions}
+                        value={yearOptions.find(y => y.value === dateFilters.year)}
+                        onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'year', value: selectedOption.value } })}
+                        isSearchable={false}
+                        menuPortalTarget={document.body}
+                        styles={{
+                          container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                        }}
+                      />
+                    </>
+                  )}
+
+                  {/* Filter per Rentang Tanggal */}
+                  {filterType === 'date_range' && (
+                    <motion.div
+                      variants={staggerItem}
+                      className='date-range-container'
+                    >
+
+                      <input
+                        type="date"
+                        name="start_date"
+                        value={dateFilters.start_date}
+                        onChange={handleDateFilterChange}
+                        className="filter-select-date"
+                        style={{ flex: 1 }}
+                      />
+                      <span className='strip' style={{ alignSelf: 'center' }}>-</span>
+                      <input
+                        type="date"
+                        name="end_date"
+                        value={dateFilters.end_date}
+                        onChange={handleDateFilterChange}
+                        className="filter-select-date"
+                        style={{ flex: 1 }}
+                      />
+                    </motion.div>
+                  )}
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
 
           <motion.div variants={staggerItem} className="download-buttons">
             <button className="btn-download pdf" onClick={() => handleDownload('pdf')} disabled={exportingPdf}>
