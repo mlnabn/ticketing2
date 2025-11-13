@@ -988,15 +988,6 @@ body.dark-mode .hamburger-menu-button span {
     padding-top: 5px;
   }
 
-  /* body.dark-mode .ticket-card-mobile,
-  body.dark-mode .user-card-mobile {
-    box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-    -webkit-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-    -moz-box-shadow: 0px 0px 19px 0px rgba(0, 0, 0, 0.75);
-    background-color: #111111;
-    border: 1px solid var(--border-color-dark);
-  } */
-
   body.dark-mode .card-row,
   body.dark-mode .user-card-row {
     border-bottom-color: var(--border-color-dark);
@@ -3968,39 +3959,6 @@ body.dark-mode .theme-toggle-button:hover {
   box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-
-
-
-/* ====== DARK MODE ====== */
-/* body.dark-mode .job-form-user {
-  background: rgba(30, 30, 30, 0.85);
-}
-
-body.dark-mode .react-select__control,
-body.dark-mode .input-like-select {
-  background-color: #2a2a2a;
-  color: #f0f0f0;
-}
-
-body.dark-mode .input-like-select::placeholder {
-  color: #bbb;
-}
-
-body.dark-mode .btn-submit {
-  background-color: #4285f4;
-}
-
-body.dark-mode .btn-submit:hover {
-  background-color: #3367d6;
-} */
-
-/* =================================================================
-   Gaya untuk Tombol Logout (Mode Terang)
-   ================================================================= */
-/* ===================================================================
-   UserHeader.css
-   =================================================================== */
-
 /* Kontainer utama header user */
 .user-header {
   display: flex;
@@ -4020,9 +3978,9 @@ body.dark-mode .btn-submit:hover {
 }
 
 .user-avatar2 {
-  width: 38px;
-  height: 38px;
-  font-size: 1.25;
+  width: 33px;
+  height: 33px;
+  font-size: 1.2rem;
   border-radius: 50%;
   background: linear-gradient(135deg, #4a90e2, #1c3b70);
   display: flex;
@@ -5712,11 +5670,10 @@ body.dark-mode .feedback-message {
   background: transparent;
   border: none;
   cursor: pointer;
-  font-size: 1.5rem;
+  font-size: 1rem;
   color: #f9fafb;
   transition: transform 0.2s ease, color 0.3s ease;
   flex-shrink: 0;
-
 }
 
 .notification-button:hover {
@@ -6473,9 +6430,9 @@ body.dark-mode .welcome-title {
     border: none;
     cursor: pointer;
     color: #fff;
-    font-size: 1.5rem;
-    width: 38px;
-    height: 38px;
+    font-size: 15px;
+    width: 33px;
+    height: 33px;
     position: relative;
   }
 
@@ -6553,20 +6510,8 @@ body.dark-mode .welcome-title {
     gap: 20px;
   }
 
-  .main-header-controls-user .notification-button {
-    margin: 0;
-    font-size: 1.25rem;
-  }
-
-
   .main-header-controls-user .breadcrump {
     display: none;
-  }
-
-  .main-header-user .notification-button {
-    font-size: 1.5rem;
-    width: 38px;
-    height: 38px;
   }
 
   .logout-buttonuser {
@@ -7241,7 +7186,7 @@ html {
 
 /* Logo kiri */
 .header-left-group .header-logo {
-  height: 42px;
+  height: 35px;
   object-fit: contain;
   transition: transform 0.3s ease;
 }
@@ -7250,9 +7195,7 @@ html {
   transform: scale(1.05);
 }
 
-/* Navigasi (Tengah) - (Style duplikat dihapus) */
 .header-nav {
-  /* Hapus 'position: absolute' agar rapi */
   display: flex;
   gap: 2rem;
 }
@@ -7289,7 +7232,6 @@ html {
   width: 70%;
 }
 
-/* Login button kanan - (Style duplikat dihapus) */
 .header-right-group .btn-btn2 {
   display: flex;
   align-items: center;
@@ -7321,7 +7263,6 @@ html {
   min-height: 90vh;
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
   position: relative;
   overflow: hidden;
   background: transparent !important;

@@ -11,7 +11,6 @@ function CalendarComponent({ tickets = [], onTicketClick }) {
   const [showModal, setShowModal] = useState(false);
   const [selectedTickets, setSelectedTickets] = useState([]);
 
-  // Sinkronisasi mode gelap
   useEffect(() => {
     const updateModeFromStorage = () => {
       const savedMode = localStorage.getItem('darkMode');
@@ -22,7 +21,6 @@ function CalendarComponent({ tickets = [], onTicketClick }) {
     return () => window.removeEventListener('storage', updateModeFromStorage);
   }, []);
 
-  // Update tiket sesuai tanggal
   useEffect(() => {
     if (!tickets || tickets.length === 0) {
       setTicketsForDate([]);
@@ -35,7 +33,6 @@ function CalendarComponent({ tickets = [], onTicketClick }) {
     setTicketsForDate(filtered);
   }, [tickets, date]);
 
-  // Klik tanggal di kalender
   const handleDayClick = (clickedDate) => {
     const formatted = format(clickedDate, 'yyyy-MM-dd');
     const filtered = tickets.filter(
