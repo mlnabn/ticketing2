@@ -4,6 +4,21 @@ import SkuDetailModal from './SkuDetailModal';
 import { motion, AnimatePresence, useIsPresent } from 'framer-motion';
 import Select from 'react-select';
 
+function useMediaQuery(query) {
+    const [matches, setMatches] = React.useState(false);
+
+    React.useEffect(() => {
+        const media = window.matchMedia(query);
+        if (media.matches !== matches) {
+            setMatches(media.matches);
+        }
+        const listener = () => setMatches(media.matches);
+        window.addEventListener('resize', listener);
+        return () => window.removeEventListener('resize', listener);
+    }, [matches, query]);
+    return matches;
+}
+
 const staggerContainer = {
     hidden: { opacity: 0 },
     visible: {
@@ -36,6 +51,15 @@ const expandVariants = {
     }
 };
 
+const filterExpandVariants = {
+    closed: { height: 0, opacity: 0, overflow: 'hidden', marginTop: 0, marginBottom: 0 },
+    open: { height: 'auto', opacity: 1, overflow: 'visible', marginTop: '0.75rem', marginBottom: '0.75rem' }
+};
+const filterExpandTransition = {
+    type: "spring",
+    stiffness: 150,
+    damping: 25
+};
 
 function ItemListView({
     items, loading, onScroll, isLoadingMore,
@@ -50,10 +74,11 @@ function ItemListView({
     const [selectedCategory, setSelectedCategory] = useState();
     const [selectedSubCategory, setSelectedSubCategory] = useState();
     const desktopListRef = useRef(null);
-    const mobileListRef = useRef(null); 
+    const mobileListRef = useRef(null);
+    const isMobile = useMediaQuery('(max-width: 768px)');
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
     const isInitialMount = useRef(true);
     const [selectedItemForDetail, setSelectedItemForDetail] = useState(null);
-    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
     const handleFilterChange = (name, selectedOption) => {
         const value = selectedOption ? selectedOption.value : '';
@@ -116,6 +141,15 @@ function ItemListView({
     }, [currentFilters, isPresent]);
 
     useEffect(() => {
+        if (!isMobile) {
+            setIsMobileFilterOpen(true);
+        }
+        else {
+            setIsMobileFilterOpen(false);
+        }
+    }, [isMobile]);
+
+    useEffect(() => {
         if (!isPresent) return;
         if (isInitialMount.current) {
             isInitialMount.current = false;
@@ -154,68 +188,84 @@ function ItemListView({
                     )}
                 </motion.div>
 
-                <motion.button
-                    variants={staggerItem}
-                    className="btn-toggle-filters"
-                    onClick={() => setIsMobileFilterOpen(prev => !prev)}
-                >
-                    <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
-                    {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
-                </motion.button>
-                
-                <motion.div 
-                    variants={staggerItem} 
-                    className={`filters-container ${isMobileFilterOpen ? 'mobile-visible' : ''}`}
-                >
-                    <Select
-                        className='filter-select-inventory-item'
-                        classNamePrefix="filter-select-invent"
-                        value={categoryOptions.find(option => option.value === selectedCategory)}
-                        onChange={(option) => handleFilterChange('category', option)}
-                        options={categoryOptions}
-                        isClearable={true}
-                        isSearchable={true}
-                        placeholder="Semua Kategori"
-                        menuPortalTarget={document.body}
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                    />
-                    <Select
-                        className='filter-select-inventory-item'
-                        classNamePrefix="filter-select-invent"
-                        value={subCategoryOptions.find(option => option.value === selectedSubCategory)}
-                        onChange={(option) => handleFilterChange('subCategory', option)}
-                        options={subCategoryOptions}
-                        isClearable={true}
-                        isDisabled={!selectedCategory || subCategoryOptions.length <= 1}
-                        isSearchable={true}
-                        placeholder="Semua Sub-Kategori"
-                        menuPortalTarget={document.body}
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                    />
-                    <button 
-                        onClick={() => onToggleArchived(!showArchived)} 
-                        className={`btn-archive ${showArchived ? 'active' : ''}`}
-                        title={showArchived ? 'Kembali ke daftar SKU aktif' : 'Lihat SKU yang diarsipkan'}
+                {isMobile && (
+                    <motion.button
+                        variants={staggerItem}
+                        className="btn-toggle-filters"
+                        onClick={() => setIsMobileFilterOpen(prev => !prev)}
                     >
-                        <i className={`fas ${showArchived ? 'fa-box' : 'fa-archive'}`} style={{ marginRight: '8px' }}></i>
-                        {showArchived ? 'SKU Aktif' : 'Lihat Arsip'}
-                    </button>
-                    {selectedIds.length > 0 && (
-                        <div className="bulk-action-bar" >
-                            {showArchived ? (
-                                <button onClick={onBulkRestore} className="btn-clear" style={{ color: '#28a745', fontWeight: 'bold' }}>
-                                    <i className="fas fa-undo" style={{ marginRight: '5px' }}></i>
-                                    Pulihkan {selectedIds.length} SKU
+                        <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+                        {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+                    </motion.button>
+                )}
+
+                <AnimatePresence initial={false}>
+                    {isMobileFilterOpen && (
+                        <motion.div
+                            variants={staggerItem}
+                            className="filters-container"
+                        >
+                            <motion.div
+                                key="mobile-filters-content"
+                                initial={isMobile ? "closed" : false} // Matikan animasi di desktop
+                                animate="open"
+                                exit="closed"
+                                transition={filterExpandTransition}
+                                variants={filterExpandVariants}
+                                className="filters-content-wrapper"
+                            >
+                                <Select
+                                    className='filter-select-inventory-item'
+                                    classNamePrefix="filter-select-invent"
+                                    value={categoryOptions.find(option => option.value === selectedCategory)}
+                                    onChange={(option) => handleFilterChange('category', option)}
+                                    options={categoryOptions}
+                                    isClearable={true}
+                                    isSearchable={true}
+                                    placeholder="Semua Kategori"
+                                    menuPortalTarget={document.body}
+                                    styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                />
+                                <Select
+                                    className='filter-select-inventory-item'
+                                    classNamePrefix="filter-select-invent"
+                                    value={subCategoryOptions.find(option => option.value === selectedSubCategory)}
+                                    onChange={(option) => handleFilterChange('subCategory', option)}
+                                    options={subCategoryOptions}
+                                    isClearable={true}
+                                    isDisabled={!selectedCategory || subCategoryOptions.length <= 1}
+                                    isSearchable={true}
+                                    placeholder="Semua Sub-Kategori"
+                                    menuPortalTarget={document.body}
+                                    styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                />
+                                <button
+                                    onClick={() => onToggleArchived(!showArchived)}
+                                    className={`btn-archive ${showArchived ? 'active' : ''}`}
+                                    title={showArchived ? 'Kembali ke daftar SKU aktif' : 'Lihat SKU yang diarsipkan'}
+                                >
+                                    <i className={`fas ${showArchived ? 'fa-box' : 'fa-archive'}`} style={{ marginRight: '8px' }}></i>
+                                    {showArchived ? 'SKU Aktif' : 'Lihat Arsip'}
                                 </button>
-                            ) : (
-                                <button onClick={onBulkDelete} className="btn-clear">
-                                    <i className="fas fa-archive" style={{ marginRight: '5px' }}></i>
-                                    Arsipkan {selectedIds.length} SKU
-                                </button>
-                            )}
-                        </div>
+                                {selectedIds.length > 0 && (
+                                    <div className="bulk-action-bar" >
+                                        {showArchived ? (
+                                            <button onClick={onBulkRestore} className="btn-clear" style={{ color: '#28a745', fontWeight: 'bold' }}>
+                                                <i className="fas fa-undo" style={{ marginRight: '5px' }}></i>
+                                                Pulihkan {selectedIds.length} SKU
+                                            </button>
+                                        ) : (
+                                            <button onClick={onBulkDelete} className="btn-clear">
+                                                <i className="fas fa-archive" style={{ marginRight: '5px' }}></i>
+                                                Arsipkan {selectedIds.length} SKU
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+                            </motion.div>
+                        </motion.div>
                     )}
-                </motion.div>
+                </AnimatePresence>
 
                 <motion.div variants={staggerItem} className="job-list-container">
                     <div className="table-scroll-container">
@@ -315,18 +365,18 @@ function ItemListView({
                                                                                             </button>
                                                                                         )}
                                                                                         {showArchived ? (
-                                                                                            <button 
-                                                                                                onClick={(e) => { e.stopPropagation(); onRestore(detail); }} 
+                                                                                            <button
+                                                                                                onClick={(e) => { e.stopPropagation(); onRestore(detail); }}
                                                                                                 className="btn-user-action btn-restore"
                                                                                                 title="Pulihkan SKU ini"
                                                                                             >
                                                                                                 <i className="fas fa-undo" style={{ fontSize: '20px', marginRight: '5px', color: '#28a745' }}></i>
                                                                                             </button>
                                                                                         ) : (
-                                                                                            <button 
-                                                                                                onClick={(e) => { e.stopPropagation(); onDelete(detail); }} 
+                                                                                            <button
+                                                                                                onClick={(e) => { e.stopPropagation(); onDelete(detail); }}
                                                                                                 className="btn-user-action btn-dlt"
-                                                                                                disabled={detail.total_active_stock > 0} 
+                                                                                                disabled={detail.total_active_stock > 0}
                                                                                                 title={detail.total_active_stock > 0 ? 'SKU tidak bisa diarsipkan jika masih ada stok aktif (Tersedia, Dipinjam, dll)' : 'Arsipkan SKU ini'}
                                                                                             >
                                                                                                 <i className="fas fa-archive" style={{ fontSize: '20px', marginRight: '5px' }}></i>
@@ -370,7 +420,7 @@ function ItemListView({
                     <div
                         className="job-list-mobile"
                         ref={mobileListRef}
-                        onScroll={onScroll} 
+                        onScroll={onScroll}
                         style={{ overflowY: 'auto', maxHeight: '65vh', minHeight: '150px' }}
                     >
                         {loading && !isLoadingMore && (
@@ -387,7 +437,7 @@ function ItemListView({
                             <div
                                 key={item.kode_barang}
                                 className={`ticket-card-mobile summary-card hoverable-row ${expandedRows[item.kode_barang] ? 'expanded' : ''}`}
-                                onClick={() => onToggleExpand(item.kode_barang)} 
+                                onClick={() => onToggleExpand(item.kode_barang)}
                             >
                                 <div className="card-header">
                                     <h4>{item.kode_barang}</h4>
@@ -419,7 +469,7 @@ function ItemListView({
                                             animate="visible"
                                             exit="hidden"
                                             variants={expandVariants}
-                                            onClick={(e) => e.stopPropagation()} 
+                                            onClick={(e) => e.stopPropagation()}
                                         >
                                             {expandingId === item.kode_barang ? (
                                                 <p className="detail-loading-mobile">Memuat variasi...</p>
@@ -445,8 +495,8 @@ function ItemListView({
                                                                 <button onClick={(e) => { e.stopPropagation(); onEdit(detail); }} className="btn-user-action btn-detail">Edit</button>
                                                             )}
                                                             {showArchived ? (
-                                                                <button 
-                                                                    onClick={(e) => { e.stopPropagation(); onRestore(detail); }} 
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); onRestore(detail); }}
                                                                     className="btn-user-action btn-restore"
                                                                     title="Pulihkan SKU ini"
                                                                     style={{ color: '#28a745', fontWeight: 'bold' }}
@@ -454,10 +504,10 @@ function ItemListView({
                                                                     Pulihkan
                                                                 </button>
                                                             ) : (
-                                                                <button 
-                                                                    onClick={(e) => { e.stopPropagation(); onDelete(detail); }} 
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); onDelete(detail); }}
                                                                     className="btn-user-action btn-dlt"
-                                                                    disabled={detail.total_active_stock > 0} 
+                                                                    disabled={detail.total_active_stock > 0}
                                                                     title={detail.total_active_stock > 0 ? 'SKU tidak bisa diarsipkan jika masih ada stok aktif' : 'Arsipkan SKU ini'}
                                                                 >
                                                                     Arsipkan

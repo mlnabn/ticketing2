@@ -6,7 +6,7 @@ import api from '../services/api';
 import { saveAs } from 'file-saver';
 import QrScannerModal from './QrScannerModal';
 import HistoryModal from './HistoryModal';
-import { motion, useIsPresent } from 'framer-motion';
+import { motion, useIsPresent, AnimatePresence } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -65,7 +65,8 @@ const monthOptions = [
 
 function ItemHistoryLookupPage() {
     const isPresent = useIsPresent();
-    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+    const isMobile = useMediaQuery('(max-width: 768px)');
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(!isMobile);
     const { showToast } = useOutletContext();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -88,7 +89,6 @@ function ItemHistoryLookupPage() {
     const [exportingHistoryExcel, setExportingHistoryExcel] = useState(false);
     const [exportingHistoryPdf, setExportingHistoryPdf] = useState(false);
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-    const isMobile = useMediaQuery('(max-width: 1290px)');
     const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 });
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const desktopListRef = useRef(null);
@@ -204,6 +204,15 @@ function ItemHistoryLookupPage() {
                 return item.updated_at;
         }
     };
+
+    useEffect(() => {
+        if (!isMobile) {
+            setIsMobileFilterOpen(true);
+        }
+        else {
+            setIsMobileFilterOpen(false);
+        }
+    }, [isMobile]);
 
     const getResponsiblePerson = (item) => {
         const latestHistoryRecord = item.latest_history;
@@ -428,83 +437,104 @@ function ItemHistoryLookupPage() {
                         </span>
                     </button>
                 </motion.div>
+                {isMobile && (
+                    <motion.button
+                        variants={staggerItem}
+                        className="btn-toggle-filters"
+                        onClick={() => setIsMobileFilterOpen(prev => !prev)}
+                    >
+                        <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+                        {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+                    </motion.button>
+                )}
 
-                <motion.button
-                    variants={staggerItem}
-                    className="btn-toggle-filters"
-                    onClick={() => setIsMobileFilterOpen(prev => !prev)}
-                >
-                    <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
-                    {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
-                </motion.button>
-
-                <motion.div 
-                    variants={staggerItem}
-                    className={`filters-container ${isMobileFilterOpen ? 'mobile-visible' : ''}`}
-                >
-
-                    {/* 1. Filter Tipe: Select */}
-                    <Select
-                        classNamePrefix="report-filter-select"
-                        options={filterTypeOptions}
-                        value={filterTypeOptions.find(opt => opt.value === filterType)}
-                        onChange={handleSelectFilterTypeChange}
-                        isSearchable={false}
-                        placeholder="Filter Riwayat"
-                        menuPortalTarget={document.body}
-                        styles={{
-                            container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
-                            menuPortal: (base) => ({ ...base, zIndex: 9999 })
-                        }}
-                    />
-
-                    {filterType === 'month' && (
-                        <>
-                            {/* 2. Filter Bulan: Select */}
-                            <Select
-                                classNamePrefix="report-filter-select"
-                                name="month"
-                                options={monthOptions}
-                                value={monthOptions.find(m => m.value === filters.month)}
-                                onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
-                                placeholder="Semua Bulan"
-                                isSearchable={false}
-                                menuPortalTarget={document.body}
-                                styles={{
-                                    container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
-                                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
-                                }}
-                            />
-
-                            {/* 3. Filter Tahun: Select */}
-                            <Select
-                                classNamePrefix="report-filter-select"
-                                name="year"
-                                options={yearSelectOptions}
-                                value={yearSelectOptions.find(y => y.value === filters.year)}
-                                onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
-                                placeholder="Semua Tahun"
-                                isSearchable={false}
-                                menuPortalTarget={document.body}
-                                styles={{
-                                    container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
-                                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
-                                }}
-                            />
-                            {/* </select> */}
-                        </>
-                    )}
-                    {filterType === 'date_range' && (
+                <AnimatePresence initial={false}>
+                    {isMobileFilterOpen && (
                         <motion.div
                             variants={staggerItem}
-                            className='date-range-container'                       
+                            className="filters-container"
                         >
-                            <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
-                            <span style={{ alignSelf: 'center' }}>-</span>
-                            <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
+                            <motion.div
+                                key="mobile-filters-content"
+                                initial={isMobile ? "closed" : false}
+                                animate="open"
+                                exit="closed"
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 150,
+                                    damping: 25
+                                }}
+                                variants={{
+                                    closed: { height: 0, opacity: 0, overflow: 'hidden', marginTop: 0, marginBottom: 0 },
+                                    open: { height: 'auto', opacity: 1, overflow: 'visible', marginTop: '0.75rem', marginBottom: '0.75rem' }
+                                }}
+                                className="filters-content-wrapper"
+                            >
+
+                                {/* 1. Filter Tipe: Select */}
+                                <Select
+                                    classNamePrefix="report-filter-select"
+                                    options={filterTypeOptions}
+                                    value={filterTypeOptions.find(opt => opt.value === filterType)}
+                                    onChange={handleSelectFilterTypeChange}
+                                    isSearchable={false}
+                                    placeholder="Filter Riwayat"
+                                    menuPortalTarget={document.body}
+                                    styles={{
+                                        container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                                        menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                                    }}
+                                />
+
+                                {filterType === 'month' && (
+                                    <>
+                                        {/* 2. Filter Bulan: Select */}
+                                        <Select
+                                            classNamePrefix="report-filter-select"
+                                            name="month"
+                                            options={monthOptions}
+                                            value={monthOptions.find(m => m.value === filters.month)}
+                                            onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
+                                            placeholder="Semua Bulan"
+                                            isSearchable={false}
+                                            menuPortalTarget={document.body}
+                                            styles={{
+                                                container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                                                menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                                            }}
+                                        />
+
+                                        {/* 3. Filter Tahun: Select */}
+                                        <Select
+                                            classNamePrefix="report-filter-select"
+                                            name="year"
+                                            options={yearSelectOptions}
+                                            value={yearSelectOptions.find(y => y.value === filters.year)}
+                                            onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
+                                            placeholder="Semua Tahun"
+                                            isSearchable={false}
+                                            menuPortalTarget={document.body}
+                                            styles={{
+                                                container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                                                menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                                            }}
+                                        />
+                                    </>
+                                )}
+                                {filterType === 'date_range' && (
+                                    <motion.div
+                                        variants={staggerItem}
+                                        className='date-range-container'
+                                    >
+                                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
+                                        <span style={{ alignSelf: 'center' }}>-</span>
+                                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
+                                    </motion.div>
+                                )}
+                            </motion.div>
                         </motion.div>
                     )}
-                </motion.div>
+                </AnimatePresence>
 
                 <motion.div variants={staggerItem} className={`split-view-container ${selectedItem ? 'split-view-active' : ''}`}>
                     <div className="list-panel">

@@ -1,8 +1,8 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import Select from 'react-select';
 import { useFinancialReport } from './useFinancialReport';
 import AcquisitionDetailModal from './AcquisitionDetailModal';
-import { motion, useIsPresent } from 'framer-motion';
+import { motion, useIsPresent, AnimatePresence } from 'framer-motion';
 
 const staggerContainer = {
     hidden: { opacity: 0 },
@@ -23,9 +23,12 @@ const staggerItem = {
     },
 };
 
+const isMobileDevice = () => typeof window !== 'undefined' && window.innerWidth < 768;
+
 export default function NewAcquisitionsReport() {
     const isPresent = useIsPresent();
-    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(isMobileDevice());
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(!isMobileDevice());
     const {
         detailedData,
         filters,
@@ -92,6 +95,23 @@ export default function NewAcquisitionsReport() {
         setSelectedItem(item);
     };
 
+    useEffect(() => {
+        const handleResize = () => {
+            const isCurrentlyDesktop = window.innerWidth >= 768;
+            setIsMobile(!isCurrentlyDesktop);
+            if (isCurrentlyDesktop) {
+                setIsMobileFilterOpen(true);
+            }
+            else {
+                setIsMobileFilterOpen(false);
+            }
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     return (
         <motion.div
             className="user-management-container"
@@ -112,68 +132,90 @@ export default function NewAcquisitionsReport() {
                 {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
             </motion.button>
 
-            <motion.div
-                variants={staggerItem}
-                className={`filters-container ${isMobileFilterOpen ? 'mobile-visible' : ''}`}
-            >
-
-                <Select
-                    classNamePrefix="report-filter-select"
-                    options={filterTypeOptions}
-                    value={filterTypeOptions.find(opt => opt.value === filterType)}
-                    onChange={handleSelectFilterTypeChange}
-                    isSearchable={false}
-                    placeholder="Filter Laporan"
-                    menuPortalTarget={document.body}
-                    styles={{
-                        container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
-                        menuPortal: (base) => ({ ...base, zIndex: 9999 })
-                    }}
-                />
-
-                {filterType === 'month' && (
-                    <>
-                        <Select
-                            classNamePrefix="report-filter-select"
-                            name="month"
-                            options={monthOptions}
-                            value={monthOptions.find(m => m.value === filters.month)}
-                            onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
-                            placeholder="Semua Bulan"
-                            isSearchable={false}
-                            menuPortalTarget={document.body}
-                            styles={{
-                                container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
-                                menuPortal: (base) => ({ ...base, zIndex: 9999 })
-                            }}
-                        />
-                        <Select
-                            classNamePrefix="report-filter-select"
-                            name="year"
-                            options={yearOptions}
-                            value={yearOptions.find(y => y.value === filters.year)}
-                            onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
-                            placeholder="Semua Tahun"
-                            isSearchable={false}
-                            menuPortalTarget={document.body}
-                            styles={{
-                                container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
-                                menuPortal: (base) => ({ ...base, zIndex: 9999 })
-                            }}
-                        />
-                    </>
-                )}
-                {filterType === 'date_range' && (
+            {/* DIPERBAIKI: Menghapus wrapper kondisional {isMobile && (...)} agar filter tampil di Desktop */}
+            <AnimatePresence>
+                {isMobileFilterOpen && (
                     <motion.div
                         variants={staggerItem}
-                        className='date-range-container'
+                        className="filters-container"
                     >
-                        <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
-                        <span style={{ alignSelf: 'center' }}>-</span>
-                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
+                        <motion.div
+                            key="mobile-filters-content"
+                            initial={isMobile ? "closed" : false}
+                            animate="open"
+                            exit="closed"
+                            transition={{
+                                type: "spring",
+                                stiffness: 150,
+                                damping: 25
+                            }}
+                            variants={{
+                                closed: { height: 0, opacity: 0, overflow: 'hidden', marginTop: 0, marginBottom: 0 },
+                                open: { height: 'auto', opacity: 1, overflow: 'visible', marginTop: '0.75rem', marginBottom: '0.75rem' }
+                            }}
+                            className="filters-content-wrapper"
+                        >
+
+                            <Select
+                                classNamePrefix="report-filter-select"
+                                options={filterTypeOptions}
+                                value={filterTypeOptions.find(opt => opt.value === filterType)}
+                                onChange={handleSelectFilterTypeChange}
+                                isSearchable={false}
+                                placeholder="Filter Laporan"
+                                menuPortalTarget={document.body}
+                                styles={{
+                                    container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                                }}
+                            />
+
+                            {filterType === 'month' && (
+                                <>
+                                    <Select
+                                        classNamePrefix="report-filter-select"
+                                        name="month"
+                                        options={monthOptions}
+                                        value={monthOptions.find(m => m.value === filters.month)}
+                                        onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'month')}
+                                        placeholder="Semua Bulan"
+                                        isSearchable={false}
+                                        menuPortalTarget={document.body}
+                                        styles={{
+                                            container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                                            menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                                        }}
+                                    />
+                                    <Select
+                                        classNamePrefix="report-filter-select"
+                                        name="year"
+                                        options={yearOptions}
+                                        value={yearOptions.find(y => y.value === filters.year)}
+                                        onChange={(selectedOption) => handleSelectFilterChange(selectedOption, 'year')}
+                                        placeholder="Semua Tahun"
+                                        isSearchable={false}
+                                        menuPortalTarget={document.body}
+                                        styles={{
+                                            container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                                            menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                                        }}
+                                    />
+                                </>
+                            )}
+                            {filterType === 'date_range' && (
+                                <motion.div
+                                    variants={staggerItem}
+                                    className='date-range-container'
+                                >
+                                    <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
+                                    <span style={{ alignSelf: 'center' }}>-</span>
+                                    <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
+                                </motion.div>
+                            )}
+                        </motion.div>
                     </motion.div>
                 )}
-            </motion.div>
+            </AnimatePresence>
 
             <motion.div variants={staggerItem} className="download-buttons">
                 <button onClick={() => handleExportWrapper('excel')} disabled={exportingExcel} className="btn-download excel">
