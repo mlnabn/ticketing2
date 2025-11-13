@@ -1,19 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import loginBackground from '../Image/LoginBg.jpg'; // Menggunakan background yang sama
-import '../App.css'; // Menggunakan style yang sama
+import '../App.css';
 import { motion } from 'framer-motion';
-import logoImg from '../Image/Login.png';
+import Particles from "react-tsparticles";
+import { loadSlim } from "tsparticles-slim";
 
-// (Anda bisa copy-paste varian animasi dari Login.js/Register.js jika mau)
+const imageVariants = {
+  hidden: { opacity: 0, y: -20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 120, damping: 15, delay: 0.1 },
+  },
+};
 const formContainerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { delayChildren: 0.2, staggerChildren: 0.08 },
+  },
 };
 const formItemVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 100 },
+  },
 };
 
 export default function ForgotPasswordPage() {
@@ -23,16 +38,44 @@ export default function ForgotPasswordPage() {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
-  // Atur background
-  useEffect(() => {
-    document.documentElement.style.setProperty(
-      '--auth-background-image-light',
-      `url(${loginBackground})`
-    );
-    return () => {
-      document.documentElement.style.removeProperty('--auth-background-image-light');
-    };
+  const particlesInit = useCallback(async engine => {
+    await loadSlim(engine);
   }, []);
+
+  const particlesOptions = {
+    background: { color: { value: "#0a0f1e" } },
+    fpsLimit: 60,
+    interactivity: {
+      events: {
+        onHover: { enable: true, mode: "repulse" },
+        resize: true,
+      },
+      modes: { repulse: { distance: 100, duration: 0.4 } },
+    },
+    particles: {
+      color: { value: "#ffffff" },
+      links: {
+        color: "#3b82f6",
+        distance: 150,
+        enable: true,
+        opacity: 0.3,
+        width: 1,
+      },
+      move: {
+        direction: "none",
+        enable: true,
+        outModes: "bounce",
+        random: false,
+        speed: 1,
+        straight: false,
+      },
+      number: { density: { enable: true, area: 800 }, value: 80 },
+      opacity: { value: 0.3 },
+      shape: { type: "circle" },
+      size: { value: { min: 1, max: 5 } },
+    },
+    detectRetina: true,
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,7 +86,6 @@ export default function ForgotPasswordPage() {
     try {
       const response = await api.post('/auth/password/request-otp', { phone });
       setMessage(response.data.message);
-      // Jika sukses, arahkan ke halaman reset dan bawa nomor HP
       navigate('/reset-password', { state: { phone: phone } });
     } catch (err) {
       const errorData = err.response?.data;
@@ -59,72 +101,82 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="auth-page-container">
-      <div className="split-card">
-        <div className="login-card" style={{ maxWidth: '450px' }}> {/* Mirip Login.js */}
-          <motion.form
-            onSubmit={handleSubmit}
-            variants={formContainerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <motion.h2 variants={formItemVariants}>Lupa Password</motion.h2>
-            <motion.p variants={formItemVariants} className="form-description">
-              Masukkan nomor WhatsApp Anda yang terdaftar. Kami akan mengirimkan kode OTP untuk reset password.
+      <Particles
+        id="tsparticles-forgot"
+        init={particlesInit}
+        options={particlesOptions}
+        className="particles-background"
+      />
+      
+      <motion.div
+        className="auth-content-centered"
+        variants={formContainerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        
+        <motion.form
+          onSubmit={handleSubmit}
+          className="login-form-inner" 
+          variants={formContainerVariants} 
+        >
+          <motion.h2 variants={formItemVariants}>Lupa Password</motion.h2>
+          <motion.p variants={formItemVariants} className="form-description" style={{color: '#e0e0e0'}}>
+            Masukkan nomor WhatsApp Anda. Kami akan mengirimkan kode OTP untuk reset password.
+          </motion.p>
+
+          {error && (
+            <motion.p variants={formItemVariants} className="error-message">
+              {error}
             </motion.p>
-
-            {error && (
-              <motion.p variants={formItemVariants} className="error-message">
-                {error}
-              </motion.p>
-            )}
-            {message && (
-              <motion.p variants={formItemVariants} className="success-message">
-                {message}
-              </motion.p>
-            )}
-
-            <motion.div variants={formItemVariants} className="input-group">
-              <span className="input-icon">📱</span>
-              <input
-                type="tel"
-                placeholder="Nomor WhatsApp (cth: 628...)"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
-            </motion.div>
-
-            <motion.button
-              type="submit"
-              className="login-btn" // Pakai style tombol login
-              disabled={loading}
-              variants={formItemVariants}
-            >
-              {loading ? 'Memproses...' : 'Kirim Kode OTP'}
-            </motion.button>
-
-            <motion.p variants={formItemVariants} className="auth-toggle">
-              Sudah ingat?{' '}
-              <button
-                type="button"
-                onClick={() => navigate('/login')}
-                className="register-link"
-              >
-                Login
-              </button>
+          )}
+          {message && (
+            <motion.p variants={formItemVariants} className="success-message">
+              {message}
             </motion.p>
-          </motion.form>
-        </div>
-        <div className="login-background-side"> 
-            <motion.img
-                src={logoImg}
-                alt="DTECH Engineering Logo"
-                className="login-logo-image"
-                initial="hidden"
-                animate="visible"
+          )}
+
+          <motion.div variants={formItemVariants} className="input-group">
+            <span className="input-icon">📱</span>
+            <input
+              type="tel"
+              placeholder="Nomor WhatsApp (cth: 628...)"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
             />
-        </div>
-      </div>
+          </motion.div>
+
+          <motion.button
+            type="submit"
+            className="login-btn" 
+            disabled={loading}
+            variants={formItemVariants}
+          >
+            {loading ? 'Memproses...' : 'Kirim Kode OTP'}
+          </motion.button>
+
+          <motion.p variants={formItemVariants} className="auth-toggle">
+            Sudah ingat?{' '}
+            <button
+              type="button"
+              onClick={() => navigate('/login')}
+              className="register-link"
+            >
+              Login
+            </button>
+          </motion.p>
+
+          <motion.button 
+            type="button"
+            onClick={() => navigate('/')}
+            className="back-to-landing" 
+            variants={formItemVariants}
+          >
+            ← Back to Landing
+          </motion.button>
+        </motion.form>
+      </motion.div>
     </div>
   );
 }

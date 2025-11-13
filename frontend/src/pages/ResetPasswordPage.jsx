@@ -1,19 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
-import { useAuth } from '../AuthContext'; // <-- 1. Import useAuth
-import loginBackground from '../Image/LoginBg.jpg';
+import { useAuth } from '../AuthContext'; 
 import '../App.css';
 import { motion } from 'framer-motion';
+import Particles from "react-tsparticles";
+import { loadSlim } from "tsparticles-slim";
 
-// (Varian animasi bisa di-copy dari ForgotPasswordPage.jsx)
+const imageVariants = {
+  hidden: { opacity: 0, y: -20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 120, damping: 15, delay: 0.1 },
+  },
+};
 const formContainerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { delayChildren: 0.2, staggerChildren: 0.08 },
+  },
 };
 const formItemVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 100 },
+  },
 };
 
 export default function ResetPasswordPage() {
@@ -27,31 +43,54 @@ export default function ResetPasswordPage() {
   
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, loggedIn } = useAuth(); // <-- 2. Ambil fungsi login
-  
-  // Ambil nomor HP dari state navigasi
+  const { login, loggedIn } = useAuth();
   const phone = location.state?.phone;
 
-  // Atur background
-  useEffect(() => {
-    document.documentElement.style.setProperty(
-      '--auth-background-image-light',
-      `url(${loginBackground})`
-    );
-    return () => {
-      document.documentElement.style.removeProperty('--auth-background-image-light');
-    };
+  const particlesInit = useCallback(async engine => {
+    await loadSlim(engine);
   }, []);
 
-  // Jika tidak ada nomor HP, tendang balik ke halaman sebelumnya
+  const particlesOptions = {
+    background: { color: { value: "#0a0f1e" } },
+    fpsLimit: 60,
+    interactivity: {
+      events: {
+        onHover: { enable: true, mode: "repulse" },
+        resize: true,
+      },
+      modes: { repulse: { distance: 100, duration: 0.4 } },
+    },
+    particles: {
+      color: { value: "#ffffff" },
+      links: {
+        color: "#3b82f6",
+        distance: 150,
+        enable: true,
+        opacity: 0.3,
+        width: 1,
+      },
+      move: {
+        direction: "none",
+        enable: true,
+        outModes: "bounce",
+        random: false,
+        speed: 1,
+        straight: false,
+      },
+      number: { density: { enable: true, area: 800 }, value: 80 },
+      opacity: { value: 0.3 },
+      shape: { type: "circle" },
+      size: { value: { min: 1, max: 5 } },
+    },
+    detectRetina: true,
+  };
+
   useEffect(() => {
     if (!phone) {
       navigate('/forgot-password');
     }
   }, [phone, navigate]);
 
-  // Jika login sukses, arahkan ke dashboard
-  // (Mengikuti pola dari LoginPage.jsx)
   useEffect(() => {
     if (loggedIn) {
       navigate('/dashboard', { replace: true });
@@ -78,13 +117,8 @@ export default function ResetPasswordPage() {
         phone: phone,
         ...form,
       };
-      
       const response = await api.post('/auth/password/reset-with-otp', payload);
-      
-      // 3. Panggil fungsi login dari AuthContext
-      // Ini akan menyimpan token & user, dan memicu useEffect di atas
-      login(response.data); 
-
+      login(response.data);
     } catch (err) {
       const errorData = err.response?.data;
       if (errorData && errorData.errors) {
@@ -97,77 +131,96 @@ export default function ResetPasswordPage() {
     }
   };
 
-  if (!phone) return null; // Mencegah render sebelum redirect
+  if (!phone) return null;
 
   return (
     <div className="auth-page-container">
-      <div className="split-card">
-        <div className="login-card" style={{ maxWidth: '450px' }}>
-          <motion.form
-            onSubmit={handleSubmit}
-            variants={formContainerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <motion.h2 variants={formItemVariants}>Set Password Baru</motion.h2>
-            <motion.p variants={formItemVariants} className="form-description">
-              Reset password untuk nomor <strong>{phone}</strong>.
+      <Particles
+        id="tsparticles-reset"
+        init={particlesInit}
+        options={particlesOptions}
+        className="particles-background"
+      />
+      <motion.div
+        className="auth-content-centered"
+        variants={formContainerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+
+        <motion.form
+          onSubmit={handleSubmit}
+          className="login-form-inner"
+        >
+          <motion.h2 variants={formItemVariants}>Set Password Baru</motion.h2>
+          <motion.p variants={formItemVariants} className="form-description" style={{color: '#e0e0e0'}}>
+            Reset password untuk nomor <strong>{phone}</strong>.
+          </motion.p>
+
+          {error && (
+            <motion.p variants={formItemVariants} className="error-message">
+              {error}
             </motion.p>
+          )}
 
-            {error && (
-              <motion.p variants={formItemVariants} className="error-message">
-                {error}
-              </motion.p>
-            )}
+          <motion.div variants={formItemVariants} className="input-group">
+            <span className="input-icon">🔑</span>
+            <input
+              type="text"
+              name="otp"
+              placeholder="Kode OTP 6 Digit"
+              maxLength="6"
+              value={form.otp}
+              onChange={handleChange}
+              required
+            />
+          </motion.div>
+          
+          <motion.div variants={formItemVariants} className="input-group">
+            <span className="input-icon">🔒</span>
+            <input
+              type="password"
+              name="password"
+              placeholder="Password Baru"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+          </motion.div>
+          
+          <motion.div variants={formItemVariants} className="input-group">
+            <span className="input-icon">🔒</span>
+            <input
+              type="password"
+              name="password_confirmation"
+              placeholder="Konfirmasi Password Baru"
+              value={form.password_confirmation}
+              onChange={handleChange}
+              required
+            />
+          </motion.div>
 
-            <motion.div variants={formItemVariants} className="input-group">
-              <span className="input-icon"></span>
-              <input
-                type="text"
-                name="otp"
-                placeholder="Kode OTP 6 Digit"
-                maxLength="6"
-                value={form.otp}
-                onChange={handleChange}
-                required
-              />
-            </motion.div>
-            
-            <motion.div variants={formItemVariants} className="input-group">
-              <span className="input-icon">🔒</span>
-              <input
-                type="password"
-                name="password"
-                placeholder="Password Baru"
-                value={form.password}
-                onChange={handleChange}
-                required
-              N/>
-            </motion.div>
-            
-            <motion.div variants={formItemVariants} className="input-group">
-              <span className="input-icon">🔒</span>
-              <input
-                type="password"
-                name="password_confirmation"
-                placeholder="Konfirmasi Password Baru"
-                value={form.password_confirmation}
-                onChange={handleChange}
-                required
-              />
-            </motion.div>
+          <motion.button
+            type="submit"
+            className="login-btn"
+            disabled={loading}
+            variants={formItemVariants}
+          >
+            {loading ? 'Menyimpan...' : 'Reset Password & Login'}
+          </motion.button>
 
-            <motion.button
-              type="submit"
-              className="login-btn"
-              disabled={loading}
-              variants={formItemVariants}
+          <motion.p variants={formItemVariants} className="auth-toggle">
+            Salah halaman?{' '}
+            <button
+              type="button"
+              onClick={() => navigate('/login')}
+              className="register-link"
             >
-              {loading ? 'Menyimpan...' : 'Reset Password & Login'}
-            </motion.button>
-          </motion.form>
-        </div>
-      </div>
+              Kembali ke Login
+            </button>
+          </motion.p>
+        </motion.form>
+      </motion.div>
     </div>
   );
 }

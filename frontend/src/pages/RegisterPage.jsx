@@ -1,15 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import api from '../services/api'; // Gunakan instance api terpusat
+import api from '../services/api';
 import Register from '../components/Register';
-import loginBackground from '../Image/LoginBg.jpg';
 
 export default function RegisterPage() {
   const { login, loggedIn, user } = useAuth();
   const navigate = useNavigate();
-
-  // --- State Management ---
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     name: '',
@@ -23,14 +20,6 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [cooldown, setCooldown] = useState(0);
 
-  // Atur background saat komponen dimuat
-  useEffect(() => {
-    document.documentElement.style.setProperty('--auth-background-image-light', `url(${loginBackground})`);
-    return () => {
-      document.documentElement.style.removeProperty('--auth-background-image-light');
-    };
-  }, []);
-
   useEffect(() => {
     let timer;
     if (cooldown > 0) {
@@ -38,18 +27,15 @@ export default function RegisterPage() {
         setCooldown((prevCooldown) => prevCooldown - 1);
       }, 1000);
     }
-    // Cleanup function untuk membersihkan interval saat komponen unmount atau cooldown selesai
     return () => {
       clearInterval(timer);
     };
   }, [cooldown]);
   
-  // Handler untuk perubahan form
   const handleFormChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
   
-  // Handler untuk submit form registrasi
   const handleRegisterSubmit = async () => {
     setError('');
     if (form.password !== form.password_confirmation) {
@@ -75,7 +61,6 @@ export default function RegisterPage() {
     }
   };
   
-  // Handler untuk submit OTP
   const handleOtpSubmit = async () => {
     setError('');
     setLoading(true);
@@ -99,9 +84,8 @@ export default function RegisterPage() {
 
   const handleResendOtp = async () => {
     setError('');
-    setLoading(true); // Tampilkan loading spinner saat mengirim
+    setLoading(true); 
     try {
-      // Panggil endpoint baru yang sudah kita buat
       const response = await api.post('/otp/resend', { phone: form.phone });
       alert(response.data.message);
       setCooldown(300);

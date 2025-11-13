@@ -1,22 +1,11 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import Login from '../components/Login';
-import loginBackground from '../Image/LoginBg.jpg';
 
 export default function LoginPage() {
   const { login, loggedIn } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    document.documentElement.style.setProperty(
-      '--auth-background-image-light',
-      `url(${loginBackground})`
-    );
-    return () => {
-      document.documentElement.style.removeProperty('--auth-background-image-light');
-    };
-  }, []);
 
   // Fungsi ini HANYA mengatur state
   const handleLoginSuccess = useCallback(

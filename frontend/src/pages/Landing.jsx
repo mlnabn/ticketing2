@@ -1,23 +1,108 @@
-// src/layouts/Landing.jsx (atau di mana file Anda berada)
-
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import bgImage from '../Image/homeBg.jpg';
 import yourLogok from '../Image/DTECH-Logo.png';
 import { useAuth } from '../AuthContext';
-
-// 1. Import semua komponen halaman
 import WelcomeHomeUser from '../components/WelcomeHomeUser';
 import FeaturesPage from '../components/FeaturesPage';
 import FAQPage from '../components/FAQPage';
 import AboutUsPage from '../components/AboutUsPage';
+import Particles from "react-tsparticles";
+import { loadSlim } from "tsparticles-slim";
 
+const imageVariants = {
+  hidden: { opacity: 0, y: -20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 120, damping: 15, delay: 0.1 },
+  },
+};
+const formContainerVariants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { delayChildren: 0.2, staggerChildren: 0.08 },
+  },
+};
+const formItemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 100 },
+  },
+};
 
 export default function LandingLayout() {
   const { loggedIn, login } = useAuth();
   const navigate = useNavigate();
 
-  // (Logika useEffect untuk Google Login Anda tetap sama)
+  const particlesInit = useCallback(async engine => {
+    await loadSlim(engine);
+  }, []);
+
+  const particlesOptions = {
+    background: { 
+      color: { 
+        value: "#0a0f1e" 
+      } 
+    },
+    fpsLimit: 30, 
+    interactivity: {
+      events: {
+        onHover: {
+          enable: false,
+          mode: "repulse",
+        },
+        resize: true,
+      },
+      modes: {
+        repulse: {
+          distance: 100,
+          duration: 0.4,
+        },
+      },
+    },
+    particles: {
+      color: {
+        value: "#ffffff",
+      },
+      links: {
+        color: "#3b82f6",
+        distance: 150,
+        enable: true,
+        opacity: 0.2, 
+        width: 1,
+      },
+      move: {
+        direction: "none",
+        enable: true,
+        outModes: "bounce",
+        random: false,
+        speed: 0.5, 
+        straight: false,
+      },
+      number: {
+        density: {
+          enable: true,
+          area: 800,
+        },
+        value: 45,
+      },
+      opacity: {
+        value: 0.3,
+      },
+      shape: {
+        type: "circle",
+      },
+      size: {
+        value: { min: 1, max: 5 },
+      },
+    },
+    detectRetina: true,
+  };
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const access_token = params.get('access_token');
@@ -42,27 +127,49 @@ export default function LandingLayout() {
     }
   }, [loggedIn, navigate]);
 
-  // 3. Fungsi untuk smooth-scroll
-  const handleScrollTo = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
+  const handleScrollTo = (e, id) => {
+    let targetId;
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+      targetId = id;
+    } else if (typeof e === 'string') {
+      targetId = e; 
+    }
+    if (targetId) {
+      const element = document.getElementById(targetId);
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
     }
   };
 
   return (
-    <div
-      className="dashboard-container no-sidebar landing-page"
-      style={{ backgroundImage: `url(${bgImage})` }}
-    >
-      <main className="main-content">
+    <div className="landing-page-container">
+      <Particles
+        id="tsparticles-landing" // ID unik untuk landing
+        init={particlesInit}
+        options={particlesOptions}
+        className="particles-background" // Class yang sama dengan login
+      />
+      
+      {/* Wrapper untuk konten yang bisa di-scroll di ATAS partikel */}
+      <div className="landing-scroll-content">
+        
+        {/* Header dibuat sticky di dalam scroll wrapper */}
         <header className="main-header-user landing-header sticky-header">
           <div className="header-left-group">
             <img src={yourLogok} alt="Logo" className="header-logo" />
           </div>
+          {/* Navigasi dipindahkan ke sini */}
+          <nav className="header-nav">
+            <a href="#home" onClick={(e) => handleScrollTo(e, 'home')}>Home</a>
+            <a href="#features" onClick={(e) => handleScrollTo(e, 'features')}>Features</a>
+            <a href="#faq" onClick={(e) => handleScrollTo(e, 'faq')}>FAQ</a>
+            <a href="#about" onClick={(e) => handleScrollTo(e, 'about')}>About Us</a>
+          </nav>
           <div className="header-right-group">
             <button onClick={() => navigate('/login')} className="btn-btn2">
               <i className="fas fa-user-circle"></i>
@@ -71,11 +178,11 @@ export default function LandingLayout() {
           </div>
         </header>
 
-        {/* 6. Konten Halaman BARU: Semua komponen di-render di sini */}
-        <div className="public-content-singlepalanding-section full-heightge">
-
+        {/* Konten Halaman */}
+        <main className="public-content-singlepage">
+          
           {/* Section 1: Home (Selamat Datang) */}
-          <section id="home" className="">
+          <section id="home" className="landing-section full-height">
             <WelcomeHomeUser
               onGetStarted={() => handleScrollTo('features')}
             />
@@ -95,13 +202,14 @@ export default function LandingLayout() {
           <section id="about" className="landing-section">
             <AboutUsPage />
           </section>
-        </div>
 
-        {/* 7. Footer SATU KALI di paling bawah */}
+        </main>
+        
+        {/* Footer */}
         <footer className="w-full text-center py-6 border-t border-gray-800 text-gray-400 text-xs sm:text-sm relative z-10 mt-12">
           © 2025 Politeknik Negeri Semarang. All rights reserved.
         </footer>
-      </main>
+      </div>
     </div>
   );
 }

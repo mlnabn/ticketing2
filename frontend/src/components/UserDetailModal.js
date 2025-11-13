@@ -145,12 +145,12 @@ function UserDetailModal({ show, user, onClose, onEditRequest }) {
                     <button onClick={handleCloseClick} className="btn-cancel">Tutup</button>
                     <button onClick={() => onEditRequest && onEditRequest(currentUser)} className="btn-confirm">
                         <i className="fas fa-edit" style={{ marginRight: '8px' }}></i>
-                        Edit Pengguna
+                        Edit
                     </button>
                     {currentUser.phone && (
                         <button onClick={handleWhatsAppChat} className="btn-history">
                             <i className="fab fa-whatsapp" style={{ marginRight: '8px' }}></i>
-                            Chat Pengguna
+                            Chat
                         </button>
                     )}
                 </div>

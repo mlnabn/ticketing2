@@ -283,7 +283,15 @@ body.dark-mode .dashboard-container {
   margin-bottom: 3.5rem;
 }
 
-/* Auth Pages */
+.particles-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
 .auth-page-container {
   display: flex;
   justify-content: center;
@@ -300,34 +308,45 @@ body.dark-mode .dashboard-container {
   background-image: var(--auth-background-image-light);
 }
 
-.split-card {
-  display: flex;
-  flex-direction: row;
-  border-radius: 20px;
-  box-shadow: 0px 0px 54px 4px rgba(150, 150, 150, 0.89);
-  -webkit-box-shadow: 0px 0px 54px 4px rgba(150, 150, 150, 0.89);
-  -moz-box-shadow: 0px 0px 54px 4px rgba(150, 150, 150, 0.89);
-  overflow: hidden;
-  width: 900px;
-  max-width: 100%;
-}
+.auth-content-centered {
+  position: relative; 
+  z-index: 1;
+  width: 420px; 
+  max-width: 95%;
+  padding: 2.5rem 3rem;
 
-.login-card,
-.register-card,
-.login-background-side {
-  flex: 1;
-  padding: 50px;
-  background: rgba(255, 255, 255, 0.432);
+  background: rgba(30, 30, 45, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
 }
 
-.login-card h2,
-.register-card h2 {
+.login-logo-image-centered {
+  width: 220px; 
+  height: auto;
+  margin-bottom: 1rem; 
+}
+
+.login-form-inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.auth-content-centered h2 {
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
   margin-bottom: 24px;
-  color: #000111;
-  font-size: 40px;
+  color: #FFFFFF; 
+  font-size: 2.5rem; 
 }
 
 .form-description {
@@ -340,7 +359,6 @@ body.dark-mode .dashboard-container {
   background: none;
   border: none;
   color: #4da6ff;
-  /* Warna biru yang sama dengan .login-link */
   font-weight: bold;
   cursor: pointer;
   text-decoration: underline;
@@ -359,46 +377,41 @@ body.dark-mode .dashboard-container {
   text-decoration: none;
 }
 
-.login-background-side {
-  flex: 1;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
 .input-group {
   position: relative;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .input-group input {
   width: 100%;
   padding: 12px 16px 12px 42px;
-  border: 1px solid #ccc;
   border-radius: 30px;
-  background-color: #f8f9fa;
   font-size: 16px;
   transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+}
+
+.input-group input::placeholder {
+  color: #b0b0b0; 
 }
 
 .input-group input:focus {
-  border-color: #42a5f5;
-  background-color: #fff;
+  background: rgba(0, 0, 0, 0.3); 
+  border-color: #3b82f6;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.1);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .input-icon {
   position: absolute;
   left: 15px;
   font-size: 16px;
-  color: #757575;
+  color: #b0b0b0;
 }
 
 .login-options {
@@ -408,14 +421,14 @@ body.dark-mode .dashboard-container {
   margin-top: 1rem;
   margin-bottom: 1.5rem;
   width: 100%;
+  color: #e0e0e0;
 }
 
-/* --- Bagian "Remember me" --- */
 .login-options label {
   display: flex;
   align-items: center;
   font-size: 14px;
-  color: #4B5563;
+  color: #e0e0e0;
   cursor: pointer;
   user-select: none;
 }
@@ -427,27 +440,44 @@ body.dark-mode .dashboard-container {
   accent-color: #2563EB;
 }
 
-.forgot-password {
+.forgot-password,
+.register-link {
   background: none;
   border: none;
   padding: 0;
-  margin: 0;
   font-family: inherit;
   font-size: 0.9em;
   font-weight: 600;
-  color: #4da6ff;
+  color: #60a5fa; 
   cursor: pointer;
   transition: color 0.2s;
 }
 
-.forgot-password:hover {
-  color: #7bb0ff;
+.forgot-password:hover,
+.register-link:hover {
+  color: #93c5fd; 
   text-decoration: underline;
 }
 
-.login-btn,
-.register-btn {
-  background: linear-gradient(to right, #1976d2, #1565c0);
+.back-to-landing {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 1rem;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #60a5fa; 
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.back-to-landing:hover {
+  color: #93c5fd; 
+  text-decoration: underline;
+}
+
+.login-btn {
+  background-color: #3b82f6; 
   color: white;
   border: none;
   padding: 12px;
@@ -456,10 +486,15 @@ body.dark-mode .dashboard-container {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.3s ease;
+  transition: all 0.3s ease;
 }
 
-.login-btn:hover,
+.login-btn:hover:not(:disabled) {
+  background-color: #2563EB;
+  transform: translateY(-3px); 
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); 
+}
+
 .register-btn:hover {
   opacity: 0.9;
   transform: scale(1.02);
@@ -468,10 +503,9 @@ body.dark-mode .dashboard-container {
 .auth-toggle {
   margin-top: 20px;
   font-size: 14px;
-  color: #ffffff;
+  color: #e0e0e0;
 }
 
-.register-link,
 .login-link {
   background: none;
   border: none;
@@ -483,12 +517,6 @@ body.dark-mode .dashboard-container {
   font-size: 14px;
 }
 
-.register-link:hover,
-.login-link:hover {
-  color: #7bb0ff;
-}
-
-/* Dashboard Layout */
 .main-content {
   width: 100%;
   padding: 15px;
@@ -511,8 +539,6 @@ body.dark-mode .dashboard-container {
   display: flex;
   flex-direction: column;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  /* overflow-y: auto; */
-  /* Scroll jika konten melebihi tinggi */
 }
 
 .dark-mode .sidebar {
@@ -522,9 +548,7 @@ body.dark-mode .dashboard-container {
 
 .sidebar-divider {
   margin-top: 1rem;
-  /* Memberi jarak atas dari grup sebelumnya */
   padding: 0 0.75rem 0.5rem 0.75rem;
-  /* Padding samping dan bawah */
 }
 
 .sidebar-divider .nav-text {
@@ -641,6 +665,10 @@ body.dark-mode .hamburger-menu-button span {
 /* Desktop Styles */
 @media (min-width: 1290px) {
 
+  .auth-content-centered {
+    padding: 2rem 1.5rem;
+  }
+
   .notification-template-list-mobile {
     display: none;
   }
@@ -729,10 +757,6 @@ body.dark-mode .hamburger-menu-button span {
 
 /* Tablet & Mobile Styles */
 @media (max-width: 1290px) {
-  .split-card {
-    flex-direction: column;
-    width: 95%;
-  }
 
   .auth-toggle {
     font-size: 13px;
@@ -1115,11 +1139,6 @@ body.dark-mode .hamburger-menu-button span {
 }
 
 @media (max-width: 1290px) {
-
-  .login-card h2,
-  .register-card h2 {
-    font-size: 24px;
-  }
 
   .main-header .breadcrumb {
     display: none;
@@ -3609,24 +3628,9 @@ body.dark-mode .btn-delete:hover {
    USER VIEW: DASHBOARD TANPA SIDEBAR
    Gaya khusus untuk tampilan user tanpa sidebar.
 ================================================================= */
-.dashboard-container.no-sidebar {
-  display: block;
-}
-
-.dashboard-container.no-sidebar {
-  background-color: transparent;
-}
-
-.dashboard-container.no-sidebar {
-  min-height: 100vh;
-}
 
 .content-area {
   background: transparent;
-}
-
-.dashboard-container.no-sidebar .main-content {
-  margin-left: 0;
 }
 
 /* Logo di header untuk user agar header tidak kosong */
@@ -6296,35 +6300,6 @@ body.dark-mode .btn-pause:hover {
   }
 }
 
-
-/* WelcomeHome.css */
-
-.welcome-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #CBD5E1;
-  position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  height: 100vh;
-  width: 100%;
-  display: flex;
-  /* aktifkan flexbox */
-  flex-direction: column;
-  /* susun ke bawah */
-  align-items: center;
-  /* center horizontal */
-  gap: 15px;
-
-}
-
-/* Dark mode for the welcome container */
-body.dark-mode .welcome-container {
-  background-color: #4A5568;
-  /* Dark mode background */
-}
-
 .welcome-title {
   font-size: 2.2rem;
   font-weight: 700;
@@ -6424,11 +6399,6 @@ body.dark-mode .welcome-title {
 
 /* Responsive untuk HP kecil */
 @media (max-width: 480px) {
-
-  .welcome-container {
-    height: auto;
-    padding: 200px 20px;
-  }
 
   .welcome-content {
     padding: 100px 10px;
@@ -7124,11 +7094,92 @@ html {
   scroll-behavior: smooth;
 }
 
-.dashboard-container.landing-page {
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-color: #0a0f1e;
+.landing-page-container {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+  background-color: #0a0f1e; 
+}
+
+.landing-scroll-content {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.landing-header.sticky-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+  background: rgba(10, 15, 30, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 2rem;
+  transition: background-color 0.3s ease;
+}
+
+/* Navigasi di tengah header */
+.landing-header .header-nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.landing-header .header-nav a {
+  color: #e2e8f0;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.landing-header .header-nav a:hover {
+  color: #60a5fa; /* Biru Dtech */
+}
+
+/* Grup Kiri & Kanan (Logo & Login) */
+.landing-header .header-left-group,
+.landing-header .header-right-group {
+  flex: 1; /* Beri ruang agar nav bisa di tengah */
+}
+
+.landing-header .header-right-group {
+  display: flex;
+  justify-content: flex-end; /* Dorong tombol login ke kanan */
+}
+
+/* Tombol Login (Style baru) */
+.landing-header .btn-btn2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.landing-header .btn-btn2:hover {
+  background-color: #3b82f6; /* Biru Dtech */
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
 }
 
 /* Kumpulan semua animasi Anda */
@@ -7221,21 +7272,6 @@ html {
    2. LAYOUT: HEADER & SECTIONS
    ================================ */
 
-/* Header Utama (Sudah digabung + sticky) */
-.landing-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.8rem 2rem;
-  background: rgba(10, 15, 30, 0.75);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  z-index: 1000;
-  position: sticky;
-  top: 0;
-  width: 100%;
-}
-
 /* Logo kiri */
 .header-left-group .header-logo {
   height: 42px;
@@ -7310,23 +7346,42 @@ html {
 
 /* Layout Single Page (BARU) */
 .public-content-singlepage {
-  padding-top: 80px;
+  width: 100%;
+  position: relative; /* Konten harus relatif di dalam scroll wrapper */
+  z-index: 1;
+  padding-top: 0; /* Hapus padding-top lama */
 }
 
 .landing-section {
   width: 100%;
-  min-height: 90vh;
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
+  justify-content: center; /* Pusatkan konten di section */
+  align-items: center;
   position: relative;
   overflow: hidden;
-  background: transparent !important;
+  background: transparent !important; /* Hapus background lain */
+  padding: 4rem 1rem; /* Beri padding internal */
+  scroll-margin-top: 70px;
 }
 
-.landing-section.full-height {
-  min-height: 100vh;
+.landing-section.full-height {  
   padding: 0;
+}
+
+.dashboard-container.no-sidebar {
+  display: flex; 
+  flex-direction: column;
+  background: none;
+  height: 100vh; 
+  overflow: hidden; 
+}
+.dashboard-container.no-sidebar .main-content {
+  margin-left: 0;
+  padding: 0;
+  flex: 1; 
+  overflow-y: auto;
+  min-height: 0; 
 }
 
 .public-content {
@@ -7944,13 +7999,18 @@ html {
    MOBILE (Layar <= 768px)
    -------------------------------- */
 @media (max-width: 768px) {
-
-  /* Header */
-  .landing-header {
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 0.75rem 1rem;
+  .landing-header.sticky-header {
+    flex-direction: column; 
+    flex-wrap: nowrap; 
+    padding: 1rem;
     gap: 0.75rem;
+  }
+
+  .landing-header .header-left-group,
+  .landing-header .header-right-group {
+    flex: unset;
+    justify-content: center;
+    width: 100%;
   }
 
   .header-left-group .header-logo {
@@ -7958,25 +8018,18 @@ html {
   }
 
   .header-nav {
-    width: 100%;
     justify-content: center;
     gap: 1rem;
-    order: 3;
-    /* Nav di bawah */
-    padding-top: 0.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    flex-wrap: wrap;
+    width: 100%;
   }
 
   .header-nav a {
     font-size: 0.9rem;
   }
 
-  .header-right-group {
-    position: absolute;
-    top: 0.75rem;
-    right: 1rem;
-    order: 2;
-    /* Tombol login di pojok */
+  .header-right-group .btn-btn2 {
+    width: auto;
   }
 
   .header-right-group .btn-btn2 span {
@@ -7985,15 +8038,7 @@ html {
 
   .header-right-group .btn-btn2 i {
     font-size: 1.4rem;
-  }
-
-  /* Layout */
-  .public-content-singlepage {
-    padding-top: 100px;
-  }
-
-  .landing-section {
-    padding: 2.5rem 1rem;
+    margin: 0;
   }
 
   .public-content {
@@ -8893,13 +8938,11 @@ html {
   /* biar gak ketarik aneh */
 }
 
-/* Tombol close dengan gradasi */
 .btn-ttp {
   position: absolute;
   top: 12px;
   right: 12px;
   background: linear-gradient(135deg, #ff4d4f, #ff7a45);
-  /* gradasi merah ke oranye */
   border: none;
   border-radius: 50%;
   padding: 6px;
@@ -8907,43 +8950,46 @@ html {
   font-size: 18px;
   line-height: 1;
   color: #fff;
-  /* biar icon/text putih */
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .btn-ttp:hover {
   background: linear-gradient(135deg, #e60023, #ff4d4f);
-  /* lebih gelap pas hover */
   transform: scale(1.15);
 }
 
 .divider {
   text-align: center;
-  color: #fff;
+  color: #b0b0b0;
   font-size: 14px;
   margin: 16px 0;
-  /* jarak atas & bawah */
   position: relative;
 }
 
 .google-login-button {
   display: inline-flex;
   align-items: center;
+  justify-content: center; 
   gap: 8px;
-  background: transparent;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-  padding: 8px 16px;
-  border: 1px solid #dadce0;
+  width: 100%;
+  padding: 10px;
   border-radius: 20px;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.25s ease;
+  
+  background: rgba(255, 255, 255, 0.9);
+  color: #333333; /* Teks gelap */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  
+  transition: all 0.3s ease;
 }
 
 .google-login-button:hover {
-  background: transparent;
+  background: #FFFFFF; 
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
 }
 
 .google-icon {
@@ -14489,10 +14535,6 @@ body.dark-mode .detail-list-footer-centered {
   .date-range-container .filter-select-date {
     flex: 1;
     width: auto;
-  }
-
-  .login-background-side {
-    display: none;
   }
 
   .sku-add-button-container {
