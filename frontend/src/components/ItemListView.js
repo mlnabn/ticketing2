@@ -276,14 +276,7 @@ function ItemListView({
                                     menuPortalTarget={document.body}
                                     styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                                 />
-                                {/* <button
-                                    onClick={() => onToggleArchived(!showArchived)}
-                                    className={`btn-archive ${showArchived ? 'active' : ''}`}
-                                    title={showArchived ? 'Kembali ke daftar SKU aktif' : 'Lihat SKU yang diarsipkan'}
-                                >
-                                    <i className={`fas ${showArchived ? 'fa-box' : 'fa-archive'}`} style={{ marginRight: '8px' }}></i>
-                                    {showArchived ? 'SKU Aktif' : 'Lihat Arsip'}
-                                </button> */}
+                                
                                 {selectedIds.length > 0 && (
                                     <div className="bulk-action-bar" >
                                         {showArchived ? (
