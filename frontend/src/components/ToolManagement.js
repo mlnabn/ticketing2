@@ -314,7 +314,7 @@ function ToolManagement() {
             animate="visible"
         >
             <motion.div variants={staggerItem} className="user-management-container" style={{ marginBottom: '20px' }}>
-                <h1>{currentFilters.is_active === 'true' ? 'Tambah SKU' : 'Arsip SKU'}</h1>
+                <h1>{currentFilters.is_active === 'true' ? 'Tambah Kode Unik Tipe Barang' : 'Arsip Tipe Barang'}</h1>
             </motion.div>
 
             <ItemListView

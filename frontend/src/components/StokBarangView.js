@@ -717,7 +717,7 @@ function StokBarangView() {
                         <table className="job-table">
                             <thead>
                                 <tr>
-                                    <th>Kode SKU</th>
+                                    <th>Kode Unik</th>
                                     <th>Nama Barang</th>
                                     <th>Kategori</th>
                                     <th>Sub-Kategori</th>
@@ -782,7 +782,7 @@ function StokBarangView() {
                                                                                     onChange={(e) => handleSelectAllMaster(masterItem.id_m_barang, e.target.checked)}
                                                                                 />
                                                                             </div>
-                                                                            <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Kode Unik</div>
+                                                                            <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Kode SKU</div>
                                                                             <div className="detail-cell header-sn" style={{ fontSize: '15px' }}>S/N</div>
                                                                             <div className="detail-cell header-kondisi" style={{ fontSize: '15px' }}>Kondisi</div>
                                                                             <div className="detail-cell header-status" style={{ fontSize: '15px' }}>Status</div>

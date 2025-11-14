@@ -196,7 +196,7 @@ function ItemListView({
                     {!showArchived && (
                         <button className="btn-primary" onClick={onAdd}>
                             <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
-                            SKU Baru
+                            Tipe Barang
                         </button>
                     )}
                     <button
@@ -205,7 +205,7 @@ function ItemListView({
                         title={showArchived ? 'Kembali ke daftar SKU aktif' : 'Lihat SKU yang diarsipkan'}
                     >
                         <i className={`fas ${showArchived ? 'fa-box' : 'fa-archive'}`} style={{ marginRight: '8px' }}></i>
-                        {showArchived ? 'SKU Aktif' : 'Lihat Arsip'}
+                        {showArchived ? 'Tipe Barang Aktif' : 'Lihat Arsip'}
                     </button>
                 </motion.div>
 
@@ -302,10 +302,10 @@ function ItemListView({
                         <table className="job-table">
                             <thead>
                                 <tr>
-                                    <th>Kode</th>
+                                    <th>Kode Unik</th>
                                     <th>Kategori</th>
                                     <th>Sub-Kategori</th>
-                                    <th>Jumlah Variasi</th>
+                                    <th>Jumlah Tipe Barang</th>
                                 </tr>
                             </thead>
                         </table>
@@ -336,7 +336,7 @@ function ItemListView({
                                                 <td>{item.kode_barang}</td>
                                                 <td>{item.nama_kategori || '-'}</td>
                                                 <td>{item.nama_sub || '-'}</td>
-                                                <td>{item.variations_count} VARIASI</td>
+                                                <td>{item.variations_count} TIPE BARANG</td>
                                             </tr>
                                             <AnimatePresence initial={false}>
                                                 {expandedRows[item.kode_barang] && (
@@ -350,7 +350,7 @@ function ItemListView({
                                                                 variants={expandVariants}
                                                             >
                                                                 {expandingId === item.kode_barang ? (
-                                                                    <div className="detail-loading">Memuat variasi SKU...</div>
+                                                                    <div className="detail-loading">Memuat Tipe Barang...</div>
                                                                 ) : detailItems[item.kode_barang]?.length > 0 ? (
                                                                     <div className="sku-detail-list-wrapper" style={{ padding: '0 20px' }}>
                                                                         <div className="sku-detail-list-header">
@@ -362,7 +362,7 @@ function ItemListView({
                                                                                     onChange={(e) => onSelectAll(e, item.kode_barang)}
                                                                                 />
                                                                             </div>
-                                                                            <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Nama Barang (Variasi)</div>
+                                                                            <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Tipe Barang</div>
                                                                             <div className="detail-cell header-stok" style={{ fontSize: '15px' }}>Stok Tersedia</div>
                                                                             <div className="detail-cell header-aksi" style={{ fontSize: '15px' }}>Aksi</div>
                                                                         </div>
@@ -418,7 +418,7 @@ function ItemListView({
                                                                         </div>
                                                                     </div>
                                                                 ) : (
-                                                                    <div className="detail-nodata">Tidak ada variasi SKU untuk kode ini.</div>
+                                                                    <div className="detail-nodata">Tidak ada Tipe Barang untuk kode ini.</div>
                                                                 )}
                                                             </motion.div>
                                                         </td>
@@ -437,7 +437,7 @@ function ItemListView({
                             <table className="job-table">
                                 <tfoot>
                                     <tr className="subtotal-row">
-                                        <td colSpan="3" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>Total SKU</td>
+                                        <td colSpan="3" style={{ textAlign: 'left', paddingLeft: '1.25rem', fontWeight: 'bold' }}>Total Kode Unik</td>
                                         <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
                                             {totalItems} Item
                                         </td>
@@ -484,7 +484,7 @@ function ItemListView({
                                     </div>
                                     <div className="card-separator"></div>
                                     <div className="card-item-row">
-                                        <span className="label">Jumlah Variasi</span>
+                                        <span className="label">Jumlah Tipe Barang</span>
                                         <span className="value">{item.variations_count}</span>
                                     </div>
                                 </div>
@@ -502,7 +502,7 @@ function ItemListView({
                                             onClick={(e) => e.stopPropagation()}
                                         >
                                             {expandingId === item.kode_barang ? (
-                                                <p className="detail-loading-mobile">Memuat variasi...</p>
+                                                <p className="detail-loading-mobile">Memuat Tipe Barang...</p>
                                             ) : detailItems[item.kode_barang]?.length > 0 ? (
                                                 detailItems[item.kode_barang].map(detail => (
                                                     <div
@@ -565,7 +565,7 @@ function ItemListView({
                                                     </div>
                                                 ))
                                             ) : (
-                                                <p className="detail-nodata-mobile">Tidak ada variasi SKU untuk kode ini.</p>
+                                                <p className="detail-nodata-mobile">Tidak ada Tipe Barang untuk kode ini.</p>
                                             )}
                                         </motion.div>
                                     )}
@@ -585,7 +585,7 @@ function ItemListView({
                             >
                                 <span className="subtotal-label"
                                     style={{ fontSize: '13px', fontWeight: 'bold' }}
-                                >Total SKU</span>
+                                >Total Kode Unik</span>
                                 <span className="subtotal-value"
                                     style={{ fontSize: '13px', fontWeight: 'bold' }}
                                 >

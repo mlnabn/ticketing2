@@ -137,7 +137,7 @@ export default function AdminDashboard() {
 
             <li className="sidebar-nav-item">
               <NavLink to="/admin/inventory" className={({ isActive }) => `sidebar-button ${isActive ? 'active' : ''}`}>
-                <i className="fas fa-warehouse"></i><span className="nav-text">Tambah SKU</span>
+                <i className="fas fa-warehouse"></i><span className="nav-text">Tipe Barang</span>
               </NavLink>
             </li>
             <li className="sidebar-nav-item">
