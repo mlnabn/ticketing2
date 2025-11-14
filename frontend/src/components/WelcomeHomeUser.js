@@ -9,7 +9,7 @@ const WelcomeHomeUser = ({ user, onGetStarted }) => {
       <main className="flex-1 flex flex-col items-center pt-20 pb-12">
         <AnimateOnScroll className="w-full max-w-6xl">
           <h1
-            className="text-4xl font-bold mb-4 text-center 
+            className="text-4xl leading-snug font-bold mb-4 text-center 
                bg-[linear-gradient(90deg,#6366f1,#3b82f6)] 
                bg-clip-text text-transparent"
           >
