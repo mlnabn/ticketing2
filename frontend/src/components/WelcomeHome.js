@@ -11,6 +11,7 @@ import PieChartComponent from './PieChartComponent';
 import BarChartComponent from './BarChartComponent';
 import MapComponent from './MapComponent';
 import CalendarComponent from './CalendarComponent';
+import { Bold } from 'lucide-react';
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -101,28 +102,28 @@ export default function WelcomeHome() {
         <div className="info-cards-grid">
           <div className="info-card red-card" onClick={() => handleCardClick('Belum Selesai')}>
             <div className="card-header">
-              <p className="card-label">Tiket Belum Selesai</p>
+              <p className="card-label" style={{fontWeight : 'bold'}}>Tiket Belum Selesai</p>
               <div className="card-icon red-icon"><i className="fas fa-exclamation-triangle"></i></div>
             </div>
             <h3 className="card-value">{stats ? stats.pending_tickets : '...'}</h3>
           </div>
           <div className="info-card green-card" onClick={() => handleCardClick('Selesai')}>
             <div className="card-header">
-              <p className="card-label">Tiket Selesai</p>
+              <p className="card-label" style={{fontWeight : 'bold'}}>Tiket Selesai</p>
               <div className="card-icon green-icon"><i className="fas fa-check-circle"></i></div>
             </div>
             <h3 className="card-value">{stats ? stats.completed_tickets : '...'}</h3>
           </div>
           <div className="info-card yellow-card" onClick={() => navigate('/admin/tickets')}>
             <div className="card-header">
-              <p className="card-label">Total Tiket</p>
+              <p className="card-label" style={{fontWeight : 'bold'}}>Total Tiket</p>
               <div className="card-icon yellow-icon"><i className="fas fa-tasks"></i></div>
             </div>
             <h3 className="card-value">{stats ? stats.total_tickets : '...'}</h3>
           </div>
           <div className="info-card blue-card" onClick={() => navigate('/admin/users')}>
             <div className="card-header">
-              <p className="card-label">Total Pengguna</p>
+              <p className="card-label" style={{fontWeight : 'bold'}}>Total Pengguna</p>
               <div className="card-icon blue-icon"><i className="fas fa-users"></i></div>
             </div>
             <h3 className="card-value">{stats ? stats.total_users : '...'}</h3>

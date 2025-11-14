@@ -26,18 +26,32 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
+const formatTickName = (value, maxLength = 12) => {
+  if (value && value.length > maxLength) {
+    return value.substring(0, maxLength - 4) + '...';
+  }
+  return value;
+};
+
 const BarChartComponent = ({ data, onBarClick }) => {
   return (
     <div className="barchart-wrapper">
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={330}>
         <BarChart
           data={data}
-          margin={{ top: 20, right: 8, left:-20, bottom: -10 }}
+          margin={{ top: 20, right: 8, left: -20, bottom: 40 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" style={{fontSize: '13px', overflow: 'ellipsis'}}/>
+          <XAxis
+            dataKey="name"
+            angle={-45}
+            textAnchor="end"
+            interval={0}
+            style={{ fontSize: '13px', overflow: 'ellipsis' }}
+            tickFormatter={(name) => formatTickName(name, 12)}
+          />
           <YAxis allowDecimals={false} />
-           <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip />} />
 
           {/* ✅ Tiket Selesai */}
           <Bar

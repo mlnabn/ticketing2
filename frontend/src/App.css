@@ -1723,7 +1723,9 @@ body.dark-mode .content-area {
   gap: 24px;
   margin-bottom: 30px;
   cursor: pointer;
+
 }
+
 
 .info-card {
   position: relative;
@@ -1956,7 +1958,6 @@ body.dark-mode .green-card {
 
 body.dark-mode .yellow-card {
   border-left: 5px solid #F59E0B;
-  /* Kuning tetap untuk "Total" */
 }
 
 body.dark-mode .blue-card {
@@ -1970,11 +1971,13 @@ body.dark-mode .blue-card {
 .red-card .card-change,
 .red-card .card-period {
   color: #991b1b;
+  font-weight: bold;
 }
 
 .red-card .card-icon {
   background-color: #fca5a5;
   color: #991b1b;
+  
 }
 
 .green-card .card-value,
@@ -1982,6 +1985,7 @@ body.dark-mode .blue-card {
 .green-card .card-change,
 .green-card .card-period {
   color: #065f46;
+  font-weight: bold;
 }
 
 .green-card .card-icon {
@@ -1993,12 +1997,13 @@ body.dark-mode .blue-card {
 .yellow-card .card-label,
 .yellow-card .card-change,
 .yellow-card .card-period {
-  color: #9a3412;
+  color: #653505;
+  font-weight: bold;
 }
 
 .yellow-card .card-icon {
-  background-color: #fcd34d;
-  color: #9a3412;
+  background-color: #FCD34D;
+  color: #653505;
 }
 
 .blue-card .card-value,
@@ -2006,6 +2011,7 @@ body.dark-mode .blue-card {
 .blue-card .card-change,
 .blue-card .card-period {
   color: #1e40af;
+  font-weight: bold;
 }
 
 .blue-card .card-icon {
@@ -2019,15 +2025,15 @@ body.dark-mode .blue-card {
 }
 
 .card-icon.orange-icon {
-  background-color: #ffb74d;
-  color: #ffffff;
+  background-color: #FCD34D;
+  color: #9D5A00;
 }
 
 body.dark-mode .orange-card .card-value,
 body.dark-mode .orange-card .card-change,
 body.dark-mode .orange-card .card-period,
 body.dark-mode .orange-card .card-label {
-  color: #FFEDD5;
+  color: #9D5A00;
 }
 
 body.dark-mode .red-card .card-icon {
@@ -4081,7 +4087,7 @@ body.dark-mode .theme-toggle-button:hover {
   right: 0;
   z-index: 1500;
   width: 200px;
-  background: rgba(30, 30, 45, 0.65); 
+  background: rgba(30, 30, 45, 0.65);
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -4117,7 +4123,7 @@ body.dark-mode .theme-toggle-button:hover {
 }
 
 .user-dropdown button.logout-buttonuser:hover {
-  background: rgba(239, 68, 68, 0.15); 
+  background: rgba(239, 68, 68, 0.15);
   color: #f87171;
 }
 
@@ -4168,8 +4174,8 @@ body.dark-mode .user-profile-clickable:hover {
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px; 
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); 
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   padding: 8px;
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
@@ -4195,7 +4201,7 @@ body.dark-mode .admin-dropdown {
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #b91c1c; 
+  color: #b91c1c;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
@@ -4209,7 +4215,7 @@ body.dark-mode .admin-dropdown button {
 }
 
 body.dark-mode .admin-dropdown button:hover {
-  background-color: rgba(239, 68, 68, 0.15); 
+  background-color: rgba(239, 68, 68, 0.15);
   color: #f87171;
 }
 
@@ -5717,7 +5723,7 @@ body.dark-mode .feedback-message {
   color: #f9fafb;
   transition: transform 0.2s ease, color 0.3s ease;
   flex-shrink: 0;
-  padding: 4px; 
+  padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5748,7 +5754,7 @@ body.dark-mode .feedback-message {
   max-height: 400px;
   overflow-y: auto;
   z-index: 1000;
-  background: rgba(30, 30, 45, 0.65); 
+  background: rgba(30, 30, 45, 0.65);
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -5780,14 +5786,14 @@ body.dark-mode .feedback-message {
   align-items: flex-start;
   gap: 10px;
   padding: 12px 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   transition: background 0.2s ease;
-  border-radius: 8px; 
+  border-radius: 8px;
   margin: 4px;
 }
 
 .notification-item:last-child {
-  border-bottom: none; 
+  border-bottom: none;
 }
 
 .notification-item:hover {
@@ -8722,7 +8728,7 @@ html {
 
 /* === Modal Content === */
 .modal-content4 {
-  background: rgba(11, 15, 41, 0.75); 
+  background: rgba(11, 15, 41, 0.75);
   backdrop-filter: blur(15px) saturate(180%);
   -webkit-backdrop-filter: blur(15px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.12);

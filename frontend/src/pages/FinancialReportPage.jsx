@@ -94,10 +94,33 @@ export default function FinancialReportPage() {
 
             {/* 4. HUBUNGKAN KARTU KPI DENGAN DATA ASLI */}
             <motion.div variants={staggerItem} className="info-cards-grid">
-                <KpiCard title="Total Nilai Aset" value={isLoading ? '...' : formatCurrency(summaryData.total_asset_value)} iconClass="fas fa-landmark" colorClass="blue-card" />
-                <KpiCard title="Nilai Aset Bersih (Net)" value={isLoading ? '...' : formatCurrency(summaryData.net_asset_value)} iconClass="fas fa-shield-alt" colorClass="green-card" />
-                <KpiCard title="Pembelian (30 Hari Terakhir)" value={isLoading ? '...' : formatCurrency(summaryData.new_asset_value_30_days)} iconClass="fas fa-cart-plus" colorClass="yellow-card" />
-                <KpiCard title="Kerugian (Periode)" value={isLoading ? '...' : formatCurrency(summaryData.problematic_asset_value)} iconClass="fas fa-exclamation-triangle" colorClass="red-card" />
+                <KpiCard
+                    title="Total Nilai Aset"
+                    value={isLoading ? '...' :
+                        formatCurrency(summaryData.total_asset_value)}
+                    iconClass="fas fa-landmark"
+                    colorClass="blue-card"
+                />
+                <KpiCard
+                    title="Nilai Aset Bersih (Net)"
+                    value={isLoading ? '...' :
+                        formatCurrency(summaryData.net_asset_value)}
+                    iconClass="fas fa-shield-alt"
+                    colorClass="green-card"
+                />
+                <KpiCard
+                    title="Pembelian (30 Hari Terakhir)"
+                    value={isLoading ? '...' :
+                        formatCurrency(summaryData.new_asset_value_30_days)}
+                    iconClass="fas fa-cart-plus"
+                    colorClass="yellow-card"
+                />
+                <KpiCard
+                    title="Kerugian (Periode)"
+                    value={isLoading ? '...' : formatCurrency(summaryData.problematic_asset_value)}
+                    iconClass="fas fa-exclamation-triangle"
+                    colorClass="red-card"
+                />
             </motion.div>
 
             {/* 5. HUBUNGKAN CHART DENGAN DATA ASLI */}
@@ -154,23 +177,23 @@ export default function FinancialReportPage() {
             <motion.div variants={staggerItem} className="navigation-section" style={{ marginTop: '25px' }}>
                 <motion.h1 variants={staggerItem}>Lihat Laporan Detail</motion.h1>
                 <div className="report-navigation-cards">
-                    <NavigationCard 
-                        title="Pembelian Baru (Aset Masuk)" 
-                        description="Lihat semua data aset yang baru dibeli berdasarkan periode." 
-                        linkTo="/admin/financial-report/new-acquisitions" 
-                        icon="fa-dolly-flatbed" 
+                    <NavigationCard
+                        title="Pembelian Baru (Aset Masuk)"
+                        description="Lihat semua data aset yang baru dibeli berdasarkan periode."
+                        linkTo="/admin/financial-report/new-acquisitions"
+                        icon="fa-dolly-flatbed"
                     />
-                    <NavigationCard 
-                        title="Potensi Kerugian (Aset Rusak/Hilang)" 
-                        description="Lacak semua aset yang berstatus rusak atau hilang." 
-                        linkTo="/admin/financial-report/problematic-assets" 
-                        icon="fa-heart-broken" 
+                    <NavigationCard
+                        title="Potensi Kerugian (Aset Rusak/Hilang)"
+                        description="Lacak semua aset yang berstatus rusak atau hilang."
+                        linkTo="/admin/financial-report/problematic-assets"
+                        icon="fa-heart-broken"
                     />
-                    <NavigationCard 
-                        title="Catatan Pengajuan" 
-                        description="Buat dan lacak catatan pengajuan pembelian barang internal." 
-                        linkTo="/admin/financial-report/purchase-proposals" 
-                        icon="fa-file-invoice-dollar" 
+                    <NavigationCard
+                        title="Catatan Pengajuan"
+                        description="Buat dan lacak catatan pengajuan pembelian barang internal."
+                        linkTo="/admin/financial-report/purchase-proposals"
+                        icon="fa-file-invoice-dollar"
                     />
                 </div>
             </motion.div>
