@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useLocation, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
@@ -84,10 +84,13 @@ const filterExpandTransition = {
 
 function StokBarangView() {
     const { showToast } = useOutletContext();
+    const location = useLocation();
+    const navigate = useNavigate();
     const isPresent = useIsPresent();
     const isMobile = useMediaQuery('(max-width: 768px)');
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
     const printRef = useRef();
+
     // State utama untuk Master Barang (SKU)
     const [masterItems, setMasterItems] = useState([]);
     const [pagination, setPagination] = useState(null);
@@ -110,6 +113,7 @@ function StokBarangView() {
     const [editItem, setEditItem] = useState(null);
     const [qrModalItem, setQrModalItem] = useState(null);
     const [isAddStockOpen, setIsAddStockOpen] = useState(false);
+    const [itemToPreselect, setItemToPreselect] = useState(null);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
     const [itemToSoftDelete, setItemToSoftDelete] = useState(null);
 
@@ -267,6 +271,15 @@ function StokBarangView() {
         }
     }, [isMobile]);
 
+    const preselectItemFromLocation = location.state?.preselectItem;
+
+    useEffect(() => {
+        if (preselectItemFromLocation) {
+            setItemToPreselect(preselectItemFromLocation);
+            setIsAddStockOpen(true);
+        }
+    }, [preselectItemFromLocation]);
+
     const loadMoreItems = async () => {
         if (isLoadingMore || !pagination || pagination.current_page >= pagination.last_page) return;
 
@@ -276,7 +289,7 @@ function StokBarangView() {
             const params = { page: nextPage, ...currentFilters };
             const res = await api.get('/inventory/stock-summary', { params });
 
-            setMasterItems(prev => [...prev, ...res.data.data]); // Tambahkan data baru
+            setMasterItems(prev => [...prev, ...res.data.data]);
             setPagination(res.data);
         } catch (error) {
             showToast('Gagal memuat data tambahan.', 'error');
@@ -1082,7 +1095,6 @@ function StokBarangView() {
                 onSaveSuccess={handleSaveSuccess}
                 formatDate={formatDate}
                 formatCurrency={formatCurrency}
-                // Props tambahan untuk modal bersarang
                 statusOptions={statusOptions}
                 colorOptions={colorOptions}
                 fetchData={fetchData}
@@ -1111,9 +1123,19 @@ function StokBarangView() {
             />
             <AddStockModal
                 show={isAddStockOpen}
-                onClose={() => setIsAddStockOpen(false)}
-                onSaveSuccess={() => fetchData(1, {})}
+                onClose={() => {
+                    setIsAddStockOpen(false);
+                    setItemToPreselect(null);
+                    if (location.state?.preselectItem) {
+                        navigate(location.pathname, { replace: true, state: {} });
+                    }
+                }}
+                onSaveSuccess={() => {
+                    fetchData(1, currentFilters); 
+                    setItemToPreselect(null); 
+                }} 
                 showToast={showToast}
+                itemToPreselect={itemToPreselect}
             />
             <DeleteStockItemModal
                 show={Boolean(itemToSoftDelete)}

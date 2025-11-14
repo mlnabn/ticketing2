@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ItemListView from './ItemListView';
 import ItemFormModal from './ItemFormModal';
@@ -29,6 +29,7 @@ const staggerItem = {
 function ToolManagement() {
     const { showToast } = useOutletContext();
     const isPresent = useIsPresent();
+    const navigate = useNavigate();
     
     // HANYA state untuk desktop/data utama
     const [items, setItems] = useState([]);
@@ -154,21 +155,30 @@ function ToolManagement() {
     const handleOpenEditNameModal = (item) => setItemToEditName(item);
     const handleCloseEditNameModal = () => setItemToEditName(null);
 
-    const handleSaveItem = async (formData) => {
+    const handleSaveRequest = async (formData, action = 'save') => {
         try {
-            await api.post('/inventory/items', formData);
+            const response = await api.post('/inventory/items', formData);
+            const newItem = response.data; 
             showToast('Tipe barang baru berhasil didaftarkan.');
             handleCloseItemModal();
-            fetchItems(pagination?.current_page || 1);
             fetchItems(1, currentFilters); 
-
+            if (action === 'saveAndAddStock' && newItem) {
+                const preselectData = {
+                    value: newItem.id_m_barang,
+                    label: `${newItem.nama_barang} (${newItem.kode_barang})`
+                };
+                navigate('/admin/stock', { 
+                    state: { 
+                        preselectItem: preselectData 
+                    } 
+                });
+            }
         } catch (e) {
             console.error('Gagal menyimpan barang:', e);
             const errorMsg = e.response?.data?.message || 'Gagal menyimpan data barang.';
             showToast(errorMsg, 'error');
         }
     };
-
     const handleDeleteClick = (item) => {
         if (!item || !item.id_m_barang) {
             console.error("Attempted to delete an invalid item:", item);
@@ -345,7 +355,7 @@ function ToolManagement() {
             <ItemFormModal
                 show={isItemModalOpen}
                 onClose={handleCloseItemModal}
-                onSave={handleSaveItem}
+                onSaveRequest={handleSaveRequest}
                 itemToEdit={itemToEdit}
                 showToast={showToast}
             />
