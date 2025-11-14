@@ -10381,7 +10381,7 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .modal-content-detail {
-  background: #FFFFFF;
+  background: #ebebeb;
   /* Latar terang */
   backdrop-filter: blur(10px);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
@@ -10402,8 +10402,7 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .dark-mode .modal-content-detail {
-  background: #1f1f1f;
-  /* Latar gelap */
+  background: #111111;
   border: 1px solid rgba(148, 163, 184, 0.25);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
 }
@@ -11499,12 +11498,12 @@ body.dark-mode .form-group-recover textarea:focus {
   border: 1px solid var(--border-color-light, #e5e7eb);
   border-radius: 10px;
   padding: 1rem 1.25rem;
-  background-color: var(--input-bg-light, #fafafa);
+  background-color: #f2f0f0;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 body.dark-mode .return-item-row {
-  background-color: #2d2f32;
+  background-color: #0f0f0f;
   border-color: #3b3b3b;
 }
 
@@ -11810,7 +11809,7 @@ body.dark-mode .assigned-item-row-scan {
 }
 
 .modal-content-large {
-  background-color: #FFFFFF;
+  background-color: #ebebeb;
   color: #212529;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
@@ -12013,7 +12012,7 @@ input:disabled {
 }
 
 .dark-mode .modal-content-large {
-  background-color: #1f1f1f;
+  background-color: #111111;
   color: #FFFFFF;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
 }
