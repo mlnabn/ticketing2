@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
-import { useAuth } from '../AuthContext'; 
+import { useAuth } from '../AuthContext';
 import '../App.css';
 import { motion } from 'framer-motion';
 import Particles from "react-tsparticles";
@@ -40,7 +40,7 @@ export default function ResetPasswordPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const navigate = useNavigate();
   const location = useLocation();
   const { login, loggedIn } = useAuth();
@@ -153,7 +153,7 @@ export default function ResetPasswordPage() {
           className="login-form-inner"
         >
           <motion.h2 variants={formItemVariants}>Set Password Baru</motion.h2>
-          <motion.p variants={formItemVariants} className="form-description" style={{color: '#e0e0e0'}}>
+          <motion.p variants={formItemVariants} className="form-description" style={{ color: '#e0e0e0' }}>
             Reset password untuk nomor <strong>{phone}</strong>.
           </motion.p>
 
@@ -163,41 +163,50 @@ export default function ResetPasswordPage() {
             </motion.p>
           )}
 
-          <motion.div variants={formItemVariants} className="input-group">
+          <motion.div variants={formItemVariants} className="input-group floating-label-group">
             <span className="input-icon">🔑</span>
             <input
+              id="otp-input"
               type="text"
               name="otp"
-              placeholder="Kode OTP 6 Digit"
               maxLength="6"
               value={form.otp}
               onChange={handleChange}
               required
             />
+            <label htmlFor="otp-input" className={form.otp ? 'active' : ''}>
+              Kode OTP
+            </label>
           </motion.div>
-          
-          <motion.div variants={formItemVariants} className="input-group">
+
+          <motion.div variants={formItemVariants} className="input-group floating-label-group">
             <span className="input-icon">🔒</span>
             <input
               type="password"
               name="password"
-              placeholder="Password Baru"
+              id="password-input"
               value={form.password}
               onChange={handleChange}
               required
             />
+            <label htmlFor="password-input" className={form.password ? 'active' : ''}>
+              Password Baru
+            </label>
           </motion.div>
-          
-          <motion.div variants={formItemVariants} className="input-group">
+
+          <motion.div variants={formItemVariants} className="input-group floating-label-group">
             <span className="input-icon">🔒</span>
             <input
               type="password"
               name="password_confirmation"
-              placeholder="Konfirmasi Password Baru"
+              id="password-confirmation-input"
               value={form.password_confirmation}
               onChange={handleChange}
               required
             />
+            <label htmlFor="password-confirmation-input" className={form.password_confirmation ? 'active' : ''}>
+              Konfirmasi Password Baru
+            </label>
           </motion.div>
 
           <motion.button

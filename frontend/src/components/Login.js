@@ -61,7 +61,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
   const particlesOptions = {
     background: {
       color: {
-        value: "#0a0f1e", 
+        value: "#0a0f1e",
       },
     },
     fpsLimit: 60,
@@ -69,7 +69,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
       events: {
         onHover: {
           enable: true,
-          mode: "repulse", 
+          mode: "repulse",
         },
         resize: true,
       },
@@ -85,7 +85,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
         value: "#ffffff",
       },
       links: {
-        color: "#3b82f6", 
+        color: "#3b82f6",
         distance: 150,
         enable: true,
         opacity: 0.3,
@@ -96,7 +96,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
         enable: true,
         outModes: "bounce",
         random: false,
-        speed: 1, 
+        speed: 1,
         straight: false,
       },
       number: {
@@ -157,7 +157,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
         options={particlesOptions}
         className="particles-background"
       />
-      
+
       <motion.div
         className="auth-content-centered"
         variants={formContainerVariants}
@@ -168,7 +168,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
           src={bgImage2}
           alt="DTECH Engineering Logo"
           className="login-logo-image-centered"
-          variants={imageVariants} 
+          variants={imageVariants}
         />
 
         {error && (
@@ -176,28 +176,36 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
             {error}
           </motion.p>
         )}
-        
+
         <motion.form onSubmit={handleSubmit} className="login-form-inner">
-          <motion.div variants={formItemVariants} className="input-group">
+
+          <motion.div variants={formItemVariants} className="input-group floating-label-group"> 
             <span className="input-icon">📧</span>
             <input
+              id="email-input"
               type="email"
-              placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+
+            <label htmlFor="email-input" className={email ? 'active' : ''}>
+              Email
+            </label>
           </motion.div>
 
-          <motion.div variants={formItemVariants} className="input-group">
+          <motion.div variants={formItemVariants} className="input-group floating-label-group">
             <span className="input-icon">🔒</span>
             <input
+              id="password-input"
               type="password"
-              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            <label htmlFor="password-input" className={password ? 'active' : ''}>
+              Password
+            </label>
           </motion.div>
 
           <motion.div variants={formItemVariants} className="login-options">
@@ -236,7 +244,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
             <span>Login with Google</span>
           </motion.button>
         </motion.form>
-        
+
         <motion.p variants={formItemVariants} className="auth-toggle">
           Don't have an account?{' '}
           <button
@@ -251,7 +259,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
         <motion.button
           type="button"
           onClick={onBackToLanding}
-          className="back-to-landing" 
+          className="back-to-landing"
           variants={formItemVariants}
         >
           ← Back to Landing

@@ -107,21 +107,21 @@ export default function ForgotPasswordPage() {
         options={particlesOptions}
         className="particles-background"
       />
-      
+
       <motion.div
         className="auth-content-centered"
         variants={formContainerVariants}
         initial="hidden"
         animate="visible"
       >
-        
+
         <motion.form
           onSubmit={handleSubmit}
-          className="login-form-inner" 
-          variants={formContainerVariants} 
+          className="login-form-inner"
+          variants={formContainerVariants}
         >
           <motion.h2 variants={formItemVariants}>Lupa Password</motion.h2>
-          <motion.p variants={formItemVariants} className="form-description" style={{color: '#e0e0e0'}}>
+          <motion.p variants={formItemVariants} className="form-description" style={{ color: '#e0e0e0' }}>
             Masukkan nomor WhatsApp Anda. Kami akan mengirimkan kode OTP untuk reset password.
           </motion.p>
 
@@ -136,20 +136,24 @@ export default function ForgotPasswordPage() {
             </motion.p>
           )}
 
-          <motion.div variants={formItemVariants} className="input-group">
-            <span className="input-icon">📱</span>
+          <motion.div variants={formItemVariants} className="input-group floating-label-group">
+            <span className="input-icon">👤</span>
             <input
-              type="tel"
-              placeholder="Nomor WhatsApp (cth: 628...)"
+              id="phone-input"
+              type="text"
+              name="phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required
             />
+            <label htmlFor="phone-input" className={phone ? 'active' : ''}>
+              Nomor WhatsApp (e.g., 628...)
+            </label>
           </motion.div>
 
           <motion.button
             type="submit"
-            className="login-btn" 
+            className="login-btn"
             disabled={loading}
             variants={formItemVariants}
           >
@@ -167,10 +171,10 @@ export default function ForgotPasswordPage() {
             </button>
           </motion.p>
 
-          <motion.button 
+          <motion.button
             type="button"
             onClick={() => navigate('/')}
-            className="back-to-landing" 
+            className="back-to-landing"
             variants={formItemVariants}
           >
             ← Back to Landing

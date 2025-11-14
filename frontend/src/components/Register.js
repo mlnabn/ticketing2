@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import '../App.css';
-import bgImage2 from '../Image/Login.svg'; 
+import bgImage2 from '../Image/Login.svg';
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 
@@ -25,11 +25,11 @@ const formContainerVariants = {
     opacity: 1,
     scale: 1,
     transition: {
-      delayChildren: 0.2, 
-      staggerChildren: 0.08, 
+      delayChildren: 0.2,
+      staggerChildren: 0.08,
     },
   },
-  exit: { 
+  exit: {
     opacity: 0,
     scale: 0.95,
     transition: { duration: 0.15 }
@@ -77,7 +77,7 @@ function Register({
   const particlesOptions = {
     background: {
       color: {
-        value: "#0a0f1e", 
+        value: "#0a0f1e",
       },
     },
     fpsLimit: 60,
@@ -85,7 +85,7 @@ function Register({
       events: {
         onHover: {
           enable: true,
-          mode: "repulse", 
+          mode: "repulse",
         },
         resize: true,
       },
@@ -101,7 +101,7 @@ function Register({
         value: "#ffffff",
       },
       links: {
-        color: "#3b82f6", 
+        color: "#3b82f6",
         distance: 150,
         enable: true,
         opacity: 0.3,
@@ -112,7 +112,7 @@ function Register({
         enable: true,
         outModes: "bounce",
         random: false,
-        speed: 1, 
+        speed: 1,
         straight: false,
       },
       number: {
@@ -175,11 +175,11 @@ function Register({
             {error}
           </motion.p>
         )}
-        
+
         <AnimatePresence mode="wait">
           {step === 1 ? (
             <motion.form
-              key="step1" 
+              key="step1"
               onSubmit={handleRegister}
               className="login-form-inner"
               variants={formContainerVariants}
@@ -188,29 +188,80 @@ function Register({
               exit="exit"
             >
 
-              <motion.div variants={formItemVariants} className="input-group">
+
+              <motion.div variants={formItemVariants} className="input-group floating-label-group">
                 <span className="input-icon">👤</span>
-                <input type="text" name="name" value={form.name} placeholder="Nama" onChange={onFormChange} required />
+                <input
+                  id="name-input"
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={onFormChange}
+                  required
+                />
+                <label htmlFor="name-input" className={form.name ? 'active' : ''}>
+                  Nama
+                </label>
               </motion.div>
 
-              <motion.div variants={formItemVariants} className="input-group">
+              <motion.div variants={formItemVariants} className="input-group floating-label-group">
                 <span className="input-icon">📧</span>
-                <input type="email" name="email" value={form.email} placeholder="Email" onChange={onFormChange} required />
+                <input
+                  id="email-input-reg"
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={onFormChange}
+                  required
+                />
+                <label htmlFor="email-input-reg" className={form.email ? 'active' : ''}>
+                  Email
+                </label>
               </motion.div>
 
-              <motion.div variants={formItemVariants} className="input-group">
+              <motion.div variants={formItemVariants} className="input-group floating-label-group">
                 <span className="input-icon">📱</span>
-                <input type="tel" name="phone" value={form.phone} placeholder="Nomor WhatsApp (e.g., 628...)" onChange={onFormChange} required />
+                <input
+                  id="phone-input"
+                  type="tel"
+                  name="phone"
+                  value={form.phone}
+                  onChange={onFormChange}
+                  required
+                />
+                <label htmlFor="phone-input" className={form.phone ? 'active' : ''}>
+                  Nomor WhatsApp (e.g., 628...)
+                </label>
               </motion.div>
 
-              <motion.div variants={formItemVariants} className="input-group">
+              <motion.div variants={formItemVariants} className="input-group floating-label-group">
                 <span className="input-icon">🔒</span>
-                <input type="password" name="password" value={form.password} placeholder="Password" onChange={onFormChange} required />
+                <input
+                  id="password-input-reg"
+                  type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={onFormChange}
+                  required
+                />
+                <label htmlFor="password-input-reg" className={form.password ? 'active' : ''}>
+                  Password
+                </label>
               </motion.div>
 
-              <motion.div variants={formItemVariants} className="input-group">
+              <motion.div variants={formItemVariants} className="input-group floating-label-group">
                 <span className="input-icon">🔒</span>
-                <input type="password" name="password_confirmation" value={form.password_confirmation} placeholder="Konfirmasi Password" onChange={onFormChange} required />
+                <input
+                  id="confirm-password-input"
+                  type="password"
+                  name="password_confirmation"
+                  value={form.password_confirmation}
+                  onChange={onFormChange}
+                  required
+                />
+                <label htmlFor="confirm-password-input" className={form.password_confirmation ? 'active' : ''}>
+                  Konfirmasi Password
+                </label>
               </motion.div>
 
               {/* 11. Ganti class tombol */}
@@ -229,7 +280,7 @@ function Register({
 
           ) : (
             <motion.form
-              key="step2" 
+              key="step2"
               onSubmit={handleOtp}
               className="login-form-inner"
               variants={formContainerVariants}
@@ -239,7 +290,7 @@ function Register({
             >
               <motion.h2 variants={formItemVariants}>Verify Your Number</motion.h2>
 
-              <motion.p variants={formItemVariants} className="form-description" style={{color: '#e0e0e0'}}>
+              <motion.p variants={formItemVariants} className="form-description" style={{ color: '#e0e0e0' }}>
                 Masukkan 6 digit kode yang dikirim ke nomor <strong>{form.phone}</strong>.
               </motion.p>
 
@@ -276,9 +327,9 @@ function Register({
               </motion.button>
             </motion.form>
           )}
-        </AnimatePresence> 
-      </motion.div> 
-    </div> 
+        </AnimatePresence>
+      </motion.div>
+    </div>
   );
 }
 
