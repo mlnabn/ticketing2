@@ -126,7 +126,7 @@ const useScannerListener = (onScan, isOpen) => {
 /* ===========================================================
    Main Component
 =========================================================== */
-function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
+function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemToPreselect }) {
     const [view, setView] = useState('form');
     const [newlyCreatedItems, setNewlyCreatedItems] = useState([]);
     const printRef = useRef();
@@ -139,6 +139,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
     const serialInputRefs = useRef([]);
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
+    const [selectedMasterBarang, setSelectedMasterBarang] = useState(null);
 
     useEffect(() => {
         if (show) {
@@ -202,7 +203,17 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
                 value: item.id_m_barang,
                 label: `${item.nama_barang} (${item.kode_barang})`,
             }));
-            setMasterBarangOptions(options);
+            if (itemToPreselect) {
+                const itemExists = options.some(opt => opt.value === itemToPreselect.value);
+                if (!itemExists) {
+                    options.unshift(itemToPreselect);
+                }
+                setMasterBarangOptions(options);
+                setSelectedMasterBarang(itemToPreselect);
+            } else {
+                setMasterBarangOptions(options);
+                setSelectedMasterBarang(null); 
+            }
         });
         api.get('/colors').then((res) => {
             const options = res.data.map((color) => ({
@@ -213,9 +224,12 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
             setColorOptions(options);
         });
         setDisplayHarga('');
-        setFormData(initialFormState);
+        setFormData(prev => ({
+            ...initialFormState,
+            master_barang_id: itemToPreselect ? itemToPreselect.value : null
+        }));
         setActiveSerialIndex(0);
-    }, [show]);
+    }, [show, itemToPreselect]);
 
     const handleCloseAndReset = () => {
         if (onClose) {
@@ -225,8 +239,6 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
 
     useEffect(() => {
         const count = parseInt(formData.jumlah, 10) || 0;
-
-        // Hanya berjalan jika panjang array tidak sesuai dengan jumlah
         if (formData.serial_numbers.length !== count) {
             const newSerials = Array(count).fill('');
             const limit = Math.min(count, formData.serial_numbers.length);
@@ -238,7 +250,6 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
     }, [formData.jumlah, formData.serial_numbers]);
 
 
-    // useEffect 2: HANYA untuk mengatur ulang index aktif jika keluar batas
     useEffect(() => {
         const count = parseInt(formData.jumlah, 10) || 0;
         if (activeSerialIndex >= count && count > 0) {
@@ -260,7 +271,8 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
         }
     };
 
-    const handleSelectChange = (selectedOption) => {
+    const handleMasterBarangChange = (selectedOption) => {
+        setSelectedMasterBarang(selectedOption);
         setFormData((prev) => ({
             ...prev,
             master_barang_id: selectedOption ? selectedOption.value : null,
@@ -284,7 +296,6 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
         window.print();
     };
 
-    /* ---------------- Submit ---------------- */
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -322,7 +333,8 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast }) {
                                     <label>Pilih Barang (SKU)</label>
                                     <Select classNamePrefix="creatable-select"
                                         options={masterBarangOptions}
-                                        onChange={handleSelectChange}
+                                        value={selectedMasterBarang}
+                                        onChange={handleMasterBarangChange} 
                                         placeholder="Cari nama atau kode barang..."
                                         isClearable
                                     />

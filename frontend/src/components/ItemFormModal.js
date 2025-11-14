@@ -9,7 +9,7 @@ const initialFormState = {
     nama_barang: '',
 };
 
-function ItemFormModal({ show, isOpen, onClose, onSave, itemToEdit, showToast, initialData = {} }) {
+function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showToast, initialData = {} }) {
     const [formData, setFormData] = useState(initialFormState);
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
@@ -129,7 +129,9 @@ function ItemFormModal({ show, isOpen, onClose, onSave, itemToEdit, showToast, i
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSave(formData);
+        if (onSaveRequest) {
+            onSaveRequest(formData, 'save');
+        }
     };
 
     const handleCloseClick = () => {
@@ -196,11 +198,21 @@ function ItemFormModal({ show, isOpen, onClose, onSave, itemToEdit, showToast, i
                         </div>
                     )}
 
-                    <div className="confirmation-modal-actions">
+                    <div className="modal-footer-user" style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
                         <button type="button" onClick={handleCloseClick} className="btn-cancel">Batal</button>
                         <button type="submit" className="btn-confirm" disabled={isLoading || (isExisting && !itemToEdit)}>
                             {isExisting && !itemToEdit ? 'Sudah Terdaftar' : 'Simpan'}
                         </button>
+                        {!itemToEdit && (
+                            <button 
+                                type="button"
+                                onClick={() => onSaveRequest(formData, 'saveAndAddStock')}
+                                className="btn-history"
+                                disabled={isLoading || (isExisting && !itemToEdit)}
+                            >
+                                Tambah Stok
+                            </button>
+                        )}
                     </div>
                 </form>
             </div>
