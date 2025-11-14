@@ -2709,7 +2709,7 @@ body.dark-mode .job-table th {
 }
 
 body.dark-mode .job-table th:first-child {
-  text-align: left;
+  text-align: center;
 }
 
 /* Divider untuk header */
@@ -5988,7 +5988,7 @@ body.dark-mode .history-item-content small {
   box-shadow: none !important;
   min-height: 40px;
   padding: 3.4px 0px 3.4px 10px !important;
-  background-color: #FFFFFF !important;
+  background-color: #f5f5f5 !important;
   cursor: pointer !important;
 }
 
@@ -13411,7 +13411,6 @@ body.dark-mode .detail-list-header {
   text-align: center;
 }
 
-/* --- (DISEIMBANGKAN) Total Lebar Kolom = 100% --- */
 
 /* --- Atur Lebar Kolom Checkbox --- */
 .header-select,
@@ -13427,7 +13426,6 @@ body.dark-mode .detail-list-header {
 .header-kode,
 .cell-kode {
   flex-basis: 14%;
-  /* Tetap 14% */
   padding-left: 1rem;
   text-align: center;
   justify-content: center;
@@ -13438,7 +13436,6 @@ body.dark-mode .detail-list-header {
 .header-sn,
 .cell-sn {
   flex-basis: 7%;
-  /* Turun dari 8% */
   flex-grow: 0;
   flex-shrink: 0;
 }
@@ -13446,7 +13443,6 @@ body.dark-mode .detail-list-header {
 .header-kondisi,
 .cell-kondisi {
   flex-basis: 6%;
-  /* Turun dari 7% */
   flex-grow: 0;
   flex-shrink: 0;
 }
@@ -13454,7 +13450,6 @@ body.dark-mode .detail-list-header {
 .header-status,
 .cell-status {
   flex-basis: 8%;
-  /* Turun dari 9% */
   flex-grow: 0;
   flex-shrink: 0;
 }
