@@ -4025,52 +4025,54 @@ body.dark-mode .theme-toggle-button:hover {
 /* Dropdown menu */
 .user-dropdown {
   position: absolute;
-  top: 50px;
+  top: 55px;
   right: 0;
   z-index: 1500;
-
-  background: linear-gradient(135deg,
-      rgba(15, 32, 80, 0.95) 0%,
-      /* biru malam pekat */
-      rgba(30, 64, 140, 0.85) 50%,
-      /* biru tengah */
-      rgba(70, 130, 180, 0.75) 100%
-      /* biru langit lembut */
-    );
-  backdrop-filter: blur(12px);
-
-  padding: 10px;
-  border-radius: 10px;
+  width: 200px;
+  background: rgba(30, 30, 45, 0.65); 
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px;
+  border-radius: 12px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-
-  animation: fadeIn 0.3s ease-in-out;
 }
 
 .user-dropdown button {
   display: flex;
   align-items: center;
-  gap: 8px;
-
+  gap: 10px;
   width: 100%;
-  padding: 10px 14px;
-
+  padding: 12px 14px;
   background: transparent;
   border: none;
-  border-radius: 6px;
-
-  color: #fff;
+  border-radius: 8px;
+  color: #e0e0e0;
   font-weight: 500;
   text-align: left;
   cursor: pointer;
-
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .user-dropdown button:hover {
   background: rgba(255, 255, 255, 0.1);
-  /* kaca terang pas hover */
-  transform: translateX(3px);
-  /* geser dikit */
+  color: #ffffff;
+  transform: none;
+}
+
+.user-dropdown button.logout-buttonuser {
+  color: #fca5a5;
+}
+
+.user-dropdown button.logout-buttonuser:hover {
+  background: rgba(239, 68, 68, 0.15); 
+  color: #f87171;
+}
+
+.user-dropdown button i {
+  width: 18px;
+  text-align: center;
+  font-size: 0.95rem;
 }
 
 /* =================================== */
@@ -5663,10 +5665,13 @@ body.dark-mode .feedback-message {
   color: #f9fafb;
   transition: transform 0.2s ease, color 0.3s ease;
   flex-shrink: 0;
+  padding: 4px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .notification-button:hover {
-  transform: scale(1.1);
   color: #38bdf8;
 }
 
@@ -5690,16 +5695,19 @@ body.dark-mode .feedback-message {
   width: 320px;
   max-height: 400px;
   overflow-y: auto;
-  background: #1e293b;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-  padding: 12px 0;
   z-index: 1000;
+  background: rgba(30, 30, 45, 0.65); 
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 .notification-panel-header {
   padding: 10px 16px;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .notification-panel-header h4 {
@@ -5719,13 +5727,19 @@ body.dark-mode .feedback-message {
   justify-content: space-between;
   align-items: flex-start;
   gap: 10px;
-  padding: 15px;
-  border-bottom: 1px solid #334155;
+  padding: 12px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
   transition: background 0.2s ease;
+  border-radius: 8px; 
+  margin: 4px;
+}
+
+.notification-item:last-child {
+  border-bottom: none; 
 }
 
 .notification-item:hover {
-  background: #475569;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .notification-item strong {
@@ -5737,9 +5751,10 @@ body.dark-mode .feedback-message {
 }
 
 .notification-item p {
-  margin: 0;
+  margin: 0 0 8px 0;
   font-size: 0.85rem;
   color: #e2e8f0;
+  line-height: 1.5;
 }
 
 .notification-item small {
@@ -8656,7 +8671,10 @@ html {
 
 /* === Modal Content === */
 .modal-content4 {
-  background: linear-gradient(160deg, #0b0f29, #1a1f3a);
+  background: rgba(11, 15, 41, 0.75); 
+  backdrop-filter: blur(15px) saturate(180%);
+  -webkit-backdrop-filter: blur(15px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: #f1f5f9;
   padding: 24px;
   border-radius: 16px;
@@ -8664,7 +8682,6 @@ html {
   width: 100%;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7),
     0 0 25px rgba(96, 165, 250, 0.25);
-  animation: fadeInScale 0.35s ease;
   line-height: 1.6;
   overflow-y: auto;
   max-height: 95vh;

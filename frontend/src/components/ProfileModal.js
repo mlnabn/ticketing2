@@ -2,6 +2,29 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import AvatarUploader from './AvatarUploader';
+import { motion } from 'framer-motion';
+
+const overlayVariants = {
+  visible: { opacity: 1 },
+  hidden: { opacity: 0 },
+  exit: { opacity: 0 }
+};
+
+const modalVariants = {
+  hidden: { opacity: 0, scale: 0.9, y: 20 },
+  visible: { 
+    opacity: 1, 
+    scale: 1, 
+    y: 0,
+    transition: { type: 'spring', stiffness: 300, damping: 25 }
+  },
+  exit: { 
+    opacity: 0, 
+    scale: 0.9, 
+    y: 20,
+    transition: { duration: 0.2 } 
+  }
+};
 
 const ProfileModal = ({ user, onClose, onSaved }) => {
   const [name, setName] = useState(user?.name || '');
@@ -71,8 +94,20 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
 
 
   return (
-    <div className="modal-overlay4">
-      <div className="modal-content4" style={{ maxWidth: 700 }}>
+    <motion.div 
+      className="modal-overlay4"
+      variants={overlayVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      onClick={onClose}
+    >
+      <motion.div 
+        className="modal-content4" 
+        style={{ maxWidth: 700 }}
+        variants={modalVariants}
+        onClick={(e) => e.stopPropagation()} 
+      >
         <h2>Edit Profil</h2>
 
         <AvatarUploader
@@ -130,8 +165,8 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
             {loading ? 'Menyimpan...' : 'Simpan'}
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
