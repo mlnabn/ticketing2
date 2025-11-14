@@ -54,7 +54,11 @@ export default function AdminDashboard() {
   const removeToast = (id) => setToasts(prev => prev.filter(t => t.id !== id));
   const toggleSidebar = () => setIsSidebarOpen(v => !v);
   const toggleDarkMode = () => setDarkMode(v => !v);
-  const handleLogout = useCallback(() => { logout?.(); }, [logout]);
+  const handleLogout = useCallback(() => { 
+    document.body.classList.remove('dark-mode');
+    localStorage.removeItem('darkMode'); 
+    logout?.(); 
+  }, [logout]);
 
   useEffect(() => { setUserName(user?.name || ''); }, [user]);
 
@@ -187,21 +191,47 @@ export default function AdminDashboard() {
             <h1 className="dashboard-header-title">Admin Dashboard</h1>
           </div>
           <div className="admin-user-info-container">
-            <div className="user-info">
+            <motion.div className="user-info">
               <button onClick={toggleDarkMode} className="theme-toggle-button" aria-label="Toggle Dark Mode">
                 {darkMode ? <i className="fas fa-sun"></i> : <i className="fas fa-moon"></i>}
               </button>
-              <div className="user-profile-clickable" onClick={() => setIsAdminDropdownOpen(!isAdminDropdownOpen)}>
+              <motion.div 
+                className="user-profile-clickable" 
+                onClick={() => setIsAdminDropdownOpen(v => !v)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 15 }}
+              >
                 <div className="user-avatar"><FaUser /></div>
                 <span><strong>{userName || "User"}</strong></span>
-              </div>
-            </div>
-            {isAdminDropdownOpen && (
-              <>
-                <div className="dropdown-overlay" onClick={() => setIsAdminDropdownOpen(false)}></div>
-                <div className="admin-dropdown"><button onClick={handleLogout}><i className="fas fa-sign-out-alt"></i><span>Logout</span></button></div>
-              </>
-            )}
+              </motion.div>
+            </motion.div>
+            <AnimatePresence>
+              {isAdminDropdownOpen && (
+                <>
+                  <motion.div 
+                    className="dropdown-overlay" 
+                    onClick={() => setIsAdminDropdownOpen(false)}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                  <motion.div 
+                    className="admin-dropdown"
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  >
+                    <button onClick={handleLogout}>
+                      <i className="fas fa-sign-out-alt"></i>
+                      <span>Logout</span>
+                    </button>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
           </div>
         </motion.header>
         <div className="content-area">

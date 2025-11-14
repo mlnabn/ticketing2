@@ -4086,8 +4086,8 @@ body.dark-mode .theme-toggle-button:hover {
 .user-profile-clickable {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 5px 8px;
+  gap: 0.75rem;
+  padding: 6px 8px;
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -4106,84 +4106,69 @@ body.dark-mode .user-profile-clickable:hover {
 .admin-dropdown {
   position: absolute;
   top: 100%;
-  /* Posisi tepat di bawah header */
   right: 0;
-  margin-top: 8px;
-  /* Jarak kecil dari header */
+  margin-top: 12px;
   z-index: 1000;
-  width: 180px;
-  /* Lebar yang pas */
-
-  /* Light Mode Styles */
-  background-color: #ffffff;
-  border: 1px solid var(--border-color-light);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-
+  width: 200px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px; 
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); 
   padding: 8px;
-  border-radius: 10px;
-  animation: fadeIn 0.2s ease-in-out;
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-/* --- Dark Mode Styles --- */
 body.dark-mode .admin-dropdown {
-  background-color: #2d3748;
-  /* Warna abu-abu gelap */
-  border-color: var(--border-color-dark);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  background: rgba(30, 30, 30, 0.55);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
-/* --- Tombol di dalam Dropdown --- */
 .admin-dropdown button {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 14px;
   background: transparent;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   text-align: left;
   cursor: pointer;
   font-size: 0.95rem;
-  font-weight: 500;
-
-  /* Light Mode Text */
-  color: var(--text-color-dashboard-light);
-
+  font-weight: 600;
+  color: #b91c1c; 
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* --- Hover Tombol (Light Mode) --- */
 .admin-dropdown button:hover {
-  background-color: #f1f5f9;
-  /* Abu-abu sangat terang */
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #991b1b;
 }
 
-/* --- Dark Mode Text & Hover --- */
 body.dark-mode .admin-dropdown button {
-  color: var(--text-color-dashboard-dark);
+  color: #fca5a5;
 }
 
 body.dark-mode .admin-dropdown button:hover {
-  background-color: var(--header-button-hover-bg-dark);
-  /* Abu-abu sedikit lebih terang */
+  background-color: rgba(239, 68, 68, 0.15); 
+  color: #f87171;
 }
 
 /* Styling Ikon di dalam Tombol */
 .admin-dropdown button i {
   width: 20px;
-  /* Agar ikon dan teks sejajar */
   text-align: center;
   font-size: 1rem;
-  color: #64748b;
-  /* Abu-abu netral */
 }
 
-body.dark-mode .admin-dropdown button i {
+/* body.dark-mode .admin-dropdown button i {
   color: #94a3b8;
-  /* Abu-abu lebih terang di dark mode */
-}
+} */
 
 /* ============================================= */
 /* === PASSWORD INPUT WITH SHOW/HIDE TOGGLE === */
