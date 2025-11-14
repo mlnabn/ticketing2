@@ -276,26 +276,26 @@ function ItemListView({
                                     menuPortalTarget={document.body}
                                     styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                                 />
-                                
-                                {selectedIds.length > 0 && (
-                                    <div className="bulk-action-bar" >
-                                        {showArchived ? (
-                                            <button onClick={onBulkRestore} className="btn-clear" style={{ color: '#28a745', fontWeight: 'bold' }}>
-                                                <i className="fas fa-undo" style={{ marginRight: '5px' }}></i>
-                                                Pulihkan {selectedIds.length} SKU
-                                            </button>
-                                        ) : (
-                                            <button onClick={onBulkDelete} className="btn-clear">
-                                                <i className="fas fa-archive" style={{ marginRight: '5px' }}></i>
-                                                Arsipkan {selectedIds.length} SKU
-                                            </button>
-                                        )}
-                                    </div>
-                                )}
                             </motion.div>
                         </motion.div>
                     )}
                 </AnimatePresence>
+
+                {selectedIds.length > 0 && (
+                    <div className="bulk-action-bar" >
+                        {showArchived ? (
+                            <button onClick={onBulkRestore} className="btn-clear" style={{ color: '#28a745', fontWeight: 'bold' }}>
+                                <i className="fas fa-undo" style={{ marginRight: '5px' }}></i>
+                                Pulihkan {selectedIds.length} SKU
+                            </button>
+                        ) : (
+                            <button onClick={onBulkDelete} className="btn-clear">
+                                <i className="fas fa-archive" style={{ marginRight: '5px' }}></i>
+                                Arsipkan {selectedIds.length} SKU
+                            </button>
+                        )}
+                    </div>
+                )}
 
                 <motion.div variants={staggerItem} className="job-list-container">
                     <div className="table-scroll-container">

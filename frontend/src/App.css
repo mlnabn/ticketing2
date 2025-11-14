@@ -10381,8 +10381,7 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .modal-content-detail {
-  background: #ebebeb;
-  /* Latar terang */
+  background: #fcfcfc;
   backdrop-filter: blur(10px);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.5);
@@ -10395,6 +10394,10 @@ body.dark-mode .form-group-recover textarea:focus {
   flex-direction: column;
   overflow-y: auto;
   animation: fadeInScale 0.3s ease-out forwards;
+}
+
+.modal-content-detail input {
+  background-color: #f5f5f5;
 }
 
 .modal-content-detail.closing {
@@ -11412,7 +11415,7 @@ body.dark-mode .form-group-recover textarea:focus {
   box-shadow: none !important;
   min-height: 40px;
   padding: 3.4px 0px 3.4px 10px !important;
-  background-color: #FFFFFF !important;
+  background-color: #f9f9f9 !important;
   cursor: pointer !important;
 }
 
@@ -11498,7 +11501,7 @@ body.dark-mode .form-group-recover textarea:focus {
   border: 1px solid var(--border-color-light, #e5e7eb);
   border-radius: 10px;
   padding: 1rem 1.25rem;
-  background-color: #f2f0f0;
+  background-color: #f5f5f5;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
@@ -11809,7 +11812,7 @@ body.dark-mode .assigned-item-row-scan {
 }
 
 .modal-content-large {
-  background-color: #ebebeb;
+  background-color: #fcfcfc;
   color: #212529;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
