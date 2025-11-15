@@ -1,6 +1,29 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { motion } from 'framer-motion';
+
+const backdropVariants = {
+  visible: { opacity: 1 },
+  hidden: { opacity: 0 },
+  exit: { opacity: 0 }
+};
+
+const modalVariants = {
+  hidden: { opacity: 0, scale: 0.9, y: 20 },
+  visible: { 
+    opacity: 1, 
+    scale: 1, 
+    y: 0,
+    transition: { type: 'spring', stiffness: 300, damping: 25 }
+  },
+  exit: { 
+    opacity: 0, 
+    scale: 0.9, 
+    y: 20,
+    transition: { duration: 0.2 } 
+  }
+};
 
 const formatDateTime = (dateTimeString) => {
     if (!dateTimeString) return '-';
@@ -24,14 +47,27 @@ function TicketDetailModalUser({ ticket, onClose }) {
     };
 
     return (
-        <div className="modal-backdrop-detail-user">
-            <div className="modal-content-detail-user">
+        <motion.div 
+            className="modal-backdrop-detail-user"
+            variants={backdropVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit" 
+            onClick={onClose}
+        >
+            <motion.div 
+                className="modal-content-detail-user"
+                variants={modalVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                onClick={(e) => e.stopPropagation()} 
+            >
                 <div className="modal-header-detail-user">
                     <h3>Detail Tiket: {ticket.kode_tiket || 'N/A'}</h3>
                 </div>
 
                 <div className="modal-body-detail-user">
-                    {/* [DIUBAH] Menggunakan struktur standar 'detail-item-full-user' */}
                     <div className="detail-item-full-user">
                         <span className="label">Deskripsi Pekerjaan</span>
                         <span className="value">{ticket.title}</span>
@@ -67,8 +103,6 @@ function TicketDetailModalUser({ ticket, onClose }) {
                             <span className="value">{formatDateTime(ticket.completed_at)}</span>
                         </div>
                     </div>
-
-                    {/* [DIUBAH] Bagian Bukti Pekerjaan menggunakan struktur standar */}
                     {ticket.status === 'Selesai' && ticket.proof_description && (
                         <div className="detail-item-full-user">
                             <span className="label">Bukti Pengerjaan</span>
@@ -82,8 +116,6 @@ function TicketDetailModalUser({ ticket, onClose }) {
                             )}
                         </div>
                     )}
-                    
-                    {/* [DIUBAH] Status dipindahkan ke sini agar full-width dan rapi */}
                     <div className="detail-item-full-user">
                         <span className="label">Status</span>
                         <span className={`value status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span>
@@ -93,8 +125,8 @@ function TicketDetailModalUser({ ticket, onClose }) {
                 <div className="modal-footer-user">
                     <button onClick={onClose} className="btn-tutup-user">Tutup</button>
                 </div>
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     );
 }
 
