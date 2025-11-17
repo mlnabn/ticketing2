@@ -80,14 +80,13 @@ class InventoryReportController extends Controller
 
     public function getDashboardData(Request $request)
     {
-        // ... (Fungsi ini tidak diubah) ...
         $statusIds = DB::table('status_barang')
-            ->whereIn('nama_status', ['Tersedia', 'Dipinjam', 'Digunakan', 'Hilang', 'Rusak', 'Perbaikan'])
+            ->whereIn('nama_status', ['Tersedia', 'Dipinjam', 'Digunakan', 'Hilang', 'Rusak', 'Perbaikan', 'Non-Aktif'])
             ->pluck('id', 'nama_status');
 
         $totalUnitBarang = StokBarang::count();
         $stokTersedia = StokBarang::where('status_id', $statusIds['Tersedia'] ?? 0)->count();
-        $rusakHilangStatusIds = array_filter([$statusIds['Rusak'] ?? null, $statusIds['Hilang'] ?? null, $statusIds['Perbaikan'] ?? null]);
+        $rusakHilangStatusIds = array_filter([$statusIds['Rusak'] ?? null, $statusIds['Hilang'] ?? null, $statusIds['Perbaikan'] ?? null, $statusIds['Non-Aktif'] ?? null]);
         $rusakHilangTotal = StokBarang::whereIn('status_id', $rusakHilangStatusIds)->count();
         $keluarOperasionalStatusIds = array_filter([
             $statusIds['Dipinjam'] ?? null,
@@ -127,9 +126,6 @@ class InventoryReportController extends Controller
         ]);
     }
 
-
-    // --- PERBAIKAN ---
-    // Fungsi ini sekarang menjadi wrapper sederhana
     public function getDetailedReport(Request $request)
     {
         $request->validate([
@@ -143,28 +139,16 @@ class InventoryReportController extends Controller
 
         $perPage = $request->input('per_page', 15);
         $getAll = $request->boolean('all');
-
-        // Panggil fungsi query terpusat kita
         $query = $this->buildReportQuery($request);
-
-        // Kembalikan data (paginasi atau semua)
         if ($getAll) {
             return $query->get();
         }
+
         return $query->paginate($perPage);
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | FUNGSI HELPER PRIBADI
-    |--------------------------------------------------------------------------
-    */
-
-    // --- FUNGSI LAMA (TIDAK BERUBAH) ---
     private function getKeluarStatusIds($statusIds)
     {
-        // ... (Tidak berubah) ...
         return array_filter([
             $statusIds['Dipinjam'] ?? null,
             $statusIds['Digunakan'] ?? null,
@@ -172,9 +156,9 @@ class InventoryReportController extends Controller
             $statusIds['Rusak'] ?? null,
         ]);
     }
+
     private function getMonthlyMovementData($year)
     {
-        // ... (Tidak berubah) ...
         $barangMasuk = StokBarang::select(DB::raw('MONTH(tanggal_masuk) as month'), DB::raw('count(*) as count'))
             ->whereYear('tanggal_masuk', $year)->groupBy('month')->pluck('count', 'month')->all();
         $barangKeluar = StokBarang::select(DB::raw('MONTH(tanggal_keluar) as month'), DB::raw('count(*) as count'))
@@ -259,38 +243,134 @@ class InventoryReportController extends Controller
                     break;
                 
                 case 'accountability':
-                    $targetStatusIds = DB::table('status_barang')
-                                        ->whereIn('nama_status', ['Hilang', 'Rusak', 'Perbaikan'])
-                                        ->pluck('id');
+                    $targetStatuses = DB::table('status_barang')
+                                        ->whereIn('nama_status', ['Hilang', 'Rusak', 'Perbaikan', 'Non-Aktif'])
+                                        ->pluck('id', 'nama_status'); 
+                    $targetStatusIds = $targetStatuses->values();
                     $query->whereIn('status_id', $targetStatusIds);
+                    $statusHilangId = $targetStatuses['Hilang'] ?? null;
+                    $statusRusakId = $targetStatuses['Rusak'] ?? null;
+                    $statusPerbaikanId = $targetStatuses['Perbaikan'] ?? null;
+                    $statusNonAktifId = $targetStatuses['Non-Aktif'] ?? null;
 
-                    $query->when($request->filled('month'), function($q) use ($request) {
-                        $q->where(function($sub) use ($request) {
-                            $sub->whereMonth('tanggal_rusak', $request->month)
-                                ->orWhereMonth('tanggal_hilang', $request->month)
-                                ->orWhereMonth('tanggal_mulai_perbaikan', $request->month);
+                    $query->when($request->filled('month'), function($q) use ($request, $statusHilangId, $statusRusakId, $statusPerbaikanId, $statusNonAktifId) {
+                        $q->where(function($sub) use ($request, $statusHilangId, $statusRusakId, $statusPerbaikanId, $statusNonAktifId) {
+                            
+                            if ($statusRusakId) {
+                                $sub->orWhere(function($subRusak) use ($request, $statusRusakId) {
+                                    $subRusak->where('status_id', $statusRusakId)
+                                             ->whereMonth('tanggal_rusak', $request->month);
+                                });
+                            }
+                            if ($statusHilangId) {
+                                $sub->orWhere(function($subHilang) use ($request, $statusHilangId) {
+                                    $subHilang->where('status_id', $statusHilangId)
+                                              ->whereMonth('tanggal_hilang', $request->month);
+                                });
+                            }
+                            if ($statusPerbaikanId) {
+                                $sub->orWhere(function($subPerbaikan) use ($request, $statusPerbaikanId) {
+                                    $subPerbaikan->where('status_id', $statusPerbaikanId)
+                                                 ->whereMonth('tanggal_mulai_perbaikan', $request->month);
+                                });
+                            }
+                            if ($statusNonAktifId) {
+                                $sub->orWhere(function($subNonAktif) use ($request, $statusNonAktifId) {
+                                    $subNonAktif->where('status_id', $statusNonAktifId)
+                                                ->whereMonth('updated_at', $request->month);
+                                });
+                            }
                         });
                     });
-                    $query->when($request->filled('year'), function($q) use ($request) {
-                        $q->where(function($sub) use ($request) {
-                            $sub->whereYear('tanggal_rusak', $request->year)
-                                ->orWhereYear('tanggal_hilang', $request->year)
-                                ->orWhereYear('tanggal_mulai_perbaikan', $request->year);
+
+                    $query->when($request->filled('year'), function($q) use ($request, $statusHilangId, $statusRusakId, $statusPerbaikanId, $statusNonAktifId) {
+                        $q->where(function($sub) use ($request, $statusHilangId, $statusRusakId, $statusPerbaikanId, $statusNonAktifId) {
+                            
+                            if ($statusRusakId) {
+                                $sub->orWhere(function($subRusak) use ($request, $statusRusakId) {
+                                    $subRusak->where('status_id', $statusRusakId)
+                                             ->whereYear('tanggal_rusak', $request->year);
+                                });
+                            }
+                            if ($statusHilangId) {
+                                $sub->orWhere(function($subHilang) use ($request, $statusHilangId) {
+                                    $subHilang->where('status_id', $statusHilangId)
+                                              ->whereYear('tanggal_hilang', $request->year);
+                                });
+                            }
+                            if ($statusPerbaikanId) {
+                                $sub->orWhere(function($subPerbaikan) use ($request, $statusPerbaikanId) {
+                                    $subPerbaikan->where('status_id', $statusPerbaikanId)
+                                                 ->whereYear('tanggal_mulai_perbaikan', $request->year);
+                                });
+                            }
+                            if ($statusNonAktifId) {
+                                $sub->orWhere(function($subNonAktif) use ($request, $statusNonAktifId) {
+                                    $subNonAktif->where('status_id', $statusNonAktifId)
+                                                ->whereYear('updated_at', $request->year);
+                                });
+                            }
                         });
                     });
-                    $query->when($request->filled('start_date'), function($q) use ($request) {
-                         $q->where(function($sub) use ($request) {
-                             $sub->whereDate('tanggal_rusak', '>=', $request->start_date)
-                                ->orWhereDate('tanggal_hilang', '>=', $request->start_date)
-                                ->orWhereDate('tanggal_mulai_perbaikan', '>=', $request->start_date);
+
+                    $query->when($request->filled('start_date'), function($q) use ($request, $statusHilangId, $statusRusakId, $statusPerbaikanId, $statusNonAktifId) {
+                         $q->where(function($sub) use ($request, $statusHilangId, $statusRusakId, $statusPerbaikanId, $statusNonAktifId) {
+                             
+                            if ($statusRusakId) {
+                                $sub->orWhere(function($subRusak) use ($request, $statusRusakId) {
+                                    $subRusak->where('status_id', $statusRusakId)
+                                             ->whereDate('tanggal_rusak', '>=', $request->start_date);
+                                });
+                            }
+                            if ($statusHilangId) {
+                                $sub->orWhere(function($subHilang) use ($request, $statusHilangId) {
+                                    $subHilang->where('status_id', $statusHilangId)
+                                              ->whereDate('tanggal_hilang', '>=', $request->start_date);
+                                });
+                            }
+                            if ($statusPerbaikanId) {
+                                $sub->orWhere(function($subPerbaikan) use ($request, $statusPerbaikanId) {
+                                    $subPerbaikan->where('status_id', $statusPerbaikanId)
+                                                 ->whereDate('tanggal_mulai_perbaikan', '>=', $request->start_date);
+                                });
+                            }
+                            if ($statusNonAktifId) {
+                                $sub->orWhere(function($subNonAktif) use ($request, $statusNonAktifId) {
+                                    $subNonAktif->where('status_id', $statusNonAktifId)
+                                                ->whereDate('updated_at', '>=', $request->start_date);
+                                });
+                            }
                          });
                     });
-                     $query->when($request->filled('end_date'), function($q) use ($request) {
-                         $q->where(function($sub) use ($request) {
-                             $sub->whereDate('tanggal_rusak', '<=', $request->end_date)
-                                ->orWhereDate('tanggal_hilang', '<=', $request->end_date)
-                                ->orWhereDate('tanggal_mulai_perbaikan', '<=', $request->end_date);
-                         });
+
+                    $query->when($request->filled('end_date'), function($q) use ($request, $statusHilangId, $statusRusakId, $statusPerbaikanId, $statusNonAktifId) {
+                        $q->where(function($sub) use ($request, $statusHilangId, $statusRusakId, $statusPerbaikanId, $statusNonAktifId) {
+                             
+                            if ($statusRusakId) {
+                                $sub->orWhere(function($subRusak) use ($request, $statusRusakId) {
+                                    $subRusak->where('status_id', $statusRusakId)
+                                             ->whereDate('tanggal_rusak', '<=', $request->end_date);
+                                });
+                            }
+                            if ($statusHilangId) {
+                                $sub->orWhere(function($subHilang) use ($request, $statusHilangId) {
+                                    $subHilang->where('status_id', $statusHilangId)
+                                              ->whereDate('tanggal_hilang', '<=', $request->end_date);
+                                });
+                            }
+                            if ($statusPerbaikanId) {
+                                $sub->orWhere(function($subPerbaikan) use ($request, $statusPerbaikanId) {
+                                    $subPerbaikan->where('status_id', $statusPerbaikanId)
+                                                 ->whereDate('tanggal_mulai_perbaikan', '<=', $request->end_date);
+                                });
+                            }
+                            if ($statusNonAktifId) {
+                                $sub->orWhere(function($subNonAktif) use ($request, $statusNonAktifId) {
+                                    $subNonAktif->where('status_id', $statusNonAktifId)
+                                                ->whereDate('updated_at', '<=', $request->end_date);
+                                });
+                            }
+                        });
                      });
 
                     $query->orderBy('updated_at', 'desc');

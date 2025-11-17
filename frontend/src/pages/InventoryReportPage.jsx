@@ -171,8 +171,8 @@ export default function InventoryReportPage() {
                     icon="fa-user-clock"
                 />
                 <NavigationCard
-                    title="Daftar Barang Hilang, Rusak, & Perbaikan"
-                    description="Lihat semua barang yang hilang, rusak, atau sedang perbaikan."
+                    title="Daftar Barang Hilang, Rusak, Perbaikan & Non-Aktif"
+                    description="Lihat semua barang yang hilang, rusak, sedang perbaikan, atau non-aktif."
                     linkTo="/admin/inventory-reports/accountability"
                     icon="fa-exclamation-triangle"
                 />
