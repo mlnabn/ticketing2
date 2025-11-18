@@ -2,52 +2,95 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Workshop;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class LocationController extends Controller
 {
-    /**
-     * Ambil data lokasi untuk peta.
-     */
+
+    private function extractCoordinatesFromUrl(string $url): ?array
+    {
+        
+        if (Str::contains($url, ['maps.app.goo.gl', 'goo.gl/maps'])) {
+            try {
+                $response = Http::withoutRedirecting()->get($url);
+                $longUrl = $response->header('Location');
+
+                if ($longUrl) {
+                    $url = $longUrl;
+                }
+            } catch (\Exception $e) {
+            }
+        }
+        if (preg_match('/@(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)/', $url, $matches)) {
+            return [
+                'lat' => (float) $matches[1],
+                'lng' => (float) $matches[2]
+            ];
+        }
+        if (preg_match('/place\\/.*@(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)/', $url, $matches)) {
+            return [
+                'lat' => (float) $matches[1],
+                'lng' => (float) $matches[2]
+            ];
+        }
+
+        return null;
+    }
+
     public function index()
     {
-        // Data statis untuk contoh. Anda bisa mengambilnya dari database.
-        $locations = [
-            [
-                "id" => 1,
-                "label" => "Kantor Utama",
-                "lat" => -7.3206,
-                "lng" => 110.5114,
-                "description" => "Lokasi kantor pusat di Canden.",
-                "url" => "https://maps.app.goo.gl/iWf4Sm78a4fU4WWT7"
-            ],
-            [
-                "id" => 2,
-                "label" => "GUDANG ARUMI MOTOPARTS",
-                "lat" => -7.3662976,
-                "lng" => 110.4728536,
-                "description" => "Lokasi Bener",
-                "url" => "https://maps.app.goo.gl/JnK7GnZeC4B4rQFu7"
-            ],
-            [
-                "id" => 3,
-                "label" => "Workshop Dtech Engineering",
-                "lat" => -7.3785594,
-                "lng" => 110.5063332,
-                "description" => "Lokasi Nobo",
-                "url" => "https://maps.app.goo.gl/x2DWL7RQi1BLSZpP9"
-            ],
+        $workshops = Workshop::select(
+            'id',
+            'name as label',
+            'lat',
+            'lng',
+            'latitude',
+            'longitude',
+            'description',
+            'url'
+        )->get();
 
-            [
-                "id" => 4,
-                "label" => "Workshop Dtech x Muhasa Salatiga",
-                "lat" => -7.3047184,
-                "lng" => 110.4875557,
-                "description" => "Lokasi Muhasa",
-                "url" => "https://maps.app.goo.gl/9i5fv9n5dzzp11ME6"
-            ],
-            // Tambahkan lokasi lain di sini
-        ];
+        $locations = $workshops->map(function ($workshop) {
+
+            $lat = $workshop->lat;
+            $lng = $workshop->lng;
+
+
+            if (!$lat || !$lng) {
+
+                $lat = $workshop->latitude ?? $lat;
+                $lng = $workshop->longitude ?? $lng;
+            }
+
+
+            if (!$lat || !$lng) {
+                if ($workshop->url) {
+                    $coordinates = $this->extractCoordinatesFromUrl($workshop->url);
+                    if ($coordinates) {
+                        $lat = $coordinates['lat'];
+                        $lng = $coordinates['lng'];
+                    }
+                }
+            }
+
+
+            if ($lat && $lng) {
+                return [
+                    'id' => $workshop->id,
+                    'label' => $workshop->label,
+                    'lat' => (float) $lat,
+                    'lng' => (float) $lng,
+                    'description' => $workshop->description,
+                    'url' => $workshop->url,
+                ];
+            }
+
+
+            return null;
+        })->filter()->values();
 
         return response()->json($locations);
     }
