@@ -81,13 +81,13 @@ export default function WorkshopManagement() {
     setShowConfirmModal(true);
   };
 
-  const handleSave = async (formData) => {
+  const handleSave = async (workshopData) => { 
     const isEditMode = Boolean(workshopToEdit);
     const url = isEditMode ? `/workshops/${workshopToEdit.id}` : '/workshops';
     const method = isEditMode ? 'put' : 'post';
 
     try {
-      await api[method](url, formData);
+      await api[method](url, workshopData); 
       showToast(`Workshop berhasil ${isEditMode ? 'diperbarui' : 'ditambahkan'}.`, 'success');
       setShowFormModal(false);
       fetchWorkshops(1);

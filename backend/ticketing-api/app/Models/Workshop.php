@@ -9,10 +9,13 @@ class Workshop extends Model
 {
     use HasFactory;
 
-    // BARU: Tentukan field yang bisa diisi
-    protected $fillable = ['name', 'code'];
+    protected $fillable = ['name', 'code', 'lat', 'lng', 'description', 'url'];
+
+    protected $casts = [
+        'lat' => 'float',
+        'lng' => 'float',
+    ];  
     
-    // BARU: Definisikan relasi ke model Ticket
     public function tickets()
     {
         return $this->hasMany(Ticket::class);

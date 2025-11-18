@@ -7,6 +7,7 @@ use App\Models\Workshop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Http;
 
 class WorkshopController extends Controller
 {
@@ -23,7 +24,21 @@ class WorkshopController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:workshops,name',
+            'lat' => 'nullable|numeric',
+            'lng' => 'nullable|numeric',
+            'description' => 'nullable|string|max:500',
+            'url' => 'nullable|url|max:2048',
         ]);
+
+        // LOGIKA BARU UNTUK STORE
+        if (!empty($validated['url'])) {
+            $coordinates = $this->extractCoordinatesFromUrl($validated['url']);
+            if ($coordinates) {
+                $validated['lat'] = $coordinates['lat'];
+                $validated['lng'] = $coordinates['lng'];
+            }
+        }
+        // END LOGIKA BARU
 
         $validated['code'] = $this->generateWorkshopCode($validated['name']);
 
@@ -36,6 +51,37 @@ class WorkshopController extends Controller
         return $workshop;
     }
 
+    private function extractCoordinatesFromUrl(string $url): ?array
+    {
+        if (Str::contains($url, ['maps.app.goo.gl', 'goo.gl/maps'])) {
+            try {
+
+                $response = Http::withoutRedirecting()->get($url);
+                $longUrl = $response->header('Location');
+
+                if ($longUrl) {
+                    $url = $longUrl;
+                }
+            } catch (\Exception $e) {
+            }
+        }
+        if (preg_match('/@(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)/', $url, $matches)) {
+            return [
+                'lat' => (float) $matches[1],
+                'lng' => (float) $matches[2]
+            ];
+        }
+
+        if (preg_match('/place\\/.*@(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)/', $url, $matches)) {
+            return [
+                'lat' => (float) $matches[1],
+                'lng' => (float) $matches[2]
+            ];
+        }
+
+        return null;
+    }
+
     public function update(Request $request, Workshop $workshop)
     {
         $validated = $request->validate([
@@ -45,7 +91,22 @@ class WorkshopController extends Controller
                 'max:255',
                 Rule::unique('workshops')->ignore($workshop->id),
             ],
+            'lat' => 'nullable|numeric',
+            'lng' => 'nullable|numeric',
+            'description' => 'nullable|string|max:500',
+            'url' => 'nullable|url|max:2048',
         ]);
+        if (isset($validated['url']) && !empty($validated['url'])) {
+            $coordinates = $this->extractCoordinatesFromUrl($validated['url']);
+
+            if ($coordinates) {
+                $validated['lat'] = $coordinates['lat'];
+                $validated['lng'] = $coordinates['lng'];
+            } else {
+                $validated['lat'] = null;
+                $validated['lng'] = null;
+            }
+        }
 
         $validated['code'] = $this->generateWorkshopCode($validated['name']);
 
@@ -56,7 +117,7 @@ class WorkshopController extends Controller
 
     public function destroy(Workshop $workshop)
     {
-        
+
         if ($workshop->tickets()->exists()) {
             return response()->json(['error' => 'Workshop tidak dapat dihapus karena masih digunakan oleh tiket.'], 409);
         }
@@ -65,42 +126,73 @@ class WorkshopController extends Controller
         return response()->json(null, 204);
     }
 
-    /**
-     * BARU: Fungsi privat untuk menghasilkan kode workshop berdasarkan nama.
-     * @param string $name
-     * @return string
-     */
     private function generateWorkshopCode(string $name): string
     {
-        // 1. Bersihkan nama dari angka dan spasi berlebih
-        $cleanedName = preg_replace('/[0-9]+/', '', $name);        
-        $cleanedName = trim(preg_replace('/\s+/', ' ', $cleanedName)); 
 
-        // 2. Pecah nama menjadi array kata
+        $cleanedName = preg_replace('/[0-9]+/', '', $name);
+        $cleanedName = trim(preg_replace('/\s+/', ' ', $cleanedName));
         $words = explode(' ', $cleanedName);
+        $fullName = str_replace(' ', '', $cleanedName); 
 
-        // Kasus 2 & 3: Jika ada 2 kata atau lebih
+        $baseCodes = [];
+
+        // --- TAHAP 1: EKSTRAKSI KODE 2-HURUF PRIORITAS ---
+
         if (count($words) >= 2) {
-            $firstLetter = Str::upper(substr($words[0], 0, 1));
-            $secondLetter = Str::upper(substr($words[1], 0, 1));
-            return $firstLetter . $secondLetter;
-        }
+            $w1 = $words[0];
+            $w2 = $words[1];
 
-        // Kasus 1: Jika hanya ada 1 kata
-        elseif (count($words) === 1 && !empty($words[0])) {
-            $word = $words[0];
-            // Pastikan kata memiliki setidaknya 3 huruf
-            if (strlen($word) >= 3) {
-                $firstLetter = Str::upper(substr($word, 0, 1));
-                $thirdLetter = Str::upper(substr($word, 2, 1));
-                return $firstLetter . $thirdLetter;
-            } else {
-                // Fallback jika kata terlalu pendek (misal: "IT")
-                return Str::upper(str_pad(substr($word, 0, 2), 2, 'X'));
+            $baseCodes[] = Str::upper(substr($w1, 0, 1) . substr($w2, 0, 1));
+            if (strlen($w2) >= 2) {
+                $baseCodes[] = Str::upper(substr($w1, 0, 1) . substr($w2, -1, 1));
+            }
+            if (strlen($w1) >= 2) {
+                $baseCodes[] = Str::upper(substr($w1, 1, 1) . substr($w2, 0, 1));
+            }
+        }
+        if (strlen($fullName) >= 3) {
+            $baseCodes[] = Str::upper(substr($fullName, 0, 1) . substr($fullName, 2, 1));
+            if (strlen($fullName) >= 4) {
+                $baseCodes[] = Str::upper(substr($fullName, 0, 1) . substr($fullName, 3, 1));
+            }
+            $baseCodes[] = Str::upper(substr($fullName, 0, 1) . substr($fullName, 1, 1));
+            if (strlen($fullName) >= 5) {
+                $baseCodes[] = Str::upper(substr($fullName, 0, 1) . substr($fullName, 4, 1));
+            }
+            $baseCodes[] = Str::upper(substr($fullName, 1, 1) . substr($fullName, 2, 1));
+        }
+        if (empty($baseCodes)) {
+            $baseCodes[] = Str::upper(str_pad(substr($fullName, 0, 2), 2, 'X'));
+        }
+        $baseCodes = array_values(array_unique($baseCodes));
+
+        // --- TAHAP 2: PENGUJIAN KODE DASAR DAN REKURSIF ---
+        foreach ($baseCodes as $baseCode) {
+            if (!$this->isCodeExists($baseCode)) {
+                return $baseCode;
             }
         }
 
-        // Fallback default jika nama kosong atau tidak valid
-        return 'XX';
+        // --- TAHAP 3: FALLBACK KE SUFIKS ANGKA ---
+        $finalBaseCode = $baseCodes[0] ?? 'XX';
+
+        return $this->generateUniqueCodeWithSuffix($finalBaseCode);
+    }
+
+    private function isCodeExists(string $code): bool
+    {
+        return Workshop::where('code', $code)->exists();
+    }
+
+    private function generateUniqueCodeWithSuffix(string $baseCode): string
+    {
+        $suffix = 1;
+        $code = $baseCode . $suffix;
+        while ($this->isCodeExists($code)) {
+            $suffix++;
+            $code = $baseCode . $suffix;
+        }
+
+        return $code;
     }
 }
