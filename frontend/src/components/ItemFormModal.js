@@ -194,7 +194,7 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
 
                     {isExisting && !itemToEdit && (
                         <div className="info-box warning">
-                            Barang ini sudah terdaftar. Anda tidak bisa mendaftarkannya lagi. Tambahkan di Menu Stok Barang.
+                            Barang ini sudah terdaftar. Anda tidak bisa mendaftarkannya lagi.
                         </div>
                     )}
 

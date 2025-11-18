@@ -128,7 +128,7 @@ class TicketController extends Controller
                                 WHEN (is_urgent = 0 OR is_urgent IS NULL) AND status IN ('Sedang Dikerjakan', 'Ditunda') THEN 3
                                 ELSE 4
                              END ASC");
-        $query->orderBy('created_at', 'DESC');
+        $query->orderBy('updated_at', 'DESC');
         if ($request->boolean('all')) {
             $ticketsResult = $query->get();
             return response()->json($ticketsResult);
@@ -507,7 +507,7 @@ class TicketController extends Controller
                                 WHEN (is_urgent = 0 OR is_urgent IS NULL) AND status IN ('Sedang Dikerjakan', 'Ditunda') THEN 1
                                 ELSE 2
                              END ASC");
-        $query->orderBy('created_at', 'DESC');
+        $query->orderBy('updated_at', 'DESC');
 
         $ticketsData = $query->paginate($perPage);
 

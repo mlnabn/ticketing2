@@ -61,6 +61,7 @@ export default function JobList() {
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
   const [ticketToReturn, setTicketToReturn] = useState(null);
+  const [hasNewTickets, setHasNewTickets] = useState(false);
 
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const desktopListRef = useRef(null);
@@ -120,6 +121,30 @@ export default function JobList() {
     }
   }, [isAdmin, showToast]);
 
+  const checkForUpdates = useCallback(async () => {
+    if (!ticketData) {
+      return;
+    }
+
+    const endpoint = isMyTicketsPage ? '/tickets/my-tickets' : '/tickets';
+    const params = {
+      page: 1,
+    };
+
+    try {
+      const response = await api.get(endpoint, { params });
+      const newTotalTickets = response.data.total;
+      const currentTotalTickets = ticketData.total;    
+
+      if (newTotalTickets > currentTotalTickets) {
+        console.log("Pembaruan tiket terdeteksi (total bertambah)!");
+        setHasNewTickets(true);
+      }
+    } catch (e) {
+      console.error("Gagal mengecek pembaruan tiket:", e);
+    }
+  }, [isMyTicketsPage, ticketData]);
+
   useEffect(() => {
     if (!isPresent) return;
     fetchTickets(false);
@@ -133,25 +158,30 @@ export default function JobList() {
   useEffect(() => {
     const POLLING_INTERVAL = 30000;
 
+    if (hasNewTickets) {
+      console.log("Polling ditunda, notifikasi aktif.");
+      return; 
+    }
+
     const intervalId = setInterval(() => {
-      const { isLoading, isLoadingMore, currentPage } = loadingStateRef.current;
-      if (isLoading || isLoadingMore || currentPage > 1) {
-        console.log(`Polling skipped: loading=${isLoading}, loadingMore=${isLoadingMore}, page=${currentPage}`);
+      const { isLoading, isLoadingMore } = loadingStateRef.current;
+      
+      if (isLoading || isLoadingMore) {
+        console.log(`Polling skipped: loading=${isLoading}, loadingMore=${isLoadingMore}`);
         return;
       }
-
-      console.log("Polling data tiket terbaru (Halaman 1)...");
-      fetchTickets(true);
+      console.log("Mengecek pembaruan tiket (Halaman 1)...");
+      checkForUpdates(); 
     }, POLLING_INTERVAL);
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [fetchTickets]);
+  }, [checkForUpdates, hasNewTickets]);
 
   useEffect(() => {
     setSelectedIds([]);
-  }, [ticketsOnPage]);
+  }, [debouncedSearchTerm, searchParams]);
 
 
   useEffect(() => {
@@ -180,10 +210,14 @@ export default function JobList() {
 
     try {
       const response = await api.get(endpoint, { params });
-      setTicketData(prev => ({
-        ...response.data,
-        data: [...prev.data, ...response.data.data]
-      }));
+      setTicketData(prev => {
+        const existingIds = new Set(prev.data.map(t => t.id));
+        const newTickets = response.data.data.filter(t => !existingIds.has(t.id));
+        return {
+          ...response.data,
+          data: [...prev.data, ...newTickets]
+        };
+      });
     } catch (e) {
       console.error('Gagal memuat data tiket tambahan:', e);
       showToast('Gagal memuat lebih banyak tiket.', 'error');
@@ -403,6 +437,30 @@ export default function JobList() {
         </motion.div>
 
         <AnimatePresence>
+          {hasNewTickets && (
+            <motion.div
+              className="btn-primary"
+              style={{ cursor: 'pointer', textAlign: 'center' }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              onClick={() => {
+                setHasNewTickets(false);
+                fetchTickets(false);
+                if (desktopListRef.current) {
+                  desktopListRef.current.scrollTop = 0;
+                }
+                if (mobileListRef.current) {
+                  mobileListRef.current.scrollTop = 0;
+                }
+              }}
+            >
+              Ada tiket baru. Klik untuk memuat ulang.
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
           {selectedIds.length > 0 && (
             <motion.div
               className="bulk-action-bar"
@@ -410,7 +468,7 @@ export default function JobList() {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
             >
-              <button onClick={handleBulkDelete} className="btn-clear">Hapus {selectedIds.length} Tiket yang Dipilih</button>
+              <button onClick={handleBulkDelete} className="btn-clear" style={{ marginTop: '15px'}}>Hapus {selectedIds.length} Tiket yang Dipilih</button>
             </motion.div>
           )}
         </AnimatePresence>
