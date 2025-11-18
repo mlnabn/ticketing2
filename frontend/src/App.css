@@ -8424,7 +8424,7 @@ html {
 }
 
 /* ========================================================= */
-/* =============== KODE LAIN (TIDAK DIUBAH) ================ */
+/* =============== dot legend ================ */
 /* ========================================================= */
 
 .dot-green {
@@ -14642,12 +14642,9 @@ body.dark-mode .detail-list-footer-centered {
   flex-direction: row;
   justify-content: space-between;
   align-items: baseline;
-  /* Menyejajarkan teks label dan angka */
   width: 100%;
-  /* Ambil lebar penuh baris */
 }
 
-/* Pastikan value-nya rata kanan */
 .data-group.horizontal .value {
   text-align: right;
   white-space: normal;
@@ -14712,4 +14709,59 @@ body:not(.dark-mode) .card-header-detail small {
 
 .stok-barang {
   width: 30px;
+}
+
+.leaflet-popup-content-wrapper {
+  background-color: white !important;
+  color: #333 !important;
+  border-radius: 12px;
+}
+.leaflet-popup-tip {
+  background-color: white !important;
+}
+
+.custom-popup-content h4 {
+  margin: 0 0 5px 0;
+  color: #333; 
+}
+
+.custom-popup-content p {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #555; 
+}
+
+.custom-popup-content button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #007bff; 
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* ======================================= */
+/* 🌙 DARK MODE MAPS */
+/* ======================================= */
+
+.dark-mode .leaflet-popup-content-wrapper {
+  background-color: #363636 !important; 
+  color: #f0f0f0 !important;             
+}
+
+.dark-mode .leaflet-popup-tip {
+  background-color: #363636 !important; 
+}
+.dark-mode .custom-popup-content h4 {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .custom-popup-content p {
+  color: #b0b0b0 !important; 
+}
+
+.dark-mode .custom-popup-content button {
+  color: #90caf9 !important; 
 }
