@@ -129,6 +129,16 @@ function TicketDetailModal({ show, ticket, onClose }) {
                         </div>
                     </div>
 
+                    <div className="detail-item-full" data-span="2">
+                        <span className="label">Deskripsi Pekerjaan</span>
+                        <span className="value">{currentTicket.title}</span>
+                    </div>                    
+
+                    <div className="detail-item-full" data-span="2">
+                        <span className="label">Status</span>
+                        <span className={`value status-badge status-${currentTicket.status.toLowerCase().replace(/\s+/g, '-')}`}>{currentTicket.status}</span>
+                    </div>
+
                     {currentTicket.status === 'Selesai' && currentTicket.proof_description && (
                         <div className="detail-item-full" data-span="2">
                             <span className="label">Bukti Pekerjaan</span>
@@ -142,16 +152,6 @@ function TicketDetailModal({ show, ticket, onClose }) {
                             )}
                         </div>
                     )}
-
-                    <div className="detail-item-full" data-span="2">
-                        <span className="label">Status</span>
-                        <span className={`value status-badge status-${currentTicket.status.toLowerCase().replace(/\s+/g, '-')}`}>{currentTicket.status}</span>
-                    </div>
-
-                    <div className="detail-item-full" data-span="2">
-                        <span className="label">Deskripsi Pekerjaan</span>
-                        <span className="value">{currentTicket.title}</span>
-                    </div>
 
                     <div className="detail-item-full" data-span="2">
                         <span className="label">Barang yang Dipinjam</span>
