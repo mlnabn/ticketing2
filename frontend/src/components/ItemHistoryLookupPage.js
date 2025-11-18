@@ -364,7 +364,6 @@ function ItemHistoryLookupPage() {
         setSelectedItem(null);
         setHistoryData([]);
         setHistoryFilters({ start_date: '', end_date: '' });
-        fetchData();
     };
 
     const loadMoreItems = async () => {
