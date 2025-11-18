@@ -69,23 +69,14 @@ const MapComponent = ({ data }) => {
             position={[location.lat, location.lng]}
           >
             <Popup>
-              <div style={{ minWidth: '150px' }}>
-                <h4 style={{ margin: '0 0 5px 0' }}>{location.label}</h4>
-                <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#555' }}>{location.description}.</p>
+              <div className="custom-popup-content" style={{ minWidth: '150px' }}> 
+                
+                <h4 >{location.label}</h4> 
+                <p >{location.description}.</p>
 
                 {location.url && (
                   <button
                     onClick={() => handleNavigationClick(location.url)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      padding: 0,
-                      cursor: 'pointer',
-                      color: '#007bff',
-                      textDecoration: 'none',
-                      fontWeight: 'bold',
-                      fontSize: '14px'
-                    }}
                   >
                     Lihat di Google Maps &rarr;
                   </button>
