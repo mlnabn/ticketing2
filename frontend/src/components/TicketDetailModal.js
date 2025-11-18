@@ -141,7 +141,7 @@ function TicketDetailModal({ show, ticket, onClose }) {
 
                     {currentTicket.status === 'Selesai' && currentTicket.proof_description && (
                         <div className="detail-item-full" data-span="2">
-                            <span className="label">Bukti Pekerjaan</span>
+                            <span className="label" style={{ color: '#0d6efd', fontStyle: 'italic', fontWeight: 'bold' }}>Bukti Pekerjaan</span>
                             <p className="value">{currentTicket.proof_description}</p>
                             {currentTicket.proof_image_url && (
                                 <div className="proof-image-container">
@@ -150,6 +150,15 @@ function TicketDetailModal({ show, ticket, onClose }) {
                                     </a>
                                 </div>
                             )}
+                        </div>
+                    )}
+
+                    {currentTicket.status === 'Ditolak' && currentTicket.rejection_reason && (
+                        <div className="detail-item-full" data-span="2">
+                            <span className="label" style={{ color: '#dc3545', fontStyle: 'italic', fontWeight: 'bold' }}>Alasan Penolakan</span>
+                            <p className="value">
+                                {currentTicket.rejection_reason}
+                            </p>
                         </div>
                     )}
 
