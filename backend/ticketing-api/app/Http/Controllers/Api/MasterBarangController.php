@@ -56,10 +56,6 @@ class MasterBarangController extends Controller
         }
 
         $paginator = $query->paginate(15);
-        // $paginator->getCollection()->each(function ($item) use ($isActive) {
-        //     $item->variations = $this->getVariationsData($item->kode_barang, $isActive);
-        // });
-
         return $paginator;
     }
 
@@ -184,10 +180,9 @@ class MasterBarangController extends Controller
             return response()->json([]);
         }
 
-        $relatedMasterBarangIds = MasterBarang::where('kode_barang', $masterBarang->kode_barang)
-                                            ->pluck('id_m_barang');
+        $targetMasterBarangId = $masterBarang->id_m_barang;
 
-        $stockData = StokBarang::whereIn('master_barang_id', $relatedMasterBarangIds)
+        $stockData = StokBarang::where('master_barang_id', $targetMasterBarangId)
             ->where('status_id', $statusTersediaId)
             ->join('master_barangs', 'stok_barangs.master_barang_id', '=', 'master_barangs.id_m_barang')
             ->leftJoin('colors', 'stok_barangs.id_warna', '=', 'colors.id_warna')
@@ -202,21 +197,22 @@ class MasterBarangController extends Controller
 
         $result = [];
         foreach ($stockData as $stock) {
-            if (!isset($result[$stock->nama_barang])) {
-                $result[$stock->nama_barang] = [
-                    'item_name' => $stock->nama_barang,
+            $itemName = $masterBarang->nama_barang;
+            if (!isset($result[$itemName])) {
+                $result[$itemName] = [
+                    'item_name' => $itemName,
                     'total_stock' => 0,
                     'colors' => [],
                 ];
             }
 
-            $result[$stock->nama_barang]['colors'][] = [
+            $result[$itemName]['colors'][] = [
                 'color_name' => $stock->nama_warna ?? 'Tanpa Warna',
                 'count' => (int) $stock->total,
             ];
 
-            $result[$stock->nama_barang]['total_stock'] += (int) $stock->total;
-        }
+            $result[$itemName]['total_stock'] += (int) $stock->total;
+            }
 
         return response()->json(array_values($result));
     }

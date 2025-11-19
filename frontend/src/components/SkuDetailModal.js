@@ -4,7 +4,6 @@ import api from '../services/api';
 function SkuDetailModal({ show, item, onClose }) {
     const [stockBreakdown, setStockBreakdown] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const [currentItem, setCurrentItem] = useState(item);
@@ -68,13 +67,13 @@ function SkuDetailModal({ show, item, onClose }) {
                 onClick={e => e.stopPropagation()}
             >
                 <div className="modal-header-detail">
-                    <h3><strong>Detail SKU: </strong>{currentItem.master_kategori?.nama_kategori || currentItem.nama_barang}</h3>
+                    <h3><strong>Detail Tipe Barang: </strong>{currentItem.master_kategori?.nama_kategori || currentItem.nama_barang}</h3>
                 </div>
 
                 <div className="modal-body-detail">
                     <div className="detail-grid-section">
                         <div className="detail-item-full" data-span="2">
-                            <span className="label">Kode Barang (SKU)</span>
+                            <span className="label">Kode Unik</span>
                             <span className="value">{currentItem.kode_barang}</span>
                         </div>
                         <div className="detail-item-full">
@@ -82,7 +81,7 @@ function SkuDetailModal({ show, item, onClose }) {
                             <span className="value">{currentItem.master_kategori?.nama_kategori || '-'}</span>
                         </div>
                         <div className="detail-item-full">
-                            <span className="label">Sub-Kategori</span>
+                            <span className="label">Sub-Kategori/Merk</span>
                             <span className="value">{currentItem.sub_kategori?.nama_sub || '-'}</span>
                         </div>
                     </div>
