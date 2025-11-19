@@ -192,7 +192,7 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show }
                             cacheOptions
                             loadOptions={loadOptions}
                             defaultOptions
-                            placeholder="Ketik nama, kode unik, atau S/N..."
+                            placeholder="Ketik Nama, Kode SKU, atau S/N..."
                             onChange={(selectedOption) => addItemToList(selectedOption.value)}
                             styles={selectStyles}
                             noOptionsMessage={() => 'Ketik untuk mencari barang...'}

@@ -10426,6 +10426,7 @@ body.dark-mode .form-group-recover textarea:focus {
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text-color-primary);
+  margin-bottom: 15px;
 }
 
 .modal-creation-date {

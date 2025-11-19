@@ -235,7 +235,7 @@ export default function NewAcquisitionsReport() {
                         <thead>
                             <tr>
                                 <th>Tanggal</th>
-                                <th>Kode Unik</th>
+                                <th>Kode SKU</th>
                                 <th>Nama Barang</th>
                                 <th style={{ textAlign: 'right' }}>Nilai</th>
                             </tr>
@@ -298,7 +298,7 @@ export default function NewAcquisitionsReport() {
                                     </div>
                                     <div className="card-row">
                                         <div className="data-group">
-                                            <span className="label">Kode Unik</span>
+                                            <span className="label">Kode SKU</span>
                                             <span className="value">{item.kode_unik}</span>
                                         </div>
                                         <div className="data-group">

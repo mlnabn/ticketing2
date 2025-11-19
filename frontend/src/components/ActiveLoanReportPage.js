@@ -287,7 +287,7 @@ export default function ActiveLoanReportPage() {
             <motion.div variants={staggerItem} className="action-buttons-stok">
                 <motion.input
                     type="text"
-                    placeholder="Cari Kode Unik / Nama Barang / Peminjam..."
+                    placeholder="Cari Kode SKU / Nama Barang / Peminjam..."
                     className="filter-search-input-invReport"
                     value={searchTerm}
                     variants={staggerItem}
@@ -420,7 +420,7 @@ export default function ActiveLoanReportPage() {
                     <table className="job-table">
                         <thead>
                             <tr>
-                                <th>Kode Unik</th>
+                                <th>Kode SKU</th>
                                 <th>Nama Barang</th>
                                 <th>Status</th>
                                 <th>Peminjam</th>
@@ -502,7 +502,7 @@ export default function ActiveLoanReportPage() {
                                 </div>
                                 <div className="card-row">
                                     <div className="data-group">
-                                        <span className="label">Kode Unik</span>
+                                        <span className="label">Kode SKU</span>
                                         <span className="value">{item.kode_unik || '-'}</span>
                                     </div>
                                     <div className="data-group">

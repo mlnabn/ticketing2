@@ -385,7 +385,7 @@ export default function DetailedReportPage({ type, title }) {
             >
                 <motion.input
                     type="text"
-                    placeholder="Cari Kode Unik / Nama Barang..."
+                    placeholder="Cari Kode SKU / Nama Barang..."
                     className="filter-search-input-invReport"
                     value={searchTerm}
                     variants={staggerItem}
@@ -516,7 +516,7 @@ export default function DetailedReportPage({ type, title }) {
                     <table className="job-table">
                         <thead>
                             <tr>
-                                <th>Kode Unik</th>
+                                <th>Kode SKU</th>
                                 <th>Serial Number</th>
                                 <th>Nama Barang</th>
                                 {showStatusDari && <th>Status Dari</th>}
@@ -609,7 +609,7 @@ export default function DetailedReportPage({ type, title }) {
                                         <span className="value description">{itemData.nama_barang || '-'}</span>
                                     </div>
                                     <div className="data-group">
-                                        <span className="label">Kode Unik</span>
+                                        <span className="label">Kode SKU</span>
                                         <span className="value">{itemData.kode_unik || '-'}</span>
                                     </div>
                                 </div>

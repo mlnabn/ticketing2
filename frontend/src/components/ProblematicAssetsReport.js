@@ -242,7 +242,7 @@ export default function ProblematicAssetsReport() {
                             <tr>
                                 <th>Tanggal Kejadian</th>
                                 <th>Status</th>
-                                <th>Kode Unik</th>
+                                <th>Kode SKU</th>
                                 <th>Nama Barang</th>
                                 <th>PJ/Lokasi</th>
                                 <th style={{ textAlign: 'right' }}>Nilai Aset</th>
@@ -312,7 +312,7 @@ export default function ProblematicAssetsReport() {
                                     </div>
                                     <div className="card-row">
                                         <div className="data-group">
-                                            <span className="label">Kode Unik</span>
+                                            <span className="label">Kode SKU</span>
                                             <span className="value">{item.kode_unik}</span>
                                         </div>
                                         <div className="data-group">

@@ -424,7 +424,7 @@ function ItemHistoryLookupPage() {
                     <motion.input
                         variants={staggerItem}
                         type="text"
-                        placeholder="Cari berdasarkan Kode Unik, S/N, atau Nama Barang..."
+                        placeholder="Cari berdasarkan Kode SKU, S/N, atau Nama Barang..."
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
                         className="filter-search-input-invReport"
@@ -544,7 +544,7 @@ function ItemHistoryLookupPage() {
                                 <table className="job-table">
                                     <thead>
                                         <tr>
-                                            <th>Kode Unik</th>
+                                            <th>Kode SKU</th>
                                             <th>Nama Barang</th>
                                             <th className={selectedItem ? 'hide-on-narrow' : ''}>Status Saat Ini</th>
                                             <th className={selectedItem ? 'hide-on-narrow' : ''}>Tgl Kejadian Terakhir</th>
@@ -628,7 +628,7 @@ function ItemHistoryLookupPage() {
                                             </div>
                                             <div className="card-row">
                                                 <div className="data-group">
-                                                    <span className="label">Kode Unik</span>
+                                                    <span className="label">Kode SKU</span>
                                                     <span className="value">{item.kode_unik}</span>
                                                 </div>
                                                 <div className="data-group">
