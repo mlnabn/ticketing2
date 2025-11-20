@@ -440,10 +440,26 @@ function StokBarangView() {
     };
 
     const handleSaveSuccess = () => {
-        fetchData(1, currentFilters);
+        let masterIdToClose = null;
+        if (editItem) masterIdToClose = editItem.master_barang_id;
+        else if (itemToSoftDelete) masterIdToClose = itemToSoftDelete.master_barang_id;
+        else if (detailItem) masterIdToClose = detailItem.master_barang_id;
+        const currentPage = pagination?.current_page || 1;
+        fetchData(currentPage, currentFilters);
+        if (masterIdToClose) {
+            setExpandedRows(prev => ({
+                ...prev,
+                [masterIdToClose]: false
+            }));
+            setDetailItems(prev => {
+                const newState = { ...prev };
+                delete newState[masterIdToClose];
+                return newState;
+            });
+        }
+        setEditItem(null);
         setItemToSoftDelete(null);
     };
-
     const handleScanSearch = useCallback(async (code) => {
         if (!code) return;
         showToast(`Mencari: ${code}`, 'info');
@@ -1173,7 +1189,7 @@ function StokBarangView() {
                 onClose={() => setItemToSoftDelete(null)}
                 onSaveSuccess={handleSaveSuccess}
                 showToast={showToast}
-                statusOptions={statusOptions} // <-- Kirim status options
+                statusOptions={statusOptions}
             />
             {createPortal(
                 <QrPrintSheet ref={printRef} items={itemsToPrint} />,
