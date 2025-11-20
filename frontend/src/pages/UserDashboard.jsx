@@ -10,7 +10,6 @@ import UserHeader from '../components/UserHeader';
 import ConfirmationModalUser from '../components/ConfirmationModalUser';
 import RejectionInfoModal from '../components/RejectionInfoModal';
 import ViewProofModal from '../components/ViewProofModal';
-import PaginationUser from '../components/PaginationUser';
 import ProfileModal from '../components/ProfileModal';
 import TicketDetailModalUser from '../components/TicketDetailModalUser';
 
