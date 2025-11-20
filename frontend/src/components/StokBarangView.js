@@ -95,7 +95,9 @@ function StokBarangView() {
     const [masterItems, setMasterItems] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState(() => {
+        return location.state?.initialSearchTerm || '';
+    });
     const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
 
     // State untuk filter
@@ -122,7 +124,12 @@ function StokBarangView() {
     const [detailItems, setDetailItems] = useState({});
     const [expandingId, setExpandingId] = useState(null);
     const [tersediaStatusId, setTersediaStatusId] = useState(null);
-    const [currentFilters, setCurrentFilters] = useState({});
+    const [currentFilters, setCurrentFilters] = useState(() => {
+        if (location.state?.initialSearchTerm) {
+            return { search: location.state.initialSearchTerm };
+        }
+        return {};
+    });
 
     // --- State untuk Print QR ---
     const [selectedItems, setSelectedItems] = useState(new Set());
@@ -132,7 +139,7 @@ function StokBarangView() {
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
     const [isLoadingMoreDetail, setIsLoadingMoreDetail] = useState(null);
-    const initialSearchFromLocation = location.state?.initialSearchTerm;
+    // const initialSearchFromLocation = location.state?.initialSearchTerm;
     const isInitialMount = useRef(true);
 
     const fetchData = useCallback(async (page = 1, filters = {}) => {
@@ -153,8 +160,8 @@ function StokBarangView() {
 
             setPagination(res.data);
             if (page === 1) {
-                setExpandedRows({});
-                setDetailItems({});
+                // setExpandedRows({});
+                // setDetailItems({});
                 setSelectedItems(new Set());
             }
 
@@ -168,32 +175,19 @@ function StokBarangView() {
 
     useEffect(() => {
         if (!isPresent) return;
-        if (initialSearchFromLocation && isInitialMount.current) {
-            setSearchTerm(initialSearchFromLocation);
-            navigate(location.pathname, { replace: true, state: {} });
-            const initialFilters = {
-                id_kategori: selectedCategory,
-                id_sub_kategori: selectedSubCategory,
-                status_id: selectedStatus,
-                id_warna: selectedColor,
-                search: initialSearchFromLocation,
-            };
-            fetchData(1, initialFilters);
-        } else if (isInitialMount.current) {
-            const defaultFilters = {
-                id_kategori: selectedCategory,
-                id_sub_kategori: selectedSubCategory,
-                status_id: selectedStatus,
-                id_warna: selectedColor,
-                search: debouncedSearchTerm, 
-            };
-            fetchData(1, defaultFilters);
+        if (isInitialMount.current) {
+            fetchData(1, currentFilters);
+            if (location.state?.initialSearchTerm) {
+                navigate(location.pathname, { replace: true, state: {} });
+            }
         }
+
         const initialLoadTimeout = setTimeout(() => {
             isInitialMount.current = false;
         }, 10);
         return () => clearTimeout(initialLoadTimeout);
-    }, [initialSearchFromLocation, navigate, location.pathname, isPresent, fetchData, selectedCategory, selectedSubCategory, selectedStatus, selectedColor, debouncedSearchTerm]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isPresent]);
 
     const filterStatusOptions = useMemo(() => {
         const allStatus = { value: 'ALL', label: 'Semua Status' };
@@ -399,7 +393,7 @@ function StokBarangView() {
         }
         setExpandedRows(prev => ({ ...prev, [masterBarangId]: true }));
         if (detailItems[masterBarangId]?.items?.length > 0) {
-            return; 
+            return;
         }
         setExpandingId(masterBarangId);
         try {
@@ -437,7 +431,7 @@ function StokBarangView() {
         } finally {
             setExpandingId(null);
         }
-        
+
     };
 
     const handleOpenEditModal = (itemToEdit) => {
@@ -680,9 +674,9 @@ function StokBarangView() {
                                 } : false}
                                 animate="open"
                                 exit="closed"
-                                transition={filterExpandTransition} 
-                                variants={filterExpandVariants} 
-                                className="filters-content-wrapper" 
+                                transition={filterExpandTransition}
+                                variants={filterExpandVariants}
+                                className="filters-content-wrapper"
                             >
                                 {/* === KONTEN FILTER LAMA DI SINI === */}
                                 <Select
@@ -1167,9 +1161,9 @@ function StokBarangView() {
                     }
                 }}
                 onSaveSuccess={() => {
-                    fetchData(1, currentFilters); 
-                    setItemToPreselect(null); 
-                }} 
+                    fetchData(1, currentFilters);
+                    setItemToPreselect(null);
+                }}
                 showToast={showToast}
                 itemToPreselect={itemToPreselect}
             />
