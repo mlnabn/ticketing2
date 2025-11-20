@@ -543,7 +543,7 @@ class TicketController extends Controller
         $tickets = Ticket::with(['user', 'creator', 'workshop'])
             ->where('creator_id', auth()->id())
             ->latest()
-            ->paginate(5);
+            ->paginate(15);
 
         return response()->json($tickets);
     }

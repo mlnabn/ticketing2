@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { format } from 'date-fns';
 import { useAuth } from '../AuthContext';
 import api from '../services/api';
@@ -69,8 +69,9 @@ export default function UserDashboard() {
   // -----------------------------------------------------------------
   const { user, logout, setUser } = useAuth();
   const [userViewTab, setUserViewTab] = useState('request');
-  const [createdTicketsData, setCreatedTicketsData] = useState(null);
-  const [createdTicketsPage, setCreatedTicketsPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const historyListRef = useRef(null); 
+  const [createdTicketsData, setCreatedTicketsData] = useState({ data: [], current_page: 1, last_page: 1 });
   const [users, setUsers] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -91,6 +92,7 @@ export default function UserDashboard() {
   const handleViewTicketDetail = (ticket) => {
     setSelectedTicketForDetail(ticket);
   };
+
   const handleCloseDetailModal = () => {
     setSelectedTicketForDetail(null);
   };
@@ -100,18 +102,38 @@ export default function UserDashboard() {
     }
     handleViewTicketDetail(ticket);
   };
+
   const handleLogout = useCallback(() => {
     logout();
   }, [logout]);
-  const fetchCreatedTickets = useCallback(async (page = 1) => {
+
+  const fetchCreatedTickets = useCallback(async (page = 1, isLoadMore = false) => {
+    const targetPage = isLoadMore ? page : 1;
+      
     try {
-      const response = await api.get('/tickets/created-by-me', { params: { page } });
-      setCreatedTicketsData(response.data);
-    } catch (error) {
-      console.error("Gagal mengambil tiket yang dibuat:", error);
-      if (error.response?.status === 401) handleLogout();
-    }
+      const response = await api.get('/tickets/created-by-me', { params: { page: targetPage } });
+        
+      if (isLoadMore) {
+        setCreatedTicketsData(prev => {
+          const newTickets = response.data.data.filter(
+              newItem => !prev.data.some(existingItem => existingItem.id === newItem.id)
+          );
+          return {
+            ...response.data,
+            data: [...prev.data, ...newTickets]
+          };
+        });
+      } else {
+          setCreatedTicketsData(response.data);
+        }
+      } catch (error) {
+        console.error("Gagal mengambil tiket yang dibuat:", error);
+        if (error.response?.status === 401) handleLogout();
+      } finally {
+        isLoadMore && setIsLoadingMore(false);
+      }
   }, [handleLogout]);
+
   const fetchAllUsers = useCallback(async () => {
     try {
       const response = await api.get('/users/all');
@@ -122,6 +144,7 @@ export default function UserDashboard() {
       console.error("Gagal mengambil daftar pengguna:", error);
     }
   }, []);
+
   const addTicket = useCallback(async (formData) => {
     try {
       await api.post('/tickets', formData);
@@ -133,15 +156,17 @@ export default function UserDashboard() {
       alert('Gagal menambah tiket. Mohon coba lagi.');
     }
   }, [fetchCreatedTickets]);
+
   const handleDeleteClick = (ticket) => {
     setTicketToDelete(ticket);
     setShowConfirmModal(true);
   };
+
   const confirmDelete = async () => {
     if (!ticketToDelete) return;
     try {
       await api.delete(`/tickets/${ticketToDelete.id}`);
-      fetchCreatedTickets(createdTicketsPage);
+      fetchCreatedTickets(1);
       alert('Tiket berhasil dihapus.');
     } catch (error) {
       console.error("Gagal hapus tiket:", error);
@@ -151,10 +176,12 @@ export default function UserDashboard() {
       setTicketToDelete(null);
     }
   };
+
   const cancelDelete = () => {
     setShowConfirmModal(false);
     setTicketToDelete(null);
   };
+
   const fetchNotifications = useCallback(async () => {
     try {
       const response = await api.get('/notifications');
@@ -168,11 +195,13 @@ export default function UserDashboard() {
       console.error("Gagal mengambil notifikasi:", error);
     }
   }, []);
+
   const handleNotificationToggle = () => {
     setUnreadCount(0);
     localStorage.setItem('notifications_last_cleared', new Date().toISOString());
     api.post('/notifications/mark-all-read');
   };
+
   const handleDeleteNotification = async (notificationId) => {
     try {
       await api.delete(`/notifications/${notificationId}`);
@@ -181,10 +210,27 @@ export default function UserDashboard() {
       console.error("Gagal menghapus notifikasi:", error);
     }
   };
+
   const handleOpenProfileModal = () => setShowProfileModal(true);
   const handleProfileSaved = (updatedUser) => {
     setUser(updatedUser);
     console.log("Profil diperbarui dan context telah diupdate.");
+  };
+
+  const loadMoreItems = async () => {
+    if (isLoadingMore || createdTicketsData.current_page >= createdTicketsData.last_page) return;
+    setIsLoadingMore(true);
+    const nextPage = createdTicketsData.current_page + 1;
+    await fetchCreatedTickets(nextPage, true);
+  };
+
+  const handleScroll = (e) => {
+    const target = e.currentTarget;
+    const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
+
+    if (nearBottom && !isLoadingMore && createdTicketsData.current_page < createdTicketsData.last_page) {
+        loadMoreItems();
+    }
   };
 
   // -----------------------------------------------------------------
@@ -194,11 +240,12 @@ export default function UserDashboard() {
     fetchAllUsers();
     fetchNotifications();
   }, [fetchAllUsers, fetchNotifications]);
+  
   useEffect(() => {
     if (userViewTab === 'history') {
-      fetchCreatedTickets(createdTicketsPage);
+      fetchCreatedTickets(1);
     }
-  }, [userViewTab, createdTicketsPage, fetchCreatedTickets]);
+  }, [userViewTab, fetchCreatedTickets]);
 
   // -----------------------------------------------------------------
   // #4. RENDER LOGIC
@@ -284,9 +331,11 @@ export default function UserDashboard() {
                     exit="exit"
                   >
                     <motion.h2 variants={itemVariants}>Your Tickets</motion.h2>
-                    <motion.div
-                      className="job-list"
-                      style={{ marginTop: '20px' }}
+                    <motion.div 
+                      className="job-list table-body-scroll"
+                      ref={historyListRef}
+                      onScroll={handleScroll}
+                      style={{ marginTop: '20px', maxHeight: '70vh', overflowY: 'auto' }} 
                       variants={itemVariants}
                     >
                       <table className="job-table-user user-history-table">
@@ -348,15 +397,11 @@ export default function UserDashboard() {
                               <td colSpan="6">Anda belum membuat tiket.</td>
                             </tr>
                           )}
+                          {isLoadingMore && (
+                            <tr><td colSpan="6" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                          )}
                         </tbody>
                       </table>
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
-                      <PaginationUser
-                        currentPage={createdTicketsPage}
-                        lastPage={createdTicketsData ? createdTicketsData.last_page : 1}
-                        onPageChange={setCreatedTicketsPage}
-                      />
                     </motion.div>
                   </motion.div>
                 )}
