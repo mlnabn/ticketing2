@@ -1977,7 +1977,7 @@ body.dark-mode .blue-card {
 .red-card .card-icon {
   background-color: #fca5a5;
   color: #991b1b;
-  
+
 }
 
 .green-card .card-value,
@@ -4398,12 +4398,12 @@ body.dark-mode .password-toggle-btn:hover {
 
 /* --- Styling Konten Modal --- */
 .confirmation-modal-content-user {
-  background: rgba(30, 30, 45, 0.65); 
+  background: rgba(30, 30, 45, 0.65);
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px; 
-  padding: 24px 28px; 
+  border-radius: 16px;
+  padding: 24px 28px;
   width: 420px;
   max-width: 90%;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
@@ -4447,11 +4447,11 @@ body.dark-mode .password-toggle-btn:hover {
 } */
 
 .confirmation-modal-content-user p {
-  font-size: 1.1rem; 
+  font-size: 1.1rem;
   font-weight: 500;
-  color: #f3f4f6; 
+  color: #f3f4f6;
   margin-top: 0;
-  margin-bottom: 24px; 
+  margin-bottom: 24px;
   line-height: 1.6;
   word-wrap: normal;
   overflow-wrap: normal;
@@ -14717,19 +14717,20 @@ body:not(.dark-mode) .card-header-detail small {
   color: #333 !important;
   border-radius: 12px;
 }
+
 .leaflet-popup-tip {
   background-color: white !important;
 }
 
 .custom-popup-content h4 {
   margin: 0 0 5px 0;
-  color: #333; 
+  color: #333;
 }
 
 .custom-popup-content p {
   margin: 0 0 10px 0;
   font-size: 14px;
-  color: #555; 
+  color: #555;
 }
 
 .custom-popup-content button {
@@ -14737,7 +14738,7 @@ body:not(.dark-mode) .card-header-detail small {
   border: none;
   padding: 0;
   cursor: pointer;
-  color: #007bff; 
+  color: #007bff;
   text-decoration: none;
   font-weight: bold;
   font-size: 14px;
@@ -14748,21 +14749,31 @@ body:not(.dark-mode) .card-header-detail small {
 /* ======================================= */
 
 .dark-mode .leaflet-popup-content-wrapper {
-  background-color: #363636 !important; 
-  color: #f0f0f0 !important;             
+  background-color: #363636 !important;
+  color: #f0f0f0 !important;
 }
 
 .dark-mode .leaflet-popup-tip {
-  background-color: #363636 !important; 
+  background-color: #363636 !important;
 }
+
 .dark-mode .custom-popup-content h4 {
   color: #f0f0f0 !important;
 }
 
 .dark-mode .custom-popup-content p {
-  color: #b0b0b0 !important; 
+  color: #b0b0b0 !important;
 }
 
 .dark-mode .custom-popup-content button {
-  color: #90caf9 !important; 
+  color: #90caf9 !important;
+}
+
+.dark-mode .leaflet-control-container .leaflet-control-zoom {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+.dark-mode .leaflet-control-container .leaflet-control-zoom a {
+  color: #f0f0f0 !important;
+  background-color: #36393f !important;
 }
