@@ -132,6 +132,68 @@ function StokBarangView() {
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
     const [isLoadingMoreDetail, setIsLoadingMoreDetail] = useState(null);
+    const initialSearchFromLocation = location.state?.initialSearchTerm;
+    const isInitialMount = useRef(true);
+
+    const fetchData = useCallback(async (page = 1, filters = {}) => {
+        setLoading(true);
+        setCurrentFilters(filters);
+        if (page === 1) {
+            setMasterItems([]);
+            setPagination(null);
+        }
+        try {
+            const params = { page, ...filters };
+            const res = await api.get('/inventory/stock-summary', { params });
+            if (page > 1) {
+                setMasterItems(prev => [...prev, ...res.data.data]);
+            } else {
+                setMasterItems(res.data.data);
+            }
+
+            setPagination(res.data);
+            if (page === 1) {
+                setExpandedRows({});
+                setDetailItems({});
+                setSelectedItems(new Set());
+            }
+
+        } catch (error) {
+            showToast('Gagal memuat data ringkasan stok.', 'error');
+            console.error("Fetch Stok Summary Error:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [showToast, setSelectedItems]);
+
+    useEffect(() => {
+        if (!isPresent) return;
+        if (initialSearchFromLocation && isInitialMount.current) {
+            setSearchTerm(initialSearchFromLocation);
+            navigate(location.pathname, { replace: true, state: {} });
+            const initialFilters = {
+                id_kategori: selectedCategory,
+                id_sub_kategori: selectedSubCategory,
+                status_id: selectedStatus,
+                id_warna: selectedColor,
+                search: initialSearchFromLocation,
+            };
+            fetchData(1, initialFilters);
+        } else if (isInitialMount.current) {
+            const defaultFilters = {
+                id_kategori: selectedCategory,
+                id_sub_kategori: selectedSubCategory,
+                status_id: selectedStatus,
+                id_warna: selectedColor,
+                search: debouncedSearchTerm, 
+            };
+            fetchData(1, defaultFilters);
+        }
+        const initialLoadTimeout = setTimeout(() => {
+            isInitialMount.current = false;
+        }, 10);
+        return () => clearTimeout(initialLoadTimeout);
+    }, [initialSearchFromLocation, navigate, location.pathname, isPresent, fetchData, selectedCategory, selectedSubCategory, selectedStatus, selectedColor, debouncedSearchTerm]);
 
     const filterStatusOptions = useMemo(() => {
         const allStatus = { value: 'ALL', label: 'Semua Status' };
@@ -194,37 +256,6 @@ function StokBarangView() {
         }
     };
 
-    const fetchData = useCallback(async (page = 1, filters = {}) => {
-        setLoading(true);
-        setCurrentFilters(filters);
-        if (page === 1) {
-            setMasterItems([]);
-            setPagination(null);
-        }
-        try {
-            const params = { page, ...filters };
-            const res = await api.get('/inventory/stock-summary', { params });
-            if (page > 1) {
-                setMasterItems(prev => [...prev, ...res.data.data]);
-            } else {
-                setMasterItems(res.data.data);
-            }
-
-            setPagination(res.data);
-            if (page === 1) {
-                setExpandedRows({});
-                setDetailItems({});
-                setSelectedItems(new Set());
-            }
-
-        } catch (error) {
-            showToast('Gagal memuat data ringkasan stok.', 'error');
-            console.error("Fetch Stok Summary Error:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [showToast, setSelectedItems]);
-
     useEffect(() => {
         if (!isPresent) return;
         api.get('/inventory/categories').then(res => setCategories(res.data));
@@ -252,6 +283,9 @@ function StokBarangView() {
 
     useEffect(() => {
         if (!isPresent) return;
+        if (isInitialMount.current) {
+            return;
+        }
         const filters = {
             id_kategori: selectedCategory,
             id_sub_kategori: selectedSubCategory,
@@ -364,44 +398,46 @@ function StokBarangView() {
             return;
         }
         setExpandedRows(prev => ({ ...prev, [masterBarangId]: true }));
-        if (!detailItems[masterBarangId]) {
-            setExpandingId(masterBarangId);
-            try {
-                if (selectedStatus === "" && !tersediaStatusId) {
-                    console.error("ID Status 'Tersedia' belum siap untuk fetch detail.");
-                    showToast("Gagal memuat detail: Status default belum siap.", "error");
-                    setExpandedRows(prev => ({ ...prev, [masterBarangId]: false }));
-                    setExpandingId(null);
-                    return;
-                }
-
-                const params = {
-                    master_barang_id: masterBarangId,
-                    status_id: (selectedStatus === "ALL") ? "" : selectedStatus,
-                    id_warna: selectedColor,
-                    search: debouncedSearchTerm,
-                    page: 1
-                };
-                const res = await api.get('/inventory/stock-items', { params });
-                setDetailItems(prev => ({
-                    ...prev,
-                    [masterBarangId]: {
-                        items: res.data.data,
-                        pagination: {
-                            currentPage: res.data.current_page,
-                            totalPages: res.data.last_page,
-                            total: res.data.total
-                        }
-                    }
-                }));
-            } catch (error) {
-                console.error("Fetch Detail Error:", error);
-                showToast('Gagal memuat detail item.', 'error');
-                setExpandedRows(prev => ({ ...prev, [masterBarangId]: false }));
-            } finally {
-                setExpandingId(null);
-            }
+        if (detailItems[masterBarangId]?.items?.length > 0) {
+            return; 
         }
+        setExpandingId(masterBarangId);
+        try {
+            if (selectedStatus === "" && !tersediaStatusId) {
+                console.error("ID Status 'Tersedia' belum siap untuk fetch detail.");
+                showToast("Gagal memuat detail: Status default belum siap.", "error");
+                setExpandedRows(prev => ({ ...prev, [masterBarangId]: false }));
+                setExpandingId(null);
+                return;
+            }
+
+            const params = {
+                master_barang_id: masterBarangId,
+                status_id: (selectedStatus === "ALL") ? "" : selectedStatus,
+                id_warna: selectedColor,
+                search: debouncedSearchTerm,
+                page: 1
+            };
+            const res = await api.get('/inventory/stock-items', { params });
+            setDetailItems(prev => ({
+                ...prev,
+                [masterBarangId]: {
+                    items: res.data.data,
+                    pagination: {
+                        currentPage: res.data.current_page,
+                        totalPages: res.data.last_page,
+                        total: res.data.total
+                    }
+                }
+            }));
+        } catch (error) {
+            console.error("Fetch Detail Error:", error);
+            showToast('Gagal memuat detail item.', 'error');
+            setExpandedRows(prev => ({ ...prev, [masterBarangId]: false }));
+        } finally {
+            setExpandingId(null);
+        }
+        
     };
 
     const handleOpenEditModal = (itemToEdit) => {
@@ -784,7 +820,7 @@ function StokBarangView() {
                                                             >
                                                                 {expandingId === masterItem.id_m_barang ? (
                                                                     <div className="detail-loading">Memuat detail unit...</div>
-                                                                ) : detailItems[masterItem.id_m_barang]?.items?.length > 0 ? (
+                                                                ) : detailItems[masterItem.id_m_barang] && detailItems[masterItem.id_m_barang].items?.length > 0 ? (
                                                                     <div className="detail-list-wrapper">
                                                                         <div className="detail-list-header">
                                                                             <div className="detail-cell header-select">

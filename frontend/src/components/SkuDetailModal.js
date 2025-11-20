@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import api from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 function SkuDetailModal({ show, item, onClose }) {
     const [stockBreakdown, setStockBreakdown] = useState([]);
@@ -7,6 +8,7 @@ function SkuDetailModal({ show, item, onClose }) {
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const [currentItem, setCurrentItem] = useState(item);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (show) {
@@ -49,6 +51,17 @@ function SkuDetailModal({ show, item, onClose }) {
     const handleCloseClick = () => {
         if (onClose) {
             onClose();
+        }
+    };
+
+    const handleCheckStockClick = () => {
+        onClose();
+        if (item) {
+            navigate('/admin/stock', {
+                state: {
+                    initialSearchTerm: item.nama_barang 
+                },
+            });
         }
     };
 
@@ -119,7 +132,8 @@ function SkuDetailModal({ show, item, onClose }) {
                 </div>
 
                 <div className="modal-footer-user">
-                    <button onClick={handleCloseClick} className="btn-cancel">Tutup</button>
+                    <button onClick={handleCloseClick} className="btn-cancel" style={{ marginRight: '10px' }}>Tutup</button>
+                    <button onClick={handleCheckStockClick} className="btn-confirm">Detail Unit</button>
                 </div>
             </div>
         </div>
