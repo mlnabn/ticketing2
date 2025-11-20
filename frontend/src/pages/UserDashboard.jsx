@@ -69,7 +69,7 @@ export default function UserDashboard() {
   const { user, logout, setUser } = useAuth();
   const [userViewTab, setUserViewTab] = useState('request');
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const historyListRef = useRef(null); 
+  const historyListRef = useRef(null);
   const [createdTicketsData, setCreatedTicketsData] = useState({ data: [], current_page: 1, last_page: 1 });
   const [users, setUsers] = useState([]);
   const [notifications, setNotifications] = useState([]);
@@ -108,14 +108,14 @@ export default function UserDashboard() {
 
   const fetchCreatedTickets = useCallback(async (page = 1, isLoadMore = false) => {
     const targetPage = isLoadMore ? page : 1;
-      
+
     try {
       const response = await api.get('/tickets/created-by-me', { params: { page: targetPage } });
-        
+
       if (isLoadMore) {
         setCreatedTicketsData(prev => {
           const newTickets = response.data.data.filter(
-              newItem => !prev.data.some(existingItem => existingItem.id === newItem.id)
+            newItem => !prev.data.some(existingItem => existingItem.id === newItem.id)
           );
           return {
             ...response.data,
@@ -123,14 +123,14 @@ export default function UserDashboard() {
           };
         });
       } else {
-          setCreatedTicketsData(response.data);
-        }
-      } catch (error) {
-        console.error("Gagal mengambil tiket yang dibuat:", error);
-        if (error.response?.status === 401) handleLogout();
-      } finally {
-        isLoadMore && setIsLoadingMore(false);
+        setCreatedTicketsData(response.data);
       }
+    } catch (error) {
+      console.error("Gagal mengambil tiket yang dibuat:", error);
+      if (error.response?.status === 401) handleLogout();
+    } finally {
+      isLoadMore && setIsLoadingMore(false);
+    }
   }, [handleLogout]);
 
   const fetchAllUsers = useCallback(async () => {
@@ -228,7 +228,7 @@ export default function UserDashboard() {
     const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
 
     if (nearBottom && !isLoadingMore && createdTicketsData.current_page < createdTicketsData.last_page) {
-        loadMoreItems();
+      loadMoreItems();
     }
   };
 
@@ -239,7 +239,7 @@ export default function UserDashboard() {
     fetchAllUsers();
     fetchNotifications();
   }, [fetchAllUsers, fetchNotifications]);
-  
+
   useEffect(() => {
     if (userViewTab === 'history') {
       fetchCreatedTickets(1);
@@ -252,18 +252,29 @@ export default function UserDashboard() {
   return (
     <motion.div
       className="dashboard-container no-sidebar"
-      style={{ backgroundImage: `url(${bgImage})` }}
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        height: '100vh',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column'
+      }}
       variants={pageVariants}
       initial="hidden"
       animate="visible"
       exit="exit"
     >
-      <main className="main-content">
+      <main className="main-content" style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <motion.header
           className="main-header-user"
           variants={headerVariants}
           initial="hidden"
           animate="visible"
+          style={{
+            flexShrink: 0,
+            zIndex: 100,
+            position: 'relative'
+          }}
         >
           <div className="header-left-group">
             <img src={yourLogok} alt="Logo" className="header-logo" />
@@ -297,7 +308,7 @@ export default function UserDashboard() {
           </div>
         </motion.header>
 
-        <div className="content-area">
+        <div className="content-area" style={{ flexGrow: 1, overflowY: 'auto', paddingBottom: '20px' }}>
           <div className="user-view-container">
             <div className="user-view-content">
 
@@ -330,24 +341,27 @@ export default function UserDashboard() {
                     exit="exit"
                   >
                     <motion.h2 variants={itemVariants}>Your Tickets</motion.h2>
-                    <motion.div 
+                    <table className="job-table-user user-history-table">
+                      <thead>
+                        <tr>
+                          <th>Deskripsi</th>
+                          <th>Workshop</th>
+                          <th>Tanggal Dibuat</th>
+                          <th>Waktu Pengerjaan</th>
+                          <th>Status</th>
+                          <th>Aksi</th>
+                        </tr>
+                      </thead>
+                    </table>
+                    <motion.div
                       className="job-list table-body-scroll"
                       ref={historyListRef}
                       onScroll={handleScroll}
-                      style={{ marginTop: '20px', maxHeight: '70vh', overflowY: 'auto' }} 
+                      style={{ marginTop: '20px', maxHeight: '60vh', overflowY: 'auto' }}
                       variants={itemVariants}
                     >
                       <table className="job-table-user user-history-table">
-                        <thead>
-                          <tr>
-                            <th>Deskripsi</th>
-                            <th>Workshop</th>
-                            <th>Tanggal Dibuat</th>
-                            <th>Waktu Pengerjaan</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                          </tr>
-                        </thead>
+
                         <tbody>
                           {!createdTicketsData ? (
                             <tr>
@@ -382,12 +396,47 @@ export default function UserDashboard() {
                                 </td>
                                 <td data-label="Aksi">
                                   {ticket.status === 'Selesai' && ticket.proof_description ? (
-                                    <motion.button variants={buttonHoverTap} whileHover="hover" whileTap="tap" onClick={(e) => { e.stopPropagation(); setTicketToShowProof(ticket); setShowViewProofModal(true); }} className="btn-action btn-start">Lihat Bukti</motion.button>
+                                    <motion.button
+                                      variants={buttonHoverTap}
+                                      whileHover="hover"
+                                      whileTap="tap"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setTicketToShowProof(ticket);
+                                        setShowViewProofModal(true);
+                                      }}
+                                      className="btn-action btn-start">
+                                      Lihat Bukti
+                                    </motion.button>
+
                                   ) : ticket.status === 'Ditolak' ? (
-                                    <motion.button variants={buttonHoverTap} whileHover="hover" whileTap="tap" onClick={(e) => { e.stopPropagation(); setTicketToShowReason(ticket); setShowRejectionInfoModal(true); }} className="btn-action btn-start">Alasan</motion.button>
+                                    <motion.button
+                                      variants={buttonHoverTap}
+                                      whileHover="hover"
+                                      whileTap="tap"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setTicketToShowReason(ticket);
+                                        setShowRejectionInfoModal(true);
+                                      }}
+                                      className="btn-action btn-start">
+                                      Alasan
+                                    </motion.button>
+
                                   ) : (
-                                    <motion.button variants={buttonHoverTap} whileHover="hover" whileTap="tap" onClick={(e) => { e.stopPropagation(); handleDeleteClick(ticket); }} className="btn-action btn-delete-small">Hapus</motion.button>
+                                    <motion.button
+                                      variants={buttonHoverTap}
+                                      whileHover="hover"
+                                      whileTap="tap"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteClick(ticket);
+                                      }}
+                                      className="btn-action btn-delete-small">
+                                      Hapus
+                                    </motion.button>
                                   )}
+
                                 </td>
                               </tr>
                             ))
@@ -402,6 +451,28 @@ export default function UserDashboard() {
                         </tbody>
                       </table>
                     </motion.div>
+
+                    {createdTicketsData && createdTicketsData.total > 0 && (
+                      <motion.div
+                        variants={itemVariants}
+                        style={{
+                          marginTop: '10px',
+                          padding: '15px 20px',
+                          background: 'linear-gradient(90deg, rgba(46, 39, 112, 0.6) 0%, rgba(30, 67, 137, 0.6) 100%)',
+                          border: '1px solid #5a6d8d',
+                          borderRadius: '8px',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          color: '#FFFFFF',
+                          width: '99%'
+                        }}
+                      >
+                        <span style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF' }}>Total Tiket Saya</span>
+                        <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#FFFFFF' }}>{createdTicketsData.total}</span>
+                      </motion.div>
+                    )}
+
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -412,7 +483,7 @@ export default function UserDashboard() {
       <AnimatePresence>
         {showViewProofModal && ticketToShowProof && (
           <ViewProofModal
-            key="viewProofModal" 
+            key="viewProofModal"
             ticket={ticketToShowProof}
             onClose={() => setShowViewProofModal(false)}
             onDelete={handleDeleteClick}

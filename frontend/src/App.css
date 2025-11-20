@@ -11424,6 +11424,10 @@ body.dark-mode .form-group-recover textarea:focus {
   cursor: pointer !important;
 }
 
+.dark-mode .custom-select-return__input-container {
+  color: #fff !important;
+}
+
 .custom-select-return__menu {
   border-radius: 8px;
   overflow: hidden;
