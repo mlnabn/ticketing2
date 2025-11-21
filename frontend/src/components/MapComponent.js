@@ -38,9 +38,10 @@ const createCustomIcon = (color, pendingCount) => {
     color === 'green' ? '#5cb85c' : 
       '#3388ff'; 
   const labelText = pendingCount > 0 ? pendingCount : '';
+  const pulseClass = color === 'yellow' ? 'marker-pulse' : '';
 
   const iconHtml = `
-    <div style="
+    <div class="${pulseClass}" style="
       background-color: ${backgroundColor}; 
       width: 25px; 
       height: 25px; 
@@ -48,7 +49,7 @@ const createCustomIcon = (color, pendingCount) => {
       border: 3px solid #fff; 
       box-shadow: 0 0 5px rgba(0,0,0,0.5);
       text-align: center;
-      line-height: 19px; /* Sesuaikan dengan tinggi untuk centering */
+      line-height: 19px; 
       color: white;
       font-weight: bold;
       font-size: 11px;
@@ -67,7 +68,7 @@ const createCustomIcon = (color, pendingCount) => {
 };
 
 
-const MapComponent = ({ data }) => {
+const MapComponent = ({ data, onStatClick }) => {
 
   const center = useMemo(() => {
     if (data && data.length > 0) {
@@ -83,6 +84,62 @@ const MapComponent = ({ data }) => {
       window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
+
+  const createPopupContent = (location) => {
+    const completedHtml = `<p 
+      class="custom-popup-stat" 
+      style="color: #5cb85c;" 
+      onclick="window.handleMapStatClick(${location.id}, 'Selesai')"
+      >&#9679; Selesai: ${location.completed_tickets ?? 0}</p>`;
+      
+    const pendingHtml = `<p 
+      class="custom-popup-stat" 
+      style="color: #f0ad4e;" 
+      onclick="window.handleMapStatClick(${location.id}, 'Belum Selesai')"
+      >&#9679; Pending: ${location.pending_tickets ?? 0}</p>`;
+      
+    const totalHtml = `<p 
+      class="custom-popup-stat" 
+      style="color: #3388ff;" 
+      onclick="window.handleMapStatClick(${location.id}, 'all')"
+      >&#9679; Total: ${location.total_tickets ?? 0}</p>`;
+
+    return `
+      <div class="custom-popup-content" style="min-width: 150px; padding: 5px;">
+        <h4>${location.label}</h4>
+        <p style="font-size: 14px; color: #555;">${location.description}</p>
+
+        <div style="font-size: 14px; border-top: 1px solid #eee; padding-top: 8px;">
+          ${completedHtml}
+          ${pendingHtml}
+          ${totalHtml}
+        </div>
+
+        ${location.url ? `
+          <button
+            onclick="window.handleMapNavClick('${location.url}')"
+            style="padding: 8px 12px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 4px; width: 100%;"
+          >
+            Lihat di Google Maps &rarr;
+          </button>
+        ` : ''}
+      </div>
+    `;
+  };
+
+  useEffect(() => {
+    window.handleMapStatClick = (workshopId, status) => {
+      if (onStatClick) {
+        onStatClick(workshopId, status);
+      }
+    };
+    window.handleMapNavClick = handleNavigationClick;
+
+    return () => {
+      delete window.handleMapStatClick;
+      delete window.handleMapNavClick;
+    };
+  }, [onStatClick]);
 
 
   return (
@@ -103,6 +160,7 @@ const MapComponent = ({ data }) => {
         {data.map((location, index) => {
           const color = getIconColor(location.pending_tickets, location.completed_tickets);
           const customIcon = createCustomIcon(color, location.pending_tickets);
+          const popupContent = createPopupContent(location);
 
           return (
             <Marker
@@ -111,27 +169,7 @@ const MapComponent = ({ data }) => {
               icon={customIcon}
             >
               <Popup>
-                <div className="custom-popup-content" style={{ minWidth: '150px' }}>
-
-                  <h4>{location.label}</h4>
-                  <p>{location.description}.</p>
-
-                  {/* --- TAMPILKAN STATUS TIKET DI POPUP --- */}
-                  <div style={{ marginTop: '10px', fontSize: '14px' }}>
-                    <p style={{ margin: '3px 0', color: '#5cb85c', fontWeight: 'bold' }}>&#9679; Selesai: {location.completed_tickets ?? 0}</p>
-                    <p style={{ margin: '3px 0', color: '#f0ad4e', fontWeight: 'bold' }}>&#9679; Pending: {location.pending_tickets ?? 0}</p>
-                    <p style={{ margin: '3px 0' }}>&#9679; **Total**: {location.total_tickets ?? 0}</p>
-                  </div>
-
-                  {location.url && (
-                    <button
-                      onClick={() => handleNavigationClick(location.url)}
-                      style={{ marginTop: '10px', padding: '8px 12px', cursor: 'pointer', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px' }}
-                    >
-                      Lihat di Google Maps &rarr;
-                    </button>
-                  )}
-                </div>
+                <div dangerouslySetInnerHTML={{ __html: popupContent }} />
               </Popup>
             </Marker>
           );

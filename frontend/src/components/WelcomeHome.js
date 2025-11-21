@@ -3,9 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { useOutletContext } from 'react-router-dom';
 import api from '../services/api';
-
 import { motion, useIsPresent } from 'framer-motion';
-
 import LineChartComponent from './LineChartComponent';
 import PieChartComponent from './PieChartComponent';
 import BarChartComponent from './BarChartComponent';
@@ -18,7 +16,7 @@ const staggerContainer = {
     opacity: 1,
     transition: {
       when: "beforeChildren",
-      staggerChildren: 0.1, // Jeda antar blok
+      staggerChildren: 0.1,
     },
   },
 };
@@ -85,6 +83,19 @@ export default function WelcomeHome() {
     handleChartFilter(filters);
   };
 
+  const handleMapStatClick = useCallback((workshopId, status) => {
+    const filters = {
+      workshop_id: workshopId,
+    };
+
+    if (status !== 'all') {
+      filters.status = status;
+    }
+    
+    const queryParams = new URLSearchParams(filters).toString();
+    navigate(`/admin/tickets?${queryParams}`);
+  }, [navigate]);
+
   return (
     <motion.div
       variants={staggerContainer}
@@ -150,7 +161,7 @@ export default function WelcomeHome() {
           </div>
           <div className="dashboard-card map-chart-card">
             <h4>Geografi Traffic</h4>
-            <MapComponent data={locationsData} />
+            <MapComponent data={locationsData} onStatClick={handleMapStatClick} />
           </div>
         </motion.div>
 

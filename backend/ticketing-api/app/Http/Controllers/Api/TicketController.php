@@ -39,6 +39,7 @@ class TicketController extends Controller
         $month = $request->query('month');
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
+        $workshopId = $request->query('workshop_id');
 
         if ($search) {
             $query->where(function (Builder $q) use ($search) {
@@ -91,6 +92,9 @@ class TicketController extends Controller
         }
         if ($ticketId) {
             $query->where('id', $ticketId);
+        }
+        if ($workshopId) {
+            $query->where('workshop_id', $workshopId);
         }
         if ($startDate && $endDate) {
             $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);

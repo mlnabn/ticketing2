@@ -14769,8 +14769,26 @@ body:not(.dark-mode) .card-header-detail small {
 }
 
 /* ======================================= */
-/* 🌙 DARK MODE MAPS */
+/* MAPS */
 /* ======================================= */
+
+.custom-popup-stat {
+  padding: 3px 0;
+  margin: 3px 0;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out, transform 0.1s ease-out;
+  border-radius: 4px;
+}
+
+.custom-popup-stat:hover {
+  background-color: rgba(0, 0, 0, 0.05); 
+  transform: translateX(3px); 
+}
+
+.dark-mode .custom-popup-stat:hover {
+  background-color: rgba(255, 255, 255, 0.05); 
+}
 
 .dark-mode .leaflet-popup-content-wrapper {
   background-color: #363636 !important;
@@ -14800,4 +14818,44 @@ body:not(.dark-mode) .card-header-detail small {
 .dark-mode .leaflet-control-container .leaflet-control-zoom a {
   color: #f0f0f0 !important;
   background-color: #36393f !important;
+}
+
+body.dark-mode .leaflet-container {
+  filter: invert(100%) hue-rotate(180deg) brightness(85%) contrast(100%);
+}
+
+.custom-div-icon div {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease;
+  cursor: pointer;
+  transform-origin: bottom;
+}
+
+.custom-div-icon:hover div {
+  transform: scale(1.2) translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .custom-div-icon, 
+.dark-mode .leaflet-marker-icon {
+  filter: invert(100%) hue-rotate(180deg);
+}
+
+.dark-mode .custom-div-icon:hover div {
+  box-shadow: 0 5px 20px rgba(255, 255, 255, 0.2);
+}
+
+@keyframes pulse-yellow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 179, 0, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 179, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 179, 0, 0);
+  }
+}
+
+.marker-pulse {
+  animation: pulse-yellow 1.5s infinite;
 }

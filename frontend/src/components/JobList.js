@@ -88,6 +88,7 @@ export default function JobList() {
       admin_id: searchParams.get('adminId'),
       date: searchParams.get('date'),
       id: searchParams.get('ticketId'),
+      workshop_id: searchParams.get('workshop_id'),
     };
 
     try {
@@ -206,6 +207,7 @@ export default function JobList() {
       admin_id: searchParams.get('adminId'),
       date: searchParams.get('date'),
       id: searchParams.get('ticketId'),
+      workshop_id: searchParams.get('workshop_id'),
     };
 
     try {
