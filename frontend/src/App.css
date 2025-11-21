@@ -3568,7 +3568,7 @@ body.dark-mode .content-area h2 {
 .content-area p {
   font-size: 1.15rem;
   color: var(--add-ticket-text-color-light);
-  margin-bottom: 0rem;
+  margin-bottom: 15px;
   transition: color 0.3s ease;
   text-align: center;
   line-height: 1.6;
@@ -4329,7 +4329,7 @@ body.dark-mode .password-toggle-btn:hover {
 
 /* Efek khusus untuk Dark Mode */
 .dark-mode .confirmation-modal-content {
-  background: #1f1f1f;
+  background: #111111;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   --input-bg: rgba(26, 32, 44, 0.7);
   --input-border: rgba(255, 255, 255, 0.2);
@@ -4398,13 +4398,13 @@ body.dark-mode .password-toggle-btn:hover {
 
 /* --- Styling Konten Modal --- */
 .confirmation-modal-content-user {
-  background: rgba(30, 30, 45, 0.65);
+  background: rgba(31, 41, 55, 0.95);
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 24px 28px;
-  width: 420px;
+  width: 500px;
   max-width: 90%;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   text-align: center;
@@ -4427,13 +4427,14 @@ body.dark-mode .password-toggle-btn:hover {
   margin-bottom: 20px;
 }
 
-/* .modal-content-user h4 {
+.modal-content-user h4 {
   font-size: 1rem;
   margin: 12px 0 6px;
   font-weight: 500;
   color: #d1d5db;
 }
 
+/*
 .confirmation-modal-content-user h3 {
   margin-top: 0;
   margin-bottom: 12px;
@@ -4451,8 +4452,6 @@ body.dark-mode .password-toggle-btn:hover {
   font-weight: 500;
   color: #f3f4f6;
   margin-top: 0;
-  margin-bottom: 24px;
-  line-height: 1.6;
   word-wrap: normal;
   overflow-wrap: normal;
   word-break: normal;
@@ -10195,6 +10194,7 @@ body.dark-mode .btn-recover-small:hover {
 .info-label {
   font-weight: 600;
   color: #555;
+  margin-bottom: 7px;
 }
 
 .dark-mode .info-label {
@@ -10349,7 +10349,7 @@ body.dark-mode .form-group-recover label {
 
 body.dark-mode .form-group-recover input,
 body.dark-mode .form-group-recover textarea {
-  background: #334155;
+  background: #3a3f44;
   border: 1px solid #475569;
   color: #f1f5f9;
 }
@@ -10357,7 +10357,7 @@ body.dark-mode .form-group-recover textarea {
 body.dark-mode .form-group-recover input:focus,
 body.dark-mode .form-group-recover textarea:focus {
   border-color: #3b82f6;
-  background: #1e293b;
+  background: #3a3f44;
 }
 
 
@@ -10897,9 +10897,9 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* --- Dark Mode --- */
 .dark-mode .filter-select-date {
-  background-color: #3a3f44 !important;
+  background-color: rgba(71, 85, 105, 0.25) !important;
   color: #e2e8f0;
-  border: 1px solid #4a5568;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
   color-scheme: dark;
 }
 
@@ -10970,6 +10970,10 @@ body.dark-mode .form-group-recover textarea:focus {
 .dark-mode .filter-select-invent__control--is-focused {
   border-color: #63b3ed !important;
   box-shadow: 0 0 0 1px #63b3ed !important;
+}
+
+.dark-mode .filter-select-invent__input-container{
+  color: #e2e8f0 !important;
 }
 
 /* --- C. STYLING MENU DROPDOWN & OPTIONS --- */
