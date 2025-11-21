@@ -8710,6 +8710,22 @@ html {
   }
 }
 
+.dark-mode .recharts-cartesian-axis-tick text {
+  fill: #ffffff !important;  
+}
+
+.recharts-cartesian-axis-tick text {
+  fill: #000000 !important;   
+}
+.recharts-tooltip-cursor {
+  fill: rgba(0, 0, 0, 0.05) !important;
+}
+
+.dark-mode .recharts-tooltip-cursor {
+  fill: rgba(255, 255, 255, 0.1) !important;
+}
+
+
 /* === Modal Overlay === */
 .modal-overlay4 {
   position: fixed;

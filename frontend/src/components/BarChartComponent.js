@@ -47,10 +47,10 @@ const BarChartComponent = ({ data, onBarClick }) => {
             angle={-45}
             textAnchor="end"
             interval={0}
-            style={{ fontSize: '13px', overflow: 'ellipsis' }}
+            tick={{ fontSize: 13 }}
             tickFormatter={(name) => formatTickName(name, 12)}
           />
-          <YAxis allowDecimals={false} />
+          <YAxis allowDecimals={false} tick={{ fontSize: 13 }} />
           <Tooltip content={<CustomTooltip />} />
 
           {/* ✅ Tiket Selesai */}

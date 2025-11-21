@@ -11,7 +11,6 @@ import PieChartComponent from './PieChartComponent';
 import BarChartComponent from './BarChartComponent';
 import MapComponent from './MapComponent';
 import CalendarComponent from './CalendarComponent';
-import { Bold } from 'lucide-react';
 
 const staggerContainer = {
   hidden: { opacity: 0 },
