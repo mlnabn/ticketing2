@@ -1814,7 +1814,7 @@ body.dark-mode .content-area {
   border-radius: 6px;
   font-size: 14px;
   border: 1px solid #d1d5db;
-  background-color: #ffffff;
+  background-color: #f5f5f5;
   color: #111827;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
@@ -1861,7 +1861,7 @@ body.dark-mode .proof-modal__group label {
 body.dark-mode .proof-modal__group textarea,
 body.dark-mode .proof-modal__group input {
   border-color: #4b5563;
-  background-color: #374151;
+  background-color: #3a3f44;
   color: #f9fafb;
 }
 
@@ -4311,7 +4311,7 @@ body.dark-mode .password-toggle-btn:hover {
 
 /* --- Styling Konten Modal --- */
 .confirmation-modal-content {
-  background: var(--modal-bg-light);
+  background: #fcfcfc;
   backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 30px;
@@ -5180,7 +5180,7 @@ body.dark-mode .rejection-reason-display p {
 }
 
 .dark-mode .custom-select-notif__control {
-  background-color: #3a3f44;
+  background-color: rgba(71, 85, 105, 0.25);
   color: #f9fafb;
   border-color: #374151 !important;
 }
@@ -5263,12 +5263,12 @@ body.dark-mode .notification-form-container label {
 
 /* 🌙 Dark mode */
 .dark-mode .btn-template {
-  background: #3a3f44;
+  background: rgba(71, 85, 105, 0.25);
   color: #f9fafb;
 }
 
 .dark-mode .btn-template:hover {
-  background: #4a5568;
+  background: rgba(71, 85, 105, 0.4);
   transform: translateY(-2px);
 }
 
@@ -5578,7 +5578,7 @@ body.dark-mode .btn-scan:hover {
 .form-group2 input,
 .form-group2 select,
 .form-group2 textarea {
-  background: #ffffff;
+  background: #f9f9f9;
   border-color: #d1d5db;
   color: #111827;
 }
@@ -8389,7 +8389,7 @@ html {
   padding: 20px;
   border-left: 5px solid transparent;
   border-radius: 10px;
-  background-color: hsl(210, 20%, 96%);
+  background-color: #f5f5f5;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -10509,7 +10509,7 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* --- WARNA UNTUK MODE GELAP (Gaya Biru Sederhana) --- */
 .dark-mode .detail-item-full {
-  background-color: rgba(71, 85, 105, 0.25);
+  background-color: #3a3f44 ;
   box-shadow: none;
   border: 1px solid rgba(148, 163, 184, 0.2);
 }
@@ -12687,7 +12687,7 @@ body.dark-mode .btn-dlt:hover {
   min-width: 250px;
   flex-grow: 1;
 
-  background-color: var(--input-bg, #FFFFFF);
+  background-color: #f5f5f5;
   color: var(--text-primary, #212529);
   border: 1px solid var(--input-border, #ced4da);
   width: 100%;
