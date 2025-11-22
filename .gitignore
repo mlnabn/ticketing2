@@ -1,0 +1,29 @@
+# =============================
+# GLOBAL / ROOT IGNORE
+# =============================
+.DS_Store
+*.log
+Thumbs.db
+/vendor
+/node_modules
+
+# =============================
+# FRONTEND (REACT)
+# =============================
+/frontend/.env
+/frontend/.env.*
+/frontend/node_modules
+/frontend/build 
+/frontend/package-lock.json 
+
+# =============================
+# BACKEND (LARAVEL)
+# =============================
+/backend/ticketing-api/.env
+/backend/ticketing-api/.env.*
+/backend/ticketing-api/vendor
+/backend/ticketing-api/node_modules 
+/backend/ticketing-api/storage/*.key
+/backend/ticketing-api/public/storage
+/backend/ticketing-api/public/hot
+/backend/ticketing-api/bootstrap/cache/*

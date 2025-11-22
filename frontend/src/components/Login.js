@@ -8,7 +8,7 @@ import '../App.css';
 import bgImage2 from '../Image/Login.svg';
 import GoogleLogo from "../Image/google.svg";
 
-const API_URL = 'http://127.0.0.1:8000/api';
+const API_URL = 'https://ticket.arumiparts.site/api';
 const imageVariants = {
   hidden: { opacity: 0, y: -20 },
   visible: {
@@ -146,7 +146,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://127.0.0.1:8000/api/auth/google/redirect';
+    window.location.href = 'https://ticket.arumiparts.site/api/auth/google/redirect';
   };
 
   return (
