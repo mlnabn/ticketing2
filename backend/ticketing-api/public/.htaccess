@@ -4,6 +4,15 @@
     </IfModule>
 
     RewriteEngine On
+    
+    # Forward API ke folder backend Laravel
+    RewriteCond %{REQUEST_URI} ^/api
+    RewriteRule ^api/(.*)$ /ticketing2/backend/ticketing-api/public/index.php/$1 [L,QSA]
+    
+    # Default React / Frontend
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ /index.html [L]
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
