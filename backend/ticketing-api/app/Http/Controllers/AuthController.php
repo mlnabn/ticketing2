@@ -50,7 +50,7 @@ class AuthController extends Controller
 
         Cache::put('registration_data_' . $validated['phone'], $registrationData, now()->addMinutes(10));
 
-        $n8nWebhookUrl = 'http://localhost:5678/webhook/whatsapp-otp';
+        $n8nWebhookUrl = env('N8N_WEBHOOK_URL', 'http://localhost:5678/webhook/whatsapp-otp');
         try {
             Http::get($n8nWebhookUrl, ['phone' => $validated['phone'], 'otp' => $otpCode]);
         } catch (\Exception $e) {
@@ -81,7 +81,7 @@ class AuthController extends Controller
         $registrationData['otp_expires_at'] = Carbon::now()->addMinutes(5);
         Cache::put($cacheKey, $registrationData, now()->addMinutes(10));
 
-        $n8nWebhookUrl = 'http://localhost:5678/webhook/whatsapp-otp';
+        $n8nWebhookUrl = env('N8N_WEBHOOK_URL', 'http://localhost:5678/webhook/whatsapp-otp');
         try {
             Http::get($n8nWebhookUrl, ['phone' => $phone, 'otp' => $registrationData['otp_code']]);
         } catch (\Exception $e) {
@@ -220,11 +220,11 @@ class AuthController extends Controller
             
             $user_param = urlencode(json_encode($user_data_for_frontend));
 
-            return redirect('http://localhost:3000?access_token=' . $access_token . '&user=' . $user_param . '&expires_in=' . $expires_in);
+            return redirect(env('FRONTEND_URL', 'http://localhost:3000') . '?access_token=' . $access_token . '&user=' . $user_param . '&expires_in=' . $expires_in);
 
         } catch (Exception $e) {
             \Log::error('Google Callback Error: ' . $e->getMessage());
-            return redirect('http://localhost:3000/login?error=google_auth_failed');
+            return redirect(env('FRONTEND_URL', 'http://localhost:3000') . '/login?error=google_auth_failed');
         }
     }
 
