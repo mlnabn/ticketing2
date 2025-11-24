@@ -5166,12 +5166,17 @@ body.dark-mode .rejection-reason-display p {
   border-radius: 8px !important;
   padding: 3.4px 0px 3.4px 10px !important;
   font-size: 14px;
-  background-color: #ffffff;
+  background-color: #f9f9f9 !important;
   color: #111827;
   border-color: #f9fafb;
   cursor: pointer !important;
 }
 
+.custom-select-notif__menu{
+  border-radius: 8px !important;
+  border: 1px solid #d1d5db !important;
+  background-color: #f9f9f9 !important;
+}
 .custom-select-notif__option--is-focused {
   background-color: #f0f0f0 !important;
   color: #333333 !important;
@@ -5184,7 +5189,7 @@ body.dark-mode .rejection-reason-display p {
 }
 
 .dark-mode .custom-select-notif__control {
-  background-color: rgba(71, 85, 105, 0.25);
+  background-color: #3a3f44 !important;
   color: #f9fafb;
   border-color: #374151 !important;
 }
