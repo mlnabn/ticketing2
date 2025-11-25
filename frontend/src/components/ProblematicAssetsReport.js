@@ -43,6 +43,35 @@ export default function ProblematicAssetsReport() {
         months
     } = useFinancialReport(isPresent);
 
+    const handleDateChange = (e) => {
+        const { name, value } = e.target;
+        handleFilterChange(e);
+
+        if (name === 'start_date' && value !== '') {
+            const currentEndDate = filters.end_date;
+            const newStartDateObj = new Date(value);
+            const currentEndDateObj = currentEndDate ? new Date(currentEndDate) : null;
+            if (currentEndDate === '' || !currentEndDateObj || currentEndDateObj < newStartDateObj) {
+                const end_date_event = {
+                    target: {
+                        name: 'end_date',
+                        value: value 
+                    }
+                };
+                handleFilterChange(end_date_event);
+            }
+        }
+        if (name === 'end_date' && filters.start_date && new Date(value) < new Date(filters.start_date)) {
+             const start_date_event = {
+                target: {
+                    name: 'end_date',
+                    value: filters.start_date
+                }
+            };
+            handleFilterChange(start_date_event);
+        }
+    };
+
     const [exportingPdf, setExportingPdf] = useState(false);
     const [exportingExcel, setExportingExcel] = useState(false);
 
@@ -212,9 +241,9 @@ export default function ProblematicAssetsReport() {
                                     variants={staggerItem}
                                     className='date-range-container'
                                 >
-                                    <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
+                                    <input type="date" name="start_date" value={filters.start_date} onChange={handleDateChange} className="filter-select-date" style={{ flex: 1 }} />
                                     <span style={{ alignSelf: 'center' }}>-</span>
-                                    <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
+                                    <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} min={filters.start_date || undefined}/>
                                 </motion.div>
                             )}
                         </motion.div>

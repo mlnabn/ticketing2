@@ -133,6 +133,26 @@
   --text-secondary: #718096;
   --border-color: #e2e8f0;
   --shadow-color: rgba(0, 0, 0, 0.08);
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+  }
+
+  input:disabled {
+    cursor: not-allowed;
+  }
 }
 
 /* Dark Mode Variables */
@@ -279,6 +299,7 @@ body.dark-mode .dashboard-container {
   font-weight: 800;
   background: linear-gradient(to right, #007bff, #00c6ff);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 3.5rem;
 }
@@ -445,6 +466,7 @@ body.dark-mode .dashboard-container {
   width: 15px;
   height: 15px;
   accent-color: #2563EB;
+  cursor: pointer;
 }
 
 .forgot-password,
@@ -1814,7 +1836,7 @@ body.dark-mode .content-area {
   border-radius: 6px;
   font-size: 14px;
   border: 1px solid #d1d5db;
-  background-color: #ffffff;
+  background-color: #f5f5f5;
   color: #111827;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
@@ -1861,7 +1883,7 @@ body.dark-mode .proof-modal__group label {
 body.dark-mode .proof-modal__group textarea,
 body.dark-mode .proof-modal__group input {
   border-color: #4b5563;
-  background-color: #374151;
+  background-color: #3a3f44;
   color: #f9fafb;
 }
 
@@ -2466,10 +2488,10 @@ body.dark-mode .job-form .input-like-select:focus {
   Gaya dasar untuk semua tombol di aplikasi.
 */
 button {
-  padding: 0.6rem 1rem;
+  padding: 0.6rem 1rem !important;
   border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
   cursor: pointer;
   border: none;
   color: white;
@@ -3542,6 +3564,7 @@ body.dark-mode .page-item.disabled .page-link:hover {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
   background: black;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-size: 200% auto;
   animation: gradientShift 5s ease infinite alternate;
@@ -3562,6 +3585,7 @@ body.dark-mode .content-area h2 {
   text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.08);
   background: white;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -3773,6 +3797,7 @@ body.dark-mode .history-tab {
   font-weight: 700;
   background: linear-gradient(90deg, #5A3FFF, #007BFF) !important;
   -webkit-background-clip: text !important;
+  background-clip: text;
   -webkit-text-fill-color: transparent !important;
 }
 
@@ -4311,7 +4336,7 @@ body.dark-mode .password-toggle-btn:hover {
 
 /* --- Styling Konten Modal --- */
 .confirmation-modal-content {
-  background: var(--modal-bg-light);
+  background: #fcfcfc;
   backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 30px;
@@ -5162,10 +5187,16 @@ body.dark-mode .rejection-reason-display p {
   border-radius: 8px !important;
   padding: 3.4px 0px 3.4px 10px !important;
   font-size: 14px;
-  background-color: #ffffff;
+  background-color: #f9f9f9 !important;
   color: #111827;
   border-color: #f9fafb;
   cursor: pointer !important;
+}
+
+.custom-select-notif__menu {
+  border-radius: 8px !important;
+  border: 1px solid #d1d5db !important;
+  background-color: #f9f9f9 !important;
 }
 
 .custom-select-notif__option--is-focused {
@@ -5180,7 +5211,7 @@ body.dark-mode .rejection-reason-display p {
 }
 
 .dark-mode .custom-select-notif__control {
-  background-color: #3a3f44;
+  background-color: #3a3f44 !important;
   color: #f9fafb;
   border-color: #374151 !important;
 }
@@ -5263,12 +5294,12 @@ body.dark-mode .notification-form-container label {
 
 /* 🌙 Dark mode */
 .dark-mode .btn-template {
-  background: #3a3f44;
+  background: rgba(71, 85, 105, 0.25);
   color: #f9fafb;
 }
 
 .dark-mode .btn-template:hover {
-  background: #4a5568;
+  background: rgba(71, 85, 105, 0.4);
   transform: translateY(-2px);
 }
 
@@ -5578,7 +5609,7 @@ body.dark-mode .btn-scan:hover {
 .form-group2 input,
 .form-group2 select,
 .form-group2 textarea {
-  background: #ffffff;
+  background: #f9f9f9;
   border-color: #d1d5db;
   color: #111827;
 }
@@ -5605,6 +5636,7 @@ body.dark-mode .btn-scan:hover {
   text-align: center;
   background: black;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
   position: relative;
@@ -5641,6 +5673,7 @@ body.dark-mode .btn-scan:hover {
 .dark-mode .user-management-container h1 {
   background: white;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.2);
 }
@@ -5990,7 +6023,6 @@ body.dark-mode .history-item-content small {
   border-radius: 8px !important;
   box-shadow: none !important;
   min-height: 40px;
-  padding: 3.4px 0px 3.4px 10px !important;
   background-color: #f5f5f5 !important;
   cursor: pointer !important;
 }
@@ -7477,6 +7509,7 @@ html {
   margin-bottom: 2.5rem;
   background: linear-gradient(90deg, #6366f1, #3b82f6);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -7571,6 +7604,7 @@ html {
   text-align: center;
   background: linear-gradient(90deg, #6366f1, #3b82f6);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -7720,6 +7754,7 @@ html {
   line-height: 1.2;
   background: linear-gradient(90deg, #6366f1, #3b82f6);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-size: 200% auto;
   animation: gradientMove 5s linear infinite alternate;
@@ -7747,6 +7782,7 @@ html {
   margin-bottom: 0.4rem;
   background: linear-gradient(to right, #2563eb, #38bdf8);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-size: 200% auto;
   animation: gradientMove 5s linear infinite alternate;
@@ -8389,7 +8425,7 @@ html {
   padding: 20px;
   border-left: 5px solid transparent;
   border-radius: 10px;
-  background-color: hsl(210, 20%, 96%);
+  background-color: #f5f5f5;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -8711,12 +8747,13 @@ html {
 }
 
 .dark-mode .recharts-cartesian-axis-tick text {
-  fill: #ffffff !important;  
+  fill: #ffffff !important;
 }
 
 .recharts-cartesian-axis-tick text {
-  fill: #000000 !important;   
+  fill: #000000 !important;
 }
+
 .recharts-tooltip-cursor {
   fill: rgba(0, 0, 0, 0.05) !important;
 }
@@ -9071,7 +9108,7 @@ html {
   font-size: 2.8rem;
   font-weight: 700;
   -webkit-background-clip: text;
-
+  background-clip: text;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
   position: relative;
   padding-left: 0;
@@ -9154,6 +9191,7 @@ html {
   font-size: 2.8rem;
   font-weight: 700;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -10509,7 +10547,7 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* --- WARNA UNTUK MODE GELAP (Gaya Biru Sederhana) --- */
 .dark-mode .detail-item-full {
-  background-color: rgba(71, 85, 105, 0.25);
+  background-color: #3a3f44;
   box-shadow: none;
   border: 1px solid rgba(148, 163, 184, 0.2);
 }
@@ -10590,6 +10628,7 @@ body.dark-mode .form-group-recover textarea:focus {
 
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -10769,10 +10808,16 @@ body.dark-mode .form-group-recover textarea:focus {
   border: 1px solid #ccc !important;
   border-radius: 8px !important;
   box-shadow: none !important;
-  min-height: 40px;
-  padding: 3.4px 0px 3.4px 10px !important;
+  min-height: 40px !important;
+  padding: 0px !important;
+  line-height: normal !important;
+  box-sizing: border-box !important;
   background-color: var(--input-bg, #FFFFFF) !important;
   cursor: pointer !important;
+}
+
+.report-filter-select__control .report-filter-select__value-container {
+  padding: 0px 8px !important;
 }
 
 /* 2. Menu Dropdown (daftar pilihan yang muncul) */
@@ -10988,7 +11033,7 @@ body.dark-mode .form-group-recover textarea:focus {
   box-shadow: 0 0 0 1px #63b3ed !important;
 }
 
-.dark-mode .filter-select-invent__input-container{
+.dark-mode .filter-select-invent__input-container {
   color: #e2e8f0 !important;
 }
 
@@ -11636,25 +11681,7 @@ label {
   font-weight: 500;
 }
 
-input,
-select,
-textarea {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border-radius: 8px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
 
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-}
-
-input:disabled {
-  cursor: not-allowed;
-}
 
 /* --- Layout Tombol --- */
 .confirmation-modal-actions,
@@ -12600,7 +12627,7 @@ body.dark-mode .btn-dlt:hover {
   background-color: var(--background-color-light);
   color: var(--text-color-primary);
   cursor: pointer;
-  width: 100px;
+  width: 100px !important;
 }
 
 .dark-mode .year-filter {
@@ -12687,7 +12714,7 @@ body.dark-mode .btn-dlt:hover {
   min-width: 250px;
   flex-grow: 1;
 
-  background-color: var(--input-bg, #FFFFFF);
+  background-color: #f5f5f5;
   color: var(--text-primary, #212529);
   border: 1px solid var(--input-border, #ced4da);
   width: 100%;
@@ -12701,7 +12728,7 @@ body.dark-mode .btn-dlt:hover {
   background-color: var(--input-bg, #FFFFFF);
   color: var(--text-primary, #212529);
   border: 1px solid var(--input-border, #ced4da);
-  width: 50%;
+  width: 50% !important;
   max-height: 45px;
 }
 
@@ -14587,10 +14614,6 @@ body.dark-mode .detail-list-footer-centered {
     display: flex;
   }
 
-  .filters-container.mobile-visible {
-    /* display: flex; */
-  }
-
   .date-range-container {
     display: flex;
     gap: 0.75rem;
@@ -14782,12 +14805,12 @@ body:not(.dark-mode) .card-header-detail small {
 }
 
 .custom-popup-stat:hover {
-  background-color: rgba(0, 0, 0, 0.05); 
-  transform: translateX(3px); 
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: translateX(3px);
 }
 
 .dark-mode .custom-popup-stat:hover {
-  background-color: rgba(255, 255, 255, 0.05); 
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .dark-mode .leaflet-popup-content-wrapper {
@@ -14835,7 +14858,7 @@ body.dark-mode .leaflet-container {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
 }
 
-.dark-mode .custom-div-icon, 
+.dark-mode .custom-div-icon,
 .dark-mode .leaflet-marker-icon {
   filter: invert(100%) hue-rotate(180deg);
 }
@@ -14848,9 +14871,11 @@ body.dark-mode .leaflet-container {
   0% {
     box-shadow: 0 0 0 0 rgba(255, 179, 0, 0.4);
   }
+
   70% {
     box-shadow: 0 0 0 10px rgba(255, 179, 0, 0);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(255, 179, 0, 0);
   }
