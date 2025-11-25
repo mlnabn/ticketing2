@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import Select from 'react-select'; // 💡 NEW: Import Select
+import Select from 'react-select'; 
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import { saveAs } from 'file-saver';
@@ -50,13 +50,11 @@ const months = [
     { value: 10, name: 'Oktober' }, { value: 11, name: 'November' }, { value: 12, name: 'Desember' }
 ];
 
-// 💡 NEW: Opsi untuk Select Filter Type
 const filterTypeOptions = [
     { value: 'month', label: 'Filter Riwayat per Bulan' },
     { value: 'date_range', label: 'Filter Riwayat per Tanggal' },
 ];
 
-// 💡 NEW: Mengubah array months ke format react-select
 const monthOptions = [
     { value: '', label: 'Semua Bulan' },
     ...months.map(m => ({ value: m.value.toString(), label: m.name })),
@@ -93,8 +91,6 @@ function ItemHistoryLookupPage() {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
-
-    // 💡 NEW: Opsi tahun yang diubah ke format react-select
     const yearSelectOptions = [{ value: '', label: 'Semua Tahun' }, ...years.map(y => ({ value: y.toString(), label: y.toString() }))];
 
 
@@ -285,17 +281,40 @@ function ItemHistoryLookupPage() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleSearchAndShowHistory, isScannerOpen]);
 
-    // 💡 KEEP: Handler untuk input native (tanggal)
     const handleFilterChange = (e) => {
-        setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    };
+        const { name, value } = e.target;
 
-    // 💡 NEW: Handler untuk Select Bulan/Tahun
+        setFilters(prevFilters => {
+            let newFilters = { ...prevFilters, [name]: value };
+
+            if (name === 'start_date') {
+                const currentEndDate = prevFilters.end_date;
+
+                if (value === '') {
+                    newFilters.end_date = '';
+                } else {
+                    const newStartDateObj = new Date(value);
+                    const currentEndDateObj = currentEndDate ? new Date(currentEndDate) : null;
+                    if (currentEndDate === '' || !currentEndDateObj || currentEndDateObj < newStartDateObj) {
+                        newFilters.end_date = value;
+                    }
+                }
+            }
+            if (newFilters.start_date && newFilters.end_date) {
+                const startDate = new Date(newFilters.start_date);
+                const endDate = new Date(newFilters.end_date);
+                if (endDate < startDate) {
+                    newFilters.end_date = newFilters.start_date;
+                }
+            }
+
+            return newFilters;
+        });
+    };
     const handleSelectFilterChange = (selectedOption, name) => {
         setFilters(prev => ({ ...prev, [name]: selectedOption ? selectedOption.value : '' }));
     };
 
-    // 💡 NEW: Handler untuk Select Filter Type (menggantikan handleFilterTypeChange lama)
     const handleSelectFilterTypeChange = (selectedOption) => {
         const newType = selectedOption.value;
         setFilterType(newType);
@@ -430,7 +449,7 @@ function ItemHistoryLookupPage() {
                         className="filter-search-input-invReport"
                     />
                     <button className="btn-scan history" onClick={() => setIsScannerOpen(true)}>
-                        <span className="fa-stack" style={{fontSize: '0.8rem'}}>
+                        <span className="fa-stack" style={{ fontSize: '0.8rem' }}>
                             <i className="fas fa-qrcode fa-stack-2x"></i>
                             <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
                         </span>
@@ -528,7 +547,7 @@ function ItemHistoryLookupPage() {
                                     >
                                         <input type="date" name="start_date" value={filters.start_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
                                         <span style={{ alignSelf: 'center' }}>-</span>
-                                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} />
+                                        <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} min={filters.start_date || undefined}/>
                                     </motion.div>
                                 )}
                             </motion.div>

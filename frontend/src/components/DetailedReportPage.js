@@ -153,7 +153,35 @@ export default function DetailedReportPage({ type, title }) {
     }, [fetchData, isPresent]);
 
     const handleFilterChange = (e) => {
-        setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value } = e.target;
+
+        setFilters(prevFilters => {
+            let newFilters = { ...prevFilters, [name]: value };
+
+            // --- Logika Khusus untuk 'start_date' ---
+            if (name === 'start_date') {
+                const currentEndDate = prevFilters.end_date;
+
+                if (value === '') {
+                    newFilters.end_date = '';
+                } else {
+                    const newStartDateObj = new Date(value);
+                    const currentEndDateObj = currentEndDate ? new Date(currentEndDate) : null;
+                    if (currentEndDate === '' || !currentEndDateObj || currentEndDateObj < newStartDateObj) {
+                        newFilters.end_date = value;
+                    }
+                }
+            }
+            if (newFilters.start_date && newFilters.end_date) {
+                const startDate = new Date(newFilters.start_date);
+                const endDate = new Date(newFilters.end_date);
+                if (endDate < startDate) {
+                    newFilters.end_date = newFilters.start_date;
+                }
+            }
+
+            return newFilters;
+        });
     };
 
     const handleSelectFilterChange = (selectedOption, name) => {
@@ -502,6 +530,7 @@ export default function DetailedReportPage({ type, title }) {
                                         value={filters.end_date}
                                         onChange={handleFilterChange}
                                         className="filter-select-date"
+                                        min={filters.start_date || undefined}
                                     />
                                 </motion.div>
                             )}
