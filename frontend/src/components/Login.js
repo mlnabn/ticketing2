@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import axios from 'axios';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Particles from "react-tsparticles";
@@ -7,8 +6,8 @@ import { loadSlim } from "tsparticles-slim";
 import '../App.css';
 import bgImage2 from '../Image/Login.svg';
 import GoogleLogo from "../Image/google.svg";
+import api, { API_BASE_URL } from '../services/api';
 
-const API_URL = 'https://ticket.arumiparts.site/api';
 const imageVariants = {
   hidden: { opacity: 0, y: -20 },
   visible: {
@@ -125,7 +124,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
     setError('');
 
     try {
-      const response = await axios.post(`${API_URL}/login`, { email, password });
+      const response = await api.post('/login', { email, password });
       const { access_token, user } = response.data;
 
       if (access_token && user) {
@@ -146,7 +145,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding }) {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = 'https://ticket.arumiparts.site/api/auth/google/redirect';
+    window.location.href = `${API_BASE_URL}/auth/google/redirect`;
   };
 
   return (
