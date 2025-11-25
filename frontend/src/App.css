@@ -133,6 +133,26 @@
   --text-secondary: #718096;
   --border-color: #e2e8f0;
   --shadow-color: rgba(0, 0, 0, 0.08);
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+  }
+
+  input:disabled {
+    cursor: not-allowed;
+  }
 }
 
 /* Dark Mode Variables */
@@ -2467,10 +2487,10 @@ body.dark-mode .job-form .input-like-select:focus {
   Gaya dasar untuk semua tombol di aplikasi.
 */
 button {
-  padding: 0.6rem 1rem;
+  padding: 0.6rem 1rem !important;
   border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
   cursor: pointer;
   border: none;
   color: white;
@@ -5172,11 +5192,12 @@ body.dark-mode .rejection-reason-display p {
   cursor: pointer !important;
 }
 
-.custom-select-notif__menu{
+.custom-select-notif__menu {
   border-radius: 8px !important;
   border: 1px solid #d1d5db !important;
   background-color: #f9f9f9 !important;
 }
+
 .custom-select-notif__option--is-focused {
   background-color: #f0f0f0 !important;
   color: #333333 !important;
@@ -8731,6 +8752,7 @@ html {
 .recharts-cartesian-axis-tick text {
   fill: #000000 !important;
 }
+
 .recharts-tooltip-cursor {
   fill: rgba(0, 0, 0, 0.05) !important;
 }
@@ -10793,7 +10815,7 @@ body.dark-mode .form-group-recover textarea:focus {
   cursor: pointer !important;
 }
 
-.report-filter-select__control .report-filter-select__value-container{
+.report-filter-select__control .report-filter-select__value-container {
   padding: 0px 8px !important;
 }
 
@@ -11658,25 +11680,7 @@ label {
   font-weight: 500;
 }
 
-input,
-select,
-textarea {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border-radius: 8px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
 
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-}
-
-input:disabled {
-  cursor: not-allowed;
-}
 
 /* --- Layout Tombol --- */
 .confirmation-modal-actions,
@@ -12622,7 +12626,7 @@ body.dark-mode .btn-dlt:hover {
   background-color: var(--background-color-light);
   color: var(--text-color-primary);
   cursor: pointer;
-  width: 100px;
+  width: 100px !important;
 }
 
 .dark-mode .year-filter {
