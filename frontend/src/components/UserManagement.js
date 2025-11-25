@@ -226,6 +226,7 @@ export default function UserManagement() {
                                             type="checkbox"
                                             onChange={handleSelectAll}
                                             checked={isAllSelectedOnPage}
+                                            style={{cursor: 'pointer'}}
                                         />
                                     </th>
                                     <th>Nama</th>
@@ -258,6 +259,7 @@ export default function UserManagement() {
                                                         checked={selectedIds.includes(user.id)}
                                                         onChange={() => handleSelect(user.id)}
                                                         onClick={(e) => e.stopPropagation()}
+                                                        style={{cursor: 'pointer'}}
                                                     />
                                                 </td>
                                                 <td>{user.name}</td>

@@ -360,6 +360,7 @@ function ItemListView({
                                                                                     title="Pilih Semua di grup ini"
                                                                                     checked={detailItems[item.kode_barang].every(child => selectedIds.includes(child.id_m_barang))}
                                                                                     onChange={(e) => onSelectAll(e, item.kode_barang)}
+                                                                                    style={{cursor : 'pointer'}}
                                                                                 />
                                                                             </div>
                                                                             <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Tipe Barang</div>
@@ -384,6 +385,7 @@ function ItemListView({
                                                                                             checked={selectedIds.includes(detail.id_m_barang)}
                                                                                             onChange={() => onSelectId(detail.id_m_barang)}
                                                                                             onClick={(e) => e.stopPropagation()}
+                                                                                            style={{cursor: 'pointer'}}
                                                                                         />
                                                                                     </div>
                                                                                     <div className="detail-cell cell-kode">{detail.nama_barang}</div>
@@ -515,6 +517,7 @@ function ItemListView({
                                                                 checked={selectedIds.includes(detail.id_m_barang)}
                                                                 onChange={() => onSelectId(detail.id_m_barang)}
                                                                 onClick={(e) => e.stopPropagation()}
+                                                                style={{cursor: 'pointer'}}
                                                             />
                                                         </div>
                                                         <div

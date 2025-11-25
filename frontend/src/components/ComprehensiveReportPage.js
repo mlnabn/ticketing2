@@ -140,12 +140,45 @@ export default function ComprehensiveReportPage() {
   const handleDateFilterChange = (e) => {
     const { name, value } = e.target;
     const newParams = new URLSearchParams(searchParams);
+    const currentEndDate = searchParams.get('end_date');
 
-    if (value === 'all' || value === '') {
-      newParams.delete(name);
-    } else {
-      newParams.set(name, value);
+    if (name === 'start_date') {
+      if (value === 'all' || value === '') {
+        newParams.delete('start_date');
+        newParams.delete('end_date');
+      } else {
+        newParams.set('start_date', value);
+        const newStartDateObj = new Date(value);
+        const currentEndDateObj = currentEndDate ? new Date(currentEndDate) : null;
+        if (!currentEndDate || !currentEndDateObj || currentEndDateObj < newStartDateObj) {
+          newParams.set('end_date', value);
+        }
+      }
     }
+    else if (name === 'end_date') {
+      if (value === 'all' || value === '') {
+        newParams.delete('end_date');
+      } else {
+        newParams.set('end_date', value);
+        const currentStartDate = searchParams.get('start_date');
+        if (currentStartDate) {
+          const newEndDateObj = new Date(value);
+          const currentStartDateObj = new Date(currentStartDate);
+
+          if (newEndDateObj < currentStartDateObj) {
+            newParams.set('end_date', currentStartDate);
+          }
+        }
+      }
+    }
+    else {
+      if (value === 'all' || value === '') {
+        newParams.delete(name);
+      } else {
+        newParams.set(name, value);
+      }
+    }
+
     setSearchParams(newParams);
   };
 
@@ -371,13 +404,13 @@ export default function ComprehensiveReportPage() {
           </motion.div>
 
           <AnimatePresence>
-            {isMobile && ( 
+            {isMobile && (
               <motion.div
-                key="toggle-filter-button" 
-                initial={{ opacity: 0, y: -10 }} 
-                animate={{ opacity: 1, y: 0 }}   
-                exit={{ opacity: 0, y: -10 }}     
-                transition={{ duration: 0.2 }} 
+                key="toggle-filter-button"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
               >
                 <motion.button
                   className="btn-toggle-filters"
@@ -485,6 +518,7 @@ export default function ComprehensiveReportPage() {
                         onChange={handleDateFilterChange}
                         className="filter-select-date"
                         style={{ flex: 1 }}
+                        min={dateFilters.start_date || undefined}
                       />
                     </motion.div>
                   )}

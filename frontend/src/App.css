@@ -133,6 +133,26 @@
   --text-secondary: #718096;
   --border-color: #e2e8f0;
   --shadow-color: rgba(0, 0, 0, 0.08);
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+  }
+
+  input:disabled {
+    cursor: not-allowed;
+  }
 }
 
 /* Dark Mode Variables */
@@ -446,6 +466,7 @@ body.dark-mode .dashboard-container {
   width: 15px;
   height: 15px;
   accent-color: #2563EB;
+  cursor: pointer;
 }
 
 .forgot-password,
@@ -2467,10 +2488,10 @@ body.dark-mode .job-form .input-like-select:focus {
   Gaya dasar untuk semua tombol di aplikasi.
 */
 button {
-  padding: 0.6rem 1rem;
+  padding: 0.6rem 1rem !important;
   border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
   cursor: pointer;
   border: none;
   color: white;
@@ -5172,11 +5193,12 @@ body.dark-mode .rejection-reason-display p {
   cursor: pointer !important;
 }
 
-.custom-select-notif__menu{
+.custom-select-notif__menu {
   border-radius: 8px !important;
   border: 1px solid #d1d5db !important;
   background-color: #f9f9f9 !important;
 }
+
 .custom-select-notif__option--is-focused {
   background-color: #f0f0f0 !important;
   color: #333333 !important;
@@ -6001,7 +6023,6 @@ body.dark-mode .history-item-content small {
   border-radius: 8px !important;
   box-shadow: none !important;
   min-height: 40px;
-  padding: 3.4px 0px 3.4px 10px !important;
   background-color: #f5f5f5 !important;
   cursor: pointer !important;
 }
@@ -8726,12 +8747,13 @@ html {
 }
 
 .dark-mode .recharts-cartesian-axis-tick text {
-  fill: #ffffff !important;  
+  fill: #ffffff !important;
 }
 
 .recharts-cartesian-axis-tick text {
-  fill: #000000 !important;   
+  fill: #000000 !important;
 }
+
 .recharts-tooltip-cursor {
   fill: rgba(0, 0, 0, 0.05) !important;
 }
@@ -10525,7 +10547,7 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* --- WARNA UNTUK MODE GELAP (Gaya Biru Sederhana) --- */
 .dark-mode .detail-item-full {
-  background-color: #3a3f44 ;
+  background-color: #3a3f44;
   box-shadow: none;
   border: 1px solid rgba(148, 163, 184, 0.2);
 }
@@ -10786,10 +10808,16 @@ body.dark-mode .form-group-recover textarea:focus {
   border: 1px solid #ccc !important;
   border-radius: 8px !important;
   box-shadow: none !important;
-  min-height: 40px;
-  padding: 3.4px 0px 3.4px 10px !important;
+  min-height: 40px !important;
+  padding: 0px !important;
+  line-height: normal !important;
+  box-sizing: border-box !important;
   background-color: var(--input-bg, #FFFFFF) !important;
   cursor: pointer !important;
+}
+
+.report-filter-select__control .report-filter-select__value-container {
+  padding: 0px 8px !important;
 }
 
 /* 2. Menu Dropdown (daftar pilihan yang muncul) */
@@ -11005,7 +11033,7 @@ body.dark-mode .form-group-recover textarea:focus {
   box-shadow: 0 0 0 1px #63b3ed !important;
 }
 
-.dark-mode .filter-select-invent__input-container{
+.dark-mode .filter-select-invent__input-container {
   color: #e2e8f0 !important;
 }
 
@@ -11653,25 +11681,7 @@ label {
   font-weight: 500;
 }
 
-input,
-select,
-textarea {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border-radius: 8px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
 
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-}
-
-input:disabled {
-  cursor: not-allowed;
-}
 
 /* --- Layout Tombol --- */
 .confirmation-modal-actions,
@@ -12617,7 +12627,7 @@ body.dark-mode .btn-dlt:hover {
   background-color: var(--background-color-light);
   color: var(--text-color-primary);
   cursor: pointer;
-  width: 100px;
+  width: 100px !important;
 }
 
 .dark-mode .year-filter {
@@ -12718,7 +12728,7 @@ body.dark-mode .btn-dlt:hover {
   background-color: var(--input-bg, #FFFFFF);
   color: var(--text-primary, #212529);
   border: 1px solid var(--input-border, #ced4da);
-  width: 50%;
+  width: 50% !important;
   max-height: 45px;
 }
 
@@ -14795,12 +14805,12 @@ body:not(.dark-mode) .card-header-detail small {
 }
 
 .custom-popup-stat:hover {
-  background-color: rgba(0, 0, 0, 0.05); 
-  transform: translateX(3px); 
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: translateX(3px);
 }
 
 .dark-mode .custom-popup-stat:hover {
-  background-color: rgba(255, 255, 255, 0.05); 
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .dark-mode .leaflet-popup-content-wrapper {
@@ -14848,7 +14858,7 @@ body.dark-mode .leaflet-container {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
 }
 
-.dark-mode .custom-div-icon, 
+.dark-mode .custom-div-icon,
 .dark-mode .leaflet-marker-icon {
   filter: invert(100%) hue-rotate(180deg);
 }
@@ -14861,9 +14871,11 @@ body.dark-mode .leaflet-container {
   0% {
     box-shadow: 0 0 0 0 rgba(255, 179, 0, 0.4);
   }
+
   70% {
     box-shadow: 0 0 0 10px rgba(255, 179, 0, 0);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(255, 179, 0, 0);
   }
