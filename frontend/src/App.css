@@ -11920,13 +11920,20 @@ input:disabled {
 }
 
 .custom-select-kondisi__control {
-  background-color: #FFFFFF !important;
+  background-color: #F5F5F5 !important;
   border: 1px solid #ced4da !important;
   border-radius: 8px !important;
   box-shadow: none !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  min-height: 48px !important;
+  min-height: 40px !important;
   cursor: pointer !important;
+  padding: 0px !important;
+  line-height: normal !important;
+  box-sizing: border-box !important;
+}
+
+.custom-select-kondisi__control .custom-select-kondisi__value-container {
+  padding: 0px 8px !important;
 }
 
 .custom-select-kondisi__control--is-focused {
@@ -11939,7 +11946,7 @@ input:disabled {
 }
 
 .custom-select-kondisi__menu {
-  background-color: #FFFFFF !important;
+  background-color: #F5F5F5 !important;
   border: 1px solid #E0E0E0 !important;
   border-radius: 8px !important;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
@@ -12011,13 +12018,20 @@ input:disabled {
 /* ========================================================== */
 /* --- React-Select Light Mode --- */
 .creatable-select__control {
-  background-color: #FFFFFF !important;
+  background-color: #F5F5F5 !important;
   border: 1px solid #ced4da !important;
   border-radius: 8px !important;
   box-shadow: none !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  min-height: 48px !important;
+  min-height: 40px !important;
   cursor: pointer !important;
+  padding: 3.58px !important;
+  line-height: normal !important;
+  box-sizing: border-box !important;
+}
+
+.creatable-select__control .creatable-select__value-container {
+  padding: 0px 8px !important;
 }
 
 .creatable-select__control--is-focused {
@@ -12030,7 +12044,7 @@ input:disabled {
 }
 
 .creatable-select__menu {
-  background-color: #FFFFFF !important;
+  background-color: #F5F5F5 !important;
   border: 1px solid #E0E0E0 !important;
   border-radius: 8px !important;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
