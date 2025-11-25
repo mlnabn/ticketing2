@@ -32,6 +32,9 @@ const staggerItem = {
   },
 };
 
+
+const UNEDITABLE_STATUS = ['Sedang Dikerjakan', 'Ditunda', 'Belum Dikerjakan'];
+
 export default function JobList() {
   // --- 1. SETUP & STATE MANAGEMENT ---
   const isPresent = useIsPresent();
@@ -62,7 +65,6 @@ export default function JobList() {
   const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
   const [ticketToReturn, setTicketToReturn] = useState(null);
   const [hasNewTickets, setHasNewTickets] = useState(false);
-  const UNEDITABLE_STATUS = ['Sedang Dikerjakan', 'Ditunda', 'Belum Dikerjakan'];
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const desktopListRef = useRef(null);
   const mobileListRef = useRef(null);
@@ -491,7 +493,7 @@ export default function JobList() {
                         type="checkbox"
                         onChange={handleSelectAll}
                         checked={deletableTickets.length > 0 && selectedIds.length === deletableTickets.length}
-                        style={{cursor: 'pointer'}}
+                        style={{ cursor: 'pointer' }}
                       />
                     </th>
                     <th style={columnStyles.col2}>Pengirim</th>
@@ -528,7 +530,7 @@ export default function JobList() {
                               checked={selectedIds.includes(ticket.id)}
                               onChange={() => handleSelect(ticket.id)}
                               disabled={UNEDITABLE_STATUS.includes(ticket.status)}
-                              style={{cursor: 'pointer'}}
+                              style={{ cursor: 'pointer' }}
                             />
                           </td>
                           <td style={columnStyles.col2}>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
