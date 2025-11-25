@@ -466,6 +466,7 @@ body.dark-mode .dashboard-container {
   width: 15px;
   height: 15px;
   accent-color: #2563EB;
+  cursor: pointer;
 }
 
 .forgot-password,

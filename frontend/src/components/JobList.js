@@ -62,7 +62,7 @@ export default function JobList() {
   const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
   const [ticketToReturn, setTicketToReturn] = useState(null);
   const [hasNewTickets, setHasNewTickets] = useState(false);
-
+  const UNEDITABLE_STATUS = ['Sedang Dikerjakan', 'Ditunda', 'Belum Dikerjakan'];
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const desktopListRef = useRef(null);
   const mobileListRef = useRef(null);
@@ -135,7 +135,7 @@ export default function JobList() {
     try {
       const response = await api.get(endpoint, { params });
       const newTotalTickets = response.data.total;
-      const currentTotalTickets = ticketData.total;    
+      const currentTotalTickets = ticketData.total;
 
       if (newTotalTickets > currentTotalTickets) {
         console.log("Pembaruan tiket terdeteksi (total bertambah)!");
@@ -161,18 +161,18 @@ export default function JobList() {
 
     if (hasNewTickets) {
       console.log("Polling ditunda, notifikasi aktif.");
-      return; 
+      return;
     }
 
     const intervalId = setInterval(() => {
       const { isLoading, isLoadingMore } = loadingStateRef.current;
-      
+
       if (isLoading || isLoadingMore) {
         console.log(`Polling skipped: loading=${isLoading}, loadingMore=${isLoadingMore}`);
         return;
       }
       console.log("Mengecek pembaruan tiket (Halaman 1)...");
-      checkForUpdates(); 
+      checkForUpdates();
     }, POLLING_INTERVAL);
 
     return () => {
@@ -342,13 +342,16 @@ export default function JobList() {
       }
     }
   };
+  const deletableTickets = useMemo(() => {
+    return ticketsOnPage.filter(t => !UNEDITABLE_STATUS.includes(t.status));
+  }, [ticketsOnPage]);
 
   const handleSelect = (id) => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(ticketId => ticketId !== id) : [...prev, id]);
   };
 
   const handleSelectAll = (e) => {
-    setSelectedIds(e.target.checked ? ticketsOnPage.map(t => t.id) : []);
+    setSelectedIds(e.target.checked ? deletableTickets.map(t => t.id) : []);
   };
 
   const handleRowClick = (e, ticket) => {
@@ -470,7 +473,7 @@ export default function JobList() {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
             >
-              <button onClick={handleBulkDelete} className="btn-clear" style={{ marginTop: '15px'}}>Hapus {selectedIds.length} Tiket yang Dipilih</button>
+              <button onClick={handleBulkDelete} className="btn-clear" style={{ marginTop: '15px' }}>Hapus {selectedIds.length} Tiket yang Dipilih</button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -483,7 +486,14 @@ export default function JobList() {
               <table className="job-table" style={{ tableLayout: 'fixed', minWidth: '1200px' }}>
                 <thead>
                   <tr>
-                    <th style={columnStyles.col1}><input type="checkbox" onChange={handleSelectAll} checked={ticketsOnPage.length > 0 && selectedIds.length === ticketsOnPage.length} /></th>
+                    <th style={columnStyles.col1}>
+                      <input
+                        type="checkbox"
+                        onChange={handleSelectAll}
+                        checked={deletableTickets.length > 0 && selectedIds.length === deletableTickets.length}
+                        style={{cursor: 'pointer'}}
+                      />
+                    </th>
                     <th style={columnStyles.col2}>Pengirim</th>
                     <th style={columnStyles.col3}>Dikerjakan Oleh</th>
                     <th style={columnStyles.col4}>Workshop</th>
@@ -512,7 +522,15 @@ export default function JobList() {
                         clickable-row`}
                           onClick={(e) => handleRowClick(e, ticket)}
                         >
-                          <td style={columnStyles.col1}><input type="checkbox" checked={selectedIds.includes(ticket.id)} onChange={() => handleSelect(ticket.id)} /></td>
+                          <td style={columnStyles.col1}>
+                            <input
+                              type="checkbox"
+                              checked={selectedIds.includes(ticket.id)}
+                              onChange={() => handleSelect(ticket.id)}
+                              disabled={UNEDITABLE_STATUS.includes(ticket.status)}
+                              style={{cursor: 'pointer'}}
+                            />
+                          </td>
                           <td style={columnStyles.col2}>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
                           <td style={columnStyles.col3}>{ticket.user ? ticket.user.name : '-'}</td>
                           <td style={columnStyles.col4}>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
@@ -564,25 +582,24 @@ export default function JobList() {
                         className={`ticket-card-mobile card-with-select ${(ticket.is_urgent && ticket.status !== 'Selesai' && ticket.status !== 'Ditolak') ? 'urgent-row' : ''}`}
                       >
                         <div className="card-select-col">
-                            <input
-                                type="checkbox"
-                                checked={selectedIds.includes(ticket.id)}
-                                onChange={() => handleSelect(ticket.id)}
-                                onClick={(e) => e.stopPropagation()}
-                            />
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.includes(ticket.id)}
+                            onChange={() => handleSelect(ticket.id)}
+                            onClick={(e) => e.stopPropagation()}
+                            disabled={UNEDITABLE_STATUS.includes(ticket.status)}
+                          />
                         </div>
                         <div
-                          className="card-content-col clickable-row" // Tambahkan class baru & clickable-row di sini
+                          className="card-content-col clickable-row"
                           onClick={(e) => {
-                              // 5. Buat onClick lebih pintar
-                              if (e.target.tagName === 'BUTTON' || e.target.closest('.action-buttons-group') || e.target.closest('.card-select-col') || e.target.type === 'checkbox') {
-                                  return;
-                              }
-                              // Jika bukan klik tombol/checkbox, baru buka detail
-                              handleRowClick(e, ticket);
+                            if (e.target.tagName === 'BUTTON' || e.target.closest('.action-buttons-group') || e.target.closest('.card-select-col') || e.target.type === 'checkbox') {
+                              return;
+                            }
+                            handleRowClick(e, ticket);
                           }}
                         >
-                            <div className="card-row">
+                          <div className="card-row">
                             <div className="data-group"><span className="label">Pengirim</span><span className="value">{ticket.creator ? ticket.creator.name : 'N/A'}</span></div>
                             <div className="data-group"><span className="label">Workshop</span><span className="value">{ticket.workshop ? ticket.workshop.name : 'N/A'}</span></div>
                           </div>

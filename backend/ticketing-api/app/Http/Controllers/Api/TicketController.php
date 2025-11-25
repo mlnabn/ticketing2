@@ -502,7 +502,7 @@ class TicketController extends Controller
 
         $perPage = $request->query('per_page', 15);
 
-       $query = Ticket::with(['user', 'creator', 'workshop', 'masterBarangs'])
+        $query = Ticket::with(['user', 'creator', 'workshop', 'masterBarangs'])
             ->where('user_id', $user->id);
 
         // Logika pengurutan baru
@@ -566,20 +566,33 @@ class TicketController extends Controller
             'ids.*' => 'exists:tickets,id',
         ]);
 
+        $nonDeletableStatuses = ['Belum Dikerjakan', 'Sedang Dikerjakan', 'Ditunda'];
+        $forbiddenTicketsCount = Ticket::whereIn('id', $validated['ids'])
+            ->whereIn('status', $nonDeletableStatuses)
+            ->count();
+
+        if ($forbiddenTicketsCount > 0) {
+            return response()->json([
+                'error' => 'Tidak dapat menghapus tiket karena terdapat tiket dengan status: ' . implode(', ', $nonDeletableStatuses) . '.'
+            ], 422);
+        }
         Ticket::whereIn('id', $validated['ids'])->delete();
         return response()->json(['message' => 'Tiket yang dipilih telah dihapus.']);
     }
 
-    /**
-     * Hapus satu tiket.
-     */
     public function destroy(Ticket $ticket)
     {
         $user = Auth::user();
         $isAdmin = $user->role === 'admin';
         $isCreator = $user->id === $ticket->creator_id;
-        $isAssigneeOfCompletedTicket = ($user->id === $ticket->user_id && $ticket->status === 'Selesai');
+        $isAssigneeOfCompletedTicket = ($user->id === $ticket->user_id && ($ticket->status === 'Selesai' || $ticket->status === 'Ditolak'));
 
+        $nonDeletableStatuses = ['Belum Dikerjakan', 'Sedang Dikerjakan', 'Ditunda'];
+        if (in_array($ticket->status, $nonDeletableStatuses)) {
+            return response()->json([
+                'error' => 'Tiket dengan status: ' . $ticket->status . ' tidak dapat dihapus.'
+            ], 422);
+        }
         if ($isAdmin || $isCreator || $isAssigneeOfCompletedTicket) {
             $ticket->delete();
             return response()->json(null, 204);

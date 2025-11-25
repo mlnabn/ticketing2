@@ -839,6 +839,7 @@ function StokBarangView() {
                                                                                     title="Pilih Semua di grup ini"
                                                                                     checked={isAllMasterSelected(masterItem.id_m_barang)}
                                                                                     onChange={(e) => handleSelectAllMaster(masterItem.id_m_barang, e.target.checked)}
+                                                                                    style={{cursor: 'pointer'}}
                                                                                 />
                                                                             </div>
                                                                             <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Kode SKU</div>
@@ -873,6 +874,7 @@ function StokBarangView() {
                                                                                             checked={selectedItems.has(detail.id)}
                                                                                             onChange={(e) => handleSelectItem(detail.id, e.target.checked)}
                                                                                             onClick={(e) => e.stopPropagation()}
+                                                                                            style={{cursor: 'pointer'}}
                                                                                         />
                                                                                     </div>
                                                                                     <div className="detail-cell cell-kode">{detail.kode_unik}</div>
@@ -1030,6 +1032,7 @@ function StokBarangView() {
                                                                                 checked={selectedItems.has(detail.id)}
                                                                                 onChange={(e) => handleSelectItem(detail.id, e.target.checked)}
                                                                                 onClick={(e) => e.stopPropagation()}
+                                                                                style={{cursor: 'pointer'}}
                                                                             />
                                                                         </div>
                                                                         <div
