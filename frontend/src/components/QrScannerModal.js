@@ -1,86 +1,103 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
 function QrScannerModal({ show, onClose, onScanSuccess }) {
     const { showToast } = useOutletContext();
-    const [scannerInstance, setScannerInstance] = useState(null);
+    const scannerRef = useRef(null);
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
 
     useEffect(() => {
         if (show) {
             setShouldRender(true);
-            setIsClosing(false); 
+            setIsClosing(false);
         } else if (shouldRender && !isClosing) {
-            setIsClosing(true); 
+            setIsClosing(true);
             const timer = setTimeout(() => {
                 setIsClosing(false);
-                setShouldRender(false); 
+                setShouldRender(false);
             }, 300);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, shouldRender]);
 
     useEffect(() => {
-        if (show && !scannerInstance && shouldRender) {
+        if (show && shouldRender && !scannerRef.current) {
             const scanner = new Html5QrcodeScanner(
-                "qr-reader", 
+                "qr-reader",
                 { fps: 10, qrbox: { width: 250, height: 250 } },
-                false 
+                false
             );
+            const handleSuccess = async (decodedText, decodedResult) => {
+                const currentScanner = scannerRef.current;
 
-            const handleSuccess = (decodedText, decodedResult) => {
-                scanner.clear().catch(err => {
-                    console.error("Gagal membersihkan scanner setelah sukses scan:", err);
-                });
-                setScannerInstance(null); 
-                onScanSuccess(decodedText);
+                if (currentScanner) {
+                    try {
+                        await currentScanner.clear();
+                        scannerRef.current = null;
+                        onScanSuccess(decodedText);
+
+                    } catch (err) {
+                        console.error("Gagal mematikan kamera setelah sukses scan:", err);
+                        scannerRef.current = null;
+                        onScanSuccess(decodedText);
+                    }
+                } else {
+                    onScanSuccess(decodedText);
+                }
             };
 
             const handleError = (error) => {
                 if (error.includes("NotFoundException")) {
                     return;
                 }
-                showToast(`Error scanning QR Code: ${error}`, 'error');
             };
 
             scanner.render(handleSuccess, handleError);
-            setScannerInstance(scanner);
+            scannerRef.current = scanner;
         }
-        if (!show && scannerInstance) {
-            scannerInstance.clear().catch(err => {
-                console.error("Gagal membersihkan scanner saat unmount:", err);
-            });
-            setScannerInstance(null); 
-        }
-        
         return () => {
-            if (scannerInstance) {
-                scannerInstance.clear().catch(err => {
-                    console.error("Gagal membersihkan scanner saat unmount total:", err);
+            const currentScanner = scannerRef.current;
+            if (currentScanner) {
+                currentScanner.clear().catch(err => {
+                    console.error("Gagal mematikan kamera saat UNMOUNT TOTAL:", err);
+                }).finally(() => {
+                    scannerRef.current = null;
                 });
             }
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [show, onScanSuccess, showToast, scannerInstance, shouldRender]);
 
-    const handleCloseClick = () => {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, onScanSuccess, showToast, shouldRender]);
+
+    const handleCloseClick = async () => {
+        const currentScanner = scannerRef.current;
+
+        if (currentScanner) {
+            try {
+                await currentScanner.clear();
+                scannerRef.current = null;
+            } catch (err) {
+                console.error("Gagal mematikan kamera saat force close:", err);
+                scannerRef.current = null;
+            }
+        }
         if (onClose) {
             onClose();
         }
     };
-    
+
     if (!shouldRender) return null;
     const animationClass = isClosing ? 'closing' : '';
 
     return (
-        <div 
+        <div
             className={`modal-backdrop-centered ${animationClass}`}
             onClick={handleCloseClick}
         >
-            <div 
+            <div
                 className={`modal-content-large qr-scanner-modal ${animationClass}`}
                 onClick={e => e.stopPropagation()}
             >

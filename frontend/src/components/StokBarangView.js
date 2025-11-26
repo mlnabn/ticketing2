@@ -117,6 +117,7 @@ function StokBarangView() {
     const [isAddStockOpen, setIsAddStockOpen] = useState(false);
     const [itemToPreselect, setItemToPreselect] = useState(null);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
+    const [isScannerBusy, setIsScannerBusy] = useState(false);
     const [itemToSoftDelete, setItemToSoftDelete] = useState(null);
 
     // State untuk expand/collapse
@@ -468,12 +469,25 @@ function StokBarangView() {
             setDetailItem(res.data);
         } catch (error) {
             showToast(`Kode "${code}" tidak ditemukan.`, 'error');
+        } finally {
+            setTimeout(() => {
+                setIsScannerBusy(false);
+            }, 500);
         }
     }, [showToast]);
 
     const handleScanSuccess = (decodedText) => {
         setIsScannerOpen(false);
+        setIsScannerBusy(true);
         handleScanSearch(decodedText);
+    };
+
+    const handleOpenScanner = () => {
+        if (!isScannerBusy) {
+            setIsScannerOpen(true);
+        } else {
+            showToast('Aksi pemindaian sedang diproses. Mohon tunggu sebentar.', 'warning');
+        }
     };
 
     const handleSelectItem = (id, isChecked) => {
@@ -634,7 +648,11 @@ function StokBarangView() {
                             </i>Tambah Stok
                         </button>
 
-                        <button className="btn-scan" onClick={() => setIsScannerOpen(true)}>
+                        <button
+                            className="btn-scan"
+                            onClick={handleOpenScanner}
+                            disabled={isScannerBusy}
+                        >
                             <span className="fa-stack" style={{ marginRight: '8px', fontSize: '0.8em' }}>
                                 <i className="fas fa-qrcode fa-stack-2x"></i>
                                 <i className="fas fa-expand fa-stack-1x fa-inverse"></i>
@@ -839,7 +857,7 @@ function StokBarangView() {
                                                                                     title="Pilih Semua di grup ini"
                                                                                     checked={isAllMasterSelected(masterItem.id_m_barang)}
                                                                                     onChange={(e) => handleSelectAllMaster(masterItem.id_m_barang, e.target.checked)}
-                                                                                    style={{cursor: 'pointer'}}
+                                                                                    style={{ cursor: 'pointer' }}
                                                                                 />
                                                                             </div>
                                                                             <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Kode SKU</div>
@@ -874,7 +892,7 @@ function StokBarangView() {
                                                                                             checked={selectedItems.has(detail.id)}
                                                                                             onChange={(e) => handleSelectItem(detail.id, e.target.checked)}
                                                                                             onClick={(e) => e.stopPropagation()}
-                                                                                            style={{cursor: 'pointer'}}
+                                                                                            style={{ cursor: 'pointer' }}
                                                                                         />
                                                                                     </div>
                                                                                     <div className="detail-cell cell-kode">{detail.kode_unik}</div>
@@ -1032,7 +1050,7 @@ function StokBarangView() {
                                                                                 checked={selectedItems.has(detail.id)}
                                                                                 onChange={(e) => handleSelectItem(detail.id, e.target.checked)}
                                                                                 onClick={(e) => e.stopPropagation()}
-                                                                                style={{cursor: 'pointer'}}
+                                                                                style={{ cursor: 'pointer' }}
                                                                             />
                                                                         </div>
                                                                         <div
