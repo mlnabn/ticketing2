@@ -42,14 +42,13 @@ const PieChartComponent = ({ stats, handleStatusFilterClick, statusFilter }) => 
 
   return (
     <div style={{ width: "100%", height: 300, display: "flex", flexDirection: "column", alignItems: "center" }}>
-      {/* Chart */}
-      <div style={{ width: "100%", height: 240 }}>
+      <div style={{ width: "100%", height: 180 }}>
         <ResponsiveContainer>
           <PieChart>
             <Pie
               data={dataWithPercent}
               cx="50%"
-              cy="40%"
+              cy={80}
               innerRadius={50}
               outerRadius={80}
               paddingAngle={0}
@@ -83,7 +82,8 @@ const PieChartComponent = ({ stats, handleStatusFilterClick, statusFilter }) => 
         </ResponsiveContainer>
       </div>
 
-      <div className="chart-legend"style={{ justifyContent: 'center', marginTop: '-30px' }}>
+      {/* Legend: Margin aman 5px */}
+      <div className="chart-legend" style={{ justifyContent: 'center', marginTop: '20px' }}>
         {dataWithPercent.map((entry, index) => (
           <div
             key={index}

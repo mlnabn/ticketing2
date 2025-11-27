@@ -43,3 +43,8 @@
 .toast.info {
   background-color: #17a2b8; /* Biru Info */
 }
+
+.toast.warning {
+  background-color: #ffc107 !important; /* Kuning/Jingga */
+  color: #333 !important;
+}

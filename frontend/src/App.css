@@ -5587,7 +5587,7 @@ body.dark-mode .btn-scan:hover {
 .modal-content .form-group textarea,
 .modal-content .form-group input {
   width: 100%;
-  background: #ffffff;
+  background: #F5F5F5;
   border-color: #d1d5db;
   color: #111827;
   border-radius: 8px;
@@ -5610,7 +5610,7 @@ body.dark-mode .btn-scan:hover {
 .form-group2 input,
 .form-group2 select,
 .form-group2 textarea {
-  background: #f9f9f9;
+  background: #F5F5F5;
   border-color: #d1d5db;
   color: #111827;
 }
@@ -8516,7 +8516,7 @@ html {
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  padding: 4px 8px;
+  padding: 0px 8px;
   border-radius: 12px;
   background-color: #f9f9f9;
   color: var(--text-color);
@@ -8540,6 +8540,7 @@ html {
   margin-top: 5px;
   flex-wrap: wrap;
   text-overflow: ellipsis;
+  z-index: 1000;
 }
 
 /* ========================================================= */
@@ -11885,7 +11886,7 @@ label {
 input,
 select,
 textarea {
-  background-color: #FFFFFF;
+  background-color: #F5F5F5;
   color: #212529;
   border: 1px solid #ced4da;
 }

@@ -1,13 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { FaCheckCircle, FaTimesCircle, FaInfoCircle } from 'react-icons/fa';
+import { FaCheckCircle, FaTimesCircle, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
 import './Toast.css';
+
 
 const icons = {
   success: <FaCheckCircle />,
   error: <FaTimesCircle />,
   info: <FaInfoCircle />,
+  warning: <FaExclamationTriangle />,
 };
 
 const Toast = ({ message, type, onClose }) => {

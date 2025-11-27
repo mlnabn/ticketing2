@@ -1,185 +1,266 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { saveAs } from 'file-saver';
+import CreatableSelect from 'react-select/creatable';
+import ItemFormModal from './ItemFormModal'; 
 
-const formatCurrency = (value) => {
-    if (typeof value !== 'number') return 'Rp 0';
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
-};
+const formatRupiah = (angka) => new Intl.NumberFormat('id-ID').format(angka);
+const parseRupiah = (rupiah) => parseInt(rupiah.replace(/\./g, ''), 10) || 0;
 
-function ProposalDetailModal({ show, proposal, onClose, showToast }) {
-    const [proposalDetails, setProposalDetails] = useState(null);
-    const [detailLoading, setDetailLoading] = useState(false);
-    const [exportingExcel, setExportingExcel] = useState(false);
-    const [exportingPdf, setExportingPdf] = useState(false);
-
+function PurchaseDetailModal({ show, onClose, onSaveSuccess, showToast }) {
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
-    const [currentProposal, setCurrentProposal] = useState(proposal);
 
+    // State utama
+    const [title, setTitle] = useState('');
+    const [items, setItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // State untuk Form Tambah Item
+    const [masterBarangOptions, setMasterBarangOptions] = useState([]);
+    const [selectedBarang, setSelectedBarang] = useState(null);
+    const [quantity, setQuantity] = useState(1);
+    const [displayEstimatedPrice, setDisplayEstimatedPrice] = useState('');
+    const [link, setLink] = useState('');
+    const [notes, setNotes] = useState('');
+
+    // State untuk Modal SKU (Modal di dalam Modal)
+    const [isSkuModalOpen, setIsSkuModalOpen] = useState(false);
+    const [newSkuName, setNewSkuName] = useState('');
+
+    // Efek untuk animasi tutup/buka
     useEffect(() => {
-        let timer;
         if (show) {
-            setCurrentProposal(proposal);
             setShouldRender(true);
             setIsClosing(false);
-        } else {
+            api.get('/inventory/items-flat?all=true').then((res) => {
+                const data = res.data.data || res.data;
+                const options = data.map((item) => ({
+                    value: item.id_m_barang,
+                    label: `${item.nama_barang} (${item.kode_barang})`,
+                    itemData: item,
+                }));
+                setMasterBarangOptions(options);
+            });
+        } else if (shouldRender && !isClosing) {
             setIsClosing(true);
-            timer = setTimeout(() => {
+            setTimeout(() => {
                 setShouldRender(false);
                 setIsClosing(false);
+                setTitle('');
+                setItems([]);
+                setSelectedBarang(null);
+                setQuantity(1);
+                setDisplayEstimatedPrice('');
+                setLink('');
+                setNotes('');
             }, 300);
         }
-        return () => clearTimeout(timer);
-    }, [show, proposal]);
+    }, [show, shouldRender, isClosing]);
 
-    useEffect(() => {
-        if (show && currentProposal?.id) {
-            setDetailLoading(true);
-            setProposalDetails(null);
-
-            api.get(`/purchase-proposals/${currentProposal.id}`)
-                .then(res => {
-                    setProposalDetails(res.data);
-                })
-                .catch(error => {
-                    showToast('Gagal memuat detail catatan.', 'error');
-                })
-                .finally(() => {
-                    setDetailLoading(false);
-                });
+    // Fungsi untuk menambah item ke daftar
+    const handleAddItem = (e) => {
+        e.preventDefault();
+        // Panggilan ini sekarang akan menampilkan toast WARNING (kuning)
+        if (!selectedBarang || !quantity || !displayEstimatedPrice) {
+            showToast('Barang, Jumlah, dan Estimasi Harga wajib diisi.', 'warning');
+            return;
         }
-    }, [show, currentProposal, showToast]);
 
-    const handleCloseClick = () => {
-        if (onClose) onClose();
-        setIsClosing(true);
-    };   
+        const newItem = {
+            id: selectedBarang.value,
+            master_barang_id: selectedBarang.value,
+            nama_barang: selectedBarang.label,
+            quantity: parseInt(quantity, 10),
+            estimated_price: parseRupiah(displayEstimatedPrice),
+            link: link,
+            notes: notes,
+        };
 
-const handleExport = async (exportType) => {
-    if (!currentProposal) return;
+        // Cek duplikat
+        // Panggilan ini sekarang akan menampilkan toast WARNING (kuning)
+        if (items.find(item => item.id === newItem.id)) {
+            showToast('Barang ini sudah ada di daftar.', 'warning');
+            return;
+        }
 
-    if (exportType === 'excel') setExportingExcel(true);
-    else setExportingPdf(true);
+        setItems(prev => [...prev, newItem]);
+        
+        // Reset form tambah item
+        setSelectedBarang(null);
+        setQuantity(1);
+        setDisplayEstimatedPrice('');
+        setLink('');
+        setNotes('');
+    };
 
-    try {
-        const response = await api.get(`/purchase-proposals/${currentProposal.id}/export`, {
-            params: { type: exportType },
-            responseType: 'blob',
-        });
-        const extension = exportType === 'excel' ? 'xlsx' : 'pdf';
-        const safeTitle = currentProposal.title.replace(/[^a-z0-9]/gi, '_').substring(0, 30);
-        const fileName = `Proposal_${safeTitle}.${extension}`;
-        saveAs(response.data, fileName);
-    } catch (err) {
-        console.error(`Gagal mengunduh ${exportType}:`, err);
-        showToast('Gagal mengunduh laporan. Mohon coba lagi.', 'error');
-    } finally {
-        if (exportType === 'excel') setExportingExcel(false);
-        else setExportingPdf(false);
-    }
-};
+    // Fungsi untuk menghapus item dari daftar
+    const handleRemoveItem = (id) => {
+        setItems(prev => prev.filter(item => item.id !== id));
+    };
 
-if (!shouldRender) return null;
+    const handlePriceChange = (e) => {
+        const { value } = e.target;
+        const numericValue = parseRupiah(value);
+        setDisplayEstimatedPrice(formatRupiah(numericValue));
+    };
 
-const animationClass = isClosing ? 'closing' : '';
-const items = proposalDetails?.items || [];
+    const handleCreateNewSKU = (inputValue) => {
+        setNewSkuName(inputValue); 
+        setIsSkuModalOpen(true);
+    };
 
-return (
-    <div className={`modal-backdrop-detail ${animationClass}`} onClick={handleCloseClick}>
-        <div className={`modal-content-large ${animationClass}`} onClick={e => e.stopPropagation()}>
-            {/* <button type="button" onClick={handleCloseClick} className="modal-close-btn">&times;</button> */}
-            <h3>Detail: {currentProposal?.title || 'Memuat...'}</h3>
+    const handleSkuSaveSuccess = (newMasterBarang) => {
+        setIsSkuModalOpen(false);
+        showToast(`SKU Baru "${newMasterBarang.nama_barang}" berhasil dibuat.`, 'success');
 
-            <div className="download-butttons" style={{ padding: '0 0 10px 0', borderBottom: '1px solid #333' }}>
-                <div className="download-buttons">
-                    <button onClick={() => handleExport('excel')} className="btn-download excel" disabled={exportingExcel}>
-                        <i className="fas fa-file-excel"></i> {exportingExcel ? '...' : 'Ekspor Excel'}
-                    </button>
-                    <button onClick={() => handleExport('pdf')} className="btn-download pdf" disabled={exportingPdf}>
-                        <i className="fas fa-file-pdf"></i> {exportingPdf ? '...' : 'Ekspor PDF'}
-                    </button>
+        const newOption = {
+            value: newMasterBarang.id_m_barang,
+            label: `${newMasterBarang.nama_barang} (${newMasterBarang.kode_barang})`,
+            itemData: newMasterBarang,
+        };
+
+        setMasterBarangOptions(prev => [newOption, ...prev]);
+        setSelectedBarang(newOption);
+    };
+
+    const handleSkuApiSave = async (formData) => {
+        setIsLoading(true);
+        try {
+            const response = await api.post('/inventory/items', formData);
+            handleSkuSaveSuccess(response.data);
+        } catch (e) {
+            console.error('Gagal menyimpan SKU baru:', e);
+            const errorMsg = e.response?.data?.message || 'Gagal menyimpan SKU baru.';
+            // Panggilan ini akan menampilkan toast ERROR (merah)
+            showToast(errorMsg, 'error'); 
+            setIsSkuModalOpen(false);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
+    const handleSubmitProposal = async () => {
+        // Panggilan ini sekarang akan menampilkan toast WARNING (kuning)
+        if (!title || items.length === 0) {
+            showToast('Judul dan minimal 1 barang wajib diisi.', 'warning');
+            return;
+        }
+        setIsLoading(true);
+        try {
+            const payload = { title, items };
+            const response = await api.post('/purchase-proposals', payload);
+            showToast('Catatan pengajuan berhasil disimpan.', 'success');
+            onSaveSuccess(response.data); 
+        } catch (error) {
+            // Panggilan ini akan menampilkan toast ERROR (merah)
+            showToast(error.response?.data?.message || 'Gagal menyimpan catatan.', 'error');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (!shouldRender) return null;
+    const animationClass = isClosing ? 'closing' : '';
+
+    return (
+        <>
+            <div className={`modal-backdrop-detail ${animationClass}`} onClick={onClose}>
+                <div className={`modal-content-large ${animationClass}`} onClick={e => e.stopPropagation()}>
+                    {/* <button onClick={onClose} className="modal-close-btn">&times;</button> */}
+                    <h3>Buat Catatan Pengajuan Baru</h3>
+
+                    <div className="form-group full">
+                        <label>Judul Catatan</label>
+                        <input 
+                            type="text" 
+                            value={title} 
+                            onChange={e => setTitle(e.target.value)} 
+                            placeholder="Mis: Belanja Kebutuhan Q4 2025" 
+                        />
+                    </div>
+
+                    <div className="items-to-return-list" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                        {items.length === 0 && (
+                            <p style={{ textAlign: 'center', color: '#999', fontStyle: 'italic' }}>Belum ada barang yang ditambahkan.</p>
+                        )}
+                        {items.map(item => (
+                            <div key={item.id} className="return-item-row" style={{ padding: '0.75rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontWeight: 'bold' }}>{item.nama_barang}</span>
+                                    <button onClick={() => handleRemoveItem(item.id)} className="btn-remove-item" title="Hapus item">
+                                        <i className="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div style={{ fontSize: '0.9rem', color: '#666' }}>
+                                    {item.quantity} unit @ {formatRupiah(item.estimated_price)}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <form onSubmit={handleAddItem} className="return-item-row" style={{ backgroundColor: 'var(--bg-color)', borderStyle: 'dashed' }}>
+                        <h4 style={{ marginTop: 0, marginBottom: '1rem' }}>Tambah Barang</h4>
+                        <div className="form-group full">
+                            <label>Nama Barang</label>
+                            <CreatableSelect
+                                classNamePrefix="creatable-select"
+                                options={masterBarangOptions}
+                                value={selectedBarang}
+                                onChange={setSelectedBarang}
+                                onCreateOption={handleCreateNewSKU}
+                                placeholder="Cari atau Ketik Barang Baru..."
+                                isClearable
+                                menuPortalTarget={document.body}
+                                styles={{ menuPortal: base => ({ ...base, zIndex: 99999 }) }}
+                            />
+                        </div>
+                        <div className="form-row2">
+                            <div className="form-group-half">
+                                <label>Jumlah</label>
+                                <input type="number" value={quantity} onChange={e => setQuantity(e.target.value)} min="1" />
+                            </div>
+                            <div className="form-group-half">
+                                <label>Estimasi Harga Satuan (Rp)</label>
+                                <input 
+                                    type="text" 
+                                    value={displayEstimatedPrice} 
+                                    onChange={handlePriceChange} 
+                                    placeholder="Mis: 1500000" 
+                                />
+                            </div>
+                        </div>
+                        <div className="form-group full">
+                            <label>Link Referensi (Opsional)</label>
+                            <input type="text" value={link} onChange={e => setLink(e.target.value)} placeholder="https://..." />
+                        </div>
+                        <div className="form-group full">
+                            <label>Keterangan (Opsional)</label>
+                            <textarea value={notes} onChange={e => setNotes(e.target.value)} rows="2" placeholder="Mis: Untuk kebutuhan workshop Canden"></textarea>
+                        </div>
+                        <button type="submit" className="btn-primary" style={{ width: '100%' }}>
+                            <i className="fas fa-plus" style={{ marginRight: '8px' }}></i>
+                            Tambahkan ke Catatan
+                        </button>
+                    </form>
+
+                    <div className="confirmation-modal-actions">
+                        <button type="button" onClick={onClose} className="btn-cancel">Batal</button>
+                        <button type="button" onClick={handleSubmitProposal} className="btn-confirm" disabled={isLoading || items.length === 0}>
+                            {isLoading ? 'Menyimpan...' : 'Simpan'}
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            {/* --- Detail Item List (Isi dari history-panel) --- */}
-            <div className="history-list-scroll" style={{ maxHeight: '60vh', overflowY: 'auto', padding: '10px 0' }}>
-                {detailLoading ? (
-                    <p style={{ textAlign: 'center', padding: '2rem' }}>Memuat detail...</p>
-                ) : items.length > 0 ? (
-                    items.map((item) => (
-                        <div key={item.id} className="history-log-item">
-                            <div className="form-row2">
-                                <div className="info-row" style={{ borderBottom: '1px solid #4A5568', paddingBottom: '10px', marginBottom: '10px' }}>
-                                    <span className="info-value-info" style={{ fontSize: '1.1rem', fontWeight: 'bold', textAlign: 'left' }}>
-                                        {item.master_barang.nama_barang}
-                                    </span>
-                                    <span className="info-label" style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>
-                                        ({item.master_barang.master_kategori?.nama_kategori} / {item.master_barang.sub_kategori?.nama_sub})
-                                    </span>
-                                </div>
-                                <div className="info-row" style={{ marginBottom: '10px' }}><span className="info-label">Jumlah</span><span className="info-value-info">{item.quantity} Unit</span></div>
-                            </div>
-                            <div className="form-row2">
-                                <div className="info-row"><span className="info-label">Estimasi Harga</span><span className="info-value-info">{formatCurrency(item.estimated_price)}</span></div>
-                                <div className="info-row" style={{ backgroundColor: 'rgba(0,0,0,0.2)', padding: '8px', borderRadius: '6px' }}>
-                                    <span className="info-label" style={{ color: '#9CA3AF' }}>Total Harga Barang</span>
-                                    <span className="info-value-info" style={{ fontWeight: 'bold', fontSize: '1.05rem' }}>
-                                        {formatCurrency(item.estimated_price * item.quantity)}
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="info-row full-width" style={{ marginTop: '10px' }}>
-                                <span className="info-label">Keterangan</span>
-                                <span className="info-value-info" style={{ whiteSpace: 'pre-wrap', textAlign: 'left' }}>{item.notes || '-'}</span>
-                            </div>
-                            {item.link && (
-                                <div className="info-row full-width" style={{ marginTop: '10px' }}>
-                                    <span className="info-label">Link</span>
-                                    <a
-                                        href={item.link}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        style={{
-                                            color: '#60a5fa',
-                                            wordBreak: 'break-all',
-                                            display: '-webkit-box',
-                                            WebkitLineClamp: 2,
-                                            WebkitBoxOrient: 'vertical',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                        }}
-                                    >
-                                        {item.link}
-                                    </a>
-                                </div>
-                            )}
-                        </div>
-                    ))
-                ) : (
-                    <p style={{ textAlign: 'center', padding: '2rem' }}>
-                        {detailLoading ? 'Memuat detail...' : 'Catatan ini tidak memiliki barang.'}
-                    </p>
-                )}
-
-                
-            </div>
-            {/* Total Riwayat Item */}
-                {!detailLoading && items.length > 0 && (
-                    <div className="subtotal-card-mobile acquisition-subtotal" style={{ marginTop: '1rem', borderTop: '1px solid #4A5568', borderRadius: '12px' }}>
-                        <span className="subtotal-label" style={{ fontSize: '13px', fontWeight: 'bold' }}>Total Barang dalam Catatan</span>
-                        <span className="subtotal-value value-acquisition" style={{ fontSize: '13px', fontWeight: 'bold' }}>
-                            {items.length} Item
-                        </span>
-                    </div>
-                )}
-
-            <div className="modal-actions">
-                <button onClick={handleCloseClick} className="btn-cancel">Tutup</button>
-            </div>
-        </div>
-    </div>
-);
+            <ItemFormModal
+                show={isSkuModalOpen}
+                onClose={() => setIsSkuModalOpen(false)}
+                onSave={handleSkuApiSave}
+                showToast={showToast}
+                initialData={{ nama_barang: newSkuName }}
+            />
+        </>
+    );
 }
 
-export default ProposalDetailModal;
+export default PurchaseDetailModal;
