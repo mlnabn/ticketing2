@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
+import api from './services/api';
 
 const AuthContext = createContext(null);
 
@@ -7,14 +8,13 @@ export function AuthProvider({ children }) {
   const [accessToken, setAccessToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Load dari localStorage saat awal
   useEffect(() => {
     try {
-      const t = localStorage.getItem('auth.accessToken');
       const u = localStorage.getItem('auth.user');
-      // Tidak perlu load expiresAt ke state, cukup di localStorage
-      if (t) setAccessToken(t);
-      if (u) setUser(JSON.parse(u));
+      if (u) {
+          setUser(JSON.parse(u));
+          setAccessToken("cookie-token-exists"); 
+      }
     } catch (e) {
       console.error("Gagal memuat auth state dari localStorage", e);
     } finally {
@@ -22,26 +22,26 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // DIUBAH: Fungsi login sekarang menjadi bagian dari context
   const login = useCallback((data) => {
-    const { access_token, user, expires_in } = data;
-    const expiresAt = Date.now() + (expires_in * 1000) - 60000;
-
-    localStorage.setItem('auth.accessToken', access_token);
+    const { user, expires_in } = data;
     localStorage.setItem('auth.user', JSON.stringify(user));
-    localStorage.setItem('auth.expiresAt', expiresAt.toString());
 
-    setAccessToken(access_token);
+    setAccessToken("cookie-token-exists");
     setUser(user);
   }, []);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem('auth.accessToken');
+  const logout = useCallback(async () => {
     localStorage.removeItem('auth.user');
-    localStorage.removeItem('auth.expiresAt');
+
+    try {
+        await api.post('/logout');
+    } catch (e) {
+        console.error("Gagal memanggil API logout, namun tetap melanjutkan logout lokal.", e);
+    }
 
     setUser(null);
     setAccessToken(null);
+    window.location.href = '/login'; 
   }, []);
 
   useEffect(() => {

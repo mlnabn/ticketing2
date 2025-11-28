@@ -15,21 +15,21 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Cookie;
+use Lcobucci\JWT\Signer\None;
 
 class AuthController extends Controller
 {
-    // ... (fungsi register tidak berubah) ...
     public function register(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            // Pastikan email unik hanya jika akun sudah terverifikasi
+            
             'email' => [
                 'required', 'string', 'email', 'max:255',
                 Rule::unique('users')->where(fn ($query) => $query->whereNotNull('phone_verified_at'))
             ],
             'password' => 'required|string|min:6|confirmed',
-            // Pastikan nomor telepon unik hanya jika akun sudah terverifikasi
             'phone' => [
                 'required', 'string', 'min:10',
                 Rule::unique('users')->where(fn ($query) => $query->whereNotNull('phone_verified_at'))
@@ -42,7 +42,7 @@ class AuthController extends Controller
         $registrationData = [
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']), // Hash password sebelum disimpan
+            'password' => Hash::make($validated['password']),
             'phone' => $validated['phone'],
             'otp_code' => $otpCode,
             'otp_expires_at' => $otpExpiresAt,
@@ -54,12 +54,11 @@ class AuthController extends Controller
         try {
             Http::get($n8nWebhookUrl, ['phone' => $validated['phone'], 'otp' => $otpCode]);
         } catch (\Exception $e) {
-            // Jika gagal kirim OTP, hapus cache agar tidak ada data menggantung
+            
             Cache::forget('registration_data_' . $validated['phone']);
             return response()->json(['message' => 'Gagal mengirim OTP. Silakan coba lagi.'], 503);
         }
 
-        // 5. Beri respons bahwa OTP telah dikirim
         return response()->json([
             'message' => 'Kode verifikasi telah dikirim. Silakan cek WhatsApp Anda.',
             'phone' => $validated['phone']
@@ -110,8 +109,21 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        auth('api')->logout(); // Cara yang lebih modern dan konsisten
-        return response()->json(['message' => 'Successfully logged out']);
+        auth('api')->logout(); 
+        $response = response()->json(['message' => 'Successfully logged out'], 200);
+
+        $cookie = cookie(
+            'access_token', 
+            null, 
+            -1, 
+            '/',            
+            env('SESSION_DOMAIN'), 
+            env('SESSION_SECURE_COOKIE', false), 
+            true, 
+            'None' 
+        );
+
+        return $response->cookie($cookie);
     }
 
     /**
@@ -119,10 +131,13 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(auth('api')->refresh(), auth('api')->user());
+        $access_token = auth('api')->refresh();
+    
+        $user = auth('api')->user();
+
+        return $this->respondWithToken($access_token, $user);
     }
 
-    // ... (fungsi getUser, updateUser, dan Google tidak berubah) ...
     public function getUser()
     {
         try {
@@ -191,24 +206,24 @@ class AuthController extends Controller
     }
     public function handleGoogleCallback()
     {
+        Log::info('--- Memulai Google Callback ---');
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
+            Log::info('Google User berhasil diambil.', ['email' => $googleUser->getEmail()]);
+            
             $user = User::firstOrNew(['email' => $googleUser->getEmail()]);
-
             if (!$user->exists) {
                 $user->name = $googleUser->getName();
-                $user->google_id = $googleUser->getId();
-                $user->avatar = $googleUser->getAvatar();
-                $user->password = Hash::make(Str::random(24));
-                $user->role = 'user';
+                $user->email_verified_at = Carbon::now();
                 $user->save();
+                Log::info('Pengguna baru dibuat.', ['id' => $user->id]);
+            } else {
+                 Log::info('Pengguna ditemukan di DB.', ['id' => $user->id]);
             }
-
-            // Buat token dari user yang sudah ada atau yang baru dibuat
-            $access_token = JWTAuth::fromUser($user);
-
-            $expires_in = auth('api')->factory()->getTTL() * 60; // Dapatkan masa berlaku token (dalam detik)
             
+            $access_token = JWTAuth::fromUser($user);
+            Log::info('Access Token berhasil dibuat.', ['token_length' => strlen($access_token), 'token_ttl' => auth('api')->factory()->getTTL()]);
+
             $user_data_for_frontend = [
                 'id'         => $user->id,
                 'name'       => $user->name,
@@ -218,12 +233,33 @@ class AuthController extends Controller
                 'avatar_url' => $user->avatar,
             ];
             
+            // 5. Buat URL Redirect ke Frontend
             $user_param = urlencode(json_encode($user_data_for_frontend));
+            $frontend_url = env('FRONTEND_URL', 'http://localhost:3000');
+            $redirect_url = $frontend_url . '/login?user=' . $user_param;
+            $redirect_response = redirect($redirect_url);
+            Log::info('URL Redirect berhasil dibuat.', ['url' => $redirect_url]);
+            
+            // 6. Buat dan Set Cookie
+            $session_domain = env('SESSION_DOMAIN', 'localhost');;
+            $cookie_secure = env('SESSION_SECURE_COOKIE', false);
+            Log::info('Konfigurasi Cookie:', ['domain' => $session_domain ?? 'null', 'secure' => $cookie_secure, 'http_only' => true, 'same_site' => 'Lax']);
 
-            return redirect(env('FRONTEND_URL', 'http://localhost:3000') . '?access_token=' . $access_token . '&user=' . $user_param . '&expires_in=' . $expires_in);
+            $cookie = cookie(
+                'access_token', 
+                $access_token,  
+                config('jwt.refresh_ttl', 20160),
+                '/',            
+                $session_domain, 
+                $cookie_secure, 
+                true,           // HTTP-only: PENTING!
+                'Lax'          // Pastikan SameSite 'None' jika ada perbedaan domain/port
+            );
 
+            Log::info('Cookie telah di-queue (antrikan). Melakukan redirect...');
+            return redirect($redirect_url)->withCookie($cookie);
         } catch (Exception $e) {
-            \Log::error('Google Callback Error: ' . $e->getMessage());
+            Log::error('Google Callback Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return redirect(env('FRONTEND_URL', 'http://localhost:3000') . '/login?error=google_auth_failed');
         }
     }
@@ -234,19 +270,32 @@ class AuthController extends Controller
      */
     public function respondWithToken($access_token, $user)
     {
-        // $user = auth('api')->user();
-        return response()->json([
-            'access_token' => $access_token,
-            'token_type'   => 'bearer',
-            'expires_in'   => auth('api')->factory()->getTTL() * 60,
-            'user'         => [
-                'id'         => $user->id,
-                'name'       => $user->name,
-                'email'      => $user->email,
-                'phone'      => $user->phone,
-                'role'       => $user->role,
-                'avatar_url' => $user->avatar ? asset('storage/' . $user->avatar) : null,
-            ],
+        $expires_in = auth('api')->factory()->getTTL() * 60;
+        $user_data = [
+            'id'         => $user->id,
+            'name'       => $user->name,
+            'email'      => $user->email,
+            'phone'      => $user->phone,
+            'role'       => $user->role,
+            'avatar_url' => $user->avatar ? asset('storage/' . $user->avatar) : null,
+        ];
+
+        $response = response()->json([
+            'user'       => $user_data,
+            'token_type' => 'bearer',
+            'expires_in' => $expires_in,
         ]);
+        $cookie = cookie(
+            'access_token',
+            $access_token,
+            config('jwt.refresh_ttl', 20160),
+            '/',
+            env('SESSION_DOMAIN'),
+            env('SESSION_SECURE_COOKIE', false),
+            true,           // HTTP-only: PENTING!
+            'Lax',          // Same-site: biarkan default atau sesuai session config
+        );
+
+        return $response->cookie($cookie);
     }
 }

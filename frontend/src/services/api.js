@@ -4,84 +4,29 @@ export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true,
 });
 
-// --- PERBAIKAN LOGIKA REFRESH TOKEN ---
-let isRefreshing = false;
-let failedQueue = [];
-
-const processQueue = (error, token = null) => {
-  failedQueue.forEach(prom => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
-  });
-  failedQueue = [];
-};
-
-// DIUBAH: Request interceptor sekarang menjadi proaktif
 api.interceptors.request.use(async (config) => {
-  if (config.url === '/auth/refresh') {
-    return config;
-  }
-
-  const token = localStorage.getItem('auth.accessToken');
-  const expiresAt = localStorage.getItem('auth.expiresAt');
-
-  if (!token || !expiresAt) {
-    return config; // Jika tidak ada token, lanjutkan saja
-  }
-
-  // Cek apakah token akan/sudah kedaluwarsa
-  if (Date.now() > parseInt(expiresAt)) {
-    if (!isRefreshing) {
-      isRefreshing = true;
-      try {
-        console.log("Token kedaluwarsa, memulai refresh proaktif...");
-        const { data } = await axios.post(`${API_BASE_URL}/auth/refresh`, {}, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        const newAccessToken = data.access_token;
-        const newExpiresAt = Date.now() + (data.expires_in * 1000) - 60000;
-        
-        localStorage.setItem('auth.accessToken', newAccessToken);
-        localStorage.setItem('auth.expiresAt', newExpiresAt.toString());
-        
-        // Perbarui header untuk request yang sedang berjalan
-        config.headers.Authorization = `Bearer ${newAccessToken}`;
-        
-        processQueue(null, newAccessToken);
-        return config;
-      } catch (error) {
-        processQueue(error, null);
-        // Jika refresh gagal, biarkan response interceptor yang menangani logout
-        return Promise.reject(error);
-      } finally {
-        isRefreshing = false;
-      }
-    }
-
-    // Jika proses refresh sedang berjalan, request ini akan menunggu
-    return new Promise((resolve, reject) => {
-      failedQueue.push({ resolve, reject });
-    }).then(newToken => {
-      config.headers.Authorization = `Bearer ${newToken}`;
-      return config;
-    });
-  }
-
-  // Jika token valid, pasang header dan lanjutkan
-  config.headers.Authorization = `Bearer ${token}`;
   return config;
 }, (error) => {
-  return Promise.reject(error);
+    return Promise.reject(error);
 });
 
+let isRefreshing = false;
+let failedQueue = []; 
 
-// DIUBAH: Response interceptor sekarang hanya sebagai fallback
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+    failedQueue = [];
+};
+
 let interceptor;
 
 export const injectAuthHooks = (authHooks) => {
@@ -92,14 +37,39 @@ export const injectAuthHooks = (authHooks) => {
     interceptor = api.interceptors.response.use(
         (response) => response,
         async (error) => {
-            // Interceptor ini sekarang hanya bertindak sebagai jaring pengaman terakhir.
-            // Jika request gagal dengan 401 (misalnya karena token refresh juga tidak valid),
-            // maka kita akan langsung logout pengguna.
-            if (error.response?.status === 401) {
-                console.error("Proses refresh gagal atau token tidak valid. Melakukan logout...");
-                authHooks.logout();
+            const originalRequest = error.config;
+
+            if (originalRequest.url.includes('/auth/refresh')) {
+                 return Promise.reject(error);
             }
 
+            if (error.response?.status === 401 && !originalRequest._retry) {
+                if (isRefreshing) {
+                    return new Promise(function(resolve, reject) {
+                        failedQueue.push({resolve, reject});
+                    }).then(() => {
+                        return api(originalRequest);
+                    }).catch(err => {
+                        return Promise.reject(err);
+                    });
+                }
+                originalRequest._retry = true;
+                isRefreshing = true;
+                try {
+                    console.log("Token kadaluarsa. Memulai proses refresh tunggal...");
+                    await api.post('/auth/refresh'); 
+                    console.log("Refresh sukses. Memproses antrean request yang tertunda...");
+                    processQueue(null, "success"); 
+                    return api(originalRequest);
+                } catch (refreshError) {
+                    console.error("Gagal refresh token. Logout semua sesi.", refreshError);
+                    processQueue(refreshError, null);
+                    authHooks.logout();
+                    return Promise.reject(refreshError);
+                } finally {
+                    isRefreshing = false;
+                }
+            }
             return Promise.reject(error);
         }
     );
