@@ -141,6 +141,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
     const [shouldRender, setShouldRender] = useState(show);
     const [selectedMasterBarang, setSelectedMasterBarang] = useState(null);
 
+
     useEffect(() => {
         if (show) {
             setShouldRender(true);
@@ -163,24 +164,35 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
 
     /* ---------------- Barcode Scanner ---------------- */
     const handleScan = useCallback(
-        (scannedSerial) => {
+        async (scannedSerial) => {
             const trimmedSerial = scannedSerial.trim();
 
             if (activeSerialIndex < formData.serial_numbers.length) {
                 const otherSerials = formData.serial_numbers
                     .filter((_, i) => i !== activeSerialIndex)
                     .map(sn => sn.trim());
-                if (otherSerials.includes(trimmedSerial)) {
-                    showToast(`Serial Number "${trimmedSerial}" sudah ada di entri lain. Ganti dengan SN yang sesuai.`, 'error');
-                    const newSerials = [...formData.serial_numbers];
-                    newSerials[activeSerialIndex] = '';
-                    setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
 
+                if (otherSerials.includes(trimmedSerial)) {
+                    showToast(`Serial Number "${trimmedSerial}" ganda di form ini.`, 'error');
+                    const newSerials = [...formData.serial_numbers];
+                    newSerials[activeSerialIndex] = ''; 
+                    setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
                     return;
                 }
+                const isExistsInDb = await checkSnOnServer(trimmedSerial);
+
+                if (isExistsInDb) {
+                    showToast(`Serial Number "${trimmedSerial}" SUDAH ADA di database!`, 'error');
+                    const newSerials = [...formData.serial_numbers];
+                    newSerials[activeSerialIndex] = ''; 
+                    setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
+                    return; 
+                }
+
                 const newSerials = [...formData.serial_numbers];
                 newSerials[activeSerialIndex] = trimmedSerial;
                 setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
+
                 const nextIndex = activeSerialIndex + 1;
                 if (nextIndex < formData.serial_numbers.length) {
                     setActiveSerialIndex(nextIndex);
@@ -193,6 +205,32 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
         },
         [activeSerialIndex, formData.serial_numbers, showToast]
     );
+
+    const handleSerialBlur = async (index, value) => {
+        const trimmedValue = value.trim();
+        if (!trimmedValue) return;
+        const isExistsInDb = await checkSnOnServer(trimmedValue);
+
+        if (isExistsInDb) {
+            showToast(`Serial Number "${trimmedValue}" SUDAH ADA di database!`, 'error');
+            const newSerials = [...formData.serial_numbers];
+            newSerials[index] = '';
+            setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
+        }
+    };
+
+    const checkSnOnServer = async (serial) => {
+        if (!serial) return false;
+        try {
+            const response = await api.post('/inventory/check-sn-availability', {
+                serial_number: serial
+            });
+            return response.data.exists; 
+        } catch (error) {
+            console.error("Gagal validasi SN:", error);
+            return false;
+        }
+    };
 
     useScannerListener(handleScan, show);
 
@@ -322,27 +360,19 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const requiredCount = parseInt(formData.jumlah, 10) || 0;
         const filledSerials = formData.serial_numbers.filter(sn => sn && sn.trim() !== '');
-        const isAnySerialEmpty = filledSerials.length !== requiredCount;
-
-        if (isAnySerialEmpty) {
-            showToast(
-                `Anda harus mengisi ${requiredCount} Serial Number (saat ini baru terisi ${filledSerials.length} SN).`,
-                'error'
-            );
-            return;
-        }
         const serialSet = new Set(filledSerials);
         if (serialSet.size !== filledSerials.length) {
             showToast('Ada Serial Number ganda di form. Harap periksa kembali.', 'error');
             return;
         }
-
-
+        const dataToSend = {
+            ...formData,
+            serial_numbers: filledSerials,
+        };
         setIsLoading(true);
         try {
-            const response = await api.post('/inventory/stock-items', formData);
+            const response = await api.post('/inventory/stock-items', dataToSend);
             setNewlyCreatedItems(response.data);
             setView('success');
             showToast('Stok baru berhasil ditambahkan.', 'success');
@@ -485,17 +515,20 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                                                 placeholder={`S/N #${index + 1}`}
                                                 value={sn}
                                                 onChange={(e) => handleSerialChange(index, e.target.value)}
+                                                onBlur={(e) => handleSerialBlur(index, e.target.value)}
+
                                                 onClick={() => setActiveSerialIndex(index)}
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter') {
                                                         e.preventDefault();
+                                                        handleSerialBlur(index, sn);
+
                                                         const nextIndex = index + 1;
                                                         if (nextIndex < formData.serial_numbers.length) {
                                                             setActiveSerialIndex(nextIndex);
                                                         }
                                                     }
                                                 }}
-
                                                 className={`serial-number-input ${index === activeSerialIndex ? 'active-scan' : ''}`}
                                             />
                                         ))}
