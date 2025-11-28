@@ -164,19 +164,28 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
     /* ---------------- Barcode Scanner ---------------- */
     const handleScan = useCallback(
         (scannedSerial) => {
+            const trimmedSerial = scannedSerial.trim();
+
             if (activeSerialIndex < formData.serial_numbers.length) {
-                if (formData.serial_numbers.includes(scannedSerial)) {
-                    showToast(`Serial number "${scannedSerial}" sudah di-scan.`, 'warning');
+                const otherSerials = formData.serial_numbers
+                    .filter((_, i) => i !== activeSerialIndex)
+                    .map(sn => sn.trim());
+                if (otherSerials.includes(trimmedSerial)) {
+                    showToast(`Serial Number "${trimmedSerial}" sudah ada di entri lain. Ganti dengan SN yang sesuai.`, 'error');
+                    const newSerials = [...formData.serial_numbers];
+                    newSerials[activeSerialIndex] = '';
+                    setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
+
                     return;
                 }
-
                 const newSerials = [...formData.serial_numbers];
-                newSerials[activeSerialIndex] = scannedSerial;
+                newSerials[activeSerialIndex] = trimmedSerial;
                 setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
-
                 const nextIndex = activeSerialIndex + 1;
                 if (nextIndex < formData.serial_numbers.length) {
                     setActiveSerialIndex(nextIndex);
+                } else {
+                    setActiveSerialIndex(formData.serial_numbers.length - 1);
                 }
             } else {
                 showToast('Semua kolom serial number sudah terisi.', 'info');
@@ -212,7 +221,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                 setSelectedMasterBarang(itemToPreselect);
             } else {
                 setMasterBarangOptions(options);
-                setSelectedMasterBarang(null); 
+                setSelectedMasterBarang(null);
             }
         });
         api.get('/colors').then((res) => {
@@ -280,7 +289,22 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
     };
 
     const handleSerialChange = (index, value) => {
+        const trimmedValue = value.trim();
+
         const newSerials = [...formData.serial_numbers];
+
+        if (trimmedValue !== '') {
+            const otherSerials = formData.serial_numbers
+                .filter((_, i) => i !== index)
+                .map(sn => sn.trim());
+
+            if (otherSerials.includes(trimmedValue)) {
+                showToast(`Serial Number "${trimmedValue}" sudah ada di entri lain. Ganti dengan SN yang sesuai.`, 'error');
+                newSerials[index] = '';
+                setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
+                return;
+            }
+        }
         newSerials[index] = value;
         setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
     };
@@ -298,6 +322,24 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const requiredCount = parseInt(formData.jumlah, 10) || 0;
+        const filledSerials = formData.serial_numbers.filter(sn => sn && sn.trim() !== '');
+        const isAnySerialEmpty = filledSerials.length !== requiredCount;
+
+        if (isAnySerialEmpty) {
+            showToast(
+                `Anda harus mengisi ${requiredCount} Serial Number (saat ini baru terisi ${filledSerials.length} SN).`,
+                'error'
+            );
+            return;
+        }
+        const serialSet = new Set(filledSerials);
+        if (serialSet.size !== filledSerials.length) {
+            showToast('Ada Serial Number ganda di form. Harap periksa kembali.', 'error');
+            return;
+        }
+
+
         setIsLoading(true);
         try {
             const response = await api.post('/inventory/stock-items', formData);
@@ -306,7 +348,32 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
             showToast('Stok baru berhasil ditambahkan.', 'success');
             onSaveSuccess();
         } catch (error) {
-            showToast(error.response?.data?.message || 'Gagal menambah stok.', 'error');
+            const errorData = error.response?.data;
+            let errorMessage = 'Gagal menambah stok.';
+            if (error.response?.status === 422 && errorData?.errors) {
+                const serialErrorKey = Object.keys(errorData.errors).find(key =>
+                    key.startsWith('serial_numbers.')
+                );
+
+                if (serialErrorKey) {
+                    const errorIndex = parseInt(serialErrorKey.split('.')[1], 10);
+                    const failedSerial = formData.serial_numbers[errorIndex];
+                    errorMessage = `Serial Number "${failedSerial}" sudah ada di daftar barang (terdaftar di database). Ganti serial number baru.`;
+                    setFormData(prev => {
+                        const newSerials = [...prev.serial_numbers];
+                        newSerials[errorIndex] = '';
+                        return { ...prev, serial_numbers: newSerials };
+                    });
+                    setActiveSerialIndex(errorIndex);
+
+                } else {
+                    errorMessage = errorData.message || errorData.errors[Object.keys(errorData.errors)[0]][0] || errorMessage;
+                }
+            } else if (errorData?.message) {
+                errorMessage = errorData.message;
+            }
+
+            showToast(errorMessage, 'error');
         } finally {
             setIsLoading(false);
         }
@@ -334,7 +401,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                                     <Select classNamePrefix="creatable-select"
                                         options={masterBarangOptions}
                                         value={selectedMasterBarang}
-                                        onChange={handleMasterBarangChange} 
+                                        onChange={handleMasterBarangChange}
                                         placeholder="Cari nama atau kode barang..."
                                         isClearable
                                     />
@@ -411,11 +478,24 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                                     <label>Serial Number (Bisa di-scan)</label>
                                     <div className="serial-number-container">
                                         {formData.serial_numbers.map((sn, index) => (
-                                            <input key={index} ref={(el) => (serialInputRefs.current[index] = el)}
-                                                type="text" placeholder={`S/N #${index + 1}`}
+                                            <input
+                                                key={index}
+                                                ref={(el) => (serialInputRefs.current[index] = el)}
+                                                type="text"
+                                                placeholder={`S/N #${index + 1}`}
                                                 value={sn}
                                                 onChange={(e) => handleSerialChange(index, e.target.value)}
                                                 onClick={() => setActiveSerialIndex(index)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                        const nextIndex = index + 1;
+                                                        if (nextIndex < formData.serial_numbers.length) {
+                                                            setActiveSerialIndex(nextIndex);
+                                                        }
+                                                    }
+                                                }}
+
                                                 className={`serial-number-input ${index === activeSerialIndex ? 'active-scan' : ''}`}
                                             />
                                         ))}
@@ -451,8 +531,6 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                 <QrPrintSheet ref={printRef} items={newlyCreatedItems} />,
                 document.getElementById('print-portal')
             )}
-
-            {/* --- KOMPONEN PRINT DITEMPATKAN DI SINI (TIDAK TERLIHAT DI LAYAR) --- */}
             <QrPrintSheet ref={printRef} items={newlyCreatedItems} />
         </>
     );

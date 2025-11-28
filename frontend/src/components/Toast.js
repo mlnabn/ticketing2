@@ -1,20 +1,30 @@
-// src/components/Toast.js
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { FaCheckCircle, FaTimesCircle, FaInfoCircle } from 'react-icons/fa';
+import { FaCheckCircle, FaTimesCircle, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
+import { useLocation } from 'react-router-dom';
 import './Toast.css';
+
 
 const icons = {
   success: <FaCheckCircle />,
   error: <FaTimesCircle />,
   info: <FaInfoCircle />,
+  warning: <FaExclamationTriangle />,
 };
 
 const Toast = ({ message, type, onClose }) => {
+  const location = useLocation();
+  const initialPath = useRef(location.pathname);
+
+  useEffect(() => {
+    if (location.pathname !== initialPath.current) {
+      onClose();
+    }
+  }, [location, onClose]);
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
-    }, 3000); // Otomatis hilang setelah 3 detik
+    }, 3000);
 
     return () => {
       clearTimeout(timer);
