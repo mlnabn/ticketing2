@@ -113,14 +113,14 @@ class AuthController extends Controller
         $response = response()->json(['message' => 'Successfully logged out'], 200);
 
         $cookie = cookie(
-            'access_token', 
-            null, 
-            -1, 
-            '/',            
-            env('SESSION_DOMAIN'), 
-            env('SESSION_SECURE_COOKIE', false), 
-            true, 
-            'None' 
+            'access_token',
+            null,
+            -1,
+            '/',
+            config('session.domain'),
+            config('session.secure'),
+            true,
+            config('session.same_site')
         );
 
         return $response->cookie($cookie);
@@ -246,14 +246,14 @@ class AuthController extends Controller
             Log::info('Konfigurasi Cookie:', ['domain' => $session_domain ?? 'null', 'secure' => $cookie_secure, 'http_only' => true, 'same_site' => 'Lax']);
 
             $cookie = cookie(
-                'access_token', 
-                $access_token,  
+                'access_token',
+                $access_token,
                 config('jwt.refresh_ttl', 20160),
-                '/',            
-                $session_domain, 
-                $cookie_secure, 
-                true,           // HTTP-only: PENTING!
-                'Lax'          // Pastikan SameSite 'None' jika ada perbedaan domain/port
+                '/',
+                config('session.domain'),
+                config('session.secure'),
+                true,
+                config('session.same_site')
             );
 
             Log::info('Cookie telah di-queue (antrikan). Melakukan redirect...');
@@ -290,10 +290,10 @@ class AuthController extends Controller
             $access_token,
             config('jwt.refresh_ttl', 20160),
             '/',
-            env('SESSION_DOMAIN'),
-            env('SESSION_SECURE_COOKIE', false),
-            true,           // HTTP-only: PENTING!
-            'Lax',          // Same-site: biarkan default atau sesuai session config
+            config('session.domain'),
+            config('session.secure'),
+            true,
+            config('session.same_site')
         );
 
         return $response->cookie($cookie);
