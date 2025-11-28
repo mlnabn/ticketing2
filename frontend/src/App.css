@@ -5187,7 +5187,7 @@ body.dark-mode .rejection-reason-display p {
   border-radius: 8px !important;
   padding: 3.4px 0px 3.4px 10px !important;
   font-size: 14px;
-  background-color: #f9f9f9 !important;
+  background-color: #F5F5F5 !important;
   color: #111827;
   border-color: #f9fafb;
   cursor: pointer !important;
@@ -5196,7 +5196,12 @@ body.dark-mode .rejection-reason-display p {
 .custom-select-notif__menu {
   border-radius: 8px !important;
   border: 1px solid #d1d5db !important;
-  background-color: #f9f9f9 !important;
+  background-color: #F5F5F5 !important;
+}
+
+.custom-select-notif__option {
+  background-color: #F5F5F5 !important;
+  cursor: pointer !important;
 }
 
 .custom-select-notif__option--is-focused {
@@ -5208,6 +5213,10 @@ body.dark-mode .rejection-reason-display p {
   background-color: #d6eaf8 !important;
   color: #154360 !important;
 
+}
+
+.dark-mode .custom-select-notif__option {
+  background-color: #3a3f44 !important;
 }
 
 .dark-mode .custom-select-notif__control {
@@ -5586,7 +5595,7 @@ body.dark-mode .btn-scan:hover {
 .modal-content .form-group textarea,
 .modal-content .form-group input {
   width: 100%;
-  background: #ffffff;
+  background: #F5F5F5;
   border-color: #d1d5db;
   color: #111827;
   border-radius: 8px;
@@ -5609,7 +5618,7 @@ body.dark-mode .btn-scan:hover {
 .form-group2 input,
 .form-group2 select,
 .form-group2 textarea {
-  background: #f9f9f9;
+  background: #F5F5F5;
   border-color: #d1d5db;
   color: #111827;
 }
@@ -6035,6 +6044,12 @@ body.dark-mode .history-item-content small {
 
 .custom-select-role__option {
   padding: 10px 12px;
+  background-color: #F5F5F5 !important;
+  cursor: pointer !important;
+}
+
+.dark-mode .custom-select-role__option {
+  background-color: #3a3f44 !important;
 }
 
 .custom-select-role__option--is-focused {
@@ -8515,7 +8530,7 @@ html {
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  padding: 4px 8px;
+  padding: 0px 8px;
   border-radius: 12px;
   background-color: #f9f9f9;
   color: var(--text-color);
@@ -10830,12 +10845,20 @@ body.dark-mode .form-group-recover textarea:focus {
 /* 3. Opsi di dalam Dropdown (opsional, untuk tampilan lebih rapi) */
 .report-filter-select__option {
   padding: 10px 12px;
+  background-color: var(--input-bg, #FFFFFF) !important;
+  cursor: pointer !important;
+}
+
+.dark-mode .report-filter-select__option {
+  background-color: rgba(71, 85, 105, 0.25) !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
+  color: #e2e8f0 !important;
 }
 
 .report-filter-select__option--is-focused {
   background-color: #f0f0f0 !important;
   color: #333333 !important;
-
 }
 
 .report-filter-select__option--is-selected {
@@ -10854,10 +10877,6 @@ body.dark-mode .form-group-recover textarea:focus {
 .dark-mode .report-filter-select__menu {
   background-color: #2d3748;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-.dark-mode .report-filter-select__option {
-  color: #e2e8f0;
 }
 
 .dark-mode .report-filter-select__option--is-focused {
@@ -11049,6 +11068,20 @@ body.dark-mode .form-group-recover textarea:focus {
 .dark-mode .filter-select-invent__menu {
   background-color: #2d3748;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.filter-select-invent__option {
+  padding: 10px 12px;
+  background-color: var(--input-bg, #FFFFFF) !important;
+  color: #333333 !important;
+  cursor: pointer !important;
+}
+
+.dark-mode .filter-select-invent__option {
+  color: #e2e8f0 !important;
+  background-color: rgba(71, 85, 105, 0.25) !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
 }
 
 /* Option Hover/Focus State (Light Mode) */
@@ -11483,10 +11516,11 @@ body.dark-mode .form-group-recover textarea:focus {
   border: 1px solid #ccc !important;
   border-radius: 8px !important;
   box-shadow: none !important;
-  min-height: 40px;
-  padding: 3.4px 0px 3.4px 10px !important;
+  min-height: none !important;
+  padding: 0px 8px !important;
   background-color: #f9f9f9 !important;
   cursor: pointer !important;
+  width: 100% !important;
 }
 
 .dark-mode .custom-select-return__input-container {
@@ -11500,7 +11534,9 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .custom-select-return__option {
-  padding: 10px 12px;
+  padding: none !important;
+  cursor: pointer !important;
+  width: 100% !important;
 }
 
 .custom-select-return__option--is-focused {
@@ -11884,7 +11920,7 @@ label {
 input,
 select,
 textarea {
-  background-color: #FFFFFF;
+  background-color: #F5F5F5;
   color: #212529;
   border: 1px solid #ced4da;
 }
@@ -11955,6 +11991,7 @@ input:disabled {
 
 .custom-select-kondisi__option {
   color: #212529 !important;
+  cursor: pointer !important;
 }
 
 .custom-select-kondisi__option--is-focused {
@@ -12053,6 +12090,7 @@ input:disabled {
 
 .creatable-select__option {
   color: #212529 !important;
+  cursor: pointer !important;
 }
 
 .creatable-select__option--is-focused {

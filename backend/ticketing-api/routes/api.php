@@ -39,7 +39,7 @@ Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallbac
 Route::post('/auth/password/request-otp', [ForgotPasswordController::class, 'requestPasswordOtp']);
 Route::post('/auth/password/reset-with-otp', [ForgotPasswordController::class, 'resetPasswordWithOtp']);
 
-Route::post('/auth/refresh', [AuthController::class, 'refresh'])->middleware('jwt.refresh');
+Route::post('/auth/refresh', [AuthController::class, 'refresh'])->middleware('jwt');
 
 Route::post('/tickets/whatsapp', [TicketController::class, 'storeFromWhatsapp'])->middleware('apikey.auth');
 
