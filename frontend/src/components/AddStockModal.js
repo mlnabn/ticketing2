@@ -166,8 +166,9 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
     const handleScan = useCallback(
         async (scannedSerial) => {
             const trimmedSerial = scannedSerial.trim();
+            const count = formData.serial_numbers.length;
 
-            if (activeSerialIndex < formData.serial_numbers.length) {
+            if (activeSerialIndex < count) {
                 const otherSerials = formData.serial_numbers
                     .filter((_, i) => i !== activeSerialIndex)
                     .map(sn => sn.trim());
@@ -175,7 +176,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                 if (otherSerials.includes(trimmedSerial)) {
                     showToast(`Serial Number "${trimmedSerial}" ganda di form ini.`, 'error');
                     const newSerials = [...formData.serial_numbers];
-                    newSerials[activeSerialIndex] = ''; 
+                    newSerials[activeSerialIndex] = '';
                     setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
                     return;
                 }
@@ -184,9 +185,9 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                 if (isExistsInDb) {
                     showToast(`Serial Number "${trimmedSerial}" SUDAH ADA di database!`, 'error');
                     const newSerials = [...formData.serial_numbers];
-                    newSerials[activeSerialIndex] = ''; 
+                    newSerials[activeSerialIndex] = '';
                     setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
-                    return; 
+                    return;
                 }
 
                 const newSerials = [...formData.serial_numbers];
@@ -194,13 +195,26 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                 setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
 
                 const nextIndex = activeSerialIndex + 1;
-                if (nextIndex < formData.serial_numbers.length) {
+                if (nextIndex < count) {
                     setActiveSerialIndex(nextIndex);
                 } else {
-                    setActiveSerialIndex(formData.serial_numbers.length - 1);
+                    // **NEW BEHAVIOR**
+                    showToast(
+                        'Semua Serial Number sudah terisi. Tambah jumlah atau simpan sebelum scan lagi.',
+                        'warning'
+                    );
+
+                    // Tetap fokus di last input, bukan pindah submit
+                    setActiveSerialIndex(count - 1);
+
+                    return;
                 }
             } else {
-                showToast('Semua kolom serial number sudah terisi.', 'info');
+                showToast(
+                    'Slot serial number penuh. Tambah jumlah atau simpan terlebih dahulu.',
+                    'warning'
+                );
+                return;
             }
         },
         [activeSerialIndex, formData.serial_numbers, showToast]
@@ -225,7 +239,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
             const response = await api.post('/inventory/check-sn-availability', {
                 serial_number: serial
             });
-            return response.data.exists; 
+            return response.data.exists;
         } catch (error) {
             console.error("Gagal validasi SN:", error);
             return false;
@@ -234,14 +248,20 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
 
     useScannerListener(handleScan, show);
 
+    const submitButtonRef = useRef(null);
+
     /* ---------------- Focus Handler ---------------- */
     useEffect(() => {
-        if (show && serialInputRefs.current[activeSerialIndex]) {
-            serialInputRefs.current[activeSerialIndex].focus();
+        if (show) {
+            if (activeSerialIndex >= 0 && serialInputRefs.current[activeSerialIndex]) {
+                serialInputRefs.current[activeSerialIndex].focus();
+            } else if (activeSerialIndex === -1 && submitButtonRef.current) {
+                // Pindahkan fokus ke tombol simpan setelah semua SN terisi
+                submitButtonRef.current.focus();
+            }
         }
     }, [show, activeSerialIndex]);
 
-    /* ---------------- Load Data ---------------- */
     useEffect(() => {
         if (!show) return;
         api.get('/inventory/items-flat?all=true').then((res) => {
@@ -526,6 +546,8 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                                                         const nextIndex = index + 1;
                                                         if (nextIndex < formData.serial_numbers.length) {
                                                             setActiveSerialIndex(nextIndex);
+                                                        } else {
+                                                            setActiveSerialIndex(-1);
                                                         }
                                                     }
                                                 }}
@@ -533,10 +555,18 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                                             />
                                         ))}
                                     </div>
+                                    {formData.serial_numbers.every(sn => sn.trim() !== '') && (
+                                        <div className="sn-full-message" style={{ marginTop: '8px' }}>
+                                            <small style={{ color: '#d9534f', fontWeight: 600 }}>
+                                                Semua Serial Number sudah terisi. Klik simpan atau tambah jumlah jika ingin scan lagi.
+                                            </small>
+                                        </div>
+                                    )}
+
                                 </div>
                                 <div className="confirmation-modal-actions">
                                     <button type="button" onClick={handleCloseAndReset} className="btn-cancel">Batal</button>
-                                    <button type="submit" className="btn-confirm" disabled={isLoading}>Simpan</button>
+                                    <button type="submit" className="btn-confirm" disabled={isLoading} ref={submitButtonRef}>Simpan</button>
                                 </div>
                             </form>
                         </>
