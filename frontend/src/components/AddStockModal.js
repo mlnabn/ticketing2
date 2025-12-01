@@ -5,7 +5,7 @@ import api from '../services/api';
 import QrPrintSheet from './QrPrintSheet';
 
 /* ===========================================================
-   Custom Components for Color Select (MODIFIED)
+   Custom Components for Color Select 
 =========================================================== */
 const ColorOption = (props) => (
     <div
@@ -194,20 +194,16 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                 newSerials[activeSerialIndex] = trimmedSerial;
                 setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
 
-                const nextIndex = activeSerialIndex + 1;
-                if (nextIndex < count) {
-                    setActiveSerialIndex(nextIndex);
+                const emptyIndex = newSerials.findIndex(sn => sn.trim() === '');
+
+                if (emptyIndex !== -1) {
+                    setActiveSerialIndex(emptyIndex);
                 } else {
-                    // **NEW BEHAVIOR**
                     showToast(
                         'Semua Serial Number sudah terisi. Tambah jumlah atau simpan sebelum scan lagi.',
                         'warning'
                     );
-
-                    // Tetap fokus di last input, bukan pindah submit
                     setActiveSerialIndex(count - 1);
-
-                    return;
                 }
             } else {
                 showToast(
@@ -219,6 +215,12 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
         },
         [activeSerialIndex, formData.serial_numbers, showToast]
     );
+
+    const blockEnterSubmit = (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+        }
+    };
 
     const handleSerialBlur = async (index, value) => {
         const trimmedValue = value.trim();
@@ -256,7 +258,6 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
             if (activeSerialIndex >= 0 && serialInputRefs.current[activeSerialIndex]) {
                 serialInputRefs.current[activeSerialIndex].focus();
             } else if (activeSerialIndex === -1 && submitButtonRef.current) {
-                // Pindahkan fokus ke tombol simpan setelah semua SN terisi
                 submitButtonRef.current.focus();
             }
         }
@@ -445,7 +446,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                     {view === 'form' && (
                         <>
                             <h3>Tambah Stok Barang</h3>
-                            <form onSubmit={handleSubmit}>
+                            <form onKeyDown={blockEnterSubmit} onSubmit={handleSubmit}>
                                 <div className="form-group-half">
                                     <label>Pilih Barang (SKU)</label>
                                     <Select classNamePrefix="creatable-select"
