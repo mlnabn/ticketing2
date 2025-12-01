@@ -75,14 +75,6 @@ export default function WorkshopFormModal({ show, workshopToEdit, onClose, onSav
               <label htmlFor="name">Nama Workshop</label>
               <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} required />
             </div>
-            {/* <div className="form-group">
-              <label htmlFor="lat">Latitude (Garis Lintang)</label>
-              <input type="text" id="lat" value={lat} onChange={e => setLat(e.target.value)} placeholder="-7.3206" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="lng">Longitude (Garis Bujur)</label>
-              <input type="text" id="lng" value={lng} onChange={e => setLng(e.target.value)} placeholder="110.5114" />
-            </div> */}
             <div className="form-group">
               <label htmlFor="description">Deskripsi Singkat</label>
               <input type="text" id="description" value={description} onChange={e => setDescription(e.target.value)} placeholder="Lokasi utama..." />

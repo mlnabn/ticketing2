@@ -29,7 +29,7 @@ class UserController extends Controller
             return $query->get();
         }
 
-        $perPage = $request->query('per_page', 10);
+        $perPage = $request->query('per_page', 15);
         $users = $query->orderBy('role', 'asc')->orderBy('name', 'asc')->paginate($perPage);
         return response()->json($users);
     }

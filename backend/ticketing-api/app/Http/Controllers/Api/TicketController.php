@@ -236,30 +236,30 @@ class TicketController extends Controller
         $firstPhoneNumber = $phoneParts[0];
         $cleanPhoneNumber = preg_replace('/[^0-9]/', '', $firstPhoneNumber);
 
-        $lockKey = 'creating-user-lock-' . $cleanPhoneNumber;
-        $lock = Cache::lock($lockKey, 10);
+        $user = User::where('phone', $cleanPhoneNumber)->first();
 
-        try {
-            if ($lock->get()) {
+        if (!$user) {
+            try {
                 $user = User::firstOrCreate(
                     ['phone' => $cleanPhoneNumber],
                     [
                         'name' => $validated['sender_name'],
+                        // Create a dummy email for WA users
                         'email' => $cleanPhoneNumber . '@whatsapp.user',
                         'password' => bcrypt(Str::random(16)),
                         'role' => 'user'
                     ]
                 );
-                $lock->release();
-            } else {
-                sleep(1);
-                $user = User::where('phone', $cleanPhoneNumber)->firstOrFail();
+            } catch (\Exception $e) {
+                // If race condition happens (user created by another req just now),
+                // fallback to finding it again.
+                $user = User::where('phone', $cleanPhoneNumber)->first();
+                
+                if (!$user) {
+                     Log::error("Failed to create or find user for WA ticket: " . $e->getMessage());
+                     return response()->json(['error' => 'Gagal memproses user.'], 500);
+                }
             }
-        } catch (\Exception $e) {
-            if ($lock && $lock->isOwned()) {
-                $lock->release();
-            }
-            return response()->json(['error' => 'Gagal memproses user: ' . $e->getMessage()], 500);
         }
 
         $isUrgent = $this->classifyUrgencyWithAI($validated['title']);

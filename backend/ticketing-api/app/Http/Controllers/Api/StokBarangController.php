@@ -373,6 +373,24 @@ class StokBarangController extends Controller
         return response()->json($history);
     }
 
+    public function checkSnAvailability(Request $request)
+    {
+        $request->validate([
+            'serial_number' => 'required|string',
+        ]);
+
+        $sn = $request->serial_number;
+
+        $exists = StokBarang::where('serial_number', $sn)->exists();
+
+        return response()->json([
+            'exists' => $exists,
+            'message' => $exists
+                ? 'Serial Number sudah terdaftar di sistem.'
+                : 'Serial Number tersedia.'
+        ]);
+    }
+
     public function __construct()
     {
         \Illuminate\Support\Facades\Validator::extend('required_if_status', function ($attribute, $value, $parameters, $validator) {
@@ -479,19 +497,17 @@ class StokBarangController extends Controller
         $isFilteringEndOfLife = $statusFilter && $statusFilter !== 'ALL' && $endOfLifeStatuses->contains($statusFilter);
 
         if ($statusFilter && $statusFilter !== 'ALL') {
-             $query->whereHas('stokBarangs', function ($q) use ($statusFilter) {
+            $query->whereHas('stokBarangs', function ($q) use ($statusFilter) {
                 $q->where('status_id', $statusFilter);
             });
-        } 
-        else if ( ($statusFilter === null || $statusFilter === '') && $tersediaStatusId ) { 
-             $query->having('available_stock_count', '>', 0);
+        } else if (($statusFilter === null || $statusFilter === '') && $tersediaStatusId) {
+            $query->having('available_stock_count', '>', 0);
         }
 
         if ($statusFilter !== 'ALL' && !$isFilteringEndOfLife) {
             if ($statusFilter === null || $statusFilter === '') {
-                 $query->having('available_stock_count', '>', 0);
-            } 
-            else if ($statusFilter && $statusFilter !== 'ALL') {
+                $query->having('available_stock_count', '>', 0);
+            } else if ($statusFilter && $statusFilter !== 'ALL') {
                 $query->having('total_stock_count', '>', 0);
             }
         }
@@ -508,21 +524,20 @@ class StokBarangController extends Controller
         $itemsForCurrentPage = $allItems->slice(($currentPage - 1) * $perPage, $perPage);
         $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
             $itemsForCurrentPage->values(),
-            $allItems->count(),             
-            $perPage,                        
-            $currentPage,                    
+            $allItems->count(),
+            $perPage,
+            $currentPage,
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        
+
         return response()->json([
             'data' => $paginator->items(),
             'current_page' => $paginator->currentPage(),
             'last_page' => $paginator->lastPage(),
             'per_page' => $paginator->perPage(),
-            'total' => $paginator->total(), 
+            'total' => $paginator->total(),
             'grand_total_units' => $grandTotalUnits,
         ]);
-
     }
 }
