@@ -236,28 +236,31 @@ class TicketController extends Controller
         $firstPhoneNumber = $phoneParts[0];
         $cleanPhoneNumber = preg_replace('/[^0-9]/', '', $firstPhoneNumber);
 
+        $dummyEmail = $cleanPhoneNumber . '@whatsapp.user';
         $user = User::where('phone', $cleanPhoneNumber)->first();
 
         if (!$user) {
-            try {
-                $user = User::firstOrCreate(
-                    ['phone' => $cleanPhoneNumber],
-                    [
+            $user = User::where('email', $dummyEmail)->first();
+
+            if ($user) {
+                $user->update([
+                    'phone' => $cleanPhoneNumber
+                ]);
+            } else {
+                try {
+                    $user = User::create([
+                        'phone' => $cleanPhoneNumber,
                         'name' => $validated['sender_name'],
-                        // Create a dummy email for WA users
-                        'email' => $cleanPhoneNumber . '@whatsapp.user',
-                        'password' => bcrypt(Str::random(16)),
+                        'email' => $dummyEmail,
+                        'password' => bcrypt('ticket_IT'), 
                         'role' => 'user'
-                    ]
-                );
-            } catch (\Exception $e) {
-                // If race condition happens (user created by another req just now),
-                // fallback to finding it again.
-                $user = User::where('phone', $cleanPhoneNumber)->first();
-                
-                if (!$user) {
-                     Log::error("Failed to create or find user for WA ticket: " . $e->getMessage());
-                     return response()->json(['error' => 'Gagal memproses user.'], 500);
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error("Gagal membuat user baru WA: " . $e->getMessage());
+                    $user = User::where('phone', $cleanPhoneNumber)->orWhere('email', $dummyEmail)->first();
+                    if (!$user) {
+                        return response()->json(['error' => 'Gagal memproses user database.'], 500);
+                    }
                 }
             }
         }
