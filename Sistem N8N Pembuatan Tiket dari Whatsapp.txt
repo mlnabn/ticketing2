@@ -208,7 +208,7 @@
           "parameters": [
             {
               "name": "phone",
-              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+              "value": "={{ $('Webhook').item.json.body.from }}"
             },
             {
               "name": "message",
@@ -304,7 +304,7 @@
           "parameters": [
             {
               "name": "phone",
-              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+              "value": "={{ $('Webhook').item.json.body.from }}"
             },
             {
               "name": "id",
@@ -340,7 +340,7 @@
             },
             {
               "name": "phone",
-              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+              "value": "={{ $('Webhook').item.json.body.from }}"
             },
             {
               "name": "message",
@@ -503,7 +503,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const text = $('Webhook').item.json.body.message.text;\nconst words = text.split(' ');\n// Mengambil kata TERAKHIR dari pesan, yang seharusnya adalah kode tiket\nconst kodeTiket = words[words.length - 1];\n\nreturn { kode_tiket: kodeTiket };"
+        "jsCode": "const text = $('Webhook').item.json.body.message.text || \"\";\nconst regexPattern = /\\b[A-Za-z]{2}\\d{8}\\b/i;\nconst match = text.match(regexPattern);\nconst kodeTiket = match ? match[0].toUpperCase() : null;\n\nreturn { kode_tiket: kodeTiket };"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -527,7 +527,7 @@
             },
             {
               "name": "phone",
-              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+              "value": "={{ $('Webhook').item.json.body.from }}"
             },
             {
               "name": "message",
@@ -555,7 +555,7 @@
           "parameters": [
             {
               "name": "phone",
-              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+              "value": "={{ $('Webhook').item.json.body.from }}"
             },
             {
               "name": "message",
@@ -634,7 +634,7 @@
             },
             {
               "name": "phone",
-              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+              "value": "={{ $('Webhook').item.json.body.from }}"
             },
             {
               "name": "message",
@@ -822,7 +822,7 @@
             },
             {
               "name": "phone",
-              "value": "={{ $('Webhook').item.json.body.chat_id }}"
+              "value": "={{ $('Webhook').item.json.body.from }}"
             }
           ]
         },
