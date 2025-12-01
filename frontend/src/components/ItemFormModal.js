@@ -26,18 +26,18 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
     useEffect(() => {
         if (show) {
             setShouldRender(true);
-            setIsClosing(false); 
+            setIsClosing(false);
         } else if (shouldRender && !isClosing) {
-            setIsClosing(true); 
+            setIsClosing(true);
             const timer = setTimeout(() => {
                 setIsClosing(false);
-                setShouldRender(false); 
+                setShouldRender(false);
                 setFormData(initialFormState);
                 setIsExisting(false);
             }, 300); // Durasi animasi
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, shouldRender]);
 
     const fetchCategories = useCallback(() => {
@@ -60,7 +60,7 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
                 setIsExisting(false);
             }
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [itemToEdit, show, fetchCategories, initialDataString]);
 
     useEffect(() => {
@@ -139,25 +139,25 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
             onClose();
         }
     };
-    
+
     if (!shouldRender) return null;
-    
+
     const animationClass = isClosing ? 'closing' : '';
 
     return (
-        <div 
+        <div
             className={`modal-backdrop-centered ${animationClass}`}
             onClick={handleCloseClick}
         >
-            <div 
+            <div
                 className={`modal-content-large ${animationClass}`}
                 onClick={e => e.stopPropagation()}
             >
                 <h3>{itemToEdit ? 'Edit Tipe Barang' : 'Daftarkan Tipe Barang Baru'}</h3>
                 <form onSubmit={handleSubmit}>
-                    {/* ... (Input Kategori & Sub-Kategori tetap sama) ... */}
-                    <div className="form-row2">
-                        <div className="form-group half">
+                    <div className="form-row-split">
+                        {/* KATEGORI */}
+                        <div className="form-group">
                             <label>Kategori</label>
                             <CreatableSelect
                                 classNamePrefix="creatable-select"
@@ -169,9 +169,12 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
                                 onChange={handleSelectChange}
                                 onCreateOption={(val) => handleCreateOption(val, 'category')}
                                 name="id_kategori"
-                                placeholder="Pilih atau ketik kategori baru..."
+                                placeholder="Pilih / ketik kategori..."
                             />
+                        </div>
 
+                        {/* SUB-KATEGORI */}
+                        <div className="form-group">
                             <label>Sub-Kategori / Merk</label>
                             <CreatableSelect
                                 classNamePrefix="creatable-select"
@@ -183,13 +186,22 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
                                 onChange={handleSelectChange}
                                 onCreateOption={(val) => handleCreateOption(val, 'subcategory')}
                                 name="id_sub_kategori"
-                                placeholder="Pilih atau ketik sub-kategori..."
+                                placeholder="Pilih / ketik sub-kategori..."
                             />
                         </div>
                     </div>
+
+                    {/* NAMA BARANG */}
                     <div className="form-group">
                         <label>Nama Barang</label>
-                        <input name="nama_barang" value={formData.nama_barang} onChange={handleChange} required disabled={!!itemToEdit} />
+                        <input
+                            name="nama_barang"
+                            value={formData.nama_barang}
+                            onChange={handleChange}
+                            required
+                            disabled={!!itemToEdit}
+                            placeholder="Contoh: Laptop Asus ROG"
+                        />
                     </div>
 
                     {isExisting && !itemToEdit && (
@@ -204,7 +216,7 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
                             {isExisting && !itemToEdit ? 'Sudah Terdaftar' : 'Simpan'}
                         </button>
                         {!itemToEdit && (
-                            <button 
+                            <button
                                 type="button"
                                 onClick={() => onSaveRequest(formData, 'saveAndAddStock')}
                                 className="btn-history"
