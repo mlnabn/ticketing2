@@ -12,17 +12,17 @@ const overlayVariants = {
 
 const modalVariants = {
   hidden: { opacity: 0, scale: 0.9, y: 20 },
-  visible: { 
-    opacity: 1, 
-    scale: 1, 
+  visible: {
+    opacity: 1,
+    scale: 1,
     y: 0,
     transition: { type: 'spring', stiffness: 300, damping: 25 }
   },
-  exit: { 
-    opacity: 0, 
-    scale: 0.9, 
+  exit: {
+    opacity: 0,
+    scale: 0.9,
     y: 20,
-    transition: { duration: 0.2 } 
+    transition: { duration: 0.2 }
   }
 };
 
@@ -37,6 +37,7 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
   const [initialAvatar, setInitialAvatar] = useState(user?.avatar_url || null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isFullPreviewOpen, setIsFullPreviewOpen] = useState(false);
 
   useEffect(() => {
     setName(user?.name || '');
@@ -68,10 +69,10 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
       formData.append('password_confirmation', passwordConfirmation);
     }
     if (avatarFile) {
-    formData.append("avatar", avatarFile);
-  } else if (removeAvatar) {
-    formData.append("avatar_remove", "1"); // kirim flag hapus avatar
-  }
+      formData.append("avatar", avatarFile);
+    } else if (removeAvatar) {
+      formData.append("avatar_remove", "1"); // kirim flag hapus avatar
+    }
     formData.append('_method', 'PUT');
 
     setLoading(true);
@@ -94,7 +95,7 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
 
 
   return (
-    <motion.div 
+    <motion.div
       className="modal-overlay4"
       variants={overlayVariants}
       initial="hidden"
@@ -102,11 +103,11 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
       exit="exit"
       onClick={onClose}
     >
-      <motion.div 
-        className="modal-content4" 
+      <motion.div
+        className="modal-content4"
         style={{ maxWidth: 700 }}
         variants={modalVariants}
-        onClick={(e) => e.stopPropagation()} 
+        onClick={(e) => e.stopPropagation()}
       >
         <h2>Edit Profil</h2>
 
@@ -114,6 +115,7 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
           initialAvatar={initialAvatar}
           onFileSelect={handleFileSelect}
           onRemoveAvatar={handleRemoveAvatar}
+          onPreviewToggle={setIsFullPreviewOpen}
         />
 
 
@@ -157,14 +159,16 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
 
         {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
 
-        <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-          <button onClick={onClose} disabled={loading} className="btn btn-cancel">
-            Batal
-          </button>
-          <button onClick={handleSave} disabled={loading} className="btn btn-confirm">
-            {loading ? 'Menyimpan...' : 'Simpan'}
-          </button>
-        </div>
+        {!isFullPreviewOpen && (
+          <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+            <button onClick={onClose} disabled={loading} className="btn btn-cancel">
+              Batal
+            </button>
+            <button onClick={handleSave} disabled={loading} className="btn btn-confirm">
+              {loading ? 'Menyimpan...' : 'Simpan'}
+            </button>
+          </div>
+        )}
       </motion.div>
     </motion.div>
   );
