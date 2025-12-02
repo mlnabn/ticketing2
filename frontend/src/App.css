@@ -6050,11 +6050,11 @@ body.dark-mode .welcome-title {
 
   .main-header-user {
     width: 100%;
-    padding: 0.5rem 1rem;
+    padding: 2rem 1rem !important;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0;
     margin: 0;
     position: relative;
   }
@@ -6770,11 +6770,6 @@ html {
 .header-left-group .header-logo {
   height: 35px;
   object-fit: contain;
-  transition: transform 0.3s ease;
-}
-
-.header-left-group .header-logo:hover {
-  transform: scale(1.05);
 }
 
 .header-nav {

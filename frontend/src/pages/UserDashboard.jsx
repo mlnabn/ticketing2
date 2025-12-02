@@ -547,7 +547,7 @@ export default function UserDashboard() {
               <h3 style={{ margin: 0, color: '#fff' }}>
                 {activeMobileMenu === 'Home' ? 'Menu' : activeMobileMenu}
               </h3>
-              <button onClick={() => setActiveMobileMenu(null)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '1.5rem' }}>&times;</button>
+              {/* <button onClick={() => setActiveMobileMenu(null)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '1.5rem' }}>&times;</button> */}
             </div>
 
             <nav className="mobile-nav-card-links-user" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
