@@ -212,6 +212,20 @@ class TicketController extends Controller
             'status' => 'Belum Dikerjakan',
             'is_urgent' => $isUrgent,
         ]);
+        
+        try {
+            $workshopName = $ticket->workshop ? $ticket->workshop->name : 'N/A';
+            $creatorName = auth()->user()->name ?? 'User Web';
+            
+            Http::timeout(2)->post('http://127.0.0.1:5678/webhook/notify-admins', [
+                'kode_tiket' => $ticket->kode_tiket,
+                'title' => $ticket->title,
+                'workshop_name' => $workshopName,
+                'creator_name' => $creatorName
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Gagal kirim notifikasi ke n8n: " . $e->getMessage());
+        }
 
         return response()->json($ticket, 201);
     }
