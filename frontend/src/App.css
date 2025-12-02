@@ -9559,6 +9559,10 @@ body.dark-mode .form-group-recover textarea:focus {
   font-size: 0.95rem !important;
 }
 
+.dark-mode .modal-content-detail label {
+  color: #e2e8f0 !important;
+}
+
 .modal-content-detail {
   background: #fcfcfc;
   backdrop-filter: blur(10px);
