@@ -30,22 +30,16 @@ function ToolManagement() {
     const { showToast } = useOutletContext();
     const isPresent = useIsPresent();
     const navigate = useNavigate();
-    
-    // HANYA state untuk desktop/data utama
     const [items, setItems] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-    // State modal & filter (tetap sama)
     const [itemToEdit, setItemToEdit] = useState(null);
     const [isItemModalOpen, setIsItemModalOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [itemToEditName, setItemToEditName] = useState(null);
     const [currentFilters, setCurrentFilters] = useState({ is_active: 'true' });
-    
-    // State expand/detail (tetap sama)
     const [selectedIds, setSelectedIds] = useState([]);
     const [expandedRows, setExpandedRows] = useState({});
     const [detailItems, setDetailItems] = useState({});

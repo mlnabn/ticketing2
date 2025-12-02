@@ -102,12 +102,6 @@ export default function WelcomeHome() {
       initial="hidden"
       animate="visible"
     >
-      {/* <div className="welcome-header">
-        <h1>Selamat Datang, {user?.name || 'Admin'}!</h1>
-        <p>Berikut adalah ringkasan aktivitas sistem saat ini.</p>
-      </div> */}
-
-      {/* Kartu Statistik */}
       <motion.div variants={staggerItem}>
         <div className="info-cards-grid">
           <div className="info-card red-card" onClick={() => handleCardClick('Belum Selesai')}>
@@ -141,7 +135,6 @@ export default function WelcomeHome() {
         </div>
       </motion.div>
 
-      {/* Kontainer Chart */}
       <div className="dashboard-container2">
         <motion.div variants={staggerItem} className="dashboard-row2">
           <div className="dashboard-card line-chart-card">

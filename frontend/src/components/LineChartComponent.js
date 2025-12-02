@@ -38,7 +38,6 @@ const LineChartComponent = ({ data, onPointClick }) => {
     "Ditolak",
   ]);
 
-  // ambil status darkmode dari localStorage
   useEffect(() => {
     const updateModeFromStorage = () => {
       const savedMode = localStorage.getItem("darkMode");
@@ -69,14 +68,10 @@ const LineChartComponent = ({ data, onPointClick }) => {
       onPointClick(status, dayjs(dataPoint.date).format("YYYY-MM-DD"));
     }
   };
-
-  // klik legend → filter lane
   const handleLegendClick = (status) => {
     if (visibleStatuses.length === 4) {
-      // default semua tampil → klik pertama, filter jadi hanya 1
       setVisibleStatuses([status]);
     } else if (visibleStatuses.length === 1 && visibleStatuses[0] === status) {
-      // kalau sudah 1 dan diklik ulang → reset tampilkan semua lagi
       setVisibleStatuses([
         "Belum Dikerjakan",
         "Sedang Dikerjakan",
@@ -84,7 +79,6 @@ const LineChartComponent = ({ data, onPointClick }) => {
         "Ditolak",
       ]);
     } else {
-      // kalau sudah difilter ke 1 lain → ganti ke status baru
       setVisibleStatuses([status]);
     }
   };
@@ -181,8 +175,6 @@ const LineChartComponent = ({ data, onPointClick }) => {
           )}
         </LineChart>
       </ResponsiveContainer>
-
-      {/* Legend custom */}
       <div className="chart-legend" style={{ justifyContent: 'center', marginTop: '10px' }}>
         {[
           { status: "Belum Dikerjakan", color: "dot-blue" },

@@ -8,13 +8,13 @@ import {
   HiOutlineTicket,
   HiOutlineArchiveBox,
   HiOutlineCog6Tooth
-} from "react-icons/hi2"; // Versi Outline (default)
+} from "react-icons/hi2";
 import {
   HiHome,
   HiTicket,
   HiArchiveBox,
   HiCog6Tooth
-} from "react-icons/hi2"; // Versi Solid (aktif)
+} from "react-icons/hi2";
 
 import Toast from '../components/Toast';
 import yourLogok from '../Image/DTECH-Logo.png';
@@ -182,8 +182,8 @@ export default function AdminDashboard() {
 
         <motion.header
           className="main-header"
-          initial={{ y: -80, opacity: 0 }} // Mulai dari atas dan transparan
-          animate={{ y: 0, opacity: 1 }}    // Selesai di posisi normal
+          initial={{ y: -80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}    
           transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.2 }}
         >
           <div className="header-left-group">
@@ -249,20 +249,12 @@ export default function AdminDashboard() {
           </AnimatePresence>
         </div>
       </main>
-
-      {/* ---------------------------------------------------- */}
-      {/* --- TAMBAHKAN SEMUA KODE DI BAWAH INI --- */}
-      {/* ---------------------------------------------------- */}
-
-      {/* 1. OVERLAY (untuk menutup modal saat diklik di luar) */}
       {activeMobileMenu && (
         <div
           className="mobile-nav-overlay"
           onClick={() => setActiveMobileMenu(null)}
         ></div>
       )}
-
-      {/* 2. KARTU NAVIGASI (MODAL) */}
       <AnimatePresence>
         {activeMobileMenu && (
           <motion.div
@@ -278,7 +270,6 @@ export default function AdminDashboard() {
               <button onClick={() => setActiveMobileMenu(null)}>&times;</button>
             </div>
             <nav className="mobile-nav-card-links">
-              {/* Gunakan helper MobileNavLink yang kita buat */}
               {activeMobileMenu === 'Home' && (
                 <>
                   <MobileNavLink to="/admin" end icon="fa-home" text="Home" onClick={() => setActiveMobileMenu(null)} />
@@ -303,14 +294,9 @@ export default function AdminDashboard() {
               )}
               {activeMobileMenu === 'Settings' && (
                 <>
-                  {/* Link Halaman Setting yang sudah ada */}
                   <MobileNavLink to="/admin/templates" icon="fa-paste" text="Template Notif" onClick={() => setActiveMobileMenu(null)} />
                   <MobileNavLink to="/admin/workshops" icon="fa-cogs" text="Daftar Workshop" onClick={() => setActiveMobileMenu(null)} />
-
-                  {/* Garis Pemisah */}
                   <div className="mobile-modal-divider"></div>
-
-                  {/* Toggle Dark Mode */}
                   <div className="mobile-modal-setting-item">
                     <span>Mode Gelap</span>
                     <label className="mobile-switch">
@@ -318,13 +304,9 @@ export default function AdminDashboard() {
                       <span className="mobile-slider"></span>
                     </label>
                   </div>
-
-                  {/* Info Profil & Tombol Logout */}
                   <div className="mobile-modal-setting-item user-profile-item">
                     <div className="user-avatar"><FaUser /></div>
                     <span><strong>{userName || "User"}</strong></span>
-
-                    {/* Tombol Logout langsung di sini */}
                     <button onClick={handleLogout} className="mobile-logout-button">
                       <i className="fas fa-sign-out-alt"></i>
                     </button>
@@ -335,8 +317,6 @@ export default function AdminDashboard() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* 3. FOOTER NAVIGASI UTAMA (Tombol 4 icon) */}
       <footer className="mobile-footer-nav">
         <button
           onClick={() => setActiveMobileMenu(activeMobileMenu === 'Home' ? null : 'Home')}

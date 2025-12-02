@@ -4,8 +4,6 @@ import { id } from 'date-fns/locale';
 import { useAuth } from '../AuthContext';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Import Icons untuk Mobile Footer
 import {
   HiOutlineHome,
   HiOutlineBell,
@@ -15,8 +13,6 @@ import {
   HiCog6Tooth
 } from "react-icons/hi2";
 import { FaUser, FaHistory, FaEdit, FaSignOutAlt } from 'react-icons/fa';
-
-// Import semua komponen yang dibutuhkan
 import JobFormUser from '../components/JobFormUser';
 import UserHeader from '../components/UserHeader';
 import ConfirmationModalUser from '../components/ConfirmationModalUser';
@@ -24,12 +20,8 @@ import RejectionInfoModal from '../components/RejectionInfoModal';
 import ViewProofModal from '../components/ViewProofModal';
 import ProfileModal from '../components/ProfileModal';
 import TicketDetailModalUser from '../components/TicketDetailModalUser';
-
-// Import aset gambar
 import bgImage from '../Image/homeBg.jpg';
 import yourLogok from '../Image/DTECH-Logo.png';
-
-// --- Variants Animation ---
 const pageVariants = {
   hidden: { opacity: 0, y: 10 },
   visible: {
@@ -86,9 +78,6 @@ const MobileMenuItem = ({ icon, text, onClick, active }) => (
 );
 
 export default function UserDashboard() {
-  // -----------------------------------------------------------------
-  // #1. STATE MANAGEMENT
-  // -----------------------------------------------------------------
   const { user, logout, setUser } = useAuth();
   const [userViewTab, setUserViewTab] = useState('request');
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -97,8 +86,6 @@ export default function UserDashboard() {
   const [users, setUsers] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-
-  // Modals State
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [ticketToShowReason, setTicketToShowReason] = useState(null);
@@ -107,15 +94,8 @@ export default function UserDashboard() {
   const [showViewProofModal, setShowViewProofModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
-
-  // Mobile Menu State
   const [activeMobileMenu, setActiveMobileMenu] = useState(null);
-
   const createdTicketsOnPage = useMemo(() => (createdTicketsData ? createdTicketsData.data : []), [createdTicketsData]);
-
-  // -----------------------------------------------------------------
-  // #2. DATA FETCHING & HANDLERS
-  // -----------------------------------------------------------------
 
   const handleViewTicketDetail = (ticket) => {
     setSelectedTicketForDetail(ticket);
@@ -263,10 +243,6 @@ export default function UserDashboard() {
       loadMoreItems();
     }
   };
-
-  // -----------------------------------------------------------------
-  // #3. EFFECTS
-  // -----------------------------------------------------------------
   useEffect(() => {
     fetchAllUsers();
     fetchNotifications();
@@ -277,10 +253,6 @@ export default function UserDashboard() {
       fetchCreatedTickets(1);
     }
   }, [userViewTab, fetchCreatedTickets]);
-
-  // -----------------------------------------------------------------
-  // #4. RENDER LOGIC
-  // -----------------------------------------------------------------
   return (
     <motion.div
       className="dashboard-container no-sidebar"
@@ -297,8 +269,6 @@ export default function UserDashboard() {
       exit="exit"
     >
       <main className="main-content" style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-
-        {/* HEADER */}
         <motion.header
           className="main-header-user"
           variants={headerVariants}
@@ -343,9 +313,7 @@ export default function UserDashboard() {
             </div>
           </div>
         </motion.header>
-
-        {/* CONTENT AREA */}
-        <div className="content-area" style={{ flexGrow: 1, overflowY: 'auto', paddingBottom: '80px' }}> {/* Padding bottom ditambah agar tidak tertutup footer */}
+        <div className="content-area" style={{ flexGrow: 1, overflowY: 'auto', paddingBottom: '80px' }}>
           <div className="user-view-container">
             <div className="user-view-content">
 
@@ -517,10 +485,6 @@ export default function UserDashboard() {
           </div>
         </div>
       </main>
-
-      {/* ---------------------------------------------------- */}
-      {/* --- MOBILE NAVIGATION & OVERLAYS --- */}
-      {/* ---------------------------------------------------- */}
       {activeMobileMenu && (
         <div
           className="mobile-nav-overlay-user"
@@ -547,12 +511,9 @@ export default function UserDashboard() {
               <h3 style={{ margin: 0, color: '#fff' }}>
                 {activeMobileMenu === 'Home' ? 'Menu' : activeMobileMenu}
               </h3>
-              {/* <button onClick={() => setActiveMobileMenu(null)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '1.5rem' }}>&times;</button> */}
             </div>
 
             <nav className="mobile-nav-card-links-user" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-
-              {/* === HOME MENU: REQUEST & HISTORY === */}
               {activeMobileMenu === 'Home' && (
                 <>
                   <MobileMenuItem
@@ -569,8 +530,6 @@ export default function UserDashboard() {
                   />
                 </>
               )}
-
-              {/* === NOTIFICATION MENU === */}
               {activeMobileMenu === 'Notification' && (
                 <div className="mobile-notifications-user">
                   <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
@@ -605,8 +564,6 @@ export default function UserDashboard() {
                   )}
                 </div>
               )}
-
-              {/* === SETTING MENU === */}
               {activeMobileMenu === 'Setting' && (
                 <>
                   <div className="mobile-modal-setting-item user-profile-item" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px', padding: '10px', background: '#2a3449', borderRadius: '8px' }}>
@@ -636,8 +593,6 @@ export default function UserDashboard() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* 3. FOOTER NAVIGASI UTAMA (className disamakan: mobile-footer-nav) */}
       <footer className="mobile-footer-nav-user">
         <button
           onClick={() => setActiveMobileMenu(activeMobileMenu === 'Home' ? null : 'Home')}
@@ -678,10 +633,6 @@ export default function UserDashboard() {
           <span>Setting</span>
         </button>
       </footer>
-
-      {/* -------------------------------------------------------- */}
-      {/* MODALS (Global) */}
-      {/* -------------------------------------------------------- */}
       <AnimatePresence>
         {showViewProofModal && ticketToShowProof && (
           <ViewProofModal

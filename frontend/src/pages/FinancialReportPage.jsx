@@ -4,10 +4,6 @@ import { motion, useIsPresent } from 'framer-motion';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, Legend } from 'recharts';
 import { useFinancialReport } from '../components/useFinancialReport';
 
-// ================================================================
-// Komponen UI
-// ================================================================
-
 const staggerContainer = {
     hidden: { opacity: 0 },
     visible: {
@@ -50,10 +46,6 @@ const KpiCard = ({ title, value, iconClass, colorClass }) => (
         <h3 className="card-value">{value}</h3>
     </div>
 );
-
-// ================================================================
-// KOMPONEN UTAMA
-// ================================================================
 export default function FinancialReportPage() {
     const isPresent = useIsPresent();
 
@@ -91,8 +83,6 @@ export default function FinancialReportPage() {
             animate="visible"
         >
             <motion.h1 variants={staggerItem}>Laporan Keuangan Inventaris</motion.h1>
-
-            {/* 4. HUBUNGKAN KARTU KPI DENGAN DATA ASLI */}
             <motion.div variants={staggerItem} className="info-cards-grid">
                 <KpiCard
                     title="Total Nilai Aset"
@@ -122,8 +112,6 @@ export default function FinancialReportPage() {
                     colorClass="red-card"
                 />
             </motion.div>
-
-            {/* 5. HUBUNGKAN CHART DENGAN DATA ASLI */}
             <motion.div variants={staggerItem} className="dashboard-container-financial">
                 <div className="dashboard-row-financial">
                     <div className="nilai-card kategori-card">
@@ -172,8 +160,6 @@ export default function FinancialReportPage() {
                     </div>
                 </div>
             </motion.div>
-
-            {/* Navigation Section (tidak berubah) */}
             <motion.div variants={staggerItem} className="navigation-section" style={{ marginTop: '25px' }}>
                 <motion.h1 variants={staggerItem}>Lihat Laporan Detail</motion.h1>
                 <div className="report-navigation-cards">

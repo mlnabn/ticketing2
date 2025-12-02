@@ -9,25 +9,18 @@ const parseRupiah = (rupiah) => parseInt(rupiah.replace(/\./g, ''), 10) || 0;
 function PurchaseDetailModal({ show, onClose, onSaveSuccess, showToast }) {
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
-
-    // State utama
     const [title, setTitle] = useState('');
     const [items, setItems] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-
-    // State untuk Form Tambah Item
     const [masterBarangOptions, setMasterBarangOptions] = useState([]);
     const [selectedBarang, setSelectedBarang] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [displayEstimatedPrice, setDisplayEstimatedPrice] = useState('');
     const [link, setLink] = useState('');
     const [notes, setNotes] = useState('');
-
-    // State untuk Modal SKU (Modal di dalam Modal)
     const [isSkuModalOpen, setIsSkuModalOpen] = useState(false);
     const [newSkuName, setNewSkuName] = useState('');
 
-    // Efek untuk animasi tutup/buka
     useEffect(() => {
         if (show) {
             setShouldRender(true);
@@ -57,10 +50,8 @@ function PurchaseDetailModal({ show, onClose, onSaveSuccess, showToast }) {
         }
     }, [show, shouldRender, isClosing]);
 
-    // Fungsi untuk menambah item ke daftar
     const handleAddItem = (e) => {
         e.preventDefault();
-        // Panggilan ini sekarang akan menampilkan toast WARNING (kuning)
         if (!selectedBarang || !quantity || !displayEstimatedPrice) {
             showToast('Barang, Jumlah, dan Estimasi Harga wajib diisi.', 'warning');
             return;
@@ -75,25 +66,18 @@ function PurchaseDetailModal({ show, onClose, onSaveSuccess, showToast }) {
             link: link,
             notes: notes,
         };
-
-        // Cek duplikat
-        // Panggilan ini sekarang akan menampilkan toast WARNING (kuning)
         if (items.find(item => item.id === newItem.id)) {
             showToast('Barang ini sudah ada di daftar.', 'warning');
             return;
         }
 
         setItems(prev => [...prev, newItem]);
-        
-        // Reset form tambah item
         setSelectedBarang(null);
         setQuantity(1);
         setDisplayEstimatedPrice('');
         setLink('');
         setNotes('');
     };
-
-    // Fungsi untuk menghapus item dari daftar
     const handleRemoveItem = (id) => {
         setItems(prev => prev.filter(item => item.id !== id));
     };
@@ -131,7 +115,6 @@ function PurchaseDetailModal({ show, onClose, onSaveSuccess, showToast }) {
         } catch (e) {
             console.error('Gagal menyimpan SKU baru:', e);
             const errorMsg = e.response?.data?.message || 'Gagal menyimpan SKU baru.';
-            // Panggilan ini akan menampilkan toast ERROR (merah)
             showToast(errorMsg, 'error'); 
             setIsSkuModalOpen(false);
         } finally {
@@ -140,7 +123,6 @@ function PurchaseDetailModal({ show, onClose, onSaveSuccess, showToast }) {
     };
     
     const handleSubmitProposal = async () => {
-        // Panggilan ini sekarang akan menampilkan toast WARNING (kuning)
         if (!title || items.length === 0) {
             showToast('Judul dan minimal 1 barang wajib diisi.', 'warning');
             return;
@@ -152,7 +134,6 @@ function PurchaseDetailModal({ show, onClose, onSaveSuccess, showToast }) {
             showToast('Catatan pengajuan berhasil disimpan.', 'success');
             onSaveSuccess(response.data); 
         } catch (error) {
-            // Panggilan ini akan menampilkan toast ERROR (merah)
             showToast(error.response?.data?.message || 'Gagal menyimpan catatan.', 'error');
         } finally {
             setIsLoading(false);
@@ -166,7 +147,6 @@ function PurchaseDetailModal({ show, onClose, onSaveSuccess, showToast }) {
         <>
             <div className={`modal-backdrop-detail ${animationClass}`} onClick={onClose}>
                 <div className={`modal-content-large ${animationClass}`} onClick={e => e.stopPropagation()}>
-                    {/* <button onClick={onClose} className="modal-close-btn">&times;</button> */}
                     <h3>Buat Catatan Pengajuan Baru</h3>
 
                     <div className="form-group full">

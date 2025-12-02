@@ -90,10 +90,7 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show }
         }),
         indicatorSeparator: () => ({ display: 'none' }),
     };
-
-    // Fungsi untuk menambah item ke daftar
     const addItemToList = useCallback((item) => {
-        // Cek duplikat
         if (itemsToAssign.some(existing => existing.id === item.id)) {
             showToast(`Barang "${item.kode_unik}" sudah ada dalam daftar.`, 'warning');
             return;

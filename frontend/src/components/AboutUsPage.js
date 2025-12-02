@@ -16,7 +16,6 @@ const AboutUsPage = ({ adminList }) => {
   const adminsToDisplay = adminList && adminList.length > 0 ? adminList : dummyAdmins;
 
   return (
-    // Container utama tidak perlu AnimateOnScroll
     <div className="about-us-container">
       <AnimateOnScroll className="w-full">
         <header className="about-us-header">
@@ -34,7 +33,6 @@ const AboutUsPage = ({ adminList }) => {
             <AnimateOnScroll delay={0.35}><p>DTECH-ENGINEERING is a research and technology company founded in 2009, specializing in mechanical engineering, manufacturing, and consumer product research and development.</p></AnimateOnScroll>
             <AnimateOnScroll delay={0.4}><p>We have expanded our world-class team to provide superior services for our customers from around the globe. Our team works tirelessly as we aim to provide the best service in the industry, with support that is second to none.</p></AnimateOnScroll>
           </AnimateOnScroll>
-          {/* Gambar bisa dianimasikan terpisah jika section tidak flex lagi di mobile */}
         </section>
       </AnimateOnScroll>
 
@@ -46,10 +44,8 @@ const AboutUsPage = ({ adminList }) => {
 
           <div className="team-grid">
             {adminsToDisplay.slice(0, 3).map((admin, index) => (
-              // AnimateOnScroll per kartu
               <AnimateOnScroll key={index} delay={0.35 + index * 0.1} className="flex justify-center">
                 <div className="team-member-card">
-                  {/* Animasi di dalam kartu */}
                   <AnimateOnScroll delay={0.4 + index * 0.1}> <img src={admin.avatar} alt={`Profile of ${admin.name}`} className="member-avatar" /> </AnimateOnScroll>
                   <AnimateOnScroll delay={0.45 + index * 0.1}><h3>{admin.name}</h3></AnimateOnScroll>
                   <AnimateOnScroll delay={0.5 + index * 0.1}><p>{admin.role}</p></AnimateOnScroll>

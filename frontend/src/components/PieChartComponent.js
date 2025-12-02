@@ -82,7 +82,6 @@ const PieChartComponent = ({ stats, handleStatusFilterClick, statusFilter }) => 
         </ResponsiveContainer>
       </div>
 
-      {/* Legend: Margin aman 5px */}
       <div className="chart-legend" style={{ justifyContent: 'center', marginTop: '20px' }}>
         {dataWithPercent.map((entry, index) => (
           <div

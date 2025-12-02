@@ -9,25 +9,18 @@ const parseRupiah = (rupiah) => parseInt(rupiah.replace(/\./g, ''), 10) || 0;
 function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
-
-    // State utama
     const [title, setTitle] = useState('');
     const [items, setItems] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-
-    // State untuk Form Tambah Item
     const [masterBarangOptions, setMasterBarangOptions] = useState([]);
     const [selectedBarang, setSelectedBarang] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [displayEstimatedPrice, setDisplayEstimatedPrice] = useState('');
     const [link, setLink] = useState('');
     const [notes, setNotes] = useState('');
-
-    // State untuk Modal SKU (Modal di dalam Modal)
     const [isSkuModalOpen, setIsSkuModalOpen] = useState(false);
     const [newSkuName, setNewSkuName] = useState('');
 
-    // Efek untuk animasi tutup/buka
     useEffect(() => {
         if (show) {
             setShouldRender(true);
@@ -57,7 +50,6 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
         }
     }, [show, shouldRender, isClosing]);
 
-    // Fungsi untuk menambah item ke daftar
     const handleAddItem = (e) => {
         e.preventDefault();
         if (!selectedBarang || !quantity || !displayEstimatedPrice) {
@@ -75,15 +67,12 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
             notes: notes,
         };
 
-        // Cek duplikat
         if (items.find(item => item.id === newItem.id)) {
             showToast('Barang ini sudah ada di daftar.', 'warning');
             return;
         }
 
         setItems(prev => [...prev, newItem]);
-        
-        // Reset form tambah item
         setSelectedBarang(null);
         setQuantity(1);
         setDisplayEstimatedPrice('');
@@ -91,7 +80,6 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
         setNotes('');
     };
 
-    // Fungsi untuk menghapus item dari daftar
     const handleRemoveItem = (id) => {
         setItems(prev => prev.filter(item => item.id !== id));
     };
@@ -161,7 +149,6 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
         <>
             <div className={`modal-backdrop-detail ${animationClass}`} onClick={onClose}>
                 <div className={`modal-content-large ${animationClass}`} onClick={e => e.stopPropagation()}>
-                    {/* <button onClick={onClose} className="modal-close-btn">&times;</button> */}
                     <h3>Buat Catatan Pengajuan Baru</h3>
 
                     <div className="form-group full">

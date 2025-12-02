@@ -263,8 +263,6 @@ function Register({
                   Konfirmasi Password
                 </label>
               </motion.div>
-
-              {/* 11. Ganti class tombol */}
               <motion.button variants={formItemVariants} type="submit" className="login-btn" disabled={loading}>
                 {loading ? 'Mengirim OTP...' : 'Send OTP'}
               </motion.button>

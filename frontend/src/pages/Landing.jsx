@@ -9,31 +9,6 @@ import AboutUsPage from '../components/AboutUsPage';
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 
-const imageVariants = {
-  hidden: { opacity: 0, y: -20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: 'spring', stiffness: 120, damping: 15, delay: 0.1 },
-  },
-};
-const formContainerVariants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { delayChildren: 0.2, staggerChildren: 0.08 },
-  },
-};
-const formItemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: 'spring', stiffness: 100 },
-  },
-};
-
 export default function LandingLayout() {
   const { loggedIn, login } = useAuth();
   const navigate = useNavigate();
@@ -43,12 +18,12 @@ export default function LandingLayout() {
   }, []);
 
   const particlesOptions = {
-    background: { 
-      color: { 
-        value: "#0a0f1e" 
-      } 
+    background: {
+      color: {
+        value: "#0a0f1e"
+      }
     },
-    fpsLimit: 30, 
+    fpsLimit: 30,
     interactivity: {
       events: {
         onHover: {
@@ -72,7 +47,7 @@ export default function LandingLayout() {
         color: "#3b82f6",
         distance: 150,
         enable: true,
-        opacity: 0.2, 
+        opacity: 0.2,
         width: 1,
       },
       move: {
@@ -80,7 +55,7 @@ export default function LandingLayout() {
         enable: true,
         outModes: "bounce",
         random: false,
-        speed: 0.5, 
+        speed: 0.5,
         straight: false,
       },
       number: {
@@ -133,7 +108,7 @@ export default function LandingLayout() {
       e.preventDefault();
       targetId = id;
     } else if (typeof e === 'string') {
-      targetId = e; 
+      targetId = e;
     }
     if (targetId) {
       const element = document.getElementById(targetId);
@@ -149,21 +124,16 @@ export default function LandingLayout() {
   return (
     <div className="landing-page-container">
       <Particles
-        id="tsparticles-landing" // ID unik untuk landing
+        id="tsparticles-landing"
         init={particlesInit}
         options={particlesOptions}
-        className="particles-background" // Class yang sama dengan login
+        className="particles-background"
       />
-      
-      {/* Wrapper untuk konten yang bisa di-scroll di ATAS partikel */}
       <div className="landing-scroll-content">
-        
-        {/* Header dibuat sticky di dalam scroll wrapper */}
         <header className="main-header-user landing-header sticky-header">
           <div className="header-left-group">
             <img src={yourLogok} alt="Logo" className="header-logo" />
           </div>
-          {/* Navigasi dipindahkan ke sini */}
           <nav className="header-nav">
             <a href="#home" onClick={(e) => handleScrollTo(e, 'home')}>Home</a>
             <a href="#features" onClick={(e) => handleScrollTo(e, 'features')}>Features</a>
@@ -177,35 +147,23 @@ export default function LandingLayout() {
             </button>
           </div>
         </header>
-
-        {/* Konten Halaman */}
         <main className="public-content-singlepage">
-          
-          {/* Section 1: Home (Selamat Datang) */}
           <section id="home" className="landing-section full-height">
             <WelcomeHomeUser
               onGetStarted={() => handleScrollTo('features')}
             />
           </section>
-
-          {/* Section 2: Features */}
           <section id="features" className="landing-section">
             <FeaturesPage />
           </section>
-
-          {/* Section 3: FAQ */}
           <section id="faq" className="landing-section">
             <FAQPage />
           </section>
-
-          {/* Section 4: About Us */}
           <section id="about" className="landing-section">
             <AboutUsPage />
           </section>
 
         </main>
-        
-        {/* Footer */}
         <footer className="w-full text-center py-6 border-t border-gray-800 text-gray-400 text-xs sm:text-sm relative z-10 mt-12">
           © 2025 Politeknik Negeri Semarang. All rights reserved.
         </footer>

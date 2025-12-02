@@ -1,4 +1,3 @@
-// src/components/ProfileModal.jsx
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import AvatarUploader from './AvatarUploader';
@@ -71,7 +70,7 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
     if (avatarFile) {
       formData.append("avatar", avatarFile);
     } else if (removeAvatar) {
-      formData.append("avatar_remove", "1"); // kirim flag hapus avatar
+      formData.append("avatar_remove", "1");
     }
     formData.append('_method', 'PUT');
 
@@ -79,12 +78,10 @@ const ProfileModal = ({ user, onClose, onSaved }) => {
     setError(null);
 
     try {
-      // 2. Gunakan api.post. Header otorisasi dan URL dasar sudah diatur otomatis.
       const res = await api.post('/user', formData);
-
       const updatedUser = res.data;
-      onSaved(updatedUser); // Kirim data baru ke parent
-      onClose(); // Tutup modal
+      onSaved(updatedUser);
+      onClose();
     } catch (err) {
       console.error('Profile update error:', err.response?.data || err.message);
       setError(err.response?.data?.message || err.response?.data?.error || 'Gagal menyimpan profil.');

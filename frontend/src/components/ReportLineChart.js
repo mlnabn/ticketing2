@@ -39,12 +39,7 @@ const ReportLineChart = ({ data }) => {
   if (!data || data.length === 0) {
     return <p>Tidak ada data untuk ditampilkan pada chart.</p>;
   }
-
-  // (DIUBAH) Cek apakah data yang masuk adalah data bulanan atau harian
-  // Ini adalah kunci perbaikan: mendeteksi tipe data secara dinamis
   const isMonthlyData = data[0] && data[0].month;
-
-  // (DIUBAH) Kunci data untuk sumbu-X juga dinamis
   const xAxisDataKey = isMonthlyData ? "month" : "date";
 
 
@@ -52,7 +47,7 @@ const ReportLineChart = ({ data }) => {
     <div className="linechart-wrapper">
       <ResponsiveContainer width="100%" height={250}>
         <LineChart
-          data={data} // (DIUBAH) Gunakan data asli tanpa format paksa
+          data={data} 
           margin={{ top: 10, right: 30, left: -10, bottom: 30 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#444" : "#ddd"} />
@@ -72,10 +67,9 @@ const ReportLineChart = ({ data }) => {
             tickLine={{ stroke: isDarkMode ? "#888" : "#ccc" }}
           />
           <Tooltip
-            // (DIUBAH) Label pada tooltip juga dibuat dinamis
             labelFormatter={(label) => {
-              if (isMonthlyData) return `Bulan ${label}`; // Tampilkan nama bulan jika data bulanan
-              return dayjs(label).format("DD MMM YYYY"); // Format tanggal lengkap jika harian
+              if (isMonthlyData) return `Bulan ${label}`;
+              return dayjs(label).format("DD MMM YYYY"); 
             }}
             contentStyle={{
               backgroundColor: isDarkMode ? "#2c2c2c" : "#fff",
@@ -84,8 +78,6 @@ const ReportLineChart = ({ data }) => {
               fontSize: "12px"
             }}
           />
-
-          {/* Render Line secara kondisional berdasarkan state visibleLines */}
           {visibleLines.includes("Total Tiket") && (
             <Line
               type="monotone"
@@ -106,8 +98,6 @@ const ReportLineChart = ({ data }) => {
           )}
         </LineChart>
       </ResponsiveContainer>
-
-      {/* Legend custom yang interaktif */}
       <div className="chart-legend">
         <div
           className="legend-item2"

@@ -1,5 +1,5 @@
 import React from 'react';
-import FeaturesPage from '../components/FeaturesPage'; // Impor komponennya
+import FeaturesPage from '../components/FeaturesPage'; 
 
 export default function FeaturesRoute() {
   return <FeaturesPage />;

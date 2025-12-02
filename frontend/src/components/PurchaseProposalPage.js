@@ -189,7 +189,6 @@ function PurchaseProposalPage() {
 
                     <div className="list-panel">
                         <div className="job-list-container">
-                            {/*Destop View Table*/}
                             {!isMobile && (
                                 <div className="table-scroll-container">
                                     <table className="job-table">
@@ -234,7 +233,6 @@ function PurchaseProposalPage() {
                                             </tbody>
                                         </table>
                                     </div>
-                                    {/* Total Data untuk Desktop */}
                                     {!loading && proposals.length > 0 && (
                                         <table className="job-table">
                                             <tfoot>
@@ -249,8 +247,6 @@ function PurchaseProposalPage() {
                                     )}
                                 </div>
                             )}
-
-                            {/* Mobile View Cards */}
                             {isMobile && (
                                 <div
                                     className="job-list-mobile"
@@ -293,7 +289,6 @@ function PurchaseProposalPage() {
                                     {isLoadingMore && (<p style={{ textAlign: 'center' }}>Memuat lebih banyak...</p>)}
                                 </div>
                             )}
-                            {/* Total Data Mobile */}
 
                             {isMobile && (
                                 <div className='job-list-mobile'>

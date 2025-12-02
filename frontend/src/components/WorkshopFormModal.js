@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 
 export default function WorkshopFormModal({ show, workshopToEdit, onClose, onSave }) {
   const [name, setName] = useState('');
-  // const [lat, setLat] = useState('');
-  // const [lng, setLng] = useState('');
   const [description, setDescription] = useState('');
   const [url, setUrl] = useState('');
   const [isClosing, setIsClosing] = useState(false);
@@ -12,16 +10,12 @@ export default function WorkshopFormModal({ show, workshopToEdit, onClose, onSav
   useEffect(() => {
     if (workshopToEdit) {
       setName(workshopToEdit.name || '');
-      // setLat(workshopToEdit.lat || '');
-      // setLng(workshopToEdit.lng || '');
       setDescription(workshopToEdit.description || '');
       setUrl(workshopToEdit.url || '');
     }
     if (!show) {
       const timer = setTimeout(() => {
         setName('');
-        // setLat('');
-        // setLng('');
         setDescription('');
         setUrl('');
       }, 300);
