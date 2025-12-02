@@ -1,14 +1,17 @@
-// AvatarUploader.jsx
 import React, { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 
-const AvatarUploader = ({ initialAvatar, onFileSelect, onRemoveAvatar }) => {
+const AvatarUploader = ({ initialAvatar, onFileSelect, onRemoveAvatar, onPreviewToggle }) => {
   const [preview, setPreview] = useState(initialAvatar || null);
   const [showFullPreview, setShowFullPreview] = useState(false);
 
   useEffect(() => {
     setPreview(initialAvatar || null);
   }, [initialAvatar]);
+
+  useEffect(() => {
+    onPreviewToggle && onPreviewToggle(showFullPreview);
+  }, [showFullPreview, onPreviewToggle]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -22,12 +25,21 @@ const AvatarUploader = ({ initialAvatar, onFileSelect, onRemoveAvatar }) => {
     onRemoveAvatar && onRemoveAvatar();
   };
 
+  const handleOpenPreview = () => {
+    if (preview) {
+      setShowFullPreview(true);
+    }
+  };
+
+  const handleClosePreview = () => {
+    setShowFullPreview(false);
+  };
+
   return (
     <div className="avatar-uploader">
-      {/* Avatar kecil */}
       <div
         className="avatar-preview"
-        onClick={() => preview && setShowFullPreview(true)}
+        onClick={handleOpenPreview}
         style={{ cursor: preview ? "pointer" : "default" }}
       >
         {preview ? (
@@ -37,7 +49,6 @@ const AvatarUploader = ({ initialAvatar, onFileSelect, onRemoveAvatar }) => {
         )}
       </div>
 
-      {/* Ganti avatar */}
       <label htmlFor="avatarInput">Ganti Avatar</label>
       <input
         id="avatarInput"
@@ -46,23 +57,20 @@ const AvatarUploader = ({ initialAvatar, onFileSelect, onRemoveAvatar }) => {
         onChange={handleFileChange}
       />
 
-      {/* Hapus avatar */}
       {preview && (
         <button
           type="button"
           onClick={handleRemove}
           className="btn btn-danger"
-          style={{ marginTop: 8 }}
         >
           Hapus Avatar
         </button>
       )}
 
-      {/* Modal full preview */}
       {showFullPreview && (
         <div
           className="avatar-modal-overlay"
-          onClick={() => setShowFullPreview(false)}
+          onClick={handleClosePreview}
         >
           <div
             className="avatar-modal-content"
@@ -71,9 +79,9 @@ const AvatarUploader = ({ initialAvatar, onFileSelect, onRemoveAvatar }) => {
             <img src={preview} alt="Full Avatar" />
             <button
               className="btn-ttp"
-              onClick={() => setShowFullPreview(false)}
+              onClick={handleClosePreview}
             >
-              <IoClose size={20} />
+              <IoClose size={30} />
             </button>
           </div>
         </div>

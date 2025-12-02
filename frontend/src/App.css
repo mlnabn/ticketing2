@@ -8145,12 +8145,12 @@ html {
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .avatar-preview {
-  width: 85px;
-  height: 85px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   overflow: hidden;
   display: flex;
@@ -8160,6 +8160,7 @@ html {
   border: 2px solid rgba(147, 197, 253, 0.5);
   box-shadow: 0 0 12px rgba(147, 197, 253, 0.4);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 8px;
 }
 
 .avatar-preview img {
@@ -8177,19 +8178,20 @@ html {
   display: none;
 }
 
-.avatar-uploader label,
-.btn-danger {
+.avatar-uploader .btn-danger,
+.avatar-uploader label {
   display: inline-block;
-  padding: 8px 14px;
+  padding: 10px 14px !important;
   border-radius: 10px;
   cursor: pointer;
-  font-size: 13.5px;
-  font-weight: 400;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
   color: #fff;
   transition: all 0.25s ease;
   text-align: center;
-  min-width: 120px;
+  width: 30%;
 }
+
 
 .avatar-uploader label {
   background: linear-gradient(90deg, #3b82f6, #6366f1);
@@ -8211,19 +8213,6 @@ html {
   background-color: #dc2626;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(239, 68, 68, 0.6);
-}
-
-
-.btn-danger:active {
-  background-color: #b91c1c;
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
-}
-
-.btn-danger:disabled {
-  background-color: #fca5a5;
-  cursor: not-allowed;
-  box-shadow: none;
 }
 
 .form-group4 {
@@ -8336,21 +8325,37 @@ html {
   position: absolute;
   top: 12px;
   right: 12px;
+  font-size: 24px;
+  padding: 10px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: linear-gradient(135deg, #ff4d4f, #ff7a45);
   border: none;
   border-radius: 50%;
-  padding: 6px;
   cursor: pointer;
-  font-size: 18px;
   line-height: 1;
   color: #fff;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  z-index: 10;
 }
 
 .btn-ttp:hover {
   background: linear-gradient(135deg, #e60023, #ff4d4f);
-  transform: scale(1.15);
+  transform: scale(1.15) rotate(3deg);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+}
+
+.btn-ttp:active {
+  transform: scale(1.05);
+}
+
+.avatar-modal-content img {
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .divider {
@@ -9541,15 +9546,16 @@ body.dark-mode .form-group-recover textarea:focus {
 .modal-backdrop-detail.closing {
   animation: fadeBackdropOut 0.3s ease-out forwards;
 }
-.modal-content-detail form > div {
-  margin-bottom: 1rem !important; 
+
+.modal-content-detail form>div {
+  margin-bottom: 1rem !important;
 }
 
 .modal-content-detail label {
-  display: block !important; 
-  margin-bottom: 0.5rem !important; 
-  font-weight: 600 !important; 
-  color: #333 !important; 
+  display: block !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: 600 !important;
+  color: #333 !important;
   font-size: 0.95rem !important;
 }
 
@@ -13106,7 +13112,7 @@ body.dark-mode .detail-list-footer-centered {
 }
 
 /* ======================================================================
- Footer Navigasi Mobile
+ Footer Navigasi Mobile DESTOP
 ======================================================================
 */
 
@@ -13504,6 +13510,166 @@ body.dark-mode .detail-list-footer-centered {
     transform: scale(1.15);
     color: #005bff;
   }
+}
+
+
+/* ======================================================================
+ Footer Navigasi Mobile USER
+======================================================================
+*/
+
+.mobile-footer-nav-user,
+.mobile-nav-card-user,
+.mobile-nav-overlay-user {
+  display: none;
+}
+
+@media screen and (max-width: 1290px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* =========================================
+     2. MOBILE FOOTER NAVIGATION
+     ========================================= */
+
+  .mobile-footer-nav-user {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background-color: #1a2236;
+    border-top: 1px solid #2e3b55;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .mobile-footer-nav-user button {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #8a9ab5;
+    font-size: 0.75rem;
+    gap: 4px;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .mobile-footer-nav-user button svg {
+    font-size: 1.5rem;
+    margin-bottom: 2px;
+  }
+
+  .mobile-footer-nav-user button.active {
+    color: #60a5fa;
+  }
+
+  .mobile-footer-nav-user button.active svg {
+    transform: translateY(-2px);
+    filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.5));
+  }
+
+  /* =========================================
+     3. MOBILE MENU CARD (SHEET)
+     ========================================= */
+
+  .mobile-nav-overlay-user {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+    z-index: 998;
+  }
+
+  .mobile-nav-card-user {
+    display: block;
+    background: linear-gradient(180deg, #1e293b 0%, #1a2236 100%);
+    border-top: 1px solid #334155;
+    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.5);
+    color: white;
+  }
+
+  .mobile-nav-card-header-user h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f1f5f9;
+  }
+
+  .mobile-nav-card-links-user .sidebar-button {
+    padding: 15px;
+    border-radius: 12px;
+    transition: background 0.2s;
+    color: #cbd5e1;
+  }
+
+  .mobile-nav-card-links-user .sidebar-button:active {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .mobile-nav-card-links-user .sidebar-button.active {
+    background-color: rgba(96, 165, 250, 0.15) !important;
+    color: #60a5fa !important;
+    font-weight: 600;
+  }
+
+  /* --- B. Styling Menu NOTIFICATION --- */
+  .mobile-notifications-user {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .notification-item-user {
+    background: #252f46;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 15px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .notification-content-user strong {
+    font-size: 0.95rem;
+    color: #e2e8f0;
+    margin-bottom: 4px;
+  }
+
+  .notification-content-user p {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    line-height: 1.4;
+  }
+
+  .notification-delete-btn {
+    align-self: flex-end;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 6px;
+    margin-top: 8px;
+    cursor: pointer;
+  }
+
+  .notification-delete-btn:active {
+    background-color: rgba(255, 107, 107, 0.1);
+  }
+
+
 }
 
 /* Filter Inventory */

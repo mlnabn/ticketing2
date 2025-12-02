@@ -1,8 +1,20 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
+import { id } from 'date-fns/locale';
 import { useAuth } from '../AuthContext';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Import Icons untuk Mobile Footer
+import {
+  HiOutlineHome,
+  HiOutlineBell,
+  HiOutlineCog6Tooth,
+  HiHome,
+  HiBell,
+  HiCog6Tooth
+} from "react-icons/hi2";
+import { FaUser, FaHistory, FaEdit, FaSignOutAlt } from 'react-icons/fa';
 
 // Import semua komponen yang dibutuhkan
 import JobFormUser from '../components/JobFormUser';
@@ -17,6 +29,7 @@ import TicketDetailModalUser from '../components/TicketDetailModalUser';
 import bgImage from '../Image/homeBg.jpg';
 import yourLogok from '../Image/DTECH-Logo.png';
 
+// --- Variants Animation ---
 const pageVariants = {
   hidden: { opacity: 0, y: 10 },
   visible: {
@@ -61,6 +74,16 @@ const buttonHoverTap = {
   tap: { scale: 0.95 }
 };
 
+const MobileMenuItem = ({ icon, text, onClick, active }) => (
+  <button
+    className={`sidebar-button ${active ? 'active' : ''}`}
+    onClick={onClick}
+    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 15px', border: 'none', background: 'transparent', color: 'inherit', textAlign: 'left', cursor: 'pointer' }}
+  >
+    <span style={{ fontSize: '1.2rem' }}>{icon}</span>
+    <span className="nav-text" style={{ fontSize: '1rem', fontWeight: 500 }}>{text}</span>
+  </button>
+);
 
 export default function UserDashboard() {
   // -----------------------------------------------------------------
@@ -74,6 +97,8 @@ export default function UserDashboard() {
   const [users, setUsers] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  // Modals State
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [ticketToShowReason, setTicketToShowReason] = useState(null);
@@ -82,6 +107,10 @@ export default function UserDashboard() {
   const [showViewProofModal, setShowViewProofModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
+
+  // Mobile Menu State
+  const [activeMobileMenu, setActiveMobileMenu] = useState(null);
+
   const createdTicketsOnPage = useMemo(() => (createdTicketsData ? createdTicketsData.data : []), [createdTicketsData]);
 
   // -----------------------------------------------------------------
@@ -210,7 +239,10 @@ export default function UserDashboard() {
     }
   };
 
-  const handleOpenProfileModal = () => setShowProfileModal(true);
+  const handleOpenProfileModal = () => {
+    setShowProfileModal(true);
+    setActiveMobileMenu(null);
+  }
   const handleProfileSaved = (updatedUser) => {
     setUser(updatedUser);
     console.log("Profil diperbarui dan context telah diupdate.");
@@ -265,6 +297,8 @@ export default function UserDashboard() {
       exit="exit"
     >
       <main className="main-content" style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+
+        {/* HEADER */}
         <motion.header
           className="main-header-user"
           variants={headerVariants}
@@ -279,36 +313,39 @@ export default function UserDashboard() {
           <div className="header-left-group">
             <img src={yourLogok} alt="Logo" className="header-logo" />
           </div>
-          <div className="user-view-tabs">
-            <button className={`tab-button ${userViewTab === 'request' ? 'active' : ''}`} onClick={() => setUserViewTab('request')}>
-              Request
-              {userViewTab === 'request' && (
-                <motion.div className="active-tab-indicator" layoutId="activeTabIndicator" />
-              )}
-            </button>
-            <button className={`tab-button ${userViewTab === 'history' ? 'active' : ''}`} onClick={() => setUserViewTab('history')}>
-              History
-              {userViewTab === 'history' && (
-                <motion.div className="active-tab-indicator" layoutId="activeTabIndicator" />
-              )}
-            </button>
-          </div>
-          <div className="main-header-controls-user">
-            <span className="breadcrump">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
-            <UserHeader
-              userName={user?.name}
-              userAvatar={user?.avatar_url}
-              handleLogout={handleLogout}
-              notifications={notifications}
-              unreadCount={unreadCount}
-              handleNotificationToggle={handleNotificationToggle}
-              handleDeleteNotification={handleDeleteNotification}
-              onEditProfile={handleOpenProfileModal}
-            />
+          <div className="desktop-header-controls" style={{ display: 'flex', alignItems: 'center', flexGrow: 1, justifyContent: 'space-between' }}>
+            <div className="user-view-tabs desktop-only">
+              <button className={`tab-button ${userViewTab === 'request' ? 'active' : ''}`} onClick={() => setUserViewTab('request')}>
+                Request
+                {userViewTab === 'request' && (
+                  <motion.div className="active-tab-indicator" layoutId="activeTabIndicator" />
+                )}
+              </button>
+              <button className={`tab-button ${userViewTab === 'history' ? 'active' : ''}`} onClick={() => setUserViewTab('history')}>
+                History
+                {userViewTab === 'history' && (
+                  <motion.div className="active-tab-indicator" layoutId="activeTabIndicator" />
+                )}
+              </button>
+            </div>
+            <div className="main-header-controls-user desktop-only">
+              <span className="breadcrump">{userViewTab.charAt(0).toUpperCase() + userViewTab.slice(1)}</span>
+              <UserHeader
+                userName={user?.name}
+                userAvatar={user?.avatar_url}
+                handleLogout={handleLogout}
+                notifications={notifications}
+                unreadCount={unreadCount}
+                handleNotificationToggle={handleNotificationToggle}
+                handleDeleteNotification={handleDeleteNotification}
+                onEditProfile={handleOpenProfileModal}
+              />
+            </div>
           </div>
         </motion.header>
 
-        <div className="content-area" style={{ flexGrow: 1, overflowY: 'auto', paddingBottom: '20px' }}>
+        {/* CONTENT AREA */}
+        <div className="content-area" style={{ flexGrow: 1, overflowY: 'auto', paddingBottom: '80px' }}> {/* Padding bottom ditambah agar tidak tertutup footer */}
           <div className="user-view-container">
             <div className="user-view-content">
 
@@ -480,6 +517,171 @@ export default function UserDashboard() {
           </div>
         </div>
       </main>
+
+      {/* ---------------------------------------------------- */}
+      {/* --- MOBILE NAVIGATION & OVERLAYS --- */}
+      {/* ---------------------------------------------------- */}
+      {activeMobileMenu && (
+        <div
+          className="mobile-nav-overlay-user"
+          onClick={() => setActiveMobileMenu(null)}
+        ></div>
+      )}
+      <AnimatePresence>
+        {activeMobileMenu && (
+          <motion.div
+            key={activeMobileMenu}
+            className="mobile-nav-card-user"
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "100%", opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            style={{
+              position: 'fixed', bottom: '70px', left: 0, right: 0,
+              background: '#1a2236', borderTopLeftRadius: '20px', borderTopRightRadius: '20px',
+              zIndex: 999, padding: '20px', maxHeight: '70vh', overflowY: 'auto',
+              boxShadow: '0 -5px 20px rgba(0,0,0,0.5)'
+            }}
+          >
+            <div className="mobile-nav-card-header-user" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', borderBottom: '1px solid #333', paddingBottom: '10px' }}>
+              <h3 style={{ margin: 0, color: '#fff' }}>
+                {activeMobileMenu === 'Home' ? 'Menu' : activeMobileMenu}
+              </h3>
+              <button onClick={() => setActiveMobileMenu(null)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '1.5rem' }}>&times;</button>
+            </div>
+
+            <nav className="mobile-nav-card-links-user" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+
+              {/* === HOME MENU: REQUEST & HISTORY === */}
+              {activeMobileMenu === 'Home' && (
+                <>
+                  <MobileMenuItem
+                    icon={<HiOutlineHome />}
+                    text="Buat Request Baru"
+                    active={userViewTab === 'request'}
+                    onClick={() => { setUserViewTab('request'); setActiveMobileMenu(null); }}
+                  />
+                  <MobileMenuItem
+                    icon={<FaHistory />}
+                    text="Riwayat Tiket"
+                    active={userViewTab === 'history'}
+                    onClick={() => { setUserViewTab('history'); setActiveMobileMenu(null); }}
+                  />
+                </>
+              )}
+
+              {/* === NOTIFICATION MENU === */}
+              {activeMobileMenu === 'Notification' && (
+                <div className="mobile-notifications-user">
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+                  </div>
+                  {notifications && notifications.length > 0 ? (
+                    notifications.map(notif => (
+                      <div key={notif.id} className="notification-item-user"
+                        style={{ background: '#2a3449', padding: '10px', borderRadius: '8px', marginBottom: '8px' }}>
+
+                        <div className="notification-content-user">
+                          <strong style={{ display: 'block', color: '#fff' }}>{notif.title}</strong>
+                          <p style={{ margin: '5px 0', fontSize: '0.9rem', color: '#ccc' }}>{notif.message}</p>
+                          <small style={{ color: '#888' }}>
+                            {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true, locale: id })}
+                          </small>
+                        </div>
+
+                        {notif.user_id === user.id && (
+                          <button
+                            onClick={() => handleDeleteNotification(notif.id)}
+                            className="notification-delete-btn"
+                            style={{ marginTop: '5px', background: 'transparent', border: 'none', color: '#ff6b6b' }}
+                          >
+                            Hapus
+                          </button>
+                        )}
+
+                      </div>
+                    ))
+                  ) : (
+                    <p style={{ color: '#ccc', textAlign: 'center' }}>Tidak ada notifikasi.</p>
+                  )}
+                </div>
+              )}
+
+              {/* === SETTING MENU === */}
+              {activeMobileMenu === 'Setting' && (
+                <>
+                  <div className="mobile-modal-setting-item user-profile-item" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px', padding: '10px', background: '#2a3449', borderRadius: '8px' }}>
+                    <div className="user-avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', background: '#ccc' }}>
+                      {user?.avatar_url ? <img src={user.avatar_url} alt="Av" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <FaUser style={{ margin: '10px', color: '#333' }} />}
+                    </div>
+                    <span style={{ color: '#fff' }}><strong>{user?.name || "User"}</strong></span>
+                  </div>
+
+                  <MobileMenuItem
+                    icon={<FaEdit />}
+                    text="Edit Profil"
+                    onClick={handleOpenProfileModal}
+                  />
+                  <div className="mobile-modal-divider" style={{ height: '1px', background: '#333', margin: '10px 0' }}></div>
+                  <button
+                    onClick={handleLogout}
+                    className="sidebar-button"
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 15px', border: 'none', background: 'rgba(255, 107, 107, 0.1)', color: '#ff6b6b', textAlign: 'left', cursor: 'pointer', borderRadius: '8px' }}
+                  >
+                    <span style={{ fontSize: '1.2rem' }}><FaSignOutAlt /></span>
+                    <span className="nav-text" style={{ fontSize: '1rem', fontWeight: 500 }}>Logout</span>
+                  </button>
+                </>
+              )}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 3. FOOTER NAVIGASI UTAMA (className disamakan: mobile-footer-nav) */}
+      <footer className="mobile-footer-nav-user">
+        <button
+          onClick={() => setActiveMobileMenu(activeMobileMenu === 'Home' ? null : 'Home')}
+          className={activeMobileMenu === 'Home' ? 'active' : ''}
+        >
+          {activeMobileMenu === 'Home' ? <HiHome /> : <HiOutlineHome />}
+          <span>Home</span>
+        </button>
+
+        <button
+          onClick={() => {
+            if (activeMobileMenu !== 'Notification') {
+              handleNotificationToggle();
+            }
+            setActiveMobileMenu(activeMobileMenu === 'Notification' ? null : 'Notification');
+          }}
+          className={activeMobileMenu === 'Notification' ? 'active' : ''}
+          style={{ position: 'relative' }}
+        >
+          {activeMobileMenu === 'Notification' ? <HiBell /> : <HiOutlineBell />}
+          <span>Notification</span>
+          {unreadCount > 0 && (
+            <span style={{
+              position: 'absolute', top: '5px', right: '25%',
+              background: 'red', color: 'white', borderRadius: '50%',
+              padding: '2px 5px', fontSize: '0.6rem'
+            }}>
+              {unreadCount}
+            </span>
+          )}
+        </button>
+
+        <button
+          onClick={() => setActiveMobileMenu(activeMobileMenu === 'Setting' ? null : 'Setting')}
+          className={activeMobileMenu === 'Setting' ? 'active' : ''}
+        >
+          {activeMobileMenu === 'Setting' ? <HiCog6Tooth /> : <HiOutlineCog6Tooth />}
+          <span>Setting</span>
+        </button>
+      </footer>
+
+      {/* -------------------------------------------------------- */}
+      {/* MODALS (Global) */}
+      {/* -------------------------------------------------------- */}
       <AnimatePresence>
         {showViewProofModal && ticketToShowProof && (
           <ViewProofModal
