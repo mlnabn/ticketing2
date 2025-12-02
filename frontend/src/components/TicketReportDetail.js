@@ -361,7 +361,7 @@ export default function TicketReportDetail() {
     return <p>Memuat data...</p>;
   }
 
-  const { total, completed, rejected, in_progress } = reportData || {};
+  const { total, completed, in_progress } = reportData || {};
   const ticketsOnPage = (reportData && reportData.tickets) ? reportData.tickets.data : [];
 
   return (
@@ -385,7 +385,7 @@ export default function TicketReportDetail() {
             <div className={`card ${filter === 'all' ? 'active' : ''}`} onClick={() => handleFilterClick('all')}><h3>Total Tiket</h3><p>{total}</p></div>
             <div className={`card ${filter === 'completed' ? 'active' : ''}`} onClick={() => handleFilterClick('completed')}><h3>Tiket Selesai</h3><p>{completed}</p></div>
             <div className={`card ${filter === 'in_progress' ? 'active' : ''}`} onClick={() => handleFilterClick('in_progress')}><h3>Tiket Belum Selesai</h3><p>{in_progress}</p></div>
-            <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterClick('rejected')}><h3>Tiket Ditolak</h3><p>{rejected}</p></div>
+            {/* <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterClick('rejected')}><h3>Tiket Ditolak</h3><p>{rejected}</p></div> */}
           </motion.div>
 
 

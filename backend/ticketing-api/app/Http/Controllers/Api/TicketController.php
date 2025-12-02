@@ -724,11 +724,18 @@ class TicketController extends Controller
     {
         $query = Ticket::query();
 
-        if ($request->has('year')) {
-            $query->whereYear('created_at', $request->year);
-        }
-        if ($request->has('month')) {
-            $query->whereMonth('created_at', $request->month);
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+        } else {
+            if ($request->has('year')) {
+                $query->whereYear('created_at', $request->year);
+            }
+            if ($request->has('month')) {
+                $query->whereMonth('created_at', $request->month);
+            }
         }
 
         $isHandledReport = $request->has('handled_status');
