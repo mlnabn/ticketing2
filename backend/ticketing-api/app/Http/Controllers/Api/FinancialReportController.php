@@ -170,8 +170,8 @@ class FinancialReportController extends Controller
         }
         
         return [
-            'new_acquisitions' => $newAssetsQuery->latest('tanggal_pembelian')->get(),
-            'problematic_assets' => $problematicAssetsQuery->orderByRaw('COALESCE(tanggal_rusak, tanggal_hilang) DESC')->get(),
+            'new_acquisitions' => $newAssetsQuery->latest('tanggal_pembelian')->get()->toArray(),
+            'problematic_assets' => $problematicAssetsQuery->orderByRaw('COALESCE(tanggal_rusak, tanggal_hilang) DESC')->get()->toArray(),
         ];
     }
 

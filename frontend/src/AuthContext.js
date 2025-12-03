@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = useCallback((data) => {
-    const { user, expires_in } = data;
+    const { user } = data;
     localStorage.setItem('auth.user', JSON.stringify(user));
 
     setAccessToken("cookie-token-exists");

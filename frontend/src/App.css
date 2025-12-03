@@ -9742,8 +9742,6 @@ body.dark-mode .form-group-recover textarea:focus {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-
-  /* Properti tambahan untuk kerapian */
   line-height: 1.4;
   max-width: 500px;
   word-break: break-word;
@@ -9766,7 +9764,7 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .modal-content-detail-user {
-  background-color: rgba(26, 32, 52, 0.7);
+  background-color: rgba(26, 32, 52, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);

@@ -7,14 +7,14 @@ import { motion } from 'framer-motion';
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 
-const imageVariants = {
-  hidden: { opacity: 0, y: -20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: 'spring', stiffness: 120, damping: 15, delay: 0.1 },
-  },
-};
+// const imageVariants = {
+//   hidden: { opacity: 0, y: -20 },
+//   visible: {
+//     opacity: 1,
+//     y: 0,
+//     transition: { type: 'spring', stiffness: 120, damping: 15, delay: 0.1 },
+//   },
+// };
 const formContainerVariants = {
   hidden: { opacity: 0, scale: 0.95 },
   visible: {

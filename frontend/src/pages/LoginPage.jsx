@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import Login from '../components/Login';
 import api from '../services/api';
@@ -7,7 +7,7 @@ import api from '../services/api';
 export default function LoginPage() {
   const { login, loggedIn, user } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
 
   const [isValidatingGoogle, setIsValidatingGoogle] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
