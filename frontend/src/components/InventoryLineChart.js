@@ -9,9 +9,6 @@ import {
     Line
 } from 'recharts';
 
-// ================================================================
-// BARU: Komponen Tooltip Kustom untuk Recharts
-// ================================================================
 const CustomTooltip = ({ active, payload, label, isDarkMode }) => {
     if (active && payload && payload.length) {
         const style = {
@@ -37,15 +34,10 @@ const CustomTooltip = ({ active, payload, label, isDarkMode }) => {
     return null;
 };
 
-// ================================================================
-// Komponen Utama Menggunakan Recharts
-// ================================================================
 const InventoryLineChartRecharts = ({ chartData }) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
-    // State baru untuk mengelola visibilitas dataset/garis
     const [hiddenDatasets, setHiddenDatasets] = useState({});
 
-    // Efek untuk mendeteksi perubahan dark mode (tidak berubah)
     useEffect(() => {
         const updateModeFromStorage = () => {
             const savedMode = localStorage.getItem("darkMode");
@@ -56,10 +48,7 @@ const InventoryLineChartRecharts = ({ chartData }) => {
         return () => window.removeEventListener("storage", updateModeFromStorage);
     }, []);
 
-    // ================================================================
-    // BARU: Transformasi data dari format Chart.js ke Recharts
-    // Recharts memerlukan array of objects, misal: [{name: 'Jan', 'Masuk': 10, 'Keluar': 5}]
-    // ================================================================
+
     const transformedData = useMemo(() => {
         if (!chartData || !chartData.labels || !chartData.datasets) {
             return [];
@@ -74,10 +63,6 @@ const InventoryLineChartRecharts = ({ chartData }) => {
     }, [chartData]);
 
 
-    // ================================================================
-    // BARU: Logika baru untuk handle klik pada legend
-    // Kita toggle state, bukan memanipulasi instance chart secara langsung
-    // ================================================================
     const handleLegendClick = (dataKey) => {
         setHiddenDatasets(prev => ({ ...prev, [dataKey]: !prev[dataKey] }));
     };
@@ -87,11 +72,9 @@ const InventoryLineChartRecharts = ({ chartData }) => {
         return <div style={{ height: '350px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Memuat data chart...</div>;
     }
 
-    // Mendefinisikan warna dinamis untuk dark/light mode
     const tickColor = isDarkMode ? "#a0a0a0" : "#666";
     const gridColor = isDarkMode ? "#444" : "#ddd";
 
-    // Menentukan warna dot untuk legend (tidak berubah)
     const legendColorMap = {
         'Barang Masuk': 'dot-green',
         'Barang Keluar': 'dot-red',
@@ -112,20 +95,18 @@ const InventoryLineChartRecharts = ({ chartData }) => {
                             content={<CustomTooltip isDarkMode={isDarkMode} />}
                             cursor={{ stroke: isDarkMode ? '#555' : '#ccc', strokeWidth: 1 }}
                         />
-                        {/* Render garis secara dinamis berdasarkan dataset */}
                         {chartData.datasets.map((dataset) => {
-                            // Jika dataset tidak ada di state 'hidden', maka render garisnya
                             if (!hiddenDatasets[dataset.label]) {
                                 return (
                                     <Line
                                         key={dataset.label}
-                                        type="monotone" // ini setara dengan 'tension' di chart.js
+                                        type="monotone" 
                                         dataKey={dataset.label}
                                         stroke={dataset.borderColor}
                                         strokeWidth={2}
                                         activeDot={{ r: 8 }}
                                         dot={{ r: 4 }}
-                                        animationDuration={1500} // Efek animasi
+                                        animationDuration={1500} 
                                     />
                                 );
                             }
@@ -134,8 +115,6 @@ const InventoryLineChartRecharts = ({ chartData }) => {
                     </LineChart>
                 </ResponsiveContainer>
             </div>
-
-            {/* Legend kustom dengan logika baru */}
             <div className="chart-legend">
                 {chartData.datasets.map((dataset) => (
                     <div

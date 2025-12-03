@@ -15,7 +15,7 @@ export default function NotificationTemplateFormModal({ show, templateToEdit, on
       const timer = setTimeout(() => {
         setTitle('');
         setMessage('');
-      }, 300); // Reset setelah animasi
+      }, 300); 
       return () => clearTimeout(timer);
     }
   }, [templateToEdit, show]);

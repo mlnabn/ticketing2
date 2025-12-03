@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import AboutUsPage from '../components/AboutUsPage'; // Impor komponen utama
-import api from '../services/api'; // Impor instance API untuk fetch data
+import AboutUsPage from '../components/AboutUsPage';
+import api from '../services/api';
 import { useAuth } from '../AuthContext';
 
 export default function AboutRoute() {
@@ -16,8 +16,6 @@ export default function AboutRoute() {
         console.error("Gagal mengambil daftar admin:", error);
       }
     };
-
-    // 3. Hanya jalankan fetchAdmins JIKA pengguna sudah login
     if (loggedIn) {
       fetchAdmins();
     }

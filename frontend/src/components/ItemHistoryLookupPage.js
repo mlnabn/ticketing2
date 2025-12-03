@@ -489,8 +489,6 @@ function ItemHistoryLookupPage() {
                                 }}
                                 className="filters-content-wrapper"
                             >
-
-                                {/* 1. Filter Tipe: Select */}
                                 <Select
                                     classNamePrefix="report-filter-select"
                                     options={filterTypeOptions}
@@ -507,7 +505,6 @@ function ItemHistoryLookupPage() {
 
                                 {filterType === 'month' && (
                                     <>
-                                        {/* 2. Filter Bulan: Select */}
                                         <Select
                                             classNamePrefix="report-filter-select"
                                             name="month"
@@ -522,8 +519,6 @@ function ItemHistoryLookupPage() {
                                                 menuPortal: (base) => ({ ...base, zIndex: 9999 })
                                             }}
                                         />
-
-                                        {/* 3. Filter Tahun: Select */}
                                         <Select
                                             classNamePrefix="report-filter-select"
                                             name="year"
@@ -558,7 +553,6 @@ function ItemHistoryLookupPage() {
                 <motion.div variants={staggerItem} className={`split-view-container ${selectedItem ? 'split-view-active' : ''}`}>
                     <div className="list-panel">
                         <div className="job-list-container">
-                            {/* Desktop View */}
                             <div className="table-scroll-container" style={{ maxHeight: '65vh' }}>
                                 <table className="job-table">
                                     <thead>
@@ -625,7 +619,6 @@ function ItemHistoryLookupPage() {
                                 )}
                             </div>
 
-                            {/* Mobile View */}
                             <div
                                 className="job-list-mobile"
                                 ref={mobileListRef}
@@ -689,7 +682,6 @@ function ItemHistoryLookupPage() {
                         </div>
                     </div>
 
-                    {/* === PANEL KANAN: RIWAYAT ITEM === */}
                     {selectedItem && !isMobile && (
                         <div className="history-panel">
                             <div className="history-panel-header">

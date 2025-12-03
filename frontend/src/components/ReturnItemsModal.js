@@ -147,7 +147,6 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
     };
 
     const formattedStatusOptions = statusOptions.map(s => ({
-        // PENTING: Gunakan String() karena nilai dari e.target.value pada Select lama adalah string
         value: String(s.id),
         label: s.nama_status
     }));
@@ -172,12 +171,9 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
                 {isLoading ? <p>Memuat...</p> : (
                     <div className="items-to-return-list">
                         {items.length > 0 ? items.map(item => {
-                            // === PERBAIKAN UTAMA ADA DI SINI ===
-                            // Mengubah string menjadi number sebelum membandingkan
                             const selectedStatus = statusOptions.find(s => s.id === Number(item.status_id));
                             return (
                                 <div key={item.stok_barang_id} className="return-item-row">
-                                    {/* ... sisa kode tidak berubah ... */}
                                     <div className="item-info">
                                         <strong>{item.name}</strong>
                                         <small>({item.kode_unik})</small>

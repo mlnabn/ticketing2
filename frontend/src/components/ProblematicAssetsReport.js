@@ -264,7 +264,6 @@ export default function ProblematicAssetsReport() {
 
 
             <motion.div variants={staggerItem} className="job-list-container">
-                {/* Desktop View */}
                 <div className="table-scroll-container">
                     <table className="job-table">
                         <thead>
@@ -317,8 +316,6 @@ export default function ProblematicAssetsReport() {
                         </table>
                     )}
                 </div>
-
-                {/* Mobile View  */}
                 <div
                     className='job-list-mobile'
                     style={{ overflowY: 'auto', maxHeight: '65vh' }}

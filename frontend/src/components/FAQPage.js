@@ -3,12 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, HelpCircle, ThumbsUp, ThumbsDown } from "lucide-react";
 import AnimateOnScroll from "./AnimateOnScroll";
 
-// 🔹 Komponen FAQ Item
 const FAQItem = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [feedback, setFeedback] = useState(null);
 
-  // Tidak perlu motion.div wrapper luar lagi
   return (
     <div
       className={`faq-item rounded-2xl border mb-4 shadow-lg backdrop-blur-lg transition-all duration-300 ${isOpen
@@ -16,8 +14,7 @@ const FAQItem = ({ question, answer }) => {
         : "border-gray-700 bg-white/5"
         }`}
     >
-      {/* Animasikan tombol pertanyaan */}
-      {/* Kita tidak perlu AnimateOnScroll di sini karena parent-nya sudah dianimasikan */}
+     
       <button
         aria-expanded={isOpen}
         aria-controls={`faq-answer-${question}`}
@@ -28,7 +25,6 @@ const FAQItem = ({ question, answer }) => {
           <HelpCircle className="w-5 h-5" />
           {question}
         </span>
-        {/* Animasi chevron tetap */}
         <motion.span
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.3 }}
@@ -36,8 +32,6 @@ const FAQItem = ({ question, answer }) => {
           <ChevronDown className="w-6 h-6 text-blue-400" />
         </motion.span>
       </button>
-
-      {/* Jawaban (Animasi buka/tutup tetap) */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -50,7 +44,6 @@ const FAQItem = ({ question, answer }) => {
           >
             <div className="px-5 pb-5">
               <p className="text-gray-300 leading-relaxed">{answer}</p>
-              {/* Feedback Section (Bisa dianimasikan juga jika mau) */}
               <AnimateOnScroll delay={0.1}>
                 <div className="mt-4 text-sm text-gray-400 flex items-center gap-3">
                   {feedback === null ? (
@@ -75,7 +68,6 @@ const FAQItem = ({ question, answer }) => {
 };
 
 const FAQPage = () => {
-  // FAQ dibagi ke kategori
   const faqCategories = {
     "🎟️ Tiket & Layanan": [
       {
@@ -122,7 +114,6 @@ const FAQPage = () => {
     ],
   };
 
-  // FAQ Populer
   const popularFaqs = [
     faqCategories["🎟️ Tiket & Layanan"][0],
     faqCategories["⚙️ Sistem & Teknis"][1],
@@ -130,7 +121,6 @@ const FAQPage = () => {
   ];
 
   return (
-    // Container utama tidak perlu AnimateOnScroll jika isinya sudah
     <div className="faq-container">
       <AnimateOnScroll className="w-full">
         <h2>
@@ -138,14 +128,12 @@ const FAQPage = () => {
         </h2>
       </AnimateOnScroll>
 
-      {/* FAQ Populer */}
       <section className="mb-8">
         <AnimateOnScroll className="w-full" delay={0.1}>
           <h3 className="text-xl font-semibold text-blue-300 mb-4">
             ⭐ Pertanyaan Populer
           </h3>
         </AnimateOnScroll>
-        {/* AnimateOnScroll membungkus setiap FAQItem */}
         {popularFaqs.map((faq, i) => (
           <AnimateOnScroll key={`popular-${i}`} delay={0.15 + i * 0.05} className="w-full">
             <FAQItem {...faq} />
@@ -153,7 +141,6 @@ const FAQPage = () => {
         ))}
       </section>
 
-      {/* FAQ per kategori */}
       {Object.keys(faqCategories).map((category, idx) => (
         <section key={idx} className="mb-10">
           <AnimateOnScroll className="w-full" delay={0.25 + idx * 0.1}>
@@ -161,7 +148,6 @@ const FAQPage = () => {
               {category}
             </h3>
           </AnimateOnScroll>
-          {/* AnimateOnScroll membungkus setiap FAQItem */}
           {faqCategories[category].map((faq, i) => (
             <AnimateOnScroll key={`${category}-${i}`} delay={0.3 + idx * 0.1 + i * 0.05} className="w-full">
               <FAQItem {...faq} />
@@ -170,7 +156,6 @@ const FAQPage = () => {
         </section>
       ))}
 
-      {/* CTA */}
       <AnimateOnScroll className="w-full" delay={0.5}>
         <div className="faq-cta text-center text-gray-400">
           Tidak menemukan jawaban?

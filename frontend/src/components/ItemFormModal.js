@@ -34,7 +34,7 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
                 setShouldRender(false);
                 setFormData(initialFormState);
                 setIsExisting(false);
-            }, 300); // Durasi animasi
+            }, 300);
             return () => clearTimeout(timer);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,7 +75,6 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
     }, [formData.id_kategori]);
 
     useEffect(() => {
-        // Jangan cek jika sedang mode edit
         if (itemToEdit) return;
 
         if (debouncedNama && debouncedSubKategori) {
@@ -156,7 +155,6 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
                 <h3>{itemToEdit ? 'Edit Tipe Barang' : 'Daftarkan Tipe Barang Baru'}</h3>
                 <form onSubmit={handleSubmit}>
                     <div className="form-row-split">
-                        {/* KATEGORI */}
                         <div className="form-group">
                             <label>Kategori</label>
                             <CreatableSelect
@@ -172,8 +170,6 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
                                 placeholder="Pilih / ketik kategori..."
                             />
                         </div>
-
-                        {/* SUB-KATEGORI */}
                         <div className="form-group">
                             <label>Sub-Kategori / Merk</label>
                             <CreatableSelect
@@ -191,7 +187,6 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
                         </div>
                     </div>
 
-                    {/* NAMA BARANG */}
                     <div className="form-group">
                         <label>Nama Barang</label>
                         <input

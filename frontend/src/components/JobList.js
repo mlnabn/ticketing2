@@ -19,7 +19,7 @@ const staggerContainer = {
     opacity: 1,
     transition: {
       when: "beforeChildren",
-      staggerChildren: 0.1, // Jeda antar item
+      staggerChildren: 0.1, 
     },
   },
 };
@@ -36,7 +36,6 @@ const staggerItem = {
 const UNEDITABLE_STATUS = ['Sedang Dikerjakan', 'Ditunda', 'Belum Dikerjakan'];
 
 export default function JobList() {
-  // --- 1. SETUP & STATE MANAGEMENT ---
   const isPresent = useIsPresent();
   const { showToast } = useOutletContext();
   const { user, logout } = useAuth();
@@ -47,17 +46,14 @@ export default function JobList() {
   const isMyTicketsPage = location.pathname.includes('/my-tickets');
   const isAdmin = user?.role?.toLowerCase() === 'admin';
 
-  // State untuk data dan UI
   const [ticketData, setTicketData] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
   const [selectedIds, setSelectedIds] = useState([]);
 
-  // State untuk data pendukung modal
   const [adminList, setAdminList] = useState([]);
   const [itemList, setItemList] = useState([]);
 
-  // State untuk mengontrol semua modal
   const [ticketToAssign, setTicketToAssign] = useState(null);
   const [ticketToReject, setTicketToReject] = useState(null);
   const [ticketForProof, setTicketForProof] = useState(null);
@@ -567,8 +563,6 @@ export default function JobList() {
                 </table>
               )}
 
-              {/* Mobile View */}
-
               <motion.div variants={staggerItem}>
                 <div
                   className="job-list-mobile"
@@ -605,7 +599,7 @@ export default function JobList() {
                             <div className="data-group"><span className="label">Pengirim</span><span className="value">{ticket.creator ? ticket.creator.name : 'N/A'}</span></div>
                             <div className="data-group"><span className="label">Workshop</span><span className="value">{ticket.workshop ? ticket.workshop.name : 'N/A'}</span></div>
                           </div>
-                          {/* <div className="card-row"><div className="data-group single"><span className="label">Workshop</span><span className="value">{ticket.workshop ? ticket.workshop.name : 'N/A'}</span></div></div> */}
+                
                           <div className="card-row">
                             <div className="data-group single">
                               <span className="label">Deskripsi</span>
@@ -619,10 +613,7 @@ export default function JobList() {
                               </span>
                             </div>
                           </div>
-                          {/* <div className="card-row">
-                            <div className="data-group"><span className="label">Tanggal Dibuat</span><span className="value">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</span></div>
-                            <div className="data-group"><span className="label">Waktu Pengerjaan</span><span className="value">{formatWorkTime(ticket)}</span></div>
-                          </div> */}
+                          
                           <div className="card-row status-row"><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></div>
                           <div className="card-row action-row"><div className="action-buttons-group">{renderActionButtons(ticket)}</div></div>
                         </div>

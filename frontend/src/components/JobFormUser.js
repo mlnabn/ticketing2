@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import api from '../services/api';
 
-// Terima prop 'addTicket'
 function JobFormUser({ addTicket }) {
   const [title, setTitle] = useState('');
   const [workshopId, setWorkshopId] = useState('');
@@ -16,8 +15,6 @@ function JobFormUser({ addTicket }) {
     const fetchWorkshops = async () => {
       try {
         const response = await api.get('/workshops');
-        
-        // --- PERBAIKAN DI SINI ---
         const dataArray = response.data.data || response.data;
         if (Array.isArray(dataArray)) {
           const options = dataArray.map(ws => ({
@@ -50,12 +47,10 @@ function JobFormUser({ addTicket }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Validasi: title dan workshop selalu wajib
     if (!title || !workshopId) {
       alert("Mohon lengkapi Workshop dan Deskripsi.");
       return;
     }
-    // Validasi: jika tidak fleksibel, tanggal & waktu wajib diisi
     if (!isFlexible && (!requestedDate || !requestedTime)) {
       alert("Mohon lengkapi Tanggal dan Waktu, atau centang 'Jadwal Fleksibel'.");
       return;
@@ -68,7 +63,6 @@ function JobFormUser({ addTicket }) {
       requested_date: isFlexible ? null : requestedDate
     });
 
-    // Reset form
     setTitle('');
     setWorkshopId('');
     setRequestedTime('');
@@ -96,7 +90,7 @@ function JobFormUser({ addTicket }) {
     }),
     placeholder: (provided) => ({
       ...provided,
-      color: "#c6c7c8ff", // biru muda untuk placeholder
+      color: "#c6c7c8ff", 
       textAlign: 'center',
       fontWeight: 500
 
@@ -110,12 +104,12 @@ function JobFormUser({ addTicket }) {
     input: (provided) => ({
       ...provided,
       textAlign: 'center',
-      color: "#c6c7c8ff" // warna teks saat mengetik
+      color: "#c6c7c8ff" 
 
     }),
     valueContainer: (provided) => ({
       ...provided,
-      justifyContent: 'center', // supaya teks tetap di tengah
+      justifyContent: 'center', 
     }),
     menu: (provided) => ({
       ...provided,
@@ -147,7 +141,6 @@ function JobFormUser({ addTicket }) {
 
   return (
     <form onSubmit={handleSubmit} className="job-form-user">
-      {/* Input untuk Workshop */}
 
       <div className="row-input">
         <Select
@@ -199,7 +192,6 @@ function JobFormUser({ addTicket }) {
         className="input-like-selectuser"
       />
 
-      {/* Tombol Tambah */}
       <button type="submit" className="btn-submituser">Submit</button>
     </form >
   );

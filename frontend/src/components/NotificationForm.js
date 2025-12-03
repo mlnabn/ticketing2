@@ -104,7 +104,7 @@ export default function NotificationForm() {
     }
     try {
       await api.delete(`/notifications/${id}`);
-      fetchGlobalNotifications(); // Panggil ulang untuk refresh
+      fetchGlobalNotifications(); 
       showToast('Notifikasi berhasil dihapus.', 'success');
     } catch (error) {
       console.error('Gagal menghapus notifikasi:', error);

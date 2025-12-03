@@ -4,7 +4,6 @@ import api from '../services/api';
 import EditStokBarangModal from './EditStokBarangModal';
 import HistoryModal from './HistoryModal';
 
-// --- Inisialisasi Data Form ---
 const initialFormData = {
     status_id: '',
     deskripsi: '',
@@ -21,7 +20,6 @@ const initialFormData = {
     tanggal_keluar: '',
 };
 
-// --- Komponen Utama ---
 function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEditClick, statusOptions, colorOptions, fetchData, pagination, currentFilters }) {
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState(initialFormData);
@@ -53,7 +51,6 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, item, shouldRender]);
 
-    // --- Efek untuk mengisi form & mengambil data ---
     useEffect(() => {
         if (currentItem) {
             setFormData({
@@ -106,7 +103,6 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
     if (!shouldRender) return null;
     if (!currentItem) return null;
 
-    // --- Handlers ---
     const handleChange = (e) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
@@ -132,7 +128,6 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
         }
     };
 
-    // --- Render Function untuk Form Kondisional (Lengkap) ---
     const renderConditionalInputs = () => {
         if (!isEditing) return null;
 
@@ -161,7 +156,6 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
                             </select>
                         </div>
                         <div className="info-row"><span className="info-label">Tanggal Keluar</span>
-                            {/* [DIUBAH] Hapus || getTodayDate() */}
                             <input type="date" name="tanggal_keluar" value={formData.tanggal_keluar || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong" />
                         </div>
                         {commonDescription('Deskripsi Peminjaman')}
@@ -177,7 +171,6 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
                             </select>
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Mulai</span>
-                            {/* [DIUBAH] Hapus || getTodayDate() */}
                             <input type="date" name="tanggal_mulai_perbaikan" value={formData.tanggal_mulai_perbaikan || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong" />
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Selesai</span>
@@ -196,7 +189,6 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
                             </select>
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Rusak</span>
-                            {/* [DIUBAH] Hapus || getTodayDate() */}
                             <input type="date" name="tanggal_rusak" value={formData.tanggal_rusak || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong" />
                         </div>
                         {commonDescription('Deskripsi Kerusakan')}
@@ -212,7 +204,6 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
                             </select>
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Hilang</span>
-                            {/* [DIUBAH] Hapus || getTodayDate() */}
                             <input type="date" name="tanggal_hilang" value={formData.tanggal_hilang || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong" />
                         </div>
                         <div className="info-row"><span className="info-label">Tgl Ketemu</span>

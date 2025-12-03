@@ -149,8 +149,6 @@ export default function TicketReportDetail() {
     const { name, value } = e.target;
     const newParams = new URLSearchParams(searchParams);
     const currentEndDate = searchParams.get('end_date');
-
-    // Logika kustom untuk start_date
     if (name === 'start_date') {
       if (value === 'all' || value === '') {
         newParams.delete('start_date');
@@ -363,7 +361,7 @@ export default function TicketReportDetail() {
     return <p>Memuat data...</p>;
   }
 
-  const { total, completed, rejected, in_progress } = reportData || {};
+  const { total, completed, in_progress } = reportData || {};
   const ticketsOnPage = (reportData && reportData.tickets) ? reportData.tickets.data : [];
 
   return (
@@ -387,7 +385,7 @@ export default function TicketReportDetail() {
             <div className={`card ${filter === 'all' ? 'active' : ''}`} onClick={() => handleFilterClick('all')}><h3>Total Tiket</h3><p>{total}</p></div>
             <div className={`card ${filter === 'completed' ? 'active' : ''}`} onClick={() => handleFilterClick('completed')}><h3>Tiket Selesai</h3><p>{completed}</p></div>
             <div className={`card ${filter === 'in_progress' ? 'active' : ''}`} onClick={() => handleFilterClick('in_progress')}><h3>Tiket Belum Selesai</h3><p>{in_progress}</p></div>
-            <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterClick('rejected')}><h3>Tiket Ditolak</h3><p>{rejected}</p></div>
+            {/* <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterClick('rejected')}><h3>Tiket Ditolak</h3><p>{rejected}</p></div> */}
           </motion.div>
 
 
@@ -426,7 +424,6 @@ export default function TicketReportDetail() {
                   variants={filterExpandVariants}
                   className="filters-content-wrapper"
                 >
-                  {/* Filter Type Select */}
                   <Select
                     value={activeFilterType}
                     onChange={handleFilterTypeChange}
@@ -439,11 +436,8 @@ export default function TicketReportDetail() {
                       menuPortal: (base) => ({ ...base, zIndex: 9999 })
                     }}
                   />
-
-                  {/* Filter per Bulan */}
                   {filterType === 'month' && (
                     <>
-                      {/* Month Select */}
                       <Select
                         name="month"
                         value={activeMonth}
@@ -457,7 +451,6 @@ export default function TicketReportDetail() {
                           menuPortal: (base) => ({ ...base, zIndex: 9999 })
                         }}
                       />
-                      {/* Year Select */}
                       <Select
                         name="year"
                         value={activeYear}
@@ -473,8 +466,6 @@ export default function TicketReportDetail() {
                       />
                     </>
                   )}
-
-                  {/* Filter per Rentang Tanggal */}
                   {filterType === 'date_range' && (
                     <motion.div
                       variants={staggerItem}
@@ -515,9 +506,6 @@ export default function TicketReportDetail() {
               {exportingExcel ? 'Mengekspor...' : 'Ekspor Excel'}
             </button>
           </motion.div>
-
-
-          {/* --- Desktop Table --- */}
           <motion.div variants={staggerItem} className="job-list-container">
             {(loading && !reportData.tickets) ? <p>Memuat tabel...</p> : (
               <div className="table-scroll-container">
@@ -584,8 +572,6 @@ export default function TicketReportDetail() {
               </div>
             )}
           </motion.div>
-
-          {/* --- Mobile Card View --- */}
           <motion.div
             variants={staggerItem}
             className="job-list-mobile"

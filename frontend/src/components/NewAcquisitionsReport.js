@@ -160,8 +160,6 @@ export default function NewAcquisitionsReport() {
                 <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
                 {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
             </motion.button>
-
-            {/* DIPERBAIKI: Menghapus wrapper kondisional {isMobile && (...)} agar filter tampil di Desktop */}
             <AnimatePresence>
                 {isMobileFilterOpen && (
                     <motion.div
@@ -303,8 +301,6 @@ export default function NewAcquisitionsReport() {
                         </table>
                     )}
                 </div>
-
-                {/* Mobile View  */}
                 <div
                     className='job-list-mobile'
                     style={{ overflowY: 'auto', maxHeight: '65vh' }}

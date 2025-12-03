@@ -76,7 +76,6 @@ const UserHeader = ({
       <AnimatePresence>
         {dropdownOpen && (
           <>
-            {/* Overlay agar klik di luar bisa menutup */}
             <motion.div
               className="dropdown-overlay"
               onClick={() => setDropdownOpen(false)}

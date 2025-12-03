@@ -1,4 +1,3 @@
-/* src/components/Toast.css */
 .toast-container {
   position: fixed;
   top: 20px;
@@ -30,21 +29,19 @@
   display: flex;
   align-items: center;
 }
-
-/* Warna berdasarkan tipe notifikasi */
 .toast.success {
-  background-color: #28a745; /* Hijau */
+  background-color: #28a745; 
 }
 
 .toast.error {
-  background-color: #dc3545; /* Merah */
+  background-color: #dc3545; 
 }
 
 .toast.info {
-  background-color: #17a2b8; /* Biru Info */
+  background-color: #17a2b8; 
 }
 
 .toast.warning {
-  background-color: #ffc107 !important; /* Kuning/Jingga */
+  background-color: #ffc107 !important; 
   color: #333 !important;
 }

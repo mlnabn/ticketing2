@@ -5,13 +5,11 @@ import api from '../services/api';
 
 const formatDateTime = (dateTimeString) => {
     if (!dateTimeString) return '-';
-    // Menggunakan locale 'id' untuk format tanggal Indonesia
     return format(new Date(dateTimeString), 'dd MMM yyyy, HH:mm', { locale: id });
 };
 
 const formatWorkTime = (ticket) => {
     if (ticket.started_at && ticket.completed_at) return `${format(new Date(ticket.started_at), 'HH:mm')} - ${format(new Date(ticket.completed_at), 'HH:mm')}`;
-    // if (ticket.started_at) return `Mulai: ${format(new Date(ticket.started_at), 'HH:mm')}`;
     if (ticket.requested_date && ticket.requested_time) return `Diminta: ${format(new Date(ticket.requested_date), 'dd MMM')}, ${ticket.requested_time}`;
     if (ticket.requested_date) return `Tgl Diminta: ${format(new Date(ticket.requested_date), 'dd MMM yyyy')}`;
     if (ticket.requested_time) return `Waktu Diminta: ${ticket.requested_time}`;
@@ -51,7 +49,7 @@ function TicketDetailModal({ show, ticket, onClose }) {
                 })
                 .catch(error => {
                     console.error("Gagal mengambil data barang pinjaman:", error);
-                    setBorrowedItems([]); // Kosongkan jika gagal
+                    setBorrowedItems([]); 
                 })
                 .finally(() => {
                     setIsLoadingItems(false);
@@ -170,7 +168,6 @@ function TicketDetailModal({ show, ticket, onClose }) {
                             <ul className="borrowed-items-list">
                                 {borrowedItems.map(item => (
                                     <li key={item.id}>
-                                        {/* Menampilkan detail per unit barang */}
                                         <span className="tool-name">{item.master_barang.nama_barang}</span>
                                         <span className="tool-quantity">({item.kode_unik})</span>
                                     </li>

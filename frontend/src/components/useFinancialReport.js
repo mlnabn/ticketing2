@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
-import { useIsPresent } from 'framer-motion';
 
-// Custom hook untuk menampung state dan logika yang berulang
 export const useFinancialReport = (isPresent) => {
     const [summaryData, setSummaryData] = useState({
         total_asset_value: 0,
@@ -21,8 +19,6 @@ export const useFinancialReport = (isPresent) => {
     });
     const [isLoading, setIsLoading] = useState(true);
     const [isExporting, setIsExporting] = useState(false);
-
-    // --- Data Fetching untuk Tabel Detail ---
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -32,8 +28,6 @@ export const useFinancialReport = (isPresent) => {
             } else if (filters.start_date && filters.end_date) {
                 apiParams = { start_date: filters.start_date, end_date: filters.end_date };
             }
-
-            // Gunakan Promise.all untuk efisiensi
             const [summaryRes, detailsRes, barChartRes, pieChartRes] = await Promise.all([
                 api.get('/financial-report/inventory', { params: apiParams }),
                 api.get('/financial-report/inventory/details', { params: apiParams }),
@@ -56,8 +50,6 @@ export const useFinancialReport = (isPresent) => {
         if (!isPresent) return;
         fetchData();
     }, [fetchData, isPresent]);
-
-    // --- Handlers ---
     const handleFilterChange = (e) => {
         setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
@@ -99,7 +91,6 @@ export const useFinancialReport = (isPresent) => {
         }
     };
 
-    // --- Helper & Variables ---
     const formatCurrency = (value) => {
         if (typeof value !== 'number') return 'Rp 0';
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
@@ -113,7 +104,6 @@ export const useFinancialReport = (isPresent) => {
     const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i);
     const months = Array.from({ length: 12 }, (_, i) => ({ value: i + 1, name: new Date(0, i).toLocaleString('id-ID', { month: 'long' }) }));
 
-    // Return semua state dan fungsi yang dibutuhkan oleh komponen
     return {
         summaryData,
         detailedData, 

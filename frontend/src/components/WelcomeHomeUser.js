@@ -1,7 +1,6 @@
 import React from "react";
 import { HelpCircle, Clock, FileText } from "lucide-react";
 import AnimateOnScroll from "./AnimateOnScroll";
-// import './WelcomeHomeUser.css'; // Hapus jika CSS sudah dipindah ke App.css atau tidak dipakai
 
 const WelcomeHomeUser = ({ user, onGetStarted }) => {
   return (
@@ -24,12 +23,9 @@ const WelcomeHomeUser = ({ user, onGetStarted }) => {
           </p>
         </AnimateOnScroll>
 
-        {/* Card Konten */}
         <AnimateOnScroll delay={0.2} className="w-full max-w-6xl">
           <div className="relative bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-lg shadow-2xl transition-all duration-300 mx-2 sm:mx-4">
-            {/* Konten Card */}
             <div className="relative z-10 space-y-5 text-left">
-              {/* ✅ Animasi elemen di dalam card */}
               <AnimateOnScroll delay={0.25}>
                 <p className="text-sm font-medium bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-400 bg-clip-text text-transparent">
                   Butuh Bantuan?
@@ -45,7 +41,6 @@ const WelcomeHomeUser = ({ user, onGetStarted }) => {
 
               <AnimateOnScroll delay={0.35}>
                 <ul className="space-y-4 text-sm sm:text-base">
-                  {/* Animasi per list item jika mau (lebih detail) */}
                   <li className="flex items-center gap-3">
                     <span className="flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-blue-500/20 shadow-inner">
                       <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />

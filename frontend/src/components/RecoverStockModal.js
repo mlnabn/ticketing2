@@ -32,7 +32,6 @@ function RecoverStockModal({ tool, ticket, onClose, onSave, showToast }) {
       showToast('Keterangan pemulihan wajib diisi.', 'warning');
       return;
     }
-    // Pastikan quantity yang dikirim adalah angka
     const finalQuantity = parseInt(quantity, 10) || 1;
     onSave(tool.id, ticket.ticket_id, finalQuantity, keterangan);
   };

@@ -240,6 +240,8 @@ class TicketController extends Controller
             'workshop_name' => 'required|string|exists:workshops,name',
             'sender_phone' => 'required|string',
             'sender_name' => 'required|string',
+            'requested_date' => 'nullable|date',
+            'requested_time' => 'nullable|date_format:H:i',
         ]);
         $workshop = Workshop::where('name', $validated['workshop_name'])->first();
         if (!$workshop) {
@@ -290,6 +292,8 @@ class TicketController extends Controller
             'creator_id' => $user->id,
             'status' => 'Belum Dikerjakan',
             'is_urgent' => $isUrgent,
+            'requested_date' => $validated['requested_date'] ?? null,
+            'requested_time' => $validated['requested_time'] ?? null,
         ]);
 
         return response()->json($ticket, 201);
@@ -727,11 +731,18 @@ class TicketController extends Controller
     {
         $query = Ticket::query();
 
-        if ($request->has('year')) {
-            $query->whereYear('created_at', $request->year);
-        }
-        if ($request->has('month')) {
-            $query->whereMonth('created_at', $request->month);
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+        } else {
+            if ($request->has('year')) {
+                $query->whereYear('created_at', $request->year);
+            }
+            if ($request->has('month')) {
+                $query->whereMonth('created_at', $request->month);
+            }
         }
 
         $isHandledReport = $request->has('handled_status');
