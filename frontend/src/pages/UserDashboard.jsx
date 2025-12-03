@@ -8,12 +8,11 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
     HiOutlineHome,
     HiOutlineBell,
-    HiOutlineCog6Tooth,
     HiHome,
     HiBell,
-    HiCog6Tooth
 } from "react-icons/hi2";
-import { FaUser, FaHistory, FaEdit, FaSignOutAlt } from 'react-icons/fa';
+import { FaUser, FaHistory, FaSignOutAlt } from 'react-icons/fa';
+import { CgProfile } from "react-icons/cg";
 import UserHeader from '../components/UserHeader';
 import ProfileModal from '../components/ProfileModal';
 import bgImage from '../Image/homeBg.jpg';
@@ -115,6 +114,7 @@ export default function UserDashboard() {
             style={{
                 backgroundImage: `url(${bgImage})`,
                 height: '100vh',
+                
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column'
@@ -137,7 +137,6 @@ export default function UserDashboard() {
                     </div>
                     <div className="desktop-header-controls" style={{ display: 'flex', alignItems: 'center', flexGrow: 1, justifyContent: 'space-between' }}>
 
-                        {/* NAVIGATION TABS (Desktop) */}
                         <div className="user-view-tabs desktop-only">
                             <NavLink to="request" className={({ isActive }) => `tab-button ${isActive ? 'active' : ''}`}>
                                 Request
@@ -171,7 +170,6 @@ export default function UserDashboard() {
                     </div>
                 </motion.header>
 
-                {/* MAIN CONTENT (Outlet) */}
                 <div className="content-area" style={{ flexGrow: 1, overflowY: 'auto', paddingBottom: '80px' }}>
                     <div className="user-view-container">
                         <div className="user-view-content">
@@ -183,7 +181,8 @@ export default function UserDashboard() {
                 </div>
             </main>
 
-            {/* MOBILE NAVIGATION OVERLAY */}
+            {/* Mobile Navigation Menu */}
+
             {activeMobileMenu && (
                 <div
                     className="mobile-nav-overlay-user"
@@ -191,7 +190,6 @@ export default function UserDashboard() {
                 ></div>
             )}
 
-            {/* MOBILE MENU */}
             <AnimatePresence>
                 {activeMobileMenu && (
                     <motion.div
@@ -228,7 +226,7 @@ export default function UserDashboard() {
                             boxShadow: '0 -5px 20px rgba(0,0,0,0.5)',
                         }}
                     >
-                        <div
+                        <div className="mobile-nav-card-drag-handle-user"
                             onPointerDown={(e) => dragControls.start(e)}
                             style={{
                                 width: '100%',
@@ -252,7 +250,6 @@ export default function UserDashboard() {
                                 }}></div>
                             </div>
 
-                            {/* Judul Menu */}
                             <div className="mobile-nav-card-header-user" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid #333', paddingBottom: '10px' }}>
                                 <h3 style={{ margin: 0, color: '#fff' }}>
                                     {activeMobileMenu === 'Home' ? 'Menu' : activeMobileMenu}
@@ -309,29 +306,76 @@ export default function UserDashboard() {
                                     )}
                                 </div>
                             )}
-                            {activeMobileMenu === 'Setting' && (
+                            {activeMobileMenu === 'Profil' && (
                                 <>
-                                    <div className="mobile-modal-setting-item user-profile-item" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px', padding: '10px', background: '#2a3449', borderRadius: '8px' }}>
-                                        <div className="user-avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', background: '#ccc' }}>
-                                            {user?.avatar_url ? <img src={user.avatar_url} alt="Av" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <FaUser style={{ margin: '10px', color: '#333' }} />}
-                                        </div>
-                                        <span style={{ color: '#fff' }}><strong>{user?.name || "User"}</strong></span>
+                                    <div style={{
+                                        flexGrow: 1,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        padding: '6px',
+                                        backgroundColor: '#232d42',
+                                        borderRadius: '12px',
+                                        border: '1px solid #334155',
+                                        color: 'inherit',
+                                        transition: 'background-color 0.2s',
+                                        textDecoration: 'none',
+                                    }}>
+                                        <button
+                                            onClick={handleOpenProfileModal}
+                                            style={{
+                                                flexGrow: 1,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '15px',
+                                                textAlign: 'left',
+                                                color: 'inherit',
+                                            }}
+                                        >
+                                            <div className="user-avatar" style={{
+                                                width: '48px',
+                                                height: '48px',
+                                                borderRadius: '50%',
+                                                overflow: 'hidden',
+                                                backgroundColor: '#4a5568',
+                                                flexShrink: 0
+                                            }}>
+                                                {user?.avatar_url ? (
+                                                    <img src={user.avatar_url} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                ) : (
+                                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <FaUser size={20} color="#cbd5e0" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                                                <span style={{ color: '#fff', fontSize: '1.1rem', fontWeight: '600' }}>
+                                                    {user?.name || "Pengguna"}
+                                                </span>
+                                                <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>
+                                                    Lihat & Edit Profil
+                                                </span>
+                                            </div>
+                                        </button>
+                                        <button
+                                            onClick={handleLogout}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                padding: '15px',
+                                                borderRadius: '12px',
+                                                color: 'rgba(255, 107, 107, 0.8)',
+                                                cursor: 'pointer',
+                                                flexShrink: 0,
+                                                transition: 'background-color 0.2s',
+                                            }}
+                                        >
+                                            <FaSignOutAlt size={20} />
+                                        </button>
                                     </div>
 
-                                    <MobileMenuItem
-                                        icon={<FaEdit />}
-                                        text="Edit Profil"
-                                        onClick={handleOpenProfileModal}
-                                    />
                                     <div className="mobile-modal-divider" style={{ height: '1px', background: '#333', margin: '10px 0' }}></div>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="sidebar-button"
-                                        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 15px', border: 'none', background: 'rgba(255, 107, 107, 0.1)', color: '#ff6b6b', textAlign: 'left', cursor: 'pointer', borderRadius: '8px' }}
-                                    >
-                                        <span style={{ fontSize: '1.2rem' }}><FaSignOutAlt /></span>
-                                        <span className="nav-text" style={{ fontSize: '1rem', fontWeight: 500 }}>Logout</span>
-                                    </button>
+
                                 </>
                             )}
                         </nav>
@@ -339,7 +383,6 @@ export default function UserDashboard() {
                 )}
             </AnimatePresence>
 
-            {/* FOOTER NAV (MOBILE) */}
             <footer className="mobile-footer-nav-user">
                 <button
                     onClick={() => setActiveMobileMenu(activeMobileMenu === 'Home' ? null : 'Home')}
@@ -373,15 +416,14 @@ export default function UserDashboard() {
                 </button>
 
                 <button
-                    onClick={() => setActiveMobileMenu(activeMobileMenu === 'Setting' ? null : 'Setting')}
-                    className={activeMobileMenu === 'Setting' ? 'active' : ''}
+                    onClick={() => setActiveMobileMenu(activeMobileMenu === 'Profil' ? null : 'Profil')} 
+                    className={activeMobileMenu === 'Profil' ? 'active' : ''} 
                 >
-                    {activeMobileMenu === 'Setting' ? <HiCog6Tooth /> : <HiOutlineCog6Tooth />}
-                    <span>Setting</span>
+                    <CgProfile /> 
+                    <span>Profil</span> 
                 </button>
             </footer>
 
-            {/* GLOBAL MODALS */}
             <AnimatePresence>
                 {showProfileModal && (
                     <ProfileModal

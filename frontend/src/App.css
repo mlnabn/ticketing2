@@ -13516,7 +13516,8 @@ body.dark-mode .detail-list-footer-centered {
  Footer Navigasi Mobile USER
 ======================================================================
 */
-
+.mobile-nav-card-drag-handle-user,
+.mobile-nav-card-links-user,
 .mobile-footer-nav-user,
 .mobile-nav-card-user,
 .mobile-nav-overlay-user {
@@ -13578,6 +13579,10 @@ body.dark-mode .detail-list-footer-centered {
     filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.5));
   }
 
+
+  .mobile-nav-card-drag-handle-user{
+    display:block;
+  }
   /* =========================================
      3. MOBILE MENU CARD (SHEET)
      ========================================= */
@@ -13606,6 +13611,20 @@ body.dark-mode .detail-list-footer-centered {
     font-size: 1.1rem;
     font-weight: 600;
     color: #f1f5f9;
+  }
+
+  .mobile-nav-card-links-user {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .header-mobile-user {
+    width: 100%;
+    padding: 15px 20px 5px 20px;
+    cursor: grab;
+    touch-action: none;
+    flex-shrink: 0;
   }
 
   .mobile-nav-card-links-user .sidebar-button {
