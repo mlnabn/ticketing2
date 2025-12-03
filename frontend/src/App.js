@@ -50,6 +50,10 @@ import RequireAuth from './routes/RequireAuth';
 import RequireRole from './routes/RequireRole';
 import './App.css';
 
+// Route User
+import UserRequestPage from './pages/UserRequestPage';
+import UserHistoryPage from './pages/UserHistoryPage';
+
 // Komponen helper tidak berubah
 function DashboardRedirect() {
   const { user } = useAuth();
@@ -87,7 +91,12 @@ export default function RootApp() {
 
           {/* Rute Terproteksi */}
           <Route path="/dashboard" element={<RequireAuth><DashboardRedirect /></RequireAuth>} />
-          <Route path="/user/*" element={<RequireRole role="user"><UserDashboard /></RequireRole>} />
+          <Route path="/user" element={<RequireRole role="user"><UserDashboard /></RequireRole>}>
+            {/* Redirect default ke 'request' */}
+            <Route index element={<Navigate to="request" replace />} />
+            <Route path="request" element={<UserRequestPage />} />
+            <Route path="history" element={<UserHistoryPage />} />
+          </Route>
 
           {/* === PERUBAHAN UTAMA: RUTE ADMIN DENGAN ANAK-ANAKNYA === */}
           <Route path="/admin" element={<RequireRole role="admin"><AdminDashboard /></RequireRole>}>
