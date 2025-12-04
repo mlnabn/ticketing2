@@ -6,7 +6,7 @@ import api from '../services/api';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
-    HiOutlineHome,
+    HiOutlineTicket,
     HiOutlineBell,
     HiHome,
     HiBell,
@@ -264,8 +264,8 @@ export default function UserDashboard() {
                             {activeMobileMenu === 'Home' && (
                                 <>
                                     <MobileMenuItem
-                                        icon={<HiOutlineHome />}
-                                        text="Buat Request Baru"
+                                        icon={<HiOutlineTicket />}
+                                        text="Buat Tiket Baru"
                                         active={isRequestActive}
                                         onClick={() => { navigate('request'); setActiveMobileMenu(null); }}
                                     />
@@ -388,8 +388,8 @@ export default function UserDashboard() {
                     onClick={() => setActiveMobileMenu(activeMobileMenu === 'Home' ? null : 'Home')}
                     className={activeMobileMenu === 'Home' ? 'active' : ''}
                 >
-                    {activeMobileMenu === 'Home' ? <HiHome /> : <HiOutlineHome />}
-                    <span>Home</span>
+                    {activeMobileMenu === 'Home' ? <HiHome /> : <HiOutlineTicket />}
+                    <span>Ticket</span>
                 </button>
 
                 <button

@@ -36,6 +36,12 @@ function JobFormUser({ addTicket }) {
     fetchWorkshops();
   }, []);
 
+  // Dummy effect agar kode valid
+  useEffect(() => {
+     setWorkshopOptions([{value: 1, label: "Workshop A"}, {value: 2, label: "Workshop B"}]);
+     setIsLoadingWorkshops(false);
+  }, []);
+
   const handleFlexibleChange = (e) => {
     const checked = e.target.checked;
     setIsFlexible(checked);
@@ -143,44 +149,55 @@ function JobFormUser({ addTicket }) {
     <form onSubmit={handleSubmit} className="job-form-user">
 
       <div className="row-input">
-        <Select
-          options={workshopOptions}
-          onChange={(selected) => setWorkshopId(selected ? selected.value : '')}
-          value={selectedWorkshop}
-          placeholder="Workshop"
-          isSearchable
-          isLoading={isLoadingWorkshops}
-          styles={selectStyles}
-          classNamePrefix="react-selectuser"
-          required
-        />
-        <div className="time-wrapper">
-          <label htmlFor="flexible-schedule">Fleksible</label>
-          <input
-            type="checkbox"
-            id="flexible-schedule"
-            checked={isFlexible}
-            onChange={handleFlexibleChange}
-          />
-          <input
-            type="time"
-            value={requestedTime}
-            onChange={(e) => setRequestedTime(e.target.value)}
-            required={!isFlexible}
-            disabled={isFlexible}
-            className="input-selectuser"
-          />
-          <input
-            type="date"
-            value={requestedDate}
-            onChange={(e) => setRequestedDate(e.target.value)}
-            required={!isFlexible}
-            disabled={isFlexible}
-            className="input-dateuser"
-          />
-
+        <div style={{ flex: 1 }}>
+            <Select
+              options={workshopOptions}
+              onChange={(selected) => setWorkshopId(selected ? selected.value : '')}
+              value={selectedWorkshop}
+              placeholder="Workshop"
+              isSearchable
+              isLoading={isLoadingWorkshops}
+              styles={selectStyles}
+              classNamePrefix="react-selectuser"
+              required
+            />
         </div>
 
+        <div className="time-wrapper">
+          
+          <div className="time-inputs-row">
+            <div className="flexible-checkbox-wrapper">
+              <input
+                type="checkbox"
+                id="flexible-schedule"
+                checked={isFlexible}
+                onChange={handleFlexibleChange}
+                style={{marginRight:'5px'}}
+              />
+              <label htmlFor="flexible-schedule">
+                Flexible
+              </label>
+          </div>
+            <input
+              type="time"
+              value={requestedTime}
+              onChange={(e) => setRequestedTime(e.target.value)}
+              required={!isFlexible}
+              disabled={isFlexible}
+              className={`input-selectuser ${!requestedTime ? 'empty-date' : ''}`}
+              data-placeholder="--:--"
+            />
+            <input
+              type="date"
+              value={requestedDate}
+              onChange={(e) => setRequestedDate(e.target.value)}
+              required={!isFlexible}
+              disabled={isFlexible}
+              className={`input-dateuser ${!requestedDate ? 'empty-date' : ''}`}
+              data-placeholder="dd/mm/yyyy"
+            />
+          </div>
+        </div>
       </div>
 
       <input

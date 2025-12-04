@@ -3608,18 +3608,43 @@ body.dark-mode .theme-toggle-button:hover {
 
 .time-wrapper {
   display: flex;
+  flex-direction: column;
   flex: 0 0 42%;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-end;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.time-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  justify-content: flex-end;
+.flexible-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.flexible-checkbox-wrapper input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  cursor: pointer;
+  margin-top: 0;
+}
+
+.flexible-checkbox-wrapper label {
+  cursor: pointer;
+  user-select: none;
+  color: #fff;
+  font-weight: 500;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  margin-top: 3px; 
+  line-height: 1.2;
+}
+
+.time-inputs-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    align-items: center;
 }
 
 .time-wrapper input[type="checkbox"] {
@@ -3642,6 +3667,7 @@ body.dark-mode .theme-toggle-button:hover {
   cursor: pointer;
   user-select: none;
   transition: color 0.2s ease;
+  margin-bottom: 0 !important;
 }
 
 .time-wrapper input[type="checkbox"]:disabled+label {
@@ -6185,6 +6211,21 @@ body.dark-mode .welcome-title {
     width: 100% !important;
   }
 
+  .time-inputs-row {
+    flex-wrap: wrap; 
+  }
+
+  .flexible-checkbox-wrapper {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .input-selectuser, 
+  .input-dateuser {
+    flex: 1 !important;
+    text-align: center;
+  }
+
   .time-wrapper {
     display: flex !important;
     flex-direction: column !important;
@@ -6202,7 +6243,55 @@ body.dark-mode .welcome-title {
     margin-top: 10px;
   }
 
+  input[type="date"],
+  input[type="time"] {
+    -webkit-appearance: none;
+    appearance: none;
+    min-height: 45px;
+    position: relative;
+    color: #fff; 
+  }
 
+  input[type="date"].empty-date,
+  input[type="time"].empty-date {
+    color: transparent; 
+  }
+
+  input[type="date"].empty-date::before,
+  input[type="time"].empty-date::before {
+    content: attr(data-placeholder); 
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #c6c7c8ff;
+    pointer-events: none;
+    text-align: center;
+    width: 100%;
+  }
+
+  input[type="date"]:focus::before,
+  input[type="time"]:focus::before,
+  input[type="date"]:valid::before,
+  input[type="time"]:valid::before {
+    content: "" !important;
+    width: 0;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+  }
 }
 
 @media (min-width: 1009px) and (max-width: 2002px) {
@@ -10011,6 +10100,18 @@ body.dark-mode .form-group-recover textarea:focus {
   appearance: none;
   cursor: text;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  color-scheme: light;
+}
+
+.filter-select-date::-webkit-datetime-edit-fields-wrapper,
+.filter-select-date::-webkit-datetime-edit-text {
+  color: var(--text-primary, #212529);
+  display: none !important;
+}
+
+.filter-select-date::before {
+  content: "dd/mm/yyyy";
+  color: #a0a0a0;
 }
 
 .filter-select-date::-webkit-inner-spin-button,
@@ -10028,10 +10129,10 @@ body.dark-mode .form-group-recover textarea:focus {
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
+  background-color: #343a40 !important;
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-calendar-event' viewBox='0 0 16 16'%3E%3Cpath d='M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z'/%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-1h12a1 1 0 0 1 1 1v1H0V4a1 1 0 0 1 1-1z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
-  background-color: #6c757d;
   transition: background-color 0.2s;
 }
 
@@ -10067,7 +10168,7 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .dark-mode .filter-select-date::-webkit-calendar-picker-indicator {
-  background-color: #adb5bd !important;
+  background-color: #E2E8F0 !important;
 }
 
 .dark-mode .filter-select-date::-webkit-calendar-picker-indicator:hover {
@@ -13578,9 +13679,10 @@ body.dark-mode .detail-list-footer-centered {
   }
 
 
-  .mobile-nav-card-drag-handle-user{
-    display:block;
+  .mobile-nav-card-drag-handle-user {
+    display: block;
   }
+
   /* =========================================
      3. MOBILE MENU CARD (SHEET)
      ========================================= */

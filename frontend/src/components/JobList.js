@@ -40,7 +40,7 @@ export default function JobList() {
   const { showToast } = useOutletContext();
   const { user, logout } = useAuth();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
 
   const isMyTicketsPage = location.pathname.includes('/my-tickets');
@@ -64,6 +64,7 @@ export default function JobList() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const desktopListRef = useRef(null);
   const mobileListRef = useRef(null);
+  const lastGlobalTotalRef = useRef(0);
 
   const loadingStateRef = useRef({
     isLoading,
@@ -121,10 +122,6 @@ export default function JobList() {
   }, [isAdmin, showToast]);
 
   const checkForUpdates = useCallback(async () => {
-    if (!ticketData) {
-      return;
-    }
-
     const endpoint = isMyTicketsPage ? '/tickets/my-tickets' : '/tickets';
     const params = {
       page: 1,
@@ -132,17 +129,21 @@ export default function JobList() {
 
     try {
       const response = await api.get(endpoint, { params });
-      const newTotalTickets = response.data.total;
-      const currentTotalTickets = ticketData.total;
+      const newGlobalTotal = response.data.total;
+      const oldGlobalTotal = lastGlobalTotalRef.current;
 
-      if (newTotalTickets > currentTotalTickets) {
+      if (newGlobalTotal > oldGlobalTotal) {
         console.log("Pembaruan tiket terdeteksi (total bertambah)!");
         setHasNewTickets(true);
+      }
+
+      if (newGlobalTotal < oldGlobalTotal) {
+          lastGlobalTotalRef.current = newGlobalTotal;
       }
     } catch (e) {
       console.error("Gagal mengecek pembaruan tiket:", e);
     }
-  }, [isMyTicketsPage, ticketData]);
+  }, [isMyTicketsPage]);
 
   useEffect(() => {
     if (!isPresent) return;
@@ -153,6 +154,23 @@ export default function JobList() {
     if (!isPresent) return;
     fetchPrerequisites();
   }, [fetchPrerequisites, isPresent]);
+
+  useEffect(() => {
+    if (!isPresent) return;
+
+    const fetchInitialGlobalCount = async () => {
+      const endpoint = isMyTicketsPage ? '/tickets/my-tickets' : '/tickets';
+      try {
+        const response = await api.get(endpoint, { params: { page: 1 } }); 
+        lastGlobalTotalRef.current = response.data.total;
+        console.log("Baseline Global Total set to:", response.data.total);
+      } catch (e) {
+        console.error("Gagal inisialisasi global count:", e);
+      }
+    };
+
+    fetchInitialGlobalCount();
+  }, [isPresent, isMyTicketsPage]);
 
   useEffect(() => {
     const POLLING_INTERVAL = 30000;
@@ -449,7 +467,33 @@ export default function JobList() {
               exit={{ opacity: 0, height: 0 }}
               onClick={() => {
                 setHasNewTickets(false);
-                fetchTickets(false);
+                setSearchTerm('');
+                setSearchParams({});
+                const endpoint = isMyTicketsPage ? '/tickets/my-tickets' : '/tickets';
+                api.get(endpoint, { params: { page: 1 } }).then(res => {
+                    lastGlobalTotalRef.current = res.data.total;
+                });
+                setIsLoading(true); 
+                api.get(endpoint, { 
+                    params: { 
+                        page: 1, 
+                        search: '', 
+                        status: null, 
+                        workshop_id: null,
+                        admin_id: null,
+                        date: null,
+                        start_date: null,
+                        end_date: null,
+                    } 
+                })
+                .then(response => {
+                    setTicketData(response.data);
+                    setIsLoading(false);
+                })
+                .catch(e => {
+                    console.error("Gagal refresh manual:", e);
+                    setIsLoading(false);
+                });
                 if (desktopListRef.current) {
                   desktopListRef.current.scrollTop = 0;
                 }
