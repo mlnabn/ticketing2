@@ -175,7 +175,7 @@ function JobFormUser({ addTicket }) {
                 style={{marginRight:'5px'}}
               />
               <label htmlFor="flexible-schedule">
-                Fleksibel
+                Flexible
               </label>
           </div>
             <input

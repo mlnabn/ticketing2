@@ -3667,6 +3667,7 @@ body.dark-mode .theme-toggle-button:hover {
   cursor: pointer;
   user-select: none;
   transition: color 0.2s ease;
+  margin-bottom: 0 !important;
 }
 
 .time-wrapper input[type="checkbox"]:disabled+label {
