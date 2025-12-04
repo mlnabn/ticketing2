@@ -36,7 +36,6 @@ function JobFormUser({ addTicket }) {
     fetchWorkshops();
   }, []);
 
-  // Dummy effect agar kode valid
   useEffect(() => {
      setWorkshopOptions([{value: 1, label: "Workshop A"}, {value: 2, label: "Workshop B"}]);
      setIsLoadingWorkshops(false);
