@@ -26,6 +26,39 @@ use Illuminate\Http\Client\ConnectionException;
 
 class TicketController extends Controller
 {
+    private function sendUserStatusNotification($ticket, $status, $note = null)
+    {
+        try {
+            if (!$ticket->creator || !$ticket->creator->phone) {
+                return;
+            }
+
+            $message = "*🔔 Update Status Tiket 🔔*\n\n";
+            $message .= "Halo *{$ticket->creator->name}*,\n";
+            $message .= "Status tiket Anda telah diperbarui.\n\n";
+            $message .= "🎫 *Kode Tiket:* {$ticket->kode_tiket}\n";
+            $message .= "🛠 *Masalah:* {$ticket->title}\n";
+            $message .= "📊 *Status Baru:* {$status}\n";
+            
+            if ($note) {
+                $message .= "📝 *Catatan:* {$note}\n";
+            }
+
+            $message .= "\nSilakan cek riwayat tiket di website untuk detail lebih lanjut.";
+            $phone = $ticket->creator->phone;
+
+            if (substr($phone, 0, 2) === '08') {
+                $phone = '62' . substr($phone, 1);
+            }
+            Http::timeout(2)->post('http://127.0.0.1:5678/webhook/notify-user-status', [
+                'phone' => $phone,
+                'message' => $message
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("Gagal mengirim notifikasi WA ke user: " . $e->getMessage());
+        }
+    }
 
     protected function applyFilters(Builder $query, Request $request): Builder
     {
@@ -502,6 +535,7 @@ class TicketController extends Controller
                     }
                 }
             });
+            $this->sendUserStatusNotification($ticket, 'Sedang Dikerjakan', "Tiket ditugaskan ke admin {$assignee->name}");
         } catch (\Exception $e) {
             return response()->json(['message' => 'Terjadi kesalahan saat menugaskan tiket: ' . $e->getMessage()], 500);
         }
@@ -526,7 +560,6 @@ class TicketController extends Controller
         $query = Ticket::with(['user', 'creator', 'workshop', 'masterBarangs'])
             ->where('user_id', $user->id);
 
-        // Logika pengurutan baru
         $query->orderByRaw("CASE
                                 WHEN is_urgent = 1 AND status IN ('Sedang Dikerjakan', 'Ditunda') THEN 0
                                 WHEN (is_urgent = 0 OR is_urgent IS NULL) AND status IN ('Sedang Dikerjakan', 'Ditunda') THEN 1
@@ -556,6 +589,8 @@ class TicketController extends Controller
         $ticket->rejection_reason = $validated['reason'];
         $ticket->completed_at = now();
         $ticket->save();
+
+        $this->sendUserStatusNotification($ticket, 'Ditolak', $validated['reason']);
 
         return response()->json($ticket->load(['user', 'creator']));
     }
@@ -651,6 +686,8 @@ class TicketController extends Controller
         }
 
         $ticket->update($updateData);
+
+        $this->sendUserStatusNotification($ticket, $newStatus);
 
         return response()->json($ticket->load(['user', 'creator', 'masterBarangs']));
     }

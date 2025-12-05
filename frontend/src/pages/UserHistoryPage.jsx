@@ -118,6 +118,10 @@ export default function UserHistoryPage() {
 
     useEffect(() => {
         fetchCreatedTickets(1);
+        const intervalId = setInterval(() => {
+            fetchCreatedTickets(1, false); 
+        }, 60000);
+        return () => clearInterval(intervalId);
     }, [fetchCreatedTickets]);
 
     return (
