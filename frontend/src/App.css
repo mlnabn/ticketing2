@@ -3434,6 +3434,19 @@ body.dark-mode .btn-delete:hover {
   border-color: #c53030;
 }
 
+.btn-link-back{
+  margin-top: 20px;
+  text-align: center !important; 
+  color: #f9f9f9;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.btn-link-back:hover {
+  color: #007bff;
+  text-decoration: none;
+}
+
 /* =================================================================
    USER VIEW: USERPAGE STYLING
 ================================================================= */
