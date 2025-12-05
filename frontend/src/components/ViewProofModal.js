@@ -1,11 +1,39 @@
 import React from 'react';
+import ReactDOM from 'react-dom'; // Wajib import ini
+import { motion } from 'framer-motion'; // Gunakan motion agar animasi smooth seperti detail modal
+
+// Gunakan varian yang sama agar konsisten
+const backdropVariants = {
+  visible: { opacity: 1 },
+  hidden: { opacity: 0 },
+  exit: { opacity: 0 }
+};
+
+const modalVariants = {
+  hidden: { opacity: 0, scale: 0.9, y: 20 },
+  visible: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 25 } },
+  exit: { opacity: 0, scale: 0.9, y: 20, transition: { duration: 0.2 } }
+};
 
 function ViewProofModal({ ticket, onClose, onDelete }) {
   if (!ticket) return null;
 
-  return (
-    <div className="modal-backdrop-user">
-      <div className="modal-content-user">
+  // Gunakan Portal ke document.body
+  return ReactDOM.createPortal(
+    <motion.div
+      className="modal-backdrop-user"
+      variants={backdropVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      onClick={onClose}
+      style={{ zIndex: 1050 }} // Pastikan z-index tinggi, tapi di bawah confirmation modal (biasanya 1100+)
+    >
+      <motion.div
+        className="modal-content-user"
+        variants={modalVariants}
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2>Bukti Pekerjaan</h2>
         <p><strong>Workshop:</strong> {ticket.workshop ? ticket.workshop.name : 'N/A'}</p>
         <p><strong>Dekripsi Pekerjaan:</strong> {ticket.title}</p>
@@ -30,15 +58,16 @@ function ViewProofModal({ ticket, onClose, onDelete }) {
         )}
 
         <div className="modal-actions">
-            <button type="button" onClick={onClose} className="btn-cancel">
-                Tutup
-            </button>
-            <button type="button" onClick={() => onDelete(ticket)} className="btn-confirm">
-                Hapus Tiket
-            </button>
+          <button type="button" onClick={onClose} className="btn-cancel">
+            Tutup
+          </button>
+          <button type="button" onClick={() => onDelete(ticket)} className="btn-confirm">
+            Hapus Tiket
+          </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>,
+    document.body
   );
 }
 

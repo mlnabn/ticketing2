@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { motion } from 'framer-motion';
 
 const modalVariants = {
@@ -10,7 +11,7 @@ const modalVariants = {
 function RejectionInfoModal({ ticket, onClose, onDelete }) {
   if (!ticket) return null;
 
-  return (
+  return ReactDOM.createPortal(
     <div className="modal-backdrop-user" onClick={onClose}>
       <motion.div
         className="modal-content-user"
@@ -25,20 +26,21 @@ function RejectionInfoModal({ ticket, onClose, onDelete }) {
         <hr style={{ margin: '15px 0', borderColor: '#4b5563' }} />
         <h4 className="detail-label">Detail Alasan:</h4>
         <div className="proof-description-area">
-          <p style={{ whiteSpace: 'pre-wrap', borderRadius: '4px', padding: '10px' }}> 
+          <p style={{ whiteSpace: 'pre-wrap', borderRadius: '4px', padding: '10px' }}>
             {ticket.rejection_reason || 'Tidak ada alasan yang diberikan.'}
           </p>
         </div>
         <div className="modal-actions">
-          <button type="button" onClick={onClose} className="btn-canceluser"> 
+          <button type="button" onClick={onClose} className="btn-canceluser">
             Tutup
           </button>
-          <button type="button" onClick={() => onDelete(ticket)} className="btn-confirmuser"> 
+          <button type="button" onClick={() => onDelete(ticket)} className="btn-confirmuser">
             Hapus Tiket
           </button>
         </div>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

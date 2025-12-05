@@ -3616,9 +3616,9 @@ body.dark-mode .theme-toggle-button:hover {
 }
 
 .flexible-checkbox-wrapper {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
 }
 
 .flexible-checkbox-wrapper input[type="checkbox"] {
@@ -3636,15 +3636,15 @@ body.dark-mode .theme-toggle-button:hover {
   font-weight: 500;
   font-size: 0.9rem;
   white-space: nowrap;
-  margin-top: 3px; 
+  margin-top: 3px;
   line-height: 1.2;
 }
 
 .time-inputs-row {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    align-items: center;
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  align-items: center;
 }
 
 .time-wrapper input[type="checkbox"] {
@@ -4119,7 +4119,8 @@ body.dark-mode .password-toggle-btn:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  z-index: 9900;
+
 }
 
 .confirmation-modal-content-user {
@@ -4165,6 +4166,9 @@ body.dark-mode .password-toggle-btn:hover {
   overflow-wrap: normal;
   word-break: normal;
   white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .dark-mode .confirmation-modal-content-user p {
@@ -6212,7 +6216,7 @@ body.dark-mode .welcome-title {
   }
 
   .time-inputs-row {
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
   }
 
   .flexible-checkbox-wrapper {
@@ -6220,7 +6224,7 @@ body.dark-mode .welcome-title {
     margin-bottom: 8px;
   }
 
-  .input-selectuser, 
+  .input-selectuser,
   .input-dateuser {
     flex: 1 !important;
     text-align: center;
@@ -6249,17 +6253,17 @@ body.dark-mode .welcome-title {
     appearance: none;
     min-height: 45px;
     position: relative;
-    color: #fff; 
+    color: #fff;
   }
 
   input[type="date"].empty-date,
   input[type="time"].empty-date {
-    color: transparent; 
+    color: transparent;
   }
 
   input[type="date"].empty-date::before,
   input[type="time"].empty-date::before {
-    content: attr(data-placeholder); 
+    content: attr(data-placeholder);
     position: absolute;
     left: 0;
     right: 0;

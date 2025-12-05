@@ -306,7 +306,7 @@ export default function UserDashboard() {
                                     )}
                                 </div>
                             )}
-                            {activeMobileMenu === 'Profil' && (
+                            {activeMobileMenu === 'Profile' && (
                                 <>
                                     <div style={{
                                         flexGrow: 1,
@@ -416,11 +416,11 @@ export default function UserDashboard() {
                 </button>
 
                 <button
-                    onClick={() => setActiveMobileMenu(activeMobileMenu === 'Profil' ? null : 'Profil')} 
-                    className={activeMobileMenu === 'Profil' ? 'active' : ''} 
+                    onClick={() => setActiveMobileMenu(activeMobileMenu === 'Profile' ? null : 'Profile')} 
+                    className={activeMobileMenu === 'Profile' ? 'active' : ''} 
                 >
                     <CgProfile /> 
-                    <span>Profil</span> 
+                    <span>Profile</span> 
                 </button>
             </footer>
 
