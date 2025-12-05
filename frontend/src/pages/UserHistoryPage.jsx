@@ -106,6 +106,11 @@ export default function UserHistoryPage() {
         try {
             await api.delete(`/tickets/${ticketToDelete.id}`);
             fetchCreatedTickets(1);
+            setShowConfirmModal(false);
+            setShowViewProofModal(false);
+            setShowRejectionInfoModal(false);
+            setTicketToDelete(null);
+
             alert('Tiket berhasil dihapus.');
         } catch (error) {
             console.error("Gagal hapus tiket:", error);
