@@ -91,8 +91,8 @@ export default function PublicTicketPage() {
                     </tbody>
                   </table>
                 </div>
-                <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                    <Link to="/" className="btn-link-back">
+                <div className="btn-link-back">
+                    <Link to="/">
                         Kembali ke Halaman Utama
                     </Link>
                 </div>
