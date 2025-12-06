@@ -422,6 +422,11 @@ function ItemHistoryLookupPage() {
         }
     };
 
+    const columnStyles = {
+        col1: { textAlign: 'center' },
+        col2: { textAlign: 'left' },
+    };
+
     return (
         <motion.div
             className="user-management-container"
@@ -557,11 +562,11 @@ function ItemHistoryLookupPage() {
                                 <table className="job-table">
                                     <thead>
                                         <tr>
-                                            <th>Kode SKU</th>
-                                            <th>Nama Barang</th>
-                                            <th className={selectedItem ? 'hide-on-narrow' : ''}>Status Saat Ini</th>
-                                            <th className={selectedItem ? 'hide-on-narrow' : ''}>Tgl Kejadian Terakhir</th>
-                                            <th className={selectedItem ? 'hide-on-narrow' : ''}>Penanggung Jawab/Pengguna Terakhir</th>
+                                            <th style={columnStyles.col1}>Kode SKU</th>
+                                            <th style={columnStyles.col1}>Nama Barang</th>
+                                            <th className={selectedItem ? 'hide-on-narrow' : ''} style={columnStyles.col1}>Status Saat Ini</th>
+                                            <th className={selectedItem ? 'hide-on-narrow' : ''} style={columnStyles.col1}>Tgl Kejadian Terakhir</th>
+                                            <th className={selectedItem ? 'hide-on-narrow' : ''} style={columnStyles.col1}>Penanggung Jawab/Pengguna Terakhir</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -583,15 +588,15 @@ function ItemHistoryLookupPage() {
                                                     style={{ cursor: 'pointer' }}
                                                     className={`hoverable-row ${selectedItem?.id === item.id ? 'selected-row' : ''}`}
                                                 >
-                                                    <td>{item.kode_unik}</td>
-                                                    <td>{item.master_barang?.nama_barang || 'N/A'}</td>
-                                                    <td className={selectedItem ? 'hide-on-narrow' : ''}>
+                                                    <td style={columnStyles.col1}>{item.kode_unik}</td>
+                                                    <td style={columnStyles.col2}>{item.master_barang?.nama_barang || 'N/A'}</td>
+                                                    <td className={selectedItem ? 'hide-on-narrow' : ''} style={columnStyles.col2}>
                                                         <span className={`badge-status status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
                                                             {item.status_detail?.nama_status || 'N/A'}
                                                         </span>
                                                     </td>
-                                                    <td className={selectedItem ? 'hide-on-narrow' : ''}>{formatDate(getRelevantDate(item))}</td>
-                                                    <td className={selectedItem ? 'hide-on-narrow' : ''}>{getResponsiblePerson(item)}</td>
+                                                    <td className={selectedItem ? 'hide-on-narrow' : ''} style={columnStyles.col2}>{formatDate(getRelevantDate(item))}</td>
+                                                    <td className={selectedItem ? 'hide-on-narrow' : ''} style={columnStyles.col2}>{getResponsiblePerson(item)}</td>
                                                 </tr>
                                             ))}
 

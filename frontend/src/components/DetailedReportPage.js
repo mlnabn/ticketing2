@@ -392,6 +392,10 @@ export default function DetailedReportPage({ type, title }) {
         }
     };
 
+    const columnStyles = {
+        col1: { textAlign: 'center' },
+        col2: { textAlign: 'left' },
+    };
     return (
         <motion.div
             className="user-management-container"
@@ -545,16 +549,22 @@ export default function DetailedReportPage({ type, title }) {
                     <table className="job-table">
                         <thead>
                             <tr>
-                                <th>Kode SKU</th>
-                                <th>Serial Number</th>
-                                <th>Nama Barang</th>
-                                {showStatusDari && <th>Status Dari</th>}
-                                {showStatusKejadian && <th>Status Perubahan</th>}
+                                <th style={columnStyles.col1}>Kode SKU</th>
+                                <th style={columnStyles.col1}>Serial Number</th>
+                                <th style={columnStyles.col1}>Nama Barang</th>
+                                {showStatusDari &&
+                                    <th style={columnStyles.col1}>Status Dari</th>}
+                                {showStatusKejadian &&
+                                    <th style={columnStyles.col1}>Status Perubahan</th>}
                                 <th>{dateHeaders[type] || 'Tanggal'}</th>
-                                {showPJKejadian && <th>Penanggung Jawab Kejadian</th>}
-                                {showWorkshop && <th>Workshop</th>}
-                                {showCurrentStatus && <th>Status Saat Ini</th>}
-                                {showPJStatus && <th>Penanggung Jawab Status</th>}
+                                {showPJKejadian &&
+                                    <th style={columnStyles.col1}>Penanggung Jawab Kejadian</th>}
+                                {showWorkshop &&
+                                    <th style={columnStyles.col1}>Workshop</th>}
+                                {showCurrentStatus &&
+                                    <th style={columnStyles.col1}>Status Saat Ini</th>}
+                                {showPJStatus &&
+                                        <th style={columnStyles.col1}>Penanggung Jawab Status</th>}
                             </tr>
                         </thead>
                     </table>
@@ -574,16 +584,16 @@ export default function DetailedReportPage({ type, title }) {
                                     const itemData = getItemData(item);
                                     return (
                                         <tr key={item.id} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
-                                            <td>{itemData.kode_unik || '-'}</td>
-                                            <td>{itemData.serial_number || '-'}</td>
-                                            <td>{itemData.nama_barang || '-'}</td>
-                                            {showStatusDari && <td>{itemData.status_dari || '-'}</td>}
-                                            {showStatusKejadian && <td>{itemData.status || '-'}</td>}
-                                            <td>{formatDate(itemData.tanggal)}</td>
-                                            {showPJKejadian && <td>{itemData.penanggung_jawab || '-'}</td>}
-                                            {showWorkshop && <td>{itemData.workshop || '-'}</td>}
+                                            <td style={columnStyles.col1}>{itemData.kode_unik || '-'}</td>
+                                            <td style={columnStyles.col2}>{itemData.serial_number || '-'}</td>
+                                            <td style={columnStyles.col2}>{itemData.nama_barang || '-'}</td>
+                                            {showStatusDari && <td style={columnStyles.col2}>{itemData.status_dari || '-'}</td>}
+                                            {showStatusKejadian && <td style={columnStyles.col2}>{itemData.status || '-'}</td>}
+                                            <td style={columnStyles.col2}>{formatDate(itemData.tanggal)}</td>
+                                            {showPJKejadian && <td style={columnStyles.col2}>{itemData.penanggung_jawab || '-'}</td>}
+                                            {showWorkshop && <td style={columnStyles.col2}>{itemData.workshop || '-'}</td>}
                                             {showCurrentStatus && (
-                                                <td>
+                                                <td style={columnStyles.col2}>
                                                     <span className={`badge-status status-${(itemData.current_status || '-').toLowerCase().replace(/\s+/g, '-')}`}>
                                                         {itemData.current_status || '-'}
                                                     </span>
@@ -609,7 +619,7 @@ export default function DetailedReportPage({ type, title }) {
                             <tfoot>
                                 <tr className="subtotal-row">
                                     <td colSpan={totalColSpan - 1}>Total Data</td>
-                                    <td style={{ textAlign: 'right', paddingRight: '1rem', fontWeight: 'bold' }}>
+                                    <td style={{ textAlign: 'left', paddingRight: '1rem', fontWeight: 'bold' }}>
                                         {pagination.total} Data
                                     </td>
                                 </tr>
