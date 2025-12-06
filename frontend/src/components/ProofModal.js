@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import imageCompression from 'browser-image-compression';
+import { FaCamera, FaImage } from 'react-icons/fa';
 
 function ProofModal({ show, ticket, onSave, onClose }) {
   const [description, setDescription] = useState('');
@@ -46,13 +47,9 @@ function ProofModal({ show, ticket, onSave, onClose }) {
         fileType: "image/jpeg"
       };
       try {
-        // Proses Kompresi
         const compressedFile = await imageCompression(originalFile, options);
-        
-        // Debugging: Cek ukuran file di console
         console.log(`Original: ${(originalFile.size / 1024 / 1024).toFixed(2)} MB`);
         console.log(`Compressed: ${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`);
-
         setImage(compressedFile);
         setPreview(URL.createObjectURL(compressedFile));
       } catch (error) {
@@ -118,38 +115,74 @@ function ProofModal({ show, ticket, onSave, onClose }) {
               className="detail-edit-textarea"
             ></textarea>
           </div>
-          <div className="proof-modal__group" style={{marginTop:'15px'}}>
-            <label htmlFor="proof_image">Foto Bukti</label>
-            <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
-                <input
-                id="proof_image"
+          <div className="proof-modal__group" style={{marginTop:'20px'}}>
+            <label style={{marginBottom:'10px', display:'block'}}>Upload Foto Bukti</label>
+            <input
+                id="camera-input"
                 type="file"
                 accept="image/*"
-                capture="environment" 
+                capture="environment"
                 onChange={handleImageChange}
                 disabled={isCompressing}
-                />
-                {isCompressing && <span style={{fontSize:'0.8rem', color:'#666'}}>Memproses gambar...</span>}
+                style={{ display: 'none' }}
+            />
+            <input
+                id="gallery-input"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                disabled={isCompressing}
+                style={{ display: 'none' }}
+            />
+            <div className="upload-options-container">
+                <label 
+                    htmlFor="camera-input" 
+                    className={`btn-upload-option btn-camera ${isCompressing ? 'disabled' : ''}`}
+                >
+                    <FaCamera size={24} />
+                    <span>Ambil Foto</span>
+                </label>
+                <label 
+                    htmlFor="gallery-input" 
+                    className={`btn-upload-option btn-gallery ${isCompressing ? 'disabled' : ''}`}
+                >
+                    <FaImage size={24} />
+                    <span>Pilih Galeri</span>
+                </label>
             </div>
-            <small style={{color: '#888', fontStyle: 'italic', marginTop: '5px', display:'block'}}>
-                *Bisa langsung ambil foto dari kamera. Ukuran otomatis diperkecil.
-            </small>
+
+            {isCompressing && (
+                <p style={{textAlign:'center', color:'#666', marginTop:'10px', fontSize:'0.9rem'}}>
+                    ⏳ Sedang memproses & memperkecil ukuran gambar...
+                </p>
+            )}
           </div>
 
           {preview && (
-            <div className="image-preview" style={{marginTop: '15px'}}>
-              <p style={{marginBottom:'5px', fontWeight:'600'}}>Preview:</p>
-              <img 
-                src={preview} 
-                alt="Preview Bukti" 
-                style={{ 
-                    maxWidth: '100%', 
-                    maxHeight: '300px', 
-                    objectFit: 'contain',
-                    borderRadius: '8px',
-                    border: '1px solid #ddd' 
-                }} 
-              />
+            <div className="image-preview" style={{marginTop: '15px', textAlign:'center'}}>
+              <div style={{position:'relative', display:'inline-block'}}>
+                  <img 
+                    src={preview} 
+                    alt="Preview Bukti" 
+                    style={{ 
+                        maxWidth: '100%', 
+                        maxHeight: '250px', 
+                        objectFit: 'contain',
+                        borderRadius: '12px',
+                        border: '1px solid #ddd',
+                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                    }} 
+                  />
+                  <button 
+                    type="button"
+                    onClick={()=>{setImage(null); setPreview(null);}}
+                    style={{
+                        position:'absolute', top:'-10px', right:'-10px', 
+                        background:'red', color:'white', border:'none', 
+                        borderRadius:'50%', width:'25px', height:'25px', cursor:'pointer'
+                    }}
+                  >X</button>
+              </div>
             </div>
           )}
           <div className="modal-actions">
