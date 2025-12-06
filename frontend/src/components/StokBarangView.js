@@ -626,6 +626,11 @@ function StokBarangView() {
         setSelectedItems(new Set());
     };
 
+    const columnStyles = {
+    col1: { textAlign: 'center' },
+    col2: { textAlign: 'left' },
+  };
+
     return (
         <>
             <motion.div
@@ -794,13 +799,13 @@ function StokBarangView() {
                         <table className="job-table">
                             <thead>
                                 <tr>
-                                    <th>Kode Unik</th>
-                                    <th>Nama Barang</th>
-                                    <th>Kategori</th>
-                                    <th>Sub-Kategori</th>
-                                    <th>Unit Tersedia</th>
-                                    <th>Unit Aktif</th>
-                                    <th>Ditambahkan Oleh</th>
+                                    <th style={columnStyles.col1}>Kode Unik</th>
+                                    <th style={columnStyles.col1}>Nama Barang</th>
+                                    <th style={columnStyles.col1}>Kategori</th>
+                                    <th style={columnStyles.col1}>Sub-Kategori</th>
+                                    <th style={columnStyles.col1}>Unit Tersedia</th>
+                                    <th style={columnStyles.col1}>Unit Aktif</th>
+                                    <th style={columnStyles.col1}>Ditambahkan Oleh</th>
                                 </tr>
                             </thead>
                         </table>
@@ -826,13 +831,13 @@ function StokBarangView() {
                                                 className={`summary-row hoverable-row ${expandedRows[masterItem.id_m_barang] ? 'expanded' : ''}`}
                                                 onClick={() => toggleExpand(masterItem.id_m_barang)}
                                             >
-                                                <td>{masterItem.kode_barang}</td>
-                                                <td>{masterItem.nama_barang}</td>
-                                                <td>{masterItem.master_kategori?.nama_kategori || '-'}</td>
-                                                <td>{masterItem.sub_kategori?.nama_sub || '-'}</td>
-                                                <td>{masterItem.available_stock_count}</td>
-                                                <td>{masterItem.total_stock_count}</td>
-                                                <td>{masterItem.created_by?.name || 'N/A'}</td>
+                                                <td style={columnStyles.col1}>{masterItem.kode_barang}</td>
+                                                <td style={columnStyles.col2}>{masterItem.nama_barang}</td>
+                                                <td style={columnStyles.col2}>{masterItem.master_kategori?.nama_kategori || '-'}</td>
+                                                <td style={columnStyles.col2}>{masterItem.sub_kategori?.nama_sub || '-'}</td>
+                                                <td style={columnStyles.col1}>{masterItem.available_stock_count}</td>
+                                                <td style={columnStyles.col1}>{masterItem.total_stock_count}</td>
+                                                <td style={columnStyles.col1}>{masterItem.created_by?.name || 'N/A'}</td>
                                             </tr>
 
                                             <AnimatePresence initial={false}>

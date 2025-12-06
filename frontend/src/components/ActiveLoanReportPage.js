@@ -296,6 +296,10 @@ export default function ActiveLoanReportPage() {
     }, [fetchData, isPresent]);
     // --- End Effects ---
 
+    const columnStyles = {
+        col1: { textAlign: 'center' },
+        col2: { textAlign: 'left' },
+    };
 
     return (
         <motion.div
@@ -449,13 +453,13 @@ export default function ActiveLoanReportPage() {
                     <table className="job-table">
                         <thead>
                             <tr>
-                                <th>Kode SKU</th>
-                                <th>Nama Barang</th>
-                                <th>Status</th>
-                                <th>Peminjam</th>
-                                <th>Lokasi</th>
-                                <th>Tgl Pinjam</th>
-                                <th>Durasi Pinjam</th>
+                                <th style={columnStyles.col1}>Kode SKU</th>
+                                <th style={columnStyles.col1}>Nama Barang</th>
+                                <th style={columnStyles.col1}>Status</th>
+                                <th style={columnStyles.col1}>Peminjam</th>
+                                <th style={columnStyles.col1}>Lokasi</th>
+                                <th style={columnStyles.col1}>Tgl Pinjam</th>
+                                <th style={columnStyles.col1}>Durasi Pinjam</th>
                             </tr>
                         </thead>
                     </table>
@@ -473,13 +477,13 @@ export default function ActiveLoanReportPage() {
                                     const duration = calculateDuration(item.tanggal_keluar);
                                     return (
                                         <tr key={item.id} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
-                                            <td>{item.kode_unik || '-'}</td>
-                                            <td>{item.master_barang?.nama_barang || '-'}</td>
-                                            <td>{item.status_detail?.nama_status || '-'}</td>
-                                            <td>{item.user_peminjam?.name || '-'}</td>
-                                            <td>{item.workshop?.name || '-'}</td>
-                                            <td>{formatDate(item.tanggal_keluar)}</td>
-                                            <td style={getDurationStyle(duration.days)}>{duration.text}</td>
+                                            <td style={columnStyles.col1}>{item.kode_unik || '-'}</td>
+                                            <td style={columnStyles.col2}>{item.master_barang?.nama_barang || '-'}</td>
+                                            <td style={columnStyles.col2}>{item.status_detail?.nama_status || '-'}</td>
+                                            <td style={columnStyles.col2}>{item.user_peminjam?.name || '-'}</td>
+                                            <td style={columnStyles.col2}>{item.workshop?.name || '-'}</td>
+                                            <td style={columnStyles.col2}>{formatDate(item.tanggal_keluar)}</td>
+                                            <td style={{ ...getDurationStyle(duration.days), ...columnStyles.col2 }}>{duration.text}</td>
                                         </tr>
                                     )
                                 })}

@@ -147,6 +147,10 @@ export default function ProblematicAssetsReport() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    const columnStyles = {
+        col1: { textAlign: 'center' },
+        col2: { textAlign: 'left' },
+    };
 
     return (
         <motion.div
@@ -268,12 +272,12 @@ export default function ProblematicAssetsReport() {
                     <table className="job-table">
                         <thead>
                             <tr>
-                                <th>Tanggal Kejadian</th>
-                                <th>Status</th>
-                                <th>Kode SKU</th>
-                                <th>Nama Barang</th>
-                                <th>PJ/Lokasi</th>
-                                <th style={{ textAlign: 'right' }}>Nilai Aset</th>
+                                <th style={columnStyles.col1}>Tanggal Kejadian</th>
+                                <th style={columnStyles.col1}>Status</th>
+                                <th style={columnStyles.col1}>Kode SKU</th>
+                                <th style={columnStyles.col1}>Nama Barang</th>
+                                <th style={columnStyles.col1}>PJ/Lokasi</th>
+                                <th style={{ textAlign: 'right', ...columnStyles.col1 }}>Nilai Aset</th>
                             </tr>
                         </thead>
                     </table>
@@ -286,16 +290,16 @@ export default function ProblematicAssetsReport() {
                                     <>
                                         {detailedData.problematic_assets.map(item => (
                                             <tr key={`prob-${item.kode_unik}`} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
-                                                <td>{formatDate(item.tanggal_hilang || item.tanggal_rusak)}</td>
-                                                <td>
+                                                <td style={columnStyles.col2}>{formatDate(item.tanggal_hilang || item.tanggal_rusak)}</td>
+                                                <td style={columnStyles.col2}>
                                                     <span className={`badge-status status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
                                                         {item.status_detail?.nama_status || 'N/A'}
                                                     </span>
                                                 </td>
-                                                <td>{item.kode_unik}</td>
-                                                <td>{item.master_barang.nama_barang}</td>
-                                                <td>{item.user_penghilang?.name || item.user_perusak?.name || item.workshop?.name || '-'}</td>
-                                                <td style={{ textAlign: 'right' }}>{formatCurrency(parseFloat(item.harga_beli))}</td>
+                                                <td style={columnStyles.col2}>{item.kode_unik}</td>
+                                                <td style={columnStyles.col2}>{item.master_barang.nama_barang}</td>
+                                                <td style={columnStyles.col2}>{item.user_penghilang?.name || item.user_perusak?.name || item.workshop?.name || '-'}</td>
+                                                <td style={{ textAlign: 'right', ...columnStyles.col2 }}>{formatCurrency(parseFloat(item.harga_beli))}</td>
                                             </tr>
                                         ))}
                                     </>
@@ -309,7 +313,7 @@ export default function ProblematicAssetsReport() {
                         <table className="job-table">
                             <tfoot><tr className="subtotal-row loss-row">
                                 <td colSpan="5">Subtotal Potensi Kerugian</td>
-                                <td style={{ textAlign: 'right', fontWeight: 'bold' }}>
+                                <td style={{ textAlign: 'left', fontWeight: 'bold' }}>
                                     ({formatCurrency(problematicAssetsSubtotal)})
                                 </td>
                             </tr></tfoot>

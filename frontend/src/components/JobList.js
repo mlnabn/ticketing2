@@ -19,7 +19,7 @@ const staggerContainer = {
     opacity: 1,
     transition: {
       when: "beforeChildren",
-      staggerChildren: 0.1, 
+      staggerChildren: 0.1,
     },
   },
 };
@@ -138,7 +138,7 @@ export default function JobList() {
       }
 
       if (newGlobalTotal < oldGlobalTotal) {
-          lastGlobalTotalRef.current = newGlobalTotal;
+        lastGlobalTotalRef.current = newGlobalTotal;
       }
     } catch (e) {
       console.error("Gagal mengecek pembaruan tiket:", e);
@@ -161,7 +161,7 @@ export default function JobList() {
     const fetchInitialGlobalCount = async () => {
       const endpoint = isMyTicketsPage ? '/tickets/my-tickets' : '/tickets';
       try {
-        const response = await api.get(endpoint, { params: { page: 1 } }); 
+        const response = await api.get(endpoint, { params: { page: 1 } });
         lastGlobalTotalRef.current = response.data.total;
         console.log("Baseline Global Total set to:", response.data.total);
       } catch (e) {
@@ -422,15 +422,26 @@ export default function JobList() {
   };
 
   const columnStyles = {
-    col1: { width: '40px' },
-    col2: { width: '100px' },
-    col3: { width: '120px' },
-    col4: { width: '120px' },
-    col5: { width: '250px' },
-    col6: { width: '110px' },
+    col1: { width: '40px', textAlign: 'center' },
+    col2: { width: '100px', textAlign: 'center' },
+    col3: { width: '120px', textAlign: 'center' },
+    col4: { width: '120px', textAlign: 'center' },
+    col5: { width: '250px', textAlign: 'center' },
+    col6: { width: '110px', textAlign: 'center' },
     col7: { width: '120px', textAlign: 'center' },
     col8: { width: '170px', textAlign: 'center' },
-    col9: { width: '250px', paddingRight: '5px' }
+    col9: { width: '250px', textAlign: 'center' },
+
+    
+        col10: { width: '40px', textAlign: 'left' },
+    col11: { width: '100px', textAlign: 'left' },
+    col12: { width: '120px', textAlign: 'left' },
+    col13: { width: '120px', textAlign: 'left' },
+    col14: { width: '250px', textAlign: 'left' },
+    col15: { width: '110px', textAlign: 'left' },
+    col16: { width: '120px', textAlign: 'left' },
+    col17: { width: '170px', textAlign: 'center' },
+    col18: { width: '250px', textAlign: 'center' },
   };
 
   return (
@@ -471,29 +482,29 @@ export default function JobList() {
                 setSearchParams({});
                 const endpoint = isMyTicketsPage ? '/tickets/my-tickets' : '/tickets';
                 api.get(endpoint, { params: { page: 1 } }).then(res => {
-                    lastGlobalTotalRef.current = res.data.total;
+                  lastGlobalTotalRef.current = res.data.total;
                 });
-                setIsLoading(true); 
-                api.get(endpoint, { 
-                    params: { 
-                        page: 1, 
-                        search: '', 
-                        status: null, 
-                        workshop_id: null,
-                        admin_id: null,
-                        date: null,
-                        start_date: null,
-                        end_date: null,
-                    } 
+                setIsLoading(true);
+                api.get(endpoint, {
+                  params: {
+                    page: 1,
+                    search: '',
+                    status: null,
+                    workshop_id: null,
+                    admin_id: null,
+                    date: null,
+                    start_date: null,
+                    end_date: null,
+                  }
                 })
-                .then(response => {
+                  .then(response => {
                     setTicketData(response.data);
                     setIsLoading(false);
-                })
-                .catch(e => {
+                  })
+                  .catch(e => {
                     console.error("Gagal refresh manual:", e);
                     setIsLoading(false);
-                });
+                  });
                 if (desktopListRef.current) {
                   desktopListRef.current.scrollTop = 0;
                 }
@@ -564,7 +575,7 @@ export default function JobList() {
                         clickable-row`}
                           onClick={(e) => handleRowClick(e, ticket)}
                         >
-                          <td style={columnStyles.col1}>
+                          <td style={columnStyles.col10}>
                             <input
                               type="checkbox"
                               checked={selectedIds.includes(ticket.id)}
@@ -573,14 +584,14 @@ export default function JobList() {
                               style={{ cursor: 'pointer' }}
                             />
                           </td>
-                          <td style={columnStyles.col2}>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
-                          <td style={columnStyles.col3}>{ticket.user ? ticket.user.name : '-'}</td>
-                          <td style={columnStyles.col4}>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
-                          <td style={columnStyles.col5}><span className="description-cell">{ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}{ticket.title}</span></td>
-                          <td style={columnStyles.col6}>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
-                          <td style={columnStyles.col7}>{formatWorkTime(ticket)}</td>
-                          <td style={columnStyles.col8}><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></td>
-                          <td style={columnStyles.col9}><div className="action-buttons-group">{renderActionButtons(ticket)}</div></td>
+                          <td style={columnStyles.col11}>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
+                          <td style={columnStyles.col12}>{ticket.user ? ticket.user.name : '-'}</td>
+                          <td style={columnStyles.col13}>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
+                          <td style={columnStyles.col14}><span className="description-cell">{ticket.is_urgent ? <span className="urgent-badge">URGENT</span> : null}{ticket.title}</span></td>
+                          <td style={columnStyles.col15}>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
+                          <td style={columnStyles.col16}>{formatWorkTime(ticket)}</td>
+                          <td style={columnStyles.col17}><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></td>
+                          <td style={columnStyles.col18}><div className="action-buttons-group">{renderActionButtons(ticket)}</div></td>
                         </tr>
                       ))
                     ) : (
@@ -643,7 +654,7 @@ export default function JobList() {
                             <div className="data-group"><span className="label">Pengirim</span><span className="value">{ticket.creator ? ticket.creator.name : 'N/A'}</span></div>
                             <div className="data-group"><span className="label">Workshop</span><span className="value">{ticket.workshop ? ticket.workshop.name : 'N/A'}</span></div>
                           </div>
-                
+
                           <div className="card-row">
                             <div className="data-group single">
                               <span className="label">Deskripsi</span>
@@ -657,7 +668,7 @@ export default function JobList() {
                               </span>
                             </div>
                           </div>
-                          
+
                           <div className="card-row status-row"><span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span></div>
                           <div className="card-row action-row"><div className="action-buttons-group">{renderActionButtons(ticket)}</div></div>
                         </div>
