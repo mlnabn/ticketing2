@@ -1962,6 +1962,33 @@ body.dark-mode .btn-upload-option.btn-gallery:hover {
   background-color: rgba(148, 163, 184, 0.2);
 }
 
+.btn-remove-preview {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 30px;   
+  height: 30px;
+  border-radius: 50%;
+  background-color: #f11b1b; 
+  color: white;
+  border: 2px solid white;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.btn-remove-preview:hover {
+  background-color: #dc2626;
+  transform: scale(1.1);
+}
+
 /* ================================ */
 /* Value & Extra Info               */
 /* ================================ */
@@ -13190,9 +13217,9 @@ body.dark-mode .btn-primary-outline:disabled {
 }
 
 .btn-soft-grey {
-  display: inline-block;
-  padding: 10px 12px;
-  border-radius: 8px;
+  display: inline-block !important;
+  padding: 12px 12px !important;
+  border-radius: 8px !important;
   border: none;
   font-weight: 600;
   cursor: pointer;

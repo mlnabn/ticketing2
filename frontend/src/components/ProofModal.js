@@ -175,12 +175,9 @@ function ProofModal({ show, ticket, onSave, onClose }) {
                   />
                   <button 
                     type="button"
+                    className="btn-remove-preview"
                     onClick={()=>{setImage(null); setPreview(null);}}
-                    style={{
-                        position:'absolute', top:'-10px', right:'-10px', 
-                        background:'red', color:'white', border:'none', 
-                        borderRadius:'50%', width:'25px', height:'25px', cursor:'pointer'
-                    }}
+                    title="Hapus gambar"
                   >X</button>
               </div>
             </div>
