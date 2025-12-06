@@ -194,7 +194,6 @@ export default function ComprehensiveReportPage() {
         newParams.set('year', currentYear.toString());
       }
     } else if (newType === 'date_range') {
-      // Hapus filter bulan & tahun
       newParams.delete('month');
       newParams.delete('year');
     }
@@ -271,7 +270,6 @@ export default function ComprehensiveReportPage() {
 
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);
-    // setCurrentPage(1);
   };
 
   const handleDownload = async (type) => {
@@ -368,8 +366,12 @@ export default function ComprehensiveReportPage() {
 
   const tickets = tableData ? tableData.data : [];
 
+  const columnStyles = {
+    col1: { textAlign: 'center' },
+    col2: { textAlign: 'left' },
+  };
+
   return (
-    // Ganti <div> dengan motion.div
     <motion.div
       className="user-management-container"
       variants={staggerContainer}
@@ -444,7 +446,7 @@ export default function ComprehensiveReportPage() {
                   exit="closed"
                   transition={filterExpandTransition}
                   variants={filterExpandVariants}
-                  className="filters-content-wrapper" // Ini yang mengontrol layout filter
+                  className="filters-content-wrapper"
                 >
 
                   <Select
@@ -459,11 +461,8 @@ export default function ComprehensiveReportPage() {
                       menuPortal: (base) => ({ ...base, zIndex: 9999 })
                     }}
                   />
-
-                  {/* Filter per Bulan */}
                   {filterType === 'month' && (
                     <>
-                      {/* 2. Filter Bulan */}
                       <Select
                         classNamePrefix="report-filter-select"
                         name="month"
@@ -478,7 +477,6 @@ export default function ComprehensiveReportPage() {
                           menuPortal: (base) => ({ ...base, zIndex: 9999 })
                         }}
                       />
-                      {/* 3. Filter Tahun */}
                       <Select
                         classNamePrefix="report-filter-select"
                         name="year"
@@ -494,8 +492,6 @@ export default function ComprehensiveReportPage() {
                       />
                     </>
                   )}
-
-                  {/* Filter per Rentang Tanggal */}
                   {filterType === 'date_range' && (
                     <motion.div
                       variants={staggerItem}
@@ -547,16 +543,16 @@ export default function ComprehensiveReportPage() {
                   <table className="job-table">
                     <thead>
                       <tr>
-                        <th>Kode Tiket</th>
-                        <th>Judul</th>
-                        <th>Status</th>
-                        <th>Workshop</th>
-                        <th>Admin Pengerja</th>
-                        <th>Pembuat</th>
-                        <th>Tgl Dibuat</th>
-                        <th>Tgl Mulai</th>
-                        <th>Tgl Selesai</th>
-                        <th>Durasi</th>
+                        <th style={columnStyles.col1}>Kode Tiket</th>
+                        <th style={columnStyles.col1}>Judul</th>
+                        <th style={columnStyles.col1}>Status</th>
+                        <th style={columnStyles.col1}>Workshop</th>
+                        <th style={columnStyles.col1}>Admin Pengerja</th>
+                        <th style={columnStyles.col1}>Pembuat</th>
+                        <th style={columnStyles.col1}>Tgl Dibuat</th>
+                        <th style={columnStyles.col1}>Tgl Mulai</th>
+                        <th style={columnStyles.col1}>Tgl Selesai</th>
+                        <th style={columnStyles.col1}>Durasi</th>
                       </tr>
                     </thead>
                   </table>
@@ -575,14 +571,14 @@ export default function ComprehensiveReportPage() {
                               <td>
                                 <span className="description-cell">{t.title}</span>
                               </td>
-                              <td>{t.status}</td>
-                              <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
-                              <td>{t.user?.name ?? 'N/A'}</td>
-                              <td>{t.creator?.name ?? 'N/A'}</td>
-                              <td>{formatDate(t.created_at)}</td>
-                              <td>{formatDate(t.started_at)}</td>
-                              <td>{formatDate(t.completed_at)}</td>
-                              <td>{calculateDuration(t.started_at, t.completed_at)}</td>
+                              <td style={columnStyles.col1}>{t.status}</td>
+                              <td style={columnStyles.col2}>{t.workshop ? t.workshop.name : 'N/A'}</td>
+                              <td style={columnStyles.col2}>{t.user?.name ?? 'N/A'}</td>
+                              <td style={columnStyles.col2}>{t.creator?.name ?? 'N/A'}</td>
+                              <td style={columnStyles.col2}>{formatDate(t.created_at)}</td>
+                              <td style={columnStyles.col2}>{formatDate(t.started_at)}</td>
+                              <td style={columnStyles.col2}>{formatDate(t.completed_at)}</td>
+                              <td style={columnStyles.col2}>{calculateDuration(t.started_at, t.completed_at)}</td>
                             </tr>
                           ))
                         ) : (

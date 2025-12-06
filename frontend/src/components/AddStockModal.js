@@ -130,6 +130,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
     const [view, setView] = useState('form');
     const [newlyCreatedItems, setNewlyCreatedItems] = useState([]);
     const printRef = useRef();
+    const isScanningRef = useRef(false);
     const [formData, setFormData] = useState(initialFormState);
     const [displayHarga, setDisplayHarga] = useState('');
     const [masterBarangOptions, setMasterBarangOptions] = useState([]);
@@ -165,6 +166,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
     /* ---------------- Barcode Scanner ---------------- */
     const handleScan = useCallback(
         async (scannedSerial) => {
+            isScanningRef.current = true;
             const trimmedSerial = scannedSerial.trim();
             const count = formData.serial_numbers.length;
 
@@ -187,6 +189,8 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                     const newSerials = [...formData.serial_numbers];
                     newSerials[activeSerialIndex] = '';
                     setFormData((prev) => ({ ...prev, serial_numbers: newSerials }));
+
+                    setTimeout(() => { isScanningRef.current = false; }, 300);
                     return;
                 }
 
@@ -211,7 +215,11 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                     'warning'
                 );
                 return;
+
             }
+            setTimeout(() => {
+                isScanningRef.current = false;
+            }, 300);
         },
         [activeSerialIndex, formData.serial_numbers, showToast]
     );
@@ -223,6 +231,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
     };
 
     const handleSerialBlur = async (index, value) => {
+        if (isScanningRef.current) return;
         const trimmedValue = value.trim();
         if (!trimmedValue) return;
         const isExistsInDb = await checkSnOnServer(trimmedValue);
@@ -542,12 +551,13 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter') {
                                                         e.preventDefault();
-                                                        handleSerialBlur(index, sn);
+                                                        // handleSerialBlur(index, sn);
 
                                                         const nextIndex = index + 1;
                                                         if (nextIndex < formData.serial_numbers.length) {
                                                             setActiveSerialIndex(nextIndex);
                                                         } else {
+                                                            e.target.blur();
                                                             setActiveSerialIndex(-1);
                                                         }
                                                     }

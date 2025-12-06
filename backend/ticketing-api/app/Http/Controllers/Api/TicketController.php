@@ -946,7 +946,7 @@ class TicketController extends Controller
 
             $ticket->update(['status' => 'Selesai', 'completed_at' => now()]);
         });
-
+        $this->sendUserStatusNotification($ticket, 'Selesai', 'Tiket telah diselesaikan.');
         return response()->json($ticket->load(['user', 'creator', 'masterBarangs']));
     }
 

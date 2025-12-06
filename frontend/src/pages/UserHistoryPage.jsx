@@ -124,10 +124,26 @@ export default function UserHistoryPage() {
     useEffect(() => {
         fetchCreatedTickets(1);
         const intervalId = setInterval(() => {
-            fetchCreatedTickets(1, false); 
+            fetchCreatedTickets(1, false);
         }, 60000);
         return () => clearInterval(intervalId);
     }, [fetchCreatedTickets]);
+
+    const columnStyles = {
+        col1: { width: '200px', textAlign: 'center' },
+        col2: { width: '100px', textAlign: 'center' },
+        col3: { width: '100px', textAlign: 'center' },
+        col4: { width: '100px', textAlign: 'center' },
+        col5: { width: '200px', textAlign: 'center' },
+        col6: { width: '150px', textAlign: 'center' },
+
+        col7: { width: '200px', textAlign: 'left' },
+        col8: { width: '100px', textAlign: 'left' },
+        col9: { width: '100px', textAlign: 'left' },
+        col10: { width: '100px', textAlign: 'left' },
+        col11: { width: '200px', textAlign: 'center' },
+        col12: { width: '150px', textAlign: 'center' },
+    };
 
     return (
         <motion.div
@@ -140,15 +156,15 @@ export default function UserHistoryPage() {
             <motion.h2 variants={itemVariants}>Your Tickets</motion.h2>
 
             {/* Table Header (Static) */}
-            <table className="job-table-user user-history-table">
+            <table className="job-table-user user-history-table" style={{ tableLayout: 'fixed', minWidth: '870px' }}>
                 <thead>
                     <tr>
-                        <th>Deskripsi</th>
-                        <th>Workshop</th>
-                        <th>Tanggal Dibuat</th>
-                        <th>Waktu Pengerjaan</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
+                        <th style={columnStyles.col1}>Deskripsi</th>
+                        <th style={columnStyles.col2}>Workshop</th>
+                        <th style={columnStyles.col3}>Tanggal Dibuat</th>
+                        <th style={columnStyles.col4}>Waktu Pengerjaan</th>
+                        <th style={columnStyles.col5}>Status</th>
+                        <th style={columnStyles.col6}>Aksi</th>
                     </tr>
                 </thead>
             </table>
@@ -172,12 +188,12 @@ export default function UserHistoryPage() {
                                     className="clickable-row"
                                     onClick={(e) => handleRowClick(e, ticket)}
                                 >
-                                    <td data-label="Deskripsi">
+                                    <td data-label="Deskripsi" style={columnStyles.col7}>
                                         <span className="description-cell">{ticket.title}</span>
                                     </td>
-                                    <td data-label="Workshop">{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
-                                    <td data-label="Tanggal Dibuat">{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
-                                    <td data-label="Waktu Pengerjaan">
+                                    <td data-label="Workshop" style={columnStyles.col8}>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
+                                    <td data-label="Tanggal Dibuat" style={columnStyles.col9}>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
+                                    <td data-label="Waktu Pengerjaan" style={columnStyles.col10}>
                                         {(() => {
                                             if (ticket.started_at) {
                                                 return ticket.completed_at
@@ -189,10 +205,10 @@ export default function UserHistoryPage() {
                                             return ticket.requested_date || ticket.requested_time ? `Request: ${datePart} ${timePart}`.trim() : 'Waktu Fleksibel';
                                         })()}
                                     </td>
-                                    <td data-label="Status">
+                                    <td data-label="Status" style={columnStyles.col11}>
                                         <span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span>
                                     </td>
-                                    <td data-label="Aksi">
+                                    <td data-label="Aksi" style={columnStyles.col12}>
                                         {ticket.status === 'Selesai' && ticket.proof_description ? (
                                             <motion.button
                                                 variants={buttonHoverTap}

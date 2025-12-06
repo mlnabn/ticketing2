@@ -141,6 +141,11 @@ export default function NewAcquisitionsReport() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    const columnStyles = {
+        col1: { textAlign: 'center' },
+        col2: { textAlign: 'left' },
+    };
+
     return (
         <motion.div
             className="user-management-container"
@@ -261,10 +266,10 @@ export default function NewAcquisitionsReport() {
                     <table className="job-table">
                         <thead>
                             <tr>
-                                <th>Tanggal</th>
-                                <th>Kode SKU</th>
-                                <th>Nama Barang</th>
-                                <th style={{ textAlign: 'right' }}>Nilai</th>
+                                <th style={columnStyles.col1}>Tanggal</th>
+                                <th style={columnStyles.col1}>Kode SKU</th>
+                                <th style={columnStyles.col1}>Nama Barang</th>
+                                <th style={{ textAlign: 'right', ...columnStyles.col1 }}>Nilai</th>
                             </tr>
                         </thead>
                     </table>
@@ -277,10 +282,10 @@ export default function NewAcquisitionsReport() {
                                     <>
                                         {detailedData.new_acquisitions.map(item => (
                                             <tr key={`new-${item.kode_unik}`} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
-                                                <td>{formatDate(item.tanggal_pembelian)}</td>
-                                                <td>{item.kode_unik}</td>
-                                                <td>{item.master_barang.nama_barang}</td>
-                                                <td style={{ textAlign: 'right' }}>{formatCurrency(parseFloat(item.harga_beli))}</td>
+                                                <td style={columnStyles.col1}>{formatDate(item.tanggal_pembelian)}</td>
+                                                <td style={columnStyles.col2}>{item.kode_unik}</td>
+                                                <td style={columnStyles.col2}>{item.master_barang.nama_barang}</td>
+                                                <td style={{ textAlign: 'right', ...columnStyles.col2 }}>{formatCurrency(parseFloat(item.harga_beli))}</td>
                                             </tr>
                                         ))}
                                     </>
@@ -294,7 +299,7 @@ export default function NewAcquisitionsReport() {
                         <table className="job-table">
                             <tfoot><tr className="subtotal-row">
                                 <td colSpan="3">Subtotal</td>
-                                <td style={{ textAlign: 'right' }}>
+                                <td style={{ textAlign: 'left' }}>
                                     {formatCurrency(newAcquisitionsSubtotal)}
                                 </td>
                             </tr></tfoot>

@@ -364,6 +364,11 @@ export default function TicketReportDetail() {
   const { total, completed, in_progress } = reportData || {};
   const ticketsOnPage = (reportData && reportData.tickets) ? reportData.tickets.data : [];
 
+  const columnStyles = {
+    col1: { textAlign: 'center' },
+    col2: { textAlign: 'left' },
+  };
+
   return (
     <motion.div
       className="user-management-container"
@@ -512,15 +517,15 @@ export default function TicketReportDetail() {
                 <table className="job-table">
                   <thead>
                     <tr>
-                      <th>Kode Tiket</th>
-                      <th>Judul</th>
-                      <th>Status</th>
-                      <th>Workshop</th>
-                      <th>Pembuat</th>
-                      <th>Tgl Dibuat</th>
-                      <th>Tgl Mulai</th>
-                      <th>Tgl Selesai</th>
-                      <th>Durasi</th>
+                      <th style={columnStyles.col1}>Kode Tiket</th>
+                      <th style={columnStyles.col1}>Judul</th>
+                      <th style={columnStyles.col1}>Status</th>
+                      <th style={columnStyles.col1}>Workshop</th>
+                      <th style={columnStyles.col1}>Pembuat</th>
+                      <th style={columnStyles.col1}>Tgl Dibuat</th>
+                      <th style={columnStyles.col1}>Tgl Mulai</th>
+                      <th style={columnStyles.col1}>Tgl Selesai</th>
+                      <th style={columnStyles.col1}>Durasi</th>
                     </tr>
                   </thead>
                 </table>
@@ -534,17 +539,17 @@ export default function TicketReportDetail() {
                       {ticketsOnPage.length > 0 ? (
                         ticketsOnPage.map(t => (
                           <tr key={t.id} className="clickable-row" onClick={(e) => handleRowClick(e, t)}>
-                            <td>{t.kode_tiket || '-'}</td>
-                            <td>
+                            <td style={columnStyles.col1}>{t.kode_tiket || '-'}</td>
+                            <td style={columnStyles.col2}>
                               <span className="description-cell">{t.title}</span>
                             </td>
-                            <td>{t.status}</td>
-                            <td>{t.workshop ? t.workshop.name : 'N/A'}</td>
-                            <td>{t.creator?.name ?? '-'}</td>
-                            <td>{formatDate(t.created_at)}</td>
-                            <td>{formatDate(t.started_at)}</td>
-                            <td>{formatDate(t.completed_at)}</td>
-                            <td>{calculateDuration(t.started_at, t.completed_at)}</td>
+                            <td style={columnStyles.col2}>{t.status}</td>
+                            <td style={columnStyles.col2}>{t.workshop ? t.workshop.name : 'N/A'}</td>
+                            <td style={columnStyles.col2}>{t.creator?.name ?? '-'}</td>
+                            <td style={columnStyles.col2}>{formatDate(t.created_at)}</td>
+                            <td style={columnStyles.col2}>{formatDate(t.started_at)}</td>
+                            <td style={columnStyles.col2}>{formatDate(t.completed_at)}</td>
+                            <td style={columnStyles.col2}>{calculateDuration(t.started_at, t.completed_at)}</td>
                           </tr>
                         ))
                       ) : (
