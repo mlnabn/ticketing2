@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; 
 import Select from 'react-select';
 import api from '../services/api';
 
-/* ===========================================================
-   Custom Components for Color Select (BAGIAN YANG DIPERBAIKI)
-=========================================================== */
 const ColorOption = (props) => (
     <div
         {...props.innerProps}
@@ -52,9 +49,6 @@ const ColorSingleValue = (props) => (
     </div>
 );
 
-/* ===========================================================
-   RUPIAH Formatting 
-=========================================================== */
 const formatRupiah = (angka) => {
     if (angka === null || angka === undefined || angka === '') return '';
     return new Intl.NumberFormat('id-ID').format(angka);
@@ -65,9 +59,6 @@ const parseRupiah = (rupiah) => {
     return parseInt(rupiah.replace(/\./g, ''), 10) || 0;
 };
 
-/* ===========================================================
-   Komponen Utama
-=========================================================== */
 function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showToast, colorOptions }) {
     const [formData, setFormData] = useState({
         serial_number: '',
@@ -80,9 +71,8 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
     });
     const [displayHarga, setDisplayHarga] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
+    const serialInputRef = useRef(null);
     const [currentItem, setCurrentItem] = useState(item);
-
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
 
@@ -91,6 +81,9 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
             setCurrentItem(item);
             setShouldRender(true);
             setIsClosing(false);
+            setTimeout(() => {
+                if (serialInputRef.current) serialInputRef.current.focus();
+            }, 100);
         } else if (shouldRender && !isClosing) {
             setIsClosing(true);
             const timer = setTimeout(() => {
@@ -102,7 +95,6 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, item, shouldRender]);
 
-    // --- Isi form dengan data item yang akan diedit ---
     useEffect(() => {
         if (currentItem) {
             setFormData({
@@ -118,7 +110,19 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
         }
     }, [currentItem]);
 
-    // --- Handlers ---
+    const checkSnOnServer = async (serial) => {
+        if (!serial) return false;
+        try {
+            const response = await api.post('/inventory/check-sn-availability', {
+                serial_number: serial
+            });
+            return response.data.exists;
+        } catch (error) {
+            console.error("Gagal validasi SN:", error);
+            return false;
+        }
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         if (name === 'harga_beli') {
@@ -129,6 +133,30 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
             setFormData(prev => ({ ...prev, [name]: value }));
         }
     };
+    const blockEnterSubmit = (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            e.target.blur(); 
+        }
+    };
+
+    const handleSerialBlur = async (e) => {
+        const val = e.target.value.trim();
+        if (!val) return;
+        if (currentItem && val === currentItem.serial_number) {
+            return;
+        }
+
+        const isExists = await checkSnOnServer(val);
+
+        if (isExists) {
+            showToast(`Serial Number "${val}" SUDAH ADA di database (milik barang lain)!`, 'error');
+            setFormData(prev => ({ ...prev, serial_number: '' }));
+            if (serialInputRef.current) {
+                serialInputRef.current.focus();
+            }
+        }
+    };
 
     const handleColorChange = (selectedOption) => {
         setFormData(prev => ({ ...prev, id_warna: selectedOption ? selectedOption.value : null }));
@@ -136,6 +164,12 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
 
     const handleSave = async (e) => {
         e.preventDefault();
+        if (!formData.serial_number) {
+            showToast('Serial Number tidak boleh kosong.', 'error');
+            if (serialInputRef.current) serialInputRef.current.focus();
+            return;
+        }
+
         setIsLoading(true);
         try {
             await api.put(`/inventory/stock-items/${item.id}`, formData);
@@ -179,11 +213,18 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
                 <p style={{ marginTop: '-1rem', marginBottom: '1.5rem', color: '#6c757d' }}>
                     {currentItem?.master_barang?.nama_barang}
                 </p>
-                <form onSubmit={handleSave}>
+                <form onSubmit={handleSave} onKeyDown={blockEnterSubmit}>
                     <div className="form-row2">
                         <div className="form-group-half">
                             <label>Serial Number</label>
-                            <input name="serial_number" value={formData.serial_number} onChange={handleChange} />
+                            <input
+                                ref={serialInputRef}
+                                name="serial_number"
+                                value={formData.serial_number}
+                                onChange={handleChange}
+                                onBlur={handleSerialBlur}
+                                autoComplete="off"
+                            />
                         </div>
                         <div className="form-group-half">
                             <label>Harga Beli (Rp)</label>
@@ -218,15 +259,14 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
                         </div>
                         <div className="form-group-half">
                             <label>Warna</label>
-                            {/* UBAH: Ganti CreatableSelect dengan Select */}
                             <Select
                                 classNamePrefix="creatable-select"
                                 options={colorOptionsForSelect}
                                 value={colorOptionsForSelect.find((opt) => opt.value === formData.id_warna)}
                                 onChange={handleColorChange}
-                                placeholder="Pilih atau cari warna..." // Placeholder disesuaikan
+                                placeholder="Pilih atau cari warna..."
                                 isClearable
-                                isSearchable // Pastikan bisa dicari
+                                isSearchable
                                 components={{ Option: ColorOption, SingleValue: ColorSingleValue }}
                                 styles={{
                                     control: (base) => ({ ...base, minHeight: '44px' }),
