@@ -10262,8 +10262,19 @@ body.dark-mode .form-group-recover textarea:focus {
 ==========================================================================
 */
 
+@media (max-width: 1008px) {
+
+  input[type="date"],
+  input[type="time"] {
+    appearance: none  ;
+    min-height: 45px;
+    position: relative;
+    color: #212529 !important;
+  }
+}
+
 .filter-select-date {
-  position: relative;
+  position: relative ;
   height: 44px;
   width: 100%;
   padding: 0.5rem 1rem;
@@ -10284,13 +10295,7 @@ body.dark-mode .form-group-recover textarea:focus {
 
 .filter-select-date::-webkit-datetime-edit-fields-wrapper,
 .filter-select-date::-webkit-datetime-edit-text {
-  color: var(--text-primary, #212529);
-  display: none !important;
-}
-
-.filter-select-date::before {
-  content: "dd/mm/yyyy";
-  color: #a0a0a0;
+  color: var(--text-primary, #212529) !important;
 }
 
 .filter-select-date::-webkit-inner-spin-button,
@@ -10306,6 +10311,7 @@ body.dark-mode .form-group-recover textarea:focus {
   width: 16px;
   height: 16px;
   cursor: pointer;
+  pointer-events: all;
   -webkit-appearance: none;
   appearance: none;
   background-color: #343a40 !important;
@@ -10319,18 +10325,21 @@ body.dark-mode .form-group-recover textarea:focus {
   background-color: #343a40;
 }
 
+/* Focus */
 .filter-select-date:focus {
   outline: none;
   border-color: var(--input-focus-border, #86b7fe);
   box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
 }
 
+/* Disabled */
 .filter-select-date:disabled {
   background-color: var(--input-disabled-bg, #e9ecef);
   opacity: 0.7;
   cursor: not-allowed;
 }
 
+/* DARK MODE */
 .dark-mode .filter-select-date {
   background-color: rgba(71, 85, 105, 0.25) !important;
   color: #e2e8f0;
@@ -10346,6 +10355,7 @@ body.dark-mode .form-group-recover textarea:focus {
   background-color: #343a40;
 }
 
+/* ICON untuk dark mode */
 .dark-mode .filter-select-date::-webkit-calendar-picker-indicator {
   background-color: #E2E8F0 !important;
 }
@@ -10354,6 +10364,13 @@ body.dark-mode .form-group-recover textarea:focus {
   background-color: #e9ecef !important;
 }
 
+.filter-select-date::placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+.dark-mode .filter-select-date::placeholder {
+  color: #94a3b8;
+}
 
 /* ===========================================================
    3. Dropdown Styling (.filter-select-invent)
@@ -14005,6 +14022,18 @@ body.dark-mode .detail-list-footer-centered {
 
 .date-separator {
   flex-shrink: 0;
+}
+
+.filter-select-date:placeholder-shown::before {
+  content: attr(placeholder);
+  color: #a0a0a0;
+  position: absolute;
+  left: 16px;
+  pointer-events: none;
+}
+
+.filter-select-date:not(:placeholder-shown)::before {
+  content: "";
 }
 
 @media (max-width: 768px) {
