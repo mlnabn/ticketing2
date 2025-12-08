@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 function AcquisitionDetailModal({ show, item, onClose, formatCurrency, formatDate }) {
@@ -7,6 +8,7 @@ function AcquisitionDetailModal({ show, item, onClose, formatCurrency, formatDat
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const [currentItem, setCurrentItem] = useState(item); 
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (show) {
@@ -41,6 +43,21 @@ function AcquisitionDetailModal({ show, item, onClose, formatCurrency, formatDat
         }
     }, [show, item]);
 
+    const handleCheckStockClick = () => {
+        onClose();
+        const searchTerm = currentItem?.kode_unik || fullDetail?.kode_unik;
+
+        if (searchTerm) {
+            navigate('/admin/stock', {
+                state: {
+                    initialSearchTerm: searchTerm
+                },
+            });
+        }
+    };
+
+    if (!shouldRender) return null;
+
     const renderWarna = (color) => {
         if (!color) return '-';
         return (
@@ -57,7 +74,6 @@ function AcquisitionDetailModal({ show, item, onClose, formatCurrency, formatDat
         );
     };
 
-    if (!shouldRender) return null;
     const animationClass = isClosing ? 'closing' : '';
 
     return (
@@ -125,7 +141,8 @@ function AcquisitionDetailModal({ show, item, onClose, formatCurrency, formatDat
                     )}
                 </div>
                 <div className="modal-footer-user">
-                    <button onClick={onClose} className="btn-cancel">Tutup</button>
+                    <button onClick={onClose} className="btn-cancel" style={{ marginRight: '10px' }}>Tutup</button>
+                    <button onClick={handleCheckStockClick} className="btn-confirm">Lihat di Stok</button>
                 </div>
             </div>
         </div>

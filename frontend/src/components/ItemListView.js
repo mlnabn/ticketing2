@@ -309,7 +309,7 @@ function ItemListView({
                                 <tr>
                                     <th style={columnStyles.col1}>Kode Unik</th>
                                     <th style={columnStyles.col1}>Kategori</th>
-                                    <th style={columnStyles.col1}>Sub-Kategori</th>
+                                    <th style={columnStyles.col1}>Sub-Kategori / Merk</th>
                                     <th style={columnStyles.col1}>Jumlah Tipe Barang</th>
                                 </tr>
                             </thead>
@@ -368,7 +368,7 @@ function ItemListView({
                                                                                     style={{ cursor: 'pointer' }}
                                                                                 />
                                                                             </div>
-                                                                            <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Tipe Barang</div>
+                                                                            <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Nama Barang</div>
                                                                             <div className="detail-cell header-stok" style={{ fontSize: '15px' }}>Stok Tersedia</div>
                                                                             <div className="detail-cell header-aksi" style={{ fontSize: '15px' }}>Aksi</div>
                                                                         </div>
@@ -486,7 +486,7 @@ function ItemListView({
                                     </div>
                                     <div className="card-separator"></div>
                                     <div className="card-item-row">
-                                        <span className="label">Sub-Kategori</span>
+                                        <span className="label">Sub-Kategori / Merk</span>
                                         <span className="value">{item.nama_sub || '-'}</span>
                                     </div>
                                     <div className="card-separator"></div>

@@ -27,7 +27,7 @@ const useScannerListener = (onScan, isOpen) => {
     }, [onScan, isOpen]);
 };
 
-function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show }) {
+function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show, currentUser }) {
     const [selectedAdminId, setSelectedAdminId] = useState(null);
     const [itemsToAssign, setItemsToAssign] = useState([]);
     const [selectKey, setSelectKey] = useState(Date.now());
@@ -35,12 +35,19 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show }
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const [currentTicket, setCurrentTicket] = useState(ticket); 
+    const adminOptions = admins.map(admin => ({ value: admin.id, label: admin.name }));
+    const selectedOption = adminOptions.find(opt => opt.value === selectedAdminId) || null;
 
     useEffect(() => {
         if (show) {
             setCurrentTicket(ticket); 
             setShouldRender(true);
             setIsClosing(false); 
+            if (currentUser && currentUser.id) {
+                setSelectedAdminId(currentUser.id);
+            } else {
+                setSelectedAdminId(null);
+            }
         } else if (shouldRender && !isClosing) {
             setIsClosing(true); 
             const timer = setTimeout(() => {
@@ -52,7 +59,7 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show }
             return () => clearTimeout(timer);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [show, ticket, shouldRender]);
+    }, [show, ticket, shouldRender, currentUser]);
 
     const isDarkMode = document.body.classList.contains('dark-mode');
     const selectStyles = {
@@ -152,8 +159,6 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show }
             onClose();
         }
     };
-    
-    const adminOptions = admins.map(admin => ({ value: admin.id, label: admin.name }));
 
     if (!shouldRender) return null;
     if (!currentTicket) return null;
@@ -174,6 +179,7 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show }
                     <label className="modal-label">Dikerjakan Oleh</label>
                     <Select
                         options={adminOptions}
+                        value={selectedOption}
                         onChange={(opt) => setSelectedAdminId(opt.value)}
                         placeholder="Pilih Admin..."
                         styles={selectStyles}

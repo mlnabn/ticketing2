@@ -711,6 +711,7 @@ export default function JobList() {
             key="assignModal"
             ticket={ticketToAssign}
             admins={adminList}
+            currentUser={user}
             items={itemList}
             onAssign={handleConfirmAssign}
             onClose={() => setTicketToAssign(null)}

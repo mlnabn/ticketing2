@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 
@@ -8,6 +9,7 @@ function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurre
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const [currentKodeUnik, setCurrentKodeUnik] = useState(kodeUnik);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (show) {
@@ -42,7 +44,21 @@ function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurre
         }
     }, [show, kodeUnik]);
 
-    // Helper untuk menampilkan warna
+    const handleCheckStockClick = () => {
+        onClose();
+        const searchTerm = fullDetail?.kode_unik || fullDetail?.master_barang?.nama_barang;
+        
+        if (searchTerm) {
+            navigate('/admin/stock', {
+                state: {
+                    initialSearchTerm: searchTerm
+                },
+            });
+        }
+    };
+
+    if (!shouldRender) return null;
+
     const renderWarna = (color) => {
         if (!color) return '-';
         return (
@@ -59,7 +75,6 @@ function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurre
         );
     };
 
-    // Helper untuk menampilkan info dinamis berdasarkan status
     const renderDynamicInfo = (detail) => {
         const status = detail.status_detail?.nama_status;
         console.log("Status yang diterima:", status);
@@ -71,8 +86,6 @@ function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurre
                         <div className="detail-item-full">
                             <span className="label">Status Saat Ini</span>
                             <span className="value">{fullDetail.status_detail?.nama_status || '-'}</span>
-
-                           
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Peminjam</span>
@@ -185,8 +198,6 @@ function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurre
         }
     };
 
-    if (!shouldRender) return null;
-
     const animationClass = isClosing ? 'closing' : '';
     
     return (
@@ -239,7 +250,8 @@ function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurre
                     )}
                 </div>
                 <div className="modal-footer-user">
-                    <button onClick={onClose} className="btn-cancel">Tutup</button>
+                    <button onClick={onClose} className="btn-cancel" style={{ marginRight: '10px' }}>Tutup</button>
+                    <button onClick={handleCheckStockClick} className="btn-confirm">Detail Unit</button>
                 </div>
             </div>
         </div>
