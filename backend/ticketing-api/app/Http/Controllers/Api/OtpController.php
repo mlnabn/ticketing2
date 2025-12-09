@@ -32,7 +32,13 @@ class OtpController extends Controller
             'otp' => 'required|string|digits:6',
         ]);
 
-        $cacheKey = 'registration_data_' . $validated['phone'];
+        $phone = $validated['phone'];
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+        if (substr($phone, 0, 2) === '08') {
+            $phone = '62' . substr($phone, 1);
+        }
+
+        $cacheKey = 'registration_data_' . $phone;
         $registrationData = Cache::get($cacheKey);
 
         if (
