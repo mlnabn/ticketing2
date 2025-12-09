@@ -379,7 +379,6 @@ function ItemListView({
                                                                             {detailItems[item.kode_barang].map(detail => (
                                                                                 <div
                                                                                     key={detail.id_m_barang}
-                                                                                    // Tambahkan style cursor not-allowed jika stok > 0
                                                                                     className={`sku-detail-row-div hoverable-row ${selectedIds.includes(detail.id_m_barang) ? 'selected-row' : ''}`}
                                                                                     style={{
                                                                                         cursor: detail.total_active_stock > 0 ? 'not-allowed' : 'pointer',

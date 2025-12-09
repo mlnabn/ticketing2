@@ -242,7 +242,7 @@ export default function UserHistoryPage() {
                                                     className="btn-action btn-start">
                                                     Alasan
                                                 </motion.button>
-                                            ) : NOT_DELETABLE_STATUSES.includes(ticket.status) ? ( // <-- LOGIKA BARU UNTUK DISALBE HAPUS
+                                            ) : NOT_DELETABLE_STATUSES.includes(ticket.status) ? ( 
                                                 <motion.button
                                                     disabled={true}
                                                     className="btn-action btn-delete-small btn-disabled"

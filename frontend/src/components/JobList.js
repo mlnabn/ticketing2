@@ -272,11 +272,11 @@ export default function JobList() {
         return;
       }
       try {
-        await api.patch(`/tickets/${ticket.id}/status`, { status: newStatus }); //
+        await api.patch(`/tickets/${ticket.id}/status`, { status: newStatus }); 
         showToast('Status tiket berhasil diupdate.', 'success');
         fetchTickets();
       } catch (e) {
-        showToast(e.response?.data?.error || 'Gagal mengupdate status tiket.', 'error'); //
+        showToast(e.response?.data?.error || 'Gagal mengupdate status tiket.', 'error'); 
       }
     }
   };
@@ -597,7 +597,7 @@ export default function JobList() {
                         </tr>
                       ))
                     ) : (
-                      !isLoadingMore && <tr><td colSpan={9} style={{ textAlign: 'center', padding: '20px' }}>Tidak ada pekerjaan yang ditemukan.</td></tr> // <-- DIUBAH
+                      !isLoadingMore && <tr><td colSpan={9} style={{ textAlign: 'center', padding: '20px' }}>Tidak ada pekerjaan yang ditemukan.</td></tr>
                     )}
                     {isLoadingMore && (
                       <tr><td colSpan={9} style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
