@@ -126,6 +126,9 @@ export default function UserHistoryPage() {
         }, 60000);
         return () => clearInterval(intervalId);
     }, [fetchCreatedTickets]);
+
+    const NOT_DELETABLE_STATUSES = ['Sedang Dikerjakan', 'Belum Dikerjakan', 'Ditunda'];
+
     const columnStyles = {
         col1: { width: '200px', textAlign: 'center' },
         col2: { width: '100px', textAlign: 'center' },
@@ -149,7 +152,7 @@ export default function UserHistoryPage() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            style={{ padding: '0 10px' }} 
+            style={{ padding: '0 10px' }}
         >
             <motion.h2 variants={itemVariants} style={{ marginBottom: '20px' }}>Your Tickets</motion.h2>
             <div className="desktop-header-container">
@@ -177,7 +180,7 @@ export default function UserHistoryPage() {
                 <table className="job-table-user user-history-table" style={{ width: '100%' }}>
                     <tbody>
                         {!createdTicketsData ? (
-                            <tr><td colSpan="6" style={{textAlign: 'center', padding: '20px'}}>Memuat riwayat tiket...</td></tr>
+                            <tr><td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>Memuat riwayat tiket...</td></tr>
                         ) : createdTicketsOnPage.length > 0 ? (
                             createdTicketsOnPage.map(ticket => (
                                 <tr
@@ -239,6 +242,14 @@ export default function UserHistoryPage() {
                                                     className="btn-action btn-start">
                                                     Alasan
                                                 </motion.button>
+                                            ) : NOT_DELETABLE_STATUSES.includes(ticket.status) ? ( 
+                                                <motion.button
+                                                    disabled={true}
+                                                    className="btn-action btn-delete-small btn-disabled"
+                                                    style={{ opacity: 0.5, cursor: 'not-allowed' }}
+                                                >
+                                                    Hapus
+                                                </motion.button>
                                             ) : (
                                                 <motion.button
                                                     variants={buttonHoverTap}
@@ -257,7 +268,7 @@ export default function UserHistoryPage() {
                                 </tr>
                             ))
                         ) : (
-                            <tr><td colSpan="6" style={{textAlign: 'center', padding: '20px'}}>Anda belum membuat tiket.</td></tr>
+                            <tr><td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>Anda belum membuat tiket.</td></tr>
                         )}
                         {isLoadingMore && (
                             <tr><td colSpan="6" style={{ textAlign: 'center', padding: '10px' }}>Memuat lebih banyak...</td></tr>
@@ -280,8 +291,8 @@ export default function UserHistoryPage() {
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         color: '#FFFFFF',
-                        width: '100%', 
-                        boxSizing: 'border-box' 
+                        width: '100%',
+                        boxSizing: 'border-box'
                     }}
                 >
                     <span style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF' }}>Total Tiket Saya</span>

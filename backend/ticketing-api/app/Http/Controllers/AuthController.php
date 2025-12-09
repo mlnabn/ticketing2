@@ -24,7 +24,6 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            
             'email' => [
                 'required', 'string', 'email', 'max:255',
                 Rule::unique('users')->where(fn ($query) => $query->whereNotNull('phone_verified_at'))
@@ -36,6 +35,12 @@ class AuthController extends Controller
             ],
         ]);
 
+        $phone = $validated['phone'];
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+        if (substr($phone, 0, 2) === '08') {
+            $phone = '62' . substr($phone, 1);
+        }
+
         $otpCode = (string) rand(100000, 999999);
         $otpExpiresAt = Carbon::now()->addMinutes(5);
 
@@ -43,25 +48,28 @@ class AuthController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'phone' => $validated['phone'],
+            'phone' => $phone, 
             'otp_code' => $otpCode,
             'otp_expires_at' => $otpExpiresAt,
         ];
 
-        Cache::put('registration_data_' . $validated['phone'], $registrationData, now()->addMinutes(10));
-
-        $n8nWebhookUrl = env('N8N_WEBHOOK_URL', 'http://localhost:5678/webhook/whatsapp-otp');
+        Cache::put('registration_data_' . $phone, $registrationData, now()->addMinutes(10));
+        $n8nWebhookUrl = 'http://127.0.0.1:5678/webhook/whatsapp-otp'; 
+        
         try {
-            Http::get($n8nWebhookUrl, ['phone' => $validated['phone'], 'otp' => $otpCode]);
+            Http::timeout(5)->post($n8nWebhookUrl, [
+                'phone' => $phone, 
+                'otp' => $otpCode
+            ]);
         } catch (\Exception $e) {
-            
-            Cache::forget('registration_data_' . $validated['phone']);
+            Log::error("Gagal kirim OTP Registrasi: " . $e->getMessage());
+            Cache::forget('registration_data_' . $phone);
             return response()->json(['message' => 'Gagal mengirim OTP. Silakan coba lagi.'], 503);
         }
 
         return response()->json([
             'message' => 'Kode verifikasi telah dikirim. Silakan cek WhatsApp Anda.',
-            'phone' => $validated['phone']
+            'phone' => $phone 
         ], 200);
     }
 
@@ -69,22 +77,32 @@ class AuthController extends Controller
     {
         $validated = $request->validate(['phone' => 'required|string']);
         $phone = $validated['phone'];
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+        if (substr($phone, 0, 2) === '08') {
+            $phone = '62' . substr($phone, 1);
+        }
+
         $cacheKey = 'registration_data_' . $phone;
 
         if (!Cache::has($cacheKey)) {
-            return response()->json(['message' => 'Sesi registrasi tidak ditemukan atau telah kedaluwarsa. Silakan mulai dari awal.'], 404);
+            return response()->json(['message' => 'Sesi registrasi tidak ditemukan atau telah kedaluwarsa.'], 404);
         }
 
         $registrationData = Cache::get($cacheKey);
         $registrationData['otp_code'] = (string) rand(100000, 999999); 
         $registrationData['otp_expires_at'] = Carbon::now()->addMinutes(5);
+        
         Cache::put($cacheKey, $registrationData, now()->addMinutes(10));
 
-        $n8nWebhookUrl = env('N8N_WEBHOOK_URL', 'http://localhost:5678/webhook/whatsapp-otp');
+        $n8nWebhookUrl = 'http://127.0.0.1:5678/webhook/whatsapp-otp';
+        
         try {
-            Http::get($n8nWebhookUrl, ['phone' => $phone, 'otp' => $registrationData['otp_code']]);
+            Http::timeout(5)->post($n8nWebhookUrl, [
+                'phone' => $phone, 
+                'otp' => $registrationData['otp_code']
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Gagal mengirim OTP. Silakan coba lagi nanti.'], 503);
+            return response()->json(['message' => 'Gagal mengirim OTP.'], 503);
         }
 
         return response()->json(['message' => 'Kode OTP baru telah dikirim ke nomor Anda.']);
