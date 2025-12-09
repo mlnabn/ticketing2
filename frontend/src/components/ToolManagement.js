@@ -110,7 +110,7 @@ function ToolManagement() {
             loadMoreItems();
         }
     };
-    
+
     const toggleExpand = async (kodeBarang) => {
         const isCurrentlyExpanded = !!expandedRows[kodeBarang];
         if (isCurrentlyExpanded) {
@@ -123,7 +123,7 @@ function ToolManagement() {
             return;
         }
 
-        setExpandingId(kodeBarang); 
+        setExpandingId(kodeBarang);
         try {
             const isActive = currentFilters.is_active === 'true';
             const res = await api.get(`/inventory/items/variations/${kodeBarang}`, {
@@ -132,7 +132,7 @@ function ToolManagement() {
 
             setDetailItems(prev => ({
                 ...prev,
-                [kodeBarang]: res.data 
+                [kodeBarang]: res.data
             }));
 
         } catch (error) {
@@ -152,19 +152,19 @@ function ToolManagement() {
     const handleSaveRequest = async (formData, action = 'save') => {
         try {
             const response = await api.post('/inventory/items', formData);
-            const newItem = response.data; 
+            const newItem = response.data;
             showToast('Tipe barang baru berhasil didaftarkan.');
             handleCloseItemModal();
-            fetchItems(1, currentFilters); 
+            fetchItems(1, currentFilters);
             if (action === 'saveAndAddStock' && newItem) {
                 const preselectData = {
                     value: newItem.id_m_barang,
                     label: `${newItem.nama_barang} (${newItem.kode_barang})`
                 };
-                navigate('/admin/stock', { 
-                    state: { 
-                        preselectItem: preselectData 
-                    } 
+                navigate('/admin/stock', {
+                    state: {
+                        preselectItem: preselectData
+                    }
                 });
             }
         } catch (e) {
@@ -245,14 +245,16 @@ function ToolManagement() {
     };
 
     const handleSelectAll = (e, kodeBarang) => {
-        const itemIds = detailItems[kodeBarang]?.map(item => item.id_m_barang) || [];
+        const validItems = detailItems[kodeBarang]?.filter(item => item.total_active_stock === 0) || [];
+        const itemIds = validItems.map(item => item.id_m_barang);
 
         setSelectedIds(prev => {
             const newSet = new Set(prev);
             if (e.target.checked) {
                 itemIds.forEach(id => newSet.add(id));
             } else {
-                itemIds.forEach(id => newSet.delete(id));
+                const allIds = detailItems[kodeBarang]?.map(item => item.id_m_barang) || [];
+                allIds.forEach(id => newSet.delete(id));
             }
             return Array.from(newSet);
         });
@@ -303,7 +305,7 @@ function ToolManagement() {
     }, [])
 
     const handleToggleArchived = (isArchived) => {
-        const newFilters = { 
+        const newFilters = {
             is_active: isArchived ? 'false' : 'true',
             id_kategori: '',
             id_sub_kategori: ''
