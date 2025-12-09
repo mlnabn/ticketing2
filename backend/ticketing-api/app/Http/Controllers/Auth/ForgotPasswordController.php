@@ -31,27 +31,38 @@ class ForgotPasswordController extends Controller
     public function requestPasswordOtp(Request $request)
     {
         $validated = $request->validate(['phone' => 'required|string|min:10']);
-        $user = User::where('phone', $validated['phone'])
-                    ->whereNotNull('phone_verified_at')
-                    ->first();
+        $phone = $validated['phone'];
 
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+        if (substr($phone, 0, 2) === '08') {
+            $phone = '62' . substr($phone, 1);
+        }
+
+        $user = User::where('phone', $phone)->first();
         if ($user) {
             $otpCode = (string) rand(100000, 999999);
             $otpExpiresAt = Carbon::now()->addMinutes(5);
-            $cacheKey = 'password_reset_otp_' . $validated['phone'];
+            $cacheKey = 'password_reset_otp_' . $phone;
             Cache::put($cacheKey, $otpCode, $otpExpiresAt);
-
-            $n8nWebhookUrl = 'http://localhost:5678/webhook/whatsapp-otp'; 
+            $n8nWebhookUrl = 'http://127.0.0.1:5678/webhook/whatsapp-otp'; 
+            
             try {
-                Http::get($n8nWebhookUrl, ['phone' => $validated['phone'], 'otp' => $otpCode]);
+                Http::timeout(5)->post($n8nWebhookUrl, [
+                    'phone' => $phone, 
+                    'otp' => $otpCode
+                ]);
+                
+                Log::info("OTP request sent to n8n for {$phone}");
+                
             } catch (\Exception $e) {
                 Log::error('Gagal kirim OTP reset password: ' . $e->getMessage());
             }
+        } else {
+            Log::warning("Reset password requested for unknown phone: {$phone}");
         }
-
         return response()->json([
             'message' => 'Jika nomor Anda terdaftar, kode verifikasi telah dikirim ke WhatsApp Anda.',
-            'phone' => $validated['phone']
+            'phone' => $phone 
         ], 200);
     }
 
@@ -66,24 +77,29 @@ class ForgotPasswordController extends Controller
             'password' => 'required|string|min:6|confirmed', 
         ]);
 
-        $cacheKey = 'password_reset_otp_' . $validated['phone'];
+        $phone = $validated['phone'];
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        if (substr($phone, 0, 2) === '08') {
+            $phone = '62' . substr($phone, 1);
+        }
+
+        $cacheKey = 'password_reset_otp_' . $phone;
         $cachedOtp = Cache::get($cacheKey);
 
         if (!$cachedOtp || $cachedOtp !== $validated['otp']) {
             return response()->json(['message' => 'Kode OTP tidak valid atau telah kedaluwarsa.'], 400);
         }
 
-        $user = User::where('phone', $validated['phone'])->whereNotNull('phone_verified_at')->first();
-
+        $user = User::where('phone', $phone)->first();
         if (!$user) {
             return response()->json(['message' => 'User tidak ditemukan.'], 404);
         }
 
         $user->password = Hash::make($validated['password']);
         $user->save();
-
+        
         Cache::forget($cacheKey);
-
         $token = JWTAuth::fromUser($user);
         return $this->authController->respondWithToken($token, $user);
     }
