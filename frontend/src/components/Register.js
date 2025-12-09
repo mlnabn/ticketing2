@@ -190,7 +190,6 @@ function Register({
 
 
               <motion.div variants={formItemVariants} className="input-group floating-label-group">
-                <span className="input-icon">👤</span>
                 <input
                   id="name-input"
                   type="text"
@@ -205,7 +204,6 @@ function Register({
               </motion.div>
 
               <motion.div variants={formItemVariants} className="input-group floating-label-group">
-                <span className="input-icon">📧</span>
                 <input
                   id="email-input-reg"
                   type="email"
@@ -220,7 +218,6 @@ function Register({
               </motion.div>
 
               <motion.div variants={formItemVariants} className="input-group floating-label-group">
-                <span className="input-icon">📱</span>
                 <input
                   id="phone-input"
                   type="tel"
@@ -235,7 +232,6 @@ function Register({
               </motion.div>
 
               <motion.div variants={formItemVariants} className="input-group floating-label-group">
-                <span className="input-icon">🔒</span>
                 <input
                   id="password-input-reg"
                   type="password"
@@ -250,7 +246,6 @@ function Register({
               </motion.div>
 
               <motion.div variants={formItemVariants} className="input-group floating-label-group">
-                <span className="input-icon">🔒</span>
                 <input
                   id="confirm-password-input"
                   type="password"
@@ -268,12 +263,9 @@ function Register({
               </motion.button>
 
               <motion.p variants={formItemVariants} className="auth-toggle">
-                Sudah punya akun?{" "}
+                Already have an account?{" "}
                 <button type="button" onClick={onShowLogin} className="register-link">Login</button>
               </motion.p>
-              <motion.button variants={formItemVariants} type="button" onClick={onBackToLanding} className="back-to-landing">
-                ← Back to Landing
-              </motion.button>
             </motion.form>
 
           ) : (
@@ -298,7 +290,7 @@ function Register({
               </motion.div>
 
               <motion.p variants={formItemVariants} className="auth-toggle">
-                Tidak menerima kode?{" "}
+                Didn't receive the OTP?{" "}
                 <button
                   type="button"
                   onClick={onResendOtp}
@@ -306,8 +298,8 @@ function Register({
                   disabled={loading || cooldown > 0}
                 >
                   {cooldown > 0
-                    ? `Kirim ulang dalam (${formatTime(cooldown)})`
-                    : 'Kirim ulang OTP?'
+                    ? `Resend the OTP in (${formatTime(cooldown)})`
+                    : 'Resend OTP?'
                   }
                 </button>
               </motion.p>
@@ -317,12 +309,9 @@ function Register({
               </motion.button>
 
               <motion.p variants={formItemVariants} className="auth-toggle">
-                Sudah punya akun?{" "}
+                Already have an account?{" "}
                 <button type="button" onClick={onShowLogin} className="register-link">Login</button>
               </motion.p>
-              <motion.button variants={formItemVariants} type="button" onClick={onBackToLanding} className="back-to-landing">
-                ← Back to Landing
-              </motion.button>
             </motion.form>
           )}
         </AnimatePresence>

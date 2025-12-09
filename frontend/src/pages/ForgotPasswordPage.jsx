@@ -120,7 +120,7 @@ export default function ForgotPasswordPage() {
           className="login-form-inner"
           variants={formContainerVariants}
         >
-          <motion.h2 variants={formItemVariants}>Lupa Password</motion.h2>
+          <motion.h2 variants={formItemVariants}>Forgot Password</motion.h2>
           <motion.p variants={formItemVariants} className="form-description" style={{ color: '#e0e0e0' }}>
             Masukkan nomor WhatsApp Anda. Kami akan mengirimkan kode OTP untuk reset password.
           </motion.p>
@@ -137,7 +137,6 @@ export default function ForgotPasswordPage() {
           )}
 
           <motion.div variants={formItemVariants} className="input-group floating-label-group">
-            <span className="input-icon">👤</span>
             <input
               id="phone-input"
               type="text"
@@ -147,7 +146,7 @@ export default function ForgotPasswordPage() {
               required
             />
             <label htmlFor="phone-input" className={phone ? 'active' : ''}>
-              Nomor WhatsApp (e.g., 628...)
+              WhatsApp Number (628...)
             </label>
           </motion.div>
 
@@ -157,11 +156,11 @@ export default function ForgotPasswordPage() {
             disabled={loading}
             variants={formItemVariants}
           >
-            {loading ? 'Memproses...' : 'Kirim Kode OTP'}
+            {loading ? 'Processing...' : 'Send OTP'}
           </motion.button>
 
           <motion.p variants={formItemVariants} className="auth-toggle">
-            Sudah ingat?{' '}
+            Remember your password?{' '}
             <button
               type="button"
               onClick={() => navigate('/login')}
@@ -170,15 +169,6 @@ export default function ForgotPasswordPage() {
               Login
             </button>
           </motion.p>
-
-          <motion.button
-            type="button"
-            onClick={() => navigate('/')}
-            className="back-to-landing"
-            variants={formItemVariants}
-          >
-            ← Back to Landing
-          </motion.button>
         </motion.form>
       </motion.div>
     </div>
