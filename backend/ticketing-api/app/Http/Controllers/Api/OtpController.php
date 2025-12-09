@@ -9,6 +9,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\DB;
 
 class OtpController extends Controller
 {
@@ -49,14 +50,67 @@ class OtpController extends Controller
             return response()->json(['message' => 'Kode OTP tidak valid atau telah kedaluwarsa.'], 400);
         }
 
-        $user = User::create([
-            'name' => $registrationData['name'],
-            'email' => $registrationData['email'],
-            'password' => $registrationData['password'], 
-            'phone' => $registrationData['phone'],
-            'role' => 'user',
-            'phone_verified_at' => Carbon::now(), 
-        ]);
+        $user = DB::transaction(function () use ($registrationData) {
+            $existingUserByPhone = User::where('phone', $registrationData['phone'])->first();
+
+            if ($existingUserByPhone) {
+                
+                if ($existingUserByPhone->phone_verified_at) {
+                    throw new \Exception('Nomor telepon sudah terdaftar dan terverifikasi. Silakan login.');
+                }
+
+                $emailConflict = User::where('email', $registrationData['email'])
+                                     ->where('id', '!=', $existingUserByPhone->id) 
+                                     ->first();
+
+                if ($emailConflict) {
+                    if ($emailConflict->phone_verified_at) {
+                        throw new \Exception('Email sudah digunakan oleh akun lain yang terverifikasi.');
+                    } else {
+                        $emailConflict->forceDelete();
+                    }
+                }
+
+                $existingUserByPhone->update([
+                    'name' => $registrationData['name'],
+                    'email' => $registrationData['email'],
+                    'password' => $registrationData['password'],
+                    'phone_verified_at' => Carbon::now(),
+                    'role' => 'user',
+                ]);
+
+                return $existingUserByPhone;
+
+            } else {
+                $existingUserByEmail = User::where('email', $registrationData['email'])->first();
+                
+                if ($existingUserByEmail) {
+                    
+                    if ($existingUserByEmail->phone_verified_at) {
+                        throw new \Exception('Email sudah terdaftar. Silakan login.');
+                    } 
+                    
+                    $existingUserByEmail->update([
+                        'name' => $registrationData['name'], 
+                        'password' => $registrationData['password'], 
+                        'phone' => $registrationData['phone'], 
+                        'phone_verified_at' => Carbon::now(),
+                        'role' => 'user',
+                    ]);
+                    
+                    return $existingUserByEmail; 
+                }
+
+                return User::create([
+                    'name' => $registrationData['name'],
+                    'email' => $registrationData['email'],
+                    'password' => $registrationData['password'], 
+                    'phone' => $registrationData['phone'],
+                    'role' => 'user',
+                    'phone_verified_at' => Carbon::now(), 
+                ]);
+            }
+        });
 
         Cache::forget($cacheKey);
 

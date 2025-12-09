@@ -196,8 +196,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding, isGoogleLoading }) {
 
         <motion.form onSubmit={handleSubmit} className="login-form-inner">
 
-          <motion.div variants={formItemVariants} className="input-group floating-label-group"> 
-            <span className="input-icon">📧</span>
+          <motion.div variants={formItemVariants} className="input-group floating-label-group">
             <input
               id="email-input"
               type="email"
@@ -212,7 +211,6 @@ function Login({ onLogin, onShowRegister, onBackToLanding, isGoogleLoading }) {
           </motion.div>
 
           <motion.div variants={formItemVariants} className="input-group floating-label-group">
-            <span className="input-icon">🔒</span>
             <input
               id="password-input"
               type="password"
@@ -248,7 +246,7 @@ function Login({ onLogin, onShowRegister, onBackToLanding, isGoogleLoading }) {
           </motion.button>
 
           <motion.div variants={formItemVariants} className="divider">
-            atau
+            or
           </motion.div>
 
           <motion.button
