@@ -14084,6 +14084,29 @@ body.dark-mode .detail-list-footer-centered {
     width: auto;
   }
 
+  .filter-select-date:required:invalid::-webkit-datetime-edit {
+    color: transparent;
+  }
+  .filter-select-date:required:invalid::before {
+    content: "dd/mm/yyyy";
+    color: #9CA3AF;
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; 
+    font-size: 0.9rem;
+    font-family: inherit;
+  }
+
+  .filter-select-date:required:invalid {
+    box-shadow: none;
+  }
+
+  body.dark-mode .filter-select-date:required:invalid::before {
+    color: #64748B;
+  }
+
   .sku-add-button-container {
     margin-bottom: 0;
   }

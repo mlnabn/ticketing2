@@ -483,6 +483,7 @@ export default function TicketReportDetail() {
                         value={dateFilters.start_date}
                         onChange={handleDateFilterChange}
                         className="filter-select-date"
+                        required
                       />
                       <span style={{ alignSelf: 'center' }}>-</span>
                       <input
@@ -492,6 +493,7 @@ export default function TicketReportDetail() {
                         onChange={handleDateFilterChange}
                         className="filter-select-date"
                         min={dateFilters.start_date || undefined}
+                        required
                       />
                     </motion.div>
                   )}
