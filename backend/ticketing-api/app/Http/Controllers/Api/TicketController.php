@@ -39,7 +39,7 @@ class TicketController extends Controller
             $message .= "🎫 *Kode Tiket:* {$ticket->kode_tiket}\n";
             $message .= "🛠 *Masalah:* {$ticket->title}\n";
             $message .= "📊 *Status Baru:* {$status}\n";
-            
+
             if ($note) {
                 $message .= "📝 *Catatan:* {$note}\n";
             }
@@ -54,7 +54,6 @@ class TicketController extends Controller
                 'phone' => $phone,
                 'message' => $message
             ]);
-
         } catch (\Exception $e) {
             Log::error("Gagal mengirim notifikasi WA ke user: " . $e->getMessage());
         }
@@ -245,11 +244,11 @@ class TicketController extends Controller
             'status' => 'Belum Dikerjakan',
             'is_urgent' => $isUrgent,
         ]);
-        
+
         try {
             $workshopName = $ticket->workshop ? $ticket->workshop->name : 'N/A';
             $creatorName = auth()->user()->name ?? 'User Web';
-            
+
             Http::timeout(2)->post('http://127.0.0.1:5678/webhook/notify-admins', [
                 'kode_tiket' => $ticket->kode_tiket,
                 'title' => $ticket->title,
@@ -301,7 +300,7 @@ class TicketController extends Controller
                         'phone' => $cleanPhoneNumber,
                         'name' => $validated['sender_name'],
                         'email' => $dummyEmail,
-                        'password' => bcrypt('ticket_IT'), 
+                        'password' => bcrypt('ticket_IT'),
                         'role' => 'user'
                     ]);
                 } catch (\Exception $e) {
@@ -334,7 +333,9 @@ class TicketController extends Controller
 
     public function showByCode($kode_tiket)
     {
-        $ticket = Ticket::where('kode_tiket', $kode_tiket)->firstOrFail();
+        $ticket = Ticket::with('workshop')
+            ->where('kode_tiket', $kode_tiket)
+            ->firstOrFail();
         return response()->json($ticket);
     }
 
