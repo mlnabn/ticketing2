@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import api from '../services/api';
-
-// Import aset yang diperlukan
 import bgImage from '../Image/homeBg.jpg';
 import yourLogok from '../Image/DTECH-Logo.png';
 
 export default function PublicTicketPage() {
-  // Ambil kode tiket dari URL
   const { ticketCode } = useParams();
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,11 +29,10 @@ export default function PublicTicketPage() {
     fetchTicketByCode();
   }, [ticketCode]);
 
-  // Fungsi untuk render baris tabel tiket
   const renderTicketRow = (t) => (
     <tr key={t.id}>
       <td data-label="Deskripsi">{t.title}</td>
-      <td data-label="Workshop">{t.workshop}</td>
+      <td data-label="Workshop">{t.workshop ? t.workshop.name : 'N/A'}</td>
       <td data-label="Tanggal Dibuat">{format(new Date(t.created_at), 'dd MMM yyyy')}</td>
       <td data-label="Waktu Pengerjaan">
         {t.started_at
