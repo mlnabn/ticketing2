@@ -245,9 +245,9 @@ export default function ProblematicAssetsReport() {
                                     variants={staggerItem}
                                     className='date-range-container'
                                 >
-                                    <input type="date" name="start_date" value={filters.start_date} onChange={handleDateChange} className="filter-select-date" style={{ flex: 1 }} />
+                                    <input type="date" name="start_date" value={filters.start_date} onChange={handleDateChange} className="filter-select-date" style={{ flex: 1 }} required />
                                     <span style={{ alignSelf: 'center' }}>-</span>
-                                    <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} min={filters.start_date || undefined}/>
+                                    <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="filter-select-date" style={{ flex: 1 }} min={filters.start_date || undefined} required />
                                 </motion.div>
                             )}
                         </motion.div>

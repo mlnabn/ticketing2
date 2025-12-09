@@ -505,6 +505,7 @@ export default function ComprehensiveReportPage() {
                         onChange={handleDateFilterChange}
                         className="filter-select-date"
                         style={{ flex: 1 }}
+                        required
                       />
                       <span className='strip' style={{ alignSelf: 'center' }}>-</span>
                       <input
@@ -515,6 +516,7 @@ export default function ComprehensiveReportPage() {
                         className="filter-select-date"
                         style={{ flex: 1 }}
                         min={dateFilters.start_date || undefined}
+                        required
                       />
                     </motion.div>
                   )}
@@ -567,11 +569,11 @@ export default function ComprehensiveReportPage() {
                         {tickets.length > 0 ? (
                           tickets.map(t => (
                             <tr key={t.id} className="clickable-row" onClick={(e) => handleRowClick(e, t)}>
-                              <td>{t.kode_tiket || '-'}</td>
+                              <td style={columnStyles.col1}>{t.kode_tiket || '-'}</td>
                               <td>
                                 <span className="description-cell">{t.title}</span>
                               </td>
-                              <td style={columnStyles.col1}>{t.status}</td>
+                              <td>{t.status}</td>
                               <td style={columnStyles.col2}>{t.workshop ? t.workshop.name : 'N/A'}</td>
                               <td style={columnStyles.col2}>{t.user?.name ?? 'N/A'}</td>
                               <td style={columnStyles.col2}>{t.creator?.name ?? 'N/A'}</td>

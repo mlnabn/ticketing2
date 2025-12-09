@@ -432,8 +432,8 @@ export default function JobList() {
     col8: { width: '170px', textAlign: 'center' },
     col9: { width: '250px', textAlign: 'center' },
 
-    
-        col10: { width: '40px', textAlign: 'left' },
+
+    col10: { width: '40px', textAlign: 'left' },
     col11: { width: '100px', textAlign: 'left' },
     col12: { width: '120px', textAlign: 'left' },
     col13: { width: '120px', textAlign: 'left' },
@@ -581,7 +581,9 @@ export default function JobList() {
                               checked={selectedIds.includes(ticket.id)}
                               onChange={() => handleSelect(ticket.id)}
                               disabled={UNEDITABLE_STATUS.includes(ticket.status)}
-                              style={{ cursor: 'pointer' }}
+                              style={{
+                                cursor: UNEDITABLE_STATUS.includes(ticket.status) ? 'not-allowed' : 'pointer'
+                              }}
                             />
                           </td>
                           <td style={columnStyles.col11}>{ticket.creator ? ticket.creator.name : 'N/A'}</td>
@@ -639,6 +641,9 @@ export default function JobList() {
                             onChange={() => handleSelect(ticket.id)}
                             onClick={(e) => e.stopPropagation()}
                             disabled={UNEDITABLE_STATUS.includes(ticket.status)}
+                            style={{
+                              cursor: UNEDITABLE_STATUS.includes(ticket.status) ? 'not-allowed' : 'pointer'
+                            }}
                           />
                         </div>
                         <div
@@ -711,6 +716,7 @@ export default function JobList() {
             key="assignModal"
             ticket={ticketToAssign}
             admins={adminList}
+            currentUser={user}
             items={itemList}
             onAssign={handleConfirmAssign}
             onClose={() => setTicketToAssign(null)}

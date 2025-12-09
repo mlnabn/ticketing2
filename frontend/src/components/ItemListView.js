@@ -309,7 +309,7 @@ function ItemListView({
                                 <tr>
                                     <th style={columnStyles.col1}>Kode Unik</th>
                                     <th style={columnStyles.col1}>Kategori</th>
-                                    <th style={columnStyles.col1}>Sub-Kategori</th>
+                                    <th style={columnStyles.col1}>Sub-Kategori / Merk</th>
                                     <th style={columnStyles.col1}>Jumlah Tipe Barang</th>
                                 </tr>
                             </thead>
@@ -368,7 +368,7 @@ function ItemListView({
                                                                                     style={{ cursor: 'pointer' }}
                                                                                 />
                                                                             </div>
-                                                                            <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Tipe Barang</div>
+                                                                            <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Nama Barang</div>
                                                                             <div className="detail-cell header-stok" style={{ fontSize: '15px' }}>Stok Tersedia</div>
                                                                             <div className="detail-cell header-aksi" style={{ fontSize: '15px' }}>Aksi</div>
                                                                         </div>
@@ -379,8 +379,14 @@ function ItemListView({
                                                                             {detailItems[item.kode_barang].map(detail => (
                                                                                 <div
                                                                                     key={detail.id_m_barang}
+                                                                                    // Tambahkan style cursor not-allowed jika stok > 0
                                                                                     className={`sku-detail-row-div hoverable-row ${selectedIds.includes(detail.id_m_barang) ? 'selected-row' : ''}`}
+                                                                                    style={{
+                                                                                        cursor: detail.total_active_stock > 0 ? 'not-allowed' : 'pointer',
+                                                                                        opacity: detail.total_active_stock > 0 ? 0.7 : 1
+                                                                                    }}
                                                                                     onClick={(e) => {
+                                                                                        if (detail.total_active_stock > 0) return;
                                                                                         handleRowClick(e, detail);
                                                                                     }}
                                                                                 >
@@ -390,7 +396,10 @@ function ItemListView({
                                                                                             checked={selectedIds.includes(detail.id_m_barang)}
                                                                                             onChange={() => onSelectId(detail.id_m_barang)}
                                                                                             onClick={(e) => e.stopPropagation()}
-                                                                                            style={{ cursor: 'pointer' }}
+                                                                                            disabled={detail.total_active_stock > 0}
+                                                                                            style={{
+                                                                                                cursor: detail.total_active_stock > 0 ? 'not-allowed' : 'pointer'
+                                                                                            }}
                                                                                         />
                                                                                     </div>
                                                                                     <div className="detail-cell cell-kode">{detail.nama_barang}</div>
@@ -486,7 +495,7 @@ function ItemListView({
                                     </div>
                                     <div className="card-separator"></div>
                                     <div className="card-item-row">
-                                        <span className="label">Sub-Kategori</span>
+                                        <span className="label">Sub-Kategori / Merk</span>
                                         <span className="value">{item.nama_sub || '-'}</span>
                                     </div>
                                     <div className="card-separator"></div>
@@ -515,6 +524,10 @@ function ItemListView({
                                                     <div
                                                         key={detail.id_m_barang}
                                                         className="ticket-card-mobile detail-card hoverable-row"
+                                                        style={{
+                                                            cursor: detail.total_active_stock > 0 ? 'not-allowed' : 'pointer',
+                                                            backgroundColor: detail.total_active_stock > 0 ? '#f8f9fa' : 'white'
+                                                        }}
                                                     >
                                                         <div className="card-select-col">
                                                             <input
@@ -522,12 +535,17 @@ function ItemListView({
                                                                 checked={selectedIds.includes(detail.id_m_barang)}
                                                                 onChange={() => onSelectId(detail.id_m_barang)}
                                                                 onClick={(e) => e.stopPropagation()}
-                                                                style={{ cursor: 'pointer' }}
+                                                                disabled={detail.total_active_stock > 0}
+                                                                style={{
+                                                                    cursor: detail.total_active_stock > 0 ? 'not-allowed' : 'pointer'
+                                                                }}
                                                             />
                                                         </div>
                                                         <div
                                                             className="card-content-col hoverable-row"
                                                             onClick={(e) => {
+                                                                if (detail.total_active_stock > 0) return;
+
                                                                 if (e.target.tagName === 'BUTTON' || e.target.closest('.action-row') || e.target.closest('.card-select-col') || e.target.type === 'checkbox') {
                                                                     return;
                                                                 }

@@ -182,7 +182,7 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
                                 onChange={handleSelectChange}
                                 onCreateOption={(val) => handleCreateOption(val, 'subcategory')}
                                 name="id_sub_kategori"
-                                placeholder="Pilih / ketik sub-kategori..."
+                                placeholder="Pilih / ketik sub-kategori / merk..."
                             />
                         </div>
                     </div>

@@ -1947,6 +1947,7 @@ body.dark-mode .btn-upload-option.btn-camera {
   border-color: rgba(37, 99, 235, 0.3);
   color: #60a5fa;
 }
+
 body.dark-mode .btn-upload-option.btn-camera:hover {
   border-color: #3b82f6;
   background-color: rgba(37, 99, 235, 0.2);
@@ -1957,6 +1958,7 @@ body.dark-mode .btn-upload-option.btn-gallery {
   border-color: rgba(148, 163, 184, 0.3);
   color: #cbd5e1;
 }
+
 body.dark-mode .btn-upload-option.btn-gallery:hover {
   border-color: #94a3b8;
   background-color: rgba(148, 163, 184, 0.2);
@@ -1966,10 +1968,10 @@ body.dark-mode .btn-upload-option.btn-gallery:hover {
   position: absolute;
   top: -12px;
   right: -12px;
-  width: 30px;   
+  width: 30px;
   height: 30px;
   border-radius: 50%;
-  background-color: #f11b1b; 
+  background-color: #f11b1b;
   color: white;
   border: 2px solid white;
   cursor: pointer;
@@ -1979,7 +1981,7 @@ body.dark-mode .btn-upload-option.btn-gallery:hover {
   padding: 0;
   font-size: 14px;
   font-weight: bold;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease;
   z-index: 10;
 }
@@ -2916,6 +2918,8 @@ body.dark-mode .user-table tbody tr:hover {
   overflow: hidden;
   border-collapse: separate;
   border-spacing: 0;
+  width: 100%;
+
 }
 
 .user-history-table th {
@@ -3556,9 +3560,9 @@ body.dark-mode .btn-delete:hover {
   border-color: #c53030;
 }
 
-.btn-link-back{
+.btn-link-back {
   margin-top: 20px;
-  text-align: center !important; 
+  text-align: center !important;
   color: #f9f9f9;
   padding: 10px;
   border-radius: 5px;
@@ -3633,10 +3637,10 @@ body.dark-mode .btn-delete:hover {
 .history-tab {
   background-color: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
-  padding: 2rem;
-  border-radius: 12px;
+  padding: 2rem !important;
+  border-radius: 12px !important;
   box-shadow: 0px 0px 100px 0px rgba(83, 83, 83, 1);
-  -webkit-box-shadow: 0px 0px 100px 0px rgba(83, 83, 83, 1);
+  -webkit-box-shadow: 0px 0px 100px 0px rgba(83, 83, 83, 1) !important;
   -moz-box-shadow: 0px 0px 100px 0px rgba(83, 83, 83, 1);
   animation: fadeSlideIn 0.6s ease-out;
 }
@@ -6503,7 +6507,6 @@ body.dark-mode .welcome-title {
   .time-wrapper,
   .input-dateuser {
     flex: 1 1 30%;
-    /* 3 kolom seimbang */
     min-width: 160px;
   }
 
@@ -6565,7 +6568,6 @@ body.dark-mode .welcome-title {
 
   .header-logo {
     max-height: 50px;
-    /* logo lebih besar agar jelas */
   }
 
   .user-view-container {
@@ -6575,7 +6577,7 @@ body.dark-mode .welcome-title {
 
   .request-tab,
   .history-tab {
-    padding: 0.8rem;
+    padding: 0.8rem !important;
     text-align: center;
   }
 
@@ -6593,15 +6595,53 @@ body.dark-mode .welcome-title {
   .user-history-table th,
   .user-history-table td,
   .user-history-table tr {
-    display: block;
     width: 100%;
+  }
+
+  .user-history-table {
+    border-collapse: collapse;
   }
 
   .user-history-table thead {
     display: none;
   }
 
-  /* Card style tiap row */
+  .job-list .user-history-table tbody tr {
+    display: block;
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .job-list .user-history-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: right !important;
+    width: 100% !important;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 14px;
+  }
+
+  .job-list .user-history-table tbody td:last-child {
+    border-bottom: none;
+    justify-content: flex-end;
+    padding-top: 15px;
+  }
+
+  .job-list .user-history-table tbody td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: #a0aec0;
+    text-align: left;
+    width: 40%;
+    display: inline-block;
+  }
+
   .user-history-table tr {
     margin-bottom: 15px;
     background: rgba(255, 255, 255, 0.05);
@@ -10222,8 +10262,19 @@ body.dark-mode .form-group-recover textarea:focus {
 ==========================================================================
 */
 
+@media (max-width: 1008px) {
+
+  input[type="date"],
+  input[type="time"] {
+    appearance: none  ;
+    min-height: 45px;
+    position: relative;
+    color: #212529 !important;
+  }
+}
+
 .filter-select-date {
-  position: relative;
+  position: relative ;
   height: 44px;
   width: 100%;
   padding: 0.5rem 1rem;
@@ -10244,13 +10295,7 @@ body.dark-mode .form-group-recover textarea:focus {
 
 .filter-select-date::-webkit-datetime-edit-fields-wrapper,
 .filter-select-date::-webkit-datetime-edit-text {
-  color: var(--text-primary, #212529);
-  display: none !important;
-}
-
-.filter-select-date::before {
-  content: "dd/mm/yyyy";
-  color: #a0a0a0;
+  color: var(--text-primary, #212529) !important;
 }
 
 .filter-select-date::-webkit-inner-spin-button,
@@ -10266,6 +10311,7 @@ body.dark-mode .form-group-recover textarea:focus {
   width: 16px;
   height: 16px;
   cursor: pointer;
+  pointer-events: all;
   -webkit-appearance: none;
   appearance: none;
   background-color: #343a40 !important;
@@ -10279,18 +10325,21 @@ body.dark-mode .form-group-recover textarea:focus {
   background-color: #343a40;
 }
 
+/* Focus */
 .filter-select-date:focus {
   outline: none;
   border-color: var(--input-focus-border, #86b7fe);
   box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
 }
 
+/* Disabled */
 .filter-select-date:disabled {
   background-color: var(--input-disabled-bg, #e9ecef);
   opacity: 0.7;
   cursor: not-allowed;
 }
 
+/* DARK MODE */
 .dark-mode .filter-select-date {
   background-color: rgba(71, 85, 105, 0.25) !important;
   color: #e2e8f0;
@@ -10306,6 +10355,7 @@ body.dark-mode .form-group-recover textarea:focus {
   background-color: #343a40;
 }
 
+/* ICON untuk dark mode */
 .dark-mode .filter-select-date::-webkit-calendar-picker-indicator {
   background-color: #E2E8F0 !important;
 }
@@ -10314,6 +10364,13 @@ body.dark-mode .form-group-recover textarea:focus {
   background-color: #e9ecef !important;
 }
 
+.filter-select-date::placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+.dark-mode .filter-select-date::placeholder {
+  color: #94a3b8;
+}
 
 /* ===========================================================
    3. Dropdown Styling (.filter-select-invent)
@@ -13967,6 +14024,18 @@ body.dark-mode .detail-list-footer-centered {
   flex-shrink: 0;
 }
 
+.filter-select-date:placeholder-shown::before {
+  content: attr(placeholder);
+  color: #a0a0a0;
+  position: absolute;
+  left: 16px;
+  pointer-events: none;
+}
+
+.filter-select-date:not(:placeholder-shown)::before {
+  content: "";
+}
+
 @media (max-width: 768px) {
 
   .btn-toggle-filters {
@@ -14013,6 +14082,29 @@ body.dark-mode .detail-list-footer-centered {
   .date-range-container .filter-select-date {
     flex: 1;
     width: auto;
+  }
+
+  .filter-select-date:required:invalid::-webkit-datetime-edit {
+    color: transparent;
+  }
+  .filter-select-date:required:invalid::before {
+    content: "dd/mm/yyyy";
+    color: #9CA3AF;
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; 
+    font-size: 0.9rem;
+    font-family: inherit;
+  }
+
+  .filter-select-date:required:invalid {
+    box-shadow: none;
+  }
+
+  body.dark-mode .filter-select-date:required:invalid::before {
+    color: #64748B;
   }
 
   .sku-add-button-container {

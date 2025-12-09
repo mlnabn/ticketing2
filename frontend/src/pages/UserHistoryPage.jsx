@@ -3,8 +3,6 @@ import { format } from 'date-fns';
 import { useAuth } from '../AuthContext';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Import Modals
 import ConfirmationModalUser from '../components/ConfirmationModalUser';
 import RejectionInfoModal from '../components/RejectionInfoModal';
 import ViewProofModal from '../components/ViewProofModal';
@@ -128,7 +126,6 @@ export default function UserHistoryPage() {
         }, 60000);
         return () => clearInterval(intervalId);
     }, [fetchCreatedTickets]);
-
     const columnStyles = {
         col1: { width: '200px', textAlign: 'center' },
         col2: { width: '100px', textAlign: 'center' },
@@ -152,35 +149,35 @@ export default function UserHistoryPage() {
             initial="hidden"
             animate="visible"
             exit="exit"
+            style={{ padding: '0 10px' }} 
         >
-            <motion.h2 variants={itemVariants}>Your Tickets</motion.h2>
+            <motion.h2 variants={itemVariants} style={{ marginBottom: '20px' }}>Your Tickets</motion.h2>
+            <div className="desktop-header-container">
+                <table className="job-table-user user-history-table" style={{ tableLayout: 'fixed', width: '100%' }}>
+                    <thead>
+                        <tr>
+                            <th style={columnStyles.col1}>Deskripsi</th>
+                            <th style={columnStyles.col2}>Workshop</th>
+                            <th style={columnStyles.col3}>Tanggal Dibuat</th>
+                            <th style={columnStyles.col4}>Waktu Pengerjaan</th>
+                            <th style={columnStyles.col5}>Status</th>
+                            <th style={columnStyles.col6}>Aksi</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
 
-            {/* Table Header (Static) */}
-            <table className="job-table-user user-history-table" style={{ tableLayout: 'fixed', minWidth: '870px' }}>
-                <thead>
-                    <tr>
-                        <th style={columnStyles.col1}>Deskripsi</th>
-                        <th style={columnStyles.col2}>Workshop</th>
-                        <th style={columnStyles.col3}>Tanggal Dibuat</th>
-                        <th style={columnStyles.col4}>Waktu Pengerjaan</th>
-                        <th style={columnStyles.col5}>Status</th>
-                        <th style={columnStyles.col6}>Aksi</th>
-                    </tr>
-                </thead>
-            </table>
-
-            {/* Table Body (Scrollable) */}
             <motion.div
                 className="job-list table-body-scroll"
                 ref={historyListRef}
                 onScroll={handleScroll}
-                style={{ marginTop: '20px', maxHeight: '60vh', overflowY: 'auto' }}
+                style={{ marginTop: '0px', maxHeight: '60vh', overflowY: 'auto' }}
                 variants={itemVariants}
             >
-                <table className="job-table-user user-history-table">
+                <table className="job-table-user user-history-table" style={{ width: '100%' }}>
                     <tbody>
                         {!createdTicketsData ? (
-                            <tr><td colSpan="6">Memuat riwayat tiket...</td></tr>
+                            <tr><td colSpan="6" style={{textAlign: 'center', padding: '20px'}}>Memuat riwayat tiket...</td></tr>
                         ) : createdTicketsOnPage.length > 0 ? (
                             createdTicketsOnPage.map(ticket => (
                                 <tr
@@ -191,8 +188,12 @@ export default function UserHistoryPage() {
                                     <td data-label="Deskripsi" style={columnStyles.col7}>
                                         <span className="description-cell">{ticket.title}</span>
                                     </td>
-                                    <td data-label="Workshop" style={columnStyles.col8}>{ticket.workshop ? ticket.workshop.name : 'N/A'}</td>
-                                    <td data-label="Tanggal Dibuat" style={columnStyles.col9}>{format(new Date(ticket.created_at), 'dd MMM yyyy')}</td>
+                                    <td data-label="Workshop" style={columnStyles.col8}>
+                                        {ticket.workshop ? ticket.workshop.name : 'N/A'}
+                                    </td>
+                                    <td data-label="Tanggal Dibuat" style={columnStyles.col9}>
+                                        {format(new Date(ticket.created_at), 'dd MMM yyyy')}
+                                    </td>
                                     <td data-label="Waktu Pengerjaan" style={columnStyles.col10}>
                                         {(() => {
                                             if (ticket.started_at) {
@@ -206,56 +207,60 @@ export default function UserHistoryPage() {
                                         })()}
                                     </td>
                                     <td data-label="Status" style={columnStyles.col11}>
-                                        <span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>{ticket.status}</span>
+                                        <span className={`status-badge status-${ticket.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                                            {ticket.status}
+                                        </span>
                                     </td>
                                     <td data-label="Aksi" style={columnStyles.col12}>
-                                        {ticket.status === 'Selesai' && ticket.proof_description ? (
-                                            <motion.button
-                                                variants={buttonHoverTap}
-                                                whileHover="hover"
-                                                whileTap="tap"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setTicketToShowProof(ticket);
-                                                    setShowViewProofModal(true);
-                                                }}
-                                                className="btn-action btn-start">
-                                                Lihat Bukti
-                                            </motion.button>
-                                        ) : ticket.status === 'Ditolak' ? (
-                                            <motion.button
-                                                variants={buttonHoverTap}
-                                                whileHover="hover"
-                                                whileTap="tap"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setTicketToShowReason(ticket);
-                                                    setShowRejectionInfoModal(true);
-                                                }}
-                                                className="btn-action btn-start">
-                                                Alasan
-                                            </motion.button>
-                                        ) : (
-                                            <motion.button
-                                                variants={buttonHoverTap}
-                                                whileHover="hover"
-                                                whileTap="tap"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDeleteClick(ticket);
-                                                }}
-                                                className="btn-action btn-delete-small">
-                                                Hapus
-                                            </motion.button>
-                                        )}
+                                        <div style={{ display: 'flex', justifyContent: 'center', gap: '5px' }}>
+                                            {ticket.status === 'Selesai' && ticket.proof_description ? (
+                                                <motion.button
+                                                    variants={buttonHoverTap}
+                                                    whileHover="hover"
+                                                    whileTap="tap"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setTicketToShowProof(ticket);
+                                                        setShowViewProofModal(true);
+                                                    }}
+                                                    className="btn-action btn-start">
+                                                    Lihat Bukti
+                                                </motion.button>
+                                            ) : ticket.status === 'Ditolak' ? (
+                                                <motion.button
+                                                    variants={buttonHoverTap}
+                                                    whileHover="hover"
+                                                    whileTap="tap"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setTicketToShowReason(ticket);
+                                                        setShowRejectionInfoModal(true);
+                                                    }}
+                                                    className="btn-action btn-start">
+                                                    Alasan
+                                                </motion.button>
+                                            ) : (
+                                                <motion.button
+                                                    variants={buttonHoverTap}
+                                                    whileHover="hover"
+                                                    whileTap="tap"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDeleteClick(ticket);
+                                                    }}
+                                                    className="btn-action btn-delete-small">
+                                                    Hapus
+                                                </motion.button>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))
                         ) : (
-                            <tr><td colSpan="6">Anda belum membuat tiket.</td></tr>
+                            <tr><td colSpan="6" style={{textAlign: 'center', padding: '20px'}}>Anda belum membuat tiket.</td></tr>
                         )}
                         {isLoadingMore && (
-                            <tr><td colSpan="6" style={{ textAlign: 'center' }}>Memuat lebih banyak...</td></tr>
+                            <tr><td colSpan="6" style={{ textAlign: 'center', padding: '10px' }}>Memuat lebih banyak...</td></tr>
                         )}
                     </tbody>
                 </table>
@@ -275,7 +280,8 @@ export default function UserHistoryPage() {
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         color: '#FFFFFF',
-                        width: '99%'
+                        width: '100%', 
+                        boxSizing: 'border-box' 
                     }}
                 >
                     <span style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF' }}>Total Tiket Saya</span>
@@ -283,7 +289,6 @@ export default function UserHistoryPage() {
                 </motion.div>
             )}
 
-            {/* Modals */}
             <AnimatePresence>
                 {showViewProofModal && ticketToShowProof && (
                     <ViewProofModal

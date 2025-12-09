@@ -126,10 +126,15 @@ function StokBarangView() {
     const [expandingId, setExpandingId] = useState(null);
     const [tersediaStatusId, setTersediaStatusId] = useState(null);
     const [currentFilters, setCurrentFilters] = useState(() => {
+        const initialState = {
+            status_id: 'ALL' // Default wajib 'ALL'
+        };
+        
         if (location.state?.initialSearchTerm) {
-            return { search: location.state.initialSearchTerm };
+            initialState.search = location.state.initialSearchTerm;
         }
-        return {};
+        
+        return initialState;
     });
 
     // --- State untuk Print QR ---
@@ -288,6 +293,8 @@ function StokBarangView() {
             id_warna: selectedColor,
             search: debouncedSearchTerm,
         };
+        setDetailItems({}); 
+        setExpandedRows({});
         fetchData(1, filters);
     }, [selectedCategory, selectedSubCategory, selectedStatus, selectedColor, debouncedSearchTerm, fetchData, isPresent]);
 

@@ -430,6 +430,7 @@ export default function ActiveLoanReportPage() {
                                         value={filters.start_date}
                                         onChange={handleFilterChange}
                                         className="filter-select-date"
+                                        required
                                     />
                                     <span style={{ alignSelf: 'center' }}>-</span>
                                     <input
@@ -439,6 +440,7 @@ export default function ActiveLoanReportPage() {
                                         onChange={handleFilterChange}
                                         className="filter-select-date"
                                         min={filters.start_date || undefined}
+                                        required
                                     />
                                 </motion.div>
                             )}

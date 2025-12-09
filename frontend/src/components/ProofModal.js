@@ -111,6 +111,7 @@ function ProofModal({ show, ticket, onSave, onClose }) {
               rows="4"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              placeholder="Contoh: Laptop sudah diperbaiki dengan mengganti RAM yang rusak."
               required
               className="detail-edit-textarea"
             ></textarea>

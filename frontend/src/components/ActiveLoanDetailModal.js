@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDuration }) {
@@ -7,6 +8,7 @@ function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDurat
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const [currentItem, setCurrentItem] = useState(item);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (show) {
@@ -40,6 +42,19 @@ function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDurat
                 });
         }
     }, [show, item]);
+
+    const handleCheckStockClick = () => {
+        onClose();
+        const searchTerm = currentItem?.kode_unik || fullDetail?.kode_unik;
+
+        if (searchTerm) {
+            navigate('/admin/stock', {
+                state: {
+                    initialSearchTerm: searchTerm
+                },
+            });
+        }
+    };
 
     if (!shouldRender) return null;
     if (!currentItem) return null;
@@ -122,7 +137,8 @@ function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDurat
                     )}
                 </div>
                 <div className="modal-footer-user">
-                    <button onClick={onClose} className="btn-cancel">Tutup</button>
+                    <button onClick={onClose} className="btn-cancel" style={{ marginRight: '10px' }}>Tutup</button>
+                    <button onClick={handleCheckStockClick} className="btn-confirm">Lihat di Stok</button>
                 </div>
             </div>
         </div>
