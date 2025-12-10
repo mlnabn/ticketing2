@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { QRCodeSVG as QRCode } from 'qrcode.react';
+import imageCompression from 'browser-image-compression'; 
+import { FaCamera, FaImage } from 'react-icons/fa';
 import api from '../services/api';
 import EditStokBarangModal from './EditStokBarangModal';
 import HistoryModal from './HistoryModal';
@@ -30,6 +32,10 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
     const [stockByColor, setStockByColor] = useState([]);
     const [showHistory, setShowHistory] = useState(false);
 
+    const [image, setImage] = useState(null);
+    const [preview, setPreview] = useState(null);
+    const [isCompressing, setIsCompressing] = useState(false);
+
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const [currentItem, setCurrentItem] = useState(item);
@@ -39,12 +45,16 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
             setCurrentItem(item);
             setShouldRender(true);
             setIsClosing(false);
+            setImage(null);
+            setPreview(null);
         } else if (shouldRender && !isClosing) {
             setIsClosing(true);
             const timer = setTimeout(() => {
                 setIsClosing(false);
                 setShouldRender(false);
                 setIsEditing(false);
+                setImage(null);
+                setPreview(null);
             }, 300);
             return () => clearTimeout(timer);
         }
@@ -92,6 +102,34 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
         }
     }, [currentItem]);
 
+    const handleImageChange = async (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const originalFile = e.target.files[0];
+            if (!originalFile.type.startsWith('image/')) {
+                showToast('Mohon upload file gambar.', 'error');
+                return;
+            }
+            setIsCompressing(true);
+            const options = {
+                maxSizeMB: 0.5,
+                maxWidthOrHeight: 1280,
+                useWebWorker: true,
+                initialQuality: 0.7,
+                fileType: "image/jpeg"
+            };
+            try {
+                const compressedFile = await imageCompression(originalFile, options);
+                setImage(compressedFile);
+                setPreview(URL.createObjectURL(compressedFile));
+            } catch (error) {
+                console.error("Gagal kompresi:", error);
+                showToast("Gagal memproses gambar.", 'error');
+            } finally {
+                setIsCompressing(false);
+            }
+        }
+    };
+
     const selectedStatusName = useMemo(() => {
         if (isEditing) {
             const selectedStatus = statusOptions.find(s => s.id === Number(formData.status_id));
@@ -115,8 +153,20 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
 
     const handleSave = async () => {
         setIsLoading(true);
+        const dataToSend = new FormData();
+
+        Object.keys(formData).forEach(key => {
+            if (formData[key] !== null && formData[key] !== undefined) {
+                dataToSend.append(key, formData[key]);
+            }
+        });
+
+        if (selectedStatusName === 'Digunakan' && image) {
+            dataToSend.append('bukti_foto', image);
+        }
+
         try {
-            await api.post(`/inventory/stock-items/${currentItem.id}/update-status`, formData);
+            await api.post(`/inventory/stock-items/${currentItem.id}/update-status`, dataToSend);
             showToast('Status barang berhasil diupdate.', 'success');
             onSaveSuccess();
             handleCloseClick();
@@ -140,6 +190,47 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
 
         switch (selectedStatusName) {
             case 'Digunakan':
+                return (
+                    <div className="form-row2">
+                        <div className="info-row"><span className="info-label">Digunakan Oleh</span>
+                            <select name="user_peminjam_id" value={formData.user_peminjam_id} onChange={handleChange} className="detail-edit-select">
+                                <option value="">Pilih Pengguna</option>
+                                {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                            </select>
+                        </div>
+                        <div className="info-row"><span className="info-label">Di Workshop</span>
+                            <select name="workshop_id" value={formData.workshop_id} onChange={handleChange} className="detail-edit-select">
+                                <option value="">Pilih Workshop</option>
+                                {workshops.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
+                            </select>
+                        </div>
+                        <div className="info-row"><span className="info-label">Tanggal Keluar</span>
+                            <input type="date" name="tanggal_keluar" value={formData.tanggal_keluar || ''} onChange={handleChange} className="detail-edit-input" placeholder="Otomatis hari ini jika kosong" />
+                        </div>
+                        {commonDescription('Deskripsi Peminjaman')}
+                        <div className="info-row full-width" style={{marginTop:'10px'}}>
+                            <span className="info-label" style={{marginBottom:'5px', display:'block'}}>Bukti Penggunaan (Foto)</span>
+                            <input id="camera-input" type="file" accept="image/*" capture="environment" onChange={handleImageChange} disabled={isCompressing} style={{ display: 'none' }} />
+                            <input id="gallery-input" type="file" accept="image/*" onChange={handleImageChange} disabled={isCompressing} style={{ display: 'none' }} />
+                            
+                            <div className="upload-options-container" style={{display: 'flex', gap: '10px'}}>
+                                <label htmlFor="camera-input" className={`btn-upload-option btn-camera ${isCompressing ? 'disabled' : ''}`} style={{cursor:'pointer', padding:'8px 12px', background:'#eee', borderRadius:'8px', display:'flex', alignItems:'center', gap:'5px'}}>
+                                    <FaCamera /> <span>Ambil Foto</span>
+                                </label>
+                                <label htmlFor="gallery-input" className={`btn-upload-option btn-gallery ${isCompressing ? 'disabled' : ''}`} style={{cursor:'pointer', padding:'8px 12px', background:'#eee', borderRadius:'8px', display:'flex', alignItems:'center', gap:'5px'}}>
+                                    <FaImage /> <span>Galeri</span>
+                                </label>
+                            </div>
+                            {isCompressing && <small>Sedang memproses gambar...</small>}
+                            {preview && (
+                                <div style={{marginTop:'10px', position:'relative', width:'fit-content'}}>
+                                    <img src={preview} alt="Preview" style={{maxHeight:'150px', borderRadius:'8px', border:'1px solid #ddd'}} />
+                                    <button type="button" onClick={()=>{setImage(null); setPreview(null);}} style={{position:'absolute', top:-5, right:-5, background:'red', color:'white', border:'none', borderRadius:'50%', width:'20px', height:'20px', cursor:'pointer'}}>x</button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
             case 'Dipinjam':
                 return (
                     <div className="form-row2">
@@ -243,18 +334,6 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
                         <div className="info-row"><span className="info-label">Harga Beli</span><span className="info-value-info">{`Rp ${Number(currentItem.harga_beli).toLocaleString('id-ID')}`}</span></div>
                         <div className="info-row"><span className="info-label">Tanggal Pembelian</span><span className="info-value-info">{new Date(currentItem.tanggal_pembelian).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>
 
-                        <div className="info-row">
-                            <span className="info-label">Status Stok</span>
-                            <span className="info-value-info">
-                                {isEditing ? (
-                                    <select name="status_id" value={formData.status_id} onChange={handleChange} className="detail-edit-select">
-                                        <option value="">Pilih Status</option>
-                                        {statusOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.nama_status}</option>)}
-                                    </select>
-                                ) : (currentItem.status_detail?.nama_status || 'N/A')}
-                            </span>
-                        </div>
-
                         {stockByColor.length > 0 && (
                             <div className="info-row full-width stock-detail-info">
                                 <span className="info-label">Rincian Stok per Warna</span>
@@ -269,8 +348,30 @@ function ItemDetailModal({ show, item, onClose, onSaveSuccess, showToast, onEdit
                             </div>
                         )}
 
+                        <div className="info-row">
+                            <span className="info-label">Status Stok</span>
+                            <span className="info-value-info">
+                                {isEditing ? (
+                                    <select name="status_id" value={formData.status_id} onChange={handleChange} className="detail-edit-select">
+                                        <option value="">Pilih Status</option>
+                                        {statusOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.nama_status}</option>)}
+                                    </select>
+                                ) : (currentItem.status_detail?.nama_status || 'N/A')}
+                            </span>
+                        </div>
+
                         {!isEditing && (
                             <>
+                                {currentItem.bukti_foto_path && (
+                                    <div className="info-row full-width" style={{display:'flex', flexDirection:'column', alignItems:'center', margin:'10px 0'}}>
+                                        <span className="info-label" style={{alignSelf:'flex-start'}}>Bukti Foto</span>
+                                        <img 
+                                            src={`${api.defaults.baseURL.replace('/api', '')}/storage/${currentItem.bukti_foto_path}`} 
+                                            alt="Bukti Aset" 
+                                            style={{maxWidth:'100%', maxHeight:'200px', borderRadius:'8px', border:'1px solid #ddd', marginTop:'5px'}} 
+                                        />
+                                    </div>
+                                )}
                                 {(currentItem.status_detail?.nama_status === 'Digunakan' || currentItem.status_detail?.nama_status === 'Dipinjam') && (
                                     <>
                                         <div className="info-row">

@@ -56,6 +56,12 @@ function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDurat
         }
     };
 
+    const getImageUrl = (path) => {
+        if (!path) return null;
+        const baseUrl = api.defaults.baseURL.replace('/api', '');
+        return `${baseUrl}/storage/${path}`;
+    };
+
     if (!shouldRender) return null;
     if (!currentItem) return null;
     const animationClass = isClosing ? 'closing' : '';
@@ -132,6 +138,31 @@ function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDurat
                                         {fullDetail.deskripsi || '(Tidak ada keterangan)'}
                                     </span>
                                 </div>
+                                {fullDetail.bukti_foto_path && (
+                                    <div className="detail-item-full" data-span="2" style={{ marginTop: '10px' }}>
+                                        <span className="label" style={{ marginBottom: '8px', display: 'block' }}>Bukti Peminjaman / Kondisi Awal</span>
+                                        <div style={{ 
+                                            border: '1px solid #eee', 
+                                            borderRadius: '8px', 
+                                            padding: '5px',
+                                            display: 'inline-block',
+                                            backgroundColor: '#f9f9f9'
+                                        }}>
+                                            <img 
+                                                src={getImageUrl(fullDetail.bukti_foto_path)} 
+                                                alt="Bukti Foto" 
+                                                style={{ 
+                                                    maxWidth: '100%', 
+                                                    maxHeight: '300px', 
+                                                    borderRadius: '6px',
+                                                    display: 'block'
+                                                }} 
+                                                onClick={() => window.open(getImageUrl(fullDetail.bukti_foto_path), '_blank')}
+                                                title="Klik untuk memperbesar"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </>
                     )}

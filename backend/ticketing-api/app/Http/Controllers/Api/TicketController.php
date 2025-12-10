@@ -741,7 +741,7 @@ class TicketController extends Controller
     {
         $request->validate([
             'proof_description' => 'required|string',
-            'proof_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'proof_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024',
         ]);
 
         $ticket = Ticket::findOrFail($id);
@@ -861,7 +861,7 @@ class TicketController extends Controller
 
         $borrowedItems = StokBarang::with('masterBarang:id_m_barang,nama_barang')
             ->whereIn('id', $borrowedItemIds)
-            ->select('id', 'master_barang_id', 'kode_unik')
+            ->select('id', 'master_barang_id', 'kode_unik', 'bukti_foto_path')
             ->get();
 
         return response()->json($borrowedItems);
@@ -884,17 +884,22 @@ class TicketController extends Controller
             'items.*.user_digunakan_id' => 'nullable|exists:users,id',
             'items.*.user_rusak_id' => 'nullable|exists:users,id',
             'items.*.user_hilang_id' => 'nullable|exists:users,id',
+            'items.*.bukti_foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024',
         ]);
 
-        DB::transaction(function () use ($ticket, $validated) {
+        DB::transaction(function () use ($ticket, $validated, $request) {
             $adminId = Auth::id();
 
-            foreach ($validated['items'] as $itemData) {
+            foreach ($validated['items'] as $index => $itemData) {
                 $stokBarang = StokBarang::find($itemData['stok_barang_id']);
                 $newStatus = \App\Models\Status::find($itemData['status_id']);
 
-                if ($stokBarang && $stokBarang->ticket_id === $ticket->id && $newStatus) {
+                if (!$stokBarang) {
+                    Log::error("Stok barang ID {$itemData['stok_barang_id']} tidak ditemukan.");
+                    continue;
+                }
 
+                if ($newStatus) {
                     $updateData = [
                         'status_id' => $newStatus->id,
                         'deskripsi' => $itemData['keterangan'] ?: null,
@@ -907,6 +912,12 @@ class TicketController extends Controller
                         'user_penghilang_id' => null,
                         'tanggal_hilang' => null,
                     ];
+
+                    $path = null;
+                    if ($request->hasFile("items.{$index}.bukti_foto")) {
+                        $path = $request->file("items.{$index}.bukti_foto")->store('bukti_stok', 'public');
+                        $updateData['bukti_foto_path'] = $path;
+                    }
 
                     $relatedUserId = null;
 
@@ -930,6 +941,10 @@ class TicketController extends Controller
                             $updateData['tanggal_hilang'] = now();
                             $relatedUserId = $responsibleUserId;
                             break;
+                        case 'Tersedia':
+                            $updateData['user_peminjam_id'] = null;
+                            $updateData['workshop_id'] = null;
+                            break;
                     }
 
                     $stokBarang->update($updateData);
@@ -941,13 +956,18 @@ class TicketController extends Controller
                         'related_user_id' => $relatedUserId,
                         'workshop_id' => $updateData['workshop_id'],
                         'event_date' => now(),
+                        'bukti_foto_path' => $path,
                     ]);
                 }
             }
 
             $ticket->update(['status' => 'Selesai', 'completed_at' => now()]);
         });
-        $this->sendUserStatusNotification($ticket, 'Selesai', 'Tiket telah diselesaikan.');
+        try {
+            $this->sendUserStatusNotification($ticket, 'Selesai', 'Tiket telah diselesaikan.');
+        } catch (\Exception $e) {
+            Log::error("Notifikasi WA gagal: " . $e->getMessage());
+        }
         return response()->json($ticket->load(['user', 'creator', 'masterBarangs']));
     }
 

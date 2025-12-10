@@ -113,6 +113,11 @@ function ItemHistoryLookupPage() {
             day: '2-digit', month: 'long', year: 'numeric'
         });
     };
+    const getImageUrl = (path) => {
+        if (!path) return null;
+        const baseUrl = api.defaults.baseURL.replace('/api', '');
+        return `${baseUrl}/storage/${path}`;
+    };
 
     const getApiParams = useCallback((page = 1) => {
         const baseParams = {
@@ -761,6 +766,31 @@ function ItemHistoryLookupPage() {
                                                     <div className="info-row full-width">
                                                         <span className="info-label">Catatan</span>
                                                         <span className="info-value-info" style={{ whiteSpace: 'pre-wrap' }}>{log.deskripsi}</span>
+                                                    </div>
+                                                )}
+                                                {log.bukti_foto_path && (
+                                                    <div className="info-row full-width" style={{ marginTop: '5px' }}>
+                                                        <span className="info-label" style={{marginBottom:'5px', display:'block'}}>Bukti Foto</span>
+                                                        <div style={{
+                                                            width: 'fit-content',
+                                                            border: '1px solid #e2e8f0',
+                                                            padding: '5px',
+                                                            borderRadius: '8px',
+                                                            backgroundColor: '#f8fafc'
+                                                        }}>
+                                                            <img 
+                                                                src={getImageUrl(log.bukti_foto_path)} 
+                                                                alt="Bukti Riwayat" 
+                                                                style={{ 
+                                                                    maxWidth: '100%', 
+                                                                    maxHeight: '150px', // Tidak terlalu tinggi
+                                                                    borderRadius: '6px',
+                                                                    cursor: 'pointer' 
+                                                                }}
+                                                                onClick={() => window.open(getImageUrl(log.bukti_foto_path), '_blank')}
+                                                                title="Klik untuk memperbesar"
+                                                            />
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>

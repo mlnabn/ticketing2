@@ -57,6 +57,12 @@ function TicketDetailModal({ show, ticket, onClose }) {
         }
     }, [show, ticket]);
 
+    const getImageUrl = (path) => {
+        if (!path) return null;
+        const baseUrl = api.defaults.baseURL.replace('/api', '');
+        return `${baseUrl}/storage/${path}`;
+    };
+
     const handleCloseClick = () => {
         if (onClose) {
             onClose();
@@ -161,20 +167,48 @@ function TicketDetailModal({ show, ticket, onClose }) {
                     )}
 
                     <div className="detail-item-full" data-span="2">
-                        <span className="label">Barang yang Dipinjam</span>
+                        <span className="label">Barang Terkait / Dipinjam</span>
                         {isLoadingItems ? (
                             <p className="value">Memuat data barang...</p>
                         ) : borrowedItems.length > 0 ? (
-                            <ul className="borrowed-items-list">
+                            <ul className="borrowed-items-list" style={{ listStyle: 'none', padding: 0 }}>
                                 {borrowedItems.map(item => (
-                                    <li key={item.id}>
-                                        <span className="tool-name">{item.master_barang.nama_barang}</span>
-                                        <span className="tool-quantity">({item.kode_unik})</span>
+                                    <li key={item.id} style={{ 
+                                        padding: '10px', 
+                                        borderBottom: '1px solid #eee',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '5px'
+                                    }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <span className="tool-name" style={{ fontWeight: '500' }}>{item.master_barang?.nama_barang}</span>
+                                            <span className="tool-quantity" style={{ fontSize: '0.9em', color: '#666' }}>({item.kode_unik})</span>
+                                        </div>
+                                        
+                                        {/* TAMPILKAN GAMBAR JIKA ADA */}
+                                        {item.bukti_foto_path && (
+                                            <div style={{ marginTop: '5px' }}>
+                                                <span style={{ fontSize: '0.8em', color: '#888', display: 'block', marginBottom: '2px' }}>Bukti Kondisi:</span>
+                                                <img 
+                                                    src={getImageUrl(item.bukti_foto_path)}
+                                                    alt="Bukti Barang" 
+                                                    style={{ 
+                                                        maxWidth: '100px', 
+                                                        height: 'auto', 
+                                                        borderRadius: '4px',
+                                                        cursor: 'pointer',
+                                                        border: '1px solid #ddd'
+                                                    }}
+                                                    onClick={() => window.open(getImageUrl(item.bukti_foto_path), '_blank')}
+                                                    title="Klik untuk memperbesar"
+                                                />
+                                            </div>
+                                        )}
                                     </li>
                                 ))}
                             </ul>
                         ) : (
-                            <p className="value">Tidak ada barang yang dipinjam untuk tiket ini.</p>
+                            <p className="value">Tidak ada barang yang tercatat untuk tiket ini.</p>
                         )}
                     </div>
 

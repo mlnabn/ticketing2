@@ -41,11 +41,12 @@ function ProofModal({ show, ticket, onSave, onClose }) {
       }
       setIsCompressing(true); 
       const options = {
-        maxSizeMB: 1,  
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-        fileType: "image/jpeg"
-      };
+                maxSizeMB: 0.5,
+                maxWidthOrHeight: 1280,
+                useWebWorker: true,
+                initialQuality: 0.7,
+                fileType: "image/jpeg"
+            };
       try {
         const compressedFile = await imageCompression(originalFile, options);
         console.log(`Original: ${(originalFile.size / 1024 / 1024).toFixed(2)} MB`);
