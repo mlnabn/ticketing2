@@ -841,26 +841,9 @@ class TicketController extends Controller
 
     public function getBorrowedItems(Ticket $ticket)
     {
-        $statusDipinjamId = DB::table('status_barang')->where('nama_status', 'Dipinjam')->value('id');
-        if (!$statusDipinjamId) {
-            Log::error('Status "Dipinjam" tidak ditemukan di status_barang.');
-            return response()->json([]);
-        }
-
-        $searchDescription = 'Dipinjam untuk tiket: ' . $ticket->kode_tiket;
-
-        $borrowedItemIds = DB::table('stok_barang_histories')
-            ->where('status_id', $statusDipinjamId)
-            ->where('deskripsi', $searchDescription)
-            ->distinct()
-            ->pluck('stok_barang_id');
-
-        if ($borrowedItemIds->isEmpty()) {
-            return response()->json([]);
-        }
-
+        // Ambil barang yang masih terkait dengan tiket ini (dipinjam/sedang digunakan)
         $borrowedItems = StokBarang::with('masterBarang:id_m_barang,nama_barang')
-            ->whereIn('id', $borrowedItemIds)
+            ->where('ticket_id', $ticket->id)
             ->select('id', 'master_barang_id', 'kode_unik', 'bukti_foto_path')
             ->get();
 
@@ -877,7 +860,7 @@ class TicketController extends Controller
             return response()->json(['error' => 'Anda tidak berhak menyelesaikan tiket yang sedang dikerjakan oleh admin lain.'], 403);
         }
         $validated = $request->validate([
-            'items' => 'present|array',
+            'items' => 'nullable|array',
             'items.*.stok_barang_id' => 'required|exists:stok_barangs,id',
             'items.*.status_id' => 'required|exists:status_barang,id',
             'items.*.keterangan' => 'nullable|string|max:1000',
@@ -889,8 +872,9 @@ class TicketController extends Controller
 
         DB::transaction(function () use ($ticket, $validated, $request) {
             $adminId = Auth::id();
+            $items = $validated['items'] ?? [];
 
-            foreach ($validated['items'] as $index => $itemData) {
+            foreach ($items as $index => $itemData) {
                 $stokBarang = StokBarang::find($itemData['stok_barang_id']);
                 $newStatus = \App\Models\Status::find($itemData['status_id']);
 
@@ -902,7 +886,7 @@ class TicketController extends Controller
                 if ($newStatus) {
                     $updateData = [
                         'status_id' => $newStatus->id,
-                        'deskripsi' => $itemData['keterangan'] ?: null,
+                        'deskripsi' => $itemData['keterangan'] ?? null,
                         'user_peminjam_id' => null,
                         'workshop_id' => null,
                         'ticket_id' => null,
@@ -951,7 +935,7 @@ class TicketController extends Controller
 
                     $stokBarang->histories()->create([
                         'status_id' => $newStatus->id,
-                        'deskripsi' => $itemData['keterangan'] ?: 'Status diubah saat pengembalian tiket: ' . $ticket->kode_tiket,
+                        'deskripsi' => ($itemData['keterangan'] ?? null) ?: 'Status diubah saat pengembalian tiket: ' . $ticket->kode_tiket,
                         'triggered_by_user_id' => $adminId,
                         'related_user_id' => $relatedUserId,
                         'workshop_id' => $updateData['workshop_id'],
