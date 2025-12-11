@@ -836,7 +836,7 @@ function ItemDetailModal({
                                         </label>
                                         <div style={{ marginTop: 10, display: 'flex', justifyContent: 'center' }}>
                                             <img
-                                                src={`http://localhost:8000/storage/${currentItem.bukti_foto_path}`}
+                                                src={`${api.defaults.baseURL.replace('/api', '')}/storage/${currentItem.bukti_foto_path}`}
                                                 alt="Bukti Stok"
                                                 style={{
                                                     maxWidth: '100%',
@@ -845,7 +845,7 @@ function ItemDetailModal({
                                                     border: '1px solid #ddd',
                                                     cursor: 'pointer'
                                                 }}
-                                                onClick={() => window.open(`http://localhost:8000/storage/${currentItem.bukti_foto_path}`, '_blank')}
+                                                onClick={() => window.open(`${api.defaults.baseURL.replace('/api', '')}/storage/${currentItem.bukti_foto_path}`, '_blank')}
                                             />
                                         </div>
                                     </div>
