@@ -11,7 +11,7 @@ class StokBarangHistory extends Model
     protected $fillable = [
         'stok_barang_id', 'status_id', 'deskripsi',
         'triggered_by_user_id', 'related_user_id', 'workshop_id',
-        'event_date'
+        'event_date', 'bukti_foto_path',
     ];
 
     protected function casts(): array

@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 
 class StokBarangController extends Controller
@@ -234,6 +235,7 @@ class StokBarangController extends Controller
             'user_penghilang_id' => 'required_if_status:Hilang|nullable|exists:users,id',
             'tanggal_hilang' => 'nullable|date',
             'tanggal_ketemu' => 'nullable|date|after_or_equal:tanggal_hilang',
+            'bukti_foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $status = \App\Models\Status::find($validated['status_id']);
@@ -261,13 +263,18 @@ class StokBarangController extends Controller
                     break;
             }
 
-            // --- 2. PERSIAPAN DATA UPDATE (TETAP SAMA) ---
             $updateData = [
                 'status_id' => $validated['status_id'],
                 'deskripsi' => $validated['deskripsi'] ?? $stokBarang->deskripsi,
             ];
 
-            // Reset semua kolom tracking terlebih dahulu
+            $path = null;
+
+            if ($request->hasFile('bukti_foto')) {
+                $path = $request->file('bukti_foto')->store('bukti_stok', 'public');
+                $updateData['bukti_foto_path'] = $path;
+            }
+
             $allTrackingColumns = [
                 'user_peminjam_id',
                 'workshop_id',
@@ -337,6 +344,7 @@ class StokBarangController extends Controller
                 'related_user_id' => $relatedUserId,
                 'workshop_id' => $validated['workshop_id'] ?? null,
                 'event_date' => $eventDate,
+                'bukti_foto_path' => $path,
             ];
 
             $stokBarang->histories()->create($historyData);

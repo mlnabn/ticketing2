@@ -380,14 +380,19 @@ function ItemListView({
                                                                                 <div
                                                                                     key={detail.id_m_barang}
                                                                                     className={`sku-detail-row-div hoverable-row ${selectedIds.includes(detail.id_m_barang) ? 'selected-row' : ''}`}
-                                                                                    style={{
-                                                                                        cursor: detail.total_active_stock > 0 ? 'not-allowed' : 'pointer',
-                                                                                        opacity: detail.total_active_stock > 0 ? 0.7 : 1
-                                                                                    }}
                                                                                     onClick={(e) => {
-                                                                                        if (detail.total_active_stock > 0) return;
+                                                                                        // Jangan buka modal kalau kliknya mengenai checkbox / tombol
+                                                                                        if (
+                                                                                            e.target.tagName === 'INPUT' ||
+                                                                                            e.target.tagName === 'BUTTON' ||
+                                                                                            e.target.closest('.action-buttons-group')
+                                                                                        ) {
+                                                                                            return;
+                                                                                        }
+
                                                                                         handleRowClick(e, detail);
                                                                                     }}
+
                                                                                 >
                                                                                     <div className="detail-cell cell-select">
                                                                                         <input
@@ -420,7 +425,7 @@ function ItemListView({
                                                                                         ) : (
                                                                                             <button
                                                                                                 onClick={(e) => { e.stopPropagation(); onDelete(detail); }}
-                                                                                                className="btn-user-action btn-dlt"
+                                                                                                className="btn-user-action btn-dlt" style={{ cursor: detail.total_active_stock > 0 ? 'not-allowed' : 'pointer' }}
                                                                                                 disabled={detail.total_active_stock > 0}
                                                                                                 title={detail.total_active_stock > 0 ? 'SKU tidak bisa diarsipkan jika masih ada stok aktif (Tersedia, Dipinjam, dll)' : 'Arsipkan SKU ini'}
                                                                                             >

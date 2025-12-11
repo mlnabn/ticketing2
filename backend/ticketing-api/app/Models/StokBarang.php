@@ -14,6 +14,7 @@ class StokBarang extends Model
         'harga_beli', 'id_warna', 'kondisi', 'user_peminjam_id', 'workshop_id', 'created_by',
         'deskripsi', 'teknisi_perbaikan_id', 'tanggal_mulai_perbaikan', 'tanggal_selesai_perbaikan',
         'user_perusak_id', 'tanggal_rusak', 'user_penghilang_id', 'tanggal_hilang', 'tanggal_ketemu',
+        'bukti_foto_path',
     ];
 
     protected function casts(): array

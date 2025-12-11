@@ -25,13 +25,18 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
-                'required', 'string', 'email', 'max:255',
-                Rule::unique('users')->where(fn ($query) => $query->whereNotNull('phone_verified_at'))
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->where(fn($query) => $query->whereNotNull('phone_verified_at'))
             ],
             'password' => 'required|string|min:6|confirmed',
             'phone' => [
-                'required', 'string', 'min:10',
-                Rule::unique('users')->where(fn ($query) => $query->whereNotNull('phone_verified_at'))
+                'required',
+                'string',
+                'min:10',
+                Rule::unique('users')->where(fn($query) => $query->whereNotNull('phone_verified_at'))
             ],
         ]);
 
@@ -48,17 +53,17 @@ class AuthController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'phone' => $phone, 
+            'phone' => $phone,
             'otp_code' => $otpCode,
             'otp_expires_at' => $otpExpiresAt,
         ];
 
         Cache::put('registration_data_' . $phone, $registrationData, now()->addMinutes(10));
-        $n8nWebhookUrl = 'http://127.0.0.1:5678/webhook/whatsapp-otp'; 
-        
+        $n8nWebhookUrl = env('N8N_WEBHOOK_OTP_URL');
+
         try {
             Http::timeout(5)->post($n8nWebhookUrl, [
-                'phone' => $phone, 
+                'phone' => $phone,
                 'otp' => $otpCode
             ]);
         } catch (\Exception $e) {
@@ -69,7 +74,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Kode verifikasi telah dikirim. Silakan cek WhatsApp Anda.',
-            'phone' => $phone 
+            'phone' => $phone
         ], 200);
     }
 
@@ -89,16 +94,16 @@ class AuthController extends Controller
         }
 
         $registrationData = Cache::get($cacheKey);
-        $registrationData['otp_code'] = (string) rand(100000, 999999); 
+        $registrationData['otp_code'] = (string) rand(100000, 999999);
         $registrationData['otp_expires_at'] = Carbon::now()->addMinutes(5);
-        
+
         Cache::put($cacheKey, $registrationData, now()->addMinutes(10));
 
-        $n8nWebhookUrl = 'http://127.0.0.1:5678/webhook/whatsapp-otp';
-        
+        $n8nWebhookUrl = env('N8N_WEBHOOK_OTP_URL');
+
         try {
             Http::timeout(5)->post($n8nWebhookUrl, [
-                'phone' => $phone, 
+                'phone' => $phone,
                 'otp' => $registrationData['otp_code']
             ]);
         } catch (\Exception $e) {
@@ -115,7 +120,7 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        if (! $access_token = auth('api')->attempt($credentials)) {
+        if (!$access_token = auth('api')->attempt($credentials)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
@@ -127,7 +132,7 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        auth('api')->logout(); 
+        auth('api')->logout();
         $response = response()->json(['message' => 'Successfully logged out'], 200);
 
         $cookie = cookie(
@@ -150,7 +155,7 @@ class AuthController extends Controller
     public function refresh()
     {
         $access_token = auth('api')->refresh();
-    
+
         $user = auth('api')->user();
 
         return $this->respondWithToken($access_token, $user);
@@ -164,11 +169,11 @@ class AuthController extends Controller
                 return response()->json(['error' => 'User not found'], 404);
             }
             return response()->json([
-                'id'         => $user->id,
-                'name'       => $user->name,
-                'email'      => $user->email,
-                'phone'      => $user->phone,
-                'role'       => $user->role,
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'role' => $user->role,
                 'avatar_url' => $user->avatar ? asset('storage/' . $user->avatar) : null,
             ]);
         } catch (\Exception $e) {
@@ -184,12 +189,12 @@ class AuthController extends Controller
         }
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => ['required','string','email','max:255',Rule::unique('users')->ignore($user->id)],
-            'phone' => ['nullable','string','min:10',Rule::unique('users')->ignore($user->id)],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'phone' => ['nullable', 'string', 'min:10', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:8|confirmed',
-            'avatar'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
-        $user->name  = $validated['name'];
+        $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->phone = $validated['phone'];
         if (!empty($validated['password'])) {
@@ -210,11 +215,11 @@ class AuthController extends Controller
         }
         $user->save();
         return response()->json([
-            'id'         => $user->id,
-            'name'       => $user->name,
-            'email'      => $user->email,
-            'phone'      => $user->phone,
-            'role'       => $user->role,
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'role' => $user->role,
             'avatar_url' => $user->avatar ? asset('storage/' . $user->avatar) : null,
         ]);
     }
@@ -228,7 +233,7 @@ class AuthController extends Controller
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
             Log::info('Google User berhasil diambil.', ['email' => $googleUser->getEmail()]);
-            
+
             $user = User::firstOrNew(['email' => $googleUser->getEmail()]);
             if (!$user->exists) {
                 $user->name = $googleUser->getName();
@@ -236,30 +241,31 @@ class AuthController extends Controller
                 $user->save();
                 Log::info('Pengguna baru dibuat.', ['id' => $user->id]);
             } else {
-                 Log::info('Pengguna ditemukan di DB.', ['id' => $user->id]);
+                Log::info('Pengguna ditemukan di DB.', ['id' => $user->id]);
             }
-            
+
             $access_token = JWTAuth::fromUser($user);
             Log::info('Access Token berhasil dibuat.', ['token_length' => strlen($access_token), 'token_ttl' => auth('api')->factory()->getTTL()]);
 
             $user_data_for_frontend = [
-                'id'         => $user->id,
-                'name'       => $user->name,
-                'email'      => $user->email,
-                'phone'      => $user->phone,
-                'role'       => $user->role,
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'role' => $user->role,
                 'avatar_url' => $user->avatar,
             ];
-            
+
             // 5. Buat URL Redirect ke Frontend
             $user_param = urlencode(json_encode($user_data_for_frontend));
             $frontend_url = env('FRONTEND_URL', 'http://localhost:3000');
             $redirect_url = $frontend_url . '/login?user=' . $user_param;
             $redirect_response = redirect($redirect_url);
             Log::info('URL Redirect berhasil dibuat.', ['url' => $redirect_url]);
-            
+
             // 6. Buat dan Set Cookie
-            $session_domain = env('SESSION_DOMAIN', 'localhost');;
+            $session_domain = env('SESSION_DOMAIN', 'localhost');
+            ;
             $cookie_secure = env('SESSION_SECURE_COOKIE', false);
             Log::info('Konfigurasi Cookie:', ['domain' => $session_domain ?? 'null', 'secure' => $cookie_secure, 'http_only' => true, 'same_site' => 'Lax']);
 
@@ -290,16 +296,16 @@ class AuthController extends Controller
     {
         $expires_in = auth('api')->factory()->getTTL() * 60;
         $user_data = [
-            'id'         => $user->id,
-            'name'       => $user->name,
-            'email'      => $user->email,
-            'phone'      => $user->phone,
-            'role'       => $user->role,
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'role' => $user->role,
             'avatar_url' => $user->avatar ? asset('storage/' . $user->avatar) : null,
         ];
 
         $response = response()->json([
-            'user'       => $user_data,
+            'user' => $user_data,
             'token_type' => 'bearer',
             'expires_in' => $expires_in,
         ]);

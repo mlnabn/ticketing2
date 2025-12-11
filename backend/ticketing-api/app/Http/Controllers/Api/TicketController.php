@@ -50,7 +50,7 @@ class TicketController extends Controller
             if (substr($phone, 0, 2) === '08') {
                 $phone = '62' . substr($phone, 1);
             }
-            Http::timeout(2)->post('http://127.0.0.1:5678/webhook/notify-user-status', [
+            Http::timeout(2)->post(env('N8N_WEBHOOK_NOTIFY_STATUS_URL'), [
                 'phone' => $phone,
                 'message' => $message
             ]);
@@ -101,11 +101,11 @@ class TicketController extends Controller
                 $query->whereIn('status', $statusFilter);
             } else {
                 $statusMap = [
-                    'Belum Selesai'     => ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'],
+                    'Belum Selesai' => ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'],
                     'Sedang Dikerjakan' => ['Sedang Dikerjakan', 'Ditunda'],
-                    'in_progress'       => ['Sedang Dikerjakan', 'Ditunda'],
-                    'completed'         => ['Selesai'],
-                    'rejected'          => ['Ditolak'],
+                    'in_progress' => ['Sedang Dikerjakan', 'Ditunda'],
+                    'completed' => ['Selesai'],
+                    'rejected' => ['Ditolak'],
                 ];
 
                 if (isset($statusMap[$statusFilter])) {
@@ -209,7 +209,7 @@ class TicketController extends Controller
 
         if ($lastTicket) {
             $lastSequencePart = substr($lastTicket->kode_tiket, strlen($prefix));
-            $lastSequenceNumber = (int)$lastSequencePart;
+            $lastSequenceNumber = (int) $lastSequencePart;
             $nextSequence = $lastSequenceNumber + 1;
         }
 
@@ -249,7 +249,7 @@ class TicketController extends Controller
             $workshopName = $ticket->workshop ? $ticket->workshop->name : 'N/A';
             $creatorName = auth()->user()->name ?? 'User Web';
 
-            Http::timeout(2)->post('http://127.0.0.1:5678/webhook/notify-admins', [
+            Http::timeout(2)->post(env('N8N_WEBHOOK_NOTIFY_ADMINS_URL'), [
                 'kode_tiket' => $ticket->kode_tiket,
                 'title' => $ticket->title,
                 'workshop_name' => $workshopName,
@@ -722,9 +722,9 @@ class TicketController extends Controller
             'ditolak' => $counts['Ditolak']->total ?? 0,
         ];
         $totalTickets = array_sum($stats);
-        $stats['pending_tickets']   = $stats['belum_dikerjakan'] + $stats['ditunda'] + $stats['sedang_dikerjakan'];
+        $stats['pending_tickets'] = $stats['belum_dikerjakan'] + $stats['ditunda'] + $stats['sedang_dikerjakan'];
         $stats['completed_tickets'] = $stats['selesai'];
-        $stats['rejected_tickets']  = $stats['ditolak'];
+        $stats['rejected_tickets'] = $stats['ditolak'];
         $stats['total_tickets'] = $totalTickets;
 
         if ($user->role === 'admin') {
@@ -741,7 +741,7 @@ class TicketController extends Controller
     {
         $request->validate([
             'proof_description' => 'required|string',
-            'proof_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'proof_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024',
         ]);
 
         $ticket = Ticket::findOrFail($id);
@@ -794,12 +794,12 @@ class TicketController extends Controller
         )->first();
 
         $result = [
-            'total'       => $isHandledReport
-                ? (int)$stats->completed + (int)$stats->in_progress
-                : (int)$stats->total_created,
-            'handled'     => (int) $stats->handled,
-            'completed'   => (int) $stats->completed,
-            'rejected'    => (int) $stats->rejected,
+            'total' => $isHandledReport
+                ? (int) $stats->completed + (int) $stats->in_progress
+                : (int) $stats->total_created,
+            'handled' => (int) $stats->handled,
+            'completed' => (int) $stats->completed,
+            'rejected' => (int) $stats->rejected,
             'in_progress' => (int) $stats->in_progress,
         ];
 
@@ -861,7 +861,7 @@ class TicketController extends Controller
 
         $borrowedItems = StokBarang::with('masterBarang:id_m_barang,nama_barang')
             ->whereIn('id', $borrowedItemIds)
-            ->select('id', 'master_barang_id', 'kode_unik')
+            ->select('id', 'master_barang_id', 'kode_unik', 'bukti_foto_path')
             ->get();
 
         return response()->json($borrowedItems);
@@ -884,17 +884,22 @@ class TicketController extends Controller
             'items.*.user_digunakan_id' => 'nullable|exists:users,id',
             'items.*.user_rusak_id' => 'nullable|exists:users,id',
             'items.*.user_hilang_id' => 'nullable|exists:users,id',
+            'items.*.bukti_foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024',
         ]);
 
-        DB::transaction(function () use ($ticket, $validated) {
+        DB::transaction(function () use ($ticket, $validated, $request) {
             $adminId = Auth::id();
 
-            foreach ($validated['items'] as $itemData) {
+            foreach ($validated['items'] as $index => $itemData) {
                 $stokBarang = StokBarang::find($itemData['stok_barang_id']);
                 $newStatus = \App\Models\Status::find($itemData['status_id']);
 
-                if ($stokBarang && $stokBarang->ticket_id === $ticket->id && $newStatus) {
+                if (!$stokBarang) {
+                    Log::error("Stok barang ID {$itemData['stok_barang_id']} tidak ditemukan.");
+                    continue;
+                }
 
+                if ($newStatus) {
                     $updateData = [
                         'status_id' => $newStatus->id,
                         'deskripsi' => $itemData['keterangan'] ?: null,
@@ -907,6 +912,12 @@ class TicketController extends Controller
                         'user_penghilang_id' => null,
                         'tanggal_hilang' => null,
                     ];
+
+                    $path = null;
+                    if ($request->hasFile("items.{$index}.bukti_foto")) {
+                        $path = $request->file("items.{$index}.bukti_foto")->store('bukti_stok', 'public');
+                        $updateData['bukti_foto_path'] = $path;
+                    }
 
                     $relatedUserId = null;
 
@@ -930,6 +941,10 @@ class TicketController extends Controller
                             $updateData['tanggal_hilang'] = now();
                             $relatedUserId = $responsibleUserId;
                             break;
+                        case 'Tersedia':
+                            $updateData['user_peminjam_id'] = null;
+                            $updateData['workshop_id'] = null;
+                            break;
                     }
 
                     $stokBarang->update($updateData);
@@ -941,14 +956,18 @@ class TicketController extends Controller
                         'related_user_id' => $relatedUserId,
                         'workshop_id' => $updateData['workshop_id'],
                         'event_date' => now(),
+                        'bukti_foto_path' => $path,
                     ]);
                 }
             }
 
             $ticket->update(['status' => 'Selesai', 'completed_at' => now()]);
         });
-        
-        $this->sendUserStatusNotification($ticket, 'Selesai', 'Tiket telah diselesaikan.');
+        try {
+            $this->sendUserStatusNotification($ticket, 'Selesai', 'Tiket telah diselesaikan.');
+        } catch (\Exception $e) {
+            Log::error("Notifikasi WA gagal: " . $e->getMessage());
+        }
         return response()->json($ticket->load(['user', 'creator', 'masterBarangs']));
     }
 

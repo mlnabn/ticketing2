@@ -21,7 +21,7 @@ function HistoryModal({ show, item, onClose, showToast, startDate, endDate }) {
             }, 300);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, item, shouldRender]);
 
     useEffect(() => {
@@ -52,6 +52,12 @@ function HistoryModal({ show, item, onClose, showToast, startDate, endDate }) {
         return new Date(dateString).toLocaleDateString('id-ID', {
             day: '2-digit', month: 'long', year: 'numeric'
         });
+    };
+
+    const getImageUrl = (path) => {
+        if (!path) return null;
+        const baseUrl = api.defaults.baseURL.replace('/api', '');
+        return `${baseUrl}/storage/${path}`;
     };
 
     const handleCloseClick = () => {
@@ -117,6 +123,32 @@ function HistoryModal({ show, item, onClose, showToast, startDate, endDate }) {
                                         </div>
                                     )}
                                 </div>
+                                {log.bukti_foto_path && (
+                                    <div className="info-row full-width" style={{ marginTop: '5px' }}>
+                                        <span className="info-label" style={{ marginBottom: '5px', display: 'block' }}>Bukti Foto</span>
+                                        <div style={{
+                                            width: 'fit-content',
+                                            border: '1px solid #e2e8f0',
+                                            padding: '5px',
+                                            borderRadius: '8px',
+                                            backgroundColor: '#f8fafc'
+                                        }}>
+                                            <img
+                                                src={getImageUrl(log.bukti_foto_path)}
+                                                alt="Bukti Riwayat"
+                                                style={{
+                                                    maxWidth: '100%',
+                                                    maxHeight: '150px',
+                                                    borderRadius: '6px',
+                                                    cursor: 'pointer',
+                                                    display: 'block'
+                                                }}
+                                                onClick={() => window.open(getImageUrl(log.bukti_foto_path), '_blank')}
+                                                title="Klik untuk memperbesar"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         ))
                     ) : (

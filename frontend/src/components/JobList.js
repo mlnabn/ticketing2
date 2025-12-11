@@ -316,14 +316,15 @@ export default function JobList() {
     }
   };
 
-  const handleConfirmReturn = async (ticketId, items) => {
+  const handleConfirmReturn = async (ticketId, formData) => {
     try {
-      await api.post(`/tickets/${ticketId}/process-return`, { items });
+      await api.post(`/tickets/${ticketId}/process-return`, formData);
       showToast('Tiket selesai dan barang telah diproses.', 'success');
       setTicketToReturn(null);
       fetchTickets();
       fetchPrerequisites();
     } catch (e) {
+      console.error(e);
       showToast(e.response?.data?.message || 'Gagal memproses pengembalian.', 'error');
     }
   };

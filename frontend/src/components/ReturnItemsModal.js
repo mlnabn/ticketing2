@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
+import imageCompression from 'browser-image-compression';
+import { FaCamera, FaImage } from 'react-icons/fa';
 import api from '../services/api';
 
 const ConditionalUserInput = ({ item, statusName, users, onChange }) => {
@@ -12,7 +14,7 @@ const ConditionalUserInput = ({ item, statusName, users, onChange }) => {
             return (
                 <div className="form-group-inline2 conditional">
                     <label>Pengguna:</label>
-                    <Select 
+                    <Select
                         classNamePrefix="custom-select-return"
                         options={optionsWithDefault}
                         value={optionsWithDefault.find(opt => opt.value === String(item.user_digunakan_id)) || null}
@@ -60,7 +62,7 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
     const [statusOptions, setStatusOptions] = useState([]);
     const [allUsers, setAllUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-
+    const [activeCompressions, setActiveCompressions] = useState(0);
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const [currentTicket, setCurrentTicket] = useState(ticket);
@@ -101,6 +103,8 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
                     user_digunakan_id: '',
                     user_rusak_id: '',
                     user_hilang_id: '',
+                    image_file: null,
+                    image_preview: null,
                 }));
                 setItems(initialItems);
 
@@ -126,18 +130,76 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
         );
     };
 
+    const handleImageChange = async (e, stokId) => {
+        if (e.target.files && e.target.files[0]) {
+            const originalFile = e.target.files[0];
+            if (!originalFile.type.startsWith('image/')) {
+                showToast('Mohon upload file gambar.', 'error');
+                return;
+            }
+
+            setActiveCompressions(prev => prev + 1);
+            const options = {
+                maxSizeMB: 0.5,
+                maxWidthOrHeight: 1280,
+                useWebWorker: true,
+                initialQuality: 0.7,
+                fileType: "image/jpeg"
+            };
+
+            try {
+                const compressedFile = await imageCompression(originalFile, options);
+                setItems(prevItems =>
+                    prevItems.map(item =>
+                        item.stok_barang_id === stokId ? {
+                            ...item,
+                            image_file: compressedFile,
+                            image_preview: URL.createObjectURL(compressedFile)
+                        } : item
+                    )
+                );
+            } catch (error) {
+                console.error("Gagal kompresi:", error);
+                showToast("Gagal memproses gambar.", 'error');
+            } finally {
+                setActiveCompressions(prev => prev - 1);
+            }
+        }
+    };
+
+    const handleRemoveImage = (stokId) => {
+        setItems(prevItems =>
+            prevItems.map(item =>
+                item.stok_barang_id === stokId ? {
+                    ...item,
+                    image_file: null,
+                    image_preview: null
+                } : item
+            )
+        );
+    };
+
     const handleSubmit = () => {
-        const payload = {
-            items: items.map(item => ({
-                stok_barang_id: item.stok_barang_id,
-                status_id: item.status_id,
-                keterangan: item.keterangan,
-                user_digunakan_id: item.user_digunakan_id,
-                user_rusak_id: item.user_rusak_id,
-                user_hilang_id: item.user_hilang_id,
-            }))
-        };
-        onSave(currentTicket.id, payload.items);
+        const formData = new FormData();
+        items.forEach((item, index) => {
+            formData.append(`items[${index}][stok_barang_id]`, item.stok_barang_id);
+            formData.append(`items[${index}][status_id]`, item.status_id);
+
+            if (item.keterangan) formData.append(`items[${index}][keterangan]`, item.keterangan);
+            if (item.user_digunakan_id && item.user_digunakan_id !== 'undefined') {
+                formData.append(`items[${index}][user_digunakan_id]`, item.user_digunakan_id);
+            }
+            if (item.user_rusak_id && item.user_rusak_id !== 'undefined') {
+                formData.append(`items[${index}][user_rusak_id]`, item.user_rusak_id);
+            }
+            if (item.user_hilang_id && item.user_hilang_id !== 'undefined') {
+                formData.append(`items[${index}][user_hilang_id]`, item.user_hilang_id);
+            }
+            if (item.image_file) {
+                formData.append(`items[${index}][bukti_foto]`, item.image_file);
+            }
+        });
+        onSave(currentTicket.id, formData);
     };
 
     const handleCloseClick = () => {
@@ -172,6 +234,7 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
                     <div className="items-to-return-list">
                         {items.length > 0 ? items.map(item => {
                             const selectedStatus = statusOptions.find(s => s.id === Number(item.status_id));
+                            const isDigunakan = selectedStatus?.nama_status === 'Digunakan';
                             return (
                                 <div key={item.stok_barang_id} className="return-item-row">
                                     <div className="item-info">
@@ -207,16 +270,102 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
                                                 placeholder="Cth: Dipasang permanen di workshop, jatuh, dll."
                                             ></textarea>
                                         </div>
+                                        {isDigunakan && (
+                                            <div className="form-group2" style={{ marginTop: '10px' }}>
+                                                <label style={{ marginBottom: '5px', display: 'block', fontSize: '0.9rem', fontWeight: '500' }}>Bukti Kondisi (Foto)</label>
+
+                                                {!item.image_preview ? (
+                                                    <div className="upload-options-container" style={{ display: 'flex', gap: '10px' }}>
+                                                        <input
+                                                            id={`camera-${item.stok_barang_id}`}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            capture="environment"
+                                                            onChange={(e) => handleImageChange(e, item.stok_barang_id)}
+                                                            style={{ display: 'none' }}
+                                                        />
+                                                        <input
+                                                            id={`gallery-${item.stok_barang_id}`}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => handleImageChange(e, item.stok_barang_id)}
+                                                            style={{ display: 'none' }}
+                                                        />
+
+                                                        <label htmlFor={`camera-${item.stok_barang_id}`} className="btn-upload-option btn-camera" style={{
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: 8,
+                                                            padding: '8px 12px',
+                                                            background: '#e3f2fd',
+                                                            color: '#0d47a1',
+                                                            borderRadius: 6,
+                                                            border: '1px solid #90caf9',
+                                                            fontSize: '0.9rem',
+                                                            width: '100%',
+                                                        }}>
+                                                            <FaCamera /> Foto
+                                                        </label>
+                                                        <label htmlFor={`gallery-${item.stok_barang_id}`} className="btn-upload-option btn-gallery" style={{
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: 8,
+                                                            padding: '8px 12px',
+                                                            background: '#f3e5f5',
+                                                            color: '#7b1fa2',
+                                                            borderRadius: 6,
+                                                            border: '1px solid #ce93d8',
+                                                            fontSize: '0.9rem',
+                                                            width: '100%',
+                                                        }}>
+                                                            <FaImage /> Galeri
+                                                        </label>
+                                                    </div>
+                                                ) : (
+                                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                        <div
+                                                            style={{
+                                                                marginTop: 10,
+                                                                position: 'relative',
+                                                                width: 'fit-content',
+                                                                textAlign: 'center',
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={item.image_preview}
+                                                                alt="Preview"
+                                                                style={{
+                                                                    maxHeight: 400,
+                                                                    borderRadius: 8,
+                                                                    border: '1px solid #ddd',
+                                                                }}
+                                                            />
+                                                            <button
+                                                                className='close-btn'
+                                                                type="button"
+                                                                onClick={() => handleRemoveImage(item.stok_barang_id)}
+                                                            >X</button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )
                         }) : <p>Tidak ada barang yang tercatat dipinjam untuk tiket ini.</p>}
                     </div>
-                )}
+                )
+                }
 
                 <div className="modal-actions">
                     <button onClick={handleCloseClick} className="btn-cancel">Batal</button>
-                    <button onClick={handleSubmit} className="btn-confirm" disabled={isLoading}>
+                    <button onClick={handleSubmit} className="btn-confirm"
+                        disabled={isLoading || activeCompressions > 0}
+                        style={{ opacity: (isLoading || activeCompressions > 0) ? 0.7 : 1 }}
+                    >
                         Selesaikan Tiket
                     </button>
                 </div>

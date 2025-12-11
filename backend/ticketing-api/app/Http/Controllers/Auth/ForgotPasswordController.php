@@ -44,16 +44,16 @@ class ForgotPasswordController extends Controller
             $otpExpiresAt = Carbon::now()->addMinutes(5);
             $cacheKey = 'password_reset_otp_' . $phone;
             Cache::put($cacheKey, $otpCode, $otpExpiresAt);
-            $n8nWebhookUrl = 'http://127.0.0.1:5678/webhook/whatsapp-otp'; 
-            
+            $n8nWebhookUrl = env('N8N_WEBHOOK_OTP_URL');
+
             try {
                 Http::timeout(5)->post($n8nWebhookUrl, [
-                    'phone' => $phone, 
+                    'phone' => $phone,
                     'otp' => $otpCode
                 ]);
-                
+
                 Log::info("OTP request sent to n8n for {$phone}");
-                
+
             } catch (\Exception $e) {
                 Log::error('Gagal kirim OTP reset password: ' . $e->getMessage());
             }
@@ -62,7 +62,7 @@ class ForgotPasswordController extends Controller
         }
         return response()->json([
             'message' => 'Jika nomor Anda terdaftar, kode verifikasi telah dikirim ke WhatsApp Anda.',
-            'phone' => $phone 
+            'phone' => $phone
         ], 200);
     }
 
@@ -74,7 +74,7 @@ class ForgotPasswordController extends Controller
         $validated = $request->validate([
             'phone' => 'required|string|min:10',
             'otp' => 'required|string|digits:6',
-            'password' => 'required|string|min:6|confirmed', 
+            'password' => 'required|string|min:6|confirmed',
         ]);
 
         $phone = $validated['phone'];
@@ -98,7 +98,7 @@ class ForgotPasswordController extends Controller
 
         $user->password = Hash::make($validated['password']);
         $user->save();
-        
+
         Cache::forget($cacheKey);
         $token = JWTAuth::fromUser($user);
         return $this->authController->respondWithToken($token, $user);

@@ -56,6 +56,12 @@ function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDurat
         }
     };
 
+    const getImageUrl = (path) => {
+        if (!path) return null;
+        const baseUrl = api.defaults.baseURL.replace('/api', '');
+        return `${baseUrl}/storage/${path}`;
+    };
+
     if (!shouldRender) return null;
     if (!currentItem) return null;
     const animationClass = isClosing ? 'closing' : '';
@@ -132,6 +138,29 @@ function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDurat
                                         {fullDetail.deskripsi || '(Tidak ada keterangan)'}
                                     </span>
                                 </div>
+                                {fullDetail.bukti_foto_path && (
+                                    
+                                    <div className="detail-item-full detail-full">
+                                        <label className="detail-label">
+                                            Bukti Peminjaman / Kondisi Awal
+                                        </label>
+                                        <div style={{ marginTop: 10, display: 'flex', justifyContent: 'center' }}>
+                                            <img 
+                                                src={getImageUrl(fullDetail.bukti_foto_path)} 
+                                                alt="Bukti Foto" 
+                                                style={{ 
+                                                    maxWidth: '100%',
+                                                    maxHeight: '400px',
+                                                    borderRadius: '8px',
+                                                    border: '1px solid #ddd',
+                                                    cursor: 'pointer'
+                                                }} 
+                                                onClick={() => window.open(getImageUrl(fullDetail.bukti_foto_path), '_blank')}
+                                                title="Klik untuk memperbesar"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </>
                     )}
