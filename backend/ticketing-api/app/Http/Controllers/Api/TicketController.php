@@ -50,7 +50,7 @@ class TicketController extends Controller
             if (substr($phone, 0, 2) === '08') {
                 $phone = '62' . substr($phone, 1);
             }
-            Http::timeout(2)->post('http://127.0.0.1:5678/webhook/notify-user-status', [
+            Http::timeout(2)->post(env('N8N_WEBHOOK_NOTIFY_STATUS_URL'), [
                 'phone' => $phone,
                 'message' => $message
             ]);
@@ -101,11 +101,11 @@ class TicketController extends Controller
                 $query->whereIn('status', $statusFilter);
             } else {
                 $statusMap = [
-                    'Belum Selesai'     => ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'],
+                    'Belum Selesai' => ['Belum Dikerjakan', 'Ditunda', 'Sedang Dikerjakan'],
                     'Sedang Dikerjakan' => ['Sedang Dikerjakan', 'Ditunda'],
-                    'in_progress'       => ['Sedang Dikerjakan', 'Ditunda'],
-                    'completed'         => ['Selesai'],
-                    'rejected'          => ['Ditolak'],
+                    'in_progress' => ['Sedang Dikerjakan', 'Ditunda'],
+                    'completed' => ['Selesai'],
+                    'rejected' => ['Ditolak'],
                 ];
 
                 if (isset($statusMap[$statusFilter])) {
@@ -209,7 +209,7 @@ class TicketController extends Controller
 
         if ($lastTicket) {
             $lastSequencePart = substr($lastTicket->kode_tiket, strlen($prefix));
-            $lastSequenceNumber = (int)$lastSequencePart;
+            $lastSequenceNumber = (int) $lastSequencePart;
             $nextSequence = $lastSequenceNumber + 1;
         }
 
@@ -249,7 +249,7 @@ class TicketController extends Controller
             $workshopName = $ticket->workshop ? $ticket->workshop->name : 'N/A';
             $creatorName = auth()->user()->name ?? 'User Web';
 
-            Http::timeout(2)->post('http://127.0.0.1:5678/webhook/notify-admins', [
+            Http::timeout(2)->post(env('N8N_WEBHOOK_NOTIFY_ADMINS_URL'), [
                 'kode_tiket' => $ticket->kode_tiket,
                 'title' => $ticket->title,
                 'workshop_name' => $workshopName,
@@ -722,9 +722,9 @@ class TicketController extends Controller
             'ditolak' => $counts['Ditolak']->total ?? 0,
         ];
         $totalTickets = array_sum($stats);
-        $stats['pending_tickets']   = $stats['belum_dikerjakan'] + $stats['ditunda'] + $stats['sedang_dikerjakan'];
+        $stats['pending_tickets'] = $stats['belum_dikerjakan'] + $stats['ditunda'] + $stats['sedang_dikerjakan'];
         $stats['completed_tickets'] = $stats['selesai'];
-        $stats['rejected_tickets']  = $stats['ditolak'];
+        $stats['rejected_tickets'] = $stats['ditolak'];
         $stats['total_tickets'] = $totalTickets;
 
         if ($user->role === 'admin') {
@@ -794,12 +794,12 @@ class TicketController extends Controller
         )->first();
 
         $result = [
-            'total'       => $isHandledReport
-                ? (int)$stats->completed + (int)$stats->in_progress
-                : (int)$stats->total_created,
-            'handled'     => (int) $stats->handled,
-            'completed'   => (int) $stats->completed,
-            'rejected'    => (int) $stats->rejected,
+            'total' => $isHandledReport
+                ? (int) $stats->completed + (int) $stats->in_progress
+                : (int) $stats->total_created,
+            'handled' => (int) $stats->handled,
+            'completed' => (int) $stats->completed,
+            'rejected' => (int) $stats->rejected,
             'in_progress' => (int) $stats->in_progress,
         ];
 
