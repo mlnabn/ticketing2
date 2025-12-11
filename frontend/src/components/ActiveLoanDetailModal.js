@@ -139,23 +139,21 @@ function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDurat
                                     </span>
                                 </div>
                                 {fullDetail.bukti_foto_path && (
-                                    <div className="detail-item-full" data-span="2" style={{ marginTop: '10px' }}>
-                                        <span className="label" style={{ marginBottom: '8px', display: 'block' }}>Bukti Peminjaman / Kondisi Awal</span>
-                                        <div style={{ 
-                                            border: '1px solid #eee', 
-                                            borderRadius: '8px', 
-                                            padding: '5px',
-                                            display: 'inline-block',
-                                            backgroundColor: '#f9f9f9'
-                                        }}>
+                                    
+                                    <div className="detail-item-full detail-full">
+                                        <label className="detail-label">
+                                            Bukti Peminjaman / Kondisi Awal
+                                        </label>
+                                        <div style={{ marginTop: 10, display: 'flex', justifyContent: 'center' }}>
                                             <img 
                                                 src={getImageUrl(fullDetail.bukti_foto_path)} 
                                                 alt="Bukti Foto" 
                                                 style={{ 
-                                                    maxWidth: '100%', 
-                                                    maxHeight: '300px', 
-                                                    borderRadius: '6px',
-                                                    display: 'block'
+                                                    maxWidth: '100%',
+                                                    maxHeight: '400px',
+                                                    borderRadius: '8px',
+                                                    border: '1px solid #ddd',
+                                                    cursor: 'pointer'
                                                 }} 
                                                 onClick={() => window.open(getImageUrl(fullDetail.bukti_foto_path), '_blank')}
                                                 title="Klik untuk memperbesar"

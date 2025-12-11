@@ -9881,10 +9881,10 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .modal-close-button-detail {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--text-color-secondary);
+  background: none !important;
+  border: none !important;
+  font-size: 1.5rem !important;
+  color: var(--text-color-secondary) !important;
   cursor: pointer;
 }
 
@@ -10063,10 +10063,10 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .modal-close-button-detail-user {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: #A0AEC0;
+  background: none !important;
+  border: none !important;
+  font-size: 1.5rem !important;
+  color: #A0AEC0 !important;
   cursor: pointer;
 }
 
@@ -10266,7 +10266,7 @@ body.dark-mode .form-group-recover textarea:focus {
 
   input[type="date"],
   input[type="time"] {
-    appearance: none  ;
+    appearance: none;
     min-height: 45px;
     position: relative;
     color: #212529 !important;
@@ -10274,7 +10274,7 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .filter-select-date {
-  position: relative ;
+  position: relative;
   height: 44px;
   width: 100%;
   padding: 0.5rem 1rem;
@@ -10368,6 +10368,7 @@ body.dark-mode .form-group-recover textarea:focus {
   color: #6c757d;
   opacity: 1;
 }
+
 .dark-mode .filter-select-date::placeholder {
   color: #94a3b8;
 }
@@ -11499,9 +11500,9 @@ input:disabled {
   right: 1.5rem;
   background: transparent;
   border: none;
-  font-size: 2.2rem;
+  font-size: 2.2rem !important;
   line-height: 1;
-  font-weight: 300;
+  font-weight: 600 !important;
   padding: 0;
   cursor: pointer;
   transition: color 0.2s ease;
@@ -14087,6 +14088,7 @@ body.dark-mode .detail-list-footer-centered {
   .filter-select-date:required:invalid::-webkit-datetime-edit {
     color: transparent;
   }
+
   .filter-select-date:required:invalid::before {
     content: "dd/mm/yyyy";
     color: #9CA3AF;
@@ -14094,7 +14096,7 @@ body.dark-mode .detail-list-footer-centered {
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    pointer-events: none; 
+    pointer-events: none;
     font-size: 0.9rem;
     font-family: inherit;
   }
@@ -14364,4 +14366,138 @@ body.dark-mode .leaflet-container {
 
 .marker-pulse {
   animation: pulse-yellow 1.5s infinite;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.detail-field {
+  display: flex;
+  flex-direction: column;
+  background: #e9ecef;
+  padding: 14px;
+  border-radius: 12px;
+  border-color: 1px solid #f0f0f0;
+}
+
+.dark-mode .detail-field {
+  background: #3a3f44;
+  border: 1px solid #3a3f44;
+}
+
+.detail-detail {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  border-radius: 12px;
+}
+
+.dark-mode .detail-detail {
+  background: #3a3f44;
+}
+
+.detail-full {
+  grid-column: 1 / -1;
+}
+
+.dark-mode .detail-full {
+  background: #3a3f44;
+}
+
+.detail-label {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.dark-mode .detail-label {
+  color: #d1d5db;
+}
+
+
+.detail-edit-input::-webkit-calendar-picker-indicator {
+  filter: invert(0);
+}
+
+.dark-mode .detail-edit-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+
+.detail-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.detail-input:focus,
+.detail-select:focus,
+.detail-textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+  outline: none;
+}
+
+.detail-input,
+.detail-select,
+.detail-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  font-size: 14px;
+}
+
+.dark-mode .detail-input,
+.dark-mode .detail-select,
+.dark-mode .detail-textarea {
+  background-color: #3a3f44;
+  border-color: #fff;
+  color: #e2e8f0;
+}
+
+.detail-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  background-image:
+    linear-gradient(to right, #ccc 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 2rem center, right 0.75rem center;
+  background-size: 1px 60%, 0.75em auto;
+}
+
+.dark-mode .detail-select {
+  background-image:
+    linear-gradient(to right, #888 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 2rem center, right 0.75rem center;
+  background-size: 1px 60%, 0.75em auto;
+}
+
+.close-btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  color: red;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: 600 !important;
+  font-size: 2rem !important;
+}
+
+
+@media (max-width: 480px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
 }

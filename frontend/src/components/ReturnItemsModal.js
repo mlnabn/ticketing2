@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
-import imageCompression from 'browser-image-compression'; 
+import imageCompression from 'browser-image-compression';
 import { FaCamera, FaImage } from 'react-icons/fa';
 import api from '../services/api';
 
@@ -14,7 +14,7 @@ const ConditionalUserInput = ({ item, statusName, users, onChange }) => {
             return (
                 <div className="form-group-inline2 conditional">
                     <label>Pengguna:</label>
-                    <Select 
+                    <Select
                         classNamePrefix="custom-select-return"
                         options={optionsWithDefault}
                         value={optionsWithDefault.find(opt => opt.value === String(item.user_digunakan_id)) || null}
@@ -103,7 +103,7 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
                     user_digunakan_id: '',
                     user_rusak_id: '',
                     user_hilang_id: '',
-                    image_file: null, 
+                    image_file: null,
                     image_preview: null,
                 }));
                 setItems(initialItems);
@@ -149,8 +149,8 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
 
             try {
                 const compressedFile = await imageCompression(originalFile, options);
-                setItems(prevItems => 
-                    prevItems.map(item => 
+                setItems(prevItems =>
+                    prevItems.map(item =>
                         item.stok_barang_id === stokId ? {
                             ...item,
                             image_file: compressedFile,
@@ -168,8 +168,8 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
     };
 
     const handleRemoveImage = (stokId) => {
-        setItems(prevItems => 
-            prevItems.map(item => 
+        setItems(prevItems =>
+            prevItems.map(item =>
                 item.stok_barang_id === stokId ? {
                     ...item,
                     image_file: null,
@@ -184,7 +184,7 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
         items.forEach((item, index) => {
             formData.append(`items[${index}][stok_barang_id]`, item.stok_barang_id);
             formData.append(`items[${index}][status_id]`, item.status_id);
-            
+
             if (item.keterangan) formData.append(`items[${index}][keterangan]`, item.keterangan);
             if (item.user_digunakan_id && item.user_digunakan_id !== 'undefined') {
                 formData.append(`items[${index}][user_digunakan_id]`, item.user_digunakan_id);
@@ -271,52 +271,83 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
                                             ></textarea>
                                         </div>
                                         {isDigunakan && (
-                                            <div className="form-group2" style={{marginTop:'10px'}}>
-                                                <label style={{marginBottom:'5px', display:'block', fontSize:'0.9rem', fontWeight:'500'}}>Bukti Kondisi (Foto)</label>
-                                                
+                                            <div className="form-group2" style={{ marginTop: '10px' }}>
+                                                <label style={{ marginBottom: '5px', display: 'block', fontSize: '0.9rem', fontWeight: '500' }}>Bukti Kondisi (Foto)</label>
+
                                                 {!item.image_preview ? (
-                                                    <div className="upload-options-container" style={{display: 'flex', gap: '10px'}}>
-                                                        <input 
-                                                            id={`camera-${item.stok_barang_id}`} 
-                                                            type="file" 
-                                                            accept="image/*" 
-                                                            capture="environment" 
-                                                            onChange={(e) => handleImageChange(e, item.stok_barang_id)} 
-                                                            style={{ display: 'none' }} 
+                                                    <div className="upload-options-container" style={{ display: 'flex', gap: '10px' }}>
+                                                        <input
+                                                            id={`camera-${item.stok_barang_id}`}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            capture="environment"
+                                                            onChange={(e) => handleImageChange(e, item.stok_barang_id)}
+                                                            style={{ display: 'none' }}
                                                         />
-                                                        <input 
-                                                            id={`gallery-${item.stok_barang_id}`} 
-                                                            type="file" 
-                                                            accept="image/*" 
-                                                            onChange={(e) => handleImageChange(e, item.stok_barang_id)} 
-                                                            style={{ display: 'none' }} 
+                                                        <input
+                                                            id={`gallery-${item.stok_barang_id}`}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => handleImageChange(e, item.stok_barang_id)}
+                                                            style={{ display: 'none' }}
                                                         />
-                                                        
-                                                        <label htmlFor={`camera-${item.stok_barang_id}`} className="btn-upload-option btn-camera" style={{cursor:'pointer', padding:'6px 10px', background:'#f0f0f0', borderRadius:'6px', display:'flex', alignItems:'center', gap:'5px', fontSize:'0.85rem'}}>
+
+                                                        <label htmlFor={`camera-${item.stok_barang_id}`} className="btn-upload-option btn-camera" style={{
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: 8,
+                                                            padding: '8px 12px',
+                                                            background: '#e3f2fd',
+                                                            color: '#0d47a1',
+                                                            borderRadius: 6,
+                                                            border: '1px solid #90caf9',
+                                                            fontSize: '0.9rem',
+                                                            width: '100%',
+                                                        }}>
                                                             <FaCamera /> Foto
                                                         </label>
-                                                        <label htmlFor={`gallery-${item.stok_barang_id}`} className="btn-upload-option btn-gallery" style={{cursor:'pointer', padding:'6px 10px', background:'#f0f0f0', borderRadius:'6px', display:'flex', alignItems:'center', gap:'5px', fontSize:'0.85rem'}}>
+                                                        <label htmlFor={`gallery-${item.stok_barang_id}`} className="btn-upload-option btn-gallery" style={{
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: 8,
+                                                            padding: '8px 12px',
+                                                            background: '#f3e5f5',
+                                                            color: '#7b1fa2',
+                                                            borderRadius: 6,
+                                                            border: '1px solid #ce93d8',
+                                                            fontSize: '0.9rem',
+                                                            width: '100%',
+                                                        }}>
                                                             <FaImage /> Galeri
                                                         </label>
                                                     </div>
                                                 ) : (
-                                                    <div style={{position:'relative', width:'fit-content', marginTop:'5px'}}>
-                                                        <img 
-                                                            src={item.image_preview} 
-                                                            alt="Preview" 
-                                                            style={{height:'80px', borderRadius:'6px', border:'1px solid #ddd'}} 
-                                                        />
-                                                        <button 
-                                                            type="button" 
-                                                            onClick={() => handleRemoveImage(item.stok_barang_id)}
+                                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                        <div
                                                             style={{
-                                                                position:'absolute', top:-8, right:-8, 
-                                                                background:'red', color:'white', 
-                                                                border:'none', borderRadius:'50%', 
-                                                                width:'20px', height:'20px', cursor:'pointer',
-                                                                display:'flex', alignItems:'center', justifyContent:'center', fontSize:'12px'
+                                                                marginTop: 10,
+                                                                position: 'relative',
+                                                                width: 'fit-content',
+                                                                textAlign: 'center',
                                                             }}
-                                                        >X</button>
+                                                        >
+                                                            <img
+                                                                src={item.image_preview}
+                                                                alt="Preview"
+                                                                style={{
+                                                                    maxHeight: 400,
+                                                                    borderRadius: 8,
+                                                                    border: '1px solid #ddd',
+                                                                }}
+                                                            />
+                                                            <button
+                                                                className='close-btn'
+                                                                type="button"
+                                                                onClick={() => handleRemoveImage(item.stok_barang_id)}
+                                                            >X</button>
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
@@ -326,13 +357,14 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
                             )
                         }) : <p>Tidak ada barang yang tercatat dipinjam untuk tiket ini.</p>}
                     </div>
-                )}
+                )
+                }
 
                 <div className="modal-actions">
                     <button onClick={handleCloseClick} className="btn-cancel">Batal</button>
-                    <button onClick={handleSubmit} className="btn-confirm" 
-                     disabled={isLoading || activeCompressions > 0} 
-                     style={{ opacity: (isLoading || activeCompressions > 0) ? 0.7 : 1 }}
+                    <button onClick={handleSubmit} className="btn-confirm"
+                        disabled={isLoading || activeCompressions > 0}
+                        style={{ opacity: (isLoading || activeCompressions > 0) ? 0.7 : 1 }}
                     >
                         Selesaikan Tiket
                     </button>

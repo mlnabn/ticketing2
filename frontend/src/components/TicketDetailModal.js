@@ -22,22 +22,22 @@ function TicketDetailModal({ show, ticket, onClose }) {
 
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
-    const [currentTicket, setCurrentTicket] = useState(ticket); 
+    const [currentTicket, setCurrentTicket] = useState(ticket);
 
     useEffect(() => {
         if (show) {
             setCurrentTicket(ticket);
             setShouldRender(true);
-            setIsClosing(false); 
+            setIsClosing(false);
         } else if (shouldRender && !isClosing) {
-            setIsClosing(true); 
+            setIsClosing(true);
             const timer = setTimeout(() => {
                 setIsClosing(false);
                 setShouldRender(false);
-            }, 300); 
+            }, 300);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, ticket, shouldRender]);
 
     useEffect(() => {
@@ -49,7 +49,7 @@ function TicketDetailModal({ show, ticket, onClose }) {
                 })
                 .catch(error => {
                     console.error("Gagal mengambil data barang pinjaman:", error);
-                    setBorrowedItems([]); 
+                    setBorrowedItems([]);
                 })
                 .finally(() => {
                     setIsLoadingItems(false);
@@ -88,15 +88,15 @@ function TicketDetailModal({ show, ticket, onClose }) {
     const animationClass = isClosing ? 'closing' : '';
 
     return (
-        <div 
+        <div
             className={`modal-backdrop-detail ${animationClass}`}
             onClick={handleCloseClick}
         >
-            <div 
+            <div
                 className={`modal-content-detail ${animationClass}`}
                 onClick={e => e.stopPropagation()}
             >
-                <div className="modal-header-detail">   
+                <div className="modal-header-detail">
                     <h3><strong>Detail Tiket: </strong>{currentTicket.kode_tiket || 'N/A'}</h3>
                     <p className="modal-creation-date">
                         {formatDateTime(currentTicket.created_at)}
@@ -104,7 +104,7 @@ function TicketDetailModal({ show, ticket, onClose }) {
                 </div>
 
                 <div className="modal-body-detail">
-                    
+
 
                     <div className="detail-grid-section">
                         <div className="detail-item-full">
@@ -136,7 +136,7 @@ function TicketDetailModal({ show, ticket, onClose }) {
                     <div className="detail-item-full" data-span="2">
                         <span className="label">Deskripsi Pekerjaan</span>
                         <span className="value">{currentTicket.title}</span>
-                    </div>                    
+                    </div>
 
                     <div className="detail-item-full" data-span="2">
                         <span className="label">Status</span>
@@ -173,8 +173,8 @@ function TicketDetailModal({ show, ticket, onClose }) {
                         ) : borrowedItems.length > 0 ? (
                             <ul className="borrowed-items-list" style={{ listStyle: 'none', padding: 0 }}>
                                 {borrowedItems.map(item => (
-                                    <li key={item.id} style={{ 
-                                        padding: '10px', 
+                                    <li key={item.id} style={{
+                                        padding: '10px',
                                         borderBottom: '1px solid #eee',
                                         display: 'flex',
                                         flexDirection: 'column',
@@ -184,24 +184,26 @@ function TicketDetailModal({ show, ticket, onClose }) {
                                             <span className="tool-name" style={{ fontWeight: '500' }}>{item.master_barang?.nama_barang}</span>
                                             <span className="tool-quantity" style={{ fontSize: '0.9em', color: '#666' }}>({item.kode_unik})</span>
                                         </div>
-                                        
+
                                         {/* TAMPILKAN GAMBAR JIKA ADA */}
                                         {item.bukti_foto_path && (
-                                            <div style={{ marginTop: '5px' }}>
-                                                <span style={{ fontSize: '0.8em', color: '#888', display: 'block', marginBottom: '2px' }}>Bukti Kondisi:</span>
-                                                <img 
-                                                    src={getImageUrl(item.bukti_foto_path)}
-                                                    alt="Bukti Barang" 
-                                                    style={{ 
-                                                        maxWidth: '100px', 
-                                                        height: 'auto', 
-                                                        borderRadius: '4px',
-                                                        cursor: 'pointer',
-                                                        border: '1px solid #ddd'
-                                                    }}
-                                                    onClick={() => window.open(getImageUrl(item.bukti_foto_path), '_blank')}
-                                                    title="Klik untuk memperbesar"
-                                                />
+                                            <div className="detail-full">
+                                                <label className="detail-label">Bukti Kondisi:</label>
+                                                <div style={{  display: 'flex', justifyContent: 'center' }}>
+                                                    <img
+                                                        src={getImageUrl(item.bukti_foto_path)}
+                                                        alt="Bukti Barang"
+                                                        style={{
+                                                            maxWidth: '100%',
+                                                            maxHeight: '400px',
+                                                            borderRadius: '8px',
+                                                            border: '1px solid #ddd',
+                                                            cursor: 'pointer'
+                                                        }}
+                                                        onClick={() => window.open(getImageUrl(item.bukti_foto_path), '_blank')}
+                                                        title="Klik untuk memperbesar"
+                                                    />
+                                                </div>
                                             </div>
                                         )}
                                     </li>

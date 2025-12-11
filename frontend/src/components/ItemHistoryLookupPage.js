@@ -63,7 +63,7 @@ const monthOptions = [
 
 function ItemHistoryLookupPage() {
     const isPresent = useIsPresent();
-    const isMobile = useMediaQuery('(max-width: 768px)');
+    const isMobile = useMediaQuery('(max-width: 1290px)');
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(!isMobile);
     const { showToast } = useOutletContext();
     const [items, setItems] = useState([]);
