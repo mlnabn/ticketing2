@@ -1875,7 +1875,7 @@ body.dark-mode .proof-modal__group input[type="file"]::file-selector-button:hove
 }
 
 .btn-upload-option {
-  display: flex;
+  display: flex !important;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -9815,7 +9815,7 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .modal-content-detail label {
-  display: block !important;
+  display: block ;
   margin-bottom: 0.5rem !important;
   font-weight: 600 !important;
   color: #333 !important;
