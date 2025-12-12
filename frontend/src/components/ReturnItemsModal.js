@@ -335,7 +335,7 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
                                                                 src={item.image_preview}
                                                                 alt="Preview"
                                                                 style={{
-                                                                    maxHeight: 400,
+                                                                    maxHeight: 150,
                                                                     borderRadius: 8,
                                                                     border: '1px solid #ddd',
                                                                 }}

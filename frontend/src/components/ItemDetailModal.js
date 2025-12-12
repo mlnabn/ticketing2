@@ -384,7 +384,7 @@ function ItemDetailModal({
                                             src={preview}
                                             alt="Preview"
                                             style={{
-                                                maxHeight: 400,
+                                                maxHeight: 150,
                                                 borderRadius: 8,
                                                 border: '1px solid #ddd',
                                             }}
@@ -844,7 +844,7 @@ function ItemDetailModal({
                                                 alt="Bukti Stok"
                                                 style={{
                                                     maxWidth: '100%',
-                                                    maxHeight: '400px',
+                                                    maxHeight: '150px',
                                                     borderRadius: '8px',
                                                     border: '1px solid #ddd',
                                                     cursor: 'pointer'

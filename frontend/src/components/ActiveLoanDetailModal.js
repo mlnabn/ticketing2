@@ -154,7 +154,7 @@ function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDurat
                                                 alt="Bukti Foto"
                                                 style={{
                                                     maxWidth: '100%',
-                                                    maxHeight: '400px',
+                                                    maxHeight: '150px',
                                                     borderRadius: '8px',
                                                     border: '1px solid #ddd',
                                                     cursor: 'pointer'
