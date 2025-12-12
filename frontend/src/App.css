@@ -4787,7 +4787,6 @@ body.dark-mode .rejection-reason-display p {
 
 @media (max-width: 1290px) {
   .modal-actions {
-    flex-direction: column;
     width: 100%;
   }
   
