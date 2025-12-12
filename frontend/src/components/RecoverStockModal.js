@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useModalBackHandlerOnMount } from '../hooks/useModalBackHandler';
 
 function RecoverStockModal({ tool, ticket, onClose, onSave, showToast }) {
   const [quantity, setQuantity] = useState(1);
   const [keterangan, setKeterangan] = useState('');
+
+  // Handle browser back button
+  const handleClose = useModalBackHandlerOnMount(onClose, 'recover-stock');
 
   useEffect(() => {
     if (ticket) {
@@ -14,7 +18,7 @@ function RecoverStockModal({ tool, ticket, onClose, onSave, showToast }) {
     const numValue = parseInt(value, 10);
 
     if (isNaN(numValue)) {
-      setQuantity(''); 
+      setQuantity('');
       return;
     }
 
@@ -39,8 +43,8 @@ function RecoverStockModal({ tool, ticket, onClose, onSave, showToast }) {
   if (!tool || !ticket) return null;
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal-content user-form-modal">
+    <div className="modal-backdrop" onClick={handleClose}>
+      <div className="modal-content user-form-modal" onClick={e => e.stopPropagation()}>
         <h3>Pulihkan Stok: {tool.name}</h3>
         <p>Dari Tiket: "{ticket.ticket_title}"</p>
         <div className="form-group-recover">
@@ -64,7 +68,7 @@ function RecoverStockModal({ tool, ticket, onClose, onSave, showToast }) {
           ></textarea>
         </div>
         <div className="modal-actions">
-          <button onClick={onClose} className="btn-cancel">Batal</button>
+          <button onClick={handleClose} className="btn-cancel">Batal</button>
           <button onClick={handleSubmit} className="btn-confirm">Simpan & Pulihkan</button>
         </div>
       </div>

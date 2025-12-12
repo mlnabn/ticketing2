@@ -4,7 +4,7 @@ import api from '../services/api';
 import { motion, useIsPresent, AnimatePresence } from 'framer-motion';
 import PurchaseProposalModal from './PurchaseProposalModal';
 import { saveAs } from 'file-saver';
-import PurchaseDetailModal from './PurchaseDetailModal';
+import ProposalDetailViewModal from './ProposalDetailViewModal';
 
 function useMediaQuery(query) {
     const [matches, setMatches] = React.useState(false);
@@ -412,9 +412,9 @@ function PurchaseProposalPage() {
                 onSaveSuccess={handleSaveSuccess}
                 showToast={showToast}
             />
-            <PurchaseDetailModal
-                show={isDetailModalOpen} 
-                proposal={selectedProposalForDetail} 
+            <ProposalDetailViewModal
+                show={isDetailModalOpen}
+                proposal={selectedProposalForDetail}
                 onClose={handleCloseDetailModal}
                 showToast={showToast}
             />

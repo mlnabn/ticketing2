@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 function TicketModal({
     show,
@@ -12,41 +13,39 @@ function TicketModal({
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
 
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'ticket');
+
     useEffect(() => {
         if (show) {
             setShouldRender(true);
-            setIsClosing(false); 
+            setIsClosing(false);
         } else if (shouldRender && !isClosing) {
-            setIsClosing(true); 
+            setIsClosing(true);
 
             const timer = setTimeout(() => {
                 setIsClosing(false);
-                setShouldRender(false); 
-            }, 300); 
+                setShouldRender(false);
+            }, 300);
 
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [show, shouldRender]); 
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, shouldRender]);
 
     if (!shouldRender || tickets.length === 0) return null;
 
-    const handleCloseClick = () => {
-        if (onClose) {
-            onClose(); 
-        }
-    };
-    
+
     const animationClass = isClosing ? 'closing' : '';
 
     return (
-        <div 
+        <div
             className={`modal-overlay2 ${isDarkMode ? 'dark-mode' : ''} ${animationClass}`}
-            onClick={handleCloseClick}
+            onClick={handleClose}
         >
-            <div 
+            <div
                 className={`modal-content2 ${isDarkMode ? 'dark-mode' : ''} ${animationClass}`}
-                onClick={(e) => e.stopPropagation()} 
+                onClick={(e) => e.stopPropagation()}
             >
                 <div className={`modal-header ${isDarkMode ? 'dark-mode' : ''}`}>
                     <h3 className="modal-title">
@@ -61,7 +60,10 @@ function TicketModal({
                             className={`ticket-modal-card ${isDarkMode ? 'dark-mode' : ''} status-${ticket.status.toLowerCase().replace(/\s/g, '-')}`}
                             onClick={() => {
                                 if (onTicketClick) onTicketClick(ticket.id);
-                                handleCloseClick();
+                                // Use onClose directly instead of handleClose
+                                // because onTicketClick will navigate away, 
+                                // and we don't want history.back() to interfere
+                                if (onClose) onClose();
                             }}
                         >
                             <p><b>Pengirim:</b> {ticket.creator?.name}</p>
@@ -75,7 +77,7 @@ function TicketModal({
                 <div className={`modal-footer ${isDarkMode ? 'dark-mode' : ''}`}>
                     <button
                         className={`btn-canceluser ${isDarkMode ? 'dark-mode' : ''}`}
-                        onClick={handleCloseClick}
+                        onClick={handleClose}
                     >
                         Tutup
                     </button>

@@ -5,6 +5,7 @@ import { FaCamera, FaImage } from 'react-icons/fa';
 import api from '../services/api';
 import EditStokBarangModal from './EditStokBarangModal';
 import HistoryModal from './HistoryModal';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 const initialFormData = {
     status_id: '',
@@ -51,6 +52,9 @@ function ItemDetailModal({
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const [currentItem, setCurrentItem] = useState(item);
+
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'item-detail');
 
     /* --------------------------------------------------------------------------
        FIXED MODAL OPEN/CLOSE ANIMATION
@@ -602,13 +606,13 @@ function ItemDetailModal({
     return (
         <div
             className={`modal-backdrop-centered ${animationClass}`}
-            onClick={onClose}
+            onClick={handleClose}
         >
             <div
                 className={`modal-content-large ${animationClass}`}
                 onClick={(e) => e.stopPropagation()}
             >
-                <button className="modal-close-btn" onClick={onClose}>
+                <button className="modal-close-btn" onClick={handleClose}>
                     &times;
                 </button>
 

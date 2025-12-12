@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import CreatableSelect from 'react-select/creatable';
-import ItemFormModal from './ItemFormModal'; 
+import ItemFormModal from './ItemFormModal';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 const formatRupiah = (angka) => new Intl.NumberFormat('id-ID').format(angka);
 const parseRupiah = (rupiah) => parseInt(rupiah.replace(/\./g, ''), 10) || 0;
@@ -20,6 +21,9 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
     const [notes, setNotes] = useState('');
     const [isSkuModalOpen, setIsSkuModalOpen] = useState(false);
     const [newSkuName, setNewSkuName] = useState('');
+
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'purchase-proposal');
 
     useEffect(() => {
         if (show) {
@@ -91,7 +95,7 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
     };
 
     const handleCreateNewSKU = (inputValue) => {
-        setNewSkuName(inputValue); 
+        setNewSkuName(inputValue);
         setIsSkuModalOpen(true);
     };
 
@@ -123,7 +127,7 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
             setIsLoading(false);
         }
     };
-    
+
     const handleSubmitProposal = async () => {
         if (!title || items.length === 0) {
             showToast('Judul dan minimal 1 barang wajib diisi.', 'warning');
@@ -134,7 +138,7 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
             const payload = { title, items };
             const response = await api.post('/purchase-proposals', payload);
             showToast('Catatan pengajuan berhasil disimpan.', 'success');
-            onSaveSuccess(response.data); 
+            onSaveSuccess(response.data);
         } catch (error) {
             showToast(error.response?.data?.message || 'Gagal menyimpan catatan.', 'error');
         } finally {
@@ -147,17 +151,17 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
 
     return (
         <>
-            <div className={`modal-backdrop-detail ${animationClass}`} onClick={onClose}>
+            <div className={`modal-backdrop-detail ${animationClass}`} onClick={handleClose}>
                 <div className={`modal-content-large ${animationClass}`} onClick={e => e.stopPropagation()}>
                     <h3>Buat Catatan Pengajuan Baru</h3>
 
                     <div className="form-group full">
                         <label>Judul Catatan</label>
-                        <input 
-                            type="text" 
-                            value={title} 
-                            onChange={e => setTitle(e.target.value)} 
-                            placeholder="Mis: Belanja Kebutuhan Q4 2025" 
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={e => setTitle(e.target.value)}
+                            placeholder="Mis: Belanja Kebutuhan Q4 2025"
                         />
                     </div>
 
@@ -203,11 +207,11 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
                             </div>
                             <div className="form-group-half">
                                 <label>Estimasi Harga Satuan (Rp)</label>
-                                <input 
-                                    type="text" 
-                                    value={displayEstimatedPrice} 
-                                    onChange={handlePriceChange} 
-                                    placeholder="Mis: 1500000" 
+                                <input
+                                    type="text"
+                                    value={displayEstimatedPrice}
+                                    onChange={handlePriceChange}
+                                    placeholder="Mis: 1500000"
                                 />
                             </div>
                         </div>
@@ -226,7 +230,7 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
                     </form>
 
                     <div className="confirmation-modal-actions">
-                        <button type="button" onClick={onClose} className="btn-cancel">Batal</button>
+                        <button type="button" onClick={handleClose} className="btn-cancel">Batal</button>
                         <button type="button" onClick={handleSubmitProposal} className="btn-confirm" disabled={isLoading || items.length === 0}>
                             {isLoading ? 'Menyimpan...' : 'Simpan'}
                         </button>

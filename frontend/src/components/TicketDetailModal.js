@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import api from '../services/api';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 const formatDateTime = (dateTimeString) => {
     if (!dateTimeString) return '-';
@@ -23,6 +24,9 @@ function TicketDetailModal({ show, ticket, onClose }) {
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const [currentTicket, setCurrentTicket] = useState(ticket);
+
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'ticket-detail');
 
     useEffect(() => {
         if (show) {
@@ -63,12 +67,6 @@ function TicketDetailModal({ show, ticket, onClose }) {
         return `${baseUrl}/storage/${path}`;
     };
 
-    const handleCloseClick = () => {
-        if (onClose) {
-            onClose();
-        }
-    };
-
     if (!shouldRender) return null;
     if (!currentTicket) return null;
 
@@ -90,7 +88,7 @@ function TicketDetailModal({ show, ticket, onClose }) {
     return (
         <div
             className={`modal-backdrop-detail ${animationClass}`}
-            onClick={handleCloseClick}
+            onClick={handleClose}
         >
             <div
                 className={`modal-content-detail ${animationClass}`}
@@ -189,7 +187,7 @@ function TicketDetailModal({ show, ticket, onClose }) {
                                         {item.bukti_foto_path && (
                                             <div className="detail-full">
                                                 <label className="detail-label">Bukti Kondisi:</label>
-                                                <div style={{  display: 'flex', justifyContent: 'center' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'center' }}>
                                                     <img
                                                         src={getImageUrl(item.bukti_foto_path)}
                                                         alt="Bukti Barang"
@@ -216,7 +214,7 @@ function TicketDetailModal({ show, ticket, onClose }) {
 
                 </div>
                 <div className="modal-footer-user" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                    <button onClick={handleCloseClick} className="btn-cancel">Tutup</button>
+                    <button onClick={handleClose} className="btn-cancel">Tutup</button>
                     {currentTicket.creator && currentTicket.creator.phone && (
                         <button onClick={handleWhatsAppChat} className="btn-history">
                             <i className="fab fa-whatsapp" style={{ marginRight: '8px' }}></i>

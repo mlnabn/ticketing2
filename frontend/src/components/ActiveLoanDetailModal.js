@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDuration }) {
     const [fullDetail, setFullDetail] = useState(null);
@@ -10,20 +11,23 @@ function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDurat
     const [currentItem, setCurrentItem] = useState(item);
     const navigate = useNavigate();
 
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'loan-detail');
+
     useEffect(() => {
         if (show) {
             setCurrentItem(item);
             setShouldRender(true);
-            setIsClosing(false); 
+            setIsClosing(false);
         } else if (shouldRender && !isClosing) {
-            setIsClosing(true); 
+            setIsClosing(true);
             const timer = setTimeout(() => {
                 setIsClosing(false);
-                setShouldRender(false); 
+                setShouldRender(false);
             }, 300);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, item, shouldRender]);
 
     useEffect(() => {
@@ -44,7 +48,7 @@ function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDurat
     }, [show, item]);
 
     const handleCheckStockClick = () => {
-        onClose();
+        if (onClose) onClose();
         const searchTerm = currentItem?.kode_unik || fullDetail?.kode_unik;
 
         if (searchTerm) {
@@ -68,11 +72,11 @@ function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDurat
     const duration = calculateDuration(currentItem.tanggal_keluar);
 
     return (
-        <div 
+        <div
             className={`modal-backdrop-detail ${animationClass}`}
-            onClick={onClose}
+            onClick={handleClose}
         >
-            <div 
+            <div
                 className={`modal-content-detail ${animationClass}`}
                 onClick={e => e.stopPropagation()}
             >
@@ -139,22 +143,22 @@ function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDurat
                                     </span>
                                 </div>
                                 {fullDetail.bukti_foto_path && (
-                                    
+
                                     <div className="detail-item-full detail-full">
                                         <label className="detail-label">
                                             Bukti Peminjaman / Kondisi Awal
                                         </label>
                                         <div style={{ marginTop: 10, display: 'flex', justifyContent: 'center' }}>
-                                            <img 
-                                                src={getImageUrl(fullDetail.bukti_foto_path)} 
-                                                alt="Bukti Foto" 
-                                                style={{ 
+                                            <img
+                                                src={getImageUrl(fullDetail.bukti_foto_path)}
+                                                alt="Bukti Foto"
+                                                style={{
                                                     maxWidth: '100%',
                                                     maxHeight: '400px',
                                                     borderRadius: '8px',
                                                     border: '1px solid #ddd',
                                                     cursor: 'pointer'
-                                                }} 
+                                                }}
                                                 onClick={() => window.open(getImageUrl(fullDetail.bukti_foto_path), '_blank')}
                                                 title="Klik untuk memperbesar"
                                             />
@@ -166,7 +170,7 @@ function ActiveLoanDetailModal({ show, item, onClose, formatDate, calculateDurat
                     )}
                 </div>
                 <div className="modal-footer-user">
-                    <button onClick={onClose} className="btn-cancel" style={{ marginRight: '10px' }}>Tutup</button>
+                    <button onClick={handleClose} className="btn-cancel" style={{ marginRight: '10px' }}>Tutup</button>
                     <button onClick={handleCheckStockClick} className="btn-confirm">Lihat di Stok</button>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 function EditNamaBarangModal({ show, onClose, item, onSaveSuccess, showToast }) {
     const [namaBarang, setNamaBarang] = useState('');
@@ -10,20 +11,23 @@ function EditNamaBarangModal({ show, onClose, item, onSaveSuccess, showToast }) 
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
 
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'edit-nama');
+
     useEffect(() => {
         if (show) {
-            setCurrentItem(item); 
+            setCurrentItem(item);
             setShouldRender(true);
-            setIsClosing(false); 
+            setIsClosing(false);
         } else if (shouldRender && !isClosing) {
-            setIsClosing(true); 
+            setIsClosing(true);
             const timer = setTimeout(() => {
                 setIsClosing(false);
-                setShouldRender(false); 
-            }, 300); 
+                setShouldRender(false);
+            }, 300);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, item, shouldRender]);
 
     useEffect(() => {
@@ -43,7 +47,7 @@ function EditNamaBarangModal({ show, onClose, item, onSaveSuccess, showToast }) 
             await api.post(`/inventory/items/${currentItem.id_m_barang}`, { nama_barang: namaBarang });
             showToast('Nama barang berhasil diubah.', 'success');
             onSaveSuccess();
-            onClose();
+            handleClose();
         } catch (error) {
             console.error("Gagal update nama barang:", error);
             showToast(error.response?.data?.message || 'Gagal menyimpan perubahan.', 'error');
@@ -52,22 +56,16 @@ function EditNamaBarangModal({ show, onClose, item, onSaveSuccess, showToast }) 
         }
     };
 
-    const handleCloseClick = () => {
-        if (onClose) {
-            onClose();
-        }
-    };
-
     if (!shouldRender) return null;
-    
+
     const animationClass = isClosing ? 'closing' : '';
 
     return (
-        <div 
+        <div
             className={`modal-overlay ${animationClass}`}
-            onClick={handleCloseClick}
+            onClick={handleClose}
         >
-            <div 
+            <div
                 className={`modal-content-detail ${animationClass}`}
                 onClick={e => e.stopPropagation()}
             >
@@ -84,7 +82,7 @@ function EditNamaBarangModal({ show, onClose, item, onSaveSuccess, showToast }) 
                         />
                     </div>
                     <div className="confirmation-modal-actions">
-                        <button type="button" onClick={handleCloseClick} className="btn-cancel">Batal</button>
+                        <button type="button" onClick={handleClose} className="btn-cancel">Batal</button>
                         <button type="submit" className="btn-confirm" disabled={isLoading}>
                             {isLoading ? 'Menyimpan...' : 'Simpan'}
                         </button>

@@ -3,6 +3,7 @@ import Select from 'react-select';
 import imageCompression from 'browser-image-compression';
 import { FaCamera, FaImage } from 'react-icons/fa';
 import api from '../services/api';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 const ConditionalUserInput = ({ item, statusName, users, onChange }) => {
     const userOptions = users.map(u => ({ value: String(u.id), label: u.name }));
@@ -66,6 +67,9 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const [currentTicket, setCurrentTicket] = useState(ticket);
+
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'return-items');
 
     useEffect(() => {
         if (show) {
@@ -202,12 +206,6 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
         onSave(currentTicket.id, formData);
     };
 
-    const handleCloseClick = () => {
-        if (onClose) {
-            onClose();
-        }
-    };
-
     const formattedStatusOptions = statusOptions.map(s => ({
         value: String(s.id),
         label: s.nama_status
@@ -221,7 +219,7 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
     return (
         <div
             className={`modal-backdrop-centered ${animationClass}`}
-            onClick={handleCloseClick}
+            onClick={handleClose}
         >
             <div
                 className={`modal-content-large ${animationClass}`}
@@ -361,7 +359,7 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
                 }
 
                 <div className="modal-actions">
-                    <button onClick={handleCloseClick} className="btn-cancel">Batal</button>
+                    <button onClick={handleClose} className="btn-cancel">Batal</button>
                     <button onClick={handleSubmit} className="btn-confirm"
                         disabled={isLoading || activeCompressions > 0}
                         style={{ opacity: (isLoading || activeCompressions > 0) ? 0.7 : 1 }}

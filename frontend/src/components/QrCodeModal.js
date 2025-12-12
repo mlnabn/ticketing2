@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { QRCodeSVG as QRCode } from 'qrcode.react';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 const formatCurrency = (value) => {
     if (isNaN(value) || value === null) return 'Rp 0';
@@ -16,6 +17,9 @@ function QrCodeModal({ show, item, onClose }) {
     const [shouldRender, setShouldRender] = useState(show);
     const [currentItem, setCurrentItem] = useState(item);
 
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'qr-code');
+
     useEffect(() => {
         if (show) {
             setCurrentItem(item);
@@ -29,20 +33,20 @@ function QrCodeModal({ show, item, onClose }) {
             }, 300);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, item, shouldRender]);
 
     if (!shouldRender) return null;
-    if (!currentItem) return null; 
+    if (!currentItem) return null;
 
     const animationClass = isClosing ? 'closing' : '';
 
     return (
-        <div 
+        <div
             className={`modal-backdrop ${animationClass}`}
-            onClick={onClose}
+            onClick={handleClose}
         >
-            <div 
+            <div
                 className={`modal-content-qr ${animationClass}`}
                 onClick={e => e.stopPropagation()}
             >
@@ -59,7 +63,7 @@ function QrCodeModal({ show, item, onClose }) {
                     </p>
                 </div>
                 <div className="modal-actions">
-                    <button onClick={onClose} className="btn-cancel">Tutup</button>
+                    <button onClick={handleClose} className="btn-cancel">Tutup</button>
                 </div>
             </div>
         </div>

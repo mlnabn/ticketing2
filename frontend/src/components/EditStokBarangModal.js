@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react'; 
+import React, { useState, useEffect, useRef } from 'react';
 import Select from 'react-select';
 import api from '../services/api';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 const ColorOption = (props) => (
     <div
@@ -76,6 +77,9 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
 
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'edit-stok');
+
     useEffect(() => {
         if (show) {
             setCurrentItem(item);
@@ -136,7 +140,7 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
     const blockEnterSubmit = (e) => {
         if (e.key === "Enter") {
             e.preventDefault();
-            e.target.blur(); 
+            e.target.blur();
         }
     };
 
@@ -184,11 +188,6 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
         }
     };
 
-    const handleCloseClick = () => {
-        if (onClose) {
-            onClose();
-        }
-    };
 
     if (!shouldRender) return null;
 
@@ -203,7 +202,7 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
     return (
         <div
             className={`modal-backdrop-centered ${animationClass}`}
-            onClick={handleCloseClick}
+            onClick={handleClose}
         >
             <div
                 className={`modal-content-large ${animationClass}`}
@@ -288,7 +287,7 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
                     </div>
 
                     <div className="confirmation-modal-actions">
-                        <button type="button" onClick={handleCloseClick} className="btn-cancel">Batal</button>
+                        <button type="button" onClick={handleClose} className="btn-cancel">Batal</button>
                         <button type="submit" className="btn-confirm" disabled={isLoading}>Simpan</button>
                     </div>
                 </form>

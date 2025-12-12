@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
-const NON_AKTIF_STATUS_ID = 7; 
+const NON_AKTIF_STATUS_ID = 7;
 
 export default function DeleteStockItemModal({ show, item, onClose, onSaveSuccess, showToast, statusOptions }) {
     const [alasan, setAlasan] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
+
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'delete-stock');
 
     useEffect(() => {
         if (show) {
@@ -22,7 +26,7 @@ export default function DeleteStockItemModal({ show, item, onClose, onSaveSucces
             }, 300); // Durasi animasi CSS
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, shouldRender]);
 
     const handleSubmit = async (e) => {
@@ -35,9 +39,9 @@ export default function DeleteStockItemModal({ show, item, onClose, onSaveSucces
 
         const statusNonAktif = statusOptions.find(s => s.id === NON_AKTIF_STATUS_ID);
         if (!statusNonAktif) {
-             showToast('Error: Status "Non-Aktif" tidak ditemukan. Hubungi administrator.', 'error');
-             setIsLoading(false);
-             return;
+            showToast('Error: Status "Non-Aktif" tidak ditemukan. Hubungi administrator.', 'error');
+            setIsLoading(false);
+            return;
         }
 
         try {
@@ -47,7 +51,7 @@ export default function DeleteStockItemModal({ show, item, onClose, onSaveSucces
             });
             showToast(`Barang ${item.kode_unik} berhasil di-nonaktifkan.`, 'success');
             onSaveSuccess();
-            onClose();
+            handleClose();
         } catch (error) {
             showToast(error.response?.data?.message || 'Gagal menonaktifkan barang.', 'error');
         } finally {
@@ -59,13 +63,13 @@ export default function DeleteStockItemModal({ show, item, onClose, onSaveSucces
     const animationClass = isClosing ? 'closing' : '';
 
     return (
-        <div className={`confirmation-modal-backdrop ${animationClass}`} onClick={onClose}>
+        <div className={`confirmation-modal-backdrop ${animationClass}`} onClick={handleClose}>
             <div className={`modal-content-large user-form-modal ${animationClass}`} onClick={e => e.stopPropagation()}>
                 <form onSubmit={handleSubmit}>
                     <h3>Non-Aktifkan Barang</h3>
                     <p>Anda akan menonaktifkan barang: <strong>{item.master_barang.nama_barang} ({item.kode_unik})</strong>. Stok ini tidak akan dihitung sebagai aset aktif. Tindakan ini akan dicatat dalam riwayat.</p>
-                    
-                    <div className="form-group-recover" style={{textAlign: 'left'}}>
+
+                    <div className="form-group-recover" style={{ textAlign: 'left' }}>
                         <label htmlFor="alasan">Alasan Penghapusan (Wajib)</label>
                         <textarea
                             id="alasan"
@@ -75,9 +79,9 @@ export default function DeleteStockItemModal({ show, item, onClose, onSaveSucces
                             placeholder="Contoh: Barang rusak berat dan tidak bisa diperbaiki, dihapus dari aset."
                         />
                     </div>
-                    
+
                     <div className="confirmation-modal-actions">
-                        <button type_button="button" className="btn-cancel" onClick={onClose} disabled={isLoading}>
+                        <button type_button="button" className="btn-cancel" onClick={handleClose} disabled={isLoading}>
                             Batal
                         </button>
                         <button type="submit" className="btn-confirm" disabled={isLoading || !alasan}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 
 function HistoryModal({ show, item, onClose, showToast, startDate, endDate }) {
@@ -7,6 +7,34 @@ function HistoryModal({ show, item, onClose, showToast, startDate, endDate }) {
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const [currentItem, setCurrentItem] = useState(item);
+    const historyPushedRef = useRef(false);
+
+    // Handle browser back button
+    useEffect(() => {
+        if (show && !historyPushedRef.current) {
+            window.history.pushState({ modal: 'history' }, '');
+            historyPushedRef.current = true;
+        }
+
+        const handlePopState = () => {
+            if (historyPushedRef.current && show) {
+                historyPushedRef.current = false;
+                if (onClose) onClose();
+            }
+        };
+
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show]);
+
+    // Cleanup history state when closing normally
+    useEffect(() => {
+        if (!show && historyPushedRef.current) {
+            historyPushedRef.current = false;
+            window.history.back();
+        }
+    }, [show]);
 
     useEffect(() => {
         if (show) {
@@ -21,7 +49,7 @@ function HistoryModal({ show, item, onClose, showToast, startDate, endDate }) {
             }, 300);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, item, shouldRender]);
 
     useEffect(() => {
@@ -61,10 +89,15 @@ function HistoryModal({ show, item, onClose, showToast, startDate, endDate }) {
     };
 
     const handleCloseClick = () => {
+        if (historyPushedRef.current) {
+            historyPushedRef.current = false;
+            window.history.back();
+        }
         if (onClose) {
             onClose();
         }
     };
+
 
     if (!shouldRender) return null;
 
@@ -125,7 +158,7 @@ function HistoryModal({ show, item, onClose, showToast, startDate, endDate }) {
                                 </div>
                                 {log.bukti_foto_path && (
                                     <div className="info-row full-width" style={{ marginTop: '5px' }}>
-                                        <span className="info-label" style={{marginBottom:'5px', display:'block'}}>Bukti Foto</span>
+                                        <span className="info-label" style={{ marginBottom: '5px', display: 'block' }}>Bukti Foto</span>
                                         <div style={{
                                             width: 'fit-content',
                                             border: '1px solid #e2e8f0',
@@ -133,12 +166,12 @@ function HistoryModal({ show, item, onClose, showToast, startDate, endDate }) {
                                             borderRadius: '8px',
                                             backgroundColor: '#f8fafc'
                                         }}>
-                                            <img 
-                                                src={getImageUrl(log.bukti_foto_path)} 
-                                                alt="Bukti Riwayat" 
-                                                style={{ 
-                                                    maxWidth: '100%', 
-                                                    maxHeight: '150px', 
+                                            <img
+                                                src={getImageUrl(log.bukti_foto_path)}
+                                                alt="Bukti Riwayat"
+                                                style={{
+                                                    maxWidth: '100%',
+                                                    maxHeight: '150px',
                                                     borderRadius: '6px',
                                                     cursor: 'pointer',
                                                     display: 'block'
