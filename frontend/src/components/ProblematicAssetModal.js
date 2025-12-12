@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 function ProblematicAssetModal({ show, item, onClose, formatCurrency, formatDate }) {
     const [fullDetail, setFullDetail] = useState(null);
@@ -9,6 +10,9 @@ function ProblematicAssetModal({ show, item, onClose, formatCurrency, formatDate
     const [shouldRender, setShouldRender] = useState(show);
     const [currentItem, setCurrentItem] = useState(item);
     const navigate = useNavigate();
+
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'problematic-asset');
 
     useEffect(() => {
         if (show) {
@@ -23,7 +27,7 @@ function ProblematicAssetModal({ show, item, onClose, formatCurrency, formatDate
             }, 300);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, item, shouldRender]);
 
     useEffect(() => {
@@ -36,7 +40,7 @@ function ProblematicAssetModal({ show, item, onClose, formatCurrency, formatDate
                 })
                 .catch(err => {
                     console.error("Gagal mengambil detail aset bermasalah:", err);
-                    setFullDetail(null); 
+                    setFullDetail(null);
                 })
                 .finally(() => {
                     setIsLoading(false);
@@ -45,7 +49,7 @@ function ProblematicAssetModal({ show, item, onClose, formatCurrency, formatDate
     }, [show, currentItem]);
 
     const handleCheckStockClick = () => {
-        onClose();
+        if (onClose) onClose();
         const searchTerm = currentItem?.kode_unik || fullDetail?.kode_unik;
 
         if (searchTerm) {
@@ -61,7 +65,7 @@ function ProblematicAssetModal({ show, item, onClose, formatCurrency, formatDate
 
     const getIncidentDetails = (detail) => {
         if (!detail) return { status: '-', date: '-', user: '-' };
-        
+
         if (detail.status_detail?.nama_status === 'Rusak') {
             return {
                 status: 'Rusak',
@@ -77,15 +81,15 @@ function ProblematicAssetModal({ show, item, onClose, formatCurrency, formatDate
             };
         }
 
-        return { 
-            status: detail.status_detail?.nama_status || '-', 
-            date: formatDate(detail.tanggal_rusak || detail.tanggal_hilang), 
+        return {
+            status: detail.status_detail?.nama_status || '-',
+            date: formatDate(detail.tanggal_rusak || detail.tanggal_hilang),
             user: detail.user_perusak?.name || detail.user_penghilang?.name || 'N/A'
         };
     };
 
     const incident = getIncidentDetails(fullDetail);
-    
+
     const animationClass = isClosing ? 'closing' : '';
 
     return (
@@ -123,7 +127,7 @@ function ProblematicAssetModal({ show, item, onClose, formatCurrency, formatDate
                                 <div className="detail-item-full">
                                     <span className="label">Status Kejadian</span>
                                     <span className="value">
-                                         <span className={`status-badge status-${incident.status.toLowerCase()}`}>
+                                        <span className={`status-badge status-${incident.status.toLowerCase()}`}>
                                             {incident.status}
                                         </span>
                                     </span>
@@ -153,7 +157,7 @@ function ProblematicAssetModal({ show, item, onClose, formatCurrency, formatDate
                     )}
                 </div>
                 <div className="modal-footer-user">
-                    <button onClick={onClose} className="btn-cancel" style={{ marginRight: '10px' }}>Tutup</button>
+                    <button onClick={handleClose} className="btn-cancel" style={{ marginRight: '10px' }}>Tutup</button>
                     <button onClick={handleCheckStockClick} className="btn-confirm">Lihat di Stok</button>
                 </div>
             </div>

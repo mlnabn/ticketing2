@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom'; // Wajib import ini
 import { motion } from 'framer-motion'; // Gunakan motion agar animasi smooth seperti detail modal
+import { useModalBackHandlerOnMount } from '../hooks/useModalBackHandler';
 
 // Gunakan varian yang sama agar konsisten
 const backdropVariants = {
@@ -16,6 +17,9 @@ const modalVariants = {
 };
 
 function ViewProofModal({ ticket, onClose, onDelete }) {
+  // Handle browser back button
+  const handleClose = useModalBackHandlerOnMount(onClose, 'view-proof');
+
   if (!ticket) return null;
 
   // Gunakan Portal ke document.body
@@ -26,7 +30,7 @@ function ViewProofModal({ ticket, onClose, onDelete }) {
       initial="hidden"
       animate="visible"
       exit="exit"
-      onClick={onClose}
+      onClick={handleClose}
       style={{ zIndex: 1050 }} // Pastikan z-index tinggi, tapi di bawah confirmation modal (biasanya 1100+)
     >
       <motion.div
@@ -58,7 +62,7 @@ function ViewProofModal({ ticket, onClose, onDelete }) {
         )}
 
         <div className="modal-actions">
-          <button type="button" onClick={onClose} className="btn-cancel">
+          <button type="button" onClick={handleClose} className="btn-cancel">
             Tutup
           </button>
           <button type="button" onClick={() => onDelete(ticket)} className="btn-confirm">

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import CreatableSelect from 'react-select/creatable';
 import { useDebounce } from 'use-debounce';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 const initialFormState = {
     id_kategori: '',
@@ -22,6 +23,9 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const initialDataString = JSON.stringify(initialData);
+
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'item-form');
 
     useEffect(() => {
         if (show) {
@@ -133,11 +137,7 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
         }
     };
 
-    const handleCloseClick = () => {
-        if (onClose) {
-            onClose();
-        }
-    };
+
 
     if (!shouldRender) return null;
 
@@ -146,7 +146,7 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
     return (
         <div
             className={`modal-backdrop-centered ${animationClass}`}
-            onClick={handleCloseClick}
+            onClick={handleClose}
         >
             <div
                 className={`modal-content-large ${animationClass}`}
@@ -206,7 +206,7 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
                     )}
 
                     <div className="modal-footer-user" style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                        <button type="button" onClick={handleCloseClick} className="btn-cancel">Batal</button>
+                        <button type="button" onClick={handleClose} className="btn-cancel">Batal</button>
                         <button type="submit" className="btn-confirm" disabled={isLoading || (isExisting && !itemToEdit)}>
                             {isExisting && !itemToEdit ? 'Sudah Terdaftar' : 'Simpan'}
                         </button>

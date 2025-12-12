@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 export default function NotificationTemplateFormModal({ show, templateToEdit, onClose, onSave }) {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [isClosing, setIsClosing] = useState(false);
   const [shouldRender, setShouldRender] = useState(show);
+
+  // Handle browser back button
+  const handleClose = useModalBackHandler(show, onClose, 'notification-template');
 
   useEffect(() => {
     if (templateToEdit) {
@@ -15,24 +19,24 @@ export default function NotificationTemplateFormModal({ show, templateToEdit, on
       const timer = setTimeout(() => {
         setTitle('');
         setMessage('');
-      }, 300); 
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, [templateToEdit, show]);
 
   useEffect(() => {
-      if (show) {
-          setShouldRender(true);
-          setIsClosing(false); 
-      } else if (shouldRender && !isClosing) {
-          setIsClosing(true); 
-          const timer = setTimeout(() => {
-              setIsClosing(false);
-              setShouldRender(false); 
-          }, 300);
-          return () => clearTimeout(timer);
-      }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (show) {
+      setShouldRender(true);
+      setIsClosing(false);
+    } else if (shouldRender && !isClosing) {
+      setIsClosing(true);
+      const timer = setTimeout(() => {
+        setIsClosing(false);
+        setShouldRender(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show, shouldRender]);
 
   const handleSubmit = (e) => {
@@ -62,7 +66,7 @@ export default function NotificationTemplateFormModal({ show, templateToEdit, on
             </div>
           </div>
           <div className="confirmation-modal-actions">
-            <button type="button" className="btn-cancel" onClick={onClose}>Batal</button>
+            <button type="button" className="btn-cancel" onClick={handleClose}>Batal</button>
             <button type="submit" className="btn-confirm">Simpan</button>
           </div>
         </form>

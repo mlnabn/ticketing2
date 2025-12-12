@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 function RejectTicketModal({ show, ticket, onReject, onClose, showToast }) {
   const [reason, setReason] = useState('');
@@ -7,21 +8,24 @@ function RejectTicketModal({ show, ticket, onReject, onClose, showToast }) {
   const [shouldRender, setShouldRender] = useState(show);
   const [currentTicket, setCurrentTicket] = useState(ticket);
 
+  // Handle browser back button
+  const handleClose = useModalBackHandler(show, onClose, 'reject-ticket');
+
   useEffect(() => {
-      if (show) {
-          setCurrentTicket(ticket); 
-          setShouldRender(true);
-          setIsClosing(false); 
-      } else if (shouldRender && !isClosing) {
-          setIsClosing(true); 
-          const timer = setTimeout(() => {
-              setIsClosing(false);
-              setShouldRender(false);
-              setReason('');
-          }, 300); 
-          return () => clearTimeout(timer);
-      }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (show) {
+      setCurrentTicket(ticket);
+      setShouldRender(true);
+      setIsClosing(false);
+    } else if (shouldRender && !isClosing) {
+      setIsClosing(true);
+      const timer = setTimeout(() => {
+        setIsClosing(false);
+        setShouldRender(false);
+        setReason('');
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show, ticket, shouldRender]);
 
   const handleSubmit = () => {
@@ -32,23 +36,17 @@ function RejectTicketModal({ show, ticket, onReject, onClose, showToast }) {
     }
   };
 
-  const handleCloseClick = () => {
-      if (onClose) {
-          onClose();
-      }
-  };
-
   if (!shouldRender) return null;
   if (!currentTicket) return null;
 
   const animationClass = isClosing ? 'closing' : '';
 
   return (
-    <div 
+    <div
       className={`modal-backdrop ${animationClass}`}
-      onClick={handleCloseClick}
+      onClick={handleClose}
     >
-      <div 
+      <div
         className={`modal-content ${animationClass}`}
         onClick={e => e.stopPropagation()}
       >
@@ -61,7 +59,7 @@ function RejectTicketModal({ show, ticket, onReject, onClose, showToast }) {
           className="rejection-reason-textarea"
         />
         <div className="modal-actions">
-          <button onClick={handleCloseClick} className="btn-cancel">Batal</button>
+          <button onClick={handleClose} className="btn-cancel">Batal</button>
           <button onClick={handleSubmit} className="btn-confirm">Tolak Tiket</button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
@@ -7,6 +7,63 @@ function QrScannerModal({ show, onClose, onScanSuccess }) {
     const scannerRef = useRef(null);
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
+    const hasHistoryPushed = useRef(false);
+
+    // Custom close handler that properly cleans up camera
+    const handleClose = useCallback(async () => {
+        const currentScanner = scannerRef.current;
+
+        if (currentScanner) {
+            try {
+                await currentScanner.clear();
+                scannerRef.current = null;
+            } catch (err) {
+                console.error("Gagal mematikan kamera saat force close:", err);
+                scannerRef.current = null;
+            }
+        }
+
+        // Navigate back if we pushed history
+        if (hasHistoryPushed.current) {
+            hasHistoryPushed.current = false;
+            window.history.back();
+        } else if (onClose) {
+            onClose();
+        }
+    }, [onClose]);
+
+    // Handle browser back button
+    useEffect(() => {
+        if (show) {
+            // Push history state when modal opens
+            if (!hasHistoryPushed.current) {
+                window.history.pushState({ modal: 'qr-scanner' }, '');
+                hasHistoryPushed.current = true;
+            }
+
+            const handlePopState = async () => {
+                hasHistoryPushed.current = false;
+                // Clean up camera
+                const currentScanner = scannerRef.current;
+                if (currentScanner) {
+                    try {
+                        await currentScanner.clear();
+                        scannerRef.current = null;
+                    } catch (err) {
+                        console.error("Gagal mematikan kamera:", err);
+                        scannerRef.current = null;
+                    }
+                }
+                if (onClose) onClose();
+            };
+
+            window.addEventListener('popstate', handlePopState);
+            return () => window.removeEventListener('popstate', handlePopState);
+        } else {
+            hasHistoryPushed.current = false;
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show]);
 
     useEffect(() => {
         if (show) {
@@ -72,30 +129,13 @@ function QrScannerModal({ show, onClose, onScanSuccess }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, onScanSuccess, showToast, shouldRender]);
 
-    const handleCloseClick = async () => {
-        const currentScanner = scannerRef.current;
-
-        if (currentScanner) {
-            try {
-                await currentScanner.clear();
-                scannerRef.current = null;
-            } catch (err) {
-                console.error("Gagal mematikan kamera saat force close:", err);
-                scannerRef.current = null;
-            }
-        }
-        if (onClose) {
-            onClose();
-        }
-    };
-
     if (!shouldRender) return null;
     const animationClass = isClosing ? 'closing' : '';
 
     return (
         <div
             className={`modal-backdrop-centered ${animationClass}`}
-            onClick={handleCloseClick}
+            onClick={handleClose}
         >
             <div
                 className={`modal-content-large qr-scanner-modal ${animationClass}`}
@@ -106,7 +146,7 @@ function QrScannerModal({ show, onClose, onScanSuccess }) {
                     <div id="qr-reader" style={{ width: '100%', maxWidth: '500px', margin: '0 auto' }}></div>
                 )}
                 <div className="modal-actions">
-                    <button onClick={handleCloseClick} className="btn-cancel">Batal</button>
+                    <button onClick={handleClose} className="btn-cancel">Batal</button>
                 </div>
             </div>
         </div>

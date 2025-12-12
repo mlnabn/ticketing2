@@ -3,6 +3,7 @@ import Select from 'react-select';
 import AsyncSelect from 'react-select/async';
 import api from '../services/api';
 import QrScannerModal from './QrScannerModal';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 
 const useScannerListener = (onScan, isOpen) => {
@@ -34,31 +35,34 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show, 
     const [isCameraScannerOpen, setIsCameraScannerOpen] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
-    const [currentTicket, setCurrentTicket] = useState(ticket); 
+    const [currentTicket, setCurrentTicket] = useState(ticket);
     const adminOptions = admins.map(admin => ({ value: admin.id, label: admin.name }));
     const selectedOption = adminOptions.find(opt => opt.value === selectedAdminId) || null;
 
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'assign-admin');
+
     useEffect(() => {
         if (show) {
-            setCurrentTicket(ticket); 
+            setCurrentTicket(ticket);
             setShouldRender(true);
-            setIsClosing(false); 
+            setIsClosing(false);
             if (currentUser && currentUser.id) {
                 setSelectedAdminId(currentUser.id);
             } else {
                 setSelectedAdminId(null);
             }
         } else if (shouldRender && !isClosing) {
-            setIsClosing(true); 
+            setIsClosing(true);
             const timer = setTimeout(() => {
                 setIsClosing(false);
-                setShouldRender(false); 
+                setShouldRender(false);
                 setSelectedAdminId(null);
                 setItemsToAssign([]);
-            }, 300); 
+            }, 300);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, ticket, shouldRender, currentUser]);
 
     const isDarkMode = document.body.classList.contains('dark-mode');
@@ -115,12 +119,12 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show, 
             showToast(error.response?.data?.message || `Kode "${code}" tidak ditemukan.`, 'error');
         }
     }, [addItemToList, showToast]);
-    
+
     useScannerListener(handleScan, show);
 
     const handleCameraScanSuccess = (decodedText) => {
         setIsCameraScannerOpen(false);
-        handleScan(decodedText);  
+        handleScan(decodedText);
     };
 
     const loadOptions = async (inputValue) => {
@@ -154,11 +158,7 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show, 
         onAssign(currentTicket.id, selectedAdminId, stokIds);
     };
 
-    const handleCloseClick = () => {
-        if (onClose) {
-            onClose();
-        }
-    };
+
 
     if (!shouldRender) return null;
     if (!currentTicket) return null;
@@ -166,11 +166,11 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show, 
     const animationClass = isClosing ? 'closing' : '';
 
     return (
-        <div 
+        <div
             className={`confirmation-modal-backdrop ${animationClass}`}
-            onClick={handleCloseClick}
+            onClick={handleClose}
         >
-            <div 
+            <div
                 className={`confirmation-modal-content ${animationClass}`}
                 onClick={e => e.stopPropagation()}
             >
@@ -201,8 +201,8 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show, 
                             noOptionsMessage={() => 'Ketik untuk mencari barang...'}
                             loadingMessage={() => 'Mencari...'}
                         />
-                        <button 
-                            type="button" 
+                        <button
+                            type="button"
                             className="btn-icon-only btn-scan-camera"
                             onClick={() => setIsCameraScannerOpen(true)}
                             title="Pindai dengan Kamera"
@@ -223,7 +223,7 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show, 
                 </div>
 
                 <div className="confirmation-modal-actions">
-                    <button onClick={handleCloseClick} className="btn-cancel">Batal</button>
+                    <button onClick={handleClose} className="btn-cancel">Batal</button>
                     <button onClick={handleSubmit} className="btn-confirm">Kerjakan</button>
                 </div>
             </div>

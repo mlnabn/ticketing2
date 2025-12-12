@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 
 function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurrency }) {
@@ -11,20 +12,23 @@ function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurre
     const [currentKodeUnik, setCurrentKodeUnik] = useState(kodeUnik);
     const navigate = useNavigate();
 
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'inventory-detail');
+
     useEffect(() => {
         if (show) {
             setCurrentKodeUnik(kodeUnik);
             setShouldRender(true);
-            setIsClosing(false); 
+            setIsClosing(false);
         } else if (shouldRender && !isClosing) {
-            setIsClosing(true); 
+            setIsClosing(true);
             const timer = setTimeout(() => {
                 setIsClosing(false);
-                setShouldRender(false); 
+                setShouldRender(false);
             }, 300);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, kodeUnik, shouldRender]);
 
     useEffect(() => {
@@ -45,9 +49,9 @@ function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurre
     }, [show, kodeUnik]);
 
     const handleCheckStockClick = () => {
-        onClose();
+        if (onClose) onClose();
         const searchTerm = fullDetail?.kode_unik || fullDetail?.master_barang?.nama_barang;
-        
+
         if (searchTerm) {
             navigate('/admin/stock', {
                 state: {
@@ -199,7 +203,7 @@ function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurre
     };
 
     const animationClass = isClosing ? 'closing' : '';
-    
+
     return (
         <div className={`modal-backdrop-detail ${animationClass}`}>
             <div className={`modal-content-detail ${animationClass}`}>
@@ -250,7 +254,7 @@ function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurre
                     )}
                 </div>
                 <div className="modal-footer-user">
-                    <button onClick={onClose} className="btn-cancel" style={{ marginRight: '10px' }}>Tutup</button>
+                    <button onClick={handleClose} className="btn-cancel" style={{ marginRight: '10px' }}>Tutup</button>
                     <button onClick={handleCheckStockClick} className="btn-confirm">Detail Unit</button>
                 </div>
             </div>

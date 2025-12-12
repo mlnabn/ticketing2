@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 function SkuDetailModal({ show, item, onClose }) {
     const [stockBreakdown, setStockBreakdown] = useState([]);
@@ -10,20 +11,23 @@ function SkuDetailModal({ show, item, onClose }) {
     const [currentItem, setCurrentItem] = useState(item);
     const navigate = useNavigate();
 
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'sku-detail');
+
     useEffect(() => {
         if (show) {
             setCurrentItem(item);
             setShouldRender(true);
-            setIsClosing(false); 
+            setIsClosing(false);
         } else if (shouldRender && !isClosing) {
-            setIsClosing(true); 
+            setIsClosing(true);
             const timer = setTimeout(() => {
                 setIsClosing(false);
-                setShouldRender(false); 
-            }, 300); 
+                setShouldRender(false);
+            }, 300);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [show, item, shouldRender]);
 
     useEffect(() => {
@@ -48,34 +52,28 @@ function SkuDetailModal({ show, item, onClose }) {
         return stockBreakdown.reduce((sum, currentItem) => sum + currentItem.total_stock, 0);
     }, [stockBreakdown]);
 
-    const handleCloseClick = () => {
-        if (onClose) {
-            onClose();
-        }
-    };
-
     const handleCheckStockClick = () => {
-        onClose();
+        if (onClose) onClose();
         if (item) {
             navigate('/admin/stock', {
                 state: {
-                    initialSearchTerm: item.nama_barang 
+                    initialSearchTerm: item.nama_barang
                 },
             });
         }
     };
 
     if (!shouldRender) return null;
-    if (!currentItem) return null; 
+    if (!currentItem) return null;
 
     const animationClass = isClosing ? 'closing' : '';
 
     return (
-        <div 
+        <div
             className={`modal-backdrop-detail ${animationClass}`}
-            onClick={handleCloseClick}
+            onClick={handleClose}
         >
-            <div 
+            <div
                 className={`modal-content-detail ${animationClass}`}
                 onClick={e => e.stopPropagation()}
             >
@@ -132,7 +130,7 @@ function SkuDetailModal({ show, item, onClose }) {
                 </div>
 
                 <div className="modal-footer-user">
-                    <button onClick={handleCloseClick} className="btn-cancel" style={{ marginRight: '10px' }}>Tutup</button>
+                    <button onClick={handleClose} className="btn-cancel" style={{ marginRight: '10px' }}>Tutup</button>
                     <button onClick={handleCheckStockClick} className="btn-confirm">Detail Unit</button>
                 </div>
             </div>

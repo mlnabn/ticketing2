@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 import '../App.css';
 
 const roleOptions = [
@@ -22,6 +23,9 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
 
   const [isClosing, setIsClosing] = useState(false);
   const [shouldRender, setShouldRender] = useState(show);
+
+  // Handle browser back button
+  const handleClose = useModalBackHandler(show, onClose, 'user-form');
 
   useEffect(() => {
     if (show) {
@@ -62,17 +66,12 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    handleClose();
     onSave(formData);
   };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
-  };
-
-  const handleCloseClick = () => {
-    if (onClose) {
-      onClose();
-    }
   };
 
   if (!shouldRender) return null;
@@ -83,7 +82,7 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
     <>
       <div
         className={`modal-overlay ${animationClass}`}
-        onClick={handleCloseClick}
+        onClick={handleClose}
       >
         <div
           className={`modal-content-detail ${animationClass}`}
@@ -158,7 +157,7 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
               </div>
             </div>
             <div className="modal-actions">
-              <button type="button" onClick={onClose} className="btn-cancel">Batal</button>
+              <button type="button" onClick={handleClose} className="btn-cancel">Batal</button>
               <button type="submit" className="btn-confirm">Simpan</button>
             </div>
           </form>

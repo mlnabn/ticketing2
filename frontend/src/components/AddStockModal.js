@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import Select from 'react-select';
 import api from '../services/api';
 import QrPrintSheet from './QrPrintSheet';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 /* ===========================================================
    Custom Components for Color Select 
@@ -141,6 +142,9 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
     const [selectedMasterBarang, setSelectedMasterBarang] = useState(null);
+
+    // Handle browser back button
+    const handleClose = useModalBackHandler(show, onClose, 'add-stock');
 
 
     useEffect(() => {
@@ -308,11 +312,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
         setActiveSerialIndex(0);
     }, [show, itemToPreselect]);
 
-    const handleCloseAndReset = () => {
-        if (onClose) {
-            onClose();
-        }
-    };
+
 
     useEffect(() => {
         const count = parseInt(formData.jumlah, 10) || 0;
@@ -446,7 +446,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
         <>
             <div
                 className={`modal-backdrop-detail ${animationClass}`}
-                onClick={handleCloseAndReset}
+                onClick={handleClose}
             >
                 <div
                     className={`modal-content-detail ${animationClass}`}
@@ -576,7 +576,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
 
                                 </div>
                                 <div className="confirmation-modal-actions">
-                                    <button type="button" onClick={handleCloseAndReset} className="btn-cancel">Batal</button>
+                                    <button type="button" onClick={handleClose} className="btn-cancel">Batal</button>
                                     <button type="submit" className="btn-confirm" disabled={isLoading} ref={submitButtonRef}>Simpan</button>
                                 </div>
                             </form>
@@ -590,7 +590,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
                             <p style={{ marginTop: '20px' }}>Anda bisa langsung mencetak label QR Code untuk ditempelkan pada unit barang.</p>
 
                             <div className="confirmation-modal-actions" style={{ marginTop: '30px' }}>
-                                <button onClick={handleCloseAndReset} className="btn-cancel">Tutup</button>
+                                <button onClick={handleClose} className="btn-cancel">Tutup</button>
                                 <button onClick={handlePrint} className="btn-confirm">
                                     <i className="fas fa-print" style={{ marginRight: '8px' }}></i>
                                     Print QR Codes

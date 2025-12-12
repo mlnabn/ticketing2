@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 export default function WorkshopFormModal({ show, workshopToEdit, onClose, onSave }) {
   const [name, setName] = useState('');
@@ -6,6 +7,9 @@ export default function WorkshopFormModal({ show, workshopToEdit, onClose, onSav
   const [url, setUrl] = useState('');
   const [isClosing, setIsClosing] = useState(false);
   const [shouldRender, setShouldRender] = useState(show);
+
+  // Handle browser back button
+  const handleClose = useModalBackHandler(show, onClose, 'workshop-form');
 
   useEffect(() => {
     if (workshopToEdit) {
@@ -58,8 +62,8 @@ export default function WorkshopFormModal({ show, workshopToEdit, onClose, onSav
   const animationClass = isClosing ? 'closing' : '';
 
   return (
-    <div className={`confirmation-modal-backdrop ${animationClass}`}>
-      <div className={`modal-content-large ${animationClass}`}>
+    <div className={`confirmation-modal-backdrop ${animationClass}`} onClick={handleClose}>
+      <div className={`modal-content-large ${animationClass}`} onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h3>{isEditMode ? 'Edit Workshop' : 'Tambah Workshop Baru'}</h3>
         </div>
@@ -79,7 +83,7 @@ export default function WorkshopFormModal({ show, workshopToEdit, onClose, onSav
             </div>
           </div>
           <div className="confirmation-modal-actions">
-            <button type="button" className="btn-cancel" onClick={onClose}>Batal</button>
+            <button type="button" className="btn-cancel" onClick={handleClose}>Batal</button>
             <button type="submit" className="btn-confirm">Simpan</button>
           </div>
         </form>

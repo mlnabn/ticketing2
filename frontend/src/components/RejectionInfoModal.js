@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { motion } from 'framer-motion';
+import { useModalBackHandlerOnMount } from '../hooks/useModalBackHandler';
 
 const modalVariants = {
   hidden: { opacity: 0, scale: 0.9 },
@@ -9,10 +10,13 @@ const modalVariants = {
 };
 
 function RejectionInfoModal({ ticket, onClose, onDelete }) {
+  // Handle browser back button
+  const handleClose = useModalBackHandlerOnMount(onClose, 'rejection-info');
+
   if (!ticket) return null;
 
   return ReactDOM.createPortal(
-    <div className="modal-backdrop-user" onClick={onClose}>
+    <div className="modal-backdrop-user" onClick={handleClose}>
       <motion.div
         className="modal-content-user"
         onClick={(e) => e.stopPropagation()}
@@ -31,7 +35,7 @@ function RejectionInfoModal({ ticket, onClose, onDelete }) {
           </p>
         </div>
         <div className="modal-actions">
-          <button type="button" onClick={onClose} className="btn-canceluser">
+          <button type="button" onClick={handleClose} className="btn-canceluser">
             Tutup
           </button>
           <button type="button" onClick={() => onDelete(ticket)} className="btn-confirmuser">

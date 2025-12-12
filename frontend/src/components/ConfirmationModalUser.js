@@ -1,6 +1,7 @@
 import React from 'react';
-import ReactDOM from 'react-dom'; 
+import ReactDOM from 'react-dom';
 import { motion } from 'framer-motion';
+import { useModalBackHandlerOnMount } from '../hooks/useModalBackHandler';
 
 const backdropVariants = {
   visible: { opacity: 1 },
@@ -23,6 +24,8 @@ const modalVariants = {
 };
 
 const ConfirmationModalUser = ({ message, onConfirm, onCancel }) => {
+  // Handle browser back button
+  const handleClose = useModalBackHandlerOnMount(onCancel, 'confirm-user');
 
   return ReactDOM.createPortal(
     <motion.div
@@ -31,7 +34,7 @@ const ConfirmationModalUser = ({ message, onConfirm, onCancel }) => {
       initial="hidden"
       animate="visible"
       exit="exit"
-      onClick={onCancel}
+      onClick={handleClose}
     >
       <motion.div
         className="confirmation-modal-content-user"
@@ -41,7 +44,7 @@ const ConfirmationModalUser = ({ message, onConfirm, onCancel }) => {
         <p>{message}</p>
         <div className="confirmation-modal-actions">
           <button
-            onClick={onCancel}
+            onClick={handleClose}
             className="btn-cancel"
           >
             Batal
@@ -55,7 +58,7 @@ const ConfirmationModalUser = ({ message, onConfirm, onCancel }) => {
         </div>
       </motion.div>
     </motion.div>,
-    document.body 
+    document.body
   );
 };
 
