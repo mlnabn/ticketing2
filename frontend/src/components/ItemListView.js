@@ -529,7 +529,7 @@ function ItemListView({
                                                         key={detail.id_m_barang}
                                                         className="ticket-card-mobile detail-card hoverable-row"
                                                         style={{
-                                                            cursor: detail.total_active_stock > 0 ? 'not-allowed' : 'pointer',
+                                                            cursor: 'default',
                                                             backgroundColor: detail.total_active_stock > 0 ? '#f8f9fa' : 'white'
                                                         }}
                                                     >
@@ -547,10 +547,14 @@ function ItemListView({
                                                         </div>
                                                         <div
                                                             className="card-content-col hoverable-row"
+                                                            style={{ cursor: 'pointer' }}
                                                             onClick={(e) => {
-                                                                if (detail.total_active_stock > 0) return;
-
-                                                                if (e.target.tagName === 'BUTTON' || e.target.closest('.action-row') || e.target.closest('.card-select-col') || e.target.type === 'checkbox') {
+                                                                if (
+                                                                    e.target.tagName === 'BUTTON' ||
+                                                                    e.target.closest('.action-row') ||
+                                                                    e.target.closest('.card-select-col') ||
+                                                                    e.target.type === 'checkbox'
+                                                                ) {
                                                                     return;
                                                                 }
                                                                 handleRowClick(e, detail);
@@ -586,6 +590,7 @@ function ItemListView({
                                                                         className="btn-user-action btn-dlt"
                                                                         disabled={detail.total_active_stock > 0}
                                                                         title={detail.total_active_stock > 0 ? 'SKU tidak bisa diarsipkan jika masih ada stok aktif' : 'Arsipkan SKU ini'}
+                                                                        style={{ cursor: detail.total_active_stock > 0 ? 'not-allowed' : 'pointer' }}
                                                                     >
                                                                         Arsipkan
                                                                     </button>
