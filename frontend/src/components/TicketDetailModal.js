@@ -145,13 +145,20 @@ function TicketDetailModal({ show, ticket, onClose }) {
 
                     {currentTicket.status === 'Selesai' && currentTicket.proof_description && (
                         <div className="detail-item-full" data-span="2">
-                            <span className="label" style={{ color: '#0d6efd', fontStyle: 'italic', fontWeight: 'bold' }}>Bukti Pekerjaan</span>
+                            <span className="label"
+                                style={{
+                                    color: '#0d6efd',
+                                    fontStyle: 'italic',
+                                    fontWeight: 'bold'
+                                }}>Bukti Pekerjaan</span>
                             <p className="value">{currentTicket.proof_description}</p>
                             {currentTicket.proof_image_url && (
                                 <div className="proof-image-container">
+                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
                                     <a href={currentTicket.proof_image_url} target="_blank" rel="noopener noreferrer">
                                         <img src={currentTicket.proof_image_url} alt="Bukti Pengerjaan" />
                                     </a>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -189,13 +196,13 @@ function TicketDetailModal({ show, ticket, onClose }) {
                                         {item.bukti_foto_path && (
                                             <div className="detail-full">
                                                 <label className="detail-label">Bukti Kondisi:</label>
-                                                <div style={{  display: 'flex', justifyContent: 'center' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'center' }}>
                                                     <img
                                                         src={getImageUrl(item.bukti_foto_path)}
                                                         alt="Bukti Barang"
                                                         style={{
                                                             maxWidth: '100%',
-                                                            maxHeight: '400px',
+                                                            maxHeight: '100px',
                                                             borderRadius: '8px',
                                                             border: '1px solid #ddd',
                                                             cursor: 'pointer'
