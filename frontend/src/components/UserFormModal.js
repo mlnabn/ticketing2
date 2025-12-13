@@ -45,19 +45,21 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
   const isEditMode = Boolean(userToEdit);
 
   useEffect(() => {
-    if (isEditMode) {
-      setFormData({
-        name: userToEdit.name,
-        email: userToEdit.email,
-        phone: userToEdit.phone || '',
-        password: '',
-        password_confirmation: '',
-        role: userToEdit.role,
-      });
-    } else {
-      setFormData({ name: '', email: '', phone: '', password: '', password_confirmation: '', role: 'user' });
+    if (show) {
+      if (isEditMode) {
+        setFormData({
+          name: userToEdit.name,
+          email: userToEdit.email,
+          phone: userToEdit.phone || '',
+          password: '',
+          password_confirmation: '',
+          role: userToEdit.role,
+        });
+      } else {
+        setFormData({ name: '', email: '', phone: '', password: '', password_confirmation: '', role: 'user' });
+      }
     }
-  }, [userToEdit, isEditMode]);
+  }, [userToEdit, isEditMode, show]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,7 +68,6 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    handleClose();
     onSave(formData);
   };
 
