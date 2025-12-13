@@ -108,7 +108,9 @@ class WorkshopController extends Controller
             }
         }
 
-        $validated['code'] = $this->generateWorkshopCode($validated['name']);
+        if ($workshop->name !== $validated['name']) {
+            $validated['code'] = $this->generateWorkshopCode($validated['name']);
+        }
 
         $workshop->update($validated);
         return response()->json($workshop);
@@ -132,7 +134,7 @@ class WorkshopController extends Controller
         $cleanedName = preg_replace('/[0-9]+/', '', $name);
         $cleanedName = trim(preg_replace('/\s+/', ' ', $cleanedName));
         $words = explode(' ', $cleanedName);
-        $fullName = str_replace(' ', '', $cleanedName); 
+        $fullName = str_replace(' ', '', $cleanedName);
 
         $baseCodes = [];
 
