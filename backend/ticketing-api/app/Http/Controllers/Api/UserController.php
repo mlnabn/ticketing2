@@ -68,20 +68,37 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        $messages = [
+            'required' => ':attribute wajib diisi.',
+            'email' => 'Format email tidak valid.',
+            'unique' => ':attribute sudah terdaftar.',
+            'min' => ':attribute minimal :min karakter.',
+            'confirmed' => 'Konfirmasi password tidak cocok.',
+            'in' => 'Pilihan :attribute tidak valid.',
+        ];
+
+        $attributes = [
+            'name' => 'Nama',
+            'email' => 'Email',
+            'phone' => 'Nomor Telepon',
+            'password' => 'Password',
+            'role' => 'Peran',
+        ];
+
         $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users',
-            'phone'    => 'required|string|min:10|unique:users',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'phone' => 'nullable|string|min:10|unique:users',
             'password' => 'required|string|min:6|confirmed',
-            'role'     => 'required|in:admin,user',
-        ]);
+            'role' => 'required|in:admin,user',
+        ], $messages, $attributes);
 
         $user = User::create([
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
-            'phone'    => $validated['phone'],
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
             'password' => bcrypt($validated['password']),
-            'role'     => $validated['role'],
+            'role' => $validated['role'],
         ]);
 
         return response()->json($user, 201);
@@ -101,13 +118,31 @@ class UserController extends Controller
         if (auth()->user()->role !== 'admin') {
             return response()->json(['error' => 'Akses ditolak.'], 403);
         }
+
+        $messages = [
+            'required' => ':attribute wajib diisi.',
+            'email' => 'Format email tidak valid.',
+            'unique' => ':attribute sudah terdaftar.',
+            'min' => ':attribute minimal :min karakter.',
+            'confirmed' => 'Konfirmasi password tidak cocok.',
+            'in' => 'Pilihan :attribute tidak valid.',
+        ];
+
+        $attributes = [
+            'name' => 'Nama',
+            'email' => 'Email',
+            'phone' => 'Nomor Telepon',
+            'password' => 'Password',
+            'role' => 'Peran',
+        ];
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'phone' => ['nullable', 'string', 'min:10', Rule::unique('users')->ignore($user->id)],
-            'password' => 'nullable|string|min:8|confirmed',
+            'password' => 'nullable|string|min:6|confirmed',
             'role' => 'required|in:admin,user',
-        ]);
+        ], $messages, $attributes);
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->phone = $validated['phone'];

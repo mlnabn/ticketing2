@@ -147,6 +147,7 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
         <div
             className={`modal-backdrop-centered ${animationClass}`}
             onClick={handleClose}
+            style={{ zIndex: 10001 }}
         >
             <div
                 className={`modal-content-large ${animationClass}`}

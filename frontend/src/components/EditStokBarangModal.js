@@ -168,11 +168,11 @@ function EditStokBarangModal({ show, isOpen, onClose, item, onSaveSuccess, showT
 
     const handleSave = async (e) => {
         e.preventDefault();
-        if (!formData.serial_number) {
-            showToast('Serial Number tidak boleh kosong.', 'error');
-            if (serialInputRef.current) serialInputRef.current.focus();
-            return;
-        }
+        // if (!formData.serial_number) {
+        //     showToast('Serial Number tidak boleh kosong.', 'error');
+        //     if (serialInputRef.current) serialInputRef.current.focus();
+        //     return;
+        // }
 
         setIsLoading(true);
         try {

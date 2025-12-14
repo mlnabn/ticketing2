@@ -82,6 +82,11 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
         setDisplayEstimatedPrice('');
         setLink('');
         setNotes('');
+
+        if (selectedBarang || quantity || displayEstimatedPrice) {
+            showToast('Barang berhasil ditambahkan', 'success');
+            return;
+        }
     };
 
     const handleRemoveItem = (id) => {
@@ -130,7 +135,7 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
 
     const handleSubmitProposal = async () => {
         if (!title || items.length === 0) {
-            showToast('Judul dan minimal 1 barang wajib diisi.', 'warning');
+            showToast('Periksa kembali Judul dan Barang yang ditambahkan', 'warning');
             return;
         }
         setIsLoading(true);
@@ -231,7 +236,7 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
 
                     <div className="confirmation-modal-actions">
                         <button type="button" onClick={handleClose} className="btn-cancel">Batal</button>
-                        <button type="button" onClick={handleSubmitProposal} className="btn-confirm" disabled={isLoading || items.length === 0}>
+                        <button type="button" onClick={handleSubmitProposal} className="btn-confirm">
                             {isLoading ? 'Menyimpan...' : 'Simpan'}
                         </button>
                     </div>
@@ -241,7 +246,7 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
             <ItemFormModal
                 show={isSkuModalOpen}
                 onClose={() => setIsSkuModalOpen(false)}
-                onSave={handleSkuApiSave}
+                onSaveRequest={handleSkuApiSave}
                 showToast={showToast}
                 initialData={{ nama_barang: newSkuName }}
             />
