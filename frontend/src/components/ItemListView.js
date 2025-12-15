@@ -529,8 +529,7 @@ function ItemListView({
                                                         key={detail.id_m_barang}
                                                         className="ticket-card-mobile detail-card hoverable-row"
                                                         style={{
-                                                            cursor: 'default',
-                                                            backgroundColor: detail.total_active_stock > 0 ? '#f8f9fa' : 'white'
+                                                            cursor: 'default'
                                                         }}
                                                     >
                                                         <div className="card-select-col">
