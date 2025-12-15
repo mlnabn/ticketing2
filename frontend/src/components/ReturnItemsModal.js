@@ -265,7 +265,7 @@ function ReturnItemsModal({ show, ticket, onSave, onClose, showToast }) {
                                                 value={item.keterangan}
                                                 onChange={(e) => handleItemChange(item.stok_barang_id, 'keterangan', e.target.value)}
                                                 rows="2"
-                                                placeholder="Cth: Dipasang permanen di workshop, jatuh, dll."
+                                                placeholder="Contoh: Dipasang permanen di workshop, jatuh, dll."
                                             ></textarea>
                                         </div>
                                         {isDigunakan && (

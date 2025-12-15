@@ -93,11 +93,27 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
           <form onSubmit={handleSubmit}>
             <div>
               <label htmlFor="name">Nama:</label>
-              <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required style={{ borderRadius: '10px' }} />
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : 'Bagas Pambudi'}
+                required
+                style={{ borderRadius: '10px' }} />
             </div>
             <div>
               <label htmlFor="email">Email:</label>
-              <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required style={{ borderRadius: '10px' }} />
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : 'user@example.com'}
+                required
+                style={{ borderRadius: '10px' }} />
             </div>
             <div>
               <label htmlFor="phone">Nomor Telepon:</label>
@@ -107,7 +123,7 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : ''}
+                placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : '628xxxxxxxxxx'}
                 style={{ borderRadius: '10px' }}
               />
             </div>
@@ -133,7 +149,7 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : ''}
+                  placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : '******'}
                   style={{ borderRadius: '10px' }}
                 />
                 <button type="button" onClick={togglePasswordVisibility} className="password-toggle-btn">
@@ -150,6 +166,7 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                   name="password_confirmation"
                   value={formData.password_confirmation}
                   onChange={handleChange}
+                  placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : '******'}
                   style={{ borderRadius: '10px' }}
                 />
                 <button type="button" onClick={togglePasswordVisibility} className="password-toggle-btn">

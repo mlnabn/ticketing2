@@ -195,12 +195,12 @@ export default function NotificationForm() {
             </div>
             <div className="form-group">
               <label htmlFor="title">Judul Notifikasi</label>
-              <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+              <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder='Gunakan Template / Ketik Judul (ex : Pengumuman Penting)'/>
             </div>
           </div>
           <div className="form-group2">
             <label htmlFor="message">Isi Pesan</label>
-            <textarea id="message" rows="5" value={message} onChange={(e) => setMessage(e.target.value)} required></textarea>
+            <textarea id="message" rows="5" value={message} onChange={(e) => setMessage(e.target.value)} required placeholder='Ketik Deskripsi Disini ...'></textarea>
           </div>
           <button type="submit" className="btn-primary" disabled={isLoading}>
             {isLoading ? 'Mengirim...' : 'Kirim Notifikasi'}
