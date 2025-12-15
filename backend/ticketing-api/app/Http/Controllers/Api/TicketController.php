@@ -435,6 +435,10 @@ class TicketController extends Controller
             }
         }
 
+        if ($request->has('workshop_id') && $request->workshop_id) {
+            $baseQuery->where('workshop_id', $request->workshop_id);
+        }
+
         $statsQuery = clone $baseQuery;
 
         $stats = $statsQuery->select(
@@ -781,6 +785,10 @@ class TicketController extends Controller
             if ($request->has('month')) {
                 $query->whereMonth('created_at', $request->month);
             }
+        }
+
+        if ($request->has('workshop_id')) {
+            $query->where('workshop_id', $request->workshop_id);
         }
 
         $isHandledReport = $request->has('handled_status');
