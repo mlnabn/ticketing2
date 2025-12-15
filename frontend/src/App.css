@@ -14273,7 +14273,7 @@ body.dark-mode .detail-list-footer-centered {
   flex-shrink: 0;
   border-right: 1px solid var(--border-color-light);
   transition: background-color 0.2s;
-  background-color: ghostwhite;
+
 }
 
 .data-group.horizontal {
@@ -14290,7 +14290,6 @@ body.dark-mode .detail-list-footer-centered {
 
 .dark-mode .card-select-col {
   border-right: 1px solid var(--border-color-dark);
-  background-color: #2c2f33;
 }
 
 .card-content-col.hoverable-row:hover+.card-select-col,
@@ -14310,11 +14309,6 @@ body.dark-mode .detail-list-footer-centered {
   flex-direction: column;
   gap: 12px;
   padding: 15px;
-  background-color: ghostwhite;
-}
-
-.dark-mode .card-content-col {
-  background-color: #2c2f33;
 }
 
 .card-select-col input[type="checkbox"] {
