@@ -40,6 +40,11 @@ export function useModalBackHandler(isOpen, onClose, modalName = 'modal') {
         // Handler for back button
         const handlePopState = () => {
             if (historyPushedRef.current && !isProcessingRef.current) {
+                // Ignore if we are back at THIS modal's state (e.g. child modal closed)
+                if (window.history.state?.modal === modalName) {
+                    return;
+                }
+
                 isProcessingRef.current = true;
                 historyPushedRef.current = false;
                 // Use ref to always get latest onClose without re-creating listener
@@ -98,6 +103,9 @@ export function useModalBackHandlerOnMount(onClose, modalName = 'modal') {
 
         const handlePopState = () => {
             if (historyPushedRef.current && !isProcessingRef.current) {
+                if (window.history.state?.modal === modalName) {
+                    return;
+                }
                 isProcessingRef.current = true;
                 historyPushedRef.current = false;
                 onCloseRef.current?.();

@@ -234,6 +234,7 @@ function ItemDetailModal({
                     onChange={handleChange}
                     rows="2"
                     className="detail-textarea"
+                    placeholder='Contoh : Barang Digunakan Untuk Keperluan ...'
                 ></textarea>
             </div>
         );

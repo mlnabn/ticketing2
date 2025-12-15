@@ -18,13 +18,10 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
     password_confirmation: '',
     role: 'user',
   });
-
+  const [focusedInput, setFocusedInput] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
-
   const [isClosing, setIsClosing] = useState(false);
   const [shouldRender, setShouldRender] = useState(show);
-
-  // Handle browser back button
   const handleClose = useModalBackHandler(show, onClose, 'user-form');
 
   useEffect(() => {
@@ -45,19 +42,21 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
   const isEditMode = Boolean(userToEdit);
 
   useEffect(() => {
-    if (isEditMode) {
-      setFormData({
-        name: userToEdit.name,
-        email: userToEdit.email,
-        phone: userToEdit.phone || '',
-        password: '',
-        password_confirmation: '',
-        role: userToEdit.role,
-      });
-    } else {
-      setFormData({ name: '', email: '', phone: '', password: '', password_confirmation: '', role: 'user' });
+    if (show) {
+      if (isEditMode) {
+        setFormData({
+          name: userToEdit.name,
+          email: userToEdit.email,
+          phone: userToEdit.phone || '',
+          password: '',
+          password_confirmation: '',
+          role: userToEdit.role,
+        });
+      } else {
+        setFormData({ name: '', email: '', phone: '', password: '', password_confirmation: '', role: 'user' });
+      }
     }
-  }, [userToEdit, isEditMode]);
+  }, [userToEdit, isEditMode, show]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,7 +65,6 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    handleClose();
     onSave(formData);
   };
 
@@ -92,13 +90,29 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
           <form onSubmit={handleSubmit}>
             <div>
               <label htmlFor="name">Nama:</label>
-              <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required style={{ borderRadius: '10px' }} />
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : 'ex: Bagas Pambudi'}
+                required
+                style={{ borderRadius: '10px' }} />
             </div>
             <div>
               <label htmlFor="email">Email:</label>
-              <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required style={{ borderRadius: '10px' }} />
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : 'user@example.com'}
+                required
+                style={{ borderRadius: '10px' }} />
             </div>
-            <div>
+            <div onFocus={() => setFocusedInput('phone')} onBlur={() => setFocusedInput(null)}>
               <label htmlFor="phone">Nomor Telepon:</label>
               <input
                 type="text"
@@ -106,9 +120,14 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : ''}
+                placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : '628xxxxxxxxxx'}
                 style={{ borderRadius: '10px' }}
               />
+              {focusedInput === 'phone' && !formData.phone.startsWith('62') && (
+                <span style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>
+                  Nomor telepon harus diawali dengan 62
+                </span>
+              )}
             </div>
 
             <div>
@@ -123,7 +142,7 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                 isSearchable={false}
               />
             </div>
-            <div>
+            <div onFocus={() => setFocusedInput('password')} onBlur={() => setFocusedInput(null)}>
               <label htmlFor="password">Password:</label>
               <div className="password-input-container">
                 <input
@@ -132,13 +151,18 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : ''}
+                  placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : '******'}
                   style={{ borderRadius: '10px' }}
                 />
                 <button type="button" onClick={togglePasswordVisibility} className="password-toggle-btn">
                   <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                 </button>
               </div>
+              {focusedInput === 'password' && formData.password.length < 6 && (
+                <span style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>
+                  Password harus minimal 6 karakter
+                </span>
+              )}
             </div>
             <div>
               <label htmlFor="password_confirmation">Konfirmasi Password:</label>
@@ -149,6 +173,7 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                   name="password_confirmation"
                   value={formData.password_confirmation}
                   onChange={handleChange}
+                  placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : '******'}
                   style={{ borderRadius: '10px' }}
                 />
                 <button type="button" onClick={togglePasswordVisibility} className="password-toggle-btn">

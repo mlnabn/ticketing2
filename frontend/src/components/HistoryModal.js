@@ -157,28 +157,25 @@ function HistoryModal({ show, item, onClose, showToast, startDate, endDate }) {
                                     )}
                                 </div>
                                 {log.bukti_foto_path && (
-                                    <div className="info-row full-width" style={{ marginTop: '5px' }}>
-                                        <span className="info-label" style={{ marginBottom: '5px', display: 'block' }}>Bukti Foto</span>
-                                        <div style={{
-                                            width: 'fit-content',
-                                            border: '1px solid #e2e8f0',
-                                            padding: '5px',
-                                            borderRadius: '8px',
-                                            backgroundColor: '#f8fafc'
-                                        }}>
-                                            <img
-                                                src={getImageUrl(log.bukti_foto_path)}
-                                                alt="Bukti Riwayat"
-                                                style={{
-                                                    maxWidth: '100%',
-                                                    maxHeight: '150px',
-                                                    borderRadius: '6px',
-                                                    cursor: 'pointer',
-                                                    display: 'block'
-                                                }}
-                                                onClick={() => window.open(getImageUrl(log.bukti_foto_path), '_blank')}
-                                                title="Klik untuk memperbesar"
-                                            />
+                                    <div className="detail-field detail-full">
+                                        <label className="detail-label">
+                                            Bukti Foto
+                                        </label>
+                                        <div style={{ marginTop: 10, display: 'flex', justifyContent: 'center' }}>
+                                            
+                                                <img
+                                                    src={getImageUrl(log.bukti_foto_path)}
+                                                    alt="Bukti Riwayat"
+                                                    style={{
+                                                        maxWidth: '100%',
+                                                        maxHeight: '150px',
+                                                        borderRadius: '6px',
+                                                        cursor: 'pointer',
+
+                                                    }}
+                                                    onClick={() => window.open(getImageUrl(log.bukti_foto_path), '_blank')}
+                                                    title="Klik untuk memperbesar"
+                                                />
                                         </div>
                                     </div>
                                 )}

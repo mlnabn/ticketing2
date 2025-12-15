@@ -23,9 +23,11 @@ class StokBarangController extends Controller
 
         $query = StokBarang::with([
             'masterBarang' => function ($query) use ($excludedStatuses) {
-                $query->withCount(['stokBarangs' => function ($q) use ($excludedStatuses) {
-                    $q->whereNotIn('status_id', $excludedStatuses);
-                }]);
+                $query->withCount([
+                    'stokBarangs' => function ($q) use ($excludedStatuses) {
+                        $q->whereNotIn('status_id', $excludedStatuses);
+                    }
+                ]);
             },
             'masterBarang.masterKategori',
             'masterBarang.subKategori',
@@ -160,17 +162,38 @@ class StokBarangController extends Controller
 
     public function store(Request $request)
     {
+        $messages = [
+            'required' => ':attribute wajib diisi.',
+            'unique' => ':attribute sudah terdaftar.',
+            'exists' => ':attribute tidak ditemukan.',
+            'numeric' => ':attribute harus berupa angka.',
+            'min' => ':attribute minimal :min angka.',
+            'max' => ':attribute maksimal :max angka.',
+            'in' => ':attribute harus berupa :values.',
+        ];
+
+        $attributes = [
+            'master_barang_id' => 'Nama Barang',
+            'jumlah' => 'Jumlah',
+            'harga_beli' => 'Harga Beli',
+            'kondisi' => 'Kondisi',
+            'id_warna' => 'Warna',
+            'tanggal_pembelian' => 'Tanggal Pembelian',
+            'tanggal_masuk' => 'Tanggal Masuk',
+            'serial_numbers' => 'Serial Numbers',
+        ];
+
         $validated = $request->validate([
             'master_barang_id' => 'required|exists:master_barangs,id_m_barang',
             'jumlah' => 'required|integer|min:1',
-            'harga_beli' => 'required|numeric|min:0',
+            'harga_beli' => 'required|numeric|min:3',
             'kondisi' => 'required|in:Baru,Bekas',
             'id_warna' => 'nullable|exists:colors,id_warna',
             'tanggal_pembelian' => 'nullable|date',
             'tanggal_masuk' => 'required|date',
             'serial_numbers' => 'nullable|array',
             'serial_numbers.*' => 'nullable|string|unique:stok_barangs,serial_number',
-        ]);
+        ], $messages, $attributes);
 
         $masterBarang = MasterBarang::find($validated['master_barang_id']);
 
@@ -403,7 +426,8 @@ class StokBarangController extends Controller
     {
         \Illuminate\Support\Facades\Validator::extend('required_if_status', function ($attribute, $value, $parameters, $validator) {
             $statusId = $validator->getData()['status_id'] ?? null;
-            if (!$statusId) return true;
+            if (!$statusId)
+                return true;
 
             $status = \App\Models\Status::find($statusId);
             if ($status && in_array($status->nama_status, $parameters)) {
@@ -468,18 +492,22 @@ class StokBarangController extends Controller
         $query = MasterBarang::with(['masterKategori', 'subKategori', 'createdBy'])
             ->active()
             ->has('stokBarangs')
-            ->withCount(['stokBarangs as available_stock_count' => function ($q) use ($request, $tersediaStatusId) {
-                $q->where('status_id', $tersediaStatusId);
-                if ($request->filled('id_warna')) {
-                    $q->where('id_warna', $request->id_warna);
+            ->withCount([
+                'stokBarangs as available_stock_count' => function ($q) use ($request, $tersediaStatusId) {
+                    $q->where('status_id', $tersediaStatusId);
+                    if ($request->filled('id_warna')) {
+                        $q->where('id_warna', $request->id_warna);
+                    }
                 }
-            }])
-            ->withCount(['stokBarangs as total_stock_count' => function ($q) use ($request, $endOfLifeStatuses) {
-                $q->whereNotIn('status_id', $endOfLifeStatuses);
-                if ($request->filled('id_warna')) {
-                    $q->where('id_warna', $request->id_warna);
+            ])
+            ->withCount([
+                'stokBarangs as total_stock_count' => function ($q) use ($request, $endOfLifeStatuses) {
+                    $q->whereNotIn('status_id', $endOfLifeStatuses);
+                    if ($request->filled('id_warna')) {
+                        $q->where('id_warna', $request->id_warna);
+                    }
                 }
-            }]);
+            ]);
 
         if ($request->filled('id_kategori')) {
             $query->where('id_kategori', $request->id_kategori);

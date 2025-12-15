@@ -12,8 +12,6 @@ function TicketModal({
 }) {
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
-
-    // Handle browser back button
     const handleClose = useModalBackHandler(show, onClose, 'ticket');
 
     useEffect(() => {
@@ -60,16 +58,33 @@ function TicketModal({
                             className={`ticket-modal-card ${isDarkMode ? 'dark-mode' : ''} status-${ticket.status.toLowerCase().replace(/\s/g, '-')}`}
                             onClick={() => {
                                 if (onTicketClick) onTicketClick(ticket.id);
-                                // Use onClose directly instead of handleClose
-                                // because onTicketClick will navigate away, 
-                                // and we don't want history.back() to interfere
                                 if (onClose) onClose();
                             }}
                         >
-                            <p><b>Pengirim:</b> {ticket.creator?.name}</p>
-                            <p><b>Workshop:</b> {ticket.workshop?.name}</p>
-                            <p className="description-cell"><b>Deskripsi:</b> {ticket.title}</p>
-                            <p><b>Status:</b> {ticket.status}</p>
+                            <p>
+                                <b>Pengirim:</b>{' '}
+                                <span className={`status-highlight status-color-${ticket.status.toLowerCase().replace(/\s/g, '-')}`}>
+                                    {ticket.creator?.name}
+                                </span>
+                            </p>
+                            <p>
+                                <b>Workshop:</b>{' '}
+                                <span className={`status-highlight status-color-${ticket.status.toLowerCase().replace(/\s/g, '-')}`}>
+                                    {ticket.workshop?.name}
+                                </span>
+                            </p>
+                            <p className="description-cell">
+                                <b>Deskripsi:</b>{' '}
+                                <span className={`status-highlight status-color-${ticket.status.toLowerCase().replace(/\s/g, '-')}`}>
+                                    {ticket.title}
+                                </span>
+                            </p>
+                            <p>
+                                <b>Status:</b>{' '}
+                                <span className={`ticket-status-text status-color-${ticket.status.toLowerCase().replace(/\s/g, '-')}`}>
+                                    {ticket.status}
+                                </span>
+                            </p>
                         </div>
                     ))}
                 </div>

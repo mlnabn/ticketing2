@@ -55,6 +55,7 @@ const yearOptions = years.map(y => ({ value: y.toString(), label: y.toString() }
 const filterTypeOptions = [
   { value: 'month', label: 'Filter per Bulan' },
   { value: 'date_range', label: 'Filter per Tanggal' },
+  { value: 'workshop', label: 'Filter per Workshop' },
 ];
 
 const staggerContainer = {
@@ -113,7 +114,9 @@ export default function ComprehensiveReportPage() {
     year: searchParams.get('year') || currentYear.toString(),
     month: searchParams.get('month') || '',
     start_date: searchParams.get('start_date') || '',
+
     end_date: searchParams.get('end_date') || '',
+    workshop_id: searchParams.get('workshop_id') || '',
   };
   const [filterType, setFilterType] = useState('month');
 
@@ -125,8 +128,22 @@ export default function ComprehensiveReportPage() {
   const [exportingPdf, setExportingPdf] = useState(false);
   const [exportingExcel, setExportingExcel] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const [workshops, setWorkshops] = useState([]);
   const desktopListRef = useRef(null);
   const mobileListRef = useRef(null);
+
+  useEffect(() => {
+    const fetchWorkshops = async () => {
+      try {
+        const res = await api.get('/workshops', { params: { per_page: 100 } });
+        setWorkshops(res.data.data.map(w => ({ value: w.id.toString(), label: w.name })));
+      } catch (err) {
+        console.error('Gagal mengambil data workshop:', err);
+      }
+    };
+    fetchWorkshops();
+  }, []);
 
 
   useEffect(() => {
@@ -196,6 +213,12 @@ export default function ComprehensiveReportPage() {
     } else if (newType === 'date_range') {
       newParams.delete('month');
       newParams.delete('year');
+      newParams.delete('workshop_id');
+    } else if (newType === 'workshop') {
+      newParams.delete('month');
+      newParams.delete('year');
+      newParams.delete('start_date');
+      newParams.delete('end_date');
     }
     setSearchParams(newParams);
   };
@@ -213,6 +236,8 @@ export default function ComprehensiveReportPage() {
       } else if (filterType === 'date_range') {
         if (dateFilters.start_date) params.start_date = dateFilters.start_date;
         if (dateFilters.end_date) params.end_date = dateFilters.end_date;
+      } else if (filterType === 'workshop') {
+        if (dateFilters.workshop_id) params.workshop_id = dateFilters.workshop_id;
       }
 
       if (currentFilter === 'handled') {
@@ -228,7 +253,7 @@ export default function ComprehensiveReportPage() {
     } finally {
       setLoading(false);
     }
-  }, [dateFilters.year, dateFilters.month, dateFilters.start_date, dateFilters.end_date, filterType]);
+  }, [dateFilters.year, dateFilters.month, dateFilters.start_date, dateFilters.end_date, dateFilters.workshop_id, filterType]);
 
   useEffect(() => {
     if (!isPresent) return;
@@ -246,6 +271,8 @@ export default function ComprehensiveReportPage() {
         } else if (filterType === 'date_range') {
           if (dateFilters.start_date) params.start_date = dateFilters.start_date;
           if (dateFilters.end_date) params.end_date = dateFilters.end_date;
+        } else if (filterType === 'workshop') {
+          if (dateFilters.workshop_id) params.workshop_id = dateFilters.workshop_id;
         }
 
         if (filterTypePath === 'handled') params.handled_status = 'true';
@@ -257,7 +284,7 @@ export default function ComprehensiveReportPage() {
       }
     };
     fetchStats();
-  }, [dateFilters.year, dateFilters.month, dateFilters.start_date, dateFilters.end_date, filterType, filterTypePath, isPresent]);
+  }, [dateFilters.year, dateFilters.month, dateFilters.start_date, dateFilters.end_date, dateFilters.workshop_id, filterType, filterTypePath, isPresent]);
 
   useEffect(() => {
     if (!isMobile) {
@@ -288,6 +315,8 @@ export default function ComprehensiveReportPage() {
     } else if (filterType === 'date_range') {
       if (dateFilters.start_date) params.append('start_date', dateFilters.start_date);
       if (dateFilters.end_date) params.append('end_date', dateFilters.end_date);
+    } else if (filterType === 'workshop') {
+      if (dateFilters.workshop_id) params.append('workshop_id', dateFilters.workshop_id);
     }
     try {
       const response = await api.get('/tickets/download-export', {
@@ -332,6 +361,8 @@ export default function ComprehensiveReportPage() {
       } else if (filterType === 'date_range') {
         if (dateFilters.start_date) params.start_date = dateFilters.start_date;
         if (dateFilters.end_date) params.end_date = dateFilters.end_date;
+      } else if (filterType === 'workshop') {
+        if (dateFilters.workshop_id) params.workshop_id = dateFilters.workshop_id;
       }
       if (filter === 'handled') {
         params.handled_status = 'handled';
@@ -461,6 +492,21 @@ export default function ComprehensiveReportPage() {
                       menuPortal: (base) => ({ ...base, zIndex: 9999 })
                     }}
                   />
+                  {filterType === 'workshop' && (
+                    <Select
+                      classNamePrefix="report-filter-select"
+                      placeholder="Pilih Workshop"
+                      options={[{ value: '', label: 'Semua Workshop' }, ...workshops]}
+                      value={workshops.find(w => w.value === dateFilters.workshop_id) || { value: '', label: 'Semua Workshop' }}
+                      onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'workshop_id', value: selectedOption.value } })}
+                      isSearchable={true}
+                      menuPortalTarget={document.body}
+                      styles={{
+                        container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                        menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                      }}
+                    />
+                  )}
                   {filterType === 'month' && (
                     <>
                       <Select

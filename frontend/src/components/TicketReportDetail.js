@@ -55,6 +55,7 @@ const months = [
 const filterTypeOptions = [
   { value: 'month', label: 'Filter per Bulan' },
   { value: 'date_range', label: 'Filter per Tanggal' },
+  { value: 'workshop', label: 'Filter per Workshop' },
 ];
 
 const staggerContainer = {
@@ -111,6 +112,7 @@ export default function TicketReportDetail() {
     month: searchParams.get('month') || '',
     start_date: searchParams.get('start_date') || '',
     end_date: searchParams.get('end_date') || '',
+    workshop_id: searchParams.get('workshop_id') || '',
   };
 
   const [filterType, setFilterType] = useState('month');
@@ -123,6 +125,7 @@ export default function TicketReportDetail() {
   const [exportingExcel, setExportingExcel] = useState(false);
   const [selectedTicketForDetail, setSelectedTicketForDetail] = useState(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [workshops, setWorkshops] = useState([]);
   const desktopListRef = useRef(null);
   const mobileListRef = useRef(null);
 
@@ -136,6 +139,18 @@ export default function TicketReportDetail() {
   const activeYear = yearOptions.find(y => y.value === dateFilters.year);
   const activeMonth = monthOptions.find(m => m.value === dateFilters.month);
   const activeFilterType = filterTypeOptions.find(opt => opt.value === filterType);
+
+  useEffect(() => {
+    const fetchWorkshops = async () => {
+      try {
+        const res = await api.get('/workshops', { params: { per_page: 100 } });
+        setWorkshops(res.data.data.map(w => ({ value: w.id.toString(), label: w.name })));
+      } catch (err) {
+        console.error('Gagal mengambil data workshop:', err);
+      }
+    };
+    fetchWorkshops();
+  }, []);
 
   useEffect(() => {
     if (dateFilters.start_date || dateFilters.end_date) {
@@ -203,6 +218,12 @@ export default function TicketReportDetail() {
     } else if (newType === 'date_range') {
       newParams.delete('month');
       newParams.delete('year');
+      newParams.delete('workshop_id');
+    } else if (newType === 'workshop') {
+      newParams.delete('month');
+      newParams.delete('year');
+      newParams.delete('start_date');
+      newParams.delete('end_date');
     }
     setSearchParams(newParams);
   };
@@ -237,6 +258,8 @@ export default function TicketReportDetail() {
       } else if (filterType === 'date_range') {
         if (dateFilters.start_date) params.start_date = dateFilters.start_date;
         if (dateFilters.end_date) params.end_date = dateFilters.end_date;
+      } else if (filterType === 'workshop') {
+        if (dateFilters.workshop_id) params.workshop_id = dateFilters.workshop_id;
       }
 
       const res = await api.get(`/tickets/admin-report/${adminId}`, { params });
@@ -246,7 +269,7 @@ export default function TicketReportDetail() {
     } finally {
       setLoading(false);
     }
-  }, [adminId, dateFilters.year, dateFilters.month, dateFilters.start_date, dateFilters.end_date, filterType]);
+  }, [adminId, dateFilters.year, dateFilters.month, dateFilters.start_date, dateFilters.end_date, dateFilters.workshop_id, filterType]);
 
   useEffect(() => {
     if (!isPresent) return;
@@ -283,6 +306,8 @@ export default function TicketReportDetail() {
       } else if (filterType === 'date_range') {
         if (dateFilters.start_date) params.start_date = dateFilters.start_date;
         if (dateFilters.end_date) params.end_date = dateFilters.end_date;
+      } else if (filterType === 'workshop') {
+        if (dateFilters.workshop_id) params.workshop_id = dateFilters.workshop_id;
       }
 
       const res = await api.get(`/tickets/admin-report/${adminId}`, { params });
@@ -325,6 +350,8 @@ export default function TicketReportDetail() {
     } else if (filterType === 'date_range') {
       if (dateFilters.start_date) params.append('start_date', dateFilters.start_date);
       if (dateFilters.end_date) params.append('end_date', dateFilters.end_date);
+    } else if (filterType === 'workshop') {
+      if (dateFilters.workshop_id) params.append('workshop_id', dateFilters.workshop_id);
     }
 
     try {
@@ -357,9 +384,7 @@ export default function TicketReportDetail() {
   if (!admin) {
     return <p>Memuat data admin...</p>;
   }
-  if (loading && !reportData) {
-    return <p>Memuat data...</p>;
-  }
+
 
   const { total, completed, in_progress } = reportData || {};
   const ticketsOnPage = (reportData && reportData.tickets) ? reportData.tickets.data : [];
@@ -384,55 +409,75 @@ export default function TicketReportDetail() {
         <h2 variants={staggerItem}>Laporan Penyelesaian - {admin.name}</h2>
       </motion.div>
 
-      {!reportData ? <motion.p variants={staggerItem}>Memuat data statistik...</motion.p> : (
-        <>
-          <motion.div variants={staggerItem} className="summary-cards">
-            <div className={`card ${filter === 'all' ? 'active' : ''}`} onClick={() => handleFilterClick('all')}><h3>Total Tiket</h3><p>{total}</p></div>
-            <div className={`card ${filter === 'completed' ? 'active' : ''}`} onClick={() => handleFilterClick('completed')}><h3>Tiket Selesai</h3><p>{completed}</p></div>
-            <div className={`card ${filter === 'in_progress' ? 'active' : ''}`} onClick={() => handleFilterClick('in_progress')}><h3>Tiket Belum Selesai</h3><p>{in_progress}</p></div>
-            {/* <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterClick('rejected')}><h3>Tiket Ditolak</h3><p>{rejected}</p></div> */}
+      <AnimatePresence>
+        {isMobile && (
+          <motion.div
+            key="toggle-filter-button"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            <motion.button
+              className="btn-toggle-filters"
+              onClick={() => setIsMobileFilterOpen(prev => !prev)}
+            >
+              <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
+              {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
+            </motion.button>
           </motion.div>
+        )}
+      </AnimatePresence>
 
-
-          <AnimatePresence>
-            {isMobile && (
-              <motion.div
-                key="toggle-filter-button"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-              >
-                <motion.button
-                  className="btn-toggle-filters"
-                  onClick={() => setIsMobileFilterOpen(prev => !prev)}
-                >
-                  <i className={`fas ${isMobileFilterOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} style={{ marginRight: '8px' }}></i>
-                  {isMobileFilterOpen ? 'Sembunyikan Filter' : 'Tampilkan Filter'}
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence initial={false}>
-            {isMobileFilterOpen && (
-              <motion.div
-                variants={staggerItem}
-                className="filters-container"
-              >
-                <motion.div
-                  key="mobile-filters-content"
-                  initial={isMobile ? { height: 0, opacity: 0, y: -20, marginTop: 0, marginBottom: 0, overflow: 'hidden' } : false}
-                  animate="open"
-                  exit="closed"
-                  transition={filterExpandTransition}
-                  variants={filterExpandVariants}
-                  className="filters-content-wrapper"
-                >
+      <AnimatePresence initial={false}>
+        {isMobileFilterOpen && (
+          <motion.div
+            variants={staggerItem}
+            className="filters-container"
+          >
+            <motion.div
+              key="mobile-filters-content"
+              initial={isMobile ? { height: 0, opacity: 0, y: -20, marginTop: 0, marginBottom: 0, overflow: 'hidden' } : false}
+              animate="open"
+              exit="closed"
+              transition={filterExpandTransition}
+              variants={filterExpandVariants}
+              className="filters-content-wrapper"
+            >
+              <Select
+                value={activeFilterType}
+                onChange={handleFilterTypeChange}
+                options={filterTypeOptions}
+                classNamePrefix="report-filter-select"
+                isSearchable={false}
+                menuPortalTarget={document.body}
+                styles={{
+                  container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                }}
+              />
+              {filterType === 'workshop' && (
+                <Select
+                  classNamePrefix="report-filter-select"
+                  placeholder="Pilih Workshop"
+                  options={[{ value: '', label: 'Semua Workshop' }, ...workshops]}
+                  value={workshops.find(w => w.value === dateFilters.workshop_id) || { value: '', label: 'Semua Workshop' }}
+                  onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'workshop_id', value: selectedOption.value } })}
+                  isSearchable={true}
+                  menuPortalTarget={document.body}
+                  styles={{
+                    container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                    menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                  }}
+                />
+              )}
+              {filterType === 'month' && (
+                <>
                   <Select
-                    value={activeFilterType}
-                    onChange={handleFilterTypeChange}
-                    options={filterTypeOptions}
+                    name="month"
+                    value={activeMonth}
+                    onChange={handleDateFilterChange}
+                    options={monthOptions}
                     classNamePrefix="report-filter-select"
                     isSearchable={false}
                     menuPortalTarget={document.body}
@@ -441,67 +486,61 @@ export default function TicketReportDetail() {
                       menuPortal: (base) => ({ ...base, zIndex: 9999 })
                     }}
                   />
-                  {filterType === 'month' && (
-                    <>
-                      <Select
-                        name="month"
-                        value={activeMonth}
-                        onChange={handleDateFilterChange}
-                        options={monthOptions}
-                        classNamePrefix="report-filter-select"
-                        isSearchable={false}
-                        menuPortalTarget={document.body}
-                        styles={{
-                          container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
-                          menuPortal: (base) => ({ ...base, zIndex: 9999 })
-                        }}
-                      />
-                      <Select
-                        name="year"
-                        value={activeYear}
-                        onChange={handleDateFilterChange}
-                        options={yearOptions}
-                        classNamePrefix="report-filter-select"
-                        isSearchable={false}
-                        menuPortalTarget={document.body}
-                        styles={{
-                          container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
-                          menuPortal: (base) => ({ ...base, zIndex: 9999 })
-                        }}
-                      />
-                    </>
-                  )}
-                  {filterType === 'date_range' && (
-                    <motion.div
-                      variants={staggerItem}
-                      className='date-range-container'
-                    >
+                  <Select
+                    name="year"
+                    value={activeYear}
+                    onChange={handleDateFilterChange}
+                    options={yearOptions}
+                    classNamePrefix="report-filter-select"
+                    isSearchable={false}
+                    menuPortalTarget={document.body}
+                    styles={{
+                      container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                      menuPortal: (base) => ({ ...base, zIndex: 9999 })
+                    }}
+                  />
+                </>
+              )}
+              {filterType === 'date_range' && (
+                <motion.div
+                  variants={staggerItem}
+                  className='date-range-container'
+                >
 
-                      <input
-                        type="date"
-                        name="start_date"
-                        value={dateFilters.start_date}
-                        onChange={handleDateFilterChange}
-                        className="filter-select-date"
-                        required
-                      />
-                      <span style={{ alignSelf: 'center' }}>-</span>
-                      <input
-                        type="date"
-                        name="end_date"
-                        value={dateFilters.end_date}
-                        onChange={handleDateFilterChange}
-                        className="filter-select-date"
-                        min={dateFilters.start_date || undefined}
-                        required
-                      />
-                    </motion.div>
-                  )}
-
+                  <input
+                    type="date"
+                    name="start_date"
+                    value={dateFilters.start_date}
+                    onChange={handleDateFilterChange}
+                    className="filter-select-date"
+                    required
+                  />
+                  <span style={{ alignSelf: 'center' }}>-</span>
+                  <input
+                    type="date"
+                    name="end_date"
+                    value={dateFilters.end_date}
+                    onChange={handleDateFilterChange}
+                    className="filter-select-date"
+                    min={dateFilters.start_date || undefined}
+                    required
+                  />
                 </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              )}
+
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {!reportData ? <motion.p variants={staggerItem}>Memuat data statistik...</motion.p> : (
+        <>
+          <motion.div variants={staggerItem} className="summary-cards">
+            <div className={`card ${filter === 'all' ? 'active' : ''}`} onClick={() => handleFilterClick('all')}><h3>Total Tiket</h3><p>{total}</p></div>
+            <div className={`card ${filter === 'completed' ? 'active' : ''}`} onClick={() => handleFilterClick('completed')}><h3>Tiket Selesai</h3><p>{completed}</p></div>
+            <div className={`card ${filter === 'in_progress' ? 'active' : ''}`} onClick={() => handleFilterClick('in_progress')}><h3>Tiket Belum Selesai</h3><p>{in_progress}</p></div>
+            {/* <div className={`card ${filter === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterClick('rejected')}><h3>Tiket Ditolak</h3><p>{rejected}</p></div> */}
+          </motion.div>
 
           <motion.div variants={staggerItem} className="download-buttons">
             <button className="btn-download pdf" onClick={() => handleDownload('pdf')} disabled={exportingPdf}>

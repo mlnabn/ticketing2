@@ -29,7 +29,7 @@ class MasterBarangController extends Controller
                 'master_barangs.kode_barang',
                 'master_kategoris.nama_kategori',
                 'sub_kategoris.nama_sub',
-                DB::raw('COUNT(master_barangs.id_m_barang) as variations_count') 
+                DB::raw('COUNT(master_barangs.id_m_barang) as variations_count')
             )
             ->where('master_barangs.is_active', $isActive)
             ->groupBy(
@@ -46,9 +46,11 @@ class MasterBarangController extends Controller
         }
 
         if ($request->has('with_stock')) {
-            $query->withCount(['stokBarangs as stok_tersedia' => function ($q) {
-                $q->where('status_id', 1);
-            }]);
+            $query->withCount([
+                'stokBarangs as stok_tersedia' => function ($q) {
+                    $q->where('status_id', 1);
+                }
+            ]);
         }
         $query->latest('master_barangs.kode_barang');
         if ($request->has('all')) {
@@ -65,15 +67,17 @@ class MasterBarangController extends Controller
         $endOfLifeStatuses = Status::whereIn('nama_status', ['Rusak', 'Hilang', 'Non-Aktif'])->pluck('id');
 
         $items = MasterBarang::where('kode_barang', $kode_barang)
-                    ->where('is_active', $isActive)
-                    ->with(['masterKategori', 'subKategori'])
-                    ->withCount(['stokBarangs as stok_tersedia_count' => function ($query) use ($tersediaStatusId) {
-                        $query->where('status_id', $tersediaStatusId);
-                    }])
-                    ->withCount(['activeStokBarangs as total_active_stock'])
-                    ->orderBy('nama_barang', 'asc')
-                    ->get();
-        
+            ->where('is_active', $isActive)
+            ->with(['masterKategori', 'subKategori'])
+            ->withCount([
+                'stokBarangs as stok_tersedia_count' => function ($query) use ($tersediaStatusId) {
+                    $query->where('status_id', $tersediaStatusId);
+                }
+            ])
+            ->withCount(['activeStokBarangs as total_active_stock'])
+            ->orderBy('nama_barang', 'asc')
+            ->get();
+
         return $items;
     }
 
@@ -87,7 +91,7 @@ class MasterBarangController extends Controller
     public function indexFlat(Request $request)
     {
         $query = MasterBarang::with(['masterKategori', 'subKategori', 'createdBy'])
-                    ->withCount('activeStokBarangs as total_active_stock');
+            ->withCount('activeStokBarangs as total_active_stock');
 
         $query->when($request->filled('is_active'), function ($q) use ($request) {
             $q->where('is_active', $request->input('is_active') === 'true');
@@ -101,14 +105,14 @@ class MasterBarangController extends Controller
         if ($request->filled('id_sub_kategori')) {
             $query->where('id_sub_kategori', $request->id_sub_kategori);
         }
-        
+
         $query->latest('id_m_barang');
 
         if ($request->has('all')) {
             return $query->get();
         }
 
-        return $query->paginate(10); 
+        return $query->paginate(10);
     }
 
     public function checkIfExists(Request $request)
@@ -130,6 +134,17 @@ class MasterBarangController extends Controller
      */
     public function store(Request $request)
     {
+        $messages = [
+            'required' => ':attribute wajib diisi.',
+            'unique' => ':attribute sudah terdaftar.',
+        ];
+
+        $attributes = [
+            'id_kategori' => 'Kategori',
+            'id_sub_kategori' => 'Sub Kategori',
+            'nama_barang' => 'Nama Barang',
+        ];
+
         $validated = $request->validate([
             'id_kategori' => 'required|exists:master_kategoris,id_kategori',
             'id_sub_kategori' => 'required|exists:sub_kategoris,id_sub_kategori',
@@ -142,7 +157,7 @@ class MasterBarangController extends Controller
                     $query->where('id_sub_kategori', $request->id_sub_kategori)
                 ),
             ],
-        ]);
+        ], $messages, $attributes);
 
         $existingSkuFamily = MasterBarang::where('id_kategori', $validated['id_kategori'])
             ->where('id_sub_kategori', $validated['id_sub_kategori'])
@@ -163,7 +178,7 @@ class MasterBarangController extends Controller
         }
 
         $dataToCreate = array_merge($validated, [
-            'kode_barang' => $kodeBarang, 
+            'kode_barang' => $kodeBarang,
             'created_by' => Auth::id(),
             'is_active' => true,
         ]);
@@ -212,7 +227,7 @@ class MasterBarangController extends Controller
             ];
 
             $result[$itemName]['total_stock'] += (int) $stock->total;
-            }
+        }
 
         return response()->json(array_values($result));
     }
@@ -245,7 +260,7 @@ class MasterBarangController extends Controller
     {
         $cleaned = strtoupper(preg_replace('/[^a-zA-Z]/', '', $input));
         if (empty($cleaned)) {
-            return ['X']; 
+            return ['X'];
         }
         return array_values(array_unique(str_split($cleaned)));
     }
@@ -260,22 +275,21 @@ class MasterBarangController extends Controller
         $word1Chars = $this->getUniqueChars($words[0]);
         $char1 = $word1Chars[$char1Index % count($word1Chars)] ?? $word1Chars[0];
         $char2 = 'X';
-        
+
         if (count($words) > 1) {
             $word2Chars = $this->getUniqueChars($words[1]);
             $char2 = $word2Chars[$char2Index % count($word2Chars)] ?? $word2Chars[0];
-        } 
-        else {
+        } else {
             $allChars = $this->getUniqueChars($words[0]);
             $targetIndex = 2 + $char2Index;
-            
+
             if (isset($allChars[$targetIndex])) {
-                 $char2 = $allChars[$targetIndex];
+                $char2 = $allChars[$targetIndex];
             } else {
-                 $char2 = $allChars[($targetIndex % count($allChars))] ?? $allChars[min(1, count($allChars) - 1)];
+                $char2 = $allChars[($targetIndex % count($allChars))] ?? $allChars[min(1, count($allChars) - 1)];
             }
         }
-        
+
         return $char1 . $char2;
     }
 
@@ -285,30 +299,32 @@ class MasterBarangController extends Controller
         $subChars1 = $this->getUniqueChars(explode(' ', $subKategoriNama)[0] ?? '');
 
         $catWords = array_values(array_filter(explode(' ', $kategoriNama)));
-        $catChars2 = (count($catWords) > 1) 
-            ? $this->getUniqueChars($catWords[1]) 
+        $catChars2 = (count($catWords) > 1)
+            ? $this->getUniqueChars($catWords[1])
             : $this->getUniqueChars($catWords[0] ?? '');
-        
+
         $subWords = array_values(array_filter(explode(' ', $subKategoriNama)));
-        $subChars2 = (count($subWords) > 1) 
-            ? $this->getUniqueChars($subWords[1]) 
+        $subChars2 = (count($subWords) > 1)
+            ? $this->getUniqueChars($subWords[1])
             : $this->getUniqueChars($subWords[0] ?? '');
-            
+
         $maxCat1 = count($catChars1);
         $maxCat2 = (count($catWords) > 1) ? count($catChars2) : count($catChars2) - 2;
         $maxSub1 = count($subChars1);
-        $maxSub2 = (count($subWords) > 1) ? count($subChars2) : count($subChars2) - 2; 
+        $maxSub2 = (count($subWords) > 1) ? count($subChars2) : count($subChars2) - 2;
 
         $maxCat2 = max(1, $maxCat2);
-        $maxSub2 = max(1, $maxSub2); 
+        $maxSub2 = max(1, $maxSub2);
 
         $baseCode = '';
         for ($s2 = 0; $s2 < $maxSub2; $s2++) {
             $catInisial = $this->getInisial($kategoriNama, 0, 0);
             $subInisial = $this->getInisial($subKategoriNama, 0, $s2);
             $code = $catInisial . $subInisial;
-            if ($s2 == 0) $baseCode = $code; 
-            if (!$this->checkCodeExists($code)) return $code;
+            if ($s2 == 0)
+                $baseCode = $code;
+            if (!$this->checkCodeExists($code))
+                return $code;
         }
 
         for ($s1 = 1; $s1 < $maxSub1; $s1++) {
@@ -316,10 +332,11 @@ class MasterBarangController extends Controller
                 $catInisial = $this->getInisial($kategoriNama, 0, 0);
                 $subInisial = $this->getInisial($subKategoriNama, $s1, $s2);
                 $code = $catInisial . $subInisial;
-                if (!$this->checkCodeExists($code)) return $code;
+                if (!$this->checkCodeExists($code))
+                    return $code;
             }
         }
-        
+
         for ($c1 = 1; $c1 < $maxCat1; $c1++) {
             for ($c2 = 0; $c2 < $maxCat2; $c2++) {
                 for ($s1 = 0; $s1 < $maxSub1; $s1++) {
@@ -327,14 +344,15 @@ class MasterBarangController extends Controller
                         $catInisial = $this->getInisial($kategoriNama, $c1, $c2);
                         $subInisial = $this->getInisial($subKategoriNama, $s1, $s2);
                         $code = $catInisial . $subInisial;
-                        if (!$this->checkCodeExists($code)) return $code;
+                        if (!$this->checkCodeExists($code))
+                            return $code;
                     }
                 }
             }
         }
 
         $preferredCode = $baseCode ?: ($this->getInisial($kategoriNama, 0, 0) . $this->getInisial($subKategoriNama, 0, 0));
-        
+
         for ($charCode = ord('A'); $charCode <= ord('Z'); $charCode++) {
             $appendedChar = chr($charCode);
             $code5 = $preferredCode . $appendedChar;
@@ -342,14 +360,14 @@ class MasterBarangController extends Controller
                 return $code5;
             }
         }
-        
-         for ($num = 0; $num <= 9; $num++) {
+
+        for ($num = 0; $num <= 9; $num++) {
             $code6 = $preferredCode . $num;
             if (!$this->checkCodeExists($code6)) {
                 return $code6;
             }
         }
-        
+
         throw new \Exception("Could not generate a unique kode_barang for $kategoriNama / $subKategoriNama after extensive tries.");
     }
 
@@ -360,9 +378,18 @@ class MasterBarangController extends Controller
 
     public function update(Request $request, MasterBarang $masterBarang)
     {
+        $messages = [
+            'required' => ':attribute wajib diisi.',
+            'unique' => ':attribute sudah terdaftar.',
+        ];
+
+        $attributes = [
+            'nama_barang' => 'Nama Barang',
+        ];
+
         $validated = $request->validate([
             'nama_barang' => ['required', 'string', 'max:255', Rule::unique('master_barangs')->ignore($masterBarang->id_m_barang, 'id_m_barang')],
-        ]);
+        ], $messages, $attributes);
         $masterBarang->update($validated);
         return response()->json($masterBarang);
     }
@@ -393,16 +420,16 @@ class MasterBarangController extends Controller
         $allIds = $validated['ids'];
 
         $idsWithActiveStock = MasterBarang::whereIn('id_m_barang', $allIds)
-                                  ->has('activeStokBarangs')
-                                  ->pluck('id_m_barang')
-                                  ->all();
+            ->has('activeStokBarangs')
+            ->pluck('id_m_barang')
+            ->all();
 
         $idsToArchive = array_diff($allIds, $idsWithActiveStock);
 
         $archivedCount = 0;
         if (count($idsToArchive) > 0) {
             $archivedCount = MasterBarang::whereIn('id_m_barang', $idsToArchive)
-                                         ->update(['is_active' => false]);
+                ->update(['is_active' => false]);
         }
 
         $skippedCount = count($allIds) - $archivedCount;
@@ -422,7 +449,7 @@ class MasterBarangController extends Controller
         ]);
 
         $restoredCount = MasterBarang::whereIn('id_m_barang', $validated['ids'])
-                                     ->update(['is_active' => true]);
+            ->update(['is_active' => true]);
 
         return response()->json(['message' => $restoredCount . ' SKU berhasil dipulihkan.']);
     }
@@ -432,7 +459,7 @@ class MasterBarangController extends Controller
         if ($masterBarang->activeStokBarangs()->exists()) {
             return response()->json(['message' => 'SKU tidak dapat diarsipkan. Masih ada unit yang berstatus Tersedia, Dipinjam, Digunakan, atau Perbaikan.'], 422);
         }
-        
+
         $masterBarang->update(['is_active' => false]);
         return response()->json(['message' => 'SKU barang berhasil diarsipkan.'], 200);
     }
