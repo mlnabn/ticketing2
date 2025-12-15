@@ -4422,8 +4422,8 @@ body.dark-mode .scan-input-group::after {
 }
 
 .btn-scan-camera {
-  padding: 0px 8px;
-  font-size: 30px;
+  padding: 0px 8px !important;
+  font-size: 30px !important;
   flex-shrink: 0;
   color: #1e40af;
 }
@@ -11368,7 +11368,7 @@ input:disabled {
 }
 
 .dark-mode .custom-select-kondisi__control--is-focused {
-  background-color: rgba(18, 20, 24, 0.95)    !important;
+  background-color: rgba(18, 20, 24, 0.95) !important;
   border-color: rgba(100, 150, 220, 0.45) !important;
   box-shadow: 0 0 0 1.5px rgba(100, 150, 220, 0.18) !important;
 }

@@ -58,11 +58,11 @@ export default function NotificationTemplateFormModal({ show, templateToEdit, on
           <div className="modal-body">
             <div className="form-group">
               <label htmlFor="title">Judul Template</label>
-              <input type="text" id="title" value={title} onChange={e => setTitle(e.target.value)} required />
+              <input type="text" id="title" value={title} onChange={e => setTitle(e.target.value)} required placeholder='ex: Pengumuman' />
             </div>
             <div className="form-group">
               <label htmlFor="message">Isi Pesan</label>
-              <textarea id="message" rows="5" value={message} onChange={e => setMessage(e.target.value)}></textarea>
+              <textarea id="message" rows="5" value={message} onChange={e => setMessage(e.target.value)} placeholder='Isi pesan notifikasi ...'></textarea>
             </div>
           </div>
           <div className="confirmation-modal-actions">

@@ -37,6 +37,7 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const [focusedInput, setFocusedInput] = useState(null);
 
   const particlesInit = useCallback(async engine => {
     await loadSlim(engine);
@@ -143,11 +144,18 @@ export default function ForgotPasswordPage() {
               name="phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+              onFocus={() => setFocusedInput('phone')}
+              onBlur={() => setFocusedInput(null)}
               required
             />
             <label htmlFor="phone-input" className={phone ? 'active' : ''}>
               WhatsApp Number (628...)
             </label>
+            {focusedInput === 'phone' && !phone.startsWith('62') && (
+              <span style={{ color: 'red', fontSize: '12px', position: 'absolute', top: '90%', left: '10px', marginTop: '5px' }}>
+                Nomor telepon harus diawali dengan 62
+              </span>
+            )}
           </motion.div>
 
           <motion.button

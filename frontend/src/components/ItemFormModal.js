@@ -10,7 +10,7 @@ const initialFormState = {
     nama_barang: '',
 };
 
-function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showToast, initialData = {} }) {
+function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showToast, initialData = {}, hideAddStock = false }) {
     const [formData, setFormData] = useState(initialFormState);
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
@@ -147,6 +147,7 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
         <div
             className={`modal-backdrop-centered ${animationClass}`}
             onClick={handleClose}
+            style={{ zIndex: 10001 }}
         >
             <div
                 className={`modal-content-large ${animationClass}`}
@@ -210,7 +211,7 @@ function ItemFormModal({ show, isOpen, onClose, onSaveRequest, itemToEdit, showT
                         <button type="submit" className="btn-confirm" disabled={isLoading || (isExisting && !itemToEdit)}>
                             {isExisting && !itemToEdit ? 'Sudah Terdaftar' : 'Simpan'}
                         </button>
-                        {!itemToEdit && (
+                        {!itemToEdit && !hideAddStock && (
                             <button
                                 type="button"
                                 onClick={() => onSaveRequest(formData, 'saveAndAddStock')}

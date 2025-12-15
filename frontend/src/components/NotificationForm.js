@@ -104,7 +104,7 @@ export default function NotificationForm() {
     }
     try {
       await api.delete(`/notifications/${id}`);
-      fetchGlobalNotifications(); 
+      fetchGlobalNotifications();
       showToast('Notifikasi berhasil dihapus.', 'success');
     } catch (error) {
       console.error('Gagal menghapus notifikasi:', error);
@@ -195,7 +195,7 @@ export default function NotificationForm() {
             </div>
             <div className="form-group">
               <label htmlFor="title">Judul Notifikasi</label>
-              <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder='Gunakan Template / Ketik Judul (ex : Pengumuman Penting)'/>
+              <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder='Gunakan Template / Ketik Judul (ex : Pengumuman Penting)' />
             </div>
           </div>
           <div className="form-group2">

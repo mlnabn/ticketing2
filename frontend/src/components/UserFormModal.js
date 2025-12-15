@@ -18,13 +18,10 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
     password_confirmation: '',
     role: 'user',
   });
-
+  const [focusedInput, setFocusedInput] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
-
   const [isClosing, setIsClosing] = useState(false);
   const [shouldRender, setShouldRender] = useState(show);
-
-  // Handle browser back button
   const handleClose = useModalBackHandler(show, onClose, 'user-form');
 
   useEffect(() => {
@@ -99,7 +96,7 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : 'Bagas Pambudi'}
+                placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : 'ex: Bagas Pambudi'}
                 required
                 style={{ borderRadius: '10px' }} />
             </div>
@@ -115,7 +112,7 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                 required
                 style={{ borderRadius: '10px' }} />
             </div>
-            <div>
+            <div onFocus={() => setFocusedInput('phone')} onBlur={() => setFocusedInput(null)}>
               <label htmlFor="phone">Nomor Telepon:</label>
               <input
                 type="text"
@@ -126,6 +123,11 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                 placeholder={isEditMode ? 'Kosongkan jika tidak ingin diubah' : '628xxxxxxxxxx'}
                 style={{ borderRadius: '10px' }}
               />
+              {focusedInput === 'phone' && !formData.phone.startsWith('62') && (
+                <span style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>
+                  Nomor telepon harus diawali dengan 62
+                </span>
+              )}
             </div>
 
             <div>
@@ -140,7 +142,7 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                 isSearchable={false}
               />
             </div>
-            <div>
+            <div onFocus={() => setFocusedInput('password')} onBlur={() => setFocusedInput(null)}>
               <label htmlFor="password">Password:</label>
               <div className="password-input-container">
                 <input
@@ -156,6 +158,11 @@ const UserFormModal = ({ show, userToEdit, onClose, onSave }) => {
                   <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                 </button>
               </div>
+              {focusedInput === 'password' && formData.password.length < 6 && (
+                <span style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>
+                  Password harus minimal 6 karakter
+                </span>
+              )}
             </div>
             <div>
               <label htmlFor="password_confirmation">Konfirmasi Password:</label>
