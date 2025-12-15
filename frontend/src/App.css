@@ -8278,7 +8278,7 @@ html {
 }
 
 .dark-mode .ticket-modal-card {
-  background-color: #3a3f44 !important;
+  background-color: rgba(18, 20, 24, 0.85) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
