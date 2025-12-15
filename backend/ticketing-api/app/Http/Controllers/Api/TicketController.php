@@ -191,7 +191,9 @@ class TicketController extends Controller
     }
 
     /**
-     * Generate kode tiket.
+     * Generate kode tiket dengan database locking untuk mencegah race condition.
+     * Menggunakan lockForUpdate() untuk memastikan hanya satu proses yang dapat
+     * menggenerate kode tiket pada satu waktu.
      */
     private function generateKodeTiket($workshopId)
     {
@@ -203,6 +205,7 @@ class TicketController extends Controller
 
         $lastTicket = Ticket::where('kode_tiket', 'like', $prefix . '%')
             ->orderBy('id', 'desc')
+            ->lockForUpdate()
             ->first();
 
         $nextSequence = 1;
@@ -219,7 +222,9 @@ class TicketController extends Controller
     }
 
     /**
-     * Simpan tiket baru.
+     * Simpan tiket baru dengan penanganan race condition.
+     * Menggunakan database transaction dan retry logic untuk memastikan
+     * tiket berhasil dibuat meskipun ada request konkuren.
      */
     public function store(Request $request)
     {
@@ -230,20 +235,40 @@ class TicketController extends Controller
             'requested_date' => 'nullable|date',
         ]);
 
-        $kodeTiket = $this->generateKodeTiket($validated['workshop_id']);
         $isUrgent = $this->classifyUrgencyWithAI($validated['title']);
+        $maxRetries = 3;
+        $ticket = null;
 
-        $ticket = Ticket::create([
-            'kode_tiket' => $kodeTiket,
-            'title' => $validated['title'],
-            'workshop_id' => $validated['workshop_id'],
-            'requested_time' => $validated['requested_time'] ?? null,
-            'requested_date' => $validated['requested_date'] ?? null,
-            'creator_id' => auth()->id(),
-            'user_id' => null,
-            'status' => 'Belum Dikerjakan',
-            'is_urgent' => $isUrgent,
-        ]);
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                $ticket = DB::transaction(function () use ($validated, $isUrgent) {
+                    $kodeTiket = $this->generateKodeTiket($validated['workshop_id']);
+
+                    return Ticket::create([
+                        'kode_tiket' => $kodeTiket,
+                        'title' => $validated['title'],
+                        'workshop_id' => $validated['workshop_id'],
+                        'requested_time' => $validated['requested_time'] ?? null,
+                        'requested_date' => $validated['requested_date'] ?? null,
+                        'creator_id' => auth()->id(),
+                        'user_id' => null,
+                        'status' => 'Belum Dikerjakan',
+                        'is_urgent' => $isUrgent,
+                    ]);
+                });
+                break;
+            } catch (\Illuminate\Database\QueryException $e) {
+                $isDuplicateError = $e->errorInfo[1] == 1062 || $e->errorInfo[0] == '23505';
+
+                if ($attempt === $maxRetries || !$isDuplicateError) {
+                    Log::error("Gagal membuat tiket setelah {$attempt} percobaan: " . $e->getMessage());
+                    throw $e;
+                }
+
+                Log::warning("Race condition terdeteksi saat membuat tiket, mencoba ulang (percobaan ke-{$attempt})");
+                usleep(100000 * $attempt);
+            }
+        }
 
         try {
             $workshopName = $ticket->workshop ? $ticket->workshop->name : 'N/A';
@@ -314,19 +339,39 @@ class TicketController extends Controller
         }
 
         $isUrgent = $this->classifyUrgencyWithAI($validated['title']);
-        $kodeTiket = $this->generateKodeTiket($workshop->id);
+        $maxRetries = 3;
+        $ticket = null;
 
-        $ticket = Ticket::create([
-            'kode_tiket' => $kodeTiket,
-            'title' => $validated['title'],
-            'workshop_id' => $workshop->id,
-            'requester_name' => $validated['sender_name'],
-            'creator_id' => $user->id,
-            'status' => 'Belum Dikerjakan',
-            'is_urgent' => $isUrgent,
-            'requested_date' => $validated['requested_date'] ?? null,
-            'requested_time' => $validated['requested_time'] ?? null,
-        ]);
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                $ticket = DB::transaction(function () use ($validated, $workshop, $user, $isUrgent) {
+                    $kodeTiket = $this->generateKodeTiket($workshop->id);
+
+                    return Ticket::create([
+                        'kode_tiket' => $kodeTiket,
+                        'title' => $validated['title'],
+                        'workshop_id' => $workshop->id,
+                        'requester_name' => $validated['sender_name'],
+                        'creator_id' => $user->id,
+                        'status' => 'Belum Dikerjakan',
+                        'is_urgent' => $isUrgent,
+                        'requested_date' => $validated['requested_date'] ?? null,
+                        'requested_time' => $validated['requested_time'] ?? null,
+                    ]);
+                });
+                break;
+            } catch (\Illuminate\Database\QueryException $e) {
+                $isDuplicateError = $e->errorInfo[1] == 1062 || $e->errorInfo[0] == '23505';
+
+                if ($attempt === $maxRetries || !$isDuplicateError) {
+                    Log::error("Gagal membuat tiket WA setelah {$attempt} percobaan: " . $e->getMessage());
+                    throw $e;
+                }
+
+                Log::warning("Race condition terdeteksi saat membuat tiket WA, mencoba ulang (percobaan ke-{$attempt})");
+                usleep(100000 * $attempt);
+            }
+        }
 
         return response()->json($ticket, 201);
     }
