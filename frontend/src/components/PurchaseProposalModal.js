@@ -249,6 +249,7 @@ function PurchaseProposalModal({ show, onClose, onSaveSuccess, showToast }) {
                 onSaveRequest={handleSkuApiSave}
                 showToast={showToast}
                 initialData={{ nama_barang: newSkuName }}
+                hideAddStock={true}
             />
         </>
     );

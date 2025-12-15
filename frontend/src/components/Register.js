@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import '../App.css';
 import bgImage2 from '../Image/Login.svg';
@@ -69,6 +69,8 @@ function Register({
   onShowLogin,
   onBackToLanding,
 }) {
+
+  const [focusedInput, setFocusedInput] = useState(null);
 
   const particlesInit = useCallback(async engine => {
     await loadSlim(engine);
@@ -224,11 +226,18 @@ function Register({
                   name="phone"
                   value={form.phone}
                   onChange={onFormChange}
+                  onFocus={() => setFocusedInput('phone')}
+                  onBlur={() => setFocusedInput(null)}
                   required
                 />
                 <label htmlFor="phone-input" className={form.phone ? 'active' : ''}>
                   Nomor WhatsApp (e.g., 628...)
                 </label>
+                {focusedInput === 'phone' && !form.phone.startsWith('62') && (
+                  <span style={{ color: 'red', fontSize: '12px', position: 'absolute', top: '90%', left: '10px', marginTop: '5px' }}>
+                    Nomor telepon harus diawali dengan 62
+                  </span>
+                )}
               </motion.div>
 
               <motion.div variants={formItemVariants} className="input-group floating-label-group">
@@ -238,11 +247,18 @@ function Register({
                   name="password"
                   value={form.password}
                   onChange={onFormChange}
+                  onFocus={() => setFocusedInput('password')}
+                  onBlur={() => setFocusedInput(null)}
                   required
                 />
                 <label htmlFor="password-input-reg" className={form.password ? 'active' : ''}>
                   Password
                 </label>
+                {focusedInput === 'password' && form.password.length < 6 && (
+                  <span style={{ color: 'red', fontSize: '12px', position: 'absolute', top: '90%', left: '10px', marginTop: '5px' }}>
+                    Password harus minimal 6 karakter
+                  </span>
+                )}
               </motion.div>
 
               <motion.div variants={formItemVariants} className="input-group floating-label-group">
@@ -316,7 +332,7 @@ function Register({
           )}
         </AnimatePresence>
       </motion.div>
-    </div>
+    </div >
   );
 }
 
