@@ -326,19 +326,7 @@ function ItemDetailModal({
                                     htmlFor="camera-input"
                                     className={`btn-upload-option btn-camera ${isCompressing ? 'disabled' : ''
                                         }`}
-                                    style={{
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 8,
-                                        padding: '8px 12px',
-                                        background: '#e3f2fd',
-                                        color: '#0d47a1',
-                                        borderRadius: 6,
-                                        border: '1px solid #90caf9',
-                                        fontSize: '0.9rem',
-                                        width: '100%',
-                                    }}
+                                   style={{width: '100%'}}
                                 >
                                     <FaCamera />
                                     <span>Ambil Foto</span>
@@ -348,19 +336,7 @@ function ItemDetailModal({
                                     htmlFor="gallery-input"
                                     className={`btn-upload-option btn-gallery ${isCompressing ? 'disabled' : ''
                                         }`}
-                                    style={{
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 8,
-                                        padding: '8px 12px',
-                                        background: '#f3e5f5',
-                                        color: '#7b1fa2',
-                                        borderRadius: 6,
-                                        border: '1px solid #ce93d8',
-                                        fontSize: '0.9rem',
-                                        width: '100%',
-                                    }}
+                                    style={{width: '100%'}}
                                 >
                                     <FaImage />
                                     <span>Galeri</span>

@@ -18,6 +18,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\TicketsExport;
 use App\Models\StokBarang;
+use App\Models\Notification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\RequestException;
@@ -44,7 +45,8 @@ class TicketController extends Controller
                 $message .= "📝 *Catatan:* {$note}\n";
             }
 
-            $message .= "\nSilakan cek riwayat tiket di website untuk detail lebih lanjut.";
+            $message .= "\nKlik link di bawah untuk melihat statusnya di web:\n";
+            $message .= "https://ticket.arumiparts.site/history/{$ticket->kode_tiket}";
             $phone = $ticket->creator->phone;
 
             if (substr($phone, 0, 2) === '08') {
@@ -56,6 +58,34 @@ class TicketController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error("Gagal mengirim notifikasi WA ke user: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Kirim notifikasi ke website user (tersimpan di database).
+     * Notifikasi ini akan muncul di NotificationBell user.
+     */
+    private function sendWebsiteNotification($ticket, $status, $note = null)
+    {
+        try {
+            if (!$ticket->creator_id) {
+                return;
+            }
+
+            $title = "🎫 Update Tiket #{$ticket->kode_tiket}";
+            $message = "Status tiket \"{$ticket->title}\" telah diubah menjadi: {$status}";
+
+            if ($note) {
+                $message .= "\nCatatan: {$note}";
+            }
+
+            Notification::create([
+                'user_id' => $ticket->creator_id,
+                'title' => $title,
+                'message' => $message,
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Gagal menyimpan notifikasi website: " . $e->getMessage());
         }
     }
 
@@ -586,6 +616,7 @@ class TicketController extends Controller
                 }
             });
             $this->sendUserStatusNotification($ticket, 'Sedang Dikerjakan', "Tiket ditugaskan ke admin {$assignee->name}");
+            $this->sendWebsiteNotification($ticket, 'Sedang Dikerjakan', "Tiket ditugaskan ke admin {$assignee->name}");
         } catch (\Exception $e) {
             return response()->json(['message' => 'Terjadi kesalahan saat menugaskan tiket: ' . $e->getMessage()], 500);
         }
@@ -641,6 +672,7 @@ class TicketController extends Controller
         $ticket->save();
 
         $this->sendUserStatusNotification($ticket, 'Ditolak', $validated['reason']);
+        $this->sendWebsiteNotification($ticket, 'Ditolak', $validated['reason']);
 
         return response()->json($ticket->load(['user', 'creator']));
     }
@@ -738,6 +770,7 @@ class TicketController extends Controller
         $ticket->update($updateData);
 
         $this->sendUserStatusNotification($ticket, $newStatus);
+        $this->sendWebsiteNotification($ticket, $newStatus);
 
         return response()->json($ticket->load(['user', 'creator', 'masterBarangs']));
     }
@@ -1019,6 +1052,7 @@ class TicketController extends Controller
         });
         try {
             $this->sendUserStatusNotification($ticket, 'Selesai', 'Tiket telah diselesaikan.');
+            $this->sendWebsiteNotification($ticket, 'Selesai', 'Tiket telah diselesaikan.');
         } catch (\Exception $e) {
             Log::error("Notifikasi WA gagal: " . $e->getMessage());
         }
