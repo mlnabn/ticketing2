@@ -10110,6 +10110,18 @@ body.dark-mode .status-default {
   color: #9ca3af;
 }
 
+.status-non-aktif {
+  background-color: rgba(107, 114, 128, 0.15);
+  color: #6b7280;
+  border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+body.dark-mode .status-non-aktif {
+  background-color: rgba(156, 163, 175, 0.15);
+  color: #9ca3af;
+  border: 1px solid rgba(156, 163, 175, 0.3);
+}
+
 /* ============================================= */
 /* === STATUS BREAKDOWN LAYOUT ================ */
 /* ============================================= */

@@ -55,14 +55,14 @@ export default function ProblematicAssetsReport() {
                 const end_date_event = {
                     target: {
                         name: 'end_date',
-                        value: value 
+                        value: value
                     }
                 };
                 handleFilterChange(end_date_event);
             }
         }
         if (name === 'end_date' && filters.start_date && new Date(value) < new Date(filters.start_date)) {
-             const start_date_event = {
+            const start_date_event = {
                 target: {
                     name: 'end_date',
                     value: filters.start_date
@@ -139,7 +139,7 @@ export default function ProblematicAssetsReport() {
             else {
                 setIsMobileFilterOpen(false);
             }
-            
+
         };
 
         handleResize();
@@ -292,7 +292,7 @@ export default function ProblematicAssetsReport() {
                                             <tr key={`prob-${item.kode_unik}`} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
                                                 <td style={columnStyles.col2}>{formatDate(item.tanggal_hilang || item.tanggal_rusak)}</td>
                                                 <td style={columnStyles.col2}>
-                                                    <span className={`badge-status status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                    <span className={`status-badge status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
                                                         {item.status_detail?.nama_status || 'N/A'}
                                                     </span>
                                                 </td>
