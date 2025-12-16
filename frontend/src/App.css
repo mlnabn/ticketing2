@@ -8095,11 +8095,10 @@ html {
 
 .ticket-modal-card {
   padding: 20px;
-  border-left: 5px solid transparent;
   border-radius: 10px;
+  border-left: 5px solid transparent;
   background-color: #f5f5f5;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -8294,7 +8293,6 @@ html {
 
 .dark-mode .ticket-modal-card {
   background-color: rgba(18, 20, 24, 0.85) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .dark-mode .ticket-modal-card p {
@@ -14657,7 +14655,8 @@ body.dark-mode .leaflet-container {
 }
 
 .dark-mode .detail-select option {
-  background-color: #121418; /* Fallback solid color mendekati rgba(18, 20, 24) */
+  background-color: #121418;
+  /* Fallback solid color mendekati rgba(18, 20, 24) */
   color: #e2e8f0;
   padding: 10px;
 }
@@ -14731,24 +14730,4 @@ body.dark-mode .leaflet-container {
 
 .status-color-ditolak {
   color: #FCA5A5;
-}
-
-.ticket-modal-card.status-selesai {
-  border-left: 4px solid #86EFAC;
-}
-
-.ticket-modal-card.status-sedang-dikerjakan {
-  border-left: 4px solid #FCD34D;
-}
-
-.ticket-modal-card.status-belum-dikerjakan {
-  border-left: 4px solid #A5B4FC;
-}
-
-.ticket-modal-card.status-ditunda {
-  border-left: 4px solid #D1D5DB;
-}
-
-.ticket-modal-card.status-ditolak {
-  border-left: 4px solid #FCA5A5;
 }
