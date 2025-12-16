@@ -490,7 +490,7 @@ export default function TicketReportDetail() {
                       <Select
                         name="month"
                         value={activeMonth}
-                        onChange={handleDateFilterChange}
+                        onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'month', value: selectedOption.value } })}
                         options={monthOptions}
                         classNamePrefix="report-filter-select"
                         isSearchable={false}
@@ -503,7 +503,7 @@ export default function TicketReportDetail() {
                       <Select
                         name="year"
                         value={activeYear}
-                        onChange={handleDateFilterChange}
+                        onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'year', value: selectedOption.value } })}
                         options={yearOptions}
                         classNamePrefix="report-filter-select"
                         isSearchable={false}
