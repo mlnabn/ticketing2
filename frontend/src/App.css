@@ -12991,6 +12991,12 @@ body.dark-mode .btn-dlt:hover {
   text-align: center;
 }
 
+body.dark-mode .detail-list-header {
+  background-color: #374151ff;
+  color: var(--detail-header-text-dark, #d1d5db);
+  border-top: 1px solid #9ca3af;
+}
+
 /* =========================================== */
 /* ROW DETAIL */
 /* =========================================== */
@@ -13077,6 +13083,9 @@ body.dark-mode .btn-dlt:hover {
   border-bottom: 1px solid #dee2e6;
 }
 
+/* =========================================== */
+/* ===        Warna Dark Mode            ===== */
+/* =========================================== */
 body.dark-mode .stok-summary-table thead th {
   background-color: #1f1f1f;
   color: #e5e7eb;
