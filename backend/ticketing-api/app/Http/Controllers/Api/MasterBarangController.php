@@ -190,46 +190,99 @@ class MasterBarangController extends Controller
 
     public function getStockBreakdown(MasterBarang $masterBarang)
     {
-        $statusTersediaId = \App\Models\Status::where('nama_status', 'Tersedia')->value('id');
-        if (!$statusTersediaId) {
-            return response()->json([]);
-        }
-
         $targetMasterBarangId = $masterBarang->id_m_barang;
 
+        // Fetch all statuses with their badge colors
+        $allStatuses = Status::all()->keyBy('id');
+
+        // Define which statuses are "active" (operational) vs "inactive" (end-of-life)
+        $activeStatusNames = ['Tersedia', 'Dipinjam', 'Digunakan', 'Perbaikan'];
+        $inactiveStatusNames = ['Rusak', 'Hilang', 'Non-Aktif'];
+
+        // Get stock counts grouped by status and color
         $stockData = StokBarang::where('master_barang_id', $targetMasterBarangId)
-            ->where('status_id', $statusTersediaId)
-            ->join('master_barangs', 'stok_barangs.master_barang_id', '=', 'master_barangs.id_m_barang')
+            ->join('status_barang', 'stok_barangs.status_id', '=', 'status_barang.id')
             ->leftJoin('colors', 'stok_barangs.id_warna', '=', 'colors.id_warna')
             ->select(
-                'master_barangs.nama_barang',
+                'status_barang.id as status_id',
+                'status_barang.nama_status',
+                'status_barang.warna_badge',
                 'colors.nama_warna',
                 DB::raw('count(stok_barangs.id) as total')
             )
-            ->groupBy('master_barangs.nama_barang', 'colors.nama_warna')
-            ->orderBy('master_barangs.nama_barang')
+            ->groupBy('status_barang.id', 'status_barang.nama_status', 'status_barang.warna_badge', 'colors.nama_warna')
+            ->orderBy('status_barang.id')
             ->get();
 
-        $result = [];
+        // Organize data by status
+        $statusBreakdown = [];
+        $totalActive = 0;
+        $totalInactive = 0;
+        $totalAll = 0;
+
         foreach ($stockData as $stock) {
-            $itemName = $masterBarang->nama_barang;
-            if (!isset($result[$itemName])) {
-                $result[$itemName] = [
-                    'item_name' => $itemName,
-                    'total_stock' => 0,
+            $statusName = $stock->nama_status;
+            $isActive = in_array($statusName, $activeStatusNames);
+
+            if (!isset($statusBreakdown[$statusName])) {
+                $statusBreakdown[$statusName] = [
+                    'status_name' => $statusName,
+                    'status_badge' => $stock->warna_badge,
+                    'is_active' => $isActive,
+                    'total' => 0,
                     'colors' => [],
                 ];
             }
 
-            $result[$itemName]['colors'][] = [
-                'color_name' => $stock->nama_warna ?? 'Tanpa Warna',
-                'count' => (int) $stock->total,
-            ];
+            $colorName = $stock->nama_warna ?? 'Tanpa Warna';
+            $count = (int) $stock->total;
 
-            $result[$itemName]['total_stock'] += (int) $stock->total;
+            // Add or update color entry
+            $colorExists = false;
+            foreach ($statusBreakdown[$statusName]['colors'] as &$color) {
+                if ($color['color_name'] === $colorName) {
+                    $color['count'] += $count;
+                    $colorExists = true;
+                    break;
+                }
+            }
+            if (!$colorExists) {
+                $statusBreakdown[$statusName]['colors'][] = [
+                    'color_name' => $colorName,
+                    'count' => $count,
+                ];
+            }
+
+            $statusBreakdown[$statusName]['total'] += $count;
+            $totalAll += $count;
+
+            if ($isActive) {
+                $totalActive += $count;
+            } else {
+                $totalInactive += $count;
+            }
         }
 
-        return response()->json(array_values($result));
+        // Separate active and inactive statuses
+        $activeStatuses = [];
+        $inactiveStatuses = [];
+
+        foreach ($statusBreakdown as $status) {
+            if ($status['is_active']) {
+                $activeStatuses[] = $status;
+            } else {
+                $inactiveStatuses[] = $status;
+            }
+        }
+
+        return response()->json([
+            'item_name' => $masterBarang->nama_barang,
+            'total_all' => $totalAll,
+            'total_active' => $totalActive,
+            'total_inactive' => $totalInactive,
+            'active_statuses' => $activeStatuses,
+            'inactive_statuses' => $inactiveStatuses,
+        ]);
     }
 
     public function show(MasterBarang $masterBarang)
