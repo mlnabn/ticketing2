@@ -168,7 +168,8 @@ export default function ComprehensiveReportPage() {
         const newStartDateObj = new Date(value);
         const currentEndDateObj = currentEndDate ? new Date(currentEndDate) : null;
         if (!currentEndDate || !currentEndDateObj || currentEndDateObj < newStartDateObj) {
-          newParams.set('end_date', value);
+          const today = new Date().toISOString().split('T')[0];
+          newParams.set('end_date', today);
         }
       }
     }
