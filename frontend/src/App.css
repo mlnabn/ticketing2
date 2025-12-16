@@ -13019,9 +13019,20 @@ body.dark-mode .detail-list-header {
 
 .header-sn,
 .cell-sn {
-  flex-basis: 7%;
+  flex-basis: 10%;
   flex-grow: 0;
   flex-shrink: 0;
+  min-width: 0;
+  /* Allow flex item to shrink below content size */
+}
+
+.cell-sn {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  /* Override flex for text truncation to work */
 }
 
 .header-kondisi,

@@ -129,11 +129,11 @@ function StokBarangView() {
         const initialState = {
             status_id: 'ALL' // Default wajib 'ALL'
         };
-        
+
         if (location.state?.initialSearchTerm) {
             initialState.search = location.state.initialSearchTerm;
         }
-        
+
         return initialState;
     });
 
@@ -293,7 +293,7 @@ function StokBarangView() {
             id_warna: selectedColor,
             search: debouncedSearchTerm,
         };
-        setDetailItems({}); 
+        setDetailItems({});
         setExpandedRows({});
         fetchData(1, filters);
     }, [selectedCategory, selectedSubCategory, selectedStatus, selectedColor, debouncedSearchTerm, fetchData, isPresent]);
@@ -634,9 +634,9 @@ function StokBarangView() {
     };
 
     const columnStyles = {
-    col1: { textAlign: 'center' },
-    col2: { textAlign: 'left' },
-  };
+        col1: { textAlign: 'center' },
+        col2: { textAlign: 'left' },
+    };
 
     return (
         <>
@@ -908,7 +908,7 @@ function StokBarangView() {
                                                                                         />
                                                                                     </div>
                                                                                     <div className="detail-cell cell-kode">{detail.kode_unik}</div>
-                                                                                    <div className="detail-cell cell-sn">{detail.serial_number || '-'}</div>
+                                                                                    <div className="detail-cell cell-sn" title={detail.serial_number || '-'}>{detail.serial_number || '-'}</div>
                                                                                     <div className="detail-cell cell-kondisi">{detail.kondisi}</div>
                                                                                     <div className="detail-cell cell-status">
                                                                                         <span className={`status-badge status-${(detail.status_detail?.nama_status || 'unknown').toLowerCase().replace(/\s+/g, '-')}`}>
