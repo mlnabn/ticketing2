@@ -4980,7 +4980,7 @@ body.dark-mode .rejection-reason-display p {
 
 .custom-select-notif__menu {
   border-radius: 8px !important;
-  border: 1px solid #d1d5db !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   background-color: #F5F5F5 !important;
 }
 
@@ -5001,7 +5001,7 @@ body.dark-mode .rejection-reason-display p {
 }
 
 .dark-mode .custom-select-notif__option {
-  background-color: #3a3f44 !important;
+  background-color: rgba(18, 20, 24, 0.85) !important;
 }
 
 .dark-mode .custom-select-notif__control {
@@ -5031,7 +5031,7 @@ body.dark-mode .rejection-reason-display p {
 }
 
 .dark-mode .custom-select-notif__menu {
-  background-color: #2c2f33 !important;
+  background-color: rgba(18, 20, 24, 0.85) !important;
   border: 1px solid #495057 !important;
 }
 
@@ -5781,6 +5781,7 @@ body.dark-mode .history-item-content small {
 }
 
 .custom-select-role__menu {
+  background-color: #f5f5f5 !important;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -5805,7 +5806,6 @@ body.dark-mode .history-item-content small {
 .custom-select-role__option--is-selected {
   background-color: #d6eaf8 !important;
   color: #154360 !important;
-
 }
 
 .dark-mode .custom-select-role__control {
@@ -5828,7 +5828,7 @@ body.dark-mode .history-item-content small {
 }
 
 .dark-mode .custom-select-role__menu {
-  background-color: #2c2f33 !important;
+  background-color: rgba(18, 20, 24, 0.85) !important;
   border: 1px solid #495057 !important;
 }
 
@@ -6468,6 +6468,21 @@ body.dark-mode .welcome-title {
     cursor: pointer;
     z-index: 10;
   }
+}
+
+.dark-mode input[type="date"] {
+  color: #e2e8f0;
+  border-color: #4b5563;
+  color-scheme: dark;
+}
+
+.dark-mode input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+.dark-mode input[type="date"]::-webkit-datetime-edit-text {
+  color: #e2e8f0 !important;
+}
+
+.dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) grayscale(1) brightness(1.5);
 }
 
 @media (min-width: 1009px) and (max-width: 2002px) {
@@ -9679,7 +9694,7 @@ body.dark-mode .btn-recover-small:hover {
 .detail-edit-textarea {
   width: 100%;
   padding: 6px 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #ccc !important;
   border-radius: 4px;
   background-color: #fff;
   font-size: 14px;
@@ -10280,7 +10295,7 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .dark-mode .report-filter-select__control {
-  background-color: rgba(71, 85, 105, 0.25) !important;
+  background-color: rgba(18, 20, 24, 0.85) !important;
   box-shadow: none !important;
   border: 1px solid rgba(148, 163, 184, 0.2) !important;
   color: #e2e8f0 !important;
@@ -10473,7 +10488,7 @@ body.dark-mode .form-group-recover textarea:focus {
 
 /* --- STYLING KONTROL UTAMA (Dark Mode) --- */
 .dark-mode .filter-select-invent__control {
-  background-color: rgba(71, 85, 105, 0.25) !important;
+  background-color: rgba(18, 20, 24, 0.85) !important;
   box-shadow: none !important;
   border: 1px solid rgba(148, 163, 184, 0.2) !important;
 }
@@ -10940,7 +10955,7 @@ body.dark-mode .form-group-recover textarea:focus {
 }
 
 .dark-mode .custom-select-return__menu {
-  background-color: rgba(18, 20, 24, 0.85) !important;
+  background-color: rgba(18, 20, 24, 1) !important;
   border: 1px solid #495057 !important;
 }
 
@@ -11396,7 +11411,7 @@ input:disabled {
 }
 
 .dark-mode .custom-select-kondisi__menu {
-  background-color: #2c2f33 !important;
+  background-color: rgba(18, 20, 24, 1) !important;
   border: 1px solid #495057 !important;
 }
 
@@ -11586,7 +11601,7 @@ input:disabled {
 }
 
 .dark-mode .creatable-select__menu {
-  background-color: #040404 !important;
+  background-color: rgba(18, 20, 24, 1) !important;
   border: 1px solid #495057 !important;
 }
 
@@ -14634,11 +14649,17 @@ body.dark-mode .leaflet-container {
 
 .dark-mode .detail-select {
   background-image:
-    linear-gradient(to right, #888 1px, transparent 1px),
+    linear-gradient(to right, #495057 1px, transparent 1px),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat, no-repeat;
   background-position: right 2rem center, right 0.75rem center;
   background-size: 1px 60%, 0.75em auto;
+}
+
+.dark-mode .detail-select option {
+  background-color: #121418; /* Fallback solid color mendekati rgba(18, 20, 24) */
+  color: #e2e8f0;
+  padding: 10px;
 }
 
 .close-btn {

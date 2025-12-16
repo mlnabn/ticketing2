@@ -85,7 +85,7 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show, 
         menu: (provided) => ({
             ...provided,
             cursor: 'pointer',
-            backgroundColor: isDarkMode ? 'rgba(18, 20, 24, 0.85)' : '#fff',
+            backgroundColor: isDarkMode ? 'rgba(18, 20, 24, 1)' : '#fff',
             border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #ccc',
             borderRadius: "10px",
         }),
@@ -93,7 +93,7 @@ function AssignAdminModal({ ticket, admins, onAssign, onClose, showToast, show, 
             ...provided,
             cursor: 'pointer',
             color: isDarkMode ? '#e2e8f0' : '#333',
-            backgroundColor: state.isFocused ? (isDarkMode ? 'rgba(59, 130, 246, 0.5)' : '#e9f2ff') : 'transparent',
+            backgroundColor: state.isFocused ? (isDarkMode ? 'rgba(59, 130, 246, 0.5)' : '#e9f2ff') : 'none',
             '&:active': {
                 backgroundColor: isDarkMode ? '#3b82f6' : '#2563eb',
                 color: '#fff'
