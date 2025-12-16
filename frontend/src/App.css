@@ -10215,12 +10215,21 @@ body.dark-mode .form-group-recover textarea:focus {
   border: 1px solid #ccc !important;
   border-radius: 8px !important;
   box-shadow: none !important;
-  min-height: 40px !important;
+  height: 42px !important;
+  min-height: 42px !important;
   padding: 0px !important;
   line-height: normal !important;
   box-sizing: border-box !important;
   background-color: var(--input-bg, #FFFFFF) !important;
   cursor: pointer !important;
+}
+
+.report-filter-select__input-container {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 .report-filter-select__control .report-filter-select__value-container {
@@ -10254,7 +10263,20 @@ body.dark-mode .form-group-recover textarea:focus {
 .report-filter-select__option--is-selected {
   background-color: #d6eaf8 !important;
   color: #154360 !important;
+}
 
+.report-filter-select__single-value {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin: 0 !important;
+}
+
+.report-filter-select__placeholder {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin: 0 !important;
 }
 
 .dark-mode .report-filter-select__control {

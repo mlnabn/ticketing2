@@ -488,7 +488,7 @@ export default function ComprehensiveReportPage() {
                     isSearchable={false}
                     menuPortalTarget={document.body}
                     styles={{
-                      container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                      container: (base) => ({ ...base, flex: 1, zIndex: 999, minWidth: '200px' }),
                       menuPortal: (base) => ({ ...base, zIndex: 9999 })
                     }}
                   />
@@ -499,10 +499,10 @@ export default function ComprehensiveReportPage() {
                       options={[{ value: '', label: 'Semua Workshop' }, ...workshops]}
                       value={workshops.find(w => w.value === dateFilters.workshop_id) || { value: '', label: 'Semua Workshop' }}
                       onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'workshop_id', value: selectedOption.value } })}
-                      isSearchable={true}
+                      isSearchable={false}
                       menuPortalTarget={document.body}
                       styles={{
-                        container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                        container: (base) => ({ ...base, flex: 1, zIndex: 999, minWidth: '200px' }),
                         menuPortal: (base) => ({ ...base, zIndex: 9999 })
                       }}
                     />
@@ -519,7 +519,7 @@ export default function ComprehensiveReportPage() {
                         isSearchable={false}
                         menuPortalTarget={document.body}
                         styles={{
-                          container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                          container: (base) => ({ ...base, flex: 1, zIndex: 999, minWidth: '200px' }),
                           menuPortal: (base) => ({ ...base, zIndex: 9999 })
                         }}
                       />
@@ -532,7 +532,7 @@ export default function ComprehensiveReportPage() {
                         isSearchable={false}
                         menuPortalTarget={document.body}
                         styles={{
-                          container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                          container: (base) => ({ ...base, flex: 1, zIndex: 999, minWidth: '200px' }),
                           menuPortal: (base) => ({ ...base, zIndex: 9999 })
                         }}
                       />

@@ -452,7 +452,7 @@ export default function TicketReportDetail() {
                 isSearchable={false}
                 menuPortalTarget={document.body}
                 styles={{
-                  container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                  container: (base) => ({ ...base, flex: 1, zIndex: 999, minWidth: '200px' }),
                   menuPortal: (base) => ({ ...base, zIndex: 9999 })
                 }}
               />
@@ -466,7 +466,7 @@ export default function TicketReportDetail() {
                   isSearchable={true}
                   menuPortalTarget={document.body}
                   styles={{
-                    container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                    container: (base) => ({ ...base, flex: 1, zIndex: 999, minWidth: '200px' }),
                     menuPortal: (base) => ({ ...base, zIndex: 9999 })
                   }}
                 />
@@ -482,7 +482,7 @@ export default function TicketReportDetail() {
                     isSearchable={false}
                     menuPortalTarget={document.body}
                     styles={{
-                      container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                      container: (base) => ({ ...base, flex: 1, zIndex: 999, minWidth: '200px' }),
                       menuPortal: (base) => ({ ...base, zIndex: 9999 })
                     }}
                   />
@@ -495,7 +495,7 @@ export default function TicketReportDetail() {
                     isSearchable={false}
                     menuPortalTarget={document.body}
                     styles={{
-                      container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                      container: (base) => ({ ...base, flex: 1, zIndex: 999, minWidth: '200px' }),
                       menuPortal: (base) => ({ ...base, zIndex: 9999 })
                     }}
                   />
