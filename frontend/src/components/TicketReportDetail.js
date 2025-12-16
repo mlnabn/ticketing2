@@ -466,7 +466,7 @@ export default function TicketReportDetail() {
                     isSearchable={false}
                     menuPortalTarget={document.body}
                     styles={{
-                      container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                      container: (base) => ({ ...base, flex: 1, zIndex: 999, minWidth: '200px' }),
                       menuPortal: (base) => ({ ...base, zIndex: 9999 })
                     }}
                   />
@@ -480,7 +480,7 @@ export default function TicketReportDetail() {
                       isSearchable={true}
                       menuPortalTarget={document.body}
                       styles={{
-                        container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                        container: (base) => ({ ...base, flex: 1, zIndex: 999, minWidth: '200px' }),
                         menuPortal: (base) => ({ ...base, zIndex: 9999 })
                       }}
                     />
@@ -490,26 +490,26 @@ export default function TicketReportDetail() {
                       <Select
                         name="month"
                         value={activeMonth}
-                        onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'month', value: selectedOption.value } })}
+                        onChange={handleDateFilterChange}
                         options={monthOptions}
                         classNamePrefix="report-filter-select"
                         isSearchable={false}
                         menuPortalTarget={document.body}
                         styles={{
-                          container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                          container: (base) => ({ ...base, flex: 1, zIndex: 999, minWidth: '200px' }),
                           menuPortal: (base) => ({ ...base, zIndex: 9999 })
                         }}
                       />
                       <Select
                         name="year"
                         value={activeYear}
-                        onChange={(selectedOption) => handleDateFilterChange({ target: { name: 'year', value: selectedOption.value } })}
+                        onChange={handleDateFilterChange}
                         options={yearOptions}
                         classNamePrefix="report-filter-select"
                         isSearchable={false}
                         menuPortalTarget={document.body}
                         styles={{
-                          container: (base) => ({ ...base, flex: 1, zIndex: 999 }),
+                          container: (base) => ({ ...base, flex: 1, zIndex: 999, minWidth: '200px' }),
                           menuPortal: (base) => ({ ...base, zIndex: 9999 })
                         }}
                       />
