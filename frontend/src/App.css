@@ -12991,12 +12991,6 @@ body.dark-mode .btn-dlt:hover {
   text-align: center;
 }
 
-body.dark-mode .detail-list-header {
-  background-color: #374151ff;
-  color: #d1d5db;
-  border-top: 1px solid #9ca3af;
-}
-
 /* =========================================== */
 /* ROW DETAIL */
 /* =========================================== */
@@ -13019,14 +13013,6 @@ body.dark-mode .detail-list-header {
 
 .detail-row-div:hover {
   background-color: #e9ecef;
-}
-
-body.dark-mode .detail-row-div {
-  border-bottom-color: #374151;
-}
-
-body.dark-mode .detail-row-div:hover {
-  background-color: #374151;
 }
 
 /* =========================================== */
@@ -13066,10 +13052,6 @@ body.dark-mode .detail-row-div:hover {
   border: 1px solid #ccc;
 }
 
-body.dark-mode .cell-warna .color-swatch {
-  border-color: #374151;
-}
-
 /* =========================================== */
 /* AKSI */
 /* =========================================== */
@@ -13095,11 +13077,43 @@ body.dark-mode .cell-warna .color-swatch {
   border-bottom: 1px solid #dee2e6;
 }
 
+body.dark-mode .stok-summary-table thead th {
+  background-color: #1f1f1f;
+  color: #e5e7eb;
+}
+
+body.dark-mode .summary-row {
+  border-bottom-color: #1f1f1f;
+}
+
+.dark-mode .summary-row:hover {
+  background-color: #111111;
+}
+
+body.dark-mode .summary-row.expanded {
+  background-color: #1f1f1f;
+}
+
+body.dark-mode .detail-list-wrapper,
 body.dark-mode .detail-loading,
 body.dark-mode .detail-nodata {
   background-color: #1f1f1f;
   border-bottom-color: #374151;
   color: #d1d5db;
+}
+
+
+
+body.dark-mode .detail-row-div {
+  border-bottom-color: #374151;
+}
+
+.dark-mode .detail-row-div:hover {
+  background-color: #374151;
+}
+
+body.dark-mode .cell-warna .color-swatch {
+  border-color: #374151;
 }
 
 
