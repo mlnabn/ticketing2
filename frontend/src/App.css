@@ -12924,7 +12924,7 @@ body.dark-mode .btn-dlt:hover {
 }
 
 /* =========================================== */
-/* === Styling Detail List (Tanpa Tabel) ==== */
+/* === Styling Detail List (GRID FIX FINAL) == */
 /* =========================================== */
 
 .detail-rows-container td {
@@ -12932,50 +12932,72 @@ body.dark-mode .btn-dlt:hover {
   border: none !important;
 }
 
+/* Wrapper */
 .detail-list-wrapper {
-  padding-left: 1rem;
-  background-color: var(--detail-bg, #f8f9fa);
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--detail-border-color, #dee2e6);
-
+  padding: 0.5rem 0;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
 }
 
+/* =========================================== */
+/* HEADER DETAIL */
+/* =========================================== */
+
 .detail-list-header {
-  display: flex;
+  display: grid;
+  grid-template-columns:
+    36px
+    /* checkbox */
+    130px
+    /* Kode SKU */
+    160px
+    /* S/N */
+    90px
+    /* Kondisi */
+    120px
+    /* Status */
+    70px
+    /* Warna */
+    130px
+    /* Harga */
+    130px
+    /* Tgl Beli */
+    130px
+    /* Tgl Masuk */
+    110px
+    /* Ditambahkan */
+    160px;
+  /* Aksi */
+
+  align-items: center;
   padding: 0.6rem 1rem;
   background-color: #b3bac6ff;
   font-weight: 600;
-  color: var(--detail-header-text, #495057);
   font-size: 0.8em;
-  margin-bottom: 0.25rem;
-  text-align: center;
+  color: #495057;
   border-top: 1px solid #4A5568;
-
+  text-align: center;
 }
 
 body.dark-mode .detail-list-header {
   background-color: #374151ff;
-  color: var(--detail-header-text-dark, #d1d5db);
+  color: #d1d5db;
   border-top: 1px solid #9ca3af;
 }
 
-.detail-list-header .detail-cell {
-  padding: 0 0.5rem;
-  box-sizing: border-box;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
+/* =========================================== */
+/* ROW DETAIL */
+/* =========================================== */
 
 .detail-row-div {
-  display: flex;
-  border-bottom: 1px solid var(--detail-border-color, #e9ecef);
+  display: grid;
+  grid-template-columns:
+    36px 130px 160px 90px 120px 70px 130px 130px 130px 110px 160px;
+
+  align-items: center;
   padding: 0.6rem 1rem;
   font-size: 0.85em;
-  align-items: center;
+  border-bottom: 1px solid #e9ecef;
   cursor: pointer;
 }
 
@@ -12984,175 +13006,83 @@ body.dark-mode .detail-list-header {
 }
 
 .detail-row-div:hover {
-  background-color: var(--detail-hover-bg, #e9ecef);
+  background-color: #e9ecef;
 }
 
+body.dark-mode .detail-row-div {
+  border-bottom-color: #374151;
+}
+
+body.dark-mode .detail-row-div:hover {
+  background-color: #374151;
+}
+
+/* =========================================== */
+/* CELL */
+/* =========================================== */
+
 .detail-cell {
-  padding: 0 0.5rem;
-  box-sizing: border-box;
-  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 0.5rem;
+  white-space: nowrap;
   text-align: center;
 }
 
-.header-select,
-.cell-select {
-  flex-basis: 4%;
-  padding: 0 8px;
-  text-align: center;
-  justify-content: center;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
-
-.header-kode,
-.cell-kode {
-  flex-basis: 14%;
-  padding-left: 1rem;
-  text-align: center;
-  justify-content: center;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
-
-.header-sn,
+/* Serial Number */
 .cell-sn {
-  flex-basis: 10%;
-  flex-grow: 0;
-  flex-shrink: 0;
-  min-width: 0;
-  /* Allow flex item to shrink below content size */
-}
-
-.cell-sn {
-  max-width: 120px;
+  justify-content: flex-start;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  display: block;
-  /* Override flex for text truncation to work */
 }
 
-.header-kondisi,
-.cell-kondisi {
-  flex-basis: 6%;
-  flex-grow: 0;
-  flex-shrink: 0;
+/* Checkbox */
+.header-select,
+.cell-select {
+  padding: 0;
 }
 
-.header-status,
-.cell-status {
-  flex-basis: 8%;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
-
-.header-jumlah,
-.cell-jumlah {
-  flex-basis: 5%;
-  text-align: center;
-  justify-content: center;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
-
-.header-warna,
-.cell-warna {
-  flex-basis: 5%;
-  justify-content: center;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
-
-.header-harga,
-.cell-harga {
-  flex-basis: 10%;
-  justify-content: center;
-  text-align: center;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
-
-.header-tglbeli,
-.cell-tglbeli {
-  flex-basis: 11%;
-  text-align: center;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
-
-.header-tanggal,
-.cell-tanggal {
-  flex-basis: 11%;
-  text-align: center;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
-
-.header-creator,
-.cell-creator {
-  flex-basis: 8%;
-  text-align: center;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
-
-.header-aksi,
-.cell-aksi {
-  flex-basis: 11%;
-  justify-content: center;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
+/* =========================================== */
+/* WARNA */
+/* =========================================== */
 
 .cell-warna .color-swatch {
-  display: inline-block;
   width: 16px;
   height: 16px;
-  border: 1px solid var(--detail-border-color, #ccc);
   border-radius: 3px;
-  vertical-align: middle;
-  align-items: center;
+  border: 1px solid #ccc;
 }
 
-.cell-aksi.action-buttons-group {
-  gap: 0.5rem;
+body.dark-mode .cell-warna .color-swatch {
+  border-color: #374151;
 }
+
+/* =========================================== */
+/* AKSI */
+/* =========================================== */
+
+.cell-aksi.action-buttons-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+/* =========================================== */
+/* EMPTY / LOADING */
+/* =========================================== */
 
 .detail-loading,
 .detail-nodata {
   padding: 1rem;
-  padding-left: 1rem;
   text-align: center;
   font-style: italic;
-  color: var(--text-color-secondary, #6c757d);
-  background-color: var(--detail-bg, #f8f9fa);
-  border-bottom: 1px solid var(--detail-border-color, #dee2e6);
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
 }
 
-/* =========================================== */
-/* ===        Warna Dark Mode            ===== */
-/* =========================================== */
-body.dark-mode .stok-summary-table thead th {
-  background-color: #1f1f1f;
-  color: #e5e7eb;
-}
-
-body.dark-mode .summary-row {
-  border-bottom-color: #1f1f1f;
-}
-
-.dark-mode .summary-row:hover {
-  background-color: #111111;
-}
-
-body.dark-mode .summary-row.expanded {
-  background-color: #1f1f1f;
-}
-
-body.dark-mode .detail-list-wrapper,
 body.dark-mode .detail-loading,
 body.dark-mode .detail-nodata {
   background-color: #1f1f1f;
@@ -13160,19 +13090,6 @@ body.dark-mode .detail-nodata {
   color: #d1d5db;
 }
 
-
-
-body.dark-mode .detail-row-div {
-  border-bottom-color: #374151;
-}
-
-.dark-mode .detail-row-div:hover {
-  background-color: #374151;
-}
-
-body.dark-mode .cell-warna .color-swatch {
-  border-color: #374151;
-}
 
 /* =========================================== */
 /* ===      Styling Mobile (Ringkasan)   ===== */
