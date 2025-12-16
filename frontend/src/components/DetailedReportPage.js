@@ -566,7 +566,7 @@ export default function DetailedReportPage({ type, title }) {
                                 {showCurrentStatus &&
                                     <th style={columnStyles.col1}>Status Saat Ini</th>}
                                 {showPJStatus &&
-                                        <th style={columnStyles.col1}>Penanggung Jawab Status</th>}
+                                    <th style={columnStyles.col1}>Penanggung Jawab Status</th>}
                             </tr>
                         </thead>
                     </table>
@@ -587,7 +587,7 @@ export default function DetailedReportPage({ type, title }) {
                                     return (
                                         <tr key={item.id} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
                                             <td style={columnStyles.col1}>{itemData.kode_unik || '-'}</td>
-                                            <td style={columnStyles.col2}>{itemData.serial_number || '-'}</td>
+                                            <td style={{ ...columnStyles.col2, maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={itemData.serial_number || '-'}>{itemData.serial_number || '-'}</td>
                                             <td style={columnStyles.col2}>{itemData.nama_barang || '-'}</td>
                                             {showStatusDari && <td style={columnStyles.col2}>{itemData.status_dari || '-'}</td>}
                                             {showStatusKejadian && <td style={columnStyles.col2}>{itemData.status || '-'}</td>}
@@ -596,7 +596,7 @@ export default function DetailedReportPage({ type, title }) {
                                             {showWorkshop && <td style={columnStyles.col2}>{itemData.workshop || '-'}</td>}
                                             {showCurrentStatus && (
                                                 <td style={columnStyles.col2}>
-                                                    <span className={`badge-status status-${(itemData.current_status || '-').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                    <span className={`status-badge status-${(itemData.current_status || '-').toLowerCase().replace(/\s+/g, '-')}`}>
                                                         {itemData.current_status || '-'}
                                                     </span>
                                                 </td>
@@ -685,7 +685,11 @@ export default function DetailedReportPage({ type, title }) {
                                         {showCurrentStatus && (
                                             <div className="data-group">
                                                 <span className="label">Status Saat Ini</span>
-                                                <span className="value">{itemData.current_status || '-'}</span>
+                                                <span className="value">
+                                                    <span className={`status-badge status-${(itemData.current_status || '-').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                        {itemData.current_status || '-'}
+                                                    </span>
+                                                </span>
                                             </div>
                                         )}
                                     </div>

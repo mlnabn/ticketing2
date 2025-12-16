@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import { useModalBackHandler } from '../hooks/useModalBackHandler';
 
 function SkuDetailModal({ show, item, onClose }) {
-    const [stockBreakdown, setStockBreakdown] = useState([]);
+    const [stockData, setStockData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
@@ -36,21 +36,16 @@ function SkuDetailModal({ show, item, onClose }) {
 
         api.get(`/inventory/items/${currentItem.id_m_barang}/stock-breakdown`)
             .then(response => {
-                setStockBreakdown(response.data);
+                setStockData(response.data);
             })
             .catch(error => {
                 console.error("Gagal mengambil rincian stok:", error);
-                setStockBreakdown([]);
+                setStockData(null);
             })
             .finally(() => {
                 setIsLoading(false);
             });
     }, [currentItem]);
-
-    const totalOverallStock = useMemo(() => {
-        if (!stockBreakdown || stockBreakdown.length === 0) return 0;
-        return stockBreakdown.reduce((sum, currentItem) => sum + currentItem.total_stock, 0);
-    }, [stockBreakdown]);
 
     const handleCheckStockClick = () => {
         if (onClose) onClose();
@@ -61,6 +56,43 @@ function SkuDetailModal({ show, item, onClose }) {
                 },
             });
         }
+    };
+
+    // Helper function to get status badge class based on badge color
+    const getStatusBadgeClass = (badgeColor) => {
+        const colorMap = {
+            'green': 'status-tersedia',
+            'blue': 'status-digunakan',
+            'purple': 'status-dipinjam',
+            'orange': 'status-perbaikan',
+            'red': 'status-rusak',
+            'black': 'status-hilang',
+        };
+        return colorMap[badgeColor] || 'status-default';
+    };
+
+    // Render a status section with color breakdown
+    const renderStatusSection = (statusData) => {
+        return (
+            <div key={statusData.status_name} className="status-breakdown-item">
+                <div className="status-header-row">
+                    <span className={`status-badge ${getStatusBadgeClass(statusData.status_badge)}`}>
+                        {statusData.status_name}
+                    </span>
+                    <span className="status-total">{statusData.total} unit</span>
+                </div>
+                {statusData.colors && statusData.colors.length > 0 && (
+                    <ul className="borrowed-items-list nested" style={{ marginTop: '8px', marginBottom: '0' }}>
+                        {statusData.colors.map((color, colorIndex) => (
+                            <li key={colorIndex}>
+                                <span>{color.color_name}</span>
+                                <span className="tool-quantity">({color.count} unit)</span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+        );
     };
 
     if (!shouldRender) return null;
@@ -78,7 +110,7 @@ function SkuDetailModal({ show, item, onClose }) {
                 onClick={e => e.stopPropagation()}
             >
                 <div className="modal-header-detail">
-                    <h3><strong>Detail Tipe Barang: </strong>{currentItem.master_kategori?.nama_kategori || currentItem.nama_barang}</h3>
+                    <h3><strong>Detail Tipe Barang: </strong>{currentItem.nama_barang}</h3>
                 </div>
 
                 <div className="modal-body-detail">
@@ -97,34 +129,73 @@ function SkuDetailModal({ show, item, onClose }) {
                         </div>
                     </div>
 
-                    {/* Tampilan baru untuk rincian stok */}
+                    {/* Rincian Stok berdasarkan Status */}
                     <div className="detail-item-full" data-span="2">
-                        {/* <span className="label">Detail Stok Tersedia</span> */}
                         {isLoading ? (
                             <p className="value">Memuat data stok...</p>
-                        ) : (
+                        ) : stockData ? (
                             <div className="stock-detail-container">
-                                <p className="value" style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '10px' }}>
-                                    Total Keseluruhan Stok Tersedia: {totalOverallStock} unit
-                                </p>
-                                {stockBreakdown.length > 0 ? (
-                                    stockBreakdown.map((stockItem, index) => (
-                                        <div key={index} className="stock-item-group">
-                                            <h4><strong>{stockItem.item_name}</strong>: {stockItem.total_stock} unit</h4>
-                                            <ul className="borrowed-items-list nested" style={{ marginBottom: '10px' }}>
-                                                {stockItem.colors.map((color, colorIndex) => (
-                                                    <li key={colorIndex}>
-                                                        <span>{color.color_name}</span>
-                                                        <span className="tool-quantity">({color.count} unit)</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                {/* Summary Section */}
+                                <div className="stock-summary-section" style={{ marginBottom: '16px' }}>
+                                    <p className="value" style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '8px' }}>
+                                        Total Keseluruhan Unit: {stockData.total_all} unit
+                                    </p>
+                                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                                        <span style={{ color: 'var(--text-secondary)' }}>
+                                            <strong style={{ color: '#22c55e' }}>Aktif:</strong> {stockData.total_active} unit
+                                        </span>
+                                        <span style={{ color: 'var(--text-secondary)' }}>
+                                            <strong style={{ color: '#ef4444' }}>Non-Aktif:</strong> {stockData.total_inactive} unit
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Active Statuses Section */}
+                                {stockData.active_statuses && stockData.active_statuses.length > 0 && (
+                                    <div className="status-section" style={{ marginBottom: '16px' }}>
+                                        <h4 style={{
+                                            fontSize: '0.95rem',
+                                            fontWeight: '600',
+                                            marginBottom: '12px',
+                                            color: '#22c55e',
+                                            borderBottom: '1px solid var(--border-color)',
+                                            paddingBottom: '8px'
+                                        }}>
+                                            Barang Aktif
+                                        </h4>
+                                        <div className="status-breakdown-list">
+                                            {stockData.active_statuses.map(renderStatusSection)}
                                         </div>
-                                    ))
-                                ) : (
-                                    <p className="value">Tidak ada rincian stok yang tersedia untuk SKU ini.</p>
+                                    </div>
                                 )}
+
+                                {/* Inactive Statuses Section */}
+                                {stockData.inactive_statuses && stockData.inactive_statuses.length > 0 && (
+                                    <div className="status-section">
+                                        <h4 style={{
+                                            fontSize: '0.95rem',
+                                            fontWeight: '600',
+                                            marginBottom: '12px',
+                                            color: '#ef4444',
+                                            borderBottom: '1px solid var(--border-color)',
+                                            paddingBottom: '8px'
+                                        }}>
+                                            Barang Non-Aktif
+                                        </h4>
+                                        <div className="status-breakdown-list">
+                                            {stockData.inactive_statuses.map(renderStatusSection)}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* No data message */}
+                                {(!stockData.active_statuses || stockData.active_statuses.length === 0) &&
+                                    (!stockData.inactive_statuses || stockData.inactive_statuses.length === 0) && (
+                                        <p className="value">Tidak ada data stok untuk SKU ini.</p>
+                                    )}
                             </div>
+                        ) : (
+                            <p className="value">Tidak ada rincian stok yang tersedia untuk SKU ini.</p>
                         )}
                     </div>
                 </div>

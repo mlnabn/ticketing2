@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import Select from 'react-select'; 
+import Select from 'react-select';
 import { useDebounce } from 'use-debounce';
 import api from '../services/api';
 import { saveAs } from 'file-saver';
@@ -596,7 +596,7 @@ function ItemHistoryLookupPage() {
                                                     <td style={columnStyles.col1}>{item.kode_unik}</td>
                                                     <td style={columnStyles.col2}>{item.master_barang?.nama_barang || 'N/A'}</td>
                                                     <td className={selectedItem ? 'hide-on-narrow' : ''} style={columnStyles.col2}>
-                                                        <span className={`badge-status status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                        <span className={`status-badge status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
                                                             {item.status_detail?.nama_status || 'N/A'}
                                                         </span>
                                                     </td>
@@ -770,7 +770,7 @@ function ItemHistoryLookupPage() {
                                                 )}
                                                 {log.bukti_foto_path && (
                                                     <div className="info-row full-width" style={{ marginTop: '5px' }}>
-                                                        <span className="info-label" style={{marginBottom:'5px', display:'block'}}>Bukti Foto</span>
+                                                        <span className="info-label" style={{ marginBottom: '5px', display: 'block' }}>Bukti Foto</span>
                                                         <div style={{
                                                             width: 'fit-content',
                                                             border: '1px solid #e2e8f0',
@@ -778,14 +778,14 @@ function ItemHistoryLookupPage() {
                                                             borderRadius: '8px',
                                                             backgroundColor: '#f8fafc'
                                                         }}>
-                                                            <img 
-                                                                src={getImageUrl(log.bukti_foto_path)} 
-                                                                alt="Bukti Riwayat" 
-                                                                style={{ 
-                                                                    maxWidth: '100%', 
+                                                            <img
+                                                                src={getImageUrl(log.bukti_foto_path)}
+                                                                alt="Bukti Riwayat"
+                                                                style={{
+                                                                    maxWidth: '100%',
                                                                     maxHeight: '150px', // Tidak terlalu tinggi
                                                                     borderRadius: '6px',
-                                                                    cursor: 'pointer' 
+                                                                    cursor: 'pointer'
                                                                 }}
                                                                 onClick={() => window.open(getImageUrl(log.bukti_foto_path), '_blank')}
                                                                 title="Klik untuk memperbesar"

@@ -114,9 +114,7 @@ function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurre
                     <div className="detail-grid-section">
                         <div className="detail-item-full">
                             <span className="label">Status Saat Ini</span>
-                            <span className="value">
-                                <span className={`status-badge status-rusak`}>Rusak</span>
-                            </span>
+                            <span className="value">Rusak</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">User Terkait</span>
@@ -137,9 +135,7 @@ function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurre
                     <div className="detail-grid-section">
                         <div className="detail-item-full">
                             <span className="label">Status Saat Ini</span>
-                            <span className="value">
-                                <span className={`status-badge status-hilang`}>Hilang</span>
-                            </span>
+                            <span className="value">Hilang</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">User Terkait</span>
@@ -160,9 +156,7 @@ function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurre
                     <div className="detail-grid-section">
                         <div className="detail-item-full">
                             <span className="label">Status Saat Ini</span>
-                            <span className="value">
-                                <span className={`status-badge status-perbaikan`}>Perbaikan</span>
-                            </span>
+                            <span className="value">Perbaikan</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Teknisi Terkait</span>
@@ -185,9 +179,7 @@ function InventoryDetailModal({ show, kodeUnik, onClose, formatDate, formatCurre
                     <div className="detail-grid-section">
                         <div className="detail-item-full">
                             <span className="label">Status Saat Ini</span>
-                            <span className="value">
-                                <span className={`status-badge status-tersedia`}>Tersedia</span>
-                            </span>
+                            <span className="value">Tersedia</span>
                         </div>
                         <div className="detail-item-full">
                             <span className="label">Terakhir Status Diubah</span>
