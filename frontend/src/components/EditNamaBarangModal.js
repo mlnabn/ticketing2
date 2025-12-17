@@ -46,7 +46,7 @@ function EditNamaBarangModal({ show, onClose, item, onSaveSuccess, showToast }) 
         try {
             await api.post(`/inventory/items/${currentItem.id_m_barang}`, { nama_barang: namaBarang });
             showToast('Nama barang berhasil diubah.', 'success');
-            onSaveSuccess();
+            onSaveSuccess(currentItem);
             handleClose();
         } catch (error) {
             console.error("Gagal update nama barang:", error);

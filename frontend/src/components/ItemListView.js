@@ -369,7 +369,7 @@ function ItemListView({
                                                                                 />
                                                                             </div>
                                                                             <div className="detail-cell header-kode" style={{ fontSize: '15px' }}>Nama Barang</div>
-                                                                            <div className="detail-cell header-stok" style={{ fontSize: '15px' }}>Stok Tersedia</div>
+                                                                            <div className="detail-cell header-stok" style={{ fontSize: '15px' }}>Total Stok</div>
                                                                             <div className="detail-cell header-aksi" style={{ fontSize: '15px' }}>Aksi</div>
                                                                         </div>
                                                                         <div
@@ -407,7 +407,7 @@ function ItemListView({
                                                                                         />
                                                                                     </div>
                                                                                     <div className="detail-cell cell-kode">{detail.nama_barang}</div>
-                                                                                    <div className="detail-cell cell-stok">{detail.stok_tersedia_count}</div>
+                                                                                    <div className="detail-cell cell-stok">{detail.total_stock}</div>
                                                                                     <div className="detail-cell cell-aksi action-buttons-group">
                                                                                         {!showArchived && (
                                                                                             <button onClick={(e) => { e.stopPropagation(); onEdit(detail); }} className="btn-user-action btn-detail">
@@ -566,8 +566,8 @@ function ItemListView({
                                                             </div>
                                                             <div className="card-row">
                                                                 <div className="data-group horizontal">
-                                                                    <span className="label" style={{ fontSize: '13px', fontWeight: '600' }}>Stok Tersedia</span>
-                                                                    <span className="value">{detail.stok_tersedia_count}</span>
+                                                                    <span className="label" style={{ fontSize: '13px', fontWeight: '600' }}>Total Stok</span>
+                                                                    <span className="value">{detail.total_stock}</span>
                                                                 </div>
                                                             </div>
                                                             <div className="card-row action-row">

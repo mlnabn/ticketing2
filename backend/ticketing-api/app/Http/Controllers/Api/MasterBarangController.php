@@ -72,7 +72,8 @@ class MasterBarangController extends Controller
             ->withCount([
                 'stokBarangs as stok_tersedia_count' => function ($query) use ($tersediaStatusId) {
                     $query->where('status_id', $tersediaStatusId);
-                }
+                },
+                'stokBarangs as total_stock'
             ])
             ->withCount(['activeStokBarangs as total_active_stock'])
             ->orderBy('nama_barang', 'asc')
