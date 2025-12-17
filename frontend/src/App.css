@@ -10539,7 +10539,8 @@ body.dark-mode .stock-summary-section {
 }
 
 .filter-select-date::-webkit-calendar-picker-indicator:hover {
-  background-color: #343a40;
+  background-color: #4a667a !important;
+  opacity: 0.8;
 }
 
 /* Focus */
@@ -10558,10 +10559,13 @@ body.dark-mode .stock-summary-section {
 
 /* DARK MODE */
 .dark-mode .filter-select-date {
-  background-color: rgba(71, 85, 105, 0.25) !important;
+  background-color: rgba(18, 20, 24, 0.85) !important;
   color: #e2e8f0;
   border: 1px solid rgba(148, 163, 184, 0.2) !important;
-  color-scheme: dark;
+  color-scheme: dark; 
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 .dark-mode .filter-select-date:focus {
@@ -10572,13 +10576,14 @@ body.dark-mode .stock-summary-section {
   background-color: #343a40;
 }
 
-/* ICON untuk dark mode */
 .dark-mode .filter-select-date::-webkit-calendar-picker-indicator {
-  background-color: #E2E8F0 !important;
+  filter: invert(1) brightness(100%);
+  cursor: pointer;
 }
 
 .dark-mode .filter-select-date::-webkit-calendar-picker-indicator:hover {
-  background-color: #e9ecef !important;
+  opacity: 0.8;
+  background-color: #0d0d0d !important;
 }
 
 .filter-select-date::placeholder {
