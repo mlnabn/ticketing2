@@ -72,7 +72,8 @@ class MasterBarangController extends Controller
             ->withCount([
                 'stokBarangs as stok_tersedia_count' => function ($query) use ($tersediaStatusId) {
                     $query->where('status_id', $tersediaStatusId);
-                }
+                },
+                'stokBarangs as total_stock'
             ])
             ->withCount(['activeStokBarangs as total_active_stock'])
             ->orderBy('nama_barang', 'asc')
@@ -192,14 +193,11 @@ class MasterBarangController extends Controller
     {
         $targetMasterBarangId = $masterBarang->id_m_barang;
 
-        // Fetch all statuses with their badge colors
         $allStatuses = Status::all()->keyBy('id');
 
-        // Define which statuses are "active" (operational) vs "inactive" (end-of-life)
         $activeStatusNames = ['Tersedia', 'Dipinjam', 'Digunakan', 'Perbaikan'];
         $inactiveStatusNames = ['Rusak', 'Hilang', 'Non-Aktif'];
 
-        // Get stock counts grouped by status and color
         $stockData = StokBarang::where('master_barang_id', $targetMasterBarangId)
             ->join('status_barang', 'stok_barangs.status_id', '=', 'status_barang.id')
             ->leftJoin('colors', 'stok_barangs.id_warna', '=', 'colors.id_warna')
@@ -214,7 +212,6 @@ class MasterBarangController extends Controller
             ->orderBy('status_barang.id')
             ->get();
 
-        // Organize data by status
         $statusBreakdown = [];
         $totalActive = 0;
         $totalInactive = 0;
@@ -237,7 +234,6 @@ class MasterBarangController extends Controller
             $colorName = $stock->nama_warna ?? 'Tanpa Warna';
             $count = (int) $stock->total;
 
-            // Add or update color entry
             $colorExists = false;
             foreach ($statusBreakdown[$statusName]['colors'] as &$color) {
                 if ($color['color_name'] === $colorName) {
@@ -263,7 +259,6 @@ class MasterBarangController extends Controller
             }
         }
 
-        // Separate active and inactive statuses
         $activeStatuses = [];
         $inactiveStatuses = [];
 

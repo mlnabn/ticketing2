@@ -10539,7 +10539,8 @@ body.dark-mode .stock-summary-section {
 }
 
 .filter-select-date::-webkit-calendar-picker-indicator:hover {
-  background-color: #343a40;
+  background-color: #4a667a !important;
+  opacity: 0.8;
 }
 
 /* Focus */
@@ -10558,10 +10559,13 @@ body.dark-mode .stock-summary-section {
 
 /* DARK MODE */
 .dark-mode .filter-select-date {
-  background-color: rgba(71, 85, 105, 0.25) !important;
+  background-color: rgba(18, 20, 24, 0.85) !important;
   color: #e2e8f0;
   border: 1px solid rgba(148, 163, 184, 0.2) !important;
-  color-scheme: dark;
+  color-scheme: dark; 
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 .dark-mode .filter-select-date:focus {
@@ -10572,13 +10576,14 @@ body.dark-mode .stock-summary-section {
   background-color: #343a40;
 }
 
-/* ICON untuk dark mode */
 .dark-mode .filter-select-date::-webkit-calendar-picker-indicator {
-  background-color: #E2E8F0 !important;
+  filter: invert(1) brightness(100%);
+  cursor: pointer;
 }
 
 .dark-mode .filter-select-date::-webkit-calendar-picker-indicator:hover {
-  background-color: #e9ecef !important;
+  opacity: 0.8;
+  background-color: #0d0d0d !important;
 }
 
 .filter-select-date::placeholder {
@@ -10861,51 +10866,94 @@ body.dark-mode .stock-summary-section {
 }
 
 @media print {
-
   body>#root {
-    display: none;
+    display: none !important;
   }
 
+  /* Force print area to be visible and positioned correctly */
   #print-area {
-    display: block;
+    display: block !important;
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
   }
 
   .print-sheet {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    display: block !important;
+    /* Block layout for floats */
+    width: 100% !important;
+    height: auto !important;
     padding: 10mm;
+    box-sizing: border-box;
+    overflow: hidden;
+    /* Clearfix behavior */
   }
 
   .qr-print-item {
+    display: block !important;
+    float: left !important;
+    /* Float is very reliable for print */
+    width: 50% !important;
+    /* Exact 50% split */
+    border: 1px solid #ccc;
+    padding: 4px;
+    margin: 0;
+    /* No margin to ensure 50%+50%=100% fits perfectly */
+    box-sizing: border-box;
+    /* Include padding/border in width */
+    page-break-inside: avoid;
+    break-inside: avoid;
+    height: 75px;
+    /* Fixed height can promote stability */
+  }
+
+  /* Inner content layout */
+  .qr-print-item-inner {
     display: flex;
     align-items: center;
-    gap: 8px;
-    border: 1px solid #ccc;
-    padding: 5px;
-    border-radius: 4px;
-    width: calc(50% - 5px);
-    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    gap: 5px;
+  }
+
+  .qr-print-item svg {
+    width: 60px !important;
+    height: 60px !important;
+    flex-shrink: 0;
   }
 
   .qr-print-details {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    flex: 1;
+    overflow: hidden;
+    min-width: 0;
   }
 
   .item-name {
     font-weight: bold;
-    font-size: 10pt;
+    font-size: 9pt;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .item-code {
     font-size: 8pt;
     color: #555;
   }
+}
+
+.item-name-inv {
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ============================================= */

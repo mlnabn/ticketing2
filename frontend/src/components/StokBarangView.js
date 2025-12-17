@@ -179,6 +179,70 @@ function StokBarangView() {
         }
     }, [showToast, setSelectedItems]);
 
+    // Silent refresh: updates data without showing loading state or closing expanded rows
+    const refreshDataSilently = useCallback(async (masterBarangIdToRefresh = null) => {
+        try {
+            // Refresh master items list (summary counts)
+            const params = { page: 1, ...currentFilters };
+            const res = await api.get('/inventory/stock-summary', { params });
+            setMasterItems(res.data.data);
+            setPagination(res.data);
+
+            // If a specific master item was affected and is currently expanded, refresh its detail items
+            if (masterBarangIdToRefresh && expandedRows[masterBarangIdToRefresh]) {
+                const detailParams = {
+                    master_barang_id: masterBarangIdToRefresh,
+                    status_id: (selectedStatus === "ALL") ? "" : selectedStatus,
+                    id_warna: selectedColor,
+                    search: debouncedSearchTerm,
+                    page: 1
+                };
+                const detailRes = await api.get('/inventory/stock-items', { params: detailParams });
+                setDetailItems(prev => ({
+                    ...prev,
+                    [masterBarangIdToRefresh]: {
+                        items: detailRes.data.data,
+                        pagination: {
+                            currentPage: detailRes.data.current_page,
+                            totalPages: detailRes.data.last_page,
+                            total: detailRes.data.total
+                        }
+                    }
+                }));
+            }
+
+            // Also refresh any other currently expanded rows
+            const expandedIds = Object.keys(expandedRows).filter(
+                id => expandedRows[id] && parseInt(id) !== masterBarangIdToRefresh
+            );
+            for (const id of expandedIds) {
+                const detailParams = {
+                    master_barang_id: id,
+                    status_id: (selectedStatus === "ALL") ? "" : selectedStatus,
+                    id_warna: selectedColor,
+                    search: debouncedSearchTerm,
+                    page: 1
+                };
+                const detailRes = await api.get('/inventory/stock-items', { params: detailParams });
+                setDetailItems(prev => ({
+                    ...prev,
+                    [id]: {
+                        items: detailRes.data.data,
+                        pagination: {
+                            currentPage: detailRes.data.current_page,
+                            totalPages: detailRes.data.last_page,
+                            total: detailRes.data.total
+                        }
+                    }
+                }));
+            }
+        } catch (error) {
+            console.error("Silent refresh error:", error);
+            // Fallback to full refresh on error
+            fetchData(1, currentFilters);
+        }
+    }, [currentFilters, expandedRows, selectedStatus, selectedColor, debouncedSearchTerm, fetchData]);
+
     useEffect(() => {
         if (!isPresent) return;
         if (isInitialMount.current) {
@@ -237,6 +301,18 @@ function StokBarangView() {
             label: color.nama_warna
         }))
     ], [colorOptions]);
+
+    // Dynamic column header based on selected status filter
+    const dynamicStatusColumnLabel = useMemo(() => {
+        if (selectedStatus === 'ALL' || selectedStatus === '') {
+            return 'Unit Tersedia';
+        }
+        const status = statusOptions.find(s => s.id === parseInt(selectedStatus));
+        if (status) {
+            return `Unit ${status.nama_status}`;
+        }
+        return 'Unit Tersedia';
+    }, [selectedStatus, statusOptions]);
 
 
     const handleFilterChange = (name, selectedOption) => {
@@ -448,23 +524,14 @@ function StokBarangView() {
     };
 
     const handleSaveSuccess = () => {
-        let masterIdToClose = null;
-        if (editItem) masterIdToClose = editItem.master_barang_id;
-        else if (itemToSoftDelete) masterIdToClose = itemToSoftDelete.master_barang_id;
-        else if (detailItem) masterIdToClose = detailItem.master_barang_id;
-        const currentPage = pagination?.current_page || 1;
-        fetchData(currentPage, currentFilters);
-        if (masterIdToClose) {
-            setExpandedRows(prev => ({
-                ...prev,
-                [masterIdToClose]: false
-            }));
-            setDetailItems(prev => {
-                const newState = { ...prev };
-                delete newState[masterIdToClose];
-                return newState;
-            });
-        }
+        let masterIdToRefresh = null;
+        if (editItem) masterIdToRefresh = editItem.master_barang_id;
+        else if (itemToSoftDelete) masterIdToRefresh = itemToSoftDelete.master_barang_id;
+        else if (detailItem) masterIdToRefresh = detailItem.master_barang_id;
+
+        // Use silent refresh to preserve expanded rows state
+        refreshDataSilently(masterIdToRefresh);
+
         setEditItem(null);
         setItemToSoftDelete(null);
     };
@@ -810,7 +877,7 @@ function StokBarangView() {
                                     <th style={columnStyles.col1}>Nama Barang</th>
                                     <th style={columnStyles.col1}>Kategori</th>
                                     <th style={columnStyles.col1}>Sub-Kategori</th>
-                                    <th style={columnStyles.col1}>Unit Tersedia</th>
+                                    <th style={columnStyles.col1}>{dynamicStatusColumnLabel}</th>
                                     <th style={columnStyles.col1}>Unit Aktif</th>
                                     <th style={columnStyles.col1}>Ditambahkan Oleh</th>
                                 </tr>
@@ -1025,7 +1092,7 @@ function StokBarangView() {
                                                 </div>
                                                 <div className="card-separator"></div> */}
                                                 <div className="card-item-row">
-                                                    <span className="label">Unit Tersedia</span>
+                                                    <span className="label">{dynamicStatusColumnLabel}</span>
                                                     <span className="value">{masterItem.available_stock_count}</span>
                                                 </div>
                                                 <div className="card-separator"></div>
@@ -1209,8 +1276,9 @@ function StokBarangView() {
                         navigate(location.pathname, { replace: true, state: {} });
                     }
                 }}
-                onSaveSuccess={() => {
-                    fetchData(1, currentFilters);
+                onSaveSuccess={(createdMasterBarangId) => {
+                    // Use silent refresh to preserve expanded rows when adding stock
+                    refreshDataSilently(createdMasterBarangId);
                     setItemToPreselect(null);
                 }}
                 showToast={showToast}

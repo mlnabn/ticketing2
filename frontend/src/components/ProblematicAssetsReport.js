@@ -52,10 +52,13 @@ export default function ProblematicAssetsReport() {
             const newStartDateObj = new Date(value);
             const currentEndDateObj = currentEndDate ? new Date(currentEndDate) : null;
             if (currentEndDate === '' || !currentEndDateObj || currentEndDateObj < newStartDateObj) {
+                // Set end_date to today's date instead of copying start_date
+                const today = new Date();
+                const todayFormatted = today.toISOString().split('T')[0];
                 const end_date_event = {
                     target: {
                         name: 'end_date',
-                        value: value
+                        value: todayFormatted
                     }
                 };
                 handleFilterChange(end_date_event);
@@ -292,9 +295,7 @@ export default function ProblematicAssetsReport() {
                                             <tr key={`prob-${item.kode_unik}`} className="hoverable-row" onClick={(e) => handleRowClick(e, item)}>
                                                 <td style={columnStyles.col2}>{formatDate(item.tanggal_hilang || item.tanggal_rusak)}</td>
                                                 <td style={columnStyles.col2}>
-                                                    <span className={`status-badge status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
-                                                        {item.status_detail?.nama_status || 'N/A'}
-                                                    </span>
+                                                    {item.status_detail?.nama_status || 'N/A'}
                                                 </td>
                                                 <td style={columnStyles.col2}>{item.kode_unik}</td>
                                                 <td style={columnStyles.col2}>{item.master_barang.nama_barang}</td>
@@ -348,9 +349,7 @@ export default function ProblematicAssetsReport() {
                                         <div className="data-group">
                                             <span className="label">Status</span>
                                             <span className="value">
-                                                <span className={`status-badge status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
-                                                    {item.status_detail?.nama_status || 'N/A'}
-                                                </span>
+                                                {item.status_detail?.nama_status || 'N/A'}
                                             </span>
                                         </div>
                                     </div>

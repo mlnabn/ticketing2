@@ -45,7 +45,7 @@ function ToolManagement() {
     const [detailItems, setDetailItems] = useState({});
     const [expandingId, setExpandingId] = useState(null);
 
-    const fetchItems = useCallback(async (page = 1, filters = {}, getIsActive = () => true) => {
+    const fetchItems = useCallback(async (page = 1, filters = {}, getIsActive = () => true, preserveExpanded = false) => {
         if (page === 1) setLoading(true);
         try {
             const params = { page, ...filters };
@@ -54,9 +54,11 @@ function ToolManagement() {
             if (getIsActive()) {
                 if (page === 1) {
                     setItems(response.data.data);
-                    setExpandedRows({});
-                    setDetailItems({});
-                    setSelectedIds([]);
+                    if (!preserveExpanded) {
+                        setExpandedRows({});
+                        setDetailItems({});
+                        setSelectedIds([]);
+                    }
                 } else {
                     setItems(prev => [...prev, ...response.data.data]);
                 }
@@ -73,6 +75,22 @@ function ToolManagement() {
             }
         }
     }, [showToast]);
+
+    const refreshDetailItems = useCallback(async (kodeBarang) => {
+        if (!kodeBarang) return;
+        try {
+            const isActive = currentFilters.is_active === 'true';
+            const res = await api.get(`/inventory/items/variations/${kodeBarang}`, {
+                params: { is_active: isActive }
+            });
+            setDetailItems(prev => ({
+                ...prev,
+                [kodeBarang]: res.data
+            }));
+        } catch (error) {
+            console.error("Gagal memuat ulang variasi SKU:", error);
+        }
+    }, [currentFilters.is_active]);
 
     useEffect(() => {
         if (!isPresent) return;
@@ -155,7 +173,10 @@ function ToolManagement() {
             const newItem = response.data;
             showToast('Tipe barang baru berhasil didaftarkan.');
             handleCloseItemModal();
-            fetchItems(1, currentFilters);
+            await fetchItems(1, currentFilters, () => true, true);
+            if (newItem?.kode_barang && expandedRows[newItem.kode_barang]) {
+                refreshDetailItems(newItem.kode_barang);
+            }
             if (action === 'saveAndAddStock' && newItem) {
                 const preselectData = {
                     value: newItem.id_m_barang,
@@ -190,7 +211,6 @@ function ToolManagement() {
 
             if (response.status === 200 || response.status === 204) {
                 showToast(response.data?.message || "Barang berhasil diarsipkan.");
-                fetchItems(1, currentFilters);
                 setDetailItems(prev => {
                     const newDetails = { ...prev };
                     if (newDetails[itemToDelete.kode_barang]) {
@@ -200,6 +220,7 @@ function ToolManagement() {
                     }
                     return newDetails;
                 });
+                await fetchItems(1, currentFilters, () => true, true);
             } else {
                 showToast(response.data?.message || "Gagal mengarsipkan barang.", "error");
             }
@@ -221,7 +242,6 @@ function ToolManagement() {
         try {
             const response = await api.post(`/inventory/items/${item.id_m_barang}/restore`);
             showToast(response.data?.message || "SKU berhasil dipulihkan.");
-            fetchItems(1, currentFilters);
             setDetailItems(prev => {
                 const newDetails = { ...prev };
                 if (newDetails[item.kode_barang]) {
@@ -231,7 +251,7 @@ function ToolManagement() {
                 }
                 return newDetails;
             });
-
+            await fetchItems(1, currentFilters, () => true, true);
         } catch (error) {
             console.error("Gagal memulihkan barang:", error);
             showToast(error.response?.data?.message || "Gagal memulihkan barang.", "error");
@@ -269,8 +289,13 @@ function ToolManagement() {
             try {
                 const response = await api.post('/inventory/items/bulk-delete', { ids: selectedIds });
                 showToast(response.data.message, 'success');
-                fetchItems(1, currentFilters);
                 setSelectedIds([]);
+                await fetchItems(1, currentFilters, () => true, true);
+                Object.keys(expandedRows).forEach(kodeBarang => {
+                    if (expandedRows[kodeBarang]) {
+                        refreshDetailItems(kodeBarang);
+                    }
+                });
             } catch (e) {
                 console.error('Gagal menghapus SKU secara massal:', e);
                 showToast(e.response?.data?.message || 'Terjadi kesalahan saat mencoba menghapus SKU.', 'error');
@@ -287,8 +312,13 @@ function ToolManagement() {
             try {
                 const response = await api.post('/inventory/items/bulk-restore', { ids: selectedIds });
                 showToast(response.data.message, 'success');
-                fetchItems(1, currentFilters);
                 setSelectedIds([]);
+                await fetchItems(1, currentFilters, () => true, true);
+                Object.keys(expandedRows).forEach(kodeBarang => {
+                    if (expandedRows[kodeBarang]) {
+                        refreshDetailItems(kodeBarang);
+                    }
+                });
             } catch (e) {
                 console.error('Gagal memulihkan SKU secara massal:', e);
                 showToast(e.response?.data?.message || 'Terjadi kesalahan saat mencoba memulihkan SKU.', 'error');
@@ -361,7 +391,13 @@ function ToolManagement() {
                 onClose={handleCloseEditNameModal}
                 item={itemToEditName}
                 showToast={showToast}
-                onSaveSuccess={() => fetchItems(pagination?.current_page || 1)}
+                onSaveSuccess={(updatedItem) => {
+                    if (updatedItem?.kode_barang && expandedRows[updatedItem.kode_barang]) {
+                        refreshDetailItems(updatedItem.kode_barang);
+                    } else {
+                        fetchItems(pagination?.current_page || 1, currentFilters, () => true, true);
+                    }
+                }}
             />
 
             <ConfirmationModal

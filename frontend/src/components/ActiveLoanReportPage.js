@@ -157,36 +157,39 @@ export default function ActiveLoanReportPage() {
     };
 
     const handleFilterChange = (e) => {
-    const { name, value } = e.target;
+        const { name, value } = e.target;
 
-    setFilters(prevFilters => {
-        let newFilters = { ...prevFilters, [name]: value };
+        setFilters(prevFilters => {
+            let newFilters = { ...prevFilters, [name]: value };
 
-        // --- Logika Khusus untuk 'start_date' ---
-        if (name === 'start_date') {
-            const currentEndDate = prevFilters.end_date;
-            
-            if (value === '') {
-                newFilters.end_date = '';
-            } else {
-                const newStartDateObj = new Date(value);
-                const currentEndDateObj = currentEndDate ? new Date(currentEndDate) : null;
-                if (currentEndDate === '' || !currentEndDateObj || currentEndDateObj < newStartDateObj) {
-                    newFilters.end_date = value;
+            // --- Logika Khusus untuk 'start_date' ---
+            if (name === 'start_date') {
+                const currentEndDate = prevFilters.end_date;
+
+                if (value === '') {
+                    newFilters.end_date = '';
+                } else {
+                    const newStartDateObj = new Date(value);
+                    const currentEndDateObj = currentEndDate ? new Date(currentEndDate) : null;
+                    if (currentEndDate === '' || !currentEndDateObj || currentEndDateObj < newStartDateObj) {
+                        // Set end_date to today's date instead of copying start_date
+                        const today = new Date();
+                        const todayFormatted = today.toISOString().split('T')[0];
+                        newFilters.end_date = todayFormatted;
+                    }
                 }
             }
-        }
-        if (newFilters.start_date && newFilters.end_date) {
-            const startDate = new Date(newFilters.start_date);
-            const endDate = new Date(newFilters.end_date);
-            if (endDate < startDate) {
-                newFilters.end_date = newFilters.start_date;
+            if (newFilters.start_date && newFilters.end_date) {
+                const startDate = new Date(newFilters.start_date);
+                const endDate = new Date(newFilters.end_date);
+                if (endDate < startDate) {
+                    newFilters.end_date = newFilters.start_date;
+                }
             }
-        }
-        
-        return newFilters;
-    });
-};
+
+            return newFilters;
+        });
+    };
 
     const handleSelectFilterChange = (selectedOption, name) => {
         setFilters(prev => ({ ...prev, [name]: selectedOption ? selectedOption.value : '' }));

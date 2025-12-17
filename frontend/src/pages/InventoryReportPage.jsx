@@ -85,7 +85,7 @@ export default function InventoryReportPage() {
             <motion.div variants={staggerItem} className="info-cards-grid">
                 <div className="info-card blue-card">
                     <div className="card-header">
-                        <p className="card-label" style={{fontWeight : 'bold'}}>Total Unit Barang</p>
+                        <p className="card-label" style={{ fontWeight: 'bold' }}>Total Unit Barang</p>
                         <div className="card-icon blue-icon"><i className="fas fa-box-open"></i></div>
                     </div>
                     <h3 className="card-value">{stats.total_unit_barang}</h3>
@@ -93,7 +93,7 @@ export default function InventoryReportPage() {
 
                 <div className="info-card green-card">
                     <div className="card-header">
-                        <p className="card-label" style={{fontWeight : 'bold'}}>Stok Tersedia</p>
+                        <p className="card-label" style={{ fontWeight: 'bold' }}>Stok Tersedia</p>
                         <div className="card-icon green-icon"><i className="fas fa-check-circle"></i></div>
                     </div>
                     <h3 className="card-value">{stats.stok_tersedia}</h3>
@@ -101,15 +101,15 @@ export default function InventoryReportPage() {
 
                 <div className="info-card orange-card">
                     <div className="card-header">
-                        <p className="card-label" style={{fontWeight : 'bold', color: '#653505'}}>Rusak & Hilang</p>
-                        <div className="card-icon orange-icon" style={{color: '#653505'}}><i className="fas fa-exclamation-triangle"></i></div>
+                        <p className="card-label" style={{ fontWeight: 'bold', color: '#653505' }}>Rusak & Hilang</p>
+                        <div className="card-icon orange-icon" style={{ color: '#653505' }}><i className="fas fa-exclamation-triangle"></i></div>
                     </div>
-                    <h3 className="card-value" style={{color: '#653505'}}>{stats.rusak_hilang_total}</h3>
+                    <h3 className="card-value" style={{ color: '#653505' }}>{stats.rusak_hilang_total}</h3>
                 </div>
 
                 <div className="info-card red-card">
                     <div className="card-header">
-                        <p className="card-label" style={{fontWeight : 'bold'}}>Barang Keluar</p>
+                        <p className="card-label" style={{ fontWeight: 'bold' }}>Barang Keluar</p>
                         <div className="card-icon red-icon"><i className="fas fa-shipping-fast"></i></div>
                     </div>
                     <h3 className="card-value">{stats.barang_keluar}</h3>
@@ -133,7 +133,7 @@ export default function InventoryReportPage() {
                                 <div className="active-item">
                                     <div className="item-info">
                                         <span className="item-rank">{index + 1}.</span>
-                                        <span className="item-name">{item.master_barang.nama_barang}</span>
+                                        <span className="item-name-inv">{item.master_barang.nama_barang}</span>
                                     </div>
                                     <span className="item-count">{item.total_keluar} kali</span>
                                 </div>
@@ -183,6 +183,6 @@ export default function InventoryReportPage() {
                     icon="fa-history"
                 />
             </motion.div>
-        </motion.div> 
+        </motion.div>
     );
 }

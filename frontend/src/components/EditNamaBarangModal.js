@@ -5,13 +5,9 @@ import { useModalBackHandler } from '../hooks/useModalBackHandler';
 function EditNamaBarangModal({ show, onClose, item, onSaveSuccess, showToast }) {
     const [namaBarang, setNamaBarang] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
     const [currentItem, setCurrentItem] = useState(item);
-
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
-
-    // Handle browser back button
     const handleClose = useModalBackHandler(show, onClose, 'edit-nama');
 
     useEffect(() => {
@@ -46,7 +42,7 @@ function EditNamaBarangModal({ show, onClose, item, onSaveSuccess, showToast }) 
         try {
             await api.post(`/inventory/items/${currentItem.id_m_barang}`, { nama_barang: namaBarang });
             showToast('Nama barang berhasil diubah.', 'success');
-            onSaveSuccess();
+            onSaveSuccess(currentItem);
             handleClose();
         } catch (error) {
             console.error("Gagal update nama barang:", error);

@@ -1,0 +1,529 @@
+# 📋 Deskripsi Proyek Sistem Ticketing
+
+## Ringkasan Eksekutif
+
+Proyek ini adalah **Sistem Ticketing & Manajemen Inventaris** berbasis web yang dikembangkan sebagai solusi terintegrasi untuk pengelolaan tiket pekerjaan IT Support dan manajemen aset/inventaris. Sistem ini menggunakan arsitektur **full-stack modern** dengan **React.js** di frontend dan **Laravel** di backend, serta terintegrasi dengan **WhatsApp** melalui N8N dan AI (DeepSeek) untuk pembuatan tiket otomatis.
+
+---
+
+## 🏗️ Arsitektur Teknologi
+
+### Stack Teknologi Utama
+
+```mermaid
+flowchart TB
+    subgraph Frontend["Frontend (React.js 19.1.1)"]
+        React[React 19.1.1]
+        Router[React Router DOM 6.26.2]
+        Auth[React Context API]
+        Axios[Axios HTTP Client]
+    end
+    
+    subgraph Backend["Backend (Laravel 12)"]
+        Laravel[Laravel Framework 12.0]
+        JWT[JWT Auth 2.2]
+        Sanctum[Laravel Sanctum 4.0]
+        Socialite[Laravel Socialite]
+    end
+    
+    subgraph Database["Database"]
+        MySQL[(MySQL/MariaDB)]
+    end
+    
+    subgraph Integration["External Integration"]
+        N8N[N8N Workflow]
+        WhatsApp[WhatsApp API]
+        DeepSeek[DeepSeek AI]
+    end
+    
+    Frontend --> Backend
+    Backend --> Database
+    N8N --> WhatsApp
+    N8N --> DeepSeek
+    N8N --> Backend
+```
+
+---
+
+## 📦 Dependensi & Tools
+
+### Frontend Dependencies
+
+| Library | Versi | Fungsi |
+|---------|-------|--------|
+| **react** | ^19.1.1 | Framework UI utama |
+| **react-router-dom** | ^6.26.2 | Routing/navigasi |
+| **axios** | ^1.7.7 | HTTP client untuk API calls |
+| **framer-motion** | ^12.23.12 | Animasi dan transisi |
+| **recharts** | ^3.1.2 | Visualisasi data (charts) |
+| **leaflet** + **react-leaflet** | ^1.9.4 / ^5.0.0 | Peta interaktif |
+| **react-icons** | ^5.5.0 | Icon library |
+| **lucide-react** | ^0.542.0 | Icon library modern |
+| **react-calendar** | ^6.0.0 | Komponen kalender |
+| **react-select** | ^5.10.2 | Dropdown terseleksi |
+| **swiper** | ^11.2.10 | Carousel/slider |
+| **date-fns** + **dayjs** | ^4.1.0 / ^1.11.18 | Manipulasi tanggal |
+| **qrcode.react** | ^4.2.0 | Generator QR Code |
+| **html5-qrcode** | ^2.3.8 | QR Code Scanner |
+| **react-to-print** | ^3.1.1 | Fitur cetak halaman |
+| **browser-image-compression** | ^2.0.2 | Kompresi gambar |
+| **react-tsparticles** | ^2.12.2 | Efek partikel animasi |
+| **use-debounce** | ^10.0.6 | Debounce hooks |
+| **file-saver** | ^2.0.5 | Download file |
+
+### Backend Dependencies
+
+| Library | Versi | Fungsi |
+|---------|-------|--------|
+| **laravel/framework** | ^12.0 | Framework PHP utama |
+| **laravel/sanctum** | ^4.0 | API token authentication |
+| **tymon/jwt-auth** | ^2.2 | JWT authentication |
+| **laravel/socialite** | ^5.23 | OAuth (Google Login) |
+| **barryvdh/laravel-dompdf** | ^3.1 | Generate PDF |
+| **maatwebsite/excel** | ^3.1 | Export Excel |
+| **guzzlehttp/guzzle** | ^7.10 | HTTP client |
+| **doctrine/dbal** | ^4.3 | Database abstraction |
+
+---
+
+## 🗄️ Struktur Database
+
+### Tabel Utama
+
+```mermaid
+erDiagram
+    users {
+        bigint id PK
+        varchar name
+        varchar email UK
+        varchar password
+        varchar role "user/admin"
+        timestamp created_at
+    }
+    
+    tickets {
+        bigint id PK
+        varchar title
+        varchar workshop
+        varchar status
+        text rejection_reason
+        text proof_description
+        varchar proof_image_path
+        timestamp started_at
+        timestamp completed_at
+        bigint user_id FK
+        bigint creator_id FK
+    }
+    
+    notifications {
+        bigint id PK
+        bigint user_id FK
+        varchar title
+        text message
+        boolean is_read
+    }
+    
+    workshops {
+        bigint id PK
+        varchar name
+        varchar code
+    }
+    
+    master_barang {
+        bigint id PK
+        varchar nama
+        varchar kode_barang
+        bigint kategori_id FK
+        bigint sub_kategori_id FK
+    }
+    
+    stok_barang {
+        bigint id PK
+        bigint master_barang_id FK
+        varchar serial_number
+        varchar status
+        decimal harga_perolehan
+        date tanggal_perolehan
+    }
+    
+    purchase_proposals {
+        bigint id PK
+        varchar judul
+        text deskripsi
+        varchar status
+        bigint created_by FK
+    }
+    
+    users ||--o{ tickets : creates
+    users ||--o{ tickets : handles
+    users ||--o{ notifications : receives
+    master_barang ||--o{ stok_barang : has
+```
+
+### Daftar Lengkap Model (15 Model)
+
+| Model | Deskripsi |
+|-------|-----------|
+| `User` | Pengguna sistem (admin/user) |
+| `Ticket` | Tiket pekerjaan IT Support |
+| `Workshop` | Unit/bengkel kerja |
+| `Notification` | Notifikasi sistem |
+| `NotificationTemplate` | Template notifikasi |
+| `MasterBarang` | Master data barang |
+| `MasterKategori` | Kategori barang |
+| `SubKategori` | Sub-kategori barang |
+| `StokBarang` | Stok per unit barang |
+| `StokBarangHistory` | Riwayat perubahan stok |
+| `PurchaseProposal` | Proposal pembelian |
+| `PurchaseProposalItem` | Item dalam proposal |
+| `Color` | Warna barang |
+| `Status` | Status referensi |
+| `Worker` | (Legacy) |
+
+---
+
+## 🔐 Sistem Autentikasi & Keamanan
+
+### Metode Autentikasi
+
+1. **JWT Authentication** (`tymon/jwt-auth`)
+   - Token access disimpan sebagai HTTP-only cookie
+   - Refresh token otomatis saat expired
+   - Token blacklisting saat logout
+
+2. **Google OAuth** (`laravel/socialite`)
+   - Login dengan akun Google
+   - Redirect flow untuk autentikasi
+
+3. **OTP via WhatsApp**
+   - Verifikasi registrasi melalui OTP
+   - Reset password dengan OTP
+   - Integrasi N8N untuk pengiriman
+
+### Fitur Keamanan
+
+- **Role-based Access Control**: Admin vs User
+- **Protected Routes** dengan `RequireAuth` dan `RequireRole`
+- **API Rate Limiting** (Laravel built-in)
+- **CORS Configuration**
+- **Input Validation** client & server side
+- **File Upload Validation**
+
+---
+
+## 🚀 Fitur-Fitur Sistem
+
+### 1. Manajemen Tiket (Ticketing)
+
+| Fitur | Deskripsi |
+|-------|-----------|
+| Buat Tiket | User membuat tiket dengan judul, workshop, waktu |
+| Kode Unik | Format `CNddmmXXXX` (contoh: CN16120001) |
+| Status Tracking | Belum Dikerjakan → Sedang Dikerjakan → Selesai/Ditolak |
+| Assignment | Admin mengambil/di-assign ke tiket |
+| Proof Submission | Upload bukti penyelesaian (gambar + deskripsi) |
+| Rejection | Tolak tiket dengan alasan |
+| Bulk Operations | Hapus banyak tiket sekaligus |
+| Export Data | Export ke Excel |
+| Tiket via WhatsApp | Buat tiket otomatis dari chat WhatsApp |
+
+### 2. Manajemen Inventaris
+
+| Fitur | Deskripsi |
+|-------|-----------|
+| Master Barang | CRUD data barang dengan kategori/sub-kategori |
+| Stok Individual | Tracking per unit dengan serial number |
+| QR Code | Generate & scan QR code per item |
+| Status Tracking | Available, Borrowed, Used, In Repair, Damaged, Lost, Inactive |
+| Riwayat Item | Log semua perubahan status per item |
+| Peminjaman | Proses pinjam/kembalikan barang |
+| Proposal Pembelian | Ajukan pembelian barang baru |
+
+### 3. Laporan & Analitik
+
+| Laporan | Deskripsi |
+|---------|-----------|
+| Ticket Analytics | Trend tiket 30 hari, distribusi status |
+| Admin Performance | Performa penanganan tiket per admin |
+| Inventory Report | Statistik inventaris, movement bulanan |
+| Financial Report | Nilai aset, pembelian, pergerakan nilai |
+| Active Loans | Barang yang sedang dipinjam |
+| Problematic Assets | Barang rusak, hilang, perbaikan |
+| New Acquisitions | Barang baru masuk |
+
+### 4. Visualisasi Data
+
+- **Line Charts**: Trend tiket & inventaris
+- **Pie Charts**: Distribusi status
+- **Bar Charts**: Perbandingan performa
+- **Maps**: Visualisasi geografis (Leaflet)
+- **Calendar**: Timeline tiket
+
+### 5. Sistem Notifikasi
+
+| Tipe | Deskripsi |
+|------|-----------|
+| Global | Broadcast ke semua user |
+| Personal | Notifikasi per-user |
+| Template | Template pesan yang bisa digunakan ulang |
+| Website | Notifikasi status tiket di web |
+| WhatsApp | Konfirmasi pembuatan tiket via WA |
+
+---
+
+## 🌐 Integrasi Eksternal
+
+### N8N Workflow Automation
+
+#### 1. Sistem OTP WhatsApp
+
+```mermaid
+flowchart LR
+    A[Laravel Backend] -->|Send OTP Request| B[N8N Webhook]
+    B --> C[HTTP Request to WhatsApp API]
+    C -->|Send Message| D[User WhatsApp]
+```
+
+**Alur:**
+- Laravel mengirim request dengan nomor telepon dan kode OTP
+- N8N menerima via webhook
+- N8N mengirim pesan ke WhatsApp API (GOWA)
+- User menerima kode OTP di WhatsApp
+
+#### 2. Sistem AI Chatbot Tiket
+
+```mermaid
+flowchart TB
+    A[User WhatsApp Message] -->|Webhook| B[N8N]
+    B --> C[Set Global Variables]
+    C --> D[AI Agent - DeepSeek]
+    D --> E[Validate JSON Output]
+    E --> F{Intent Switch}
+    
+    F -->|CREATE_TICKET| G[Check Info Complete]
+    G -->|Complete| H[Create Ticket via API]
+    H --> I[Send Confirmation to User]
+    I --> J[Notify Admin via WhatsApp]
+    
+    F -->|CHECK_STATUS| K[Extract Ticket Code]
+    K --> L[Fetch from Laravel API]
+    L --> M[Send Status to User]
+    
+    F -->|GREETING/OTHER| N[Send AI Response]
+    
+    F -->|TALK_TO_HUMAN| O[Send Admin Contacts]
+```
+
+**AI Agent (TAI - Teknisi AI):**
+- Model: DeepSeek Chat
+- Memory: Buffer Window per session (berdasarkan nomor WA)
+- Intent Detection: CREATE_TICKET, CHECK_STATUS, PROVIDE_INFO, CONFIRM_TICKET, GREETING, DO_NOTHING, TALK_TO_HUMAN
+- Self-Help: Memberikan solusi awal sebelum membuat tiket
+
+---
+
+## 📂 Struktur Kode
+
+### Frontend Structure
+
+```
+frontend/src/
+├── App.js              # Root component dengan routing
+├── AuthContext.js      # Global auth state management
+├── App.css             # Global styles (300KB+)
+├── index.js            # Entry point
+│
+├── services/
+│   └── api.js          # Axios instance dengan interceptors
+│
+├── routes/
+│   ├── RequireAuth.jsx # Auth guard
+│   └── RequireRole.jsx # Role guard
+│
+├── pages/              # 16 halaman
+│   ├── AdminDashboard.jsx
+│   ├── UserDashboard.jsx
+│   ├── LoginPage.jsx
+│   ├── RegisterPage.jsx
+│   ├── ForgotPasswordPage.jsx
+│   ├── ResetPasswordPage.jsx
+│   ├── PublicTicketPage.jsx
+│   ├── FinancialReportPage.jsx
+│   ├── InventoryReportPage.jsx
+│   └── ...
+│
+└── components/         # 80+ komponen
+    ├── JobList.js
+    ├── UserManagement.js
+    ├── StokBarangView.js
+    ├── ItemDetailModal.js
+    ├── TicketDetailModal.js
+    ├── NotificationBell.js
+    ├── LineChartComponent.js
+    ├── MapComponent.js
+    └── ...
+```
+
+### Backend Structure
+
+```
+backend/ticketing-api/
+├── app/
+│   ├── Http/
+│   │   └── Controllers/
+│   │       ├── Api/                    # 15 API Controllers
+│   │       │   ├── TicketController.php
+│   │       │   ├── UserController.php
+│   │       │   ├── StokBarangController.php
+│   │       │   ├── MasterBarangController.php
+│   │       │   ├── InventoryReportController.php
+│   │       │   ├── FinancialReportController.php
+│   │       │   ├── PurchaseProposalController.php
+│   │       │   └── ...
+│   │       ├── AuthController.php
+│   │       ├── AnalyticsController.php
+│   │       └── DashboardController.php
+│   │
+│   ├── Models/                         # 15 Models
+│   │   ├── User.php
+│   │   ├── Ticket.php
+│   │   ├── MasterBarang.php
+│   │   ├── StokBarang.php
+│   │   └── ...
+│   │
+│   ├── Exports/                        # Export handlers
+│   └── Helpers/
+│       └── helpers.php
+│
+├── routes/
+│   └── api.php                         # 100+ API routes
+│
+└── database/
+    └── migrations/                     # 22 migrations
+```
+
+---
+
+## 🔗 API Endpoints
+
+### Authentication (8 endpoints)
+
+| Method | Endpoint | Deskripsi |
+|--------|----------|-----------|
+| POST | `/api/register` | Registrasi user baru |
+| POST | `/api/login` | Login dengan email/password |
+| GET | `/api/user` | Get current user data |
+| PUT | `/api/user` | Update user profile |
+| POST | `/api/logout` | Logout user |
+| POST | `/api/auth/refresh` | Refresh JWT token |
+| GET | `/api/auth/google/redirect` | Google OAuth redirect |
+| GET | `/api/auth/google/callback` | Google OAuth callback |
+
+### Tickets (15+ endpoints)
+
+| Method | Endpoint | Deskripsi |
+|--------|----------|-----------|
+| GET | `/api/tickets` | List tickets |
+| POST | `/api/tickets` | Create ticket |
+| DELETE | `/api/tickets/{id}` | Delete ticket |
+| PATCH | `/api/tickets/{id}/status` | Update status |
+| PATCH | `/api/tickets/{id}/assign` | Assign to admin |
+| PATCH | `/api/tickets/{id}/reject` | Reject ticket |
+| POST | `/api/tickets/{id}/submit-proof` | Submit proof |
+| GET | `/api/tickets/by-code/{code}` | Get by ticket code (public) |
+| GET | `/api/tickets/stats` | Get statistics |
+| GET | `/api/tickets/analytics` | Get analytics |
+| GET | `/api/tickets/export` | Export to Excel |
+
+### Inventory (25+ endpoints)
+
+| Method | Endpoint | Deskripsi |
+|--------|----------|-----------|
+| GET | `/api/inventory/categories` | List categories |
+| GET | `/api/inventory/sub-categories` | List sub-categories |
+| GET | `/api/inventory/items` | List master items |
+| GET | `/api/inventory/stock-items` | List individual stock |
+| POST | `/api/inventory/stock-items` | Add stock |
+| GET | `/api/inventory/stock-summary` | Stock summary |
+| POST | `/api/tickets/{id}/process-return` | Process item return |
+
+### Reports (10+ endpoints)
+
+| Method | Endpoint | Deskripsi |
+|--------|----------|-----------|
+| GET | `/api/financial-report/inventory` | Financial summary |
+| GET | `/api/financial-report/chart-data` | Chart data |
+| GET | `/api/reports/inventory/stats` | Inventory stats |
+| GET | `/api/reports/inventory/monthly-movement` | Monthly movement |
+| GET | `/api/reports/inventory/detailed` | Detailed report |
+
+---
+
+## 📱 Responsive Design
+
+### Breakpoints
+
+| Kategori | Lebar | Fitur |
+|----------|-------|-------|
+| Mobile | ≤ 480px | Hamburger menu, card-based tables |
+| Tablet | 481px - 1008px | Grid layout adaptif |
+| Desktop | ≥ 1009px | Sidebar navigation penuh |
+
+### Mobile Features
+
+- Touch-friendly buttons
+- Swipe gestures
+- Optimized form layouts
+- Mobile-first CSS approach
+
+---
+
+## 🎨 Desain UI/UX
+
+### Pendekatan Visual
+
+- **Theme System**: Dark/Light mode toggle
+- **Glassmorphism**: Efek transparan dan blur
+- **Gradient Colors**: Tombol dan teks gradient
+- **Micro-animations**: Transisi halus dengan Framer Motion
+- **Responsive**: Mobile-first design
+
+### Komponen Navigasi
+
+- **Admin**: Sidebar dengan 10+ menu/submenu
+- **User**: Tab-based (Request/History)
+- **Public**: Header navigation
+
+---
+
+## ⚡ Performance Optimizations
+
+| Optimization | Implementasi |
+|--------------|--------------|
+| Memoization | `React.memo`, `useCallback`, `useMemo` |
+| API Optimization | Debouncing, request deduplication |
+| Pagination | Server-side pagination untuk data besar |
+| Image Handling | Lazy loading, compression |
+| Token Refresh | Auto-refresh dengan queue mechanism |
+| Chart Virtualization | Render data yang terlihat saja |
+
+---
+
+## 📋 Kesimpulan
+
+Proyek Ticketing System ini adalah aplikasi **full-stack enterprise-grade** yang menggabungkan:
+
+1. **Modern React Frontend** dengan 80+ komponen reusable
+2. **Laravel Backend** dengan 15 API controllers dan 100+ endpoints
+3. **AI Integration** menggunakan DeepSeek untuk chatbot WhatsApp
+4. **Workflow Automation** dengan N8N
+5. **Comprehensive Reporting** untuk tiket dan inventaris
+6. **Multi-channel Communication** (Web + WhatsApp)
+
+Sistem ini cocok untuk organisasi yang membutuhkan:
+- IT Support ticketing system
+- Asset/inventory management
+- Financial reporting untuk aset
+- Multi-user access dengan role-based permissions
+- Mobile-friendly interface
+- Integration dengan WhatsApp untuk accessibility
