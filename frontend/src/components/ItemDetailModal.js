@@ -133,11 +133,14 @@ function ItemDetailModal({
     }, [currentItem]);
 
     const handleImageChange = async (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const originalFile = e.target.files[0];
+        const inputElement = e.target;
+
+        if (inputElement.files && inputElement.files[0]) {
+            const originalFile = inputElement.files[0];
 
             if (!originalFile.type.startsWith('image/')) {
                 showToast('Mohon upload file gambar.', 'error');
+                inputElement.value = "";
                 return;
             }
 
@@ -156,6 +159,8 @@ function ItemDetailModal({
                     originalFile,
                     options
                 );
+                if (preview) URL.revokeObjectURL(preview);
+
                 setImage(compressedFile);
                 setPreview(URL.createObjectURL(compressedFile));
             } catch (error) {
@@ -163,6 +168,7 @@ function ItemDetailModal({
                 showToast('Gagal memproses gambar.', 'error');
             } finally {
                 setIsCompressing(false);
+                inputElement.value = "";
             }
         }
     };
@@ -326,7 +332,7 @@ function ItemDetailModal({
                                     htmlFor="camera-input"
                                     className={`btn-upload-option btn-camera ${isCompressing ? 'disabled' : ''
                                         }`}
-                                   style={{width: '100%'}}
+                                    style={{ width: '100%' }}
                                 >
                                     <FaCamera />
                                     <span>Ambil Foto</span>
@@ -336,7 +342,7 @@ function ItemDetailModal({
                                     htmlFor="gallery-input"
                                     className={`btn-upload-option btn-gallery ${isCompressing ? 'disabled' : ''
                                         }`}
-                                    style={{width: '100%'}}
+                                    style={{ width: '100%' }}
                                 >
                                     <FaImage />
                                     <span>Galeri</span>
