@@ -489,12 +489,18 @@ class StokBarangController extends Controller
             ->whereIn('nama_status', ['Rusak', 'Hilang', 'Non-Aktif'])
             ->pluck('id');
 
+        $statusFilterForCount = $request->input('status_id');
+        $countByStatusId = $tersediaStatusId;
+        if ($statusFilterForCount && $statusFilterForCount !== 'ALL') {
+            $countByStatusId = $statusFilterForCount;
+        }
+
         $query = MasterBarang::with(['masterKategori', 'subKategori', 'createdBy'])
             ->active()
             ->has('stokBarangs')
             ->withCount([
-                'stokBarangs as available_stock_count' => function ($q) use ($request, $tersediaStatusId) {
-                    $q->where('status_id', $tersediaStatusId);
+                'stokBarangs as available_stock_count' => function ($q) use ($request, $countByStatusId) {
+                    $q->where('status_id', $countByStatusId);
                     if ($request->filled('id_warna')) {
                         $q->where('id_warna', $request->id_warna);
                     }

@@ -5,13 +5,9 @@ import { useModalBackHandler } from '../hooks/useModalBackHandler';
 function EditNamaBarangModal({ show, onClose, item, onSaveSuccess, showToast }) {
     const [namaBarang, setNamaBarang] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
     const [currentItem, setCurrentItem] = useState(item);
-
     const [isClosing, setIsClosing] = useState(false);
     const [shouldRender, setShouldRender] = useState(show);
-
-    // Handle browser back button
     const handleClose = useModalBackHandler(show, onClose, 'edit-nama');
 
     useEffect(() => {

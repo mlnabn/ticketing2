@@ -238,6 +238,18 @@ function StokBarangView() {
         }))
     ], [colorOptions]);
 
+    // Dynamic column header based on selected status filter
+    const dynamicStatusColumnLabel = useMemo(() => {
+        if (selectedStatus === 'ALL' || selectedStatus === '') {
+            return 'Unit Tersedia';
+        }
+        const status = statusOptions.find(s => s.id === parseInt(selectedStatus));
+        if (status) {
+            return `Unit ${status.nama_status}`;
+        }
+        return 'Unit Tersedia';
+    }, [selectedStatus, statusOptions]);
+
 
     const handleFilterChange = (name, selectedOption) => {
         const value = selectedOption ? selectedOption.value : '';
@@ -810,7 +822,7 @@ function StokBarangView() {
                                     <th style={columnStyles.col1}>Nama Barang</th>
                                     <th style={columnStyles.col1}>Kategori</th>
                                     <th style={columnStyles.col1}>Sub-Kategori</th>
-                                    <th style={columnStyles.col1}>Unit Tersedia</th>
+                                    <th style={columnStyles.col1}>{dynamicStatusColumnLabel}</th>
                                     <th style={columnStyles.col1}>Unit Aktif</th>
                                     <th style={columnStyles.col1}>Ditambahkan Oleh</th>
                                 </tr>
@@ -1025,7 +1037,7 @@ function StokBarangView() {
                                                 </div>
                                                 <div className="card-separator"></div> */}
                                                 <div className="card-item-row">
-                                                    <span className="label">Unit Tersedia</span>
+                                                    <span className="label">{dynamicStatusColumnLabel}</span>
                                                     <span className="value">{masterItem.available_stock_count}</span>
                                                 </div>
                                                 <div className="card-separator"></div>

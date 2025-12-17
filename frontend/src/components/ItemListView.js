@@ -381,7 +381,6 @@ function ItemListView({
                                                                                     key={detail.id_m_barang}
                                                                                     className={`sku-detail-row-div hoverable-row ${selectedIds.includes(detail.id_m_barang) ? 'selected-row' : ''}`}
                                                                                     onClick={(e) => {
-                                                                                        // Jangan buka modal kalau kliknya mengenai checkbox / tombol
                                                                                         if (
                                                                                             e.target.tagName === 'INPUT' ||
                                                                                             e.target.tagName === 'BUTTON' ||

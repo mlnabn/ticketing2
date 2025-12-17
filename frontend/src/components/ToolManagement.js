@@ -211,7 +211,6 @@ function ToolManagement() {
 
             if (response.status === 200 || response.status === 204) {
                 showToast(response.data?.message || "Barang berhasil diarsipkan.");
-                // Update local state first (optimistic)
                 setDetailItems(prev => {
                     const newDetails = { ...prev };
                     if (newDetails[itemToDelete.kode_barang]) {
@@ -221,7 +220,6 @@ function ToolManagement() {
                     }
                     return newDetails;
                 });
-                // Refresh items list while preserving expanded state
                 await fetchItems(1, currentFilters, () => true, true);
             } else {
                 showToast(response.data?.message || "Gagal mengarsipkan barang.", "error");
@@ -244,7 +242,6 @@ function ToolManagement() {
         try {
             const response = await api.post(`/inventory/items/${item.id_m_barang}/restore`);
             showToast(response.data?.message || "SKU berhasil dipulihkan.");
-            // Update local state first (optimistic)
             setDetailItems(prev => {
                 const newDetails = { ...prev };
                 if (newDetails[item.kode_barang]) {
@@ -254,7 +251,6 @@ function ToolManagement() {
                 }
                 return newDetails;
             });
-            // Refresh items list while preserving expanded state
             await fetchItems(1, currentFilters, () => true, true);
         } catch (error) {
             console.error("Gagal memulihkan barang:", error);
@@ -295,7 +291,6 @@ function ToolManagement() {
                 showToast(response.data.message, 'success');
                 setSelectedIds([]);
                 await fetchItems(1, currentFilters, () => true, true);
-                // Refresh all expanded detail items
                 Object.keys(expandedRows).forEach(kodeBarang => {
                     if (expandedRows[kodeBarang]) {
                         refreshDetailItems(kodeBarang);
@@ -319,7 +314,6 @@ function ToolManagement() {
                 showToast(response.data.message, 'success');
                 setSelectedIds([]);
                 await fetchItems(1, currentFilters, () => true, true);
-                // Refresh all expanded detail items
                 Object.keys(expandedRows).forEach(kodeBarang => {
                     if (expandedRows[kodeBarang]) {
                         refreshDetailItems(kodeBarang);
@@ -398,7 +392,6 @@ function ToolManagement() {
                 item={itemToEditName}
                 showToast={showToast}
                 onSaveSuccess={(updatedItem) => {
-                    // Refresh detail items for the specific kode_barang
                     if (updatedItem?.kode_barang && expandedRows[updatedItem.kode_barang]) {
                         refreshDetailItems(updatedItem.kode_barang);
                     } else {
