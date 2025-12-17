@@ -406,7 +406,7 @@ function AddStockModal({ show, isOpen, onClose, onSaveSuccess, showToast, itemTo
             setNewlyCreatedItems(response.data);
             setView('success');
             showToast('Stok baru berhasil ditambahkan.', 'success');
-            onSaveSuccess();
+            onSaveSuccess(formData.master_barang_id);
         } catch (error) {
             const errorData = error.response?.data;
             let errorMessage = 'Gagal menambah stok.';
