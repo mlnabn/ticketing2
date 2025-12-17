@@ -52,10 +52,13 @@ export default function NewAcquisitionsReport() {
             const newStartDateObj = new Date(value);
             const currentEndDateObj = currentEndDate ? new Date(currentEndDate) : null;
             if (currentEndDate === '' || !currentEndDateObj || currentEndDateObj < newStartDateObj) {
+                // Set end_date to today's date instead of copying start_date
+                const today = new Date();
+                const todayFormatted = today.toISOString().split('T')[0];
                 const end_date_event = {
                     target: {
                         name: 'end_date',
-                        value: value
+                        value: todayFormatted
                     }
                 };
                 handleFilterChange(end_date_event);
