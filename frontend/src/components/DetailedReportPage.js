@@ -168,7 +168,10 @@ export default function DetailedReportPage({ type, title }) {
                     const newStartDateObj = new Date(value);
                     const currentEndDateObj = currentEndDate ? new Date(currentEndDate) : null;
                     if (currentEndDate === '' || !currentEndDateObj || currentEndDateObj < newStartDateObj) {
-                        newFilters.end_date = value;
+                        // Set end_date to today's date instead of copying start_date
+                        const today = new Date();
+                        const todayFormatted = today.toISOString().split('T')[0];
+                        newFilters.end_date = todayFormatted;
                     }
                 }
             }
@@ -596,9 +599,13 @@ export default function DetailedReportPage({ type, title }) {
                                             {showWorkshop && <td style={columnStyles.col2}>{itemData.workshop || '-'}</td>}
                                             {showCurrentStatus && (
                                                 <td style={columnStyles.col2}>
-                                                    <span className={`status-badge status-${(itemData.current_status || '-').toLowerCase().replace(/\s+/g, '-')}`}>
-                                                        {itemData.current_status || '-'}
-                                                    </span>
+                                                    {(type === 'accountability' || type === 'available') ? (
+                                                        itemData.current_status || '-'
+                                                    ) : (
+                                                        <span className={`status-badge status-${(itemData.current_status || '-').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                            {itemData.current_status || '-'}
+                                                        </span>
+                                                    )}
                                                 </td>
                                             )}
                                             {showPJStatus && <td>{itemData.penanggung_jawab || '-'}</td>}
@@ -686,9 +693,13 @@ export default function DetailedReportPage({ type, title }) {
                                             <div className="data-group">
                                                 <span className="label">Status Saat Ini</span>
                                                 <span className="value">
-                                                    <span className={`status-badge status-${(itemData.current_status || '-').toLowerCase().replace(/\s+/g, '-')}`}>
-                                                        {itemData.current_status || '-'}
-                                                    </span>
+                                                    {(type === 'accountability' || type === 'available') ? (
+                                                        itemData.current_status || '-'
+                                                    ) : (
+                                                        <span className={`status-badge status-${(itemData.current_status || '-').toLowerCase().replace(/\s+/g, '-')}`}>
+                                                            {itemData.current_status || '-'}
+                                                        </span>
+                                                    )}
                                                 </span>
                                             </div>
                                         )}

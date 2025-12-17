@@ -301,7 +301,10 @@ function ItemHistoryLookupPage() {
                     const newStartDateObj = new Date(value);
                     const currentEndDateObj = currentEndDate ? new Date(currentEndDate) : null;
                     if (currentEndDate === '' || !currentEndDateObj || currentEndDateObj < newStartDateObj) {
-                        newFilters.end_date = value;
+                        // Set end_date to today's date instead of copying start_date
+                        const today = new Date();
+                        const todayFormatted = today.toISOString().split('T')[0];
+                        newFilters.end_date = todayFormatted;
                     }
                 }
             }
@@ -596,9 +599,7 @@ function ItemHistoryLookupPage() {
                                                     <td style={columnStyles.col1}>{item.kode_unik}</td>
                                                     <td style={columnStyles.col2}>{item.master_barang?.nama_barang || 'N/A'}</td>
                                                     <td className={selectedItem ? 'hide-on-narrow' : ''} style={columnStyles.col2}>
-                                                        <span className={`status-badge status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
-                                                            {item.status_detail?.nama_status || 'N/A'}
-                                                        </span>
+                                                        {item.status_detail?.nama_status || 'N/A'}
                                                     </td>
                                                     <td className={selectedItem ? 'hide-on-narrow' : ''} style={columnStyles.col2}>{formatDate(getRelevantDate(item))}</td>
                                                     <td className={selectedItem ? 'hide-on-narrow' : ''} style={columnStyles.col2}>{getResponsiblePerson(item)}</td>
@@ -656,9 +657,7 @@ function ItemHistoryLookupPage() {
                                                 <div className="data-group">
                                                     <span className="label">Status Saat Ini</span>
                                                     <span className="value">
-                                                        <span className={`status-badge status-${(item.status_detail?.nama_status || '').toLowerCase().replace(/\s+/g, '-')}`}>
-                                                            {item.status_detail?.nama_status || 'N/A'}
-                                                        </span>
+                                                        {item.status_detail?.nama_status || 'N/A'}
                                                     </span>
                                                 </div>
                                             </div>
