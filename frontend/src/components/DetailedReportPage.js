@@ -310,7 +310,7 @@ export default function DetailedReportPage({ type, title }) {
             const stokInfo = item.stok_barang || {};
             const masterInfo = stokInfo.master_barang || {};
             const historyDate = item.event_date || item.created_at;
-            const triggeredBy = item.triggered_by_user?.name || '-';
+            const responsibleUser = item.related_user?.name || item.triggered_by_user?.name || '-';
             const workshopName = item.workshop?.name || stokInfo.workshop?.name || '-';
             const historyStatus = item.status_detail?.nama_status || 'N/A';
             const currentStatus = stokInfo.status_detail?.nama_status || 'N/A';
@@ -323,7 +323,7 @@ export default function DetailedReportPage({ type, title }) {
                 status_dari: previousStatus,
                 status: historyStatus,
                 tanggal: historyDate,
-                penanggung_jawab: triggeredBy,
+                penanggung_jawab: responsibleUser,
                 workshop: workshopName,
                 current_status: currentStatus,
             };
