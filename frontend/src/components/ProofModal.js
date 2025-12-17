@@ -36,13 +36,17 @@ function ProofModal({ show, ticket, onSave, onClose }) {
   }, [show, ticket, shouldRender]);
 
   const handleImageChange = async (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const originalFile = e.target.files[0];
+    const eventTarget = e.target; 
+
+    if (eventTarget.files && eventTarget.files[0]) {
+      const originalFile = eventTarget.files[0];
 
       if (!originalFile.type.startsWith('image/')) {
         alert('Mohon upload file gambar.');
+        eventTarget.value = ''; 
         return;
       }
+
       setIsCompressing(true);
       const options = {
         maxSizeMB: 0.5,
@@ -51,17 +55,21 @@ function ProofModal({ show, ticket, onSave, onClose }) {
         initialQuality: 0.7,
         fileType: "image/jpeg"
       };
+      
       try {
         const compressedFile = await imageCompression(originalFile, options);
         console.log(`Original: ${(originalFile.size / 1024 / 1024).toFixed(2)} MB`);
         console.log(`Compressed: ${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`);
         setImage(compressedFile);
+        if (preview) URL.revokeObjectURL(preview);
+        
         setPreview(URL.createObjectURL(compressedFile));
       } catch (error) {
         console.error("Gagal melakukan kompresi gambar:", error);
         alert("Gagal memproses gambar, silakan coba lagi.");
       } finally {
         setIsCompressing(false);
+        eventTarget.value = ''; 
       }
     }
   };
