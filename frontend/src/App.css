@@ -10861,51 +10861,94 @@ body.dark-mode .stock-summary-section {
 }
 
 @media print {
-
   body>#root {
-    display: none;
+    display: none !important;
   }
 
+  /* Force print area to be visible and positioned correctly */
   #print-area {
-    display: block;
+    display: block !important;
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
   }
 
   .print-sheet {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    display: block !important;
+    /* Block layout for floats */
+    width: 100% !important;
+    height: auto !important;
     padding: 10mm;
+    box-sizing: border-box;
+    overflow: hidden;
+    /* Clearfix behavior */
   }
 
   .qr-print-item {
+    display: block !important;
+    float: left !important;
+    /* Float is very reliable for print */
+    width: 50% !important;
+    /* Exact 50% split */
+    border: 1px solid #ccc;
+    padding: 4px;
+    margin: 0;
+    /* No margin to ensure 50%+50%=100% fits perfectly */
+    box-sizing: border-box;
+    /* Include padding/border in width */
+    page-break-inside: avoid;
+    break-inside: avoid;
+    height: 75px;
+    /* Fixed height can promote stability */
+  }
+
+  /* Inner content layout */
+  .qr-print-item-inner {
     display: flex;
     align-items: center;
-    gap: 8px;
-    border: 1px solid #ccc;
-    padding: 5px;
-    border-radius: 4px;
-    width: calc(50% - 5px);
-    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    gap: 5px;
+  }
+
+  .qr-print-item svg {
+    width: 60px !important;
+    height: 60px !important;
+    flex-shrink: 0;
   }
 
   .qr-print-details {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    flex: 1;
+    overflow: hidden;
+    min-width: 0;
   }
 
   .item-name {
     font-weight: bold;
-    font-size: 10pt;
+    font-size: 9pt;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .item-code {
     font-size: 8pt;
     color: #555;
   }
+}
+
+.item-name-inv {
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ============================================= */
