@@ -76,7 +76,7 @@ function ItemHistoryLookupPage() {
         start_date: '',
         end_date: '',
         month: '',
-        year: new Date().getFullYear().toString()
+        year: ''
     });
     const [years, setYears] = useState([]);
 
@@ -164,9 +164,6 @@ function ItemHistoryLookupPage() {
             .then(res => {
                 if (res.data.availableYears && res.data.availableYears.length > 0) {
                     setYears(res.data.availableYears);
-                    if (!filters.year) {
-                        setFilters(prev => ({ ...prev, year: res.data.availableYears[0] }));
-                    }
                 } else {
                     const currentYear = new Date().getFullYear().toString();
                     setYears([currentYear]);
@@ -177,7 +174,7 @@ function ItemHistoryLookupPage() {
                 const currentYear = new Date().getFullYear().toString();
                 setYears([currentYear]);
             });
-    }, [filters.year, isPresent]);
+    }, [isPresent]);
 
     useEffect(() => {
         if (!isPresent) return;
