@@ -53,7 +53,7 @@ export default function DetailedReportPage({ type, title }) {
         start_date: '',
         end_date: '',
         month: '',
-        year: new Date().getFullYear().toString()
+        year: ''
     });
     const [years, setYears] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -66,7 +66,10 @@ export default function DetailedReportPage({ type, title }) {
     const desktopListRef = useRef(null);
     const mobileListRef = useRef(null);
 
-    const yearOptions = years.map(y => ({ value: y.toString(), label: y.toString() }));
+    const yearOptions = [
+        { value: '', label: 'Semua Tahun' },
+        ...years.map(y => ({ value: y.toString(), label: y.toString() }))
+    ];
 
 
     const getApiParams = useCallback((page = 1) => {
@@ -132,9 +135,6 @@ export default function DetailedReportPage({ type, title }) {
             .then(res => {
                 if (res.data.availableYears && res.data.availableYears.length > 0) {
                     setYears(res.data.availableYears);
-                    if (!filters.year) { //
-                        setFilters(prev => ({ ...prev, year: res.data.availableYears[0] }));
-                    }
                 } else {
                     const currentYear = new Date().getFullYear().toString();
                     setYears([currentYear]);
@@ -145,7 +145,7 @@ export default function DetailedReportPage({ type, title }) {
                 const currentYear = new Date().getFullYear().toString();
                 setYears([currentYear]);
             });
-    }, [filters.year, isPresent]);
+    }, [isPresent]);
 
     useEffect(() => {
         if (!isPresent) return;

@@ -54,7 +54,7 @@ export default function ActiveLoanReportPage() {
         start_date: '',
         end_date: '',
         month: '',
-        year: new Date().getFullYear().toString()
+        year: ''
     });
     const [years, setYears] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -277,10 +277,9 @@ export default function ActiveLoanReportPage() {
         api.get('/reports/inventory/dashboard')
             .then(res => {
                 const availableYears = res.data.availableYears || [];
-                setYears(availableYears);
-                if (availableYears.length > 0 && !filters.year) {
-                    setFilters(prev => ({ ...prev, year: availableYears[0] }));
-                } else if (availableYears.length === 0) {
+                if (availableYears.length > 0) {
+                    setYears(availableYears);
+                } else {
                     const currentYear = new Date().getFullYear().toString();
                     setYears([currentYear]);
                 }
@@ -290,7 +289,7 @@ export default function ActiveLoanReportPage() {
                 const currentYear = new Date().getFullYear().toString();
                 setYears([currentYear]);
             });
-    }, [filters.year, isPresent]);
+    }, [isPresent]);
 
     // Efek untuk memuat data laporan
     useEffect(() => {
